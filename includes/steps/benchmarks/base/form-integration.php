@@ -36,23 +36,23 @@ abstract class Form_Integration extends Benchmark {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'Run when this form is submitted...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Run when this form is submitted...', 'groundhogg' ) );
 
-		echo html()->select2( [
+		html( html()->select2( [
 			'id'       => $this->setting_id_prefix( 'form_id' ),
 			'name'     => $this->setting_name_prefix( 'form_id' ),
 			'data'     => $this->get_forms_for_select_2(),
 			'selected' => $this->get_setting( 'form_id' ),
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], __( 'Then map the form fields to contact fields...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Then map the form fields to contact fields...', 'groundhogg' ) );
 
-		echo html()->wrap( $this->field_map_table( $this->get_setting( 'form_id' ) ), 'div', [
+		html( 'div', [
 			'class' => 'field-map-wrapper',
 			'id'    => $this->setting_id_prefix( 'field_map' )
-		] );
+		], $this->field_map_table( $this->get_setting( 'form_id' ) ) );
 
-		echo '<p></p>';
+		html( 'p' );
 	}
 
 	/**
@@ -92,7 +92,7 @@ abstract class Form_Integration extends Benchmark {
 		$fields    = $this->get_form_fields( $form_id );
 
 		if ( ! $fields ) {
-			return __( 'Please select a valid form and update first.', 'groundhogg' );
+			return esc_html__( 'Please select a valid form and update first.', 'groundhogg' );
 		}
 
 		$rows = [];
@@ -127,9 +127,9 @@ abstract class Form_Integration extends Benchmark {
 				'class' => 'field-map'
 			],
 			[
-				__( 'Field ID', 'groundhogg' ),
-				__( 'Field Label', 'groundhogg' ),
-				__( 'Map To', 'groundhogg' ),
+				esc_html__( 'Field ID', 'groundhogg' ),
+				esc_html__( 'Field Label', 'groundhogg' ),
+				esc_html__( 'Map To', 'groundhogg' ),
 			],
 			$rows, false
 		);

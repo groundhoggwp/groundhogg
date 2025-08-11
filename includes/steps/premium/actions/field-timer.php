@@ -34,7 +34,7 @@ class Field_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Field Timer', 'step_name', 'groundhogg-pro' );
+		return _x( 'Field Timer', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -52,7 +52,7 @@ class Field_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Pause for a specified amount of time before/after a date in the the contact\'s custom fields.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Pause for a specified amount of time before/after a date in the the contact\'s custom fields.', 'step_description', 'groundhogg' );
 	}
 
 	/**

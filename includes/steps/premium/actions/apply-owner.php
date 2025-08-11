@@ -26,7 +26,7 @@ class Apply_Owner extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Assign Owner', 'step_name', 'groundhogg-pro' );
+		return _x( 'Assign Owner', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -48,7 +48,7 @@ class Apply_Owner extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Assign the specified user(s) as the owner of the contact.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Assign the specified user(s) as the owner of the contact.', 'step_description', 'groundhogg' );
 	}
 
 	/**

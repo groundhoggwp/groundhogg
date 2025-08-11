@@ -388,6 +388,11 @@ function is_option_enabled( $option = '' ) {
  * Shorthand;
  * When using as the wrapper for HTML::e() echo defaults to true
  *
+ * @param  null|string|array  $tag  null if returning HTML class, string if shorthand for tag or HTML content, array for frag as well
+ * @param  array  $atts  array of tag attributes
+ * @param  string  $content  content if tag is not self-closing
+ * @param  bool  $echo  whether to directly echo the content
+ *
  * @return HTML|string|void
  */
 function html( $tag = null, $atts = [], $content = '', $echo = true ) {
@@ -396,8 +401,21 @@ function html( $tag = null, $atts = [], $content = '', $echo = true ) {
 	    return Plugin::instance()->utils->html;
     }
 
+    // frag shorthand
+    if ( is_array( $tag ) ){
+	    return html()->frag( $tag, $echo );
+    }
+
     // will echo automatically
     if ( is_string( $tag ) ){
+
+	    $tag = trim( $tag );
+
+	    // frag shorthand, assume tag
+	    if ( str_starts_with( $tag, '<' ) ) {
+		    return html()->frag( $tag, $echo );
+	    }
+
 	    return html()->e( $tag, $atts, $content, null, $echo );
     }
 }

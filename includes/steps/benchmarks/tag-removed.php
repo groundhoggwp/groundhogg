@@ -75,7 +75,7 @@ class Tag_Removed extends Tag_Applied {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'Run when the following tags are removed from the contact...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Run when the following tags are removed from the contact...', 'groundhogg' ) );
 
 		$this->tag_settings();
 	}
@@ -88,15 +88,18 @@ class Tag_Removed extends Tag_Applied {
 		if ( empty( $tags ) ) {
 			$name = __( 'A tag is removed', 'groundhogg' );
 		} else if ( count( $tags ) === 1 ) {
-			$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
+			/* translators: %s: tag name */
+			$name = sprintf( esc_html__( '%s is removed', 'groundhogg' ), orList( $tags ) );
 		} else if ( count( $tags ) >= 4 ) {
 			switch ( $condition ) {
 				default:
 				case 'any':
-					$name = sprintf( __( 'Any of %s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+					/* translators: %s: number of tags */
+					$name = sprintf( esc_html__( 'Any of %s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
 					break;
 				case 'all':
-					$name = sprintf( __( '%s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+					/* translators: %s: number of tags */
+					$name = sprintf( esc_html__( '%s tags are removed', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
 					break;
 			}
 		} else {
@@ -104,10 +107,12 @@ class Tag_Removed extends Tag_Applied {
 			switch ( $condition ) {
 				default:
 				case 'any':
-					$name = sprintf( __( '%s is removed', 'groundhogg' ), orList( $tags ) );
+					/* translators: %s: list of tags */
+					$name = sprintf( esc_html__( '%s is removed', 'groundhogg' ), orList( $tags ) );
 					break;
 				case 'all':
-					$name = sprintf( __( '%s are removed', 'groundhogg' ), andList( $tags ) );
+					/* translators: %s: list of tags */
+					$name = sprintf( esc_html__( '%s are removed', 'groundhogg' ), andList( $tags ) );
 					break;
 			}
 		}

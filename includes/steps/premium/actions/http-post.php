@@ -26,7 +26,7 @@ class HTTP_Post extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Webhook', 'step_name', 'groundhogg-pro' );
+		return _x( 'Webhook', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -48,7 +48,7 @@ class HTTP_Post extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Send an HTTP Post to your favorite external software.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Send an HTTP Post to your favorite external software.', 'step_description', 'groundhogg' );
 	}
 
 	/**

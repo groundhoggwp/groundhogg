@@ -19,7 +19,7 @@ class Login_Status extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Logs In', 'step_name', 'groundhogg-pro' );
+		return _x( 'Logs In', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Login_Status extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Runs whenever a user logs in.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Runs whenever a user logs in.', 'step_description', 'groundhogg' );
 	}
 
 	/**

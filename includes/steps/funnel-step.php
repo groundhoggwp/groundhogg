@@ -213,14 +213,14 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		// Step is still using the legacy enqueue method
 		if ( method_exists( $this, 'enqueue' ) ) {
-			_deprecated_function( get_called_class() . '::enqueue', '3.4', __CLASS__ . '::calc_run_time' );
+			_deprecated_function( esc_html( get_called_class() ) . '::enqueue', '3.4', __CLASS__ . '::calc_run_time' );
 
 			return $this->enqueue( $step );
 		}
 
 		// Step is still using the legacy get_delay_time method
 		if ( method_exists( $this, 'get_delay_time' ) ) {
-			_deprecated_function( get_called_class() . '::get_delay_time', '3.4', __CLASS__ . '::calc_run_time' );
+			_deprecated_function( esc_html( get_called_class() ) . '::get_delay_time', '3.4', __CLASS__ . '::calc_run_time' );
 
 			return $baseTimestamp + $this->get_delay_time( $step );
 		}
@@ -541,11 +541,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			'class'   => 'add-action',
 		] );
 
-		echo html()->button( [
+		html( html()->button( [
 			'class' => 'add-step ' . $atts['class'],
 			'id'    => $atts['id'],
 			'text'  => dashicon( 'plus-alt2' ) . html()->e( 'div', [ 'class' => 'gh-tooltip top' ], $atts['tooltip'] ),
-		] );
+		] ) );
 	}
 
 	protected function __sortable_item( Step $step ) {
@@ -589,18 +589,18 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		?>
         <div
-                id="step-<?php echo $step->get_id(); ?>"
-                data-id="<?php echo $step->get_id(); ?>"
+                id="step-<?php echo esc_attr( $step->get_id() ); ?>"
+                data-id="<?php echo esc_attr( $step->get_id() ); ?>"
                 data-type="<?php echo esc_attr( $step->get_type() ); ?>"
                 data-group="<?php echo esc_attr( $step->get_group() ); ?>"
                 data-level="<?php echo esc_attr( $step->get_level() ); ?>"
-                class="step <?php echo implode( ' ', $classes ) ?>" tabindex="0">
-            <input type="hidden" name="step_ids[]" value="<?php echo $step->get_id(); ?>">
-            <input type="hidden" id="<?php echo $this->setting_id_prefix( 'branch' ) ?>" name="<?php echo $this->setting_name_prefix( 'branch' ) ?>" value="<?php echo esc_attr( $step->branch ); ?>">
+                class="step <?php echo esc_attr( implode( ' ', $classes ) ) ?>" tabindex="0">
+            <input type="hidden" name="step_ids[]" value="<?php echo esc_attr( $step->get_id() ); ?>">
+            <input type="hidden" id="<?php echo esc_attr( $this->setting_id_prefix( 'branch' ) ) ?>" name="<?php echo esc_attr( $this->setting_name_prefix( 'branch' ) ) ?>" value="<?php echo esc_attr( $step->branch ); ?>">
             <div class="step-labels display-flex gap-10">
 				<?php if ( WP_DEBUG ): ?>
-                    <div class="step-label">ID: <?php echo $step->ID; ?></div>
-                    <div class="step-label">Pos: <?php echo $step->get_order(); ?>,<?php echo $step->get_level(); ?></div>
+                    <div class="step-label">ID: <?php echo esc_html( $step->ID ); ?></div>
+                    <div class="step-label">Pos: <?php echo esc_html( $step->get_order() ); ?>,<?php echo esc_html( $step->get_level() ); ?></div>
 				<?php endif; ?>
 				<?php $this->labels(); ?>
 				<?php if ( $step->is_entry() ): ?>
@@ -642,20 +642,20 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			<?php endif; ?>
             <div class="hndle">
 				<?php if ( $this->icon_is_svg() ) {
-					echo html()->e( 'div', [
+					html( 'div', [
 						'class' => 'hndle-icon'
 					], $this->get_icon_svg() );
 				} else {
 					?><img class="hndle-icon"
-                           src="<?php echo $this->get_icon() ? $this->get_icon() : $this->get_default_icon(); ?>"><?php
+                           src="<?php echo esc_attr( $this->get_icon() ? $this->get_icon() : $this->get_default_icon() ); ?>"><?php
 				} ?>
                 <div>
 					<?php
-					echo html()->e( 'span', [
+					html( 'span', [
 						'class' => 'step-title',
 					], $this->get_title( $step ) );
 
-					echo html()->e( 'span', [
+					html( 'span', [
 						'class' => 'step-name',
 					], $this->get_name() );
 					?>
@@ -696,7 +696,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		];
 
 		?>
-        <div class="<?php echo implode( ' ', $sortable_classes ); ?>"><?php
+        <div class="<?php echo esc_attr( implode( ' ', $sortable_classes ) ); ?>"><?php
 
 		if ( $step->get_funnel()->is_editing() ) {
 			$this->add_step_button( 'before-' . $step->ID );
@@ -747,14 +747,14 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			<?php foreach ( $step->get_errors() as $error ): ?>
                 <div id="<?php $error->get_error_code() ?>"
                      class="notice notice-warning is-dismissible">
-					<?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
+	                <?php echo wp_kses_post( wpautop( $error->get_error_message() ) ); ?>
                 </div>
 			<?php endforeach; ?>
 			<?php foreach ( $this->get_errors() as $error ): ?>
 
                 <div id="<?php $error->get_error_code() ?>"
                      class="notice notice-warning is-dismissible">
-					<?php echo wpautop( wp_kses_post( $error->get_error_message() ) ); ?>
+	                <?php echo wp_kses_post( wpautop( $error->get_error_message() ) ); ?>
                 </div>
 			<?php endforeach; ?>
         </div>
@@ -782,9 +782,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		}
 
 		?>
-        <div data-id="<?php echo $step->get_id(); ?>" data-type="<?php echo esc_attr( $this->get_type() ); ?>"
-             id="settings-<?php echo $step->get_id(); ?>"
-             class="step <?php echo implode( ' ', $classes ) ?>">
+        <div data-id="<?php echo esc_attr( $step->get_id() ); ?>" data-type="<?php echo esc_attr( $this->get_type() ); ?>"
+             id="settings-<?php echo esc_attr( $step->get_id() ); ?>"
+             class="step <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
             <div class="step-locked"><?php dashicon_e( 'lock' ); ?></div>
 
             <!-- WARNINGS -->
@@ -792,23 +792,21 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
             <!-- SETTINGS -->
             <div class="step-flex">
                 <div class="step-edit panels <?php echo $this->settings_should_ignore_morph() ? 'ignore-morph' : '' ?>">
-
 					<?php $this->before_settings( $step ); ?>
-
                     <div class="gh-panel main-step-settings-panel">
                         <div class="gh-panel-header">
-                            <h2><?php printf( '%s Settings', $this->get_name() ) ?></h2>
+                            <h2><?php printf( '%s Settings', esc_html( $this->get_name() ) ) ?></h2>
                         </div>
                         <div class="custom-settings"><?php
 
 							// instead of having it as part of the step container, just show it as an input field...
 							if ( force_custom_step_names() || $this->generate_step_title( $step ) === false ) {
 								// todo internal name settings
-								echo html()->e( 'p', [], 'Give this step an internal name...' );
-								echo html()->input( [
+								html( 'p', [], 'Give this step an internal name...' );
+								html( html()->input( [
 									'name'  => $this->setting_name_prefix( 'step_title' ),
 									'value' => $step->step_title
-								] );
+								] ) );
 							}
 
 							$this->settings( $step )
@@ -834,41 +832,43 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
                             <div class="inside display-flex gap-20 column">
 								<?php if ( ! $step->is_starting() ):
 
-									echo html()->toggleYesNo( [
-										'label'   => 'Allow contacts to enter the flow at this step?',
-										'name'    => $this->setting_name_prefix( 'is_entry' ),
-										'id'      => $this->setting_id_prefix( 'is_entry' ),
-										'checked' => $step->is_entry()
-									] );
-
-									echo html()->toggleYesNo( [
-										'label'   => 'Allow contacts to pass through this trigger',
-										'name'    => $this->setting_name_prefix( 'can_passthru' ),
-										'id'      => $this->setting_id_prefix( 'can_passthru' ),
-										'checked' => $step->can_passthru()
+									html( [
+										html()->toggleYesNo( [
+											'label'   => 'Allow contacts to enter the flow at this step?',
+											'name'    => $this->setting_name_prefix( 'is_entry' ),
+											'id'      => $this->setting_id_prefix( 'is_entry' ),
+											'checked' => $step->is_entry()
+										] ),
+										html()->toggleYesNo( [
+											'label'   => 'Allow contacts to pass through this trigger',
+											'name'    => $this->setting_name_prefix( 'can_passthru' ),
+											'id'      => $this->setting_id_prefix( 'can_passthru' ),
+											'checked' => $step->can_passthru()
+										] )
 									] );
 
 								endif;
 
-								echo html()->toggle( [
+								html( html()->toggle( [
 									'label'   => 'Track conversion when triggered',
 									'name'    => $this->setting_name_prefix( 'is_conversion' ),
 									'id'      => $this->setting_id_prefix( 'is_conversion' ),
 									'checked' => $step->is_conversion()
-								] );
+								] ) );
 
 								?>
                             </div>
                         </div>
-					<?php endif; ?>
-					<?php
-					echo html()->textarea( [
+					<?php endif;
+
+					html( html()->textarea( [
 						'id'          => $this->setting_id_prefix( 'step-notes' ),
 						'name'        => 'step_notes',
 						'value'       => $step->get_step_notes(),
 						'placeholder' => __( 'You can use this area to store custom notes about the step.', 'groundhogg' ),
 						'class'       => 'step-notes-textarea'
-					] );
+					] ) );
+
 					?>
                 </div>
             </div>

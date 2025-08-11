@@ -58,9 +58,9 @@ abstract class LMS_Enroll extends Action {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e('p', [], 'Select an action to take...' );
+		html('p', [], 'Select an action to take...' );
 
-		echo html()->dropdown( [
+		html()->frag( html()->dropdown( [
 			'name'        => $this->setting_name_prefix( 'action' ),
 			'id'          => $this->setting_id_prefix( 'action' ),
 			'options'     => [
@@ -70,18 +70,18 @@ abstract class LMS_Enroll extends Action {
 			'selected'    => $this->get_setting( 'action' ),
 			'multiple'    => false,
 			'option_none' => false,
-		] );
+		] ), true );
 
 		$course_id = absint( $this->get_setting( 'course' ) );
 
-		echo html()->e('p', [], 'In which course?' );
+		html('p', [], 'In which course?' );
 
-		echo html()->select2( [
+		html()->frag( html()->select2( [
 			'id'       => $this->setting_id_prefix( 'course' ),
 			'name'     => $this->setting_name_prefix( 'course' ),
 			'data'     => $this->get_courses_for_select(),
 			'selected' => [ $course_id ],
-		] );
+		] ), true );
 
 		?><p></p><?php
 	}

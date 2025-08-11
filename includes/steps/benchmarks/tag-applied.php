@@ -80,7 +80,7 @@ class Tag_Applied extends Benchmark {
 	}
 
 	public function tag_settings() {
-		echo html()->e( 'div', [
+		html( 'div', [
 			'class' => 'display-flex gap-10 align-top'
 		], [
 			html()->dropdown( [
@@ -99,7 +99,7 @@ class Tag_Applied extends Benchmark {
 			] )
 		] );
 
-		echo html()->e( 'p' );
+		html( 'p' );
 	}
 
 	/**
@@ -107,7 +107,7 @@ class Tag_Applied extends Benchmark {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'Run when the following tags are applied to the contact...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Run when the following tags are applied to the contact...', 'groundhogg' ) );
 
 		$this->tag_settings();
 	}
@@ -144,15 +144,18 @@ class Tag_Applied extends Benchmark {
 		if ( empty( $tags ) ) {
 			$name = __( 'A tag is applied', 'groundhogg' );
 		} else if ( count( $tags ) === 1 ) {
-			$name = sprintf( __( '%s is applied', 'groundhogg' ), orList( $tags ) );
+			/* translators: %s: name of a tag */
+			$name = sprintf( esc_html__( '%s is applied', 'groundhogg' ), orList( $tags ) );
 		} else if ( count( $tags ) >= 4 ) {
 			switch ( $condition ) {
 				default:
 				case 'any':
-					$name = sprintf( __( 'Any of %s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+					/* translators: %s: number of tags being applied  */
+					$name = sprintf( esc_html__( 'Any of %s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
 					break;
 				case 'all':
-					$name = sprintf( __( '%s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
+					/* translators: %s: number of tags being applied  */
+					$name = sprintf( esc_html__( '%s tags are applied', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
 					break;
 			}
 		} else {
@@ -160,10 +163,12 @@ class Tag_Applied extends Benchmark {
 			switch ( $condition ) {
 				default:
 				case 'any':
-					$name = sprintf( __( '%s is applied', 'groundhogg' ), orList( $tags ) );
+					/* translators: %s: list of tags  */
+					$name = sprintf( esc_html__( '%s is applied', 'groundhogg' ), orList( $tags ) );
 					break;
 				case 'all':
-					$name = sprintf( __( '%s are applied', 'groundhogg' ), andList( $tags ) );
+					/* translators: %s: list of tags  */
+					$name = sprintf( esc_html__( '%s are applied', 'groundhogg' ), andList( $tags ) );
 					break;
 			}
 		}

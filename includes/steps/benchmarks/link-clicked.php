@@ -68,18 +68,18 @@ class Link_Clicked extends Benchmark {
 
 		$redirect_url = $step->get_meta( 'redirect_to' );
 
-		echo html()->e( 'p', [], __( 'Copy this link to use in emails or on your website...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Copy this link to use in emails or on your website...', 'groundhogg' ) );
 
-		echo html()->input( [
+		html( html()->input( [
 			'class'    => 'regular-text code',
 			'value'    => sprintf( managed_page_url( "click/%s/" ), $step->get_slug() ),
 			'onfocus'  => "this.select()",
 			'readonly' => true,
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], __( 'When the link is clicked, redirect to...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'When the link is clicked, redirect to...', 'groundhogg' ) );
 
-		echo html()->e( 'div', [
+		html( 'div', [
 			'class' => 'gh-input-group'
 		], [
 			html()->link_picker( [
@@ -94,7 +94,7 @@ class Link_Clicked extends Benchmark {
 			], dashicon( 'external' ) )
 		] );
 
-		?><p></p><?php
+        html( 'p' );
 	}
 
 	/**

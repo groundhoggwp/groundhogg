@@ -12,7 +12,7 @@ class Webhook_Listener extends Benchmark {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return __( 'Webhook Listener', 'groundhogg-pro' );
+		return __( 'Webhook Listener', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -24,7 +24,7 @@ class Webhook_Listener extends Benchmark {
 	}
 
 	public function get_description() {
-		return __( 'Listen for requests from external webhooks.', 'groundhogg-pro' );
+		return __( 'Listen for requests from external webhooks.', 'groundhogg' );
 	}
 
 	public function get_icon() {

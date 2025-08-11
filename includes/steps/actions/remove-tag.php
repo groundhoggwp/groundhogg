@@ -77,14 +77,13 @@ class Remove_Tag extends Apply_Tag {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'Remove all of the following tags...', 'groundhogg' ) );
+		html( 'p', [], __( 'Remove all of the following tags...', 'groundhogg' ) );
 
-
-		echo html()->dropdown( [
+		html( html()->dropdown( [
 			'id' => $this->setting_id_prefix( 'tags' )
-		] );
+		] ) );
 
-		echo html()->e( 'p' );
+		html( 'p' );
 	}
 
 
@@ -95,8 +94,10 @@ class Remove_Tag extends Apply_Tag {
 		if ( empty( $tags ) ) {
 			$name = __( 'Remove tags', 'groundhogg' );
 		} else if ( count( $tags ) >= 4 ) {
+			/* translators: %s: the number of tags to remove */
 			$name = sprintf( __( 'Remove %s tags', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
 		} else {
+			/* translators: %s: the list of tags to remove, like "Customer and user" */
 			$name = sprintf( __( 'Remove %s', 'groundhogg' ), andList( $tags ) );
 		}
 

@@ -19,7 +19,7 @@ class New_Activity extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'New Custom Activity', 'step_name', 'groundhogg-pro' );
+		return _x( 'New Custom Activity', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -46,7 +46,7 @@ class New_Activity extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Track a new custom activity.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Track a new custom activity.', 'step_description', 'groundhogg' );
 	}
 
 	/**

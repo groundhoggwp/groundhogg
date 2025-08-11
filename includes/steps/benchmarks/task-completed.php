@@ -136,9 +136,9 @@ class Task_Completed extends Benchmark {
 			$options[ $available_step->get_id() ] = sprintf( "%d. %s", $available_step->get_order(), $available_step->get_meta( 'summary' ) );
 		}
 
-		echo html()->e( 'p', [], __( 'Run when these preceding tasks are completed...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Run when these preceding tasks are completed...', 'groundhogg' ) );
 
-		echo html()->e( 'div', [
+		html( 'div', [
 			'class' => 'display-flex gap-5'
 		], [
 			html()->dropdown( [
@@ -161,8 +161,7 @@ class Task_Completed extends Benchmark {
 			] )
 		] );
 
-		?><p></p><?php
-
+		html( 'p' );
 	}
 
 	/**

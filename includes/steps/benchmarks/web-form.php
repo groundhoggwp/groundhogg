@@ -86,7 +86,7 @@ class Web_Form extends Benchmark {
 	}
 
 	protected function after_settings( Step $step ) {
-		echo html()->input( [
+		html( html()->input( [
 			'id'          => $this->setting_id_prefix( 'form_name' ),
 			'name'        => $this->setting_name_prefix( 'form_name' ),
 			'value'       => $this->get_setting( 'form_name', $step->step_title ),
@@ -95,9 +95,9 @@ class Web_Form extends Benchmark {
 				'font-size' => '18px'
 			],
 			'placeholder' => 'Form name...'
-		] );
+		] ) );
 
-		echo html()->e( 'div', [
+		html( 'div', [
 			'id' => "step_{$step->ID}_web_form_builder"
 		], 'Form Builder' );
 	}
@@ -110,25 +110,25 @@ class Web_Form extends Benchmark {
 		?>
         <div class="gh-panel">
             <div class="gh-panel-header">
-                <h2><?php esc_html_e( 'Embed options' ); ?></h2>
+                <h2><?php esc_html_e( 'Embed options', 'groundhogg' ); ?></h2>
             </div>
             <div class="inside">
                 <div class="display-flex column gap-10">
-                    <label><?php printf( '%s:', __( 'Shortcode', 'groundhogg' ) ); ?></label>
+                    <label><?php printf( '%s:', esc_html__( 'Shortcode', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="full-width code copy-text"
                             value="<?php echo esc_attr( $form->get_shortcode() ); ?>"
                             readonly>
-                    <label><?php printf( '%s:', __( 'Iframe', 'groundhogg' ) ); ?></label>
+                    <label><?php printf( '%s:', esc_html__( 'Iframe', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
                             class="full-width code copy-text"
                             value="<?php echo esc_attr( $form->get_iframe_embed_code() ); ?>"
                             readonly>
-                    <label><?php printf( '%s:', __( 'Hosted', 'groundhogg' ) ); ?></label>
+                    <label><?php printf( '%s:', esc_html__( 'Hosted', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
@@ -137,10 +137,10 @@ class Web_Form extends Benchmark {
                             readonly>
                 </div>
                 <p>
-					<?php echo Plugin::$instance->utils->html->modal_link( array(
-						'title'              => __( 'Preview', 'groundhogg' ),
-						'text'               => __( 'Preview', 'groundhogg' ),
-						'footer_button_text' => __( 'Close', 'groundhogg' ),
+					<?php html( html()->modal_link( array(
+						'title'              => esc_html__( 'Preview', 'groundhogg' ),
+						'text'               => esc_html__( 'Preview', 'groundhogg' ),
+						'footer_button_text' => esc_html__( 'Close', 'groundhogg' ),
 						'id'                 => '',
 						'class'              => 'gh-button secondary',
 						'source'             => $form_url,
@@ -148,7 +148,7 @@ class Web_Form extends Benchmark {
 						'width'              => 600,
 						'footer'             => 'false',
 						'preventSave'        => 'true',
-					) );
+					) ) );
 					?>
                 </p>
             </div>
@@ -305,7 +305,8 @@ class Web_Form extends Benchmark {
 	}
 
 	public function generate_step_title( $step ) {
-		return sprintf( __( 'Submits %s', 'groundhogg' ), bold_it( $this->get_setting( 'form_name' ) ) );
+        /* translators: %s: the form name */
+		return sprintf( esc_html__( 'Submits %s', 'groundhogg' ), bold_it( $this->get_setting( 'form_name' ) ) );
 	}
 
 	protected function get_the_contact() {

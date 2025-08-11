@@ -26,7 +26,7 @@ class Edit_Meta extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Edit Custom Fields', 'step_name', 'groundhogg-pro' );
+		return _x( 'Edit Custom Fields', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -48,7 +48,7 @@ class Edit_Meta extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Directly edit the custom fields of the contact.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Directly edit the custom fields of the contact.', 'step_description', 'groundhogg' );
 	}
 
 	/**

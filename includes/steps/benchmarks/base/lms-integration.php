@@ -9,6 +9,7 @@ use function Groundhogg\array_bold;
 use function Groundhogg\bold_it;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\html;
+use function Groundhogg\kses;
 use function Groundhogg\orList;
 
 abstract class LMS_Integration extends Benchmark {
@@ -141,43 +142,43 @@ abstract class LMS_Integration extends Benchmark {
 		$course_ids = wp_parse_id_list( $this->get_setting( 'course' ) );
 		$lesson_ids = wp_parse_id_list( $this->get_setting( 'lesson' ) );
 
-		echo html()->e( 'p', [], __( 'When a contact...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'When a contact...', 'groundhogg' ) );
 
-		echo html()->select2( [
+		html( html()->select2( [
 			'id'       => $this->setting_id_prefix( 'action' ),
 			'name'     => $this->setting_name_prefix( 'action' ) . '[]',
 			'options'  => [
-				'course_enrolled'  => __( 'Enrolls in a course', 'groundhogg' ),
-				'course_completed' => __( 'Completes a course', 'groundhogg' ),
-				'lesson_completed' => __( 'Completes a lesson', 'groundhogg' ),
+				'course_enrolled'  => esc_html__( 'Enrolls in a course', 'groundhogg' ),
+				'course_completed' => esc_html__( 'Completes a course', 'groundhogg' ),
+				'lesson_completed' => esc_html__( 'Completes a lesson', 'groundhogg' ),
 			],
 			'selected' => $actions,
 			'multiple' => true,
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], __( 'For any of the following courses...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'For any of the following courses...', 'groundhogg' ) );
 
-		echo html()->select2( [
+		html( html()->select2( [
 			'id'          => $this->setting_id_prefix( 'course' ),
 			'name'        => $this->setting_name_prefix( 'course' ) . '[]',
 			'data'        => $this->get_courses_for_select(),
 			'selected'    => $course_ids,
 			'multiple'    => true,
 			'placeholder' => 'Any course'
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], __( 'And for any of the following lessons... <i>Only relevant for lesson events.</i>', 'groundhogg' ) );
+		html( 'p', [], kses( __( 'And for any of the following lessons... <i>Only relevant for lesson events.</i>', 'groundhogg' ), [ 'i' => [] ] ) );
 
-		echo html()->select2( [
+		html( html()->select2( [
 			'id'          => $this->setting_id_prefix( 'lesson' ),
 			'name'        => $this->setting_name_prefix( 'lesson' ) . '[]',
 			'data'        => $this->get_lessons_for_select( $course_ids ),
 			'selected'    => $lesson_ids,
 			'multiple'    => true,
 			'placeholder' => 'Any lesson'
-		] );
+		] ) );
 
-		?><p></p><?php
+		html( 'p' );
 	}
 
 	public function get_settings_schema() {
@@ -244,9 +245,9 @@ abstract class LMS_Integration extends Benchmark {
 		if ( in_array( 'lesson_completed', $actions ) ) {
 
 			$events = [
-				'course_enrolled'  => __( 'Enrolls in a course', 'groundhogg' ),
-				'course_completed' => __( 'Completes a course', 'groundhogg' ),
-				'lesson_completed' => __( 'Completes a lesson', 'groundhogg' )
+				'course_enrolled'  => esc_html__( 'Enrolls in a course', 'groundhogg' ),
+				'course_completed' => esc_html__( 'Completes a course', 'groundhogg' ),
+				'lesson_completed' => esc_html__( 'Completes a lesson', 'groundhogg' )
 			];
 
 			$actions = array_intersect_key( $events, array_combine( $actions, $actions ) );

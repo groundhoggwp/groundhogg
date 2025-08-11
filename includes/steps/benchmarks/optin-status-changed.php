@@ -79,29 +79,29 @@ class Optin_Status_Changed extends Benchmark {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'When a contact\'s opt-in status is changed from...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'When a contact\'s opt-in status is changed from...', 'groundhogg' ) );
 
-		echo html()->select2( [
-			'id'          => $this->setting_id_prefix( 'from_status' ),
-			'name'        => $this->setting_name_prefix( 'from_status' ) . '[]',
-			'data'        => Preferences::get_preference_names(),
-			'selected'    => $this->get_setting( 'from_status', [] ),
-			'multiple'    => true,
-			'placeholder' => __( 'Any status', 'groundhogg' )
-		] );
+        html(  html()->select2( [
+	        'id'          => $this->setting_id_prefix( 'from_status' ),
+	        'name'        => $this->setting_name_prefix( 'from_status' ) . '[]',
+	        'data'        => Preferences::get_preference_names(),
+	        'selected'    => $this->get_setting( 'from_status', [] ),
+	        'multiple'    => true,
+	        'placeholder' => __( 'Any status', 'groundhogg' )
+        ] ) );
 
-		echo html()->e( 'p', [], __( 'To any of these statuses...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'To any of these statuses...', 'groundhogg' ) );
 
-		echo html()->select2( [
+		html( html()->select2( [
 			'id'          => $this->setting_id_prefix( 'status' ),
 			'name'        => $this->setting_name_prefix( 'status' ) . '[]',
 			'data'        => Preferences::get_preference_names(),
 			'selected'    => $this->get_setting( 'status', [] ),
 			'multiple'    => true,
 			'placeholder' => __( 'Any status', 'groundhogg' )
-		] );
+		] ) );
 
-		?><p></p><?php
+        html( 'p' );
 	}
 
 	public function sanitize_statuses( $statuses ) {

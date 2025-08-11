@@ -19,7 +19,7 @@ class Role_Changed extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Role Changed', 'step_name', 'groundhogg-pro' );
+		return _x( 'Role Changed', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Role_Changed extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( "Runs whenever a user's role is changed.", 'step_description', 'groundhogg-pro' );
+		return _x( "Runs whenever a user's role is changed.", 'step_description', 'groundhogg' );
 	}
 
 	/**

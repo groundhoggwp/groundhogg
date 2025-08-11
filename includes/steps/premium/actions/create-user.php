@@ -26,7 +26,7 @@ class Create_User extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Create User', 'step_name', 'groundhogg-pro' );
+		return _x( 'Create User', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -48,7 +48,7 @@ class Create_User extends Action {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Create a new WordPress user account.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Create a new WordPress user account.', 'step_description', 'groundhogg' );
 	}
 
 	/**

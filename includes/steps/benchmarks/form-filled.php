@@ -14,6 +14,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_custom_fields_dropdown_options;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\kses;
 use function Groundhogg\managed_page_url;
 
 
@@ -446,18 +447,24 @@ class Form_Filled extends Benchmark {
 		$form_embed_code = esc_html( $form->get_html_embed_code() );
 		$form_url        = managed_page_url( sprintf( 'forms/%s/', urlencode( encrypt( $step->get_id() ) ) ) );
 
-		echo html()->button( [
-			'type'  => 'button',
-			'id'    => $this->setting_id_prefix( 'upgrade_form' ),
-			'text' => __( 'Upgrade Form', 'groundhogg' ),
-			'class' => 'gh-button secondary full-width'
+		html( [
+			html()->button( [
+				'type'  => 'button',
+				'id'    => $this->setting_id_prefix( 'upgrade_form' ),
+				'text'  => __( 'Upgrade Form', 'groundhogg' ),
+				'class' => 'gh-button secondary full-width'
+			] ),
+			html()->input( [
+				'type' => 'hidden',
+				'name' => $this->setting_name_prefix( 'upgrade_form_confirm' ),
+				'id'   => $this->setting_id_prefix( 'upgrade_form_confirm' ),
+			] ),
+			html()->input( [
+				'type' => 'hidden',
+				'name' => $this->setting_name_prefix( 'upgrade_form_confirm' ),
+				'id'   => $this->setting_id_prefix( 'upgrade_form_confirm' ),
+			] )
 		] );
-
-		echo html()->input( [
-			'type' => 'hidden',
-			'name' => $this->setting_name_prefix( 'upgrade_form_confirm' ),
-			'id'   => $this->setting_id_prefix( 'upgrade_form_confirm' ),
-		] )
 
 		?>
         <div class="gh-panel">
@@ -466,7 +473,7 @@ class Form_Filled extends Benchmark {
             </div>
             <div class="inside">
                 <div class="display-flex column gap-10">
-                    <label><?php printf( '%s:', __( 'Shortcode', 'groundhogg' ) ); ?></label>
+                    <label><?php printf( '%s:', esc_html__( 'Shortcode', 'groundhogg' ) ); ?></label>
                     <input
                             type="text"
                             onfocus="this.select()"
@@ -496,10 +503,10 @@ class Form_Filled extends Benchmark {
                             readonly>
                 </div>
                 <p>
-					<?php echo Plugin::$instance->utils->html->modal_link( array(
-						'title'              => esc_html__( 'Preview' ),
-						'text'               => esc_html__( 'Preview' ),
-						'footer_button_text' => esc_html__( 'Close' ),
+	                <?php html( html()->modal_link( array(
+		                'title'              => esc_html__( 'Preview', 'groundhogg' ),
+		                'text'               => esc_html__( 'Preview', 'groundhogg' ),
+		                'footer_button_text' => esc_html__( 'Close', 'groundhogg' ),
 						'id'                 => '',
 						'class'              => 'gh-button secondary',
 						'source'             => $form_url,
@@ -507,7 +514,7 @@ class Form_Filled extends Benchmark {
 						'width'              => 600,
 						'footer'             => 'false',
 						'preventSave'        => 'true',
-					) );
+	                ) ) );
 					?>
                 </p>
             </div>
@@ -633,6 +640,7 @@ class Form_Filled extends Benchmark {
 
 					$args = wp_parse_args( $button, array(
 						'text'               => __( 'Field', 'groundhogg' ),
+						/* translators: %s: the field type */
 						'title'              => sprintf( __( 'Insert Field: %s', 'groundhogg' ), $button['text'] ),
 						'class'              => 'gh-button grey text small code',
 						'source'             => 'form-field-editor',
@@ -641,7 +649,7 @@ class Form_Filled extends Benchmark {
 						'height'             => 600
 					) );
 
-					echo html()->modal_link( $args );
+					html( html()->modal_link( $args ) );
 				} ?>
             </div>
 
@@ -650,7 +658,7 @@ class Form_Filled extends Benchmark {
 			$code = $this->prettify( $this->get_setting( 'form', $default_form ) );
 			$rows = min( substr_count( $code, "\n" ) + 1, 15 );
 
-			$args = array(
+			html( html()->textarea( [
 				'id'    => $this->setting_id_prefix( 'form' ),
 				'name'  => $this->setting_name_prefix( 'form' ),
 				'value' => $code,
@@ -661,9 +669,7 @@ class Form_Filled extends Benchmark {
 					'white-space' => ' nowrap',
 					'width'       => '100%'
 				],
-			); ?>
-
-			<?php echo html()->textarea( $args ) ?>
+			] ) ) ?>
         </div>
         <table class="form-table">
             <tbody>
@@ -676,15 +682,15 @@ class Form_Filled extends Benchmark {
 
 					$ajax_is_enabled = (bool) $this->get_setting( 'enable_ajax' );
 
-					echo Plugin::$instance->utils->html->checkbox( [
-						'label' => esc_html__( 'Enable' ),
+					html( html()->checkbox( [
+						'label' => esc_html__( 'Enable', 'groundhogg' ),
 						'name'    => $this->setting_name_prefix( 'enable_ajax' ),
 						'id'      => $this->setting_id_prefix( 'enable_ajax' ),
 						'class'   => 'enable-ajax auto-save',
 						'value'   => '1',
 						'checked' => $ajax_is_enabled,
 						'title' => __( 'Enable Ajax', 'groundhogg' ),
-					] ); ?>
+					] ) ); ?>
                 </td>
             </tr>
             <tr class="<?php echo $ajax_is_enabled ? '' : 'hidden'; ?>">
@@ -694,7 +700,7 @@ class Form_Filled extends Benchmark {
                 <td>
 					<?php
 
-					$args = array(
+					html( html()->textarea( [
 						'id'    => $this->setting_id_prefix( 'success_message' ),
 						'name'  => $this->setting_name_prefix( 'success_message' ),
 						'title' => __( 'Thank You Message', 'groundhogg' ),
@@ -704,9 +710,7 @@ class Form_Filled extends Benchmark {
 						'style' => [
 							'width' => '100%'
 						],
-					);
-
-					echo Plugin::$instance->utils->html->textarea( $args ); ?>
+					] ) ); ?>
                 </td>
             </tr>
             <tr class="<?php echo $ajax_is_enabled ? 'hidden' : ''; ?>">
@@ -716,15 +720,15 @@ class Form_Filled extends Benchmark {
                 <td>
 					<?php
 
-					$args = array(
-						'type'  => 'text',
-						'id'    => $this->setting_id_prefix( 'success_page' ),
-						'name'  => $this->setting_name_prefix( 'success_page' ),
-						'title' => __( 'Thank You Page', 'groundhogg' ),
-						'value' => $this->get_setting( 'success_page', home_url( 'thank-you/' ) )
-					);
+                    html( html()->link_picker([
+	                    'type'  => 'text',
+	                    'id'    => $this->setting_id_prefix( 'success_page' ),
+	                    'name'  => $this->setting_name_prefix( 'success_page' ),
+	                    'title' => __( 'Thank You Page', 'groundhogg' ),
+	                    'value' => $this->get_setting( 'success_page', home_url( 'thank-you/' ) )
+                    ]) );
 
-					echo Plugin::$instance->utils->html->link_picker( $args ); ?>
+					?>
                 </td>
             </tr>
             </tbody>
@@ -800,39 +804,39 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-required">
                         <th><?php esc_html_e( 'Required Field', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->checkbox( array(
+							html( html()->checkbox( array(
 								'id'    => 'field-required',
 								'name'  => 'required',
 								'label' => __( 'Yes', 'groundhogg' ),
 								'value' => 'true'
-							) );
+							) ) );
 							?></td>
                     </tr>
                     <tr id="gh-field-label">
                         <th><?php esc_html_e( 'Label', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'id'   => 'field-label',
 								'name' => 'label'
-							) );
+							) ) );
 							?><p class="description"><?php esc_html_e( 'The field label.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-text">
                         <th><?php esc_html_e( 'Text', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'id'   => 'field-text',
 								'name' => 'text'
-							) );
+							) ) );
 							?><p class="description"><?php esc_html_e( 'The button text.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-placeholder">
                         <th><?php esc_html_e( 'Placeholder', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'id'   => 'field-placeholder',
 								'name' => 'placeholder'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The ghost text within the field.', 'groundhogg' ); ?></p>
                         </td>
@@ -840,10 +844,10 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-name">
                         <th><?php esc_html_e( 'Meta name', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->meta_picker( array(
+							html( html()->meta_picker( array(
 								'id'   => 'field-name',
 								'name' => 'name'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'This will be the custom field name. I.E. {meta.name}', 'groundhogg' ); ?></p>
                         </td>
@@ -851,11 +855,11 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-custom_field">
                         <th><?php esc_html_e( 'Custom Field', 'groundhogg' ); ?></th>
                         <td><?php
-							echo html()->dropdown( [
+							html( html()->dropdown( [
 								'id'      => 'field-custom_field',
 								'name'    => 'custom_field',
 								'options' => get_custom_fields_dropdown_options()
-							] );
+							] ) );
 							?>
                             <p class="description"><?php esc_html_e( 'Select a custom field to show.', 'groundhogg' ); ?></p>
                         </td>
@@ -865,11 +869,11 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-min">
                         <th><?php esc_html_e( 'Min', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->number( array(
+							html( html()->number( array(
 								'id'    => 'field-min',
 								'name'  => 'min',
 								'class' => 'input'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The minimum number a user can enter.', 'groundhogg' ); ?></p>
                         </td>
@@ -877,11 +881,11 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-max">
                         <th><?php esc_html_e( 'Max', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->number( array(
+							html( html()->number( array(
 								'id'    => 'field-max',
 								'name'  => 'max',
 								'class' => 'input'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The max number a user can enter.', 'groundhogg' ); ?></p>
                         </td>
@@ -891,22 +895,22 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-value">
                         <th><?php esc_html_e( 'Value', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'id'   => 'field-value',
 								'name' => 'value'
-							) );
+							) ) );
 							?><p class="description"><?php esc_html_e( 'The default value of the field.', 'groundhogg' ); ?></p>
                         </td>
                     </tr>
                     <tr id="gh-field-tag">
                         <th><?php esc_html_e( 'Add Tag', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->tag_picker( array(
+							html( html()->tag_picker( array(
 								'id'       => 'field-tag',
 								'name'     => 'tag',
 								'class'    => 'gh-single-tag-picker',
 								'multiple' => false
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'Add a tag when this checkbox is selected.', 'groundhogg' ); ?></p>
                         </td>
@@ -915,13 +919,13 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-options">
                         <th><?php esc_html_e( 'Options', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->textarea( array(
+							html( html()->textarea( array(
 								'id'    => 'field-options',
 								'name'  => 'options',
 								'cols'  => 50,
 								'rows'  => '5',
 								'class' => 'hidden'
-							) );
+							) ) );
 							?>
                             <div id='gh-option-table' class="display-flex gap-10 column">
                                 <div class='option-wrapper display-flex gap-10'>
@@ -948,22 +952,22 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-multiple">
                         <th><?php esc_html_e( 'Allow Multiple Selections', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->checkbox( array(
+							html( html()->checkbox( array(
 								'id'    => 'field-multiple',
 								'name'  => 'multiple',
 								'label' => __( 'Yes', 'groundhogg' )
-							) );
+							) ) );
 							?></td>
                     </tr>
                     <tr id="gh-field-default">
                         <th><?php esc_html_e( 'Default', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'id'   => 'field-default',
 								'name' => 'default',
 								'cols' => 50,
 								'rows' => '5'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The blank option which appears at the top of the list.', 'groundhogg' ); ?></p>
                         </td>
@@ -973,7 +977,7 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-width">
                         <th><?php esc_html_e( 'Width', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->dropdown( array(
+							html( html()->dropdown( array(
 								'id'          => 'field-width',
 								'name'        => 'width',
 								'options'     => array(
@@ -985,7 +989,7 @@ class Form_Filled extends Benchmark {
 									'3/4' => '3/4',
 								),
 								'option_none' => false
-							) );
+							) ) );
 							?><p class="description"><?php esc_html_e( 'The width of the column.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <!-- END COLUMN OPTIONS -->
@@ -995,27 +999,27 @@ class Form_Filled extends Benchmark {
                         <tr id="gh-field-captcha-theme">
                             <th><?php esc_html_e( 'Theme', 'groundhogg' ); ?></th>
                             <td><?php
-								echo Plugin::$instance->utils->html->dropdown( array(
+								html( html()->dropdown( array(
 									'id'      => 'field-theme',
 									'name'    => 'captcha-theme',
 									'options' => array(
 										'light' => 'Light',
 										'dark'  => 'Dark',
 									)
-								) );
+								) ) );
 								?><p class="description"><?php esc_html_e( 'The CAPTCHA Theme.', 'groundhogg' ); ?></p></td>
                         </tr>
                         <tr id="gh-field-captcha-size">
                             <th><?php esc_html_e( 'Size', 'groundhogg' ); ?></th>
                             <td><?php
-								echo Plugin::$instance->utils->html->dropdown( array(
+								html( html()->dropdown( array(
 									'id'      => 'field-captcha-size',
 									'name'    => 'captcha-size',
 									'options' => array(
 										'normal'  => 'Normal',
 										'compact' => 'Compact',
 									)
-								) );
+								) ) );
 								?><p class="description"><?php esc_html_e( 'The CAPTCHA Size.', 'groundhogg' ); ?></p></td>
                         </tr>
 					<?php endif; ?>
@@ -1025,12 +1029,12 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-min_date">
                         <th><?php esc_html_e( 'Min Date', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'type'        => 'date',
 								'id'          => 'field-min_date',
 								'name'        => 'min_date',
 								'placeholder' => 'YYY-MM-DD or +3 days or -1 days'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The minimum date a user can enter. You can enter a dynamic date or static date.', 'groundhogg' ); ?></p>
                         </td>
@@ -1038,12 +1042,12 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-max_date">
                         <th><?php esc_html_e( 'Max Date', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'type'        => 'date',
 								'id'          => 'field-max_date',
 								'name'        => 'max_date',
 								'placeholder' => 'YYY-MM-DD or +3 days or -1 days'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The maximum date a user can enter. You can enter a dynamic date or static date.', 'groundhogg' ); ?></p>
                         </td>
@@ -1054,7 +1058,7 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-phone_type">
                         <th><?php esc_html_e( 'Phone Type', 'groundhogg' ); ?></th>
                         <td><?php
-							echo html()->dropdown( [
+							html( html()->dropdown( [
 								'id'          => 'field-phone_type',
 								'name'        => 'phone_type',
 								'options'     => [
@@ -1063,7 +1067,7 @@ class Form_Filled extends Benchmark {
 									'company' => __( 'Company Phone', 'groundhogg' ),
 								],
 								'option_none' => false,
-							] )
+							] ) )
 							?>
                             <p class="description"><?php esc_html_e( 'Which phone field you want the contact to provide.', 'groundhogg' ); ?></p>
                         </td>
@@ -1071,12 +1075,12 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-show_ext">
                         <th><?php esc_html_e( 'Collect Number Extension', 'groundhogg' ); ?></th>
                         <td><?php
-							echo html()->checkbox( [
+							html( html()->checkbox( [
 								'id'    => 'field-show_ext',
 								'name'  => 'show_ext',
 								'label' => __( 'Yes', 'groundhogg' ),
 								'value' => 'true'
-							] );
+							] ) );
 							?>
                             <p class="description"><?php esc_html_e( 'Ask to collect the phone number extension.', 'groundhogg' ); ?></p>
                         </td>
@@ -1087,11 +1091,11 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-min_time">
                         <th><?php esc_html_e( 'Min Time', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'type' => 'time',
 								'id'   => 'field-min_time',
 								'name' => 'min_time'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The minimum time a user can enter. You can enter a dynamic time or static time.', 'groundhogg' ); ?></p>
                         </td>
@@ -1099,11 +1103,11 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-max_time">
                         <th><?php esc_html_e( 'Max Time', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'type' => 'time',
 								'id'   => 'field-max_time',
 								'name' => 'max_time'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The maximum time a user can enter. You can enter a dynamic time or static time.', 'groundhogg' ); ?></p>
                         </td>
@@ -1114,25 +1118,28 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-max_file_size">
                         <th><?php esc_html_e( 'Max File Size', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->number( array(
+							html( html()->number( array(
 								'id'          => 'field-max_file_size',
 								'name'        => 'max_file_size',
 								'placeholder' => '1000000',
 								'min'         => 0,
 								'max'         => wp_max_upload_size() * 1000000
-							) );
+							) ) );
 							?>
-                            <p class="description"><?php printf( __( 'Maximum size a file can be <b>in Bytes</b>. Your max upload size is %d Bytes.', 'groundhogg' ), wp_max_upload_size() ); ?></p>
+                            <p class="description"><?php
+                                /* translators: %d: the number of allowed bytes */
+                                kses( sprintf( __( 'Maximum size a file can be <b>in Bytes</b>. Your max upload size is %d Bytes.', 'groundhogg' ), wp_max_upload_size() ), [ 'b' => [] ] );
+                                ?></p>
                         </td>
                     </tr>
                     <tr id="gh-field-file_types">
                         <th><?php esc_html_e( 'Accepted File Types', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'id'          => 'field-file_types',
 								'name'        => 'file_types',
 								'placeholder' => '.pdf,.txt,.doc,.docx'
-							) );
+							) ) );
 							?>
                             <p class="description"><?php esc_html_e( 'The types of files a user may upload (comma separated). Leave empty to not specify.', 'groundhogg' ) ?></p>
                         </td>
@@ -1147,16 +1154,16 @@ class Form_Filled extends Benchmark {
                     <tr id="gh-field-id">
                         <th><?php esc_html_e( 'CSS ID', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array( 'id' => 'field-id', 'name' => 'id' ) );
+							html( html()->input( array( 'id' => 'field-id', 'name' => 'id' ) ) );
 							?><p class="description"><?php esc_html_e( 'Use to apply CSS.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <tr id="gh-field-class">
                         <th><?php esc_html_e( 'CSS Class', 'groundhogg' ); ?></th>
                         <td><?php
-							echo Plugin::$instance->utils->html->input( array(
+							html( html()->input( array(
 								'id'   => 'field-class',
 								'name' => 'class'
-							) );
+							) ) );
 							?><p class="description"><?php esc_html_e( 'Use to apply CSS.', 'groundhogg' ); ?></p></td>
                     </tr>
                     <!-- END CSS OPTIONS -->

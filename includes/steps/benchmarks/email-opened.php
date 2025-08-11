@@ -11,6 +11,7 @@ use function Groundhogg\array_bold;
 use function Groundhogg\array_map_to_class;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\html;
+use function Groundhogg\kses;
 use function Groundhogg\orList;
 
 class Email_Opened extends Benchmark {
@@ -52,7 +53,7 @@ class Email_Opened extends Benchmark {
 	}
 
 	public function get_name() {
-		return __( 'Email Opened', 'groundhogg-pro' );
+		return __( 'Email Opened', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -64,7 +65,7 @@ class Email_Opened extends Benchmark {
 	}
 
 	public function get_description() {
-		return __( 'Runs when a contact opens an email that was sent from the funnel.', 'groundhogg-pro' );
+		return __( 'Runs when a contact opens an email that was sent from the funnel.', 'groundhogg' );
 	}
 
 	public function get_icon() {
@@ -76,8 +77,8 @@ class Email_Opened extends Benchmark {
         <div class="step-warnings">
 		<?php
 
-		echo html()->e( 'div', [ 'class' => 'notice notice-warning' ], [
-			html()->e( 'p', [], __( 'This benchmark is available for legacy usage only. Running automation based on email opens is <b>NOT</b> a good idea. False positives are frequent. We recommend you use the <b>Link Click</b> benchmark instead.', 'groundhogg-pro' ) )
+		html( 'div', [ 'class' => 'notice notice-warning' ], [
+			html()->e( 'p', [], kses( __( 'This benchmark is available for legacy usage only. Running automation based on email opens is <b>NOT</b> a good idea. False positives are frequent. We recommend you use the <b>Link Click</b> benchmark instead.', 'groundhogg' ), 'simple' ) )
 		] );
 
 		?>
@@ -127,15 +128,13 @@ class Email_Opened extends Benchmark {
 			'selected' => wp_parse_id_list( $this->get_setting( 'email_steps' ) )
 		] );
 
-		$td_content[] = html()->description( __( 'Update the funnel to show new email steps in the email step picker.', 'groundhogg-pro' ) );
+		$td_content[] = html()->description( esc_html__( 'Update the funnel to show new email steps in the email step picker.', 'groundhogg' ) );
 
 		html()->td( $td_content );
 
 		html()->end_row();
 
 		html()->end_form_table();
-
-		// TODO: Implement settings() method.
 	}
 
 	public function save( $step ) {

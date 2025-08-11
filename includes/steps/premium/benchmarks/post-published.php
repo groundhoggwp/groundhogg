@@ -19,7 +19,7 @@ class Post_Published extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Post Published', 'step_name', 'groundhogg-pro' );
+		return _x( 'Post Published', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Post_Published extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( "Runs whenever a WordPress post meeting the criteria is published.", 'step_description', 'groundhogg-pro' );
+		return _x( "Runs whenever a WordPress post meeting the criteria is published.", 'step_description', 'groundhogg' );
 	}
 
 	/**

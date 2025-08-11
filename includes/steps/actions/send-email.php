@@ -14,6 +14,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\kses;
 use function Groundhogg\track_activity;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -89,7 +90,7 @@ class Send_Email extends Action {
 	}
 
 	protected function after_settings( Step $step ) {
-		echo html()->e( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email', 'class' => 'gh-panel email-preview ignore-morph' ], [
+		html( 'div', [ 'id' => 'step_' . $step->get_id() . '_send_email', 'class' => 'gh-panel email-preview ignore-morph' ], [
 			html()->e( 'div', [
 				'class' => 'inside',
 			], [
@@ -112,11 +113,11 @@ class Send_Email extends Action {
 
 		if ( $email->exists() ) {
 			if ( $email->is_draft() ) {
-				$step->add_error( 'email_in_draft_mode', __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.' ) );
+				$step->add_error( 'email_in_draft_mode', kses( __( 'The selected email is in draft mode! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.', 'groundhogg' ), [ 'b' => [] ] ) );
 			} else if ( $email->get_status() === 'trash' ) {
-				$step->add_error( 'email_in_trashed', __( 'The selected email is currently in the <b>trash</b>. <b>Restore and publish it</b> to solve the problem.' ) );
+				$step->add_error( 'email_in_trashed', kses( __( 'The selected email is currently in the <b>trash</b>. <b>Restore and publish it</b> to solve the problem.', 'groundhogg' ), [ 'b' => [] ] ) );
 			} else if ( ! $email->is_ready() ) {
-				$step->add_error( 'email_not_ready', __( 'The selected email is not ready! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.' ) );
+				$step->add_error( 'email_not_ready', kses( __( 'The selected email is not ready! It will not be sent and will cause automation to stop. <b>Publish it</b> to solve the problem.', 'groundhogg' ), [ 'b' => [] ] ) );
 			}
 		}
 	}
@@ -152,7 +153,8 @@ class Send_Email extends Action {
 			return 'Send an email';
 		}
 
-		return sprintf( __( 'Send %s', 'groundhogg' ), '<b>' . $email->get_title() . '</b>' );
+		/* translators: %s: the title of the email to send */
+		return sprintf( esc_html__( 'Send %s', 'groundhogg' ), bold_it( esc_html( $email->get_title() ) ) );
 	}
 
 	/**
@@ -180,6 +182,7 @@ class Send_Email extends Action {
 	 * @return string the new subject line
 	 */
 	public function set_thread_subject( $subject ) {
+		/* translators: %s: the subject line being replied to */
 		return sprintf( __( 'Re: %s', 'groundhogg' ), $this->subject );
 	}
 
@@ -336,18 +339,18 @@ class Send_Email extends Action {
             </div>
             <div class="inside display-flex column gap-10">
                 <label for=""><?php esc_html_e( 'Email threading', 'groundhogg' ); ?></label>
-				<?php echo html()->dropdown( [
+				<?php html( html()->dropdown( [
 					'name'        => $this->setting_name_prefix( 'reply_in_thread' ),
 					'option_none' => 'No threading',
 					'options'     => $prev_email_options,
 					'selected'    => $this->get_setting( 'reply_in_thread' ),
-				] ); ?>
+				] ) ); ?>
 				<?php if ( $has_confirmation ): ?>
-					<?php echo html()->checkbox( [
+					<?php html( html()->checkbox( [
 						'label'   => esc_html__( 'Skip this email if the contact is already confirmed', 'groundhogg' ),
 						'name'    => $this->setting_name_prefix( 'skip_if_confirmed' ),
 						'checked' => $this->get_setting( 'skip_if_confirmed' )
-					] ); ?>
+					] ) ); ?>
 				<?php endif; ?>
             </div>
         </div>

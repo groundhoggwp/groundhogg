@@ -14,7 +14,7 @@ class Advanced_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Advanced Timer', 'step_name', 'groundhogg-pro' );
+		return _x( 'Advanced Timer', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -32,7 +32,7 @@ class Advanced_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Use a <code>strtotime</code> friendly string to create a delay.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Use a <code>strtotime</code> friendly string to create a delay.', 'step_description', 'groundhogg' );
 	}
 
 	/**

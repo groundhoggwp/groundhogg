@@ -79,9 +79,9 @@ class Apply_Note extends Action {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], 'What type of note is being added?' );
+		html('p', [], 'What type of note is being added?' );
 
-		echo html()->dropdown( [
+		html( html()->dropdown( [
 			'name'     => $this->setting_name_prefix( 'note_type' ),
 			'options'  => [
 				'note'    => 'Note',
@@ -90,15 +90,15 @@ class Apply_Note extends Action {
 				'meeting' => 'Meeting',
 			],
 			'selected' => $this->get_setting( 'note_type' ),
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], 'Add the note content...' );
+		html( 'p', [], 'Add the note content...' );
 
-		echo html()->e( 'div', [ 'class' => 'ignore-morph' ], html()->textarea( [
+		html( html()->e( 'div', [ 'class' => 'ignore-morph' ], html()->textarea( [
 			'id'    => $this->setting_id_prefix( 'note_text' ),
 			'name'  => 'note_text',
 			'value' => $this->get_setting( 'note_text' )
-		] ) );
+		] ) ) );
 
 		?><p></p><?php
 	}

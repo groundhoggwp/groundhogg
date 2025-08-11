@@ -23,7 +23,7 @@ class Page_Visited extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Page Visited', 'step_name', 'groundhogg-pro' );
+		return _x( 'Page Visited', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -45,7 +45,7 @@ class Page_Visited extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Runs whenever the specified page is visited.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Runs whenever the specified page is visited.', 'step_description', 'groundhogg' );
 	}
 
 	/**

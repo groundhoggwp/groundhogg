@@ -79,7 +79,11 @@ class Email_Confirmed extends Benchmark {
 	 */
 	public function settings( $step ) {
 		?>
-        <p><?php printf( esc_html__( 'Runs when a contact confirms their email address, changing their opt-in status to %s.', 'groundhogg' ), bold_it( Preferences::get_preference_pretty_name( Preferences::CONFIRMED ) ) ); ?></p>
+        <p><?php
+            /* translators: %s: the pretty name of the confirmed opt-in status */
+            printf( esc_html__( 'Runs when a contact confirms their email address, changing their opt-in status to %s.', 'groundhogg' ),
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                bold_it( esc_html( Preferences::get_preference_pretty_name( Preferences::CONFIRMED ) ) ) ); ?></p>
 		<?php
 	}
 

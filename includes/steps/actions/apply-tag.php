@@ -81,13 +81,13 @@ class Apply_Tag extends Action {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'Apply all of the following tags...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Apply all of the following tags...', 'groundhogg' ) );
 
-		echo html()->dropdown( [
+		html( html()->dropdown( [
 			'id' => $this->setting_id_prefix( 'tags' )
-		] );
+		] ) );
 
-		echo html()->e( 'p' );
+		html( 'p' );
 	}
 
 	public function get_settings_schema() {
@@ -115,8 +115,10 @@ class Apply_Tag extends Action {
 		if ( empty( $tags ) ) {
 			$name = __( 'Apply tags', 'groundhogg' );
 		} else if ( count( $tags ) >= 4 ) {
+			/* translators: %s: the number of tags */
 			$name = sprintf( __( 'Apply %s tags', 'groundhogg' ), '<b>' . count( $tags ) . '</b>' );
 		} else {
+			/* translators: %s: a list of tags like "Customer, and User" */
 			$name = sprintf( __( 'Apply %s', 'groundhogg' ), andList( $tags ) );
 		}
 

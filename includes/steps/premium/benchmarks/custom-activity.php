@@ -20,7 +20,7 @@ class Custom_Activity extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Custom Activity', 'step_name', 'groundhogg-pro' );
+		return _x( 'Custom Activity', 'step_name', 'groundhogg' );
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Custom_Activity extends Benchmark {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Listen for when a specified activity is create for the contact.', 'step_description', 'groundhogg-pro' );
+		return _x( 'Listen for when a specified activity is create for the contact.', 'step_description', 'groundhogg' );
 	}
 
 	/**

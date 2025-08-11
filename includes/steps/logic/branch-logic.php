@@ -141,9 +141,9 @@ abstract class Branch_Logic extends Logic {
 					$classes = $this->get_branch_classes( $branch_id );
 
 					?>
-                    <div class="split-branch <?php echo $classes ?>">
+                    <div class="split-branch <?php echo esc_attr( $classes ) ?>">
                         <div class="logic-line line-above">
-                            <span id="<?php echo esc_attr( 'branch-name-indicator-' . $branch_id ) ?>" class="path-indicator"><?php esc_html_e( $this->get_branch_name( $branch_id ) ); ?></span>
+                            <span id="<?php echo esc_attr( 'branch-name-indicator-' . $branch_id ) ?>" class="path-indicator"><?php echo esc_html( $this->get_branch_name( $branch_id ) ); ?></span>
                         </div>
                         <div id="<?php echo esc_attr( 'branch-' . $branch_id ); ?>" class="step-branch" data-branch="<?php echo esc_attr( $branch_id ); ?>">
                             <?php foreach ( $steps as $branch_step ) {

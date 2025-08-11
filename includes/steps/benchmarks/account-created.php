@@ -85,18 +85,17 @@ class Account_Created extends Benchmark {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], 'Run when a user account with any of the following roles is created...' );
+		html( 'p', [], 'Run when a user account with any of the following roles is created...' );
 
-		echo html()->select2( [
+		html( html()->select2( [
 			'name'        => $this->setting_name_prefix( 'role' ) . '[]',
 			'multiple'    => true,
 			'placeholder' => 'Any role...',
 			'selected'    => $this->get_setting( 'role' ),
 			'options'     => Plugin::$instance->roles->get_roles_for_select()
-		] );
+		] ) );
 
-
-		?><p></p><?php
+        html( 'p' );
 	}
 
 	public function generate_step_title( $step ) {

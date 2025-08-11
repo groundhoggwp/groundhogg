@@ -35,8 +35,8 @@ trait Trait_Premium_Step {
 
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], sprintf( 'The %s step is a paid feature. Upgrade to unlock it along with 20+ other premium steps!', $this->get_name() ) );
-		echo html()->e( 'a', [
+		html( 'p', [], sprintf( 'The %s step is a paid feature. Upgrade to unlock it along with 20+ other premium steps!', esc_html( $this->get_name() ) ) );
+		html( 'a', [
 			'href'   => 'https://groundhogg.io/pricing/',
 			'target' => '_blank',
 			'class'  => 'gh-button primary'

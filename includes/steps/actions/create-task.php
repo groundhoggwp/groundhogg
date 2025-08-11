@@ -83,26 +83,26 @@ class Create_Task extends Action {
 	 */
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'Briefly summarize the task in a few words...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Briefly summarize the task in a few words...', 'groundhogg' ) );
 
-		echo html()->input( [
+		html( html()->input( [
 			'id'          => $this->setting_id_prefix( 'summary' ),
 			'name'        => $this->setting_name_prefix( 'summary' ),
 			'value'       => $this->get_setting( 'summary', '' ),
 			'placeholder' => 'Call the contact...'
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], __( 'Provide some additional details to help the task be completed...', 'groundhogg' ) );
+		html('p', [], esc_html__( 'Provide some additional details to help the task be completed...', 'groundhogg' ) );
 
-		echo html()->textarea( [
+		html( html()->textarea( [
 			'id'    => $this->setting_id_prefix( 'task_content' ),
 			'name'  => 'task_content',
 			'value' => $this->get_setting( 'content' )
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], __( 'When should the task be completed by?', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'When should the task be completed by?', 'groundhogg' ) );
 
-		echo html()->e( 'div', [
+		html( 'div', [
 			'class' => 'gh-input-group'
 		], [
 			html()->input( [
@@ -113,9 +113,9 @@ class Create_Task extends Action {
 			] ),
 			html()->dropdown( [
 				'options'     => [
-					'days'   => __( 'Days', 'groundhogg' ),
-					'weeks'  => __( 'Weeks', 'groundhogg' ),
-					'months' => __( 'Months', 'groundhogg' ),
+					'days'   => esc_html__( 'Days', 'groundhogg' ),
+					'weeks'  => esc_html__( 'Weeks', 'groundhogg' ),
+					'months' => esc_html__( 'Months', 'groundhogg' ),
 				],
 				'selected'    => $this->get_setting( 'delay_unit', 'days' ),
 				'name'        => $this->setting_name_prefix( 'delay_unit' ),
@@ -129,29 +129,29 @@ class Create_Task extends Action {
 			] ),
 		] );
 
-		echo html()->e( 'p', [], __( 'What type of task is it?', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'What type of task is it?', 'groundhogg' ) );
 
-		echo html()->dropdown( [
+		html( html()->dropdown( [
 			'selected'    => $this->get_setting( 'task_type', 'task' ),
 			'name'        => $this->setting_name_prefix( 'task_type' ),
 			'option_none' => false,
 			'options'     => [
-				'task'    => __( 'General Task', 'groundhogg' ),
-				'call'    => __( 'Call', 'groundhogg' ),
-				'email'   => __( 'Email', 'groundhogg' ),
-				'meeting' => __( 'Meeting', 'groundhogg' ),
+				'task'    => esc_html__( 'General Task', 'groundhogg' ),
+				'call'    => esc_html__( 'Call', 'groundhogg' ),
+				'email'   => esc_html__( 'Email', 'groundhogg' ),
+				'meeting' => esc_html__( 'Meeting', 'groundhogg' ),
 			]
-		] );
+		] ) );
 
-		echo html()->e( 'p', [], __( 'Assign the task to...', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Assign the task to...', 'groundhogg' ) );
 
-		echo html()->dropdown_owners( [
+		html( html()->dropdown_owners( [
 			'class'       => 'gh-select2',
 			'selected'    => absint( $this->get_setting( 'assign_to' ) ),
 			'name'        => $this->setting_name_prefix( 'assign_to' ),
 			'id'          => $this->setting_id_prefix( 'assign_to' ),
-			'option_none' => __( 'The contact owner', 'groundhogg' )
-		] );
+			'option_none' => esc_html__( 'The contact owner', 'groundhogg' )
+		] ) );
 
 		?><p></p><?php
 	}

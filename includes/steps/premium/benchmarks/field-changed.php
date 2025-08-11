@@ -10,7 +10,7 @@ class Field_Changed extends Benchmark {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return _x( 'Field Changed', 'step_name', 'groundhogg-pro' );
+		return _x( 'Field Changed', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -22,7 +22,7 @@ class Field_Changed extends Benchmark {
 	}
 
 	public function get_description() {
-		return _x( "Runs whenever a value of selected custom field changes.", 'step_description', 'groundhogg-pro' );
+		return _x( "Runs whenever a value of selected custom field changes.", 'step_description', 'groundhogg' );
 	}
 
 	public function get_icon() {

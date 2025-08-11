@@ -28,10 +28,15 @@ class If_Else extends Branch_Logic {
 
 	public function settings( $step ) {
 
-		echo html()->e( 'p', [], __( 'If the contact matches the conditions they will go down the <span class="pill green">YES</span> branch, otherwise the <span class="pill red">NO</span> branch.' ) );
+		html( 'p', [], sprintf(
+		    /* translators: 1: the YES branch pill, 2: the NO branch pill */
+			esc_html__( 'If the contact matches the conditions they will go down the %1$s branch, otherwise the %2$s branch.', 'groundhogg' ),
+			'<span class="pill green">' . esc_html__( 'YES', 'groundhogg' ) . '</span>', // yes tag,
+			'<span class="pill red">' . esc_html__( 'NO', 'groundhogg' ) . '</span>', // not tag
+		) );
 
-		echo html()->e( 'div', [ 'class' => 'include-search-filters' ], [ html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'include_filters' ) ] ) ] );
-		echo html()->e( 'div', [ 'class' => 'exclude-search-filters' ], [ html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'exclude_filters' ) ] ) ] );
+		html( 'div', [ 'class' => 'include-search-filters' ], [ html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'include_filters' ) ] ) ] );
+		html( 'div', [ 'class' => 'exclude-search-filters' ], [ html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'exclude_filters' ) ] ) ] );
 
 		?><p></p><?php
 	}
