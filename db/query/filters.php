@@ -84,14 +84,12 @@ class Filters {
 
 		// No filter handler available
 		if ( ! $handler ) {
-			throw new FilterException( sprintf( "%s is not a registered filter", $type ) );
+			throw new FilterException( esc_html( sprintf( "%s is not a registered filter", $type ) ) );
 		}
 
 		if ( ! is_callable( $handler['filter_callback'] ) ) {
-			throw new FilterException( sprintf( "%s does not have a valid callback", $type ) );
+			throw new FilterException( esc_html( sprintf( "%s does not have a valid callback", $type ) ) );
 		}
-
-//		var_dump( $filter );
 
 		return call_user_func( $handler['filter_callback'], $filter, $where, $where->query );
 	}

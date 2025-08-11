@@ -304,7 +304,7 @@ class Split_Test extends Split_Path {
 		$path_a_weight = absint( $this->get_setting( 'weight' ) );
 		$path_b_weight = 100 - $path_a_weight;
 
-		$random     = rand( 1, 100 ); // Generate a random number between 1 and 100
+		$random     = wp_rand( 1, 100 ); // Generate a random number between 1 and 100
 		$cumulative = 0;
 
 		$branches = [

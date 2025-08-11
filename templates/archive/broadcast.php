@@ -30,4 +30,5 @@ if ( ! $contact ){
 
 $email->set_contact( $contact );
 
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 echo $email->build();

@@ -23,7 +23,7 @@ class Micro_Time_Tracker {
 	}
 
 	public function show_time_elapsed( $precision = 2 ) {
-		echo $this->time_elapsed_rounded( $precision ) . ' seconds, ';
+		echo esc_html( $this->time_elapsed_rounded( $precision ) . ' seconds, ' );
 	}
 
 }

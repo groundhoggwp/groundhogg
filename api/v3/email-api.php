@@ -160,6 +160,7 @@ class Email_Api extends Base {
 		$email_id = intval( $request->get_param( 'email_id' ) );
 
 		if ( ! Plugin::$instance->dbs->get_db( 'emails' )->exists( $email_id ) ) {
+			/* translators: %d: the email ID */
 			return self::ERROR_400( 'no_email', sprintf( _x( 'Email with ID %d not found.', 'api', 'groundhogg' ), $email_id ) );
 		}
 

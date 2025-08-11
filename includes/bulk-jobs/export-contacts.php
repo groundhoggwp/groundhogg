@@ -192,6 +192,7 @@ class Export_Contacts extends Bulk_Job {
 	protected function get_finished_notice() {
 		$file_url = file_access_url( '/exports/' . $this->file_name, true );
 
+		/* translators: %s: link to the export file */
 		return sprintf( esc_html_x( 'Export file created. %s', 'notice', 'groundhogg' ), "&nbsp;&nbsp;&nbsp;<a class='button button-primary' href='$file_url'>Download Now</a>" );
 	}
 }

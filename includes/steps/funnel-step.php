@@ -13,6 +13,7 @@ use function Groundhogg\current_screen_is_gh_page;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\ensure_array;
+use function Groundhogg\files;
 use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
@@ -173,7 +174,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			// get the absolute path of the svg file relative to wp-content
 			$icon_path = preg_replace( '@https://.*/wp-content/plugins/@', WP_PLUGIN_DIR . '/', $icon );
 
-			return @file_get_contents( $icon_path );
+			return files()->filesystem()->get_contents( $icon_path );
 		}
 
 		return false;
@@ -911,6 +912,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			return;
 		}
 
+        // phpcs:disable WordPress.Security -- if we're here, we know it exists and we'll sanitize it later
 		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
 
 		// Loop through the schema and do any obvious work ahead of time.

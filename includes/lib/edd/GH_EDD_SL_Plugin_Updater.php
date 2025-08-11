@@ -396,7 +396,7 @@ class GH_EDD_SL_Plugin_Updater {
 		// Do a quick status check on this domain if we haven't already checked it.
 		$store_hash = md5( $this->api_url );
 		if ( ! is_array( $edd_plugin_url_available ) || ! isset( $edd_plugin_url_available[ $store_hash ] ) ) {
-			$test_url_parts = parse_url( $this->api_url );
+			$test_url_parts = wp_parse_url( $this->api_url );
 
 			$scheme = ! empty( $test_url_parts['scheme'] ) ? $test_url_parts['scheme'] : 'http';
 			$host   = ! empty( $test_url_parts['host'] ) ? $test_url_parts['host'] : '';
@@ -476,6 +476,8 @@ class GH_EDD_SL_Plugin_Updater {
 
 	public function show_changelog() {
 
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- handled upstream.
+
 		global $edd_plugin_data;
 
 		if ( empty( $_REQUEST['edd_sl_action'] ) || 'view_plugin_changelog' != $_REQUEST['edd_sl_action'] ) {
@@ -494,7 +496,9 @@ class GH_EDD_SL_Plugin_Updater {
 			wp_die( esc_html__( 'You do not have permission to install plugin updates', 'groundhogg' ), esc_html__( 'Error', 'groundhogg' ), array( 'response' => 403 ) );
 		}
 
-		$data         = $edd_plugin_data[ $_REQUEST['slug'] ];
+		$slug = sanitize_key( wp_unslash( $_REQUEST['slug'] ) );
+
+		$data         = $edd_plugin_data[ $slug ];
 		$beta         = ! empty( $data['beta'] ) ? true : false;
 		$cache_key    = md5( 'edd_plugin_' . sanitize_key( $_REQUEST['plugin'] ) . '_' . $beta . '_version_info' );
 		$version_info = $this->get_cached_version_info( $cache_key );
@@ -503,9 +507,9 @@ class GH_EDD_SL_Plugin_Updater {
 
 			$api_params = array(
 				'edd_action' => 'get_version',
-				'item_name'  => isset( $data['item_name'] ) ? $data['item_name'] : false,
-				'item_id'    => isset( $data['item_id'] ) ? $data['item_id'] : false,
-				'slug'       => $_REQUEST['slug'],
+				'item_name'  => $data['item_name'] ?? false,
+				'item_id'    => $data['item_id'] ?? false,
+				'slug'       => $slug,
 				'author'     => $data['author'],
 				'url'        => home_url(),
 				'beta'       => ! empty( $data['beta'] )
@@ -543,6 +547,8 @@ class GH_EDD_SL_Plugin_Updater {
 			echo '<div style="background:#fff;padding:10px;">' . wp_kses_post( $version_info->sections['changelog'] ) . '</div>';
 		}
 
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
 		exit;
 	}
 
@@ -576,7 +582,7 @@ class GH_EDD_SL_Plugin_Updater {
 
 		$data = array(
 			'timeout' => strtotime( '+3 hours', time() ),
-			'value'   => json_encode( $value )
+			'value'   => wp_json_encode( $value )
 		);
 
 		update_option( $cache_key, $data, 'no' );

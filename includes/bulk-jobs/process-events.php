@@ -2,10 +2,13 @@
 
 namespace Groundhogg\Bulk_Jobs;
 
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Event;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\Limits;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\db;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 
@@ -29,16 +32,12 @@ class Process_Events extends Bulk_Job {
 	 */
 	public function query( $items ) {
 
-		global $wpdb;
+		$eventQuery = new Table_Query( db()->event_queue, 'eq' );
+		$eventQuery->where()->equals( 'status', Event::WAITING )
+		                    ->lessThan( 'time', time() )
+		                    ->equals( 'claim', '' );
 
-		$now = time();
-
-		$db = get_db( 'event_queue' );
-
-		$SQL = "SELECT COUNT(ID) FROM {$db->get_table_name()}
-		WHERE `status` = 'waiting' AND `time` <= {$now} AND `claim` = ''";
-
-		$num_queued_events = $wpdb->get_var( $SQL );
+		$num_queued_events = $eventQuery->count();
 
 		// Max 3 minutes
 		$requests = ceil( $num_queued_events / 18 );
@@ -93,6 +92,7 @@ class Process_Events extends Bulk_Job {
 
 		$time = new Micro_Time_Tracker();
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- not needed
 		if ( ! key_exists( 'the_end', $_POST ) ) {
 
 			$error = new \WP_Error(
@@ -111,9 +111,11 @@ class Process_Events extends Bulk_Job {
 		$diff = $time->time_elapsed_rounded(3);
 
 		if ( $failed === 0 ) {
-			$msg = sprintf( __( 'Processed %d events in %s seconds.', 'groundhogg' ), $completed, $diff );
+			/* translators: 1: the number of events processed, 2: the time it took in seconds */
+			$msg = sprintf( __( 'Processed %1$d events in %2$s seconds.', 'groundhogg' ), $completed, $diff );
 		} else {
-			$msg = sprintf( __( 'Processed %d events in %s seconds. %d events failed.', 'groundhogg' ), $completed - $failed, $diff, $failed );
+			/* translators: 1: the number of events processed, 2: the time it took in seconds, 3: how many events failed */
+			$msg = sprintf( __( 'Processed %1$d events in %2$s seconds. %3$d events failed.', 'groundhogg' ), $completed - $failed, $diff, $failed );
 		}
 
 		$response = [

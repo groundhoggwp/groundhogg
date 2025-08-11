@@ -73,17 +73,19 @@ class Date extends Input {
 
 		ob_start();
 
+		$datePickerArgs = array_filter( [
+			'changeMonth' => true,
+			'changeYear'  => true,
+			'minDate'     => $this->get_min_date(),
+			'maxDate'     => $this->get_max_date(),
+			'dateFormat'  => $this->get_date_format()
+		] );
+
 		?>
 		<script>
           (($) => {
             $(() => {
-              $('.<?php echo $uniq_id ?>').datepicker({
-                changeMonth: true,
-                changeYear: true,
-				  <?php echo $this->get_min_date() ? "minDate: '{$this->get_min_date()}'," : ''?>
-				  <?php echo $this->get_max_date() ? "maxDate: '{$this->get_max_date()}'," : ''?>
-				  <?php echo $this->get_date_format() ? "dateFormat: '{$this->get_date_format()}'," : ''?>
-              })
+              $('.<?php echo esc_attr( $uniq_id ) ?>').datepicker( <?php echo wp_json_encode( $datePickerArgs ); ?> )
             })
           })(jQuery)
 		</script>

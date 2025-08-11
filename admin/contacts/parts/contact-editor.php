@@ -144,58 +144,58 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                                         <label
                                                 for="primary_phone"><?php esc_html_e( 'Primary Phone & Ext.', 'groundhogg' ) ?></label>
                                         <div class="gh-input-group">
-											<?php echo html()->input( [
-												'type'        => 'tel',
-												'class'       => 'input',
-												'id'          => 'primary_phone',
-												'name'        => 'primary_phone',
-												'value'       => $contact->get_meta( 'primary_phone' ),
-												'placeholder' => esc_html_x( '+1 (555) 555-5555', 'phone number', 'groundhogg' )
-
-											] ); ?>
-											<?php echo html()->input( [
-												'id'          => 'primary_phone_extension',
-												'name'        => 'primary_phone_extension',
-												'class'       => 'phone-ext',
-												'value'       => $contact->get_meta( 'primary_phone_extension' ),
-												'style'       => [
-													'width' => '60px'
-												],
-												'placeholder' => esc_html_x( '1234', 'phone extension', 'groundhogg' )
-											] ); ?>
+	                                        <?php html( [
+                                                    html()->input( [
+                                                    'type'        => 'tel',
+                                                    'class'       => 'input',
+                                                    'id'          => 'primary_phone',
+                                                    'name'        => 'primary_phone',
+                                                    'value'       => $contact->get_meta( 'primary_phone' ),
+                                                    'placeholder' => esc_html_x( '+1 (555) 555-5555', 'phone number', 'groundhogg' )
+		                                        ] ),
+		                                        html()->input( [
+                                                    'id'          => 'primary_phone_extension',
+                                                    'name'        => 'primary_phone_extension',
+                                                    'class'       => 'phone-ext',
+                                                    'value'       => $contact->get_meta( 'primary_phone_extension' ),
+                                                    'style'       => [
+                                                        'width' => '60px'
+                                                    ],
+                                                    'placeholder' => esc_html_x( '1234', 'phone extension', 'groundhogg' )
+		                                        ] )
+	                                        ] ); ?>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="gh-col">
                                 <label for="mobile_phone"><?php esc_html_e( 'Mobile Phone', 'groundhogg' ) ?></label>
-								<?php
-								echo html()->input( [
+								<?php html( html()->input( [
 									'type'  => 'tel',
 									'class' => 'input',
 									'id'    => 'mobile_phone',
 									'name'  => 'mobile_phone',
 									'value' => $contact->get_meta( 'mobile_phone' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                         </div>
                         <div class="gh-row">
                             <div class="gh-col">
                                 <label for="owner_id"><?php esc_html_e( 'Contact Owner', 'groundhogg' ) ?></label>
-								<?php echo html()->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ); ?>
+								<?php html( html()->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ) ); ?>
                             </div>
                             <div class="gh-col">
                                 <label><?php esc_html_e( 'Birthday', 'groundhogg' ); ?></label>
 								<?php
 
-								$years  = array_reverse( range( date( 'Y' ) - 100, date( 'Y' ) ) );
+								$years  = array_reverse( range( gmdate( 'Y' ) - 100, gmdate( 'Y' ) ) );
 								$years  = array_combine( $years, $years );
 								$days   = range( 1, 31 );
 								$days   = array_combine( $days, $days );
 								$months = [];
 
 								for ( $i = 1; $i <= 12; $i ++ ) {
-									$timestamp    = mktime( 0, 0, 0, $i, 1, date( 'Y' ) );
+									$timestamp    = mktime( 0, 0, 0, $i, 1, gmdate( 'Y' ) );
 									$months[ $i ] = date_i18n( "F", $timestamp );
 								}
 
@@ -261,7 +261,7 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 								}
 
-								echo html()->e( 'div', [
+								html( 'div', [
 									'class' => 'gh-input-group',
 								], $inputs );
 
@@ -283,87 +283,83 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <div class="gh-row">
                             <div class="gh-col">
                                 <label for="street_address_1"><?php esc_html_e( 'Line 1', 'groundhogg' ) ?></label>
-								<?php echo html()->input( [
+								<?php html( html()->input( [
 									'id'    => 'street_address_1',
 									'name'  => 'street_address_1',
 									'value' => $contact->get_meta( 'street_address_1' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                             <div class="gh-col">
-                                <label
-                                        for="street_address_2"><?php esc_html_e( 'Line 2', 'groundhogg' ) ?></label>
-								<?php echo html()->input( [
+                                <label for="street_address_2"><?php esc_html_e( 'Line 2', 'groundhogg' ) ?></label>
+								<?php html( html()->input( [
 									'id'    => 'street_address_2',
 									'name'  => 'street_address_2',
 									'value' => $contact->get_meta( 'street_address_2' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                         </div>
                         <div class="gh-row">
                             <div class="gh-col">
                                 <label for="city"><?php esc_html_e( 'City', 'groundhogg' ) ?></label>
-								<?php echo html()->input( [
+								<?php html( html()->input( [
 									'id'    => 'city',
 									'name'  => 'city',
 									'value' => $contact->get_meta( 'city' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                             <div class="gh-col">
                                 <label for="postal_zip"><?php esc_html_e( 'Postal/Zip Code', 'groundhogg' ) ?></label>
-								<?php echo html()->input( [
+								<?php html( html()->input( [
 									'id'    => 'postal_zip',
 									'name'  => 'postal_zip',
 									'value' => $contact->get_meta( 'postal_zip' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                         </div>
                         <div class="gh-row">
                             <div class="gh-col">
                                 <label for="region"><?php esc_html_e( 'State', 'groundhogg' ) ?></label>
-								<?php echo html()->input( [
+								<?php html( html()->input( [
 									'id'    => 'region',
 									'name'  => 'region',
 									'value' => $contact->get_meta( 'region' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                             <div class="gh-col">
                                 <label for="country"><?php esc_html_e( 'Country', 'groundhogg' ) ?></label>
-								<?php echo html()->select2( [
+								<?php html( html()->select2( [
 									'id'          => 'country',
 									'name'        => 'country',
 									'selected'    => $contact->get_meta( 'country' ),
 									'data'        => Plugin::$instance->utils->location->get_countries_list(),
 									'placeholder' => esc_html__( 'Select a Country', 'groundhogg' ),
 									'style'       => []
-								] ); ?>
+								] ) ); ?>
                             </div>
                         </div>
                         <div class="gh-row">
                             <div class="gh-col">
-                                <label
-                                        for="ip_address"><?php esc_html_e( 'IP Address', 'groundhogg' ) ?></label>
-								<?php echo html()->input( [
+                                <label for="ip_address"><?php esc_html_e( 'IP Address', 'groundhogg' ) ?></label>
+								<?php html( html()->input( [
 									'id'    => 'ip_address',
 									'name'  => 'ip_address',
 									'value' => $contact->get_meta( 'ip_address' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                             <div class="gh-col">
-                                <label
-                                        for="time_zone"><?php esc_html_e( 'Time Zone', 'groundhogg' ) ?></label>
-								<?php echo html()->select2( [
+                                <label for="time_zone"><?php esc_html_e( 'Time Zone', 'groundhogg' ) ?></label>
+								<?php html( html()->select2( [
 									'id'       => 'time_zone',
 									'name'     => 'time_zone',
 									'data'     => Plugin::$instance->utils->location->get_time_zones(),
 									'selected' => $contact->get_meta( 'time_zone' ),
 									'style'    => []
-								] ); ?>
+								] ) ); ?>
                             </div>
                         </div>
                         <div class="gh-row">
                             <div class="gh-col">
-                                <label
-                                        for="ip_address"><?php esc_html_e( 'Locale', 'groundhogg' ) ?></label>
+                                <label for="locale"><?php esc_html_e( 'Locale', 'groundhogg' ) ?></label>
 								<?php wp_dropdown_languages( [
 									'selected'              => $contact->get_locale(),
 									'explicit_option_en_us' => true,
@@ -379,19 +375,19 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <div class="gh-row">
                             <div class="gh-col">
                                 <label for="source_page"><?php esc_html_e( 'Signup Page', 'groundhogg' ); ?></label>
-								<?php echo html()->input( [
+								<?php html( html()->input( [
 									'id'    => 'source_page',
 									'name'  => 'source_page',
 									'value' => $contact->get_meta( 'source_page' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                             <div class="gh-col">
                                 <label for="source_page"><?php esc_html_e( 'Lead Source', 'groundhogg' ); ?></label>
-								<?php echo html()->input( [
+								<?php html( html()->input( [
 									'id'    => 'lead_source',
 									'name'  => 'lead_source',
 									'value' => $contact->get_meta( 'lead_source' ),
-								] ); ?>
+								] ) ); ?>
                             </div>
                         </div>
                     </div>
@@ -405,18 +401,18 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         </tr>
 						<?php if ( Plugin::$instance->preferences->is_gdpr_enabled() ): ?>
                             <tr>
-                                <th><?php esc_html_e( 'Data Processing Consent' ); ?></th>
+                                <th><?php esc_html_e( 'Data Processing Consent', 'groundhogg' ); ?></th>
                                 <td><?php echo ( $contact->get_meta( 'gdpr_consent' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' , 'groundhogg' ), $contact->get_meta( 'gdpr_consent_date' ) ) ): '&#x2014;'; ?></td>
                             </tr>
                             <tr>
-                                <th><?php esc_html_e( 'Marketing Consent' ); ?></th>
+                                <th><?php esc_html_e( 'Marketing Consent', 'groundhogg' ); ?></th>
                                 <td><?php echo ( $contact->get_meta( 'marketing_consent' ) === 'yes' ) ? esc_html( sprintf( "%s: %s", __( 'Agreed' , 'groundhogg' ), $contact->get_meta( 'marketing_consent_date' ) ) ): '&#x2014;'; ?></td>
                             </tr>
 						<?php endif; ?>
                         </tbody>
                     </table>
                     <div class="sticky-submit has-box-shadow">
-                        <button class="gh-button primary" id="save-primary"><?php esc_html_e( 'Save Changes' ) ?></button>
+                        <button class="gh-button primary" id="save-primary"><?php esc_html_e( 'Save Changes', 'groundhogg' ) ?></button>
                     </div>
 
 					<?php

@@ -1852,7 +1852,7 @@ class Legacy_Contact_Query {
 			'count_compare' => ''
 		] );
 
-		$path = parse_url( $filter_vars['link'], PHP_URL_PATH );
+		$path = wp_parse_url( $filter_vars['link'], PHP_URL_PATH );
 
 		$ba = self::get_before_and_after_from_filter_date_range( $filter_vars );
 

@@ -204,6 +204,7 @@ class Import_Contacts extends Bulk_Job {
 			'tags_include_needs_all' => 1,
 		] );
 
+		/* translators: %s: the number of contacts imported */
 		return sprintf( _n( '%s contact imported!', '%s contacts imported!', $total_contacts_imported, 'groundhogg' ), number_format_i18n( $total_contacts_imported ) );
 	}
 

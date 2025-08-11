@@ -27,12 +27,9 @@ class Manager {
 		$this->export_contacts          = new Export_Contacts();
 		$this->import_contacts          = new Import_Contacts();
 		$this->sync_contacts            = new Sync_Users();
-		$this->migrate_form_impressions = new Migrate_Form_Impressions();
-		$this->migrate_waiting_events   = new Migrate_Waiting_Events();
 		$this->add_contacts_to_funnel   = new Add_Contacts_To_Funnel();
 		$this->create_users             = new Create_Users();
 		$this->process_events           = new Process_Events();
-		$this->migrate_notes            = new Migrate_Notes();
 		$this->update_subsites          = new Update_subsites();
 		$this->check_licenses           = new Check_Licenses();
 		$this->update_marketing_consent = new Update_Marketing_Consent();

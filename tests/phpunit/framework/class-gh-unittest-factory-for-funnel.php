@@ -35,7 +35,7 @@ class GH_UnitTest_Factory_For_Funnel extends GH_UnitTest_Factory_For_Thing {
 			return false;
 		}
 
-		return $array[ mt_rand( 0, count( $array ) - 1 ) ];
+		return $array[ wp_rand( 0, count( $array ) - 1 ) ];
 	}
 
 	/**

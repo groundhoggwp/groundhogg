@@ -431,7 +431,8 @@ function add_review_link_in_footer( $text ) {
 		return $text;
 	}
 
-	return preg_replace( "/<\/span>/", sprintf( wp_kses( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>', 'groundhogg' ), 'simple' ), 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ), $text );
+	/* translators: %s: link to leave a review */
+	return preg_replace( "/<\/span>/", sprintf( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>', 'groundhogg' ), 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ), $text );
 }
 
 add_filter( 'admin_footer_text', __NAMESPACE__ . '\add_review_link_in_footer' );

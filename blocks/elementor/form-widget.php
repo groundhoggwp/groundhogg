@@ -16,6 +16,7 @@ class Form_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
+		/* translators: %s: the plugin/brand name */
 		return sprintf( __( '%s Forms', 'groundhogg' ), white_labeled_name() );
 	}
 
@@ -32,7 +33,7 @@ class Form_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'content_section',
 			[
-				'label' => esc_html__( 'Content', 'elementor' ),
+				'label' => esc_html__( 'Content', 'groundhogg' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			]
 		);

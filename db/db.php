@@ -315,13 +315,9 @@ abstract class DB {
 	 * @return array
 	 */
 	public function search( $s = '' ) {
-		global $wpdb;
-
-		$where = $this->generate_search( $s );
-
-		return $wpdb->get_results(
-			"SELECT * FROM $this->table_name WHERE $where ORDER BY $this->primary_key DESC"
-		);
+		$query = new Table_Query( $this );
+		$query->search( $s );
+		return $query->get_results();
 	}
 
 	/**

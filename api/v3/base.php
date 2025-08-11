@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V3;
 
 use Groundhogg\Contact;
+use Groundhogg\DB\Query\Query;
 use function Groundhogg\get_contactdata;
 use WP_Error;
 use WP_REST_Response;
@@ -224,8 +225,10 @@ abstract class Base {
 
 		if ( ! $contact ) {
 			if ( is_numeric( $id_or_email ) ) {
+				/* translators: %s: the contact's ID */
 				return self::ERROR_400( 'invalid_id', sprintf( _x( 'Contact with ID %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
 			} else {
+				/* translators: %s: the contact's email address */
 				return self::ERROR_400( 'invalid_email', sprintf( _x( 'Contact with email %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
 			}
 		}
@@ -264,7 +267,14 @@ abstract class Base {
 		//validate user
 		global $wpdb;
 
-		$user_id = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'wpgh_user_public_key' AND meta_value = %s LIMIT 1", $key ) );
+		$query = new Query( $wpdb->usermeta, 'um' );
+		$query->setSelect( 'user_id' )
+		      ->setLimit(1)
+		      ->where()
+		      ->equals( 'meta_key', 'wpgh_user_public_key' )
+		      ->equals( 'meta_value', $key );
+
+		$user_id = $query->get_var();
 
 		if ( ! $user_id ) {
 			return self::ERROR_401( 'public_key_invalid', _x( 'Public key is invalid.', 'api', 'groundhogg' ) );

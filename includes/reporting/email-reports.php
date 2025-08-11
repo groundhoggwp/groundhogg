@@ -70,13 +70,11 @@ class Email_Reports extends Notification_Builder {
 	 */
 	public static function get_recipients( string $meta_key ) {
 
-		$args = [
+		// Create a new query
+		$user_query = new \WP_User_Query( [
 			'meta_key'   => $meta_key,
 			'meta_value' => 1,
-		];
-
-		// Create a new query
-		$user_query = new \WP_User_Query( $args );
+		] );
 
 		// Get the results
 		$users  = filter_by_cap( $user_query->get_results(), 'view_reports' );
@@ -288,13 +286,15 @@ class Email_Reports extends Notification_Builder {
 			$pending_tasks .= $replacer->replace( $task_template );
 		}
 
-		echo self::get_general_notification_template_html( 'pending-tasks', [
+		$replacements = [
 			'all_pending_tasks_count' => _nf( $total_tasks ),
 			'pending_tasks'           => $pending_tasks
-		] );
+		];
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+		echo self::get_general_notification_template_html( 'pending-tasks', $replacements );
 
 		die();
-
 	}
 
 	/**
@@ -524,7 +524,13 @@ class Email_Reports extends Notification_Builder {
 			return false;
 		}
 
-		$subject = sprintf( _n( '[%s] %s new failed event on %s', '[%s] %s new failed events on %s', $new_errors_count, 'groundhogg' ), white_labeled_name(), _nf( $new_errors_count ), get_hostname() );
+		$subject = sprintf(
+			/* translators: 1: plugin/brand name, 2: number of errors, 3: the site hostname */
+			_n( '[%1$s] %2$s new failed event on %3$s', '[%1$s] %2$s new failed events on %3$s', $new_errors_count, 'groundhogg' ),
+			white_labeled_name(),
+			_nf( $new_errors_count ),
+			get_hostname()
+		);
 
 		$eventQuery = new Table_Query( 'events' );
 		$eventQuery->setSelect( 'error_code', 'error_message', [ 'count(ID)', 'total' ] )

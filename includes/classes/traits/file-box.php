@@ -90,7 +90,7 @@ trait File_Box {
 		$result = files()->safe_file_sideload( $file, $this->get_allowed_mime_types(), $folder );
 
 		if ( is_wp_error( $result ) ) {
-			@unlink( $file['tmp_name'] );
+			wp_delete_file( $file['tmp_name'] );
 		}
 
 		return $result;
@@ -168,7 +168,7 @@ trait File_Box {
 		$file_name = basename( $file_name );
 		foreach ( $this->get_files() as $file ) {
 			if ( $file_name === $file['name'] ) {
-				unlink( $file['path'] );
+				wp_delete_file( $file['path'] );
 			}
 		}
 	}
@@ -201,7 +201,7 @@ trait File_Box {
 			$file_path = $file['path'];
 			$file_name = $file['name'];
 
-			rename( $file_path, $uploads_dir['path'] . '/' . $file_name );
+			files()->filesystem()->move( $file_path, $uploads_dir['path'] . '/' . $file_name );
 		}
 
 		return parent::merge( $other );

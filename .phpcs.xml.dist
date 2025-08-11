@@ -26,8 +26,11 @@
 	<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
 	<config name="minimum_supported_wp_version" value="6.0"/>
 	<!-- Minimal WPCS focus for plugin review: I18n and Security only. -->
-	<rule ref="WordPress.WP.I18n"/>
 	<rule ref="WordPress.Security"/>
+	<rule ref="WordPress.DB"/>
+	<rule ref="WordPress.DateTime"/>
+	<rule ref="WordPress.WP.AlternativeFunctions"/>
+	<rule ref="WordPress.WP.I18n"/>
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<!-- Replace the text domain used. -->

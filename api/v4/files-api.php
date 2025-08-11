@@ -129,7 +129,7 @@ class Files_Api extends Base_Api {
 		$files_to_delete = $request->get_json_params();
 
 		foreach ( $files_to_delete as $file ){
-			unlink( files()->get_csv_imports_dir( $file ) );
+			wp_delete_file( files()->get_csv_imports_dir( $file ) );
 		}
 
 		return self::SUCCESS_RESPONSE();
@@ -175,7 +175,7 @@ class Files_Api extends Base_Api {
 		$files_to_delete = $request->get_json_params();
 
 		foreach ( $files_to_delete as $file ){
-			unlink( files()->get_csv_exports_dir( $file ) );
+			wp_delete_file( files()->get_csv_exports_dir( $file ) );
 		}
 
 		return self::SUCCESS_RESPONSE();

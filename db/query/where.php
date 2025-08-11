@@ -272,7 +272,7 @@ class Where {
 		$compare = $this->symbolize_comparison( $compare );
 
 		if ( ! in_array( $compare, $this->get_allowed_comparisons() ) ) {
-			throw new Exception( "$compare is not an allowed comparison symbol" );
+			throw new Exception( esc_html( "$compare is not an allowed comparison symbol" ) );
 		}
 
 		switch ( strtoupper( $compare ) ) {

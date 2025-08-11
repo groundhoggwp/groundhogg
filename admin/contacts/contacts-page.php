@@ -850,7 +850,7 @@ class Contacts_Page extends Admin_Page {
 			return new WP_Error( 'error', 'The requested file does not exist.' );
 		}
 
-		unlink( $file_path );
+		wp_delete_file( $file_path );
 
 		$this->add_notice( 'success', esc_html__( 'File deleted.', 'groundhogg' ) );
 

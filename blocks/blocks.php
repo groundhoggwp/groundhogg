@@ -41,7 +41,8 @@ class Blocks {
 					'title'    => __( 'Select a form', 'groundhogg' ),
 					'sections' => [
 						'groundhogg-forms' => [
-							'title'  => sprintf( esc_html__( '%s Forms', 'groundhogg' ), white_labeled_name() ),
+							/* translators: the plugin/brand name */
+							'title'  => sprintf( __( '%s Forms', 'groundhogg' ), white_labeled_name() ),
 							'fields' => [
 								'groundhogg_form_id' => [
 									'type'    => 'select',

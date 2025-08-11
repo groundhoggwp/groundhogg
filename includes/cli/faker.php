@@ -63,7 +63,7 @@ class Faker {
 
 		while ( $base_date > $start_date && ! empty( $contacts ) ) {
 
-			$num_records = rand( $avg_records_per_day, ceil( $records_per_day ) );
+			$num_records = wp_rand( $avg_records_per_day, ceil( $records_per_day ) );
 
 			$eod = ( clone $base_date )->modify( '9:00 pm' );
 			$sod = ( clone $eod )->modify( '6:00 am' );
@@ -71,7 +71,7 @@ class Faker {
 			$times = [];
 
 			for ( $i = 0; $i < $num_records; $i ++ ) {
-				$times[] = mt_rand( $sod->getTimestamp(), $eod->getTimestamp() );
+				$times[] = wp_rand( $sod->getTimestamp(), $eod->getTimestamp() );
 			}
 
 			rsort( $times );

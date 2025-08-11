@@ -38,10 +38,10 @@ class GH_UnitTest_Time_Generator {
 	public function generate() {
 
 		if ( $this->format === 'U' ){
-			return rand( $this->start, $this->end );
+			return wp_rand( $this->start, $this->end );
 		}
 
-		return date( $this->format, rand( $this->start, $this->end ) );
+		return date( $this->format, wp_rand( $this->start, $this->end ) );
 	}
 
 }

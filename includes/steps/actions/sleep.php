@@ -7,6 +7,7 @@ use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -73,7 +74,7 @@ class Sleep extends Action {
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-		echo Plugin::$instance->utils->html->description( 'Sleep for a second.' );
+		html( 'p', [], 'Sleep for a second.' );
 	}
 
 	/**

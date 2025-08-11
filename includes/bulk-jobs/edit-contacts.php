@@ -108,6 +108,7 @@ class Edit_Contacts extends Bulk_Job {
 	 */
 	protected function get_finished_notice() {
 		$total_contacts_imported = get_db( 'contacts' )->count( $this->query );
+		/* translators: %s the number of contacts updated */
 		return sprintf( _n( '%s contact updated!', '%s contacts updated!', $total_contacts_imported, 'groundhogg' ), number_format_i18n( $total_contacts_imported ) );
 	}
 

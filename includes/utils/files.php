@@ -21,7 +21,51 @@ class Files {
 	public function add_htaccess() {
 		$htaccess_content = "Deny from all";
 		$base_url         = $this->get_base_uploads_dir();
-		file_put_contents( $base_url . DIRECTORY_SEPARATOR . '.htaccess', $htaccess_content );
+		$this->put( $base_url . DIRECTORY_SEPARATOR . '.htaccess', $htaccess_content, '' );
+	}
+
+	/**
+	 *
+	 *
+	 * @return \WP_Filesystem_Base
+	 */
+	public function filesystem() {
+
+		global $wp_filesystem;
+
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		if ( ! $wp_filesystem ){
+			WP_Filesystem();
+		}
+
+		return $wp_filesystem;
+	}
+
+	/**
+	 * Get the contents of a file
+	 *
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	public function get( string $path ) {
+		return $this->filesystem()->get_contents( $path );
+	}
+
+	/**
+	 * Wrapper for WP_Filesystem
+	 *
+	 * @param $path
+	 * @param $content
+	 * @param $mode
+	 *
+	 * @return bool
+	 */
+	public function put( $path, $content, $mode = false ) {
+		return $this->filesystem()->put_contents( $path, $content, $mode );
 	}
 
 	/**
@@ -68,9 +112,9 @@ class Files {
 				$this->delete_files( $file );
 			}
 
-			@rmdir( $target );
+			$this->filesystem()->rmdir( $target );
 		} else if ( is_file( $target ) ) {
-			@unlink( $target );
+			@wp_delete_file( $target );
 		}
 	}
 
@@ -358,7 +402,8 @@ class Files {
 		}
 
 		// Read the first part of the file
-		$bytes = file_get_contents( $filepath, false, null, 0, 2048 );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- not a remote file
+		$bytes = @file_get_contents( $filepath, false, null, 0, 2048 );
 		if ( $bytes === false ) {
 			return true;
 		}

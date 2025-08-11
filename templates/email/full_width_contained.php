@@ -59,7 +59,7 @@ if ( $bgImage ) {
 		<?php load_css( 'responsive' ); ?>
 	</style>
 	<style id="block-styles">
-		<?php echo $email->get_css() ?>
+		<?php echo esc_html( $email->get_css() ) ?>
 	</style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
@@ -67,7 +67,7 @@ if ( $bgImage ) {
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
 	<tr>
 		<td bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>"
-		    style="<?php echo \Groundhogg\array_to_css( $bodyStyle ) ?>">
+		    style="<?php echo esc_attr( \Groundhogg\array_to_css( $bodyStyle ) ); ?>">
 			<?php load_part( 'preview-text' ); ?>
 			<?php load_part( 'browser-view' ); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>

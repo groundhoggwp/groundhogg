@@ -13,7 +13,7 @@ class Form_Widget extends \FLBuilderModule {
 			'name'            => __( 'Groundhogg Forms', 'groundhogg' ),
 			'description'     => __( 'Use Groundhogg forms to collect leads and launch automation!', 'groundhogg' ),
 			//'group'           => __( 'Standard Modules', 'fl-builder' ),
-			'category'        => __( 'Forms', 'fl-builder' ),
+			'category'        => __( 'Forms', 'groundhogg' ),
 			'dir'             => plugin_dir_path( __FILE__ ),
 			'url'             => plugin_dir_url( __FILE__ ),
 			'icon'            => 'icon.svg',

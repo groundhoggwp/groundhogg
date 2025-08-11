@@ -215,7 +215,7 @@ class Help_Page extends Tabbed_Admin_Page {
 
 		$user_login = get_option( 'gh_support_user_login', self::SUPPORT_LOGIN );
 
-		$user = get_userdatabylogin( $user_login );
+		$user = get_user_by( 'login', $user_login );
 
 		// No user exists, create one
 		if ( ! $user ) {

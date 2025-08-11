@@ -20,7 +20,7 @@ class Faker {
 	public static function chance( int $percentage ): bool {
 
 		// Generate a random number between 0 and 100
-		$randomNumber = rand( 0, 100 );
+		$randomNumber = wp_rand( 0, 100 );
 
 		// Return true if the random number is less than or equal to the percentage, otherwise return false
 		return $randomNumber <= $percentage;
@@ -110,7 +110,7 @@ class Faker {
 		if ( self::chance( 40 ) ) {
 
 			$date = new DateTimeHelper( $event->get_time() );
-			$date->modify( sprintf( '+%d minutes', rand( 2, 10 ) ) );
+			$date->modify( sprintf( '+%d minutes', wp_rand( 2, 10 ) ) );
 
 			track_event_activity( $event, Activity::EMAIL_OPENED, [], [
 				'timestamp' => $date->getTimestamp()
@@ -309,7 +309,7 @@ class Faker {
 					get_db( 'form_impressions' )->add( [
 						'form_id'    => $step->get_id(),
 						'ip_address' => $contact->get_ip_address(),
-						'views'      => rand( 1, 3 ),
+						'views'      => wp_rand( 1, 3 ),
 						'timestamp'  => $date->getTimestamp() - ( 5 * MINUTE_IN_SECONDS )
 					] );
 

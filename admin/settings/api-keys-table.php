@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Settings;
 
+use Groundhogg\DB\Query\Query;
 use WP_List_Table;
 use function Groundhogg\action_url;
 
@@ -228,13 +229,10 @@ class API_Keys_Table extends WP_List_Table {
 	public function total_items() {
 		global $wpdb;
 
-		if ( ! get_transient( 'wpgh_total_api_keys' ) ) {
-			$total_items = $wpdb->get_var( "SELECT count(user_id) FROM $wpdb->usermeta WHERE meta_value='wpgh_user_secret_key'" );
+		$query = new Query( $wpdb->usermeta );
+		$query->setSelect( 'COUNT(user_id)' )->where( 'meta_key', 'wpgh_user_secret_key' );
 
-			set_transient( 'wpgh_total_api_keys', $total_items, 60 * 60 );
-		}
-
-		return get_transient( 'wpgh_total_api_keys' );
+		return $query->get_var();
 	}
 
 	/**
@@ -311,7 +309,7 @@ class API_Keys_Table extends WP_List_Table {
 
 		$auth_key = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
 
-		return hash( 'md5', $user_email . $auth_key . date( 'U' ) );
+		return hash( 'md5', $user_email . $auth_key . gmdate( 'U' ) );
 	}
 
 	/**
@@ -328,7 +326,7 @@ class API_Keys_Table extends WP_List_Table {
 	public static function generate_private_key( $user_id = 0 ) {
 		$auth_key = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
 
-		return hash( 'md5', $user_id . $auth_key . date( 'U' ) );
+		return hash( 'md5', $user_id . $auth_key . gmdate( 'U' ) );
 	}
 
 	/**

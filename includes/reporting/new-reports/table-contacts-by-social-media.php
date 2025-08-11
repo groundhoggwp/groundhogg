@@ -35,7 +35,7 @@ class Table_Contacts_By_Social_Media extends Base_Table_Report {
 
 		foreach ( $counts as $datum => $num_contacts ) {
 			if ( filter_var( $datum, FILTER_VALIDATE_URL ) ) {
-				$test_lead_source = parse_url( $datum, PHP_URL_HOST );
+				$test_lead_source = wp_parse_url( $datum, PHP_URL_HOST );
 				$test_lead_source = str_replace( 'www.', '', $test_lead_source );
 				foreach ( $networks as $network => $urls ) {
 					if ( in_array( $test_lead_source, $urls ) ) {

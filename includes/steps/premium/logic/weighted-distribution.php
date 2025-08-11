@@ -68,7 +68,7 @@ class Weighted_Distribution extends Split_Path {
 
 		$total_weight = array_sum( wp_list_pluck( $branches, 'weight' ) );
 
-		$random     = rand( 1, $total_weight ); // Generate a random number between 1 and 100
+		$random     = wp_rand( 1, $total_weight ); // Generate a random number between 1 and 100
 		$cumulative = 0;
 
 		foreach ( $branches as $branch_key => $branch ) {

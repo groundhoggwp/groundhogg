@@ -340,6 +340,7 @@ class Emails_Api extends Base_Object_Api {
 		}
 
 		header( 'Content-Type: image/jpeg' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated image
 		echo $image;
 		die();
 	}
@@ -647,6 +648,7 @@ class Emails_Api extends Base_Object_Api {
 
 		// Prefix subject line with [TEST]
 		add_filter( 'groundhogg/email/subject', function ( $subject ) {
+			/* translators: %s: the subject line */
 			return sprintf( __( '[TEST] %s', 'groundhogg' ), $subject );
 		} );
 

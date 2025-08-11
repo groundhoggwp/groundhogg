@@ -26,7 +26,7 @@ function groundhogg_get_gutenberg_form_html( $attr ) {
 
 	ob_start();
 
-	echo "<div class='" . \Groundhogg\get_array_var( $attr, 'className', '' ) . "'>";
+	echo "<div class='" . esc_attr( \Groundhogg\get_array_var( $attr, 'className', '' ) ) . "'>";
 
 	echo do_shortcode( ' [gh_form id="' . $id . '" title="' . $title . '"] ' );
 

@@ -2004,7 +2004,7 @@ class Replacements implements \JsonSerializable {
 
 		$quotes = apply_filters( 'add_movie_quotes', $quotes );
 
-		$quote = rand( 0, count( $quotes ) - 1 );
+		$quote = wp_rand( 0, count( $quotes ) - 1 );
 
 		return $quotes[ $quote ];
 	}
@@ -2398,7 +2398,7 @@ class Replacements implements \JsonSerializable {
 				$thumbnail = function ( $thumbnail_size ) {
 
 					$post_thumbnail_id = get_post_thumbnail_id();
-					$alt               = trim( strip_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
+					$alt               = trim( wp_strip_all_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
 
 					return html()->e( 'img', [
 						'src'   => get_the_post_thumbnail_url( null, $thumbnail_size ),
@@ -2575,7 +2575,7 @@ class Replacements implements \JsonSerializable {
 
 						$thumbnail_size    = $props['thumbnail_size'];
 						$post_thumbnail_id = get_post_thumbnail_id();
-						$alt               = trim( strip_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
+						$alt               = trim( wp_strip_all_tags( get_post_meta( $post_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
 
 						$thumbnail = html()->e( 'a', [
 							'href' => get_the_permalink()

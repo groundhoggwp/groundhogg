@@ -3671,7 +3671,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 			}
 
 			// delete the file, either invalid contents or expired ttl, or force expiration with negative ttl
-			unlink( $cached_file );
+			wp_delete_file( $cached_file );
 		}
 	}
 

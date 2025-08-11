@@ -625,7 +625,7 @@ if ( ! class_exists( 'Spyc' ) ) {
 
 		private function loadFromSource( $input ) {
 			if ( ! empty( $input ) && strpos( $input, "\n" ) === false && file_exists( $input ) ) {
-				$input = file_get_contents( $input );
+				$input = \Groundhogg\files()->filesystem()->get_contents( $input );
 			}
 
 			return $this->loadFromString( $input );
@@ -970,7 +970,7 @@ if ( ! class_exists( 'Spyc' ) ) {
 		private function referenceContentsByAlias( $alias ) {
 			do {
 				if ( ! isset( $this->SavedGroups[ $alias ] ) ) {
-					echo "Bad group name: $alias.";
+					echo esc_html( "Bad group name: $alias." );
 					break;
 				}
 				$groupPath = $this->SavedGroups[ $alias ];
@@ -1283,7 +1283,7 @@ if ( ! class_exists( 'Spyc' ) ) {
 		private function checkKeysInValue( $value ) {
 			if ( strchr( '[{"\'', $value[0] ) === false ) {
 				if ( strchr( $value, ': ' ) !== false ) {
-					throw new Exception( 'Too many keys: ' . $value );
+					throw new Exception( 'Too many keys: ' . esc_html( $value ) );
 				}
 			}
 		}
@@ -1398,20 +1398,3 @@ if ( ! class_exists( 'Spyc' ) ) {
 		}
 	}
 }
-
-// Enable use of Spyc from command line
-// The syntax is the following: php Spyc.php spyc.yaml
-
-do {
-	if ( PHP_SAPI != 'cli' ) {
-		break;
-	}
-	if ( empty ( $_SERVER['argc'] ) || $_SERVER['argc'] < 2 ) {
-		break;
-	}
-	if ( empty ( $_SERVER['PHP_SELF'] ) || false === strpos( $_SERVER['PHP_SELF'], 'Spyc.php' ) ) {
-		break;
-	}
-	$file = $argv[1];
-	echo wp_json_encode( spyc_load_file( $file ) );
-} while ( 0 );

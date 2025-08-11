@@ -674,7 +674,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		foreach ( $files as $file_name ) {
 			$filepath = files()->get_csv_imports_dir( sanitize_file_name( $file_name ) );
 
-			if ( ! file_exists( $filepath ) || ! unlink( $filepath ) ) {
+			if ( ! file_exists( $filepath ) || ! wp_delete_file( $filepath ) ) {
 				return new WP_Error( 'failed', 'Unable to delete file.' );
 			}
 		}
@@ -892,7 +892,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		foreach ( $files as $file_name ) {
 			$filepath = files()->get_csv_exports_dir( sanitize_file_name( $file_name ) );
-			if ( ! file_exists( $filepath ) || ! unlink( $filepath ) ) {
+			if ( ! file_exists( $filepath ) || ! wp_delete_file( $filepath ) ) {
 				return new WP_Error( 'failed', 'Unable to delete file.' );
 			}
 		}
@@ -1017,7 +1017,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function process_cron_install_gh_cron_manually() {
 
-		$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
+		$gh_cron_php = files()->filesystem()->get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
 
 		nocache_headers();
 
@@ -1102,9 +1102,9 @@ class Tools_Page extends Tabbed_Admin_Page {
 		status_header( 200 );
 		nocache_headers();
 
-		readfile( $file_path );
-		exit();
-
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- file contents
+        echo files()->filesystem()->get_contents( $file_path );
+		exit;
 	}
 
 	/**
