@@ -51,8 +51,8 @@ class Pointers {
 					'target'  => $ptr['target'],
 					'options' => array(
 						'content'  => sprintf( '<h3> %s </h3><p> %s </p>%s',
-							__( $ptr['title'], 'plugindomain' ),
-							__( $ptr['content'], 'plugindomain' ),
+							esc_html( $ptr['title'] ),
+							wp_kses_post( $ptr['content'] ),
 							! $ptr['show_next'] ? '' : html()->wrap( html()->wrap( esc_html__( 'Next', 'groundhogg' ), 'a', [
 								'href'  => 'javascript:void(0)',
 								'class' => 'pointer-next button button-primary',
@@ -110,7 +110,6 @@ class Pointers {
 			return;
 		}
 
-		$pointers = wp_json_encode( $pointers );
 		?>
         <script>
             GroundhoggPointers = {};
@@ -180,7 +179,7 @@ class Pointers {
                     p.init();
                 })
 
-            })(jQuery, <?php echo $pointers; ?>, GroundhoggPointers);
+            })(jQuery, <?php echo wp_json_encode( $pointers ); ?>, GroundhoggPointers);
         </script>
 		<?php
 	}

@@ -162,31 +162,22 @@ class Preferences {
 				}
 
 				return apply_filters( 'groundhogg/preferences/optin_status_text', _x( 'Will receive marketing.', 'optin_status', 'groundhogg' ), $contact );
-				break;
 			case self::CONFIRMED:
 				return _x( 'They will receive marketing.', 'optin_status', 'groundhogg' );
-				break;
 			case self::UNSUBSCRIBED:
 				return _x( 'They will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
 			case self::WEEKLY:
 				return _x( 'This contact will only receive marketing weekly.', 'optin_status', 'groundhogg' );
-				break;
 			case self::MONTHLY:
 				return _x( 'This contact will only receive marketing monthly.', 'optin_status', 'groundhogg' );
-				break;
 			case self::HARD_BOUNCE:
 				return _x( 'This email address bounced, they will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
 			case self::SPAM:
 				return _x( 'This contact was marked as spam. They will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
 			case self::COMPLAINED:
 				return _x( 'This contact complained about your emails. They will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
 			case self::BLOCKED:
 				return _x( 'This contact was blocked. They will not receive marketing.', 'optin_status', 'groundhogg' );
-				break;
 		}
 	}
 
@@ -320,27 +311,22 @@ class Preferences {
 				}
 
 				return true;
-				break;
 			case self::CONFIRMED:
 				return true;
-				break;
 			case self::SPAM;
 			case self::COMPLAINED;
 			case self::HARD_BOUNCE;
 			case self::UNSUBSCRIBED:
 			case self::BLOCKED:
 				return false;
-				break;
 			case self::WEEKLY:
 				$last_sent = $contact->get_meta( 'last_sent' );
 
 				return ( time() - absint( $last_sent ) ) > 7 * 24 * HOUR_IN_SECONDS;
-				break;
 			case self::MONTHLY:
 				$last_sent = $contact->get_meta( 'last_sent' );
 
 				return ( time() - absint( $last_sent ) ) > 30 * 24 * HOUR_IN_SECONDS;
-				break;
 		}
 	}
 

@@ -211,7 +211,8 @@ class Main_Updater extends Old_Updater {
 			],
 			'3.7.3.6'  => [
 				'automatic'   => true,
-				'description' => sprintf( __( 'Add <code>big_uploads</code> capability to %s roles.', 'groundhogg' ), white_labeled_name() ),
+				/* translators: %s: the plugin/brand name */
+				'description' => sprintf( __( 'Add <code>big_uploads</code> capability to %s roles.', 'groundhogg' ), esc_html( white_labeled_name() ) ),
 				'callback'    => function () {
 					foreach ( Main_Roles::$owner_roles as $owner_role ) {
 						$role = get_role( $owner_role );

@@ -74,7 +74,7 @@ class Backwards_Compatibility {
 			switch ( $tracking_via ) {
 				case 'link':
 
-					wp_redirect( managed_page_url( sprintf( 'link/click/%s/', get_request_var( 'id' ) ) ) );
+					wp_safe_redirect( managed_page_url( sprintf( 'link/click/%s/', get_request_var( 'id' ) ) ) );
 					die();
 
 					break;
@@ -92,7 +92,7 @@ class Backwards_Compatibility {
 								)
 							);
 
-							wp_redirect( $url );
+							wp_safe_redirect( $url );
 							die();
 
 							break;
@@ -108,7 +108,7 @@ class Backwards_Compatibility {
 								)
 							);
 
-							wp_redirect( $url );
+							wp_safe_redirect( $url );
 							die();
 
 							break;
@@ -121,7 +121,7 @@ class Backwards_Compatibility {
 		$confirmation = get_query_var( 'confirmation' );
 
 		if ( $confirmation ) {
-			wp_redirect( managed_page_url( 'preferences/confirm/' ) );
+			wp_safe_redirect( managed_page_url( 'preferences/confirm/' ) );
 			die();
 		}
 

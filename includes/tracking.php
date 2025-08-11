@@ -577,7 +577,11 @@ class Tracking {
 	public function fix_tracking_ssl() {
 		$site = get_option( 'siteurl' );
 		if ( strpos( $site, 'https://' ) !== false && ! is_ssl() ) {
-			$actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+			$host        = sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ?? '' ) );
+			$request_uri = get_request_uri();
+
+			$actual_link = "https://$host$request_uri";
 			wp_safe_redirect( $actual_link );
 			die();
 		}
@@ -682,6 +686,7 @@ class Tracking {
 			'utm_term'     => '',
 		);
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- not processed here
 		$utm = array_intersect_key( $_GET, $utm_defaults );
 
 		$has_utm = array_filter( array_values( $utm_defaults ) );
@@ -715,9 +720,8 @@ class Tracking {
 
 		status_header( 200 );
 		header( 'Content-Type: image/png' );
-		echo base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=' );
-
-		die();
+		echo esc_html( base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=' ) );
+		die;
 	}
 
 	/**
@@ -761,8 +765,9 @@ class Tracking {
 	 * Redirects to the target URL
 	 */
 	protected function redirect_to_target() {
+		// phpcs:ignore WordPress.Security.SafeRedirect -- user-defined redirect
 		wp_redirect( $this->get_target_url(), $this->redirect_http_status_code() );
-		die();
+		exit;
 	}
 
 	/**

@@ -176,7 +176,7 @@ function groundhogg_tools_sysinfo_get() {
 	$return .= "\n" . '-- Webserver Configuration' . "\n\n";
 	$return .= 'PHP Version:              ' . PHP_VERSION . "\n";
 	$return .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
-	$return .= 'Webserver Info:           ' . esc_html( $_SERVER['SERVER_SOFTWARE'] ) . "\n";
+	$return .= 'Webserver Info:           ' . esc_html( sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ?? '' ) ) ) . "\n";
 
 	$return = apply_filters( 'groundhogg_sysinfo_after_webserver_config', $return );
 
@@ -356,7 +356,8 @@ function groundhogg_get_host() {
 		$host = 'Rackspace Cloud';
 	} else if ( strpos( DB_HOST, '.sysfix.eu' ) !== false ) {
 		$host = 'SysFix.eu Power Hosting';
-	} else if ( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) {
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- not used
+	} else if ( str_contains( wp_unslash( $_SERVER['SERVER_NAME'] ?? '' ), 'Flywheel' ) ) {
 		$host = 'Flywheel';
 	} else if ( defined( 'SiteGround_Optimizer\VERSION' ) ) {
 		$host = 'SiteGround';
@@ -364,7 +365,7 @@ function groundhogg_get_host() {
 		$host = 'Closte';
 	} else {
 		// Adding a general fallback for data gathering
-		$host = 'DBH: ' . DB_HOST . ', SRV: ' . sanitize_text_field( $_SERVER['SERVER_NAME'] );
+		$host = 'DBH: ' . DB_HOST . ', SRV: ' . sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ?? '' ) );
 	}
 
 	return $host;
@@ -382,6 +383,7 @@ function groundhogg_tools_sysinfo_download() {
 		return;
 	}
 
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- handled upstream
 	if ( ! isset( $_REQUEST['gh_download_sys_info'] ) ) {
 		return;
 	}
@@ -395,8 +397,8 @@ function groundhogg_tools_sysinfo_download() {
 	header( 'Content-Type: text/plain' );
 	header( 'Content-Disposition: attachment; filename="groundhogg-system-info.txt"' );
 
-	echo wp_strip_all_tags( groundhogg_tools_sysinfo_get() );
-	die();
+	echo esc_html( groundhogg_tools_sysinfo_get() );
+	die;
 }
 
 add_action( 'admin_init', 'groundhogg_tools_sysinfo_download' );

@@ -28,7 +28,7 @@ function sanitize_custom_field( $value, $field_id ) {
 	}
 
 	if ( ! $field ) {
-		throw new PropertyException( 'Field ' . $field_id . ' does not exist' );
+		throw new PropertyException( 'Field ' . esc_html( $field_id ) . ' does not exist' );
 	}
 
 	// empty value? just return the default expected value...
@@ -142,6 +142,7 @@ function format_custom_field( $id_or_name, $data ) {
 				$data = is_array( $data ) ? esc_html( implode( ', ', $data ) ) : '';
 				break;
 			case 'html':
+				$data = wp_kses_post( $data );
 				// output with no change as already HTML
 				break;
 		endswitch;
@@ -192,7 +193,7 @@ function display_custom_field( $id_or_name, $contact, $echo = true ) {
 	$data = apply_filters( 'groundhogg/display_custom_field', $data, $contact );
 
 	if ( $echo ) {
-		echo $data;
+		echo wp_kses_post( $data );
 	}
 
 	return $data;

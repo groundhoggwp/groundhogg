@@ -342,8 +342,9 @@ class Rewrites {
 					}
 				}
 
+				// phpcs:ignore WordPress.Security.SafeRedirect -- user-defined redirect
 				wp_redirect( $target_url );
-				die();
+				exit;
 
 				break;
 			case 'funnels':
@@ -444,16 +445,16 @@ class Rewrites {
 
 					// If the contact or permissions key is not available, exit now.
 					if ( ! $contact || ! $permissions_key || ! check_permissions_key( $permissions_key, $contact, 'auto_login' ) ) {
-						wp_redirect( wp_login_url( $redirect_to ) );
-						die();
+						wp_safe_redirect( wp_login_url( $redirect_to ) );
+						exit;
 					}
 
 					$user = $contact->get_userdata();
 
 					// If there is no user account, send to the home page
 					if ( ! $user ) {
-						wp_redirect( wp_login_url( $redirect_to ) );
-						die();
+						wp_safe_redirect( wp_login_url( $redirect_to ) );
+						exit;
 					}
 
 					wp_set_current_user( $user->ID );
@@ -468,9 +469,9 @@ class Rewrites {
 					do_action( 'wp_login', $user->user_login, $user );
 				}
 
-				exit( wp_redirect( $redirect_to ) );
-
-				break;
+				// phpcs:ignore WordPress.Security.SafeRedirect -- user-defined redirect
+				wp_redirect( $redirect_to );
+				exit;
 		}
 	}
 

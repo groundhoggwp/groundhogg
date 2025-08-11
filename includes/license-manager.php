@@ -291,6 +291,7 @@ class License_Manager {
 	 * Activate a license
 	 */
 	public static function perform_activation() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- handled upstream
 		if ( isset( $_POST['gh_activate_license'] ) ) {
 
 			if ( ! current_user_can( 'manage_options' ) ) {
@@ -327,6 +328,7 @@ class License_Manager {
 		switch ( $error ) {
 			case 'expired' :
 				$message = sprintf(
+                    /* translators: %s: license expiry date */
 					esc_html_x( 'Your license key expired on %s.', 'notice', 'groundhogg' ),
 					date_i18n( get_option( 'date_format' ), strtotime( $expiry, current_time( 'timestamp' ) ) )
 				);
@@ -397,7 +399,7 @@ class License_Manager {
 		$response = wp_remote_post( static::$storeUrl, $request );
 		// make sure the response came back okay
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			$message = ( is_wp_error( $response ) && $response->get_error_message() ) ? $response->get_error_message() : esc_html__( 'An error occurred, please try again.' );
+			$message = ( is_wp_error( $response ) && $response->get_error_message() ) ? $response->get_error_message() : esc_html__( 'An error occurred, please try again.', 'groundhogg' );
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 			if ( false === $license_data->success ) {
@@ -692,7 +694,7 @@ class License_Manager {
 					<div class="img-container">
 						<a href="<?php echo esc_url( $extension->info->link ); ?>" target="_blank">
 							<img src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
-							     style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd">
+							     style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd" alt="<?php echo esc_attr( $extension->info->title ); ?>">
 						</a>
 					</div>
 				<?php endif; ?>
@@ -712,7 +714,9 @@ class License_Manager {
 
 							?>
 							<a class="button-secondary" target="_blank"
-							   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf( _x( 'Buy Now ($%s - $%s)', 'action', 'groundhogg' ), $price1, $price2 ) ); ?></a>
+							   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf(
+                                       /* translators: 1: the min price, 2: the max price */
+                                       _x( 'Buy Now ($%1$s - $%2$s)', 'action', 'groundhogg' ), $price1, $price2 ) ); ?></a>
 							<?php
 						} else {
 
@@ -721,7 +725,9 @@ class License_Manager {
 							if ( $price > 0.00 ) {
 								?>
 								<a class="button-secondary" target="_blank"
-								   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ) ); ?></a>
+								   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf(
+                                           /* translators: %s: the price */
+                                           _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ) ); ?></a>
 								<?php
 							} else {
 								?>

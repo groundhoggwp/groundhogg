@@ -509,7 +509,14 @@ if ( ! function_exists( 'log_only_logs_not_enabled_notice' ) ) {
 		?>
         <div class="notice notice-warning is-dismissible">
             <p>
-				<?php printf( wp_kses_post( __( '<b>Attention:</b> The <code>Log Only</code> email service is in use, but email logs are not enabled. <a href="%s">Enable logging!</a>' ) ), \Groundhogg\admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) ); ?>
+				<?php printf(
+                        /* translators: 1: the name of the log only email service, 2: open <a> to settings, 3: closing </a> tag */
+                        esc_html__( '⚠️ The %1$s email service is in use, but email logs are not enabled. %2$sEnable logging!%3$s', 'groundhogg' ),
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                        \Groundhogg\code_it( esc_html( Groundhogg_Email_Services::get_name( 'log_only' ) ) ),
+					    '<a href="' . esc_url( \Groundhogg\admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) ) . '">',
+					    '</a>',
+                ); ?>
             </p>
         </div>
 		<?php

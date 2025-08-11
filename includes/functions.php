@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection SqlNoDataSourceInspection */
 
 namespace Groundhogg;
 
@@ -508,6 +508,7 @@ function isset_not_empty( $array, $key = '' ) {
  * @return mixed
  */
 function get_request_var( $key = '', $default = false, $post_only = false ) {
+	// phpcs:ignore WordPress.Security.NonceVerification -- nonce verification happens upstream, this is just a helper function
 	$global = $post_only ? $_POST : $_REQUEST;
 
 	return wp_unslash( get_array_var( $global, $key, $default ) );
@@ -532,6 +533,7 @@ function set_request_var( $key, $value ) {
  * @return mixed
  */
 function get_post_var( $key = '', $default = false ) {
+	// phpcs:ignore WordPress.Security.NonceVerification -- nonce verification happens upstream, this is just a helper function
 	return wp_unslash( get_array_var( $_POST, $key, $default ) );
 }
 
@@ -544,6 +546,7 @@ function get_post_var( $key = '', $default = false ) {
  * @return mixed
  */
 function get_url_var( $key = '', $default = false ) {
+	// phpcs:ignore WordPress.Security.NonceVerification -- nonce verification happens upstream, this is just a helper function
 	return wp_unslash( urldecode_deep( get_array_var( $_GET, $key, $default ) ) );
 }
 
@@ -652,6 +655,7 @@ function alias_from_filter( $filter ) {
  * @return array|string
  */
 function get_request_query( $default = [], $force = [], $accepted_keys = [] ) {
+	// phpcs:ignore WordPress.Security.NonceVerification -- nonce verification happens upstream, this is just a helper function
 	$query = wp_unslash( $_GET );
 
 	$ignore = apply_filters( 'groundhogg/get_request_query/ignore', [
@@ -1456,11 +1460,16 @@ add_action( 'wp_mail_failed', __NAMESPACE__ . '\listen_for_complaint_and_bounce_
  * @return string
  */
 function wpgh_get_referer() {
+	// phpcs:disable WordPress.Security.NonceVerification -- nonce verification happens upstream, this is just a helper function
 	if ( ! isset( $_REQUEST['_wp_http_referer'] ) ) {
 		return wp_get_referer();
 	}
 
-	return ( is_ssl() ? "https" : "http" ) . "://{$_SERVER['HTTP_HOST']}" . $_REQUEST['_wp_http_referer'];
+	$host    = sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ?? get_hostname() ) );
+	$referer = sanitize_text_field( wp_unslash( $_REQUEST['_wp_http_referer'] ) );
+
+	return ( is_ssl() ? "https" : "http" ) . "://$host" . $referer;
+	//phpcs:enable WordPress.Security.NonceVerification
 }
 
 /**
@@ -2722,9 +2731,11 @@ function generate_contact_with_map( $fields, $map = [], $submission = [], $conta
 				if ( file_exists( $value ) ) {
 					$copy[] = $value;
 				} // Get from $_FILES
+				// phpcs:disable WordPress.Security.NonceVerification -- handled upstream
 				else if ( isset_not_empty( $_FILES, $column ) ) {
 					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
 				}
+				// phpcs:enable WordPress.Security.NonceVerification
 				break;
 
 			case 'copy_file':
@@ -2992,6 +3003,7 @@ function scheduled_time( $time, $date_prefix = 'on' ) {
 		}
 
 	} else {
+		/* translators: %s: time difference, like "3 hours" */
 		$format = $time_diff <= 0 ? esc_html_x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
 		$time   = sprintf( $format, human_time_diff( $p_time, $cur_time ) );
 	}
@@ -3020,6 +3032,7 @@ function time_ago( $time ) {
 	if ( absint( $time_diff ) > DAY_IN_SECONDS ) {
 		$time = date_i18n( get_date_time_format(), intval( $time ) );
 	} else {
+		/* translators: %s: time difference, like "3 hours" */
 		$format = $time_diff <= 0 ? _x( "%s ago", 'status', 'groundhogg' ) : _x( "in %s", 'status', 'groundhogg' );
 		$time   = sprintf( $format, human_time_diff( $time, $cur_time ) );
 	}
@@ -3101,7 +3114,7 @@ function show_groundhogg_branding() {
  */
 function floating_phil() {
 	?><img style="position: fixed;bottom: -80px;right: -80px;transform: rotate(-20deg);" class="phil"
-           src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" width="340" height="340"><?php
+           src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png' ); ?>" width="340" height="340" alt="Phil"><?php
 }
 
 /**
@@ -3134,6 +3147,7 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo = true ) {
 	] );
 
 	if ( $echo ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 		echo $img;
 
 		return true;
@@ -3149,7 +3163,7 @@ function groundhogg_logo( $color = 'black', $width = 300, $echo = true ) {
  */
 function header_icon() {
 	if ( is_white_labeled() ): ?>
-		<?php echo html()->e( 'span', [ 'class' => 'white-label-icon' ], white_labeled_name() ) ?>
+		<?php html( 'span', [ 'class' => 'white-label-icon' ], esc_html( white_labeled_name() ) ) ?>
 	<?php else: ?>
 		<?php groundhogg_icon( 60 ) ?>
 	<?php endif;
@@ -3221,6 +3235,7 @@ function form_errors( $return = true ) {
 			return $err_html;
 		}
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safely generated HTML
 		echo $err_html;
 
 		return true;
@@ -3355,10 +3370,10 @@ function preferences_center_shortcode() {
     <p><?php esc_html_e( 'Here are some things you can try:', 'groundhogg' ); ?></p>
     <ul>
         <li>
-            <a href="<?php echo admin_url( 'options-permalink.php' ) ?>"><?php esc_html_e( 'Re-save your permalinks.', 'groundhogg' ); ?></a>
+            <a href="<?php echo esc_url( admin_url( 'options-permalink.php' ) ); ?>"><?php esc_html_e( 'Re-save your permalinks.', 'groundhogg' ); ?></a>
         </li>
         <li>
-            <a href="<?php echo admin_page_url( 'gh_tools' ) ?>"><?php esc_html_e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ); ?></a>
+            <a href="<?php echo esc_url( admin_page_url( 'gh_tools' ) ) ?>"><?php esc_html_e( 'Enable safe mode to check for a plugin conflict.', 'groundhogg' ); ?></a>
         </li>
         <li><?php esc_html_e( 'Try viewing this page in an incognito window.', 'groundhogg' ); ?></li>
         <li><?php esc_html_e( 'Clearing your cookies.', 'groundhogg' ); ?></li>
@@ -3495,6 +3510,7 @@ function dashicon( $icon, $wrap = 'span', $atts = [], $echo = false ) {
 	$html = html()->e( $wrap, $atts, '', false );
 
 	if ( $echo ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safely generated HTML
 		echo $html;
 	}
 
@@ -4335,7 +4351,7 @@ function maybe_print_menu_styles() {
 
         <?php if ( $unread = notices()->count_unread() > 0 ): ?>
         .unread-notices::after {
-            content: '<?php echo $unread ?>' !important;
+            content: '<?php echo esc_attr( $unread ) ?>' !important;
         }
 
         <?php endif; ?>
@@ -4462,6 +4478,7 @@ function is_wpengine() {
  * @return bool|\WP_User
  */
 function get_primary_user() {
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- no dynamic content here
 	_doing_it_wrong( 'get_primary_user', "Use <code>get_primary_owner</code> instead.", GROUNDHOGG_VERSION );
 
 	return get_primary_owner();
@@ -5333,7 +5350,7 @@ function fix_nested_p( $content ) {
  */
 function get_current_user_agent_id() {
 
-	$ua = sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] );
+	$ua = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ?? '' ) );
 
 	if ( empty( $ua ) ) {
 		return false;
@@ -6354,12 +6371,15 @@ function get_default_field_label( $field = '' ) {
 			$label = _x( 'Mobile Phone Number', 'field_label', 'groundhogg' );
 			break;
 		case 'gdpr_consent':
+			/* translators: %s: site/brand name */
 			$label = sprintf( _x( "I agree to %s's storage and processing of my personal data.", 'field_label', 'groundhogg' ), get_bloginfo() );
 			break;
 		case 'marketing_consent':
+			/* translators: %s: site/brand name */
 			$label = sprintf( _x( "I agree to receive marketing offers and updates from %s.", 'field_label', 'groundhogg' ), get_bloginfo() );
 			break;
 		case 'terms_agreement':
+			/* translators: %s: site/brand name */
 			$label = sprintf( _x( "I agree to terms and conditions of %s.", 'field_label', 'groundhogg' ), get_bloginfo() );
 			break;
 	}
@@ -6685,6 +6705,7 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'privacy' => $privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], esc_html__( 'Privacy Policy', 'groundhogg' ) ) : false,
 		'terms'   => $terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms', 'groundhogg' ) ) : false,
 	];
+	/* translators: %s: the unsubscribe link */
 	$unsubscribe    = sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
 		'href' => '#unsubscribe_link#'
 	], __( 'Unsubscribe', 'groundhogg' ) ) );
@@ -7415,10 +7436,11 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
             <p>
                 <legend><?php esc_html_e( 'Also delete contact records related to these users?', 'groundhogg' ); ?></legend>
             </p>
-            <p><?php echo html()->checkbox( [
-					'label' => sprintf( _n( 'Delete %s related contact record', 'Delete %s related contact records', $num_related_contacts, 'groundhogg' ), number_format_i18n( $num_related_contacts ) ),
+            <p><?php html( html()->checkbox( [
+			        /* translators: %s: the number of contacts */
+			        'label' => esc_html( sprintf( _n( 'Delete %s related contact record', 'Delete %s related contact records', $num_related_contacts, 'groundhogg' ), number_format_i18n( $num_related_contacts ) ) ),
 					'name'  => 'delete_related_contact_records'
-				] ) ?></p>
+		        ] ) ) ?></p>
         </fieldset>
 	<?php
 	endif;
@@ -7439,13 +7461,13 @@ function select_contact_owner_to_reassign( $current_user, $all_ids ) {
 		?>
         <fieldset>
             <p>
-                <legend><?php echo _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ); ?></legend>
+                <legend><?php echo esc_html( _n( 'Who should CRM data owned by this user be reassigned to?', 'Who should CRM data owned by these users be reassigned to?', count( $all_ids ), 'groundhogg' ) ); ?></legend>
             </p>
-            <p><?php echo html()->dropdown_owners( [
+            <p><?php html( html()->dropdown_owners( [
 					'name'        => 'reassign_groundhogg_owner',
 					'option_none' => false,
 					'exclude'     => $all_ids
-				] ) ?></p>
+				] ) ) ?></p>
         </fieldset>
 	<?php
 

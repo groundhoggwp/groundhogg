@@ -175,7 +175,12 @@ abstract class Extension {
 		<div class="notice notice-warning display-flex gap-20">
 			<?php groundhogg_icon(30 ) ?>
 			<div class="error-description">
-				<p><?php printf( esc_html__( '%s requires the following plugins also be active.', 'groundhogg' ), bold_it( esc_html( $this->get_display_name() ) ) ) ?></p>
+				<p><?php printf(
+                        /* translators: %s: plugin extension name */
+                        esc_html__( '%s requires the following plugins also be active.', 'groundhogg' ),
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                        bold_it( esc_html( $this->get_display_name() ) )
+                    ) ?></p>
 				<ul style="list-style-type: disc; padding-left: 20px;margin: 0">
 					<?php foreach ( $this->get_dependent_plugins() as $plugin ): ?>
 						<li><?php echo esc_html( $plugin ) ?></li>
@@ -185,7 +190,10 @@ abstract class Extension {
                 <p class="display-flex gap-10">
                     <a class="" href="<?php echo esc_url( admin_url('plugins.php') ); ?>"><?php esc_html_e( 'Manage plugins', 'groundhogg' ); ?></a>
                     |
-                    <a class="gh-text danger" href="<?php echo esc_url( $this->deactivate_url() ) ?>"><?php echo esc_html( sprintf( __( 'Deactivate %s', 'groundhogg' ), $this->get_display_name() ) ); ?></a>
+                    <a class="gh-text danger" href="<?php echo esc_url( $this->deactivate_url() ) ?>"><?php
+                        /* translators: %s: plugin extension name */
+                        echo esc_html( sprintf( __( 'Deactivate %s', 'groundhogg' ), $this->get_display_name() )
+                        ); ?></a>
                 </p>
 			</div>
 		</div><?php

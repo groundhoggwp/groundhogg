@@ -172,27 +172,32 @@ class Mailhawk {
 
 			if ( function_exists( '\MailHawk\mailhawk_is_suspended' ) && ! \MailHawk\mailhawk_is_suspended() ) {
 				$ret[] = sprintf(
-				// Translators: %1$s = Opening anchor tag; %2$s = Closing anchor tag.
+				// Translators: 1: Opening anchor tag, 2: Closing anchor tag.
 					esc_html__( '%1$sManage your account%2$s.', 'groundhogg' ),
 					'<a href="https://mailhawk.io/account/" target="_blank" rel="noopener noreferrer">',
 					'</a>'
 				);
 			} else {
 				$ret[] = sprintf(
-				// Translators: %1$s = Opening anchor tag; %2$s = Closing anchor tag.
+				// Translators: 1: Opening anchor tag; 2: Closing anchor tag.
 					'<em>' . esc_html__( 'Email sending is currently disabled. %1$sVisit the MailHawk Settings%2$s to enable sending..', 'groundhogg' ) . '</em>',
 					'<a href="' . admin_url( '/tools.php?page=mailhawk' ) . '">',
 					'</a>'
 				);
 			}
 
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
 			echo '<p>' . implode( ' ', $ret ) . '</p>';
 
 			return;
 
 		}
 
-		echo sprintf( '<button type="button" class="button button-primary" id="groundhogg-mailhawk-connect">%s %s</button>', dashicon( 'email-alt' ), esc_html__( 'Connect MailHawk', 'groundhogg' ) );
+		printf( '<button type="button" class="button button-primary" id="groundhogg-mailhawk-connect">%s %s</button>',
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+            dashicon( 'email-alt' ),
+            esc_html__( 'Connect MailHawk', 'groundhogg' )
+        );
 	}
 
 	/**
@@ -236,7 +241,10 @@ class Mailhawk {
                 <td><?php $this->output_connect_button(); ?>
 
 					<?php if ( ! function_exists( '\MailHawk\mailhawk_is_connected' ) || ! \MailHawk\mailhawk_is_connected() ) : ?>
-                        <p class="description"><?php printf( esc_html__( 'Never worry about sending email again! %s takes care of everything for you for starting at $1/month!', 'groundhogg' ), '<a href="https://mailhawk.io/" target="_blank">MailHawk</a>' ); ?></p>
+                        <p class="description"><?php printf(
+                                /* translators: %s: link to Mailhawk */
+                                esc_html__( 'Never worry about sending email again! %s takes care of everything for you for starting at $1/month!', 'groundhogg' ),
+                                '<a href="https://mailhawk.io/" target="_blank">MailHawk</a>' ); ?></p>
 					<?php endif; ?>
                 </td>
             </tr>
@@ -273,7 +281,7 @@ class Mailhawk {
             function groundhogg_mailhawk_remote_install() {
                 var data = {
                     "action": "groundhogg_mailhawk_remote_install",
-                    "nonce": '<?php echo wp_create_nonce( 'install_mailhawk' ); ?>'
+                    "nonce": <?php echo wp_json_encode( wp_create_nonce( 'install_mailhawk' ) ); ?>
                 };
 
                 jQuery.post(ajaxurl, data, function (res) {

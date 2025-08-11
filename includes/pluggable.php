@@ -81,16 +81,39 @@ function gh_wp_mail_already_defined_notice() {
              src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/phil-oops.png' ); ?>" alt="Phil">
         <?php endif; ?>
         <p>
-			<?php printf( esc_html__( '⚠️ It looks like another plugin is overwriting the %s function. This means %s will not be able to send your WordPress emails.', 'groundhogg' ), bold_it( esc_html( $current_service_name ) ) ); ?>
+			<?php printf(
+                    /* translators: 1: <code>wp_mail</code>, 2: the email service name */
+                    esc_html__( '⚠️ It looks like another plugin is overwriting the %1$s function. This means %2$s will not be able to send your WordPress emails.', 'groundhogg' ),
+				    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    \Groundhogg\code_it( 'wp_mail' ),
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    bold_it( esc_html( $current_service_name ) )
+            ); ?>
         </p>
         <p>
-			<?php printf( esc_html__( '%s is defined in:', 'groundhogg' ), \Groundhogg\code_it(  'wp_mail' ) ); ?>
+			<?php printf(
+			        /* translators: %s: <code>wp_mail</code> */
+                    esc_html__( '%s is defined in:', 'groundhogg' ),
+				    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    \Groundhogg\code_it(  'wp_mail' )
+            ); ?>
             <code><?php echo esc_html( $plugin_file ); ?></code>
         </p>
-        <p><?php echo $deactivate_link; ?>&nbsp;<?php echo $disable_in_settings_link ?></p>
+        <p><?php
+	        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+            echo $deactivate_link;
+            ?>&nbsp;<?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+            echo $disable_in_settings_link
+            ?></p>
 		<?php if ( $is_pluggable_file ) : ?>
             <p>
-				<?php printf( esc_html__( 'One of your plugins is including pluggable functions from WordPress before it should. This is causing a conflict with %s and potentially other plugins you are using. You will have to deactivate your plugins one-by-one until this notice goes away to discover which plugin is causing the issue.', 'groundhogg' ), bold_it( esc_html( white_labeled_name() ) ) ); ?>
+				<?php printf(
+                        /* translators: %s: plugin/brand name */
+                        esc_html__( 'One of your plugins is including pluggable functions from WordPress before it should. This is causing a conflict with %s and potentially other plugins you are using. You will have to deactivate your plugins one-by-one until this notice goes away to discover which plugin is causing the issue.', 'groundhogg' ),
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                        bold_it( esc_html( white_labeled_name() ) )
+                ); ?>
             </p>
 		<?php endif; ?>
         <div class="wp-clearfix"></div>

@@ -131,7 +131,7 @@ class Big_File_Uploader {
 
 		$file_path = $this->get_file_path();
 
-		$file_data = $this->decode_chunk( $_POST['file_data'] );
+		$file_data = $this->decode_chunk( get_post_var( 'file_data' ) );
 
 		if ( false === $file_data ) {
 			wp_send_json_error();

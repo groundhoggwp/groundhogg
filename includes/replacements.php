@@ -1049,9 +1049,9 @@ class Replacements implements \JsonSerializable {
             <table class="wp-list-table widefat fixed striped replacements-table">
                 <thead>
                 <tr>
-                    <th><?php esc_html_e( 'Name' ); ?></th>
-                    <th><?php esc_html_e( 'Code' ); ?></th>
-                    <th><?php esc_html_e( 'Description' ); ?></th>
+                    <th><?php esc_html_e( 'Name', 'groundhogg' ); ?></th>
+                    <th><?php esc_html_e( 'Code', 'groundhogg' ); ?></th>
+                    <th><?php esc_html_e( 'Description', 'groundhogg' ); ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -1074,7 +1074,7 @@ class Replacements implements \JsonSerializable {
                                    readonly>
                         </td>
                         <td>
-                            <span class="description"><?php esc_html_e( $replacement['description'] ); ?></span>
+                            <span class="description"><?php echo esc_html( $replacement['description'] ); ?></span>
                         </td>
                     </tr>
 				<?php endforeach; ?>
@@ -1087,18 +1087,18 @@ class Replacements implements \JsonSerializable {
 	public function show_replacements_button( $short = false ) {
 		wp_enqueue_script( 'groundhogg-admin-replacements' );
 
-		echo Plugin::$instance->utils->html->modal_link( array(
+		html( html()->modal_link( array(
 			'title'              => esc_html__( 'Replacements', 'groundhogg' ),
 			'text'               => $short
 				? '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>'
-				: '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . _x( 'Insert Replacement', 'replacement', 'groundhogg' ),
+				: '<span style="vertical-align: middle" class="dashicons dashicons-admin-users"></span>&nbsp;' . esc_html_x( 'Insert Replacement', 'replacement', 'groundhogg' ),
 			'footer_button_text' => esc_html__( 'Insert', 'groundhogg' ),
 			'id'                 => 'replacements',
 			'class'              => 'button button-secondary no-padding replacements replacements-button',
 			'source'             => 'footer-replacement-codes',
 			'height'             => 900,
 			'width'              => 700,
-		) );
+		) ) );
 
 	}
 
@@ -1134,6 +1134,7 @@ class Replacements implements \JsonSerializable {
 		] );
 
 		if ( $echo ) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 			echo $return;
 
 			return true;
@@ -1715,7 +1716,7 @@ class Replacements implements \JsonSerializable {
 		$link_text = apply_filters( 'groundhogg/replacements/confirmation_text', Plugin::$instance->settings->get_option( 'confirmation_text', __( 'Confirm your email.', 'groundhogg' ) ) );
 		$link_url  = $this->replacement_confirmation_link_raw( $redirect_to );
 
-		return sprintf( "<a href=\"%s\" target=\"_blank\">%s</a>", $link_url, $link_text );
+		return "<a href=\"" . esc_url( $link_url ) . "\" target=\"_blank\">" . $link_text . "</a>";
 	}
 
 	/**
@@ -1941,7 +1942,7 @@ class Replacements implements \JsonSerializable {
 		$html = '';
 
 		foreach ( $files as $i => $file ) {
-			$html .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( maybe_permissions_key_url( $file['url'], $this->get_current_contact(), 'download_files' ) ), esc_html( $file['name'] ) );
+			$html .= '<li><a href="' . esc_url( maybe_permissions_key_url( $file['url'], $this->get_current_contact(), 'download_files' ) ) . '">' . esc_html( $file['name'] ) . '</a></li>';
 		}
 
 		return sprintf( '<ul>%s</ul>', $html );
@@ -2329,6 +2330,8 @@ class Replacements implements \JsonSerializable {
 	 */
 	function posts( $args, $contact_id = null ) {
 
+        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- ALL GENERATED, GEEZ
+
 		$props = $this->parse_atts( $args );
 
 		$props = wp_parse_args( $props, [
@@ -2593,7 +2596,8 @@ class Replacements implements \JsonSerializable {
 										<?php if ( $props['thumbnail'] && $props['thumbnail_position'] === 'left' ): ?>
                                             <td class="email-columns-cell one-half thumbnail" width="45%"
                                                 style="width: 45%">
-												<?php echo $thumbnail ?>
+												<?php
+                                                echo $thumbnail ?>
                                             </td>
 											<?php echo $columnGap ?>
 										<?php endif; ?>
@@ -2653,6 +2657,8 @@ class Replacements implements \JsonSerializable {
 		remove_filter( 'excerpt_more', [ $this, 'post_excerpt_ellipses' ] );
 
 		return $content;
+
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

@@ -27,6 +27,7 @@ function row_item_locked_text( Base_Object_With_Meta $object ) {
 		/* translators: %s: User's display name. */
 		$locked_text = esc_html( sprintf( __( '%s is currently editing', 'groundhogg' ), $user->display_name ) );
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
 		echo '<div class="locked-info"><span class="locked-avatar">' . $locked_avatar . '</span> <span class="locked-text">' . $locked_text . "</span></div>\n";
 	}
 }
@@ -44,7 +45,7 @@ function use_edit_lock( Base_Object_With_Meta $object, $can_take_over = true ) {
 	if ( get_url_var( 'take-over' ) == 1 && $can_take_over ){
 		check_admin_referer( 'take-over' );
 		set_lock( $object );
-		wp_redirect( $object->admin_link() );
+		wp_safe_redirect( $object->admin_link() );
 		die();
 	}
 

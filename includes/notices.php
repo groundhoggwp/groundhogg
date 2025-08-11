@@ -201,6 +201,7 @@ class Notices {
 
 			$this->add(
 				'incorrect-permalinks',
+                /* translators: %s: link to permalink settings */
 				sprintf( __( "Your site permalink structure is currently set to <code>Plain</code>. This setting is not compatible with Groundhogg. Change your permalink structure to any other setting to avoid issues. We recommend <code>Post name</code>.</p><p>%s", 'groundhogg' ), $change_permalink_button ),
 				'warning',
 				'administrator',

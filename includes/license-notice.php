@@ -45,8 +45,12 @@ class License_Notice {
 		?>
         <div class="notice notice-warning is-dismissible">
             <img style="float: left;margin: 12px 10px 10px 0" height="80"
-                 src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" alt="Phil">
-            <p><?php printf( __( "<b>Oops!</b> Your Groundhogg license <code>%s</code> has expired. Please renew it to continue receiving critical updates and support.", 'groundhogg' ), $license_key ) ?></p>
+                 src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png' ); ?>" alt="Phil">
+            <p><?php printf(
+                    /* translators: %s the license key */
+                    esc_html__( "Your Groundhogg license %s has expired. Please renew it to continue receiving critical updates and support.", 'groundhogg' ),
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    code_it( esc_html( $license_key ) ) ) ?></p>
             <p class="display-flex gap-10">
                 <a class="gh-button primary small" target="_blank"
                    href="<?php echo esc_url( $renewal_url ); ?>"><?php esc_html_e( "👉 Yes, I'd like to renew my license!", 'groundhogg' ); ?></a>
@@ -90,8 +94,8 @@ class License_Notice {
 		?>
         <div class="notice notice-warning is-dismissible">
             <img style="float: left;margin: 12px 10px 10px 0" height="80"
-                 src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png'; ?>" alt="Phil">
-            <p><?php printf( __( "<b>License your extensions!</b> Some of your premium extensions are missing a license key. Remember to add your license key to receive critical updates and support.", 'groundhogg' ) ); ?></p>
+                 src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/phil-340x340.png' ); ?>" alt="Phil">
+            <p><?php printf( wp_kses( __( "<b>License your extensions!</b> Some of your premium extensions are missing a license key. Remember to add your license key to receive critical updates and support.", 'groundhogg' ), ['b' => [] ] ) ); ?></p>
             <p>
                 <?php if ( $master_license ):?>
                     <a class="gh-button primary small"

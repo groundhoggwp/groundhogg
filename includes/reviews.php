@@ -18,6 +18,7 @@ class Reviews {
 		}
 
 		$message = sprintf(
+            /* translators: 1: stars, 2: Leave a review link, 3: Dismiss link, 4: Dismiss link alternate */
 			esc_html__( 'Is Groundhogg working for you? Show your appreciation by leaving a %1$s review! %2$s | %3$s | %4$s', 'groundhogg' ),
 
             // Stars
