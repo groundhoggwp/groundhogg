@@ -485,7 +485,7 @@ class Location {
 
 		foreach ( $places as $place ) {
 			if ( ! empty( $_SERVER[ $place ] ) ) {
-				$found = $_SERVER[ $place ];
+				$found = sanitize_text_field( wp_unslash( $_SERVER[ $place ] ) );
 				break;
 			}
 		}

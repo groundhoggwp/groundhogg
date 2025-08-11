@@ -120,10 +120,13 @@ class DateTimeHelper extends \DateTime {
 		if ( site_locale_is_english() ){
 			switch ( $this->whenIs() ) {
 				case 'today':
+					/* translators: %s: the time of day */
 					return sprintf( __( 'today at %s', 'groundhogg' ), $this->format( get_time_format() ) );
 				case 'tomorrow':
+					/* translators: %s: the time of day */
 					return sprintf( __( 'tomorrow at %s', 'groundhogg' ), $this->format( get_time_format() ) );
 				case 'yesterday':
+					/* translators: %s: the time of day  */
 					return sprintf( __( 'yesterday at %s', 'groundhogg' ), $this->format( get_time_format() ) );
 			}
 		}

@@ -46,20 +46,6 @@ class HTML {
 	const DROPDOWN_SMS = 'dropdown_sms';
 
 	/**
-	 * WPGH_HTML constructor.
-	 *
-	 * Set up the ajax calls.
-	 */
-	public function __construct() {
-		add_action( 'wp_ajax_gh_get_contacts', [ $this, 'ajax_get_contacts' ] );
-		add_action( 'wp_ajax_gh_get_emails', [ $this, 'ajax_get_emails' ] );
-		add_action( 'wp_ajax_gh_get_sms', [ $this, 'ajax_get_sms' ] );
-		add_action( 'wp_ajax_gh_get_tags', [ $this, 'ajax_get_tags' ] );
-		add_action( 'wp_ajax_gh_get_benchmarks', [ $this, 'ajax_get_benchmarks' ] );
-		add_action( 'wp_ajax_gh_get_meta_keys', [ $this, 'ajax_get_meta_keys' ] );
-	}
-
-	/**
 	 * @param        $inputs
 	 * @param string $prefix
 	 */
@@ -76,11 +62,11 @@ class HTML {
 			if ( is_array( $value ) ) {
 				$this->hidden_inputs( $value, $name );
 			} else {
-				echo $this->input( [
+				$this->frag( $this->input( [
 					'type'  => 'hidden',
 					'name'  => $name,
 					'value' => $value
-				] );
+				] ), true );
 			}
 		}
 	}
@@ -95,6 +81,7 @@ class HTML {
 	public function hidden_GET_inputs( $echo = true ) {
 		$html = '';
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- used search form
 		foreach ( $_GET as $key => $value ) {
 
 			$html .= $this->input( [
@@ -105,6 +92,7 @@ class HTML {
 		}
 
 		if ( $echo ) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safely generated HTML
 			echo $html;
 		}
 
@@ -133,10 +121,15 @@ class HTML {
 				unset( $atts['name'] );
 				unset( $atts['tag'] );
 
-				echo sprintf( '<%1$s %2$s>%3$s</%1$s>', $tag, array_to_atts( $atts ), $name );
+				echo sprintf( '<%1$s %2$s>%3$s</%1$s>',
+                    esc_html( $tag ),
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safely generated attributes
+                    array_to_atts( $atts ),
+                    wp_kses_post( $name )
+                );
 
 			else: ?>
-                <th><?php echo $name; ?></th>
+                <th><?php echo wp_kses_post( $name ); ?></th>
 			<?php endif;
 		endforeach;
 	}
@@ -155,7 +148,9 @@ class HTML {
 		$args['class'] .= ' wp-list-table widefat fixed striped';
 
 		?>
-        <table <?php echo array_to_atts( $args ); ?> >
+        <table <?php
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safely generated attributes
+        echo array_to_atts( $args ); ?> >
             <thead>
             <tr>
 				<?php $this->list_table_column_headers( $cols ); ?>
@@ -167,14 +162,16 @@ class HTML {
 				<?php foreach ( $rows as $row => $cells ): ?>
                     <tr>
 						<?php foreach ( $cells as $cell => $content ): ?>
-                            <td><?php echo $content; ?></td>
+                            <td><?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- content here should be escaped upstream
+                                echo $content; ?></td>
 						<?php endforeach; ?>
                     </tr>
 				<?php endforeach; ?>
 			<?php else:
 
 				$col_span = count( $cols );
-				echo $this->wrap( __( 'No items found.', 'groundhogg' ), 'td', [ 'colspan' => $col_span ] );
+				$this->frag( $this->wrap( esc_html__( 'No items found.', 'groundhogg' ), 'td', [ 'colspan' => $col_span ] ), true );
 
 			endif; ?>
             </tbody>
@@ -194,7 +191,7 @@ class HTML {
 	 */
 	public function export_columns_table( $columns ) {
 
-		html()->list_table( [
+		$this->list_table( [
 			'class' => 'export-table'
 		], [
 			[
@@ -206,7 +203,7 @@ class HTML {
 			__( 'Field ID', 'groundhogg' ),
 		], array_map_with_keys( $columns, function ( $label, $key ) {
 			return [
-				html()->checkbox( [
+				$this->checkbox( [
 					'label'   => '',
 					'type'    => 'checkbox',
 					'name'    => 'headers[' . $key . ']',
@@ -240,11 +237,10 @@ class HTML {
         <h2 class="<?php echo esc_attr( $class ); ?>">
 			<?php foreach ( $tabs as $id => $tab ):
 
-				echo html()->e( 'a', [
-					'href'  => add_query_arg( [ 'tab' => $id ], $_SERVER['REQUEST_URI'] ),
+				$this->frag( $this->e( 'a', [
+					'href'  => add_query_arg( [ 'tab' => $id ], get_request_uri() ),
 					'class' => 'nav-tab' . ( $active_tab == $id ? ' nav-tab-active' : '' ),
-//					'id'    => $id,
-				], $tab );
+				], esc_html( $tab ) ), true );
 
 			endforeach; ?>
         </h2>
@@ -263,7 +259,7 @@ class HTML {
 		] );
 
 		if ( ! empty( $args['title'] ) ) {
-			?><h3><?php echo $args['title']; ?></h3><?php
+			?><h3><?php echo esc_html( $args['title'] ); ?></h3><?php
 		}
 		?>
         <table class="form-table <?php echo esc_attr( $args['class'] ) ?>">
@@ -298,7 +294,7 @@ class HTML {
 			'class' => '',
 		] );
 
-		echo $this->wrap( $content, 'th', $args );
+		$this->frag( $this->wrap( $content, 'th', $args ), true );
 	}
 
 	public function td( $content, $args = [] ) {
@@ -311,7 +307,7 @@ class HTML {
 			'class' => '',
 		] );
 
-		echo $this->wrap( $content, 'td', $args );
+		$this->frag( $this->wrap( $content, 'td', $args ), true );
 	}
 
 	/**
@@ -347,22 +343,26 @@ class HTML {
 
 			?>
             <tr class="form-row">
-                <th><?php echo $args['label']; ?></th>
-                <td><?php echo call_user_func( [ $this, $args['type'] ], $args['field'] );
+                <th><?php echo esc_html( $args['label'] ); ?></th>
+                <td><?php
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- expected upstream escaping
+                    echo call_user_func( [ $this, $args['type'] ], $args['field'] );
 					if ( ! empty( $args['description'] ) ) {
-						?><p class="description"><?php echo $args['description']; ?></p><?php
+						?><p class="description"><?php echo wp_kses_post( $args['description'] ); ?></p><?php
 					} ?></td>
             </tr>
 		<?php
 		else:
 			?>
             <div class="form-row">
-                <label><?php echo $args['label']; ?><?php echo call_user_func( [
+                <label><?php echo esc_html( $args['label'] ); ?><?php
+	                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- expected upstream escaping
+                    echo call_user_func( [
 						$this,
 						$args['type']
 					], $args['field'] ); ?></label>
 				<?php if ( ! empty( $args['description'] ) ) {
-					?><p class="description"><?php echo $args['description']; ?></p><?php
+					?><p class="description"><?php echo wp_kses_post( $args['description'] ); ?></p><?php
 				} ?>
             </div>
 		<?php
@@ -574,17 +574,17 @@ class HTML {
 
 		if ( ! is_callable( $option_callback ) ) {
 			$option_callback = function ( $option, $key ) {
-				return html()->e( 'li', [ 'class' => 'gh-dropdown-menu-option', 'id' => 'option-' . $key ], $option );
+				return $this->e( 'li', [ 'class' => 'gh-dropdown-menu-option', 'id' => 'option-' . $key ], $option );
 			};
 		}
 
-		return html()->e( 'div', [ 'class' => 'gh-dropdown-button-wrap' ], [
-			html()->button( [
+		return $this->e( 'div', [ 'class' => 'gh-dropdown-button-wrap' ], [
+			$this->button( [
 				'text'  => $text,
 				'class' => implode( ' ', [ 'gh-dropdown-button', 'button-' . $type, 'dropdown' ] ),
 				'type'  => 'button'
 			] ),
-			html()->e( 'ul', [ 'class' => 'gh-dropdown-menu' ], array_map_with_keys( $options, $option_callback ) )
+			$this->e( 'ul', [ 'class' => 'gh-dropdown-menu' ], array_map_with_keys( $options, $option_callback ) )
 		] );
 	}
 
@@ -646,7 +646,7 @@ class HTML {
 		$checkboxes = [];
 
 		foreach ( $a['options'] as $value => $label ) {
-			$checkboxes[] = html()->checkbox( [
+			$checkboxes[] = $this->checkbox( [
 				'name'    => $a['name'] . '[]',
 				'value'   => $value,
 				'checked' => in_array( $value, $checked ),
@@ -654,7 +654,7 @@ class HTML {
 			] );
 		}
 
-		return html()->e( 'div', [ 'class' => 'display-flex column gap-5' ], $checkboxes );
+		return $this->e( 'div', [ 'class' => 'display-flex column gap-5' ], $checkboxes );
 	}
 
 
@@ -822,11 +822,11 @@ class HTML {
 		$optionHTML = [];
 
 		if ( isset_not_empty( $a, 'data-placeholder' ) ) {
-			$optionHTML[] = html()->e( 'option', [], '', false );
+			$optionHTML[] = $this->e( 'option', [], '', false );
 		}
 
 		if ( ! empty( $a['option_none'] ) ) {
-			$optionHTML[] = html()->e( 'option', [
+			$optionHTML[] = $this->e( 'option', [
 				'value'    => $a['option_none_value'],
 				'selected' => in_array( $a['option_none_value'], $selected )
 			], esc_html( $a['option_none'] ) );
@@ -849,7 +849,7 @@ class HTML {
 
 					foreach ( $inner_options as $inner_value => $inner_name ) {
 
-						$optionHTML[] = html()->e( 'option', [
+						$optionHTML[] = $this->e( 'option', [
 							'value'    => $inner_value,
 							'selected' => in_array( $inner_value, $selected ),
 						], esc_html( $inner_name ), false );
@@ -858,7 +858,7 @@ class HTML {
 					$optionHTML[] = "</optgroup>";
 
 				} else {
-					$optionHTML[] = html()->e( 'option', [
+					$optionHTML[] = $this->e( 'option', [
 						'value'    => $value,
 						'selected' => in_array( $value, $selected ),
 					], esc_html( $name ), false );
@@ -1120,7 +1120,7 @@ class HTML {
 		) );
 
 		$html = sprintf(
-			"<input type='text' id='%s' class='%s' name='%s' value='%s' placeholder='%s' autocomplete='off' %s><script>jQuery(function($){\$('#%s').datepicker({changeMonth: true,changeYear: true,minDate: '%s', maxDate: '%s',dateFormat:'%s'})});</script>",
+			'<input type="text" id="%s" class="%s" name="%s" value="%s" placeholder="%s" autocomplete="off" %s><script>jQuery(function($){$(\'#%s\').datepicker({changeMonth: true,changeYear: true,minDate: \'%s\', maxDate: \'%s\',dateFormat:\'%s\'})});</script>',
 			esc_attr( $a['id'] ),
 			esc_attr( $a['class'] ),
 			esc_attr( $a['name'] ),
@@ -1531,11 +1531,11 @@ class HTML {
 
 		$hidden = ( $a['hidden'] ) ? 'hidden' : '';
 
-		$bar = sprintf( "<div id='%s-wrap' class=\"progress-bar-wrap %s %s\">
-	            <div id='%s' class=\"progress-bar\">
-	            <span id='%s-percentage' style='visibility: visible;float: none;padding-left: 30px;opacity: 1;' class=\"progress-percentage spinner\">0%%</span>
+		$bar = sprintf( '<div id="%s-wrap" class="progress-bar-wrap %s %s">
+	            <div id="%s" class="progress-bar">
+	            <span id="%s-percentage" style="visibility: visible;float: none;padding-left: 30px;opacity: 1;" class="progress-percentage spinner">0%%</span>
 	            </div>
-			</div>",
+			</div>',
 			esc_attr( $a['id'] ),
 			esc_attr( $a['class'] ),
 			$hidden,
@@ -1568,17 +1568,17 @@ class HTML {
 			'off'        => 'Off',
 		), $args );
 
-		$css = sprintf( "<style>#%s-switch .onoffswitch-inner:before {content: \"%s\";} #%s-switch .onoffswitch-inner:after {content: \"%s\";}</style>", esc_attr( $a['id'] ), esc_attr( $a['on'] ), esc_attr( $a['id'] ), esc_attr( $a['off'] ) );
+		$css = sprintf( '<style>#%s-switch .onoffswitch-inner:before {content: "%s";} #%s-switch .onoffswitch-inner:after {content: "%s";}</style>', esc_attr( $a['id'] ), esc_attr( $a['on'] ), esc_attr( $a['id'] ), esc_attr( $a['off'] ) );
 
 		wp_enqueue_style( 'groundhogg-admin' );
 
-		$html = sprintf( "%s<div id=\"%s-switch\" class=\"onoffswitch %s\" style=\"text-align: left\">
-                        <input type=\"checkbox\" id=\"%s\" name=\"%s\" class=\"onoffswitch-checkbox %s\" value=\"%s\" %s>
-                        <label class=\"onoffswitch-label\" for=\"%s\">
-                            <span class=\"onoffswitch-inner\"></span>
-                            <span class=\"onoffswitch-switch\"></span>
+		$html = sprintf( '%s<div id="%s-switch" class="onoffswitch %s" style="text-align: left">
+                        <input type="checkbox" id="%s" name="%s" class="onoffswitch-checkbox %s" value="%s" %s>
+                        <label class="onoffswitch-label" for="%s">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
                         </label>
-                    </div>",
+                    </div>',
 			$css,
 			esc_attr( $a['id'] ),
 			esc_attr( $a['class'] ),
@@ -1609,26 +1609,26 @@ class HTML {
 			'value'    => 1,
 		] );
 
-		$switch = html()->e( 'label', [
+		$switch = $this->e( 'label', [
 			'class' => 'gh-switch'
 		], [
-			html()->input( [
+			$this->input( [
 				'type'    => 'checkbox',
 				'id'      => $args['id'],
 				'name'    => $args['name'],
 				'value'   => $args['value'],
 				'checked' => $args['checked'],
 			] ),
-			html()->e( 'span', [ 'class' => 'slider round' ], '', false ),
-			html()->e( 'span', [ 'class' => 'on' ], esc_html( $args['onLabel'] ) ),
-			html()->e( 'span', [ 'class' => 'off' ], esc_html( $args['offLabel'] ) ),
+			$this->e( 'span', [ 'class' => 'slider round' ], '', false ),
+			$this->e( 'span', [ 'class' => 'on' ], esc_html( $args['onLabel'] ) ),
+			$this->e( 'span', [ 'class' => 'off' ], esc_html( $args['offLabel'] ) ),
 		] );
 
 		if ( isset( $args['label'] ) ) {
-			$switch = html()->e( 'div', [
+			$switch = $this->e( 'div', [
 				'class' => 'display-flex align-center gap-5'
 			], [
-				html()->e( 'label', [ 'for' => $args['id'] ], $args['label'] ),
+				$this->e( 'label', [ 'for' => $args['id'] ], $args['label'] ),
 				$switch,
 			] );
 		}
@@ -1641,188 +1641,6 @@ class HTML {
 		$args['offLabel'] = __( 'No', 'groundhogg' );
 
 		return $this->toggle( $args );
-	}
-
-	/**
-	 * Send a json response in the format for a select2 picker
-	 *
-	 * @param array $data
-	 */
-	public function send_picker_response( $data = [] ) {
-		$results = [ 'results' => $data, 'more' => false ];
-		wp_send_json( $results );
-	}
-
-	/**
-	 * Get json tag results for tag picker
-	 */
-	public function ajax_get_tags() {
-		if ( ! is_user_logged_in() || ! current_user_can( 'manage_tags' ) ) {
-			wp_send_json_error();
-		}
-
-		$value = isset( $_REQUEST['q'] ) ? sanitize_text_field( $_REQUEST['q'] ) : '';
-
-		$tags = Plugin::$instance->dbs->get_db( 'tags' )->search( $value );
-
-		$json = [];
-
-		foreach ( $tags as $i => $tag ) {
-
-			$json[] = array(
-				'id'   => $tag->tag_id,
-				'text' => $tag->tag_name
-			);
-
-		}
-
-		$this->send_picker_response( $json );
-	}
-
-	/**
-	 * Get json contact results for contact picker
-	 */
-	public function ajax_get_contacts() {
-		if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) ) {
-			wp_send_json_error();
-		}
-
-		$value = isset( $_REQUEST['q'] ) ? sanitize_text_field( $_REQUEST['q'] ) : '';
-
-		$contacts = Plugin::$instance->dbs->get_db( 'contacts' )->search( $value );
-
-		$json = array();
-
-		foreach ( $contacts as $i => $contact ) {
-
-			$json[] = array(
-				'id'   => $contact->ID,
-				'text' => sprintf( "%s %s (%s)", $contact->first_name, $contact->last_name, $contact->email )
-			);
-
-		}
-
-		$this->send_picker_response( $json );
-	}
-
-	/**
-	 * Get json email results for email picker
-	 */
-	public function ajax_get_emails() {
-		if ( ! is_user_logged_in() || ! current_user_can( 'edit_emails' ) ) {
-			wp_send_json_error();
-		}
-
-		$value = isset( $_REQUEST['q'] ) ? sanitize_text_field( $_REQUEST['q'] ) : '';
-		$data  = Plugin::$instance->dbs->get_db( 'emails' )->search( $value );
-
-		$json = [];
-
-		foreach ( $data as $i => $email ) {
-
-			$json[] = array(
-				'id'   => $email->ID,
-				'text' => $email->subject . ' (' . $email->status . ')'
-			);
-
-		}
-
-		$this->send_picker_response( $json );
-	}
-
-	/**
-	 * Get json email results for email picker
-	 */
-	public function ajax_get_sms() {
-		if ( ! is_user_logged_in() || ! current_user_can( 'edit_sms' ) ) {
-			wp_send_json_error();
-		}
-
-		$value = isset( $_REQUEST['q'] ) ? sanitize_text_field( $_REQUEST['q'] ) : '';
-		$data  = Plugin::$instance->dbs->get_db( 'sms' )->search( $value );
-
-		$json = array();
-
-		foreach ( $data as $i => $sms ) {
-
-			$json[] = array(
-				'id'   => $sms->ID,
-				'text' => $sms->title
-			);
-
-		}
-
-		$this->send_picker_response( $json );
-	}
-
-	/**
-	 * Returns a select 2 compatible json object with contact data meta keys
-	 */
-	public function ajax_get_meta_keys() {
-		if ( ! is_user_logged_in() || ! current_user_can( 'view_contacts' ) ) {
-			wp_send_json_error();
-		}
-
-		$json = [];
-
-		$data = Plugin::$instance->dbs->get_db( 'contactmeta' )->get_keys();
-
-		foreach ( $data as $i => $key ) {
-
-			$json[] = array(
-				'id'   => $key,
-				'text' => $key
-			);
-
-		}
-
-		$this->send_picker_response( $json );
-	}
-
-	/**
-	 * Get json email results for email picker
-	 */
-	public function ajax_get_benchmarks() {
-
-		if ( ! is_user_logged_in() || ! current_user_can( 'edit_funnels' ) ) {
-			wp_send_json_error();
-		}
-
-		$value = isset( $_REQUEST['q'] ) ? sanitize_text_field( $_REQUEST['q'] ) : '';
-		$data  = Plugin::$instance->dbs->get_db( 'steps' )->search( $value );
-
-		$json = array();
-
-		foreach ( $data as $i => $step ) {
-
-			$step = new Step( absint( $step->ID ) );
-
-			if ( $step->is_active() ) {
-
-				$funnel_name = $step->get_funnel_title();
-
-				if ( isset( $json[ $funnel_name ] ) ) {
-					$json[ $funnel_name ]['children'][] = [
-						'text' => sprintf( '%d. %s (%s)', $step->get_order(), $step->get_title(), str_replace( '_', ' ', $step->get_type() ) ),
-						'id'   => $step->ID
-					];
-				} else {
-					$json[ $funnel_name ] = array(
-						'text'     => $funnel_name,
-						'children' => [
-							[
-								'text' => sprintf( '%d. %s (%s)', $step->get_order(), $step->get_title(), str_replace( '_', ' ', $step->get_type() ) ),
-								'id'   => $step->ID
-							]
-						]
-					);
-				}
-
-			}
-
-		}
-
-		$this->send_picker_response( $json );
 	}
 
 	/**
@@ -1867,7 +1685,7 @@ class HTML {
 //			$tri       = '&#9652;';
 		}
 
-		return html()->e( 'span', [
+		return $this->e( 'span', [
 			'class' => $classes
 		], $tri . number_format( abs( $percentage ) ) . '%' );
 	}

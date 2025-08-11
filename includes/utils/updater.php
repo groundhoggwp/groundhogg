@@ -120,7 +120,7 @@ abstract class Updater {
 		}
 
 		?>
-		<h3><?php echo apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ); ?></h3>
+        <h3><?php echo esc_html( apply_filters( 'groundhogg/updater/display_name', $this->get_display_name() ) ); ?></h3>
 		<p><?php esc_html_e( 'Click on a version to run the update process for that version.', 'groundhogg' );; ?></p>
 		<?php
 
@@ -145,7 +145,7 @@ abstract class Updater {
 							'updater'       => $this->get_updater_name(),
 							'manual_update' => $update,
 							'confirm'       => 'yes',
-						], $_SERVER['REQUEST_URI'] )
+						], get_request_uri() )
 					], $update ),
 					kses( $_this->get_update_description( $update ), 'simple' )
 				];
@@ -163,10 +163,10 @@ abstract class Updater {
 		<h3><?php echo esc_html( $this->get_display_name() ); ?></h3>
 		<p><?php
 
-		echo html()->e( 'a', [
+	html( 'a', [
 			'class' => 'button',
 			'href'  => $action_url
-		], __( 'Run Network Upgrade', 'groundhogg' ) )
+	], esc_html__( 'Run Network Upgrade', 'groundhogg' ) )
 
 		?></p><?php
 	}
@@ -313,6 +313,7 @@ abstract class Updater {
 		}
 
 		if ( $this->update_to_version( $update ) ) {
+			/* translators: %s: the new version */
 			notices()->add( 'updated', sprintf( __( 'Update to version %s successful!', 'groundhogg' ), $update ), 'success', 'manage_options' );
 		} else {
 			notices()->add( new \WP_Error( 'update_failed', __( 'Update failed.', 'groundhogg' ) ) );
@@ -469,13 +470,14 @@ abstract class Updater {
 			$action_url = action_url( $action );
 		}
 
-		$update_button = html()->e( 'a', [
-			'href'  => $action_url,
-			'class' => 'gh-button secondary small'
-		], esc_html__( 'Update Now!', 'groundhogg' ) );
-
 ?><div class="notice notice-info">
-    <p><?php printf( __( "%s (%s) requires an update. Consider backing up your site before updating.", 'groundhogg' ), bold_it( $this->get_display_name() ), white_labeled_name() ); ?></p>
+        <p><?php
+			/* translators: 1: the extension/plugin name, 2: the plugin/brand name */
+			printf( esc_html__( '%1$s (%2$s) requires an update. Consider backing up your site before updating.', 'groundhogg' ),
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+				bold_it( esc_html( $this->get_display_name() ) ),
+				esc_html( white_labeled_name() )
+			); ?></p>
     <ul>
         <?php foreach ( $missing_updates as $missing_update ) :
 
@@ -484,7 +486,11 @@ abstract class Updater {
             ?><li style="margin-left: 10px"><?php echo esc_html( $missing_update ); if ($description) kses_e( ' - ' . $description, 'simple' ); ?></li><?php
         endforeach; ?>
     </ul>
-        <p><?php echo $update_button; ?></p>
+        <p><?php
+			html( 'a', [
+				'href'  => $action_url,
+				'class' => 'gh-button secondary small'
+			], esc_html__( 'Update Now!', 'groundhogg' ) ) ?></p>
 </div><?php
 	}
 
@@ -502,7 +508,8 @@ abstract class Updater {
 		$this->unlock_updates();
 
 		if ( $this->do_updates() ) {
-			notices()->add( 'updated', sprintf( __( "%s updated successfully!", 'groundhogg' ), white_labeled_name() ), 'success', 'manage_options', true );
+            /* translators: %s: the plugin/brand name */
+			notices()->add( 'updated', sprintf( esc_html__( "%s updated successfully!", 'groundhogg' ), esc_html( white_labeled_name() ) ), 'success', 'manage_options', true );
 		}
 
 		wp_safe_redirect( wp_get_referer() );
@@ -582,7 +589,7 @@ abstract class Updater {
 		do_action( "groundhogg/updater/{$this->get_updater_name()}/finished" );
 
 		/* translators: 1: updater display name, 2: version number */
-		notices()->add( 'updated', sprintf( __( '%1$s database upgraded to %2$s in the background.', 'groundhogg' ), $this->get_display_name(), $update ) );
+		notices()->add( 'updated', sprintf( esc_html__( '%1$s database upgraded to %2$s in the background.', 'groundhogg' ), esc_html( $this->get_display_name() ), esc_html( $update ) ) );
 
 		return true;
 	}
