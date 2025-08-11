@@ -31,7 +31,7 @@ if ( $email->get_template() === 'framed' ) {
 }
 
 $_p = function ( $content, $style = [] ) use ( $p_style ) {
-	echo html()->e( 'p', [
+	html( 'p', [
 		'style' => array_merge( $p_style, $style ),
 	], $content );
 };
@@ -45,8 +45,10 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 		'margin-top' => '40px'
 	], $email );
 	?>
-	<div class="pre-footer-content" style="<?php echo array_to_css( $custom_footer_text_style ) ?>">
-		<?php echo wpautop( do_replacements( $custom_text, $email->get_contact() ) ); ?>
+	<div class="pre-footer-content" style="<?php echo esc_attr( array_to_css( $custom_footer_text_style ) ) ?>">
+		<?php
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- dealt with wp_kses
+        echo \Groundhogg\email_kses( wpautop( do_replacements( $custom_text, $email->get_contact() ) ) ); ?>
 	</div>
 <?php endif; ?>
 <div class="footer" style="margin-top: 40px;">
@@ -58,9 +60,9 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 	$privacy_policy = get_option( 'gh_privacy_policy' ) ?: get_privacy_policy_url();
 
 	$links = array_filter( [
-		$tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], $tel ) : false,
-		$privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], __( 'Privacy Policy', 'groundhogg' ) ) : false,
-		$terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms', 'groundhogg' ) ) : false,
+		$tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], esc_html( $tel ) ) : false,
+		$privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], esc_html__( 'Privacy Policy', 'groundhogg' ) ) : false,
+		$terms ? html()->e( 'a', [ 'href' => $terms ], esc_html__( 'Terms', 'groundhogg' ) ) : false,
 	] );
 
 	$_p( $business_name );
@@ -69,9 +71,9 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 
 	if ( ! $email->is_transactional() ) {
 		/* translators: 1: unsubscribe link HTML */
-		$_p( sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
+		$_p( sprintf( esc_html__( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
 			'href' => $email->get_unsubscribe_link()
-		], __( 'Unsubscribe', 'groundhogg' ) ) ) );
+		], esc_html__( 'Unsubscribe', 'groundhogg' ) ) ) );
 	}
 
 	include __DIR__ . '/affiliate-link.php' ?>

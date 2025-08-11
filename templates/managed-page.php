@@ -127,7 +127,7 @@ function managed_page_head( $title = '', $action = '' ) {
         <meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php no_index_tag(); ?>
         <link rel="profile" href="http://gmpg.org/xfn/11">
-        <title><?php echo $mp_title; ?></title>
+        <title><?php echo esc_html( $mp_title ); ?></title>
 		<?php wp_head(); ?>
     </head>
     <body class="managed-page <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
@@ -178,22 +178,30 @@ function managed_page_footer() {
 
 	?>
     </div>
-    <p id="extralinks"><?php echo $html; ?></p>
+    <p id="extralinks"><?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- handled upstream
+		echo $html;
+		?></p>
 	<?php if ( is_option_enabled( 'gh_affiliate_link_in_email' ) ): ?>
         <p id="credit">
-	        <?php /* translators: 1: plugin/brand name as a link */
-	        printf( esc_html__( "Powered by %s", 'groundhogg' ), html()->e( 'a', [
-				'target' => '_blank',
-				'href'   => add_query_arg( [
-					'utm_source'   => 'email',
-					'utm_medium'   => 'footer-link',
-					'utm_campaign' => 'email-affiliate',
-					'aff'          => absint( get_option( 'gh_affiliate_id' ) ),
-				], 'https://www.groundhogg.io/pricing/' )
-			], html()->e( 'img', [
-				'width' => 85,
-				'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png'
-			], null, true ) ) ); ?>
+	        <?php
+
+            $powered_by_link = html()->e( 'a', [
+	            'target' => '_blank',
+	            'href'   => add_query_arg( [
+		            'utm_source'   => 'email',
+		            'utm_medium'   => 'footer-link',
+		            'utm_campaign' => 'email-affiliate',
+		            'aff'          => absint( get_option( 'gh_affiliate_id' ) ),
+	            ], 'https://www.groundhogg.io/pricing/' )
+            ], html()->e( 'img', [ 'width' => 85, 'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png' ] ) );
+
+	        printf(
+	            /* translators: %s: plugin/brand name as a link */
+		        esc_html__( "Powered by %s", 'groundhogg' ),
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+		        $powered_by_link
+            ); ?>
         </p>
 	<?php endif; ?>
     </div>

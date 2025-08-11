@@ -8,12 +8,12 @@ define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
 $email_id = absint( get_query_var( 'email_id' ) );
 
 if ( ! $email_id ){
-    wp_die( __( 'Could not load this email', 'groundhogg' ), __( 'Error loading email.', 'groundhogg' ) );
+    wp_die( esc_html__( 'Could not load this email', 'groundhogg' ), esc_html__( 'Error loading email.', 'groundhogg' ) );
 }
 
 $email = new Email( $email_id );
 
-if ( ! $email ){
+if ( ! $email->exists() ){
     wp_die( 'Invalid email.' );
 }
 
@@ -35,7 +35,8 @@ add_action( 'groundhogg/templates/email/head/after', function(){
 } );
 
 if ( get_url_var( 'plain' ) ){
-	?><pre><?php esc_html_e( $email->get_merged_alt_body() ); ?></pre><?php
+	?><pre><?php echo esc_html( $email->get_merged_alt_body() ); ?></pre><?php
 } else {
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 	echo $email->build();
 }

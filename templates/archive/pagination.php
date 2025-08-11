@@ -9,7 +9,7 @@ if ( $total_pages > 1 ):
     <div class="pagination">
         <!-- Previous button -->
 		<?php if ( $current_page > 1 ) { ?>
-            <a href="?_page=<?php echo( $current_page - 1 ); ?>">&laquo; <?php esc_html_e( 'Previous' ); ?></a>
+            <a href="?_page=<?php echo absint( $current_page - 1 ); ?>">&laquo; <?php esc_html_e( 'Previous', 'groundhogg' ); ?></a>
 		<?php } ?>
 
         <!-- Page numbers -->
@@ -32,20 +32,20 @@ if ( $total_pages > 1 ):
 		}
 
 		for ( $i = $start_page; $i <= $end_page; $i ++ ) {
-			echo '<a href="?_page=' . $i . '" ' . ( $current_page == $i ? 'class="active"' : '' ) . '>' . $i . '</a>';
+			echo '<a href="?_page=' . esc_url( $i ) . '" ' . ( $current_page == $i ? 'class="active"' : '' ) . '>' . esc_html( $i ) . '</a>';
 		}
 
 		if ( $end_page < $total_pages ) {
 			if ( $end_page < $total_pages - 1 ) {
 				echo '<span>...</span>';
 			}
-			echo '<a href="?_page=' . $total_pages . '">' . $total_pages . '</a>';
+			echo '<a href="?_page=' . esc_url( $total_pages ) . '">' . esc_html( $total_pages ) . '</a>';
 		}
 		?>
 
         <!-- Next button -->
 		<?php if ( $current_page < $total_pages ) { ?>
-            <a href="?_page=<?php echo( $current_page + 1 ); ?>"><?php esc_html_e( 'Next' ); ?> &raquo;</a>
+            <a href="?_page=<?php echo absint( $current_page + 1 ); ?>"><?php esc_html_e( 'Next', 'groundhogg' ); ?> &raquo;</a>
 		<?php } ?>
     </div>
 <?php

@@ -116,7 +116,7 @@ function groundhogg_disable_safe_mode() {
  */
 function groundhogg_validate_safe_mode_cookie() {
 
-	$cookie_value = $_COOKIE[ GROUNDHOGG_SAFE_MODE_COOKIE ] ?? '';
+	$cookie_value = sanitize_text_field( wp_unslash( $_COOKIE[ GROUNDHOGG_SAFE_MODE_COOKIE ] ?? '' ) );
 
 	if ( empty( $cookie_value ) ) {
 		return false;

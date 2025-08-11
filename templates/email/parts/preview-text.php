@@ -16,7 +16,9 @@ if ( $email->get_pre_header() ):
 		<?php echo esc_html( $email->get_merged_pre_header() ) ?>
 	</div>
 	<div style="display: none; max-height: 0px; overflow: hidden;">
-		<?php echo str_repeat( '&#847; &zwnj; &nbsp; &#8199; &shy;', 5 ); ?>
+		<?php
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- string literal HTML
+        echo str_repeat( '&#847; &zwnj; &nbsp; &#8199; &shy;', 5 ); ?>
 	</div>
 <?php
 endif;

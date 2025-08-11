@@ -13,7 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @param $notice
  */
 function redirect_with_notice( $url, $notice ){
-	die( wp_safe_redirect( add_query_arg( 'notice', $notice, $url ) ) );
+	wp_safe_redirect( add_query_arg( 'notice', $notice, $url ) );
+    exit;
 }
 
 /**
@@ -47,9 +48,19 @@ function notice_admin_logged_in_testing_warning(){
 
 	?>
     <div class="notice notice-warning">
-        <p><?php /* translators: 1: the current user's role name */
-		    printf( esc_html__( 'You are currently logged in as an %s. This means any actions you take will affect the contact record associated with your user account.', 'groundhogg' ), bold_it( get_role( array_shift( wp_get_current_user()->roles ) )->name ) ); ?></p>
-        <p><?php printf( esc_html__( 'If you are trying to test with another contact record (not the one associated with your user account) use an incognito window, logout, or %1$sdisable logged in user precedence in the settings%2$s.', 'groundhogg' ), "<a href='https://help.groundhogg.io/article/294-why-is-my-email-not-being-confirmed'>", "</a>" ); ?></p>
+        <p><?php
+		    printf(
+		        /* translators: 1: the current user's role name */
+                esc_html__( 'You are currently logged in as an %s. This means any actions you take will affect the contact record associated with your user account.', 'groundhogg' ),
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Generated HTML
+                bold_it( esc_html( get_role( array_shift( wp_get_current_user()->roles ) )->name ) ) );
+            ?></p>
+        <p><?php printf(
+	            /* translators: 1: open <a>, 2: closing </a> */
+                esc_html__( 'If you are trying to test with another contact record (not the one associated with your user account) use an incognito window, logout, or %1$sdisable logged in user precedence in the settings%2$s.', 'groundhogg' ),
+                "<a href='https://help.groundhogg.io/article/294-why-is-my-email-not-being-confirmed'>",
+                "</a>"
+            ); ?></p>
     </div>
 	<?php
 }

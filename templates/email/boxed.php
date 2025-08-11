@@ -50,7 +50,7 @@ $bodyStyle = array_filter( $bodyStyle );
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="x-apple-disable-message-reformatting"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><?php echo $email_title; ?></title>
+	<title><?php echo esc_html( $email_title ); ?></title>
 	<base target="_blank">
 	<style id="global-styles">
 		<?php load_css( 'email' ); ?>
@@ -60,7 +60,7 @@ $bodyStyle = array_filter( $bodyStyle );
 		<?php load_css( 'responsive' ); ?>
 	</style>
 	<style id="block-styles">
-		<?php echo $email->get_css() ?>
+		<?php echo esc_html( $email->get_css() ) ?>
 	</style>
 	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
 	<?php load_part( 'head-close' ) ?>
@@ -71,7 +71,7 @@ $bodyStyle = array_filter( $bodyStyle );
 <table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0" role="presentation">
 	<tr>
 		<td align="<?php echo esc_attr( $alignment ); ?>" bgcolor="<?php echo esc_attr( $bgColor ); ?>"
-		    background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle )?>">
+		    background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo esc_attr( \Groundhogg\array_to_css( $bodyStyle ) );?>">
 			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse" role="presentation">
 				<tr>
 					<td width="<?php echo esc_attr( $email->get_width() ); ?>"
@@ -80,9 +80,13 @@ $bodyStyle = array_filter( $bodyStyle );
 						<?php load_part( 'browser-view' ); ?>
 
 						<div class="body-content">
-							<?php do_action( 'groundhogg/templates/email/boxed/content/before' ); ?>
-							<?php echo $email->get_merged_content(); ?>
-							<?php do_action( 'groundhogg/templates/email/boxed/content/after' ); ?>
+							<?php
+                            do_action( 'groundhogg/templates/email/boxed/content/before' );
+
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- handled upstream
+                            echo $email->get_merged_content();
+
+                            do_action( 'groundhogg/templates/email/boxed/content/after' ); ?>
 						</div>
 
 						<?php load_part( 'footer' ); ?>

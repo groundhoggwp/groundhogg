@@ -147,17 +147,26 @@ managed_page_head( __( 'Email Archive', 'groundhogg' ), 'archive' );
 
 			?>
             <p><?php
-                /* translators: 1: number of emails received, 2: search term */
-				printf( __( 'You\'ve received %s emails matching %s.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ), bold_it( esc_html( $search ) ) );
-                ?></p>
+				printf(
+				    /* translators: 1: number of emails received, 2: search term */
+                    esc_html__( 'You\'ve received %1$s emails matching %2$s.', 'groundhogg' ),
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    bold_it( esc_html( number_format_i18n( $total_events ) ) ),
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    bold_it( esc_html( $search ) )
+                ); ?></p>
 		<?php
 
 		else:
 
 			?>
             <p><?php
-                /* translators: 1: number of emails received */
-				printf( __( 'You\'ve received %s emails from us.', 'groundhogg' ), bold_it( number_format_i18n( $total_events ) ) );
+				printf(
+				    /* translators: 1: number of emails received */
+                    esc_html__( 'You\'ve received %s emails from us.', 'groundhogg' ),
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    bold_it( esc_html( number_format_i18n( $total_events ) ) )
+                );
                 ?></p>
 		<?php
 

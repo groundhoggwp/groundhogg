@@ -16,7 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     <?php do_action( 'groundhogg/templates/email/content/before' ); ?>
 
     <!-- START CONTENT -->
-    <?php echo apply_filters( 'groundhogg/email_template/content', '' ); ?>
+    <?php
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- we're outputting HTML here
+    echo apply_filters( 'groundhogg/email_template/content', '' ); ?>
     <!-- END CONTENT -->
 
     <?php do_action( 'groundhogg/templates/email/content/after' ); ?>

@@ -55,12 +55,13 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 	$GLOBALS['email'] = $email;
 
 	if ( ! $email->exists() ) {
-		wp_die( __( 'Could not load email...', 'groundhogg' ) );
+		wp_die( esc_html__( 'Could not load email...', 'groundhogg' ) );
 	}
 
 	$email->set_contact( $contact );
 	$email->set_event( $event );
 
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Generated HTML
 	echo $email->build();
 
 else:

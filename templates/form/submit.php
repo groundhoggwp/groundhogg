@@ -23,6 +23,8 @@ if ( $step->type_is( 'form_fill' ) ) {
 	$form = new Form( [ 'id' => $step->get_id() ] );
 } else if ( $step->type_is( 'web_form' ) ) {
 	$form = new Form_v2( [ 'id' => $step->get_id() ] );
+} else {
+	wp_die( 'Invalid form type.' );
 }
 
 
@@ -48,8 +50,8 @@ managed_page_head( $step->get_title(), 'view' );
 
 		form_errors( false );
 
-		?>
-		<?php echo $form->get_iframe_embed_code(); ?>
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Generated HTML
+		echo $form->get_iframe_embed_code(); ?>
     </div>
 	<?php
 

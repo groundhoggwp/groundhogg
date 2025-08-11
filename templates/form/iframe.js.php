@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-use function Groundhogg\managed_page_url;status_header( 200 );
+status_header( 200 );
 nocache_headers();
 
 header( "Content-Type: application/javascript" );

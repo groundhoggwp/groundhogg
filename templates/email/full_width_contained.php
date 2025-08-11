@@ -49,7 +49,7 @@ if ( $bgImage ) {
 	<meta name="x-apple-disable-message-reformatting"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-	<title><?php echo $email_title; ?></title>
+	<title><?php echo esc_html( $email_title ); ?></title>
 	<base target="_blank">
 	<style id="global-style">
 		<?php load_css( 'email' ); ?>
@@ -71,7 +71,9 @@ if ( $bgImage ) {
 			<?php load_part( 'preview-text' ); ?>
 			<?php load_part( 'browser-view' ); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
-			<?php echo $email->get_merged_content(); ?>
+			<?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- handled upstream
+            echo $email->get_merged_content(); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
 			<?php if ( ! $email->has_footer_block() ): ?>
 			<table cellspacing="0" cellpadding="0" role="presentation" align="center">

@@ -58,11 +58,11 @@ do_action( 'groundhogg/templates/email/footer/before' );
 
 $footer_info = [
     html()->e( 'span', [], [
-	    apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', __( "Don't want these emails?", 'groundhogg' ) ),
+	    apply_filters( 'groundhogg/email_template/pre_unsubscribe_text', esc_html__( "Don't want these emails?", 'groundhogg' ) ),
         " ",
         html()->e( 'a', [
             'href' => apply_filters( 'groundhogg/email_template/unsubscribe_link', home_url() ),
-        ], apply_filters( 'groundhogg/email_template/unsubscribe_text', __( "Unsubscribe", 'groundhogg' ) ) ) . '.'
+        ], apply_filters( 'groundhogg/email_template/unsubscribe_text', esc_html__( "Unsubscribe", 'groundhogg' ) ) ) . '.'
     ] ),
 ];
 
@@ -70,44 +70,50 @@ $custom_text = get_option( 'gh_custom_email_footer_text' );
 
 if ( $custom_text ): ?>
                                 <div class="pre-footer">
-                                    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
+                                    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo esc_attr( $footer_container ); ?>">
                                         <tr>
                                             <td class="content-block" style="">
-                                                <?php echo wpautop( $custom_text ); ?>
+                                                <?php
+                                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- using wp_kses
+                                                echo \Groundhogg\email_kses( wpautop( $custom_text ) ); ?>
                                             </td>
                                         </tr>
                                     </table>
                                 </div>
                                 <?php endif; ?>
                                 <!-- START FOOTER -->
-                                <div class="footer" style="<?php echo $footer; ?>">
-                                    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo $footer_container; ?>">
+                                <div class="footer" style="<?php echo esc_attr( $footer ); ?>">
+                                    <table border="0" cellpadding="0" cellspacing="0" style="<?php echo esc_attr( $footer_container ); ?>">
                                         <tr>
-                                            <td class="content-block" style="<?php echo $footer_css; ?>">
-                                                <span class="apple-link" style="<?php echo $apple_link; ?>">
-                                                    <?php echo apply_filters( 'groundhogg/email_template/footer_text', '' ); ?>
+                                            <td class="content-block" style="<?php echo esc_attr( $footer_css ); ?>">
+                                                <span class="apple-link" style="<?php echo esc_attr( $apple_link ); ?>">
+                                                    <?php
+                                                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- using wp_kses
+                                                    echo \Groundhogg\email_kses( apply_filters( 'groundhogg/email_template/footer_text', '' ) ); ?>
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="content-block" style="<?php echo $footer_css; ?>">
-                                                <span style="<?php echo $apple_link; ?>">
-                                                    <?php echo implode( ' | ', $footer_info ); ?>
+                                            <td class="content-block" style="<?php echo esc_attr( $footer_css ); ?>">
+                                                <span style="<?php echo esc_attr( $apple_link ); ?>">
+                                                    <?php
+                                                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- handled upstream
+                                                    echo implode( ' | ', $footer_info ); ?>
                                                 </span>
                                             </td>
                                         </tr>
                                         <?php if(\Groundhogg\is_option_enabled( 'gh_affiliate_link_in_email')) : ?>
                                             <tr>
-                                                <td style="padding: 20px" style="<?php echo $footer_css; ?>">
-                                                    <p style="<?php echo $apple_link; ?>">
+                                                <td style="padding: 20px" style="<?php echo esc_attr( $footer_css ); ?>">
+                                                    <p style="<?php echo esc_attr( $apple_link ); ?>">
                                                         <?php esc_html_e("This email was sent with" , 'groundhogg');; ?>
-                                                        <a href="<?php echo add_query_arg( [
+                                                        <a href="<?php echo esc_url( add_query_arg( [
                                                             'utm_source'    => 'email',
                                                             'utm_medium'    => 'footer-link',
                                                             'utm_campaign'  => 'email-affiliate',
                                                             'aff'           => absint( get_option( 'gh_affiliate_id' ) ),
-                                                        ], 'https://www.groundhogg.io/pricing/' ); ?>" target="_blank">
-                                                            <img style="vertical-align: middle" height="18.33" width="100" src="<?php echo GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png'; ?>"/>
+                                                        ], 'https://www.groundhogg.io/pricing/' ) ); ?>" target="_blank">
+                                                            <img style="vertical-align: middle" height="18.33" width="100" src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png' ); ?>"/>
                                                         </a>
                                                     </p>
                                                 </td>

@@ -111,7 +111,7 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 	<meta name="x-apple-disable-message-reformatting"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-	<title><?php echo $email_title; ?></title>
+    <title><?php echo esc_html( $email_title ); ?></title>
 	<base target="_parent">
 	<style>
 
@@ -162,7 +162,7 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 
 		<?php do_action( 'groundhogg/templates/email/head/style' ); ?>
         <?php if ( apply_filters( 'groundhogg/templates/email/has_posts', false ) ): ?>
-            <?php echo file_get_contents( __DIR__ . '/posts.css' ) ?>
+        <?php echo esc_html( file_get_contents( __DIR__ . '/posts.css' ) ) ?>
         <?php endif; ?>
     </style>
 	<?php do_action( 'groundhogg/templates/email/head/after' ); ?>
@@ -170,26 +170,27 @@ $email_width          = $is_showing_in_iframe ? '100%' : $email_width;
 <!-- /HEAD -->
 
 <!-- BODY -->
-<body class="email" style="<?php echo $body; ?>">
-<table border="0" cellpadding="0" cellspacing="0" class="body" style="<?php echo $wrapper; ?>">
+<body class="email" style="<?php echo esc_attr( $body ); ?>">
+<table border="0" cellpadding="0" cellspacing="0" class="body" style="<?php echo esc_attr( $wrapper ); ?>">
 	<tr>
-		<td class="container" style="<?php echo $template_container; ?>" align="<?php echo $alignment; ?>">
+        <td class="container" style="<?php echo esc_attr( $template_container ); ?>" align="<?php echo esc_attr( $alignment ); ?>">
 			<table border="0" cellpadding="0" cellspacing="0" class="body"
-			       style="max-width: <?php echo $email_width; ?>px">
+                   style="max-width: <?php echo esc_attr( $email_width ); ?>px">
 				<tr>
 					<td align="center">
-						<div class="content" style="<?php echo $template_content; ?>">
+                        <div class="content" style="<?php echo esc_attr( $template_content ); ?>">
 
 							<!-- PREHEADER -->
 							<span class="preheader"
-							      style="<?php echo $preheader; ?>"><?php echo apply_filters( 'groundhogg/email_template/pre_header_text', '' ); ?></span>
+							      style="<?php echo esc_attr( $preheader ); ?>"><?php
+                                echo esc_html( apply_filters( 'groundhogg/email_template/pre_header_text', '' ) ); ?></span>
 							<!-- /PREHEADER -->
 
 							<!-- BROWSER VIEW -->
 							<?php if ( apply_filters( 'groundhogg/email_template/show_browser_view', false ) && \Groundhogg\is_sending() ): ?>
 								<div class="header" style="text-align: center;margin-bottom: 25px;">
-                                    <span class="apple-link" style="<?php echo $apple_link; ?>">
-                                        <a href="<?php echo esc_url_raw( apply_filters( 'groundhogg/email_template/browser_view_link', home_url() ) ); ?>">
+                                    <span class="apple-link" style="<?php echo esc_attr( $apple_link ); ?>">
+                                        <a href="<?php echo esc_url( apply_filters( 'groundhogg/email_template/browser_view_link', home_url() ) ); ?>">
                                             <?php echo esc_html( apply_filters( 'groundhogg/email_template/browser_view_text', __( 'View In Browser...', 'groundhogg' ) ), 'groundhogg' ); ?>
                                         </a>
                                     </span>

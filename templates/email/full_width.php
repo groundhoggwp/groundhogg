@@ -49,7 +49,7 @@ if ( $bgImage ) {
     <meta name="x-apple-disable-message-reformatting"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <title><?php echo $email_title; ?></title>
+    <title><?php echo esc_html( $email_title ); ?></title>
     <base target="_blank">
     <style id="global-style">
         <?php load_css( 'email' ); ?>
@@ -59,18 +59,21 @@ if ( $bgImage ) {
         <?php load_css( 'responsive' ); ?>
     </style>
     <style id="block-styles">
-        <?php echo $email->get_css() ?>
+        <?php echo esc_html( $email->get_css() ); ?>
     </style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
 <body class="email template-full-width" dir="<?php echo esc_attr( $direction ); ?>">
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
     <tr>
-        <td bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo \Groundhogg\array_to_css( $bodyStyle ) ?>">
+        <td bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo esc_attr( Groundhogg\array_to_css( $bodyStyle ) ) ?>">
 			<?php load_part( 'preview-text' ); ?>
 			<?php load_part( 'browser-view' ); ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
-			<?php echo $email->get_merged_content(); ?>
+			<?php
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitize and escaped upstream
+            echo $email->get_merged_content();
+            ?>
 			<?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
 			<?php load_part( 'footer' ); ?>
         </td>

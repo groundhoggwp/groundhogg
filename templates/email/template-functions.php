@@ -40,6 +40,6 @@ function load_css( $file = '' ) {
 
 		do_action( "groundhogg/templates/email/css/$file" );
 
-		echo file_get_contents( $file );
+		echo esc_html( file_get_contents( $file ) );
 	}
 }

@@ -95,29 +95,37 @@ managed_page_head( __( 'Campaigns Archive', 'groundhogg' ), 'archive' );
 		if ( $search ):
 			?>
             <p><?php
-                /* translators: 1: number of campaigns found, 2: search term */
-				printf( _n( 'We found %s campaign matching %s.', 'We found %s campaigns matching %s.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ), bold_it( esc_html( $search ) ) ); ?></p>
+				printf(
+				    /* translators: 1: number of campaigns found, 2: search term */
+                    esc_html( _n( 'We found %1$s campaign matching %2$s.', 'We found %1$s campaigns matching %2$s.', $total_items, 'groundhogg' ) ),
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    bold_it( number_format_i18n( $total_items ) ), bold_it( esc_html( $search ) )
+                ); ?></p>
 		    <?php
 		else:
 			?>
             <p><?php
-                /* translators: 1: number of campaign archives available */
-				printf( _n( 'There is %s campaign archive available.', 'There are %s campaign archives available.', $total_items, 'groundhogg' ), bold_it( number_format_i18n( $total_items ) ) ); ?></p>
+				printf(
+				    /* translators: 1: number of campaign archives available */
+                    esc_html( _n( 'There is %s campaign archive available.', 'There are %s campaign archives available.', $total_items, 'groundhogg' ) ),
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+                    bold_it( number_format_i18n( $total_items ) ) );
+                ?></p>
 		    <?php
 		endif;
 
 		foreach ( $items as $campaign ):
 
-			echo html()->e( 'a', [
+			html( 'a', [
 				'href'  => managed_page_url( sprintf( '/campaigns/%s/', $campaign->get_slug() ) ),
 				'class' => 'campaign-title'
-			], $campaign->get_name() );
+			], esc_html( $campaign->get_name() ) );
 
-			printf( ' (%s)', number_format_i18n( $campaign->total ) );
+			printf( ' (%s)', esc_html( number_format_i18n( $campaign->total ) ) );
 
-			echo html()->e( 'p', [
+			html( 'p', [
 				'class' => 'campaign-description'
-			], $campaign->get_description() );
+			], esc_html( $campaign->get_description() ) );
 
 
 		endforeach;
