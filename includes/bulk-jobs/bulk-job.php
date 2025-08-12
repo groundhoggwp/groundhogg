@@ -97,8 +97,6 @@ abstract class Bulk_Job {
 			'page' => 'gh_bulk_jobs',
 			'tab'  => false
 		], $this->get_start_query_args(), $additional ) );
-
-//		return add_query_arg( array_merge( [ 'action' => $this->get_action() ], $this->get_start_query_args(), $additional ), admin_url( 'admin.php?page=gh_bulk_jobs' ) );
 	}
 
 	/**
