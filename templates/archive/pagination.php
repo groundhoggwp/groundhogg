@@ -32,14 +32,14 @@ if ( $total_pages > 1 ):
 		}
 
 		for ( $i = $start_page; $i <= $end_page; $i ++ ) {
-			echo '<a href="?_page=' . esc_url( $i ) . '" ' . ( $current_page == $i ? 'class="active"' : '' ) . '>' . esc_html( $i ) . '</a>';
+			echo '<a href="?_page=' . absint( $i ) . '" ' . ( $current_page == $i ? 'class="active"' : '' ) . '>' . esc_html( $i ) . '</a>';
 		}
 
 		if ( $end_page < $total_pages ) {
 			if ( $end_page < $total_pages - 1 ) {
 				echo '<span>...</span>';
 			}
-			echo '<a href="?_page=' . esc_url( $total_pages ) . '">' . esc_html( $total_pages ) . '</a>';
+			echo '<a href="?_page=' . absint( $total_pages ) . '">' . esc_html( $total_pages ) . '</a>';
 		}
 		?>
 

@@ -1972,9 +1972,9 @@ class Settings_Page extends Admin_Page {
 					continue;
 				}
 
+                $tab_url = admin_page_url( $this->get_slug(), [ 'tab' => $tab['id'] ] );
 				?>
-
-                <a href="?page=gh_settings&tab=<?php echo esc_url( $tab['id'] ); ?>"
+                <a href="<?php echo esc_url( $tab_url ); ?>"
                    class="nav-tab <?php echo $this->active_tab() == $tab['id'] ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $tab['title'] ); ?></a>
 			<?php endforeach; ?>
         </h2>
