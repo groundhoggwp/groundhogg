@@ -470,9 +470,9 @@ class Notices {
 
 		$notices = $this->get_stored_notices();
 
-		if ( ! $notices ) {
-			$notices = [];
-		}
+        if ( empty( $notices ) ) {
+            return;
+        }
 
 		foreach ( $notices as $code => $notice ) {
 

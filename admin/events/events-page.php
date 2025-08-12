@@ -420,8 +420,16 @@ class Events_Page extends Tabbed_Admin_Page {
 		// Move the events over...
 		get_db( 'events' )->move_events_to_queue( [ 'status' => Event::WAITING ], true );
 
-		/* translators: %s: the number of events uncancelled */
-		$this->add_notice( 'scheduled', sprintf( _nx( '%s event uncancelled', '%s events uncancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+        switch ( $query_params['status'] ) {
+            case Event::FAILED:
+	            /* translators: %s: the number of events to retry */
+	            $this->add_notice( 'scheduled', sprintf( _nx( 'Retrying %s event', 'Retrying %s events', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+	            break;
+            case Event::CANCELLED:
+	            /* translators: %s: the number of events uncancelled */
+	            $this->add_notice( 'scheduled', sprintf( _nx( '%s event uncancelled', '%s events uncancelled', $result, 'notice', 'groundhogg' ), _nf( $result ) ) );
+	            break;
+        }
 
 		return false;
 	}

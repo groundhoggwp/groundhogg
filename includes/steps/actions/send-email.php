@@ -101,7 +101,7 @@ class Send_Email extends Action {
 					]
 				] )
 			] ),
-		], false );
+		] );
 	}
 
 	public function validate_settings( Step $step ) {

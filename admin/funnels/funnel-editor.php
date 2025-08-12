@@ -127,8 +127,8 @@ function render_draggable_step_grid( $steps, $groups = true ) {
         <div class="title-section">
             <div class="title-view"><?php
 	            /* translators: %s: the funnel title */
-	            esc_html_e( 'Now editing %s', 'groundhogg' );
-                ?><span class="title"><?php echo esc_html( $funnel->get_title() ) ?></span></div>
+	            esc_html_e( 'Now editing', 'groundhogg' );
+                ?>&nbsp;<span class="title"><?php echo esc_html( $funnel->get_title() ) ?></span></div>
             <div class="title-edit hidden">
                 <input class="title" placeholder="<?php esc_attr_e( 'Enter Funnel Name Here', 'groundhogg' ); ?>"
                        type="text"

@@ -616,13 +616,12 @@ abstract class Extension {
 	 */
 	public function license_status() {
 		$status  = get_array_var( $this->get_extension_details(), 'status' );
-		$status  = html()->e( 'span', [ 'class' => 'status-' . $status ], esc_html( $status === 'valid' ? __( 'valid', 'groundhogg' ) : __( 'invalid', 'groundhogg' ) ) );
+		$status  = html()->e( 'span', [ 'class' => 'status-' . $status ], esc_html( $status === 'valid' ? esc_html__( 'valid', 'groundhogg' ) : esc_html__( 'invalid', 'groundhogg' ) ) );
 		/* translators: 1: expiry date */
-		$expires = $this->get_expiry() ? sprintf( __( 'expires on %1$s', 'groundhogg' ), html()->e('abbr', [ 'title' => $this->get_expiry() ], $this->get_expiry() ) ) : esc_html__( 'never expires', 'groundhogg' );
+		$expires = $this->get_expiry() ? sprintf( esc_html__( 'expires on %1$s', 'groundhogg' ), html()->e('abbr', [ 'title' => $this->get_expiry() ], esc_html( $this->get_expiry() ) ) ) : esc_html__( 'never expires', 'groundhogg' );
 
 		/* translators: 1: license status (valid/invalid), 2: expiry string */
-
-		return sprintf( esc_html__( 'Your license is %1$s and %2$s.', 'groundhogg' ), bold_it( $status ), $expires );
+		return sprintf( esc_html__( 'Your license is %1$s and %2$s.', 'groundhogg' ), bold_it( $status ), esc_html( $expires ) );
 	}
 
 	/**
@@ -630,15 +629,15 @@ abstract class Extension {
 	 */
 	public function __toString() {
 
-        $display_name = esc_html( $this->get_display_name() );
-        $description = esc_html( $this->get_display_description() );
+		$display_name = $this->get_display_name();
+		$description  = $this->get_display_description();
 
 		$content = "<div class='gh-panel'>";
 		$content .= "<div class='gh-panel-header'>";
-		$content .= "<h2 class='hndle'>{$display_name}</h2>";
+		$content      .= "<h2 class='hndle'>" . esc_html( $display_name ) . "</h2>";
 		$content .= "</div>";
 		$content .= "<div class=\"inside\">";
-		$content .= "<p>" . $description . "</p>";
+		$content .= "<p>" . kses( $description, 'simple' ) . "</p>";
 
 
 		$content .= html()->input( [

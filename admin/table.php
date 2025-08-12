@@ -102,7 +102,7 @@ abstract class Table extends WP_List_Table {
 
 		if ( method_exists( $item, 'get_title' ) ):
 			?>
-            <label for="cb-select-<?php echo esc_attr( item->ID ); ?>">
+            <label for="cb-select-<?php echo esc_attr( $item->ID ); ?>">
 				<span class="screen-reader-text">
 				<?php
 				/* translators: %s: Post title. */

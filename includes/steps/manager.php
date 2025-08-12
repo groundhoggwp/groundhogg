@@ -48,7 +48,7 @@ class Manager {
 	 */
 	public function __construct() {
 		// RIGHT AFTER THE DBS.
-		add_action( 'setup_theme', [ $this, 'init_steps' ], 2 );
+		add_action( 'init', [ $this, 'init_steps' ], 1 );
 	}
 
 

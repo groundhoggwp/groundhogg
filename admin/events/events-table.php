@@ -576,7 +576,7 @@ class Events_Table extends WP_List_Table {
 		}
 
 		?>
-        <div class="alignleft gh-actions">
+        <div class="alignleft gh-actions display-flex gap-5">
 	        <?php if ( $this->get_view() === Event::WAITING ) :
 
                 html()->frag( [
@@ -603,12 +603,19 @@ class Events_Table extends WP_List_Table {
 		            html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'uncancel' ], get_request_uri() ), 'uncancel' ), sprintf( esc_html_x( 'Uncancel %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button secondary small' ] ),
 		        ], true );
 
+            elseif ( $this->get_view() === Event::FAILED ) :
+
+	            html()->frag( [
+		            /* translators: %s: the number of events to retry */
+		            html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'uncancel' ], get_request_uri() ), 'uncancel' ), sprintf( esc_html_x( 'Retry %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button secondary small danger-confirm' ] ),
+	            ], true );
+
             endif;
 
             if ( in_array( $this->get_view(), array( 'failed', 'skipped', 'cancelled' ) ) ) :
 
 	            html()->frag( [
-		            /* translators: %s: the number of events to purge */
+		           /* translators: %s: the number of events to purge */
 		            html()->a( wp_nonce_url( add_query_arg( [ 'action' => 'purge', 'status' => $this->get_view() ], get_request_uri() ), 'purge' ), sprintf( esc_html_x( 'Purge %s events', 'action', 'groundhogg' ), _nf( $items ) ), [ 'class' => 'gh-button danger danger-permanent small' ] ),
 	            ], true );
 
