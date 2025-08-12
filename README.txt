@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.3.2
+Stable tag: 4.2.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -373,6 +373,13 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.4 (2025-08-12) =
+Just an absolute huge refactoring effort with over 1000+ changes to please our WordPress.org overlords' WPCS checklist. Including, but not limited to:
+* Escaping literally anything that can be escaped.
+* Adding translator comments and re-ordering placeholders.
+* Refactoring DB Queries.
+* Replacing PHP functions with WordPress core functions.
 
 = 4.2.3.2 (2025-08-04) =
 * UPDATED Repository plugin name.
