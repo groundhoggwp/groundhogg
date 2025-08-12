@@ -576,8 +576,6 @@ function email_kses( $content ) {
 		'replacement', // hacky trick to allow replacements in URI elements
 	];
 
-	include_once __DIR__ . '/kses.php';
-
 	$content = kses( $content, 'post', array_merge( $basic_protocols, $wacky_protocols ) );
 
 	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\more_allowed_tags' );

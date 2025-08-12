@@ -12,7 +12,6 @@ use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\kses;
-use function Groundhogg\kses_e;
 
 /**
  * Map Import

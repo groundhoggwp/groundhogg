@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Admin;
 
+use function Groundhogg\admin_page_url;
+use function Groundhogg\get_request_uri;
 use function Groundhogg\get_request_var;
 use function Groundhogg\groundhogg_icon;
 use function Groundhogg\header_icon;
@@ -182,11 +184,16 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 		?>
         <!-- BEGIN TABS -->
         <h2 class="nav-tab-wrapper gh-nav">
-			<?php foreach ( $this->parsed_tabs() as $id => $tab ): ?>
-				<?php if ( ! current_user_can( $tab['cap'] ) ) {
+			<?php foreach ( $this->parsed_tabs() as $id => $tab ):
+
+                if ( ! current_user_can( $tab['cap'] ) ) {
 					continue;
-				} ?>
-                <a href="?<?php echo esc_url( http_build_query( [ 'page' => $this->get_slug(), 'tab' => $tab['slug'] ] ) ); ?>"
+				}
+
+                $url = admin_page_url( $this->get_slug(), [ 'tab' => $tab['slug'] ] );;
+
+                ?>
+                <a href="<?php echo esc_url( $url ); ?>"
                    class="nav-tab <?php echo $this->get_current_tab() == $tab['slug'] ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $tab['name'] ); ?></a>
 			<?php endforeach; ?>
         </h2>
