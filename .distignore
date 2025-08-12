@@ -12,6 +12,9 @@
 .gitignore
 .phpcs.xml.dist
 .travis.yml
+.phpcs.xml
+phpcs.xml
+phpunit.xml.dist
 composer.json
 composer.lock
 composer.phar

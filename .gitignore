@@ -4,3 +4,6 @@
 /composer.phar
 /.idea/
 /phpunit.phar
+/.php-cs-fixer.cache
+/.php-cs-fixer.dist.php
+/composer.lock
