@@ -241,7 +241,7 @@ abstract class Bulk_Job {
 			return sprintf( __( 'Processed %1$s items in %2$s seconds. Skipped %3$s items.', 'groundhogg' ), _nf( $completed ), $time, _nf( $skipped ) );
 		} else {
 			/* translators: 1: the number of items processed, 2: the time it took in seconds */
-			return sprintf( __( 'Processed %$1s items in %$2s seconds.', 'groundhogg' ), $completed, $time );
+			return sprintf( __( 'Processed %1$s items in %2$s seconds.', 'groundhogg' ), $completed, $time );
 		}
 	}
 

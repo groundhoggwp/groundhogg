@@ -1686,7 +1686,7 @@ class Settings_Page extends Admin_Page {
 			'gh_enable_one_click_unsubscribe'        => [
 				'id'      => 'gh_enable_one_click_unsubscribe',
 				'section' => 'unsubscribe',
-				'label'   => _x( 'Enable One-Click Unsubscribe', 'settings', 'groundhogg' ),
+				'label'   => _x( 'Enable Instant Unsubscribe (No confirmation)', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'When contacts click the unsubscribe link in emails they will be instantly unsubscribed instead of having to confirm. This is not recommended because inbox bots could follow the link and unsubscribe contacts accidentally.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
 				'atts'    => [
