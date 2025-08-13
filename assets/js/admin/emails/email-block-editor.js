@@ -6768,7 +6768,6 @@
         return fillFontStyle({
           ...font,
           color,
-          fontFamily,
         })
       }
     }
@@ -7243,7 +7242,7 @@
                 tinymceElement(editorId, {
                     replacements: true,
                     savedReplies: true,
-                    posttags    : blockEl.closest('[data-type="queryloop"]') && true,
+                    posttags    : blockEl && blockEl.closest('[data-type="queryloop"]') && true,
                     tinymce     : {
                       content_style : tinyMceCSS(),
                       height, // inline: true,
