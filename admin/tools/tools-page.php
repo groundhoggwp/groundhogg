@@ -18,6 +18,7 @@ use WP_Error;
 use function Groundhogg\action_input;
 use function Groundhogg\action_url;
 use function Groundhogg\admin_page_url;
+use function Groundhogg\bold_it;
 use function Groundhogg\code_it;
 use function Groundhogg\count_csv_rows;
 use function Groundhogg\enqueue_filter_assets;
@@ -733,110 +734,241 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$meta_keys                 = array_diff( array_values( get_db( 'contactmeta' )->get_keys() ), array_keys( $default_exportable_fields ), $custom_properties );
 
 		?>
-        <p><?php esc_html_e( "Select which information you want to appear in your CSV file.", 'groundhogg' ); ?></p>
-
-        <form method="post">
-			<?php action_input( 'choose_columns', true, true ); ?>
-
-            <h3><?php esc_html_e( 'Name your export', 'groundhogg' ); ?></h3>
-
-			<?php
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-            echo html()->input( [
-				'name'        => 'file_name',
-				'placeholder' => 'My export...',
-				'required'    => true,
-	            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-				'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
-			] ); ?>
-
-            <h3><?php esc_html_e( 'Basic Contact Information', 'groundhogg' ); ?></h3>
-			<?php
-
-			html()->export_columns_table( $default_exportable_fields );
-
-			$tabs = Properties::instance()->get_tabs();
-
-			foreach ( $tabs as $tab ):
-
-				?><h2><?php echo esc_html( $tab['name'] ); ?></h2><?php
-
-				$groups = Properties::instance()->get_groups( $tab['id'] );
-
-				foreach ( $groups as $group ):
-					?><h4><?php echo esc_html( $group['name'] ); ?></h4><?php
-
-					$columns = [];
-					$fields  = Properties::instance()->get_fields( $group['id'] );
-
-					foreach ( $fields as $field ) {
-						$columns[ $field['id'] ] = $field['label'];
-					}
-
-					html()->export_columns_table( $columns );
-				endforeach;
-
-			endforeach;
-
-			do_action( 'groundhogg/admin/tools/export' );
-
-			?>
-
-			<?php if ( ! empty( $meta_keys ) ): ?>
-
-                <h3><?php esc_html_e( 'Custom Meta Information', 'groundhogg' ); ?></h3>
+        <div class="display-flex" style="gap: 40px">
+            <div id="select-columns">
+                <h2><?php esc_html_e( "Select columns", 'groundhogg' );  ?></h2>
+                <p><?php esc_html_e( "Select which information you want to appear in your CSV file.", 'groundhogg' ); ?></p>
 				<?php
 
-				html()->export_columns_table( array_combine( $meta_keys, array_map( '\Groundhogg\key_to_words', $meta_keys ) ) );
+				html( 'p', [
+                        'style' => [ 'text-align' => 'right' ],
+                ], [
+					bold_it( esc_html__( 'Search fields', 'groundhogg' ) ),
+					'&nbsp;',
+					html()->input( [
+						'type'        => 'search',
+						'name'        => 'field_search',
+						'class'       => 'search-field',
+						'id'          => 'field-search',
+						'placeholder' => __( 'Search fields...', 'groundhogg' ),
+					] )
+				] )
 
-			endif;
-			?>
-            <table class="form-table">
-                <tbody>
-                <tr>
-                    <th><?php esc_html_e( 'Select the kind of column headers you want.', 'groundhogg' ); ?></th>
-                    <td>
-						<?php
+				?>
+                <h3><?php esc_html_e( 'Basic Contact Information', 'groundhogg' ); ?></h3>
+				<?php
 
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-						echo html()->dropdown( [
-							'name'        => 'header_type',
-							'options'     => [
-								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-								'basic'  => __( 'Field IDs' , 'groundhogg' ),
-								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-								'pretty' => __( 'Pretty Names' , 'groundhogg' ),
-							],
-							'option_none' => false
-						] );
+				html()->export_columns_table( $default_exportable_fields );
 
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses used
-						echo html()->description( kses( __( "Choose <b>Fields IDs</b> for <code>first_name</code> and <b>Pretty Names</b> for <code>First Name</code>.", 'groundhogg' ), 'simple' ) )
+				$tabs = Properties::instance()->get_tabs();
 
-						?>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-			<?php
-			/* translators: 1: number of contacts to export */
-			submit_button( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) );
-			?>
-        </form>
+				foreach ( $tabs as $tab ):
+
+					$groups = Properties::instance()->get_groups( $tab['id'] );
+
+					foreach ( $groups as $group ):
+						?><h3><?php echo esc_html( $tab['name'] ); ?>: <?php echo esc_html( $group['name'] ); ?></h3><?php
+
+						$columns = [];
+						$fields  = Properties::instance()->get_fields( $group['id'] );
+
+						foreach ( $fields as $field ) {
+							$columns[ $field['name'] ] = $field['label'];
+						}
+
+						html()->export_columns_table( $columns );
+					endforeach;
+
+				endforeach;
+
+				do_action( 'groundhogg/admin/tools/export' );
+
+                if ( ! empty( $meta_keys ) ): ?>
+                    <h3><?php esc_html_e( 'Custom Meta Information', 'groundhogg' ); ?></h3>
+					<?php
+
+                    // ignore keys that were included with properties
+					$meta_keys = array_filter( $meta_keys, function ( $key ) {
+                        return Properties::instance()->get_field( $key ) === false;
+                    } );
+
+                    $meta_keys = array_combine( $meta_keys, array_map( '\Groundhogg\key_to_words', $meta_keys ) );
+
+					html()->export_columns_table( $meta_keys );
+
+				endif;
+				?>
+            </div>
+            <form id="export-preview" method="post">
+				<?php action_input( 'choose_columns', true, true ); ?>
+                <h3><?php esc_html_e( 'Name your export', 'groundhogg' ); ?></h3>
+				<?php
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+				echo html()->input( [
+					'name'        => 'file_name',
+					'placeholder' => 'My export...',
+					'required'    => true,
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+					'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
+				] );
+
+				?>
+                <div class="sticky-preview">
+                    <h2><?php esc_html_e( 'Export preview', 'groundhogg' ); ?></h2>
+	                <?php
+
+	                html()->export_columns_table( [] )
+
+	                ?>
+                    <table class="form-table">
+                        <tbody>
+                        <tr>
+                            <th><?php esc_html_e( 'Select the kind of column headers you want.', 'groundhogg' ); ?></th>
+                            <td>
+				                <?php
+
+				                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+				                echo html()->dropdown( [
+					                'name'        => 'header_type',
+					                'options'     => [
+						                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+						                'basic'  => __( 'Field IDs', 'groundhogg' ),
+						                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+						                'pretty' => __( 'Pretty Names', 'groundhogg' ),
+					                ],
+					                'option_none' => false
+				                ] );
+
+				                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses used
+				                echo html()->description( kses( __( "Choose <b>Fields IDs</b> for <code>first_name</code> and <b>Pretty Names</b> for <code>First Name</code>.", 'groundhogg' ), 'simple' ) )
+
+				                ?>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+	                <?php
+	                html( html()->button( [
+		                'type'  => 'submit',
+		                'class' => 'gh-button primary',
+		                /* translators: 1: number of contacts to export */
+		                'text'  => esc_html( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) )
+	                ] ) );
+	                ?>
+                </div>
+            </form>
+        </div>
+        <style>
+            #wpbody-content td {
+                vertical-align: middle;
+            }
+            #export-preview .check-column input {
+                /*display: none;*/
+                visibility: hidden;
+            }
+
+        </style>
         <script>
           ( function ($) {
 
+            document.querySelector('#select-columns').addEventListener('change', function (e) {
+              if (e.target.matches('input[type="checkbox"]')) {
+                build_export_preview();
+              }
+            });
+
+            function build_export_preview() {
+              const scope = document.querySelector('#select-columns');
+              const preview_container = document.querySelector('#export-preview');
+              if (!scope || !preview_container) return;
+
+              // Ensure preview table exists
+              let preview_table = preview_container.querySelector('table');
+
+              const preview_tbody = preview_table.tBodies[0] || preview_table.appendChild(document.createElement('tbody'));
+              preview_tbody.innerHTML = ''; // clear old preview
+
+              // Get all checked checkboxes in tbody rows (exclude the preview table)
+              const checked_boxes = Array.from(scope.querySelectorAll('tbody input[type="checkbox"]:checked'))
+
+              // Deduplicate rows in case a row has multiple checkboxes
+              const rows = [];
+              checked_boxes.forEach(cb => {
+                const tr = cb.closest('tr');
+                if (tr && !rows.includes(tr)) rows.push(tr);
+              });
+
+              // Clone rows directly (keeping controls intact)
+              rows.forEach(row => {
+                const clone = row.cloneNode(true);
+                clone.style.display = '';
+                let input = clone.querySelector('input')
+                input.type = 'hidden';
+                input.insertAdjacentElement('afterend', MakeEl.Button({
+                  className: 'gh-button danger text',
+                  dataName: input.name,
+                  type: 'button',
+                  style: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontSize: '12px',
+                    height: '18px',
+                    width: '18px',
+                    padding: '0'
+                  },
+                  onClick: e => {
+                    $(document.querySelector(`#select-columns input[name="${e.target.dataset.name}"]`)).prop('checked', false );
+                    e.target.closest('tr').remove();
+                  }
+                }, [ '✕', MakeEl.ToolTip( 'Remove', 'left' ) ] ))
+
+                preview_tbody.appendChild(clone);
+              });
+            }
+
             $('.select-all').on('change', function (e) {
-
               let $checks = $(e.target).closest('table').find('input')
-
-              if ($(this).is(':checked')) {
-                $checks.prop('checked', true)
-              }
-              else {
-                $checks.prop('checked', false)
-              }
+              $checks.prop('checked', $(this).is(':checked'))
             })
+
+            document.getElementById('field-search').addEventListener('input', function () {
+              const search_value = this.value.toLowerCase()
+              const tables = document.querySelectorAll('#select-columns table')
+
+              tables.forEach(table => {
+                const rows = table.querySelectorAll('tbody tr')
+                let visible_count = 0
+
+                rows.forEach(row => {
+                  const row_text = row.textContent.toLowerCase()
+                  if (row_text.includes(search_value)) {
+                    row.style.display = ''
+                    visible_count++
+                  }
+                  else {
+                    row.style.display = 'none'
+                  }
+                })
+
+                if (visible_count === 0) {
+                  table.style.display = 'none'
+                  const prev_h3 = table.previousElementSibling
+                  if (prev_h3 && prev_h3.tagName.toLowerCase() === 'h3') {
+                    prev_h3.style.display = 'none'
+                  }
+                }
+                else {
+                  table.style.display = ''
+                  const prev_h3 = table.previousElementSibling
+                  if (prev_h3 && prev_h3.tagName.toLowerCase() === 'h3') {
+                    prev_h3.style.display = ''
+                  }
+                }
+              })
+            })
+
+            $(()=>build_export_preview());
 
           } )(jQuery)
         </script>

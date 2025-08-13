@@ -61,7 +61,7 @@ class Export_Contacts_Last_Id extends Export_Contacts {
 			$message = sprintf( __( 'Your contacts export %s is ready for download!', 'groundhogg' ), html()->e( 'a', [
 //				'class' => 'gh-button primary',
 				'href' => file_access_url( '/exports/' . basename( $this->filePath ), true )
-			], esc_html( bold_it( basename( $this->filePath ) ) ) ) );
+			], bold_it( esc_html( basename( $this->filePath ) ) ) ) );
 
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 

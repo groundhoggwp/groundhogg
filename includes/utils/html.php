@@ -125,7 +125,8 @@ class HTML {
                     esc_html( $tag ),
                     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safely generated attributes
                     array_to_atts( $atts ),
-                    wp_kses_post( $name )
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped upstream
+                    $name
                 );
 
 			else: ?>
@@ -207,12 +208,11 @@ class HTML {
 					'label'   => '',
 					'type'    => 'checkbox',
 					'name'    => 'headers[' . $key . ']',
-					'id'      => 'header_' . $key,
 					'value'   => '1',
 					'checked' => false,
 				] ),
-				$label,
-				'<code>' . esc_html( $key ) . '</code>'
+				esc_html( $label ),
+				code_it( esc_html( $key ) )
 			];
 		} ) );
 
