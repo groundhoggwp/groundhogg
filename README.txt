@@ -374,7 +374,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.4 (2025-08-12) =
+= 4.2.4 (2025-08-13) =
 Just an absolute huge refactoring effort with over 1000+ changes to please our WordPress.org overlords' WPCS checklist. Including, but not limited to:
 * Escaping literally anything that can be escaped.
 * Adding translator comments and re-ordering placeholders.
