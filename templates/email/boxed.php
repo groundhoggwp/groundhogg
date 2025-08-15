@@ -72,26 +72,20 @@ $bodyStyle = array_filter( $bodyStyle );
 <?php load_part( 'preview-text' ); ?>
 <table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0" role="presentation">
 	<tr>
-		<td align="<?php echo esc_attr( $alignment ); ?>" bgcolor="<?php echo esc_attr( $bgColor ); ?>"
-		    background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo esc_attr( \Groundhogg\array_to_css( $bodyStyle ) );?>">
+        <td align="<?php echo esc_attr( $alignment ); ?>" bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo esc_attr( \Groundhogg\array_to_css( $bodyStyle ) ); ?>">
 			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse" role="presentation">
 				<tr>
-					<td width="<?php echo esc_attr( $email->get_width() ); ?>"
-					    style="width: <?php echo esc_attr( $email->get_width() ); ?>px">
+                    <td width="<?php echo esc_attr( $email->get_width() ); ?>" style="width: <?php echo esc_attr( $email->get_width() ); ?>px">
+						<?php
 
-						<?php load_part( 'browser-view' ); ?>
+                        load_part( 'browser-view' );
+                        do_action( 'groundhogg/templates/email/boxed/content/before' );
 
-						<div class="body-content">
-							<?php
-                            do_action( 'groundhogg/templates/email/boxed/content/before' );
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- handled upstream
+                        echo $email->get_merged_content();
 
-                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- handled upstream
-                            echo $email->get_merged_content();
-
-                            do_action( 'groundhogg/templates/email/boxed/content/after' ); ?>
-						</div>
-
-						<?php load_part( 'footer' ); ?>
+						do_action( 'groundhogg/templates/email/boxed/content/after' );
+						load_part( 'footer' ); ?>
 					</td>
 				</tr>
 			</table>

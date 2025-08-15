@@ -1215,6 +1215,7 @@ function array_to_atts( $atts ) {
 			case 'href':
 			case 'action':
 			case 'src':
+			case 'background':
 				$value = strpos( $value, 'data:image/png;base64,' ) === false ? esc_url( $value ) : esc_attr( $value );
 				break;
 			default:

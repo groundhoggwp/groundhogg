@@ -48,7 +48,6 @@ if ( $bgImage ) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="x-apple-disable-message-reformatting"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
 	<title><?php echo esc_html( $email_title ); ?></title>
 	<base target="_blank">
 	<style id="global-style">
@@ -68,16 +67,19 @@ if ( $bgImage ) {
 <body class="email template-full-width-contained" dir="<?php echo esc_attr( $direction ); ?>">
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
 	<tr>
-		<td bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>"
-		    style="<?php echo esc_attr( \Groundhogg\array_to_css( $bodyStyle ) ); ?>">
-			<?php load_part( 'preview-text' ); ?>
-			<?php load_part( 'browser-view' ); ?>
-			<?php do_action( 'groundhogg/templates/email/full-width/content/before' ); ?>
+        <td bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo esc_attr( \Groundhogg\array_to_css( $bodyStyle ) ); ?>">
 			<?php
+
+			load_part( 'preview-text' );
+			load_part( 'browser-view' );
+			do_action( 'groundhogg/templates/email/full-width/content/before' );
+
             // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- handled upstream
-            echo $email->get_merged_content(); ?>
-			<?php do_action( 'groundhogg/templates/email/full-width/content/after' ); ?>
-			<?php if ( ! $email->has_footer_block() ): ?>
+			echo $email->get_merged_content();
+
+			do_action( 'groundhogg/templates/email/full-width/content/after' );
+
+			if ( ! $email->has_footer_block() ): ?>
 			<table cellspacing="0" cellpadding="0" role="presentation" align="center">
 				<tr>
 					<td width="<?php echo esc_attr( $email->get_width() ) ?>" style="width: <?php echo esc_attr( $email->get_width() ) ?>px">

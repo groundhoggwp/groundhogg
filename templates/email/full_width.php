@@ -48,7 +48,6 @@ if ( $bgImage ) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="x-apple-disable-message-reformatting"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
     <title><?php echo esc_html( $email_title ); ?></title>
     <base target="_blank">
     <style id="global-style">
