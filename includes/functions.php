@@ -3663,7 +3663,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 				$time = filectime( $cached_file );
 				// check the time the file was created, if within our ttl, return the contents
 				if ( $time && $time > time() - $cache_ttl ) {
-					$json = json_decode( @file_get_contents( $cached_file ), $as_array );
+					$json = json_decode( files()->get_contents( $cached_file ), $as_array );
 					if ( ! empty( $json ) ) {
 						return $json;
 					}
@@ -3715,7 +3715,7 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 
 	// We don't cache errors...
 	if ( $cache_ttl !== 0 && $cache_key ) {
-		@file_put_contents( files()->get_uploads_dir( 'requests', $cache_key . '.json', true ), json_encode( $json ) );
+		files()->put( files()->get_uploads_dir( 'requests', $cache_key . '.json', true ), wp_json_encode( $json ) );
 	}
 
 	return $json;
@@ -4614,8 +4614,8 @@ function gh_cron_installed() {
  */
 function install_gh_cron_file() {
 
-	$gh_cron_php = file_get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
-	$bytes       = file_put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
+	$gh_cron_php = files()->get_contents( GROUNDHOGG_PATH . 'gh-cron.txt' );
+	$bytes       = files()->put_contents( ABSPATH . 'gh-cron.php', $gh_cron_php );
 
 	return (bool) $bytes;
 }
@@ -4626,7 +4626,7 @@ function install_gh_cron_file() {
  * @return bool
  */
 function uninstall_gh_cron_file() {
-	return @unlink( ABSPATH . 'gh-cron.php' );
+	return wp_delete_file( ABSPATH . 'gh-cron.php' );
 }
 
 /**
@@ -7394,7 +7394,7 @@ function is_free_email_provider( $email ) {
 
 	// initialize providers
 	if ( empty( $providers ) ) {
-		$providers = json_decode( file_get_contents( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
+		$providers = json_decode( files()->get( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
 	}
 
 	return apply_filters( 'groundhogg/is_free_email_provider', in_array( get_email_address_hostname( $email ), $providers ) );
@@ -8828,13 +8828,13 @@ function search_and_replace_in_file( $file_path, $search, $replace ) {
 	}
 
 	// Read file content
-	$content = file_get_contents( $file_path );
+	$content = files()->get_contents( $file_path );
 
 	// Replace occurrences
 	$updated_content = str_replace( $search, $replace, $content );
 
 	// Write back to file
-	return file_put_contents( $file_path, $updated_content ) !== false;
+	return files()->put_contents( $file_path, $updated_content ) !== false;
 }
 
 /**
@@ -9000,14 +9000,11 @@ function schedule_meta_redaction( Meta_DB $table, int $object_id, string $meta_k
  */
 function redact_meta_table( $table ) {
 
-	global $wpdb;
-
 	$table      = db()->get_db( $table );
 	$table_name = $table->table_name;
 	$id_col     = $table->get_object_id_col();
 
 	$time = time();
-
 
 	global $wpdb;
 

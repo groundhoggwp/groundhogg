@@ -1,5 +1,7 @@
 <?php
 
+use function Groundhogg\files;
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 function the_campaign(){
@@ -39,7 +41,9 @@ function load_css( $file = '' ) {
 	if ( file_exists( $file ) ){
 
 		do_action( "groundhogg/templates/email/css/$file" );
+		$css = files()->get_contents( $file );
 
-		echo esc_html( file_get_contents( $file ) );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_html() breaks `div > span` selectors
+		echo wp_strip_all_tags( $css );
 	}
 }

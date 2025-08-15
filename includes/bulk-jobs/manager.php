@@ -40,7 +40,6 @@ class Manager {
 		do_action( 'groundhogg/bulk_jobs/init', $this );
 	}
 
-
 	/**
 	 * Magic get method
 	 *

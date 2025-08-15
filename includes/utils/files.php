@@ -7,6 +7,22 @@ use WP_Error;
 class Files {
 
 	/**
+	 * Proxy for filesystem())
+	 *
+	 * @param $name
+	 * @param $arguments
+	 *
+	 * @return mixed
+	 */
+	public function __call( $name, $arguments ) {
+		if ( method_exists( $this->filesystem(), $name ) ) {
+			return call_user_func_array( [ $this->filesystem(), $name ], $arguments );
+		}
+
+		throw new \BadMethodCallException( sprintf( "Method %s does not exist.", esc_html( $name ) ) );
+	}
+
+	/**
 	 * Create the uploads dir.
 	 */
 	public function mk_dir() {

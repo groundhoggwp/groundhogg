@@ -59,7 +59,9 @@ if ( $bgImage ) {
 		<?php load_css( 'responsive' ); ?>
 	</style>
 	<style id="block-styles">
-		<?php echo esc_html( $email->get_css() ) ?>
+        <?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_html() breaks `div > span` selectors
+		echo wp_strip_all_tags( $email->get_css() ); ?>
 	</style>
 	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
 </head>
