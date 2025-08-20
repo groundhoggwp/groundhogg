@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function kses_e( $text, $allowed_html = 'simple' ) {
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- this is our own wrapper for wp_kses_post
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- this is our own wrapper for wp_kses()
 	echo kses( $text, $allowed_html );
 }
 
