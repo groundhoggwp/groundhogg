@@ -67,6 +67,14 @@
       enabled: false,
       required: true,
     },
+    turnstile: {
+      type: 'turnstile',
+      label: 'Cloudflare Turnstile',
+      text: 'Turnstile',
+      column_width: '1/1',
+      enabled: false,
+      required: true,
+    },
     fields: [
       {
         ...defaultField,
@@ -599,6 +607,30 @@
         })
       },
     },
+    turnstileTheme: {
+      type: 'captchaTheme',
+      edit ({ captcha_theme }) {
+        //language=HTML
+        return `<label for="captcha-theme">Turnstile Theme</label>
+        <div class="setting">${ select({
+            id: 'captcha-theme',
+            name: 'captcha_theme',
+            className: 'captcha-theme',
+        }, {
+            'auto': 'Auto',
+            'light': 'Light',
+            'dark': 'Dark',
+        }, captcha_theme) }
+        </div>`
+      },
+      onMount (field, updateField) {
+        $('#captcha-theme').on('change', (e) => {
+          updateField({
+            captcha_theme: e.target.value,
+          })
+        })
+      },
+    },
     captchaSize: {
       type: 'captchaSize',
       edit ({ captcha_size }) {
@@ -611,6 +643,30 @@
         }, {
             'normal': 'Normal',
             'compact': 'Compact',
+        }, captcha_size) }
+        </div>`
+      },
+      onMount (field, updateField) {
+        $('#captcha-size').on('change', (e) => {
+          updateField({
+            captcha_size: e.target.value,
+          })
+        })
+      },
+    },
+    turnstileSize: {
+      type: 'turnstileSize',
+      edit ({ captcha_size }) {
+        //language=HTML
+        return `<label for="captcha-size">Turnstile Size</label>
+        <div class="setting">${ select({
+          id: 'captcha-size',
+          name: 'captcha_size',
+          className: 'captcha-size',
+        }, {
+          'normal': 'Normal',
+          'flexible': 'Flexible',
+          'compact': 'Compact',
         }, captcha_size) }
         </div>`
       },
@@ -895,6 +951,24 @@
         ...field,
         type: 'text',
       }),
+    },
+    turnstile: {
+      name: 'Cloudflare Turnstile',
+      hide: true,
+      content: [
+        Settings.enabled.type,
+        Settings.turnstileSize.type,
+        Settings.turnstileTheme.type,
+        Settings.columnWidth.type,
+      ],
+      advanced: [
+        Settings.id.type,
+        Settings.className.type,
+      ],
+      preview ({ id = '', className = '' }) {
+        return `<div id="${ id }" class="${ className }"><div id="turnstile-here" class="gh-panel outlined" style="width: fit-content"><div class="inside">${ __(
+          'Turnstile: <i>Only displayed on the front-end.</i>', 'groundhogg') }</div></div></div>`
+      },
     },
     recaptcha: {
       name: 'reCAPTCHA',
@@ -1719,8 +1793,8 @@
                   </div>
                   <button class="add-field gh-button secondary">${ __('Add Field', 'groundhogg') }</button>
                   <div class="special-fields">
-                      ${ Groundhogg.recaptcha.enabled ? this.field('recaptcha', form.recaptcha,
-                              activeField === 'recaptcha', settingsTab, true) : '' }
+                      ${ Groundhogg.recaptcha.enabled ? this.field('recaptcha', form.recaptcha, activeField === 'recaptcha', settingsTab, true) : '' }
+                      ${ Groundhogg.turnstile.enabled ? this.field('turnstile', form.turnstile, activeField === 'turnstile', settingsTab, true) : '' }
                       ${ this.field('button', form.button, activeField === 'button', settingsTab, true) }
                   </div>
               </div>
@@ -1744,13 +1818,18 @@
      */
     preview (form) {
 
-      let { button, recaptcha, fields } = form
+      let { button, recaptcha = defaultForm.recaptcha, turnstile = defaultForm.turnstile, fields } = form
 
       let tmpFields = [...fields].filter(({ type }) => !['hidden'].includes(type))
 
       // only show if enabled and is version 2
       if (recaptcha.enabled && Groundhogg.recaptcha.version === 'v2' && Groundhogg.recaptcha.enabled) {
         tmpFields.push(recaptcha)
+      }
+
+      // only show if enabled
+      if (turnstile.enabled && Groundhogg.turnstile.enabled) {
+        tmpFields.push(turnstile)
       }
 
       tmpFields.push(button)
@@ -1777,14 +1856,26 @@
 
   }
 
+  const polyfillForm = ({
+    fields = [],
+    turnstile = defaultForm.turnstile,
+    recaptcha = defaultForm.recaptcha,
+    button = defaultForm.button,
+  }) => ({
+    fields,
+    turnstile,
+    recaptcha,
+    button,
+  })
+
   const FormBuilder = (
     selector,
     form,
     onChange = (form) => {
       console.log(form)
-    }) => ( {
+    }) => ({
 
-    form,
+    form: polyfillForm(form),
     el: $(selector),
     activeField: false,
     activeFieldTab: 'content',
@@ -1819,6 +1910,8 @@
             return this.form.button
           case 'recaptcha':
             return this.form.recaptcha
+          case 'turnstile':
+            return this.form.turnstile
           default:
             return this.form.fields[this.activeField]
         }
@@ -1874,6 +1967,12 @@
               ...atts,
             }
             break
+          case 'turnstile' :
+            this.form.turnstile = {
+              ...this.form.turnstile,
+              ...atts,
+            }
+            break
           default:
             this.form.fields[this.activeField] = {
               ...this.form.fields[this.activeField],
@@ -1904,7 +2003,7 @@
 
         let fieldKey = $field.data('key')
 
-        if (fieldKey !== 'button' && fieldKey !== 'recaptcha') {
+        if (fieldKey !== 'button' && fieldKey !== 'recaptcha' && fieldKey !== 'turnstile' ) {
           fieldKey = parseInt(fieldKey)
         }
 

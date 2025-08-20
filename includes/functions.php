@@ -7555,6 +7555,15 @@ function is_recaptcha_enabled() {
 }
 
 /**
+ * Whether Google Recaptcha is enabled
+ *
+ * @return bool
+ */
+function is_turnstile_enabled() {
+	return is_option_enabled( 'gh_turnstile_site_key' ) && is_option_enabled( 'gh_turnstile_secret_key' );
+}
+
+/**
  * Whether a file can be copied because the file exists or it's a downloadable URL of the same hostname
  *
  * @param $file string

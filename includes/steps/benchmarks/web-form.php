@@ -205,10 +205,10 @@ class Web_Form extends Benchmark {
 				return array_map( 'sanitize_text_field', $value );
 			},
 			'captcha_theme' => function ( $value ) {
-				return one_of( $value, [ 'light', 'dark' ] );
+				return one_of( $value, [ 'light', 'dark', 'auto' ] );
 			},
 			'captcha_size'  => function ( $value ) {
-				return one_of( $value, [ 'normal', 'compact' ] );
+				return one_of( $value, [ 'normal', 'compact', 'flexible' ] );
 			},
 			'hide_label'    => 'boolval',
 			'options'       => function ( $options ) {
@@ -256,6 +256,10 @@ class Web_Form extends Benchmark {
 
 		if ( isset( $form['recaptcha'] ) ) {
 			$form['recaptcha'] = $this->sanitize_form_field( $form['recaptcha'] );
+		}
+
+		if ( isset( $form['turnstile'] ) ) {
+			$form['turnstile'] = $this->sanitize_form_field( $form['turnstile'] );
 		}
 
 		return $form;

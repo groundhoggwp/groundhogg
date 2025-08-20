@@ -549,9 +549,14 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'WordPress', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'integrations'
 			],
-			'captcha'               => [
-				'id'    => 'captcha',
+			'recaptcha'               => [
+				'id'    => 'recaptcha',
 				'title' => _x( 'Google reCAPTCHA', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'integrations'
+			],
+			'turnstile'               => [
+				'id'    => 'turnstile',
+				'title' => _x( 'Cloudflare Turnstile', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'integrations'
 			],
 			'event_notices'         => [
@@ -1209,7 +1214,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_recaptcha_site_key'                  => [
 				'id'      => 'gh_recaptcha_site_key',
-				'section' => 'captcha',
+				'section' => 'recaptcha',
 				'label'   => _x( 'Site Key', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'This is the key which faces the users on the front-end', 'settings', 'groundhogg' ),
 				'type'    => 'input',
@@ -1220,18 +1225,19 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_recaptcha_secret_key'                => [
 				'id'      => 'gh_recaptcha_secret_key',
-				'section' => 'captcha',
+				'section' => 'recaptcha',
 				'label'   => _x( 'Secret Key', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Never ever ever share this with anyone!', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
 					'name' => 'gh_recaptcha_secret_key',
 					'id'   => 'gh_recaptcha_secret_key',
+                    'type' => 'password'
 				],
 			],
 			'gh_recaptcha_version'                   => [
 				'id'      => 'gh_recaptcha_version',
-				'section' => 'captcha',
+				'section' => 'recaptcha',
 				'label'   => _x( 'Version', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'Which version of reCAPTCHA you want to use.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
@@ -1247,7 +1253,7 @@ class Settings_Page extends Admin_Page {
 			],
 			'gh_recaptcha_v3_score_threshold'        => [
 				'id'      => 'gh_recaptcha_v3_score_threshold',
-				'section' => 'captcha',
+				'section' => 'recaptcha',
 				'label'   => _x( 'v3 Score Threshold', 'settings', 'groundhogg' ),
 				'desc'    => _x( 'The score threshold to block form submissions. <code>0.5</code> by default.', 'settings', 'groundhogg' ),
 				'type'    => 'number',
@@ -1258,6 +1264,29 @@ class Settings_Page extends Admin_Page {
 					'max'         => 1,
 					'step'        => '0.1',
 					'placeholder' => '0.5'
+				],
+			],
+            'gh_turnstile_site_key'                  => [
+				'id'      => 'gh_turnstile_site_key',
+				'section' => 'turnstile',
+				'label'   => _x( 'Site Key', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'This is the key which faces the users on the front-end', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					'name' => 'gh_turnstile_site_key',
+					'id'   => 'gh_turnstile_site_key',
+				],
+			],
+			'gh_turnstile_secret_key'                => [
+				'id'      => 'gh_turnstile_secret_key',
+				'section' => 'turnstile',
+				'label'   => _x( 'Secret Key', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Never ever ever share this with anyone!', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					'name' => 'gh_turnstile_secret_key',
+					'id'   => 'gh_turnstile_secret_key',
+                    'type' => 'password'
 				],
 			],
 			'gh_imap_inbox_address'                  => [

@@ -132,6 +132,11 @@ class Scripts {
 			$form_dependencies[]    = 'groundhogg-google-recaptcha';
 		}
 
+		if ( is_turnstile_enabled() ){
+			wp_register_script( 'cf-turnstile', 'https://challenges.cloudflare.com/turnstile/v0/api.js' );
+			$form_v2_dependencies[] = 'cf-turnstile';
+		}
+
 		wp_register_script( 'groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $dot_min . '.js', $form_dependencies, GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-form-v2', GROUNDHOGG_ASSETS_URL . 'js/frontend/form' . $dot_min . '.js', $form_v2_dependencies, GROUNDHOGG_VERSION, true );
 
@@ -672,6 +677,9 @@ class Scripts {
 				'recaptcha'        => [
 					'enabled' => is_recaptcha_enabled(),
 					'version' => get_option( 'gh_recaptcha_version' )
+				],
+				'turnstile'        => [
+					'enabled' => is_turnstile_enabled(),
 				],
 				'screen'           => get_current_screen()
 			] ), 'before' );

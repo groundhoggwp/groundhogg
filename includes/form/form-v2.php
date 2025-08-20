@@ -21,6 +21,7 @@ use function Groundhogg\format_custom_field;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_current_contact;
+use function Groundhogg\get_current_ip_address;
 use function Groundhogg\get_db;
 use function Groundhogg\get_default_field_label;
 use function Groundhogg\get_sanitized_FILE;
@@ -29,10 +30,12 @@ use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_recaptcha_enabled;
+use function Groundhogg\is_turnstile_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\process_events;
+use function Groundhogg\remote_post_json;
 use function Groundhogg\the_funnel;
 use function Groundhogg\utils;
 use function Groundhogg\Ymd;
@@ -1505,7 +1508,7 @@ class Form_v2 extends Step {
 				},
 				'validate' => function ( $field, $posted_data ) {
 
-					if ( current_user_can( 'edit_contacts' ) ) {
+					if ( current_user_can( 'add_contacts' ) ) {
 						return true;
 					}
 
@@ -1544,6 +1547,43 @@ class Form_v2 extends Step {
 
 
 					return true;
+				},
+				'required' => '__return_true'
+			],
+			// Cloudflare Turnstile
+			'turnstile' => [
+				'render'   => function ( $field ) {
+					return html()->e( 'div', [
+						'class'        => 'cf-turnstile',
+						'data-sitekey' => get_option( 'gh_turnstile_site_key', '' ),
+						'data-theme'   => get_array_var( $field, 'captcha_theme', 'light' ),
+						'data-size'    => get_array_var( $field, 'captcha_size', 'normal' ),
+					] );
+				},
+				'validate' => function ( $field, $posted_data ) {
+
+					if ( current_user_can( 'add_contacts' ) ) {
+						return true;
+					}
+
+					$ip = get_current_ip_address();
+
+					$data = [
+						'secret'   => get_option( 'gh_turnstile_secret_key' ),
+						'response' => $posted_data['cf-turnstile-response'],
+					];
+
+					if ( $ip ){
+						$data['remoteip'] = $ip;
+					}
+
+					$response = remote_post_json( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', $data );
+
+					if ( $response->success == true ) {
+						return true;
+					}
+
+					return new WP_Error( 'captcha_verification_failed', esc_html_x( 'Failed Turnstile verification. You are probably a robot.', 'submission_error', 'groundhogg' ) );
 				},
 				'required' => '__return_true'
 			],
@@ -1868,10 +1908,15 @@ class Form_v2 extends Step {
 		$html = implode( '', array_map( [ $this, 'render_field' ], $fields ) );
 
 		$recaptcha = get_array_var( $config, 'recaptcha', [] );
+		$turnstile = get_array_var( $config, 'turnstile', [] );
 		$button    = get_array_var( $config, 'button', [] );
 
 		if ( isset_not_empty( $recaptcha, 'enabled' ) && is_recaptcha_enabled() && get_option( 'gh_recaptcha_version' ) === 'v2' ) {
 			$html .= $this->render_field( $recaptcha );
+		}
+
+		if ( isset_not_empty( $turnstile, 'enabled' ) && is_turnstile_enabled() ) {
+			$html .= $this->render_field( $turnstile );
 		}
 
 		$html .= $this->render_field( $button );
@@ -1953,13 +1998,6 @@ class Form_v2 extends Step {
 
 		if ( ! empty( $this->hidden_fields ) ) {
 			$form .= do_replacements( $this->get_hidden_fields(), $this->contact ?: get_contactdata() );
-		}
-
-		$config    = $this->get_meta( 'form' );
-		$recaptcha = get_array_var( $config, 'recaptcha', [] );
-
-		if ( isset_not_empty( $recaptcha, 'enabled' ) && is_recaptcha_enabled() && get_option( 'gh_recaptcha_version' ) === 'v3' ) {
-			$form .= self::render_input( $recaptcha );
 		}
 
 		$form .= '</form>';
@@ -2170,9 +2208,14 @@ class Form_v2 extends Step {
 		$config    = json_decode( wp_json_encode( $this->get_meta( 'form' ) ), true );
 		$fields    = $config['fields'];
 		$recaptcha = $config['recaptcha'];
+		$turnstile = $config['turnstile'];
 
 		if ( $recaptcha['enabled'] ) {
 			$fields[] = $recaptcha;
+		}
+
+		if ( $turnstile['enabled'] ) {
+			$fields[] = $turnstile;
 		}
 
 		foreach ( $fields as $field ) {
@@ -2329,6 +2372,7 @@ class Form_v2 extends Step {
 
 		$white_list_keys = [
 			'g-recaptcha-response',
+			'cf-turnstile-response',
 		];
 
 		foreach ( $white_list_keys as $key ) {
