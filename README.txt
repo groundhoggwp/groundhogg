@@ -276,7 +276,7 @@ If you'd like a trial of our premium plans, please check out our [$1 sandbox dem
 This plugin connects to several 3rd party services to provide crucial functionality. Each is listed below with what services are used and what information is shared, if any.
 
 ### Email and flow templates
-Email and flow templates are pulled from a remote repository via API periodically at `https://library.groundhogg.io`. No information about you or your site is shared or logged in this request.
+Email and flow templates are pulled periodically from a remote repository via API at `https://library.groundhogg.io`. No information about you or your site is shared or logged in this request.
 
 ### Dashboard notices and widgets
 Recent blog posts from `https://groundhogg.io` are shown in the dashboard and are fetched periodically. No data or information is logged or shared.
@@ -289,7 +289,8 @@ No information is shared or collected when telemetry sharing is disabled.
 ### Google Recaptcha
 If you have the Google Recaptcha integration enabled, scripts will be loaded from `https://www.google.com/recaptcha/api.js` and requests will be made to `https://www.google.com/recaptcha/api/siteverify` sharing only essential information (such as your recaptcha site key) to facilitate the integration.
 
-
+### Cloudflare Turnstile
+If you have the Cloudflare Turnstile integration enabled, scripts will be loaded from `https://challenges.cloudflare.com/turnstile/v0/api.js` and requests will be made to `https://challenges.cloudflare.com/turnstile/v0/siteverify` sharing only essential information (such as your turnstile site key) to facilitate the integration.
 
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
@@ -373,6 +374,9 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.5 (2025-08-20) =
+* ADDED Cloudflare Turnstile Integration as an alternative to Google Recaptcha.
 
 = 4.2.4.2 (2025-08-15) =
 * TWEAKED Refactored usages of `file_get_contents()` to use the `WP_Filesystem` instead.
