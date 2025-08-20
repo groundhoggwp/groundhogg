@@ -882,8 +882,9 @@ switch ( $action ):
                 <b><?php /* translators: 1: the contact's email address */
 		            printf( esc_html__( 'Your email address %s has just been confirmed!', 'groundhogg' ), esc_html( $contact->get_email() ) ) ?></b>
             </p>
-            <p><?php /* translators: 1: site title/name */
-		        kses_e( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> link or <b>Unsubscribe</b> link in the footer of any email sent by %1$s.', 'groundhogg' ), esc_html( get_bloginfo( 'title', 'display' ) ) ); ?></p>
+            <p><?php
+                /* translators: 1: site title/name */
+		        echo wp_kses( sprintf( __( 'You will now receive electronic communication from %1$s. Should you wish to change your communication preferences you may do so at any time by clicking the <b>Manage Preferences</b> link or <b>Unsubscribe</b> link in the footer of any email sent by %1$s.', 'groundhogg' ), esc_html( get_bloginfo( 'title', 'display' ) ) ), [ 'b' => [] ] ); ?></p>
             <p>
                 <a id="gotosite" class="button"
                    href="<?php echo esc_url( home_url() ); ?>"><?php
