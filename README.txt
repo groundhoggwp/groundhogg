@@ -377,6 +377,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.2.5 (2025-08-20) =
 * ADDED Cloudflare Turnstile Integration as an alternative to Google Recaptcha.
+* FIXED Missing `sprintf` call on the unsubscribe page causing visible placeholders.
 
 = 4.2.4.2 (2025-08-15) =
 * TWEAKED Refactored usages of `file_get_contents()` to use the `WP_Filesystem` instead.
