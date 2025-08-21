@@ -154,9 +154,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	 * @return string
 	 */
 	public function get_icon() {
-
 		$file_name = str_replace( '_', '-', $this->get_type() ) . '.svg';
-
 		return GROUNDHOGG_ASSETS_URL . 'images/funnel-icons/' . $file_name;
 	}
 
@@ -171,8 +169,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 		if ( $icon && str_ends_with( $icon, '.svg' ) ) {
 
-			// get the absolute path of the svg file relative to wp-content
-			$icon_path = preg_replace( '@https://.*/wp-content/plugins/@', WP_PLUGIN_DIR . '/', $icon );
+			$icon_path = str_replace( trailingslashit( plugins_url() ), trailingslashit( WP_PLUGIN_DIR ), $icon );
 
 			return files()->filesystem()->get_contents( $icon_path );
 		}
