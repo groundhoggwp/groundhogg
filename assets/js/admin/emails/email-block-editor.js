@@ -3321,11 +3321,6 @@
         let parent = $sortable.is('.column,.children') ? $sortable.closest('.builder-block').data('id') : false
         let column = parseInt(e.target.dataset.col)
 
-        console.log({
-          parent,
-          column,
-        })
-
         // adding block
         if (ui.item.is('.new-block')) {
 
@@ -10746,6 +10741,7 @@
   Groundhogg.EmailEditor = initialize
   Groundhogg.emailEditor = {
     PostTagReference,
+    BlockRegistry,
     registerBlock,
     registerDynamicBlock,
     getActiveBlock,
