@@ -99,7 +99,10 @@ class DateTimeHelper extends \DateTime {
 			$format = get_date_time_format();
 		}
 
-		return date_i18n( $format, $this->getTimestamp() );
+		// compute offset from UTC
+		$offset = $this->getTimezone()->getOffset( new \DateTime() );
+
+		return date_i18n( $format, $this->getTimestamp() + $offset );
 	}
 
 	public function time_i18n() {

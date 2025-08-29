@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.5.1
+Stable tag: 4.2.5.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -375,8 +375,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.5.1 (2025-08-21) =
+= 4.2.5.2 (2025-08-29) =
+* FIXED Contact details card local time displaying incorrect time.
+
+= 4.2.5.1 (2025-08-29) =
 * FIXED Flow icons not loading correctly when using custom `wp-content` directory.
+* FIXED Custom Fields (properties) not loading when creating a fresh pipeline
+* FIXED Redaction query timeout on MySQL 8+
 
 = 4.2.5 (2025-08-20) =
 * ADDED Cloudflare Turnstile Integration as an alternative to Google Recaptcha.
