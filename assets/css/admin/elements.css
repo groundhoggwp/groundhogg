@@ -37,8 +37,12 @@
     transform: rotate(360deg);
   }
 }
-h3.no-margin-top {
-  margin-top: 0;
+.no-margin-top {
+  margin-top: 0 !important;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0 !important;
 }
 
 .gh-spinner-wrap {

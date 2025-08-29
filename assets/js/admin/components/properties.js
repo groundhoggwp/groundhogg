@@ -531,6 +531,12 @@
      * @returns {boolean}
      */
     function isInternalNameInUse (name, fieldId) {
+
+      // there are no properties, thus, we're good
+      if ( ! properties || typeof properties.fields === 'undefined' ) {
+        return false
+      }
+
       return properties.fields.some(field => field.name === name && field.id !== fieldId)
     }
 

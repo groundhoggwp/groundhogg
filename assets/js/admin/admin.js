@@ -720,6 +720,16 @@
     return maybeFunc
   }
 
+  function arrayToggle(arr, value) {
+    const index = arr.indexOf(value);
+    if (index === -1) {
+      arr.push(value);      // not in array → add
+    } else {
+      arr.splice(index, 1); // in array → remove
+    }
+    return arr;
+  }
+
   const dismissNotice = (id) => Groundhogg.api.ajax({
     action: 'gh_dismiss_notice',
     notice: id,
@@ -734,6 +744,7 @@
   gh.functions.debounce = debounce
   gh.functions.maybeCall = maybeCall
   gh.functions.dismissNotice = dismissNotice
+  gh.functions.arrayToggle = arrayToggle
 
   $(document).on('click', 'button.hide-panel', e => {
 
