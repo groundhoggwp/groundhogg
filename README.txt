@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.5.2
+Stable tag: 4.2.5.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -374,6 +374,10 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.5.3 (2025-08-30) =
+* FIXED Web form editor missing when adding a new blank Web Form trigger.
+* FIXED Fatal error when using the "Process events" button in the logs screen.
 
 = 4.2.5.2 (2025-08-29) =
 * FIXED Contact details card local time displaying incorrect time.
