@@ -1857,7 +1857,7 @@
   }
 
   const polyfillForm = ({
-    fields = [],
+    fields = defaultForm.fields,
     turnstile = defaultForm.turnstile,
     recaptcha = defaultForm.recaptcha,
     button = defaultForm.button,

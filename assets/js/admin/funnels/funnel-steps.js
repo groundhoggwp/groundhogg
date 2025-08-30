@@ -387,7 +387,7 @@
         })
       })
 
-      const formBuilder = Groundhogg.FormBuilder(`${ parent } div.edit-form`, meta.form, (form) => {
+      const formBuilder = Groundhogg.FormBuilder(`${ parent } div.edit-form`, meta.form ?? {}, (form) => {
         updateStepMeta({
           form,
         })
