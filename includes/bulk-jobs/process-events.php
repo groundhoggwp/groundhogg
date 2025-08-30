@@ -32,7 +32,7 @@ class Process_Events extends Bulk_Job {
 	 */
 	public function query( $items ) {
 
-		$eventQuery = new Table_Query( db()->event_queue, 'eq' );
+		$eventQuery = new Table_Query( db()->event_queue );
 		$eventQuery->where()->equals( 'status', Event::WAITING )
 		                    ->lessThan( 'time', time() )
 		                    ->equals( 'claim', '' );
