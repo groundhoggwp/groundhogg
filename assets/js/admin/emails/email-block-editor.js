@@ -103,6 +103,45 @@
     imageSizes = [],
   } = _BlockEditor
 
+  class TokenList extends Array {
+    add (...tokens) {
+      tokens.forEach(t => {
+        if (!this.includes(t)) {
+          this.push(t)
+        }
+      })
+    }
+
+    remove (...tokens) {
+      tokens.forEach(t => {
+        const i = this.indexOf(t)
+        if (i > -1) {
+          this.splice(i, 1)
+        }
+      })
+    }
+
+    toggle (token) {
+      if (this.includes(token)) {
+        this.remove(token)
+        return false
+      }
+      else {
+        this.add(token)
+        return true
+        return true
+      }
+    }
+
+    contains (token) {
+      return this.includes(token)
+    }
+
+    clear () {
+      this.length = 0;
+    }
+  }
+
   improveTinyMCE({})
 
   let fontWeights = [
@@ -123,6 +162,7 @@
     'Arial Narrow, Arial, sans-serif', // Web
     'Times New Roman, Times, serif', // All
     'Georgia, serif',
+    'Comic Sans MS, Comic Sans, cursive',
     'Courier New, Courier, monospace',
     'Verdana, Geneva, sans-serif',
     'Tahoma, sans-serif',
@@ -2559,6 +2599,14 @@
             className: 'move-block',
           },
           icons.move),
+        Button({
+            className: 'insert-block add-before',
+          },
+          '+'),
+        Button({
+            className: 'insert-block add-after',
+          },
+          icons.plus),
         Div({
             className: 'block-buttons',
           },
@@ -5547,6 +5595,234 @@
                 },
                 [
                   Button({
+                      id       : 'generate-ai',
+                      className: 'gh-button secondary',
+                      onClick  : e => {
+
+                        const elements = new TokenList()
+                        elements.add('text')
+                        elements.add('images')
+
+                        const AiState = Groundhogg.createState({
+                          generating: false,
+                          topic     : '',
+                          tone      : 'casual',
+                          design    : 'simple',
+                          context   : 'N/A',
+                        })
+
+                        let prevPrompts = JSON.parse(localStorage.getItem('gh-ai-prompts') ?? '[]')
+
+                        Modal({
+                            onOpen: ({ modal }) => {
+                              document.getElementById('ai-topic').focus()
+                            },
+                          },
+                          ({
+                            close,
+                            morph,
+                          }) => Div({},
+                            [
+                              `<h2>Describe the email you want to generate!</h2>`,
+                              Pg({ className: 'no-margin-bottom' }, 'What is the topic for this email?'),
+                              Textarea({
+                                id         : 'ai-topic',
+                                name       : 'ai_topic',
+                                placeholder: __('Most recent blog posts.', 'groundhogg'),
+                                className  : 'full-width',
+                                value      : AiState.topic,
+                                readonly   : AiState.generating,
+                                onInput    : e => {
+                                  AiState.set({
+                                    topic: e.target.value,
+                                  })
+                                },
+                              }),
+                              Div({
+                                className: 'display-flex gap-5 column',
+                              }, [
+                                Pg({ className: 'no-margin-bottom' }, 'In what tone do you want the content?'),
+                                Select({
+                                  id      : 'ai-tone',
+                                  name    : 'ai-tone',
+                                  selected: AiState.tone,
+                                  options : {
+                                    happy      : 'Happy',
+                                    silly      : 'Silly',
+                                    goofy      : 'Goofy',
+                                    formal     : 'Formal',
+                                    casual     : 'Casual',
+                                    personal   : 'Personal',
+                                    serious    : 'Serious',
+                                    grave      : 'Grave',
+                                    angry      : 'Angry',
+                                    flirtatious: 'Flirtatious',
+                                  },
+                                  onChange: e => AiState.set({ tone: e.target.value }),
+                                }),
+                                Pg({ className: 'no-margin-bottom' }, 'What kind of design do you want?'),
+                                Select({
+                                  id      : 'ai-design',
+                                  name    : 'ai-design',
+                                  selected: AiState.design,
+                                  options : {
+                                    simple    : 'Simple',
+                                    newsletter: 'Newsletter',
+                                    flashy    : 'Flashy',
+                                    personal  : 'Personal',
+                                    corporate : 'Corporate',
+                                    minimal   : 'Minimal',
+                                    playful   : 'Playful',
+                                    ecommerce : 'Ecommerce',
+                                    seasonal  : 'Seasonal',
+                                  },
+                                  onChange: e => AiState.set({ design: e.target.value }),
+                                }),
+                                Pg({ className: 'no-margin-bottom' }, 'Do you want to include any specific blocks?'),
+                                ...[
+                                  'text',
+                                  'headings',
+                                  'images',
+                                  'columns',
+                                  'social links',
+                                  'posts',
+                                  'buttons',
+                                ].map(element => {
+                                  return Div({ className: 'display-flex gap-5' }, [
+                                    Toggle({
+                                      id      : 'ai-include-' + element,
+                                      checked : elements.contains(element),
+                                      onChange: e => {
+                                        if (e.target.checked) {
+                                          elements.add(element)
+                                        }
+                                        else {
+                                          elements.remove(element)
+                                        }
+                                      },
+                                    }),
+                                    element,
+                                  ])
+                                }),
+                                Pg({ className: 'no-margin-bottom' }, 'Any context you want to add?'),
+                                Textarea({
+                                  id         : 'ai-context',
+                                  name       : 'ai_context',
+                                  placeholder: __('The target audience of this email is marketers.', 'groundhogg'),
+                                  className  : 'full-width',
+                                  value      : AiState.context,
+                                  readonly   : AiState.generating,
+                                  onInput    : e => {
+                                    AiState.set({
+                                      context: e.target.value,
+                                    })
+                                  },
+                                }),
+                                Button({
+                                  id       : 'upload-ai-prompt',
+                                  className: 'gh-button primary' + ( AiState.generating ? ' loading-dots' : '' ),
+                                  disabled : AiState.generating,
+                                  onClick  : e => {
+                                    AiState.set({
+                                      generating: true,
+                                    })
+
+                                    morph()
+
+                                    let prompt = {
+                                      topic   : AiState.topic,
+                                      tone    : AiState.tone,
+                                      design  : AiState.design,
+                                      elements: [...elements],
+                                      context : AiState.context,
+                                    }
+
+                                    prevPrompts.push(prompt)
+                                    localStorage.setItem('gh-ai-prompts', JSON.stringify(prevPrompts))
+
+                                    prompt.elements = Groundhogg.element.andList(prompt.elements)
+
+                                    post('https://webhook.site/EmailJson', {
+                                      prompt,
+                                    }).then(r => {
+
+                                      const {
+                                        subject = '',
+                                        preview = '',
+                                        blocks = [],
+                                        settings = {},
+                                      } = r.response
+
+                                      const {
+                                        template = 'boxed',
+                                        width = 600,
+                                        direction = 'ltr',
+                                        alignment = 'center',
+                                        backgroundColor = '',
+                                      } = settings
+
+                                      setEmailData({
+                                        title       : subject,
+                                        subject     : subject,
+                                        preview_text: preview,
+                                        message_type: 'marketing',
+                                      })
+                                      setEmailMeta({
+                                        template,
+                                        width,
+                                        direction,
+                                        alignment,
+                                        backgroundColor,
+                                      })
+                                      setState({ page: 'editor' })
+                                      setBlocks(blocks.map(__replaceId), false)
+                                      renderEditor()
+                                      close()
+                                      TitlePrompt()
+
+                                    }).catch(err => {
+                                      dialog({
+                                        type   : 'error',
+                                        message: err.message,
+                                      })
+                                      AiState.set({
+                                        generating: false,
+                                      })
+                                      morph()
+                                    })
+                                  },
+                                }, 'Generate'),
+                                prevPrompts.length ? Button({
+                                  id       : 'restore-last-prompt',
+                                  className: 'gh-button secondary',
+                                  disabled : AiState.generating,
+                                  onClick  : e => {
+
+                                    let lastPrompt = prevPrompts.shift()
+                                    localStorage.setItem('gh-ai-prompts', JSON.stringify(prevPrompts))
+
+                                    AiState.set({
+                                      topic  : lastPrompt.topic,
+                                      tone   : lastPrompt.tone,
+                                      design : lastPrompt.design,
+                                      context: lastPrompt.context,
+                                    })
+
+                                    elements.clear()
+                                    elements.add(...lastPrompt.elements)
+
+                                    morph()
+                                  },
+                                }, 'Restore last prompt') : null,
+                              ]),
+                            ]))
+
+                      },
+                    },
+                    [
+                      '🤖 AI',
+                    ]),
+                  Button({
                       id       : 'import-html',
                       className: 'gh-button secondary',
                       onClick  : e => {
@@ -6019,6 +6295,52 @@
       },
     })
   }
+
+  registerBlock('ai', 'AI', {
+    svg     : '🤖',
+    html    : () => {
+      return Pg({}, 'Enter a prompt to generate blocks with AI 🤖')
+    },
+    controls: () => Fragment(),
+    edit    : ({
+      id,
+      prompt = '',
+      generating = false,
+      updateBlock,
+    }) => {
+
+      return Div({}, morph => Div({
+        id: 'ai-prompt-block-form',
+        className: 'display-flex column gap-5',
+      }, [
+        Textarea({
+          name   : 'ai_prompt',
+          id     : 'ai-prompt',
+          placeholder: 'Create a prompt for the AI to generate blocks...',
+          value  : prompt,
+          onInput: e => {
+            updateBlock({
+              prompt: e.target.value,
+            })
+          },
+        }),
+        Button({
+          id: 'ai-generate-blocks',
+          className: 'gh-button primary' + ( generating ? ' loading-dots' : '' ),
+          disabled: generating,
+          onClick: e => {
+            updateBlock({
+              generating: true
+            })
+
+
+
+          },
+        }, generating ? 'Generating' : 'Generate blocks'),
+      ]))
+    },
+    defaults: {},
+  })
 
   const ColumnGap = (gap = 10, height = 0, content = '') => gap > 0 ? Td({
     className: 'email-columns-cell gap',
@@ -6661,11 +6983,11 @@
   const tinyMceCSS = () => {
 
     let {
-      p,
-      h1,
-      h2,
-      h3,
-      a,
+      p = {},
+      h1 = {},
+      h2 = {},
+      h3 = {},
+      a = {},
       css = '',
     } = getActiveBlock()
 

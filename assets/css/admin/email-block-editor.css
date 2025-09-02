@@ -334,6 +334,32 @@
   z-index: 99;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 }
+#email-block-editor #content #builder-content .builder-block .block-toolbar .insert-block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  padding: 6px;
+  line-height: 1;
+  border-radius: 3px 3px 0 0;
+  position: absolute;
+  color: #FFF;
+  background-color: #66ACFF;
+  z-index: 99;
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar .insert-block.add-before {
+  left: 50%;
+  top: 0;
+  transform: translateY(-100%) translateX(-50%);
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar .insert-block.add-after {
+  left: 50%;
+  bottom: 0;
+  top: auto;
+  border-radius: 0 0 3px 3px;
+  transform: translateY(100%) translateX(-50%);
+}
 #email-block-editor #content #builder-content .builder-block .block-toolbar .move-block {
   display: flex;
   border: none;
@@ -383,6 +409,10 @@
   display: block;
 }
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .move-block {
+  color: #FFF;
+  background-color: #0075ff;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .insert-block {
   color: #FFF;
   background-color: #0075ff;
 }

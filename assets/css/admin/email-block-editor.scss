@@ -467,6 +467,35 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             box-shadow: $box-shadow;
           }
 
+          .insert-block {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            padding: 6px;
+            line-height: 1;
+            border-radius: 3px 3px 0 0;
+            position: absolute;
+            color: #FFF;
+            background-color: $primary-blue-60-hex;
+            z-index: 99;
+            box-shadow: $box-shadow;
+
+            &.add-before {
+              left: 50%;
+              top: 0;
+              transform: translateY(-100%) translateX(-50%);
+            }
+
+            &.add-after {
+              left: 50%;
+              bottom: 0;
+              top: auto;
+              border-radius:  0 0 3px 3px;
+              transform: translateY(100%) translateX(-50%);
+            }
+          }
+
           .move-block {
             display: flex;
             border: none;
@@ -537,6 +566,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             display: block;
 
             .move-block {
+              color: #FFF;
+              background-color: $primary-blue;
+            }
+
+            .insert-block {
               color: #FFF;
               background-color: $primary-blue;
             }

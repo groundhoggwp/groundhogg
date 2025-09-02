@@ -10,6 +10,7 @@ class AI_Handler {
 	public AI_Generator $generator;
 
 	public function __construct() {
+		add_action( 'wp_ajax_gh_ai_subject_line', [ $this, 'ajax_ai_subject_line' ] );
 		add_action( 'wp_ajax_gh_ai_simple_text', [ $this, 'ajax_ai_simple_text' ] );
 		add_action( 'wp_ajax_gh_ai_formatted_text', [ $this, 'ajax_ai_formatted_text' ] );
 		add_action( 'wp_ajax_gh_ai_image', [ $this, 'ajax_ai_image' ] );
@@ -24,8 +25,14 @@ class AI_Handler {
 			return call_user_func_array( [ $this->generator, $name ], $arguments );
 		}
 
-		throw new \BadMethodCallException( 'Method ' . $name . ' does not exist.' );
+		throw new \BadMethodCallException( 'Invalid method call.' );
 	}
+
+
+	public function ajax_ai_subject_line() {
+
+	}
+
 
 	/**
 	 * Generate simple text using the generator
