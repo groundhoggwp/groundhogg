@@ -115,6 +115,59 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   }
 }
 
+.insert-block-grid {
+  .block-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: auto;
+    gap: 10px;
+
+    .block-wrap {
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .block-name{
+        text-align: center;
+        font-weight: 300;
+      }
+
+      .block {
+        height: 40px;
+        width: 40px;
+        padding: 10px;
+        border-radius: 8px;
+        background: #FFFFFF;
+        cursor: pointer;
+        margin-bottom: 5px;
+        color: $primary-dark;
+        border: 1px solid $primary-dark-10;
+
+        :hover {
+          border-color: $primary-dark-15;
+          transition: 0.4s;
+          transform: scale(1.05);
+        }
+
+        .icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          svg {
+            height: 100%;
+            width: 100%;
+          }
+        }
+      }
+    }
+
+
+  }
+}
+
 #email-block-editor {
   display: flex;
   //gap: 20px;
@@ -481,13 +534,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             z-index: 99;
             box-shadow: $box-shadow;
 
-            &.add-before {
+            &.insert-before {
               left: 50%;
               top: 0;
               transform: translateY(-100%) translateX(-50%);
             }
 
-            &.add-after {
+            &.insert-after {
               left: 50%;
               bottom: 0;
               top: auto;

@@ -270,6 +270,14 @@ class Scripts {
 			'wp-api-request' // needed for wpApiSettigns.nonce
 		], GROUNDHOGG_VERSION );
 
+		wp_register_script( 'groundhogg-ai', GROUNDHOGG_ASSETS_URL . 'js/admin/ai' . $dot_min . '.js', [
+			'groundhogg-admin-data'
+		], GROUNDHOGG_VERSION, true );
+
+		wp_localize_script( 'groundhogg-ai', 'GroundhoggAi', [
+			"license_key" => get_master_license()
+		] );
+
 		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [
 			'groundhogg-admin',
 			'groundhogg-admin-formatting',
@@ -434,6 +442,7 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-email-block-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/emails/email-block-editor' . $dot_min . '.js', [
 			'groundhogg-admin',
+			'groundhogg-ai',
 			'groundhogg-admin-element',
 			'groundhogg-admin-components',
 			'groundhogg-admin-saved-replies',

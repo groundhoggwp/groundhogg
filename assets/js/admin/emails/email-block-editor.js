@@ -2589,6 +2589,107 @@
     deleteBlock,
   }) => {
 
+    const handleInsertBlock = e => {
+
+      const InsertState = Groundhogg.createState({
+        generating: false,
+        prompt: '',
+        index: 0
+      })
+
+      MiniModal({
+        target: e.target,
+        dialogClasses: 'insert-block-grid',
+        onClose: e => {
+          setState({
+            insertAfter: null,
+            insertBefore: null,
+          })
+        }
+      }, ({close}) => [
+        Div({
+          id: 'ai-prompt-block-form',
+          className: 'display-flex column gap-5',
+        }, morph => Fragment([
+          Textarea({
+            name   : 'ai_prompt',
+            id     : 'ai-prompt',
+            placeholder: 'Create a prompt for the AI to generate blocks...',
+            value  : InsertState.prompt,
+            onInput: e => {
+              InsertState.set({
+                prompt: e.target.value,
+              })
+            },
+          }),
+          Button({
+            id: 'ai-generate-blocks',
+            className: 'gh-button primary' + ( InsertState.generating ? ' loading-dots' : '' ),
+            // disabled: InsertState.generating, // disabled causes focus to leave
+            onClick: e => {
+
+              if ( InsertState.generating ) return
+
+              InsertState.set({
+                generating: true
+              })
+
+              let textInterval = setInterval(()=>{
+                InsertState.set({
+                  index: InsertState.index + 1,
+                })
+                morph()
+              }, 3000)
+
+              Groundhogg.ai.request({
+                type: 'blockJson',
+                userPrompt: InsertState.prompt,
+                blockJson: JSON.stringify(getBlocks())
+              }).then(r => {
+
+                let {
+                  blocks = [],
+                } = r
+
+                blocks = blocks.map(block => __replaceId(block))
+
+                if ( State.insertAfter ) {
+                  insertBlockAfter(blocks, State.insertBefore)
+                } else if ( State.insertBefore ) {
+                  insertBlockBefore(blocks, State.insertBefore)
+                }
+
+                setActiveBlock( blocks[blocks.length - 1].id )
+                close()
+
+              }).catch(err => {
+                dialog({
+                  type   : 'error',
+                  message: err.message,
+                })
+                InsertState.set({
+                  generating: false,
+                })
+                morph()
+              }).finally(() => {
+                clearInterval(textInterval)
+              })
+
+              morph()
+            },
+          }, InsertState.generating ? Groundhogg.ai.AiGeneratingText(InsertState.index) : '🤖 Generate blocks'),
+        ])),
+        makeEl('hr', {
+          style: {
+            margin: '10px 0',
+          }
+        }),
+        Div({ className: 'block-grid' },
+          Object.values(BlockRegistry.blocks).map(b => Block(b)))
+      ] )
+
+    }
+
     return Div({
         className: 'block-toolbar',
       },
@@ -2600,13 +2701,25 @@
           },
           icons.move),
         Button({
-            className: 'insert-block add-before',
+            className: 'insert-block insert-before',
+            onClick: e => {
+              setState({
+                insertBefore: block.id,
+              })
+              handleInsertBlock(e)
+            },
           },
-          '+'),
+          Dashicon('plus-alt2')),
         Button({
-            className: 'insert-block add-after',
+            className: 'insert-block insert-after',
+            onClick: e => {
+              setState({
+                insertAfter: block.id,
+              })
+              handleInsertBlock(e)
+            },
           },
-          icons.plus),
+          Dashicon('plus-alt2')),
         Div({
             className: 'block-buttons',
           },
@@ -2871,7 +2984,7 @@
           }
 
           // Using the toolbar
-          if (clickedIn(e, '.delete-block, .duplicate-block')) {
+          if (clickedIn(e, '.delete-block, .duplicate-block, .insert-block')) {
             return
           }
 
@@ -3073,6 +3186,41 @@
 
     return false
 
+  }
+
+  /**
+   * Insert a block after the given block
+   *
+   * @param newBlock
+   * @param blockId
+   * @param blocks
+   * @return {boolean|*}
+   * @private
+   */
+  const __insertBefore = (newBlock, blockId, blocks) => {
+
+    for (let block of blocks) {
+      if (block.id === blockId) {
+        blocks.splice(blocks.findIndex(b => b.id === blockId), 0, newBlock)
+        return true
+      }
+
+      if (block.children && Array.isArray(block.children)) {
+        if (__insertBefore(newBlock, blockId, block.children)) {
+          return true
+        }
+      }
+
+      if (block.columns && Array.isArray(block.columns)) {
+        for (let column of block.columns) {
+          if (__insertBefore(newBlock, blockId, column)) {
+            return true
+          }
+        }
+      }
+    }
+
+    return false
   }
 
   /**
@@ -3287,12 +3435,41 @@
    * Insert a block after another one
    *
    * @param newBlock
+   * @param before
+   */
+  const insertBlockBefore = (newBlock, before) => {
+    let tempBlocks = getBlocksCopy()
+
+    if ( Array.isArray(newBlock) ) {
+      newBlock.forEach(block => {
+        __insertBefore(block, before, tempBlocks)
+      })
+    } else {
+      __insertBefore(newBlock, before, tempBlocks)
+    }
+
+    setBlocks(tempBlocks)
+    morphBlocks()
+    updateStyles()
+  }
+
+
+  /**
+   * Insert a block after another one
+   *
+   * @param newBlock
    * @param after
    */
   const insertBlockAfter = (newBlock, after) => {
     let tempBlocks = getBlocksCopy()
 
-    __insertAfter(newBlock, after, tempBlocks)
+    if ( Array.isArray(newBlock)){
+      newBlock.forEach(block => {
+        __insertAfter(block, after, tempBlocks)
+      })
+    } else {
+      __insertAfter(newBlock, after, tempBlocks)
+    }
 
     setBlocks(tempBlocks)
     morphBlocks()
@@ -3443,6 +3620,27 @@
         className : 'block-wrap',
         id        : `add-${ type }`,
         title     : name,
+        onClick: e => {
+
+          let newBlock = createBlock(type)
+
+          if ( State.insertBefore ){
+            insertBlockBefore(newBlock, State.insertBefore )
+          } else if ( State.insertAfter ){
+            insertBlockAfter(newBlock, State.insertAfter )
+          } else {
+            return
+          }
+
+          setState({
+            insertAfter: null,
+            insertBefore: null,
+          })
+
+          setActiveBlock(newBlock.id)
+          document.getElementById(`edit-${ newBlock.id }`).scrollIntoView(true)
+
+        },
         onDblclick: e => {
 
           let newBlock = createBlock(type)
@@ -5609,6 +5807,7 @@
                           tone      : 'casual',
                           design    : 'simple',
                           context   : 'N/A',
+                          index: 0
                         })
 
                         let prevPrompts = JSON.parse(localStorage.getItem('gh-ai-prompts') ?? '[]')
@@ -5727,6 +5926,13 @@
                                       generating: true,
                                     })
 
+                                    let interval = setInterval(() => {
+                                      AiState.set({
+                                        index: AiState.index + 1,
+                                      })
+                                      morph()
+                                    }, 3000)
+
                                     morph()
 
                                     let prompt = {
@@ -5742,8 +5948,9 @@
 
                                     prompt.elements = Groundhogg.element.andList(prompt.elements)
 
-                                    post('https://webhook.site/EmailJson', {
-                                      prompt,
+                                    Groundhogg.ai.request({
+                                      type: 'emailJson',
+                                      ...prompt,
                                     }).then(r => {
 
                                       const {
@@ -5751,7 +5958,7 @@
                                         preview = '',
                                         blocks = [],
                                         settings = {},
-                                      } = r.response
+                                      } = r
 
                                       const {
                                         template = 'boxed',
@@ -5789,9 +5996,11 @@
                                         generating: false,
                                       })
                                       morph()
+                                    }).finally(()=>{
+                                      clearInterval(interval)
                                     })
                                   },
-                                }, 'Generate'),
+                                }, AiState.generating ? Groundhogg.ai.AiGeneratingText(AiState.index) : 'Generate' ),
                                 prevPrompts.length ? Button({
                                   id       : 'restore-last-prompt',
                                   className: 'gh-button secondary',
@@ -6295,52 +6504,6 @@
       },
     })
   }
-
-  registerBlock('ai', 'AI', {
-    svg     : '🤖',
-    html    : () => {
-      return Pg({}, 'Enter a prompt to generate blocks with AI 🤖')
-    },
-    controls: () => Fragment(),
-    edit    : ({
-      id,
-      prompt = '',
-      generating = false,
-      updateBlock,
-    }) => {
-
-      return Div({}, morph => Div({
-        id: 'ai-prompt-block-form',
-        className: 'display-flex column gap-5',
-      }, [
-        Textarea({
-          name   : 'ai_prompt',
-          id     : 'ai-prompt',
-          placeholder: 'Create a prompt for the AI to generate blocks...',
-          value  : prompt,
-          onInput: e => {
-            updateBlock({
-              prompt: e.target.value,
-            })
-          },
-        }),
-        Button({
-          id: 'ai-generate-blocks',
-          className: 'gh-button primary' + ( generating ? ' loading-dots' : '' ),
-          disabled: generating,
-          onClick: e => {
-            updateBlock({
-              generating: true
-            })
-
-
-
-          },
-        }, generating ? 'Generating' : 'Generate blocks'),
-      ]))
-    },
-    defaults: {},
-  })
 
   const ColumnGap = (gap = 10, height = 0, content = '') => gap > 0 ? Td({
     className: 'email-columns-cell gap',
@@ -7449,7 +7612,6 @@
   registerBlock('text', 'Text', {
     attributes: {
       content: el => {
-        console.log('content', el)
         let divWrap = el.querySelector('.text-content-wrap')
         return divWrap ? divWrap.innerHTML : el.innerHTML
       },

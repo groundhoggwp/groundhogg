@@ -286,6 +286,8 @@
 
         el.appendChild(child)
       })
+
+      el.morph = morph
     }
 
     for (let attributeName in attributes) {
@@ -760,6 +762,7 @@
    */
   const MiniModal = ({
     selector = '',
+    target = null,
     from = 'right',
     dialogClasses = '',
     onOpen = () => {},
@@ -811,7 +814,7 @@
     // Run before positioning
     onOpen()
 
-    let targetElement = document.querySelector(selector)
+    let targetElement = selector && target === null ? document.querySelector(selector) : target
 
     let {
       right,

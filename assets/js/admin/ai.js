@@ -1,7 +1,6 @@
 (() => {
 
-  const { post, get } = Groundhogg.api
-  const AI_ENDPOINT = 'https://groundhogg.io/ai/block-json/'
+  const AI_ENDPOINT = 'https://ai.groundhogg.io'
 
   const BUTTON_TEXTS = [
     "Corralling groundhogs",
@@ -22,33 +21,7 @@
     "Trying again",
   ]
 
-
-
-  const AiButton = ({
-    buttonText = '🤖 Generate',
-    onClick = e => {},
-    generating = false
-  }) => {
-
-    return MakeEl.Button({
-      onClick: e => {
-
-        setInterval( () => {
-
-          let button = e.target
-          if ( ! button ){
-            return
-          }
-
-          let textIndex = parseInt( e.dataset.textindex ?? "0", 10 )
-
-        }, 3000 )
-
-        onClick( e )
-
-      }
-    }, generating ? 'Generating' : buttonText )
-  }
+  const AiGeneratingText = index => BUTTON_TEXTS[ ((index % BUTTON_TEXTS.length) + BUTTON_TEXTS.length) % BUTTON_TEXTS.length]
 
   /**
    * Poll our AI endpoint for the response to our prompt
@@ -56,45 +29,43 @@
    * @param job_id
    * @returns {Response}
    */
-  const pollAiResponse = job_id => {
-    return new Response((res, rej) => {
-      let interval = setInterval(async () => {
-        let jobRes
+  const pollAiResponse = job_id => new Promise((res, rej) => {
+    let interval = setInterval(async () => {
+      let jobRes
 
-        try {
-          jobRes = await get( AI_ENDPOINT, { job_id } )
+      try {
+        jobRes = await fetch( AI_ENDPOINT + `?job_id=${job_id}` ).then( res => res.json() )
 
-        } catch (err) {
-          clearInterval( interval )
-          rej( err )
-        }
+      } catch (err) {
+        clearInterval( interval )
+        rej( err )
+      }
 
-        if ( jobRes.status === 'done' ){
-          clearInterval( interval )
-          res( jobRes.content )
-        }
+      if ( jobRes.status === 'done' ){
+        clearInterval( interval )
+        res( jobRes.content )
+      }
 
-        if ( jobRes.status === 'error' ){
-          clearInterval( interval )
-          rej( new Error( jobRes.error ) )
-        }
+      if ( jobRes.status === 'error' ){
+        clearInterval( interval )
+        rej( new Error( jobRes.error ) )
+      }
 
-      }, 5000 )
-    })
-  }
+    }, 5000 )
+  })
 
   const aiRequest = async (prompt) => {
 
-    try {
-      let jobRes = await post( AI_ENDPOINT, {
-        license_key: "",
+    let jobRes = await fetch( AI_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        license_key: GroundhoggAi.license_key,
         prompt
-      } )
-    } catch ( err ){
-
-    }
-
-    let jobRes = await post()
+      })
+    } ).then( res => res.json() )
 
     if ( jobRes.error ){
       throw new Error( jobRes.error )
@@ -102,11 +73,14 @@
 
     let jobId = jobRes.job_id
 
-    let contentRes = await pollAiResponse( jobId )
+    let content = await pollAiResponse(jobId)
 
-
+    return JSON.parse(content)
   }
 
-  Groundhogg.ai = {}
+  Groundhogg.ai = {
+    AiGeneratingText,
+    request: aiRequest,
+  }
 
 })()
