@@ -4,7 +4,9 @@ namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Contact;
 use Groundhogg\Event;
+use Groundhogg\Event_Queue_Item;
 use Groundhogg\Step;
+use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_CLI;
 use function cli\prompt;
@@ -253,12 +255,32 @@ class Simulator {
 					self::log( "⌛ Wait until " . ( new DateTimeHelper( $time ) )->wpDateTimeFormat() );
 				} else if ( ! self::is_dry_run() ) {
 					$event = new Event();
+					$event->create( [
+						'step_id'    => $current->ID,
+						'funnel_id'  => $funnel->ID,
+						'contact_id' => $contact->ID,
+						'event_type' => Event::FUNNEL,
+						'status'     => Event::WAITING,
+					] );
+
+					if ( $current->type_is( Send_Email::TYPE ) ) {
+						$event->update( [ 'email_id' => $current->get_meta( 'email_id' ) ] );
+					}
+
 					// run the step, but use a simulated event
 					$current->get_step_element()->pre_run( $contact, $event );
 					$result = $current->get_step_element()->run( $contact, $event );
 					if ( is_wp_error( $result ) ) {
 						self::log( sprintf( "⚠️ %s", $result->get_error_message() ) );
+						$event->update( [ 'status' => Event::FAILED ] );
 					}
+					else if ( $result === false ) {
+						self::log( sprintf( "⚠️ %s", "Step failed to run during simulation." ) );
+						$event->update( [ 'status' => Event::SKIPPED ] );
+					} else {
+						$event->update( [ 'status' => Event::COMPLETE ] );
+					}
+
 				}
 
 				$next = self::getNext( $current );
