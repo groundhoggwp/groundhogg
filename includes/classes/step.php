@@ -1831,10 +1831,19 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @param $overrides
 	 * @param $meta_overrides
 	 *
-	 * @return Base_Object|Base_Object_With_Meta
+	 * @return Step
 	 */
 	public function duplicate( $overrides = [], $meta_overrides = [] ) {
+
+		// this will duplicate the step, likely in an incative status but with changes
 		$new = parent::duplicate( $overrides, $meta_overrides );
+
+		if ( $new->has_changes() ) {
+			$new->commit();
+			$new->update( $overrides );
+			$new->update_meta( $meta_overrides );
+		}
+
 		$this->get_step_element()->duplicate( $new, $this );
 
 		return $new;
