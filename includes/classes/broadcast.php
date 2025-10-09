@@ -277,7 +277,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$added = Background_Tasks::add(
 			new Schedule_Broadcast( $this->get_id() ),
 			$this->get_meta( 'segment_type' ) === 'dynamic'
-				? $this->get_send_time()
+				? max( $this->get_send_time() - ( 10 * MINUTE_IN_SECONDS ), time() ) // start 10 minutes before actual send time
 				: time()
 		);
 
@@ -486,24 +486,30 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 				continue;
 			}
 
-			$local_time = $this->get_send_time();
+			$send_time = $this->get_send_time();
 
 			// Send in the local time, maybe
 			if ( $in_lt && ! $send_now ) {
 
-				$local_time = $contact->get_local_time_in_utc_0( $local_time );
+				$local_time = $contact->get_local_time_in_utc_0( $send_time );
 
-				if ( $local_time < time() ) {
-					$local_time += DAY_IN_SECONDS;
+				// if not in the same TZ
+				if ( $local_time !== $send_time ) {
+
+					if ( $local_time < $send_time ) {
+						$local_time += DAY_IN_SECONDS;
+					}
+
+					$send_time = $local_time;
 				}
 			}
 
 			if ( $batch_interval && $batch_delay ) {
-				$local_time += $batch_delay;
+				$send_time += $batch_delay;
 			}
 
 			$args = [
-				'time'       => $local_time,
+				'time'       => $send_time,
 				'contact_id' => $contact->get_id(),
 				'funnel_id'  => Broadcast::FUNNEL_ID,
 				'step_id'    => $this->get_id(),
