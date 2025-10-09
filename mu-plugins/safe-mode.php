@@ -30,6 +30,48 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 define( 'GROUNDHOGG_SAFE_MODE_INSTALLED', true );
 define( 'GROUNDHOGG_SAFE_MODE_COOKIE', 'gh-safe-mode' );
 
+// we need these for WP_User::has_cap() to work, sigh.
+if ( ! function_exists( 'get_userdata' ) ) :
+	/**
+	 * Retrieves user info by user ID.
+	 *
+	 * @since 0.71
+	 *
+	 * @param int $user_id User ID
+	 * @return WP_User|false WP_User object on success, false on failure.
+	 */
+	function get_userdata( $user_id ) {
+		return get_user_by( 'id', $user_id );
+	}
+endif;
+
+if ( ! function_exists( 'get_user_by' ) ) :
+	/**
+	 * Retrieves user info by a given field.
+	 *
+	 * @since 2.8.0
+	 * @since 4.4.0 Added 'ID' as an alias of 'id' for the `$field` parameter.
+	 *
+	 * @global WP_User $current_user The current user object which holds the user data.
+	 *
+	 * @param string     $field The field to retrieve the user with. id | ID | slug | email | login.
+	 * @param int|string $value A value for $field. A user ID, slug, email address, or login name.
+	 * @return WP_User|false WP_User object on success, false on failure.
+	 */
+	function get_user_by( $field, $value ) {
+		$userdata = WP_User::get_data_by( $field, $value );
+
+		if ( ! $userdata ) {
+			return false;
+		}
+
+		$user = new WP_User();
+		$user->init( $userdata );
+
+		return $user;
+	}
+endif;
+
 /**
  * Whether the current user can manage safe mode
  *
@@ -135,14 +177,7 @@ function groundhogg_validate_safe_mode_cookie() {
 		return false;
 	}
 
-	$userdata = WP_User::get_data_by( 'login', $user_login );
-
-	if ( ! $userdata ) {
-		return false;
-	}
-
-	$user = new WP_User();
-	$user->init( $userdata );
+	$user = get_user_by( 'login', $user_login );
 
     if ( ! $user->has_cap( 'activate_plugins' ) ) {
         return false;
