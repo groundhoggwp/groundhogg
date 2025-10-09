@@ -84,7 +84,9 @@ class Main_Installer extends Installer {
 	}
 
 	protected function deactivate() {
-		// TODO: Implement deactivate() method.
+		// make sure safe mode is also disabled
+		maybe_install_safe_mode_plugin();
+		groundhogg_disable_safe_mode();
 	}
 
 	/**

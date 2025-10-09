@@ -419,7 +419,7 @@ function maybe_install_safe_mode_plugin() {
 
 	// Ensure the mu-plugins directory exists
 	if ( ! is_dir( $mu_plugins_dir ) ) {
-		mkdir( $mu_plugins_dir, 0755, true );
+		\Groundhogg\files()->filesystem()->mkdir( $mu_plugins_dir, 0755 );
 	}
 
 	$source      = __DIR__ . '/../mu-plugins/safe-mode.php';
@@ -433,4 +433,27 @@ function maybe_install_safe_mode_plugin() {
 	\Groundhogg\search_and_replace_in_file( $destination, 'REPLACEWITHKEY', wp_generate_password( 20 ) );
 
 	include_once $destination;
+}
+
+
+/**
+ * Delete the safe mode plugin
+ *
+ * @return void
+ */
+function uninstall_safe_mode_plugin() {
+
+	maybe_install_safe_mode_plugin();
+	groundhogg_disable_safe_mode();
+
+	$mu_plugins_dir = WPMU_PLUGIN_DIR;
+
+	// Ensure the mu-plugins directory exists
+	if ( ! is_dir( $mu_plugins_dir ) ) {
+		return;
+	}
+
+	$destination = $mu_plugins_dir . '/groundhogg-safe-mode.php';
+
+	\Groundhogg\files()->filesystem()->delete( $destination );
 }

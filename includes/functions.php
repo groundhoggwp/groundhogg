@@ -6336,6 +6336,7 @@ function uninstall_groundhogg() {
 	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_site_transient_timeout_gh_%'" );
 
 	uninstall_gh_cron_file();
+    uninstall_safe_mode_plugin();
 
 	do_action( 'groundhogg/uninstall' );
 }
