@@ -9115,3 +9115,37 @@ function redact_meta_table( $table ) {
 
 	$table->cache_set_last_changed();
 }
+
+/**
+ * Get a value from an object or array using dot notation instead of direct key access
+ *
+ * @param $data array|object
+ * @param $path string
+ * @param $default mixed
+ *
+ * @return mixed|null
+ */
+function get_by_dotn($data, $path, $default = null) {
+	if ($data === null || $path === '') {
+		return $default;
+	}
+
+	$keys = explode('.', $path);
+
+	foreach ($keys as $key) {
+		// convert purely numeric keys to int for array index access
+		if (ctype_digit($key)) {
+			$key = (int) $key;
+		}
+
+		if (is_array($data) && array_key_exists($key, $data)) {
+			$data = $data[$key];
+		} elseif (is_object($data) && (isset($data->$key) || property_exists($data, $key))) {
+			$data = $data->$key;
+		} else {
+			return $default;
+		}
+	}
+
+	return $data;
+}
