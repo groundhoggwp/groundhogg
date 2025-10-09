@@ -2277,6 +2277,46 @@ function get_exportable_fields( $extra = [] ) {
 }
 
 /**
+ * Nicely displays a variable
+ *
+ * @param $var
+ * @param $echo
+ *
+ * @return mixed
+ */
+function display_var( $var, $echo = false ) {
+
+	switch ( gettype( $var ) ) {
+		case 'string':
+			break;
+		case 'integer':
+			$var = _nf( $var );
+			break;
+		case 'boolean':
+			$var = $var ? __( 'Yes', 'groundhogg' ) : __( 'No', 'groundhogg' );
+			break;
+		case 'array':
+			$var = multi_implode( ', ', array_map( function ( $v ) {
+				return display_var( $v );
+			}, $var ) );
+			break;
+		case 'object':
+			$var = display_var( get_object_vars( $var ) );
+			break;
+		case 'NULL':
+		default:
+			$var = '';
+			break;
+	}
+
+	if ( $echo ) {
+		echo esc_html( $var );
+	}
+
+	return $var;
+}
+
+/**
  * Export a field for the contact exporter
  *
  * @param Contact $contact
@@ -2291,9 +2331,6 @@ function export_field( $contact, $field = '' ) {
 	switch ( $field ) {
 		case 'full_name':
 			$return = $contact->get_full_name();
-			break;
-		default:
-			$return = $contact->$field;
 			break;
 		case 'notes':
 			$return = wp_json_encode( $contact->get_notes() );
@@ -2339,6 +2376,17 @@ function export_field( $contact, $field = '' ) {
 				case 'unsub_feedback':
 					$return = $activity->get_meta( 'feedback' );
 					break;
+			}
+
+			break;
+		default:
+
+			$custom_field = Properties::instance()->get_field( $field );
+
+			if ( $custom_field ) {
+				$return = display_custom_field( $custom_field, $contact, false );
+			} else {
+				$return = display_var( $contact->$field );
 			}
 
 			break;

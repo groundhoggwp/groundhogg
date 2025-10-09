@@ -391,14 +391,15 @@ function export_custom_property( $return, $contact, $field_id ) {
 	$field = Properties::instance()->get_field( $field_id );
 
 	// if we don't know about it forget about it
-	if ( ! empty( $return ) || ! $field || ! $field['name'] ) {
+	if ( empty( $field ) || empty( $field['name'] ) ) {
 		return $return;
 	}
 
 	return display_custom_field( $field, $contact, false );
 }
 
-add_filter( 'groundhogg/export_field', __NAMESPACE__ . '\export_custom_property', 10, 3 );
+// built-in to the export_field function now
+// add_filter( 'groundhogg/export_field', __NAMESPACE__ . '\export_custom_property', 10, 3 );
 
 
 /**
