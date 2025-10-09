@@ -4,6 +4,7 @@ namespace Groundhogg;
 
 use Groundhogg\DB\Event_Queue;
 use Groundhogg\DB\Events;
+use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Step_Meta;
 use Groundhogg\DB\Steps;
@@ -1198,9 +1199,14 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
+		// make sure benchmark conditions pass, like...
+		// - can trigger at most twice in the last 60 days
+		// - can trigger at most once ever
+		// - can trigger any number of times
+
 		// Check if starting
 		if ( $this->is_starting() || $this->is_entry() ) {
-			return true;
+			return $this->check_trigger_frequency( $contact );
 		}
 
 		// If inner step, check if contact is at a step before this one.
@@ -1212,11 +1218,64 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			// We must be in the funnel and the current order MUST BE LESS than this one
 			// also ensure we're not in a parallel branch
 			if ( $current_step && $this->can_travel( $current_step, $contact ) ) {
-				return true;
+				return $this->check_trigger_frequency( $contact );
 			}
 		}
 
 		return apply_filters( 'groundhogg/step/can_complete', false, $this, $contact );
+	}
+
+	/**
+	 * Checks if the contact can enter the flow based on the trigger's prev historical conditions
+	 * For example...
+	 * - can trigger at most twice in the last 60 days
+	 * - can trigger at most once ever
+	 * - can trigger any number of times
+	 *
+	 * @param $contact Contact
+	 *
+	 * @return bool true if the contact is within the allowed frequency, otherwise false
+	 */
+	public function check_trigger_frequency( Contact $contact ) {
+
+		$rule = $this->get_meta( '_frequency_rule' );
+
+		$query = new Table_Query( 'events' );
+		$query->where()
+		      ->equals( 'contact_id', $contact->ID )
+		      ->equals( 'step_id', $this->get_id() )
+		      ->equals( 'funnel_id', $this->get_funnel_id() );
+
+		switch ( $rule ) {
+			// unset or any, return true
+			case 'unlimited':
+			default:
+				return true;
+			case 'once':
+
+				$query->setLimit( 1 );
+
+				// must be 0
+				return $query->count() === 0;
+			case 'x':
+
+				$x_times = absint( $this->get_meta( '_trigger_frequency_x_times' ) );
+				$range   = $this->get_meta( '_trigger_frequency_range' ) ?: 'all';
+				$x_days  = absint( $this->get_meta( '_trigger_frequency_x_days' ) );
+
+				if ( $range === 'x_days' ) {
+					Filters::timestamp( 'timestamp', [
+						'date_range' => 'x_days',
+						'days'       => $x_days
+					], $query->where );
+				}
+
+				// no need to get more events than the limit, if there are more, we're for sure over
+				$query->setLimit( $x_times );
+
+				// the number of events should be less than the times specified
+				return $query->count() < $x_times;
+		}
 	}
 
 	/**
@@ -2020,6 +2079,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		}
 
 		switch ( $key ) {
+			case '_trigger_frequency':
+				return one_of( $value, [ 'unlimited', 'once', 'x' ] );
+			case '_trigger_frequency_range':
+				return one_of( $value, [ 'all', 'x_days' ] );
+			case '_trigger_frequency_x_times':
+			case '_trigger_frequency_x_days':
+				return absint( $value );
 			case 'step_notes':
 				return sanitize_textarea_field( $value );
 		}

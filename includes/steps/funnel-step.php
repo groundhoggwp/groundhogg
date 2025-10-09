@@ -853,8 +853,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 									'id'      => $this->setting_id_prefix( 'is_conversion' ),
 									'checked' => $step->is_conversion()
 								] ) );
-
 								?>
+                                <div id="trigger-frequency-settings-<?php echo absint( $step->get_id() ); ?>" class="ignore-morph"></div>
                             </div>
                         </div>
 					<?php endif;

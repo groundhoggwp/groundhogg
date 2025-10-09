@@ -2132,6 +2132,84 @@
     })
   }
 
+  $(document).on('step-active', e => {
+
+    const step = Funnel.getActiveStep()
+
+    if ( step.data.step_group === 'benchmark' ) {
+      morphdom( document.getElementById( `trigger-frequency-settings-${ step.ID }` ), TriggerFrequencySettings() )
+    }
+
+  })
+
+  const TriggerFrequencySettings = () => {
+
+    const step = () => Funnel.getActiveStep()
+
+    return Div({
+      id: `trigger-frequency-settings-${ step().ID }`,
+      className: 'trigger-frequency-settings display-flex align-center gap-5 ignore-morph flex-wrap',
+    }, morph => MakeEl.Fragment([
+      MakeEl.Label({ for: `trigger-frequency-${step().ID}` }, 'Can be triggered' ),
+      MakeEl.InputGroup([
+        MakeEl.Select({
+          name: '_trigger_frequency',
+          id: `trigger-frequency-${step().ID}`,
+          onChange: e => {
+            Funnel.updateStepMeta({
+              _trigger_frequency: e.target.value,
+            })
+            morph()
+          },
+          options: {
+            unlimited: 'Unlimited times',
+            once: 'At most once per contact',
+            x: 'Up to X times per contact',
+          },
+          selected: step().meta._trigger_frequency ?? 'unlimited',
+        }),
+        step().meta._trigger_frequency === 'x' ? Input({
+          type: 'number',
+          className: 'number',
+          style: { width: '50px'},
+          value: step().meta._trigger_frequency_x_times ?? 1,
+          onChange: e => {
+            Funnel.updateStepMeta({
+              _trigger_frequency_x_times: e.target.value,
+            })
+          },
+        }) : null
+      ]),
+      step().meta._trigger_frequency === 'x' ? MakeEl.InputGroup([
+        MakeEl.Select({
+          onChange: e => {
+            Funnel.updateStepMeta({
+              _trigger_frequency_range: e.target.value,
+            })
+            morph()
+          },
+          options: {
+            all: 'in all time',
+            x_days: 'in X days',
+          },
+          selected: step().meta._trigger_frequency_range ?? 'all',
+        }),
+        step().meta._trigger_frequency_range === 'x_days' ? Input({
+          type: 'number',
+          className: 'number',
+          style: { width: '50px'},
+          value: step().meta._trigger_frequency_x_days ?? 1,
+          onChange: e => {
+            Funnel.updateStepMeta({
+              _trigger_frequency_x_days: e.target.value,
+            })
+          },
+        }) : null,
+      ]) : null
+    ]))
+
+  }
+
   function areNumbersClose (num1, num2, tolerancePercent) {
     const average = ( Math.abs(num1) + Math.abs(num2) ) / 2
     const tolerance = ( tolerancePercent / 100 ) * average
