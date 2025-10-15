@@ -1508,7 +1508,7 @@ class Form_v2 extends Step {
 				},
 				'validate' => function ( $field, $posted_data ) {
 
-					if ( current_user_can( 'add_contacts' ) ) {
+					if ( current_user_can( 'add_contacts' ) || ! is_recaptcha_enabled() ) {
 						return true;
 					}
 
@@ -1562,7 +1562,7 @@ class Form_v2 extends Step {
 				},
 				'validate' => function ( $field, $posted_data ) {
 
-					if ( current_user_can( 'add_contacts' ) ) {
+					if ( current_user_can( 'add_contacts' ) || ! is_turnstile_enabled() ) {
 						return true;
 					}
 
