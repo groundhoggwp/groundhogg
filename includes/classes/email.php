@@ -508,6 +508,18 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * What goes in the <title> tag
+	 *
+	 * @return string
+	 */
+	public function get_html_head_title() {
+		$subject = $this->get_merged_subject_line();
+		// if actually sending, the <title> should be the same as the subject line
+		/* translators: Login screen title. 1: Login screen name, 2: Network or site name */
+		return is_sending() ? $subject : sprintf( '%1$s &lsaquo; %2$s', $this->get_merged_subject_line(), get_bloginfo( 'name', 'display' ) );
+	}
+
+	/**
 	 * Return pre header text
 	 * This is called by a filter rather than directly
 	 *
