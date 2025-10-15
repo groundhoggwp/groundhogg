@@ -41,26 +41,7 @@ if ( $bgImage ) {
 ?>
 <!doctype html>
 <html>
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="x-apple-disable-message-reformatting"/>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><?php echo esc_html( $email_title ); ?></title>
-	<base target="_blank">
-	<style id="global-style">
-		<?php load_css( 'email' ); ?>
-		<?php do_action( 'groundhogg/templates/email/full-width/style' ); ?>
-	</style>
-	<style id="responsive">
-		<?php load_css( 'responsive' ); ?>
-	</style>
-	<style id="block-styles">
-        <?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_html() breaks `div > span` selectors
-		echo wp_strip_all_tags( $email->get_css() ); ?>
-	</style>
-	<?php do_action( 'groundhogg/templates/email/full-width/head' ); ?>
-</head>
+<?php load_part( 'head' ); ?>
 <body class="email template-full-width-contained" dir="<?php echo esc_attr( $direction ); ?>">
 <table class="body-content" cellspacing="0" cellpadding="0" role="presentation" width="100%">
 	<tr>

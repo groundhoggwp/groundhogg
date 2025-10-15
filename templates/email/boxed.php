@@ -44,27 +44,7 @@ $bodyStyle = array_filter( $bodyStyle );
 ?>
 <!doctype html>
 <html>
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="x-apple-disable-message-reformatting"/>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><?php echo esc_html( $email_title ); ?></title>
-	<base target="_blank">
-	<style id="global-styles">
-		<?php load_css( 'email' ); ?>
-		<?php do_action( 'groundhogg/templates/email/boxed/style' ); ?>
-	</style>
-	<style id="responsive">
-		<?php load_css( 'responsive' ); ?>
-	</style>
-	<style id="block-styles">
-		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_html() breaks `div > span` selectors
-		echo wp_strip_all_tags( $email->get_css() ); ?>
-	</style>
-	<?php do_action( 'groundhogg/templates/email/boxed/head' ); ?>
-	<?php load_part( 'head-close' ) ?>
-</head>
+<?php load_part('head' ); ?>
 <body class="email responsive template-boxed" dir="<?php echo esc_attr( $direction ); ?>" style="background-color: <?php echo esc_attr( $bgColor ); ?>">
 <?php load_part( 'body-open' ); ?>
 <?php load_part( 'preview-text' ); ?>
