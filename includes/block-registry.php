@@ -126,7 +126,7 @@ class Block_Registry {
 		] = $args;
 
 		$query->set( 'post_type', $post_type );
-		$query->set( 'status', 'publish' );
+		$query->set( 'post_status', 'publish' );
 
 		if ( $post_type === 'post' && ! empty( 'category' ) ) {
 			$query->set( $args['category_rel'] === 'all' ? 'category__and' : 'category__in', wp_parse_id_list( $args['category'] ) );
@@ -565,7 +565,7 @@ class Block_Registry {
 
 		// handle block visibility
 		// block has visibility filters
-		if ( isset_not_empty( $block, 'include_filters' ) || isset_not_empty( $block, 'exclude_filters' ) ) {
+		if ( the_email() && ! the_email()->is_testing() && ( isset_not_empty( $block, 'include_filters' ) || isset_not_empty( $block, 'exclude_filters' ) ) ) {
 
 			$contact = the_email()->get_contact();
 
