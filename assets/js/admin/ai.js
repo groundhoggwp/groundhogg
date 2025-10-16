@@ -81,6 +81,9 @@
   Groundhogg.ai = {
     AiGeneratingText,
     request: aiRequest,
+    poll: async job_id => {
+      return JSON.parse( await pollAiResponse(job_id) )
+    }
   }
 
 })()

@@ -410,6 +410,7 @@ class Plugin {
 		require __DIR__ . '/tools.php';
 		require __DIR__ . '/better-meta-compat.php';
 		require __DIR__ . '/cli/bootstrap.php';
+		require __DIR__ . '/ai/actions.php';
 	}
 }
 
