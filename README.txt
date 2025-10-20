@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.5.3
+Stable tag: 4.2.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -374,6 +374,17 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.6 (2025-10-20) =
+* ADDED Frequency limits for triggers.
+* ADDED Support for `litespeed_finish_request()` in the `gh-cron.php` file.
+* ADDED Groundwork for AI in the email editor.
+* IMPROVED Exporting of custom fields and metadata.
+* FIXED Broadcast delayed by 24 hours when using the *send in local timezone* setting with a dynamic segment.
+* FIXED `<title>` tag in HTML emails should be the same as the subject line.
+* FIXED safe-mode causing errors on multisite.
+* FIXED bug when duplicating or copying steps with unpublished changes.
+* FIXED Turnstile/Recaptcha ignored if disabled in settings even if enabled in forms.
 
 = 4.2.5.3 (2025-08-30) =
 * FIXED Web form editor missing when adding a new blank Web Form trigger.
