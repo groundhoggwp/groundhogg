@@ -2623,7 +2623,7 @@
           })
         }
       }, ({close}) => [
-        Div({
+        ! Groundhogg.ai.enabled ? null : Div({
           id: 'ai-prompt-block-form',
           className: 'display-flex column gap-5',
         }, morph => Fragment([
@@ -2695,7 +2695,7 @@
             },
           }, InsertState.generating ? Groundhogg.ai.AiGeneratingText(InsertState.index) : '🤖 Generate blocks'),
         ])),
-        makeEl('hr', {
+        ! Groundhogg.ai.enabled ? null : makeEl('hr', {
           style: {
             margin: '10px 0',
           }
@@ -5822,7 +5822,7 @@
                   className: 'gh-input-group',
                 },
                 [
-                  Button({
+                  ! Groundhogg.ai.enabled ? null : Button({
                       id       : 'generate-ai',
                       className: 'gh-button secondary',
                       onClick: NewAImodal,

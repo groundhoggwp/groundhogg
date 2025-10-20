@@ -274,10 +274,6 @@ class Scripts {
 			'groundhogg-admin-data'
 		], GROUNDHOGG_VERSION, true );
 
-		wp_localize_script( 'groundhogg-ai', 'GroundhoggAi', [
-			"license_key" => get_master_license()
-		] );
-
 		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [
 			'groundhogg-admin',
 			'groundhogg-admin-formatting',
@@ -690,7 +686,10 @@ class Scripts {
 				'turnstile'        => [
 					'enabled' => is_turnstile_enabled(),
 				],
-				'screen'           => get_current_screen()
+				'screen' => get_current_screen(),
+				'ai'     => [
+					'enabled' => false
+				]
 			] ), 'before' );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );

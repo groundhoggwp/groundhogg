@@ -4,8 +4,46 @@ namespace Groundhogg\AI;
 
 use function Groundhogg\base64url_encode;
 use function Groundhogg\get_master_license;
+use function Groundhogg\get_post_var;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\verify_admin_ajax_nonce;
+
+function ajax_generate_job_with_prompt() {
+
+	if ( ! verify_admin_ajax_nonce() ) {
+		wp_send_json_error();
+	}
+
+	$license = get_master_license();
+
+	if ( ! $license ) {
+		wp_send_json_error();
+	}
+
+	$prompt = get_post_var( 'prompt', [] );
+
+	// the `/ready` endpoint preloads a job_id without actually sending anything to the AI,
+	// and links it with a pre-determined email address so that we can poll the result
+	$res = remote_post_json( "https://ai.groundhogg.io/", [
+		'license_key' => $license,
+		'prompt'      => $prompt
+	] );
+
+	if ( is_wp_error( $res ) ) {
+		wp_send_json_error( $res );
+	}
+
+	if ( empty( $res->job_id ) || empty( $res->prefix ) ) {
+		wp_send_json_error( $res );
+	}
+
+	$job_id = $res->job_id;
+
+	wp_send_json( [
+		'job_id' => $job_id,
+	] );
+
+}
 
 /**
  * Generate an email address where the user can forward an email to and Groundhogg will convert that email into blocks for them.
@@ -27,7 +65,7 @@ function ajax_generate_ai_converter_email_address() {
 	// the `/ready` endpoint preloads a job_id without actually sending anything to the AI,
 	// and links it with a pre-determined email address so that we can poll the result
 	$res = remote_post_json( "https://ai.groundhogg.io/ready", [
-		"license_key" => $license
+		'license_key' => $license
 	] );
 
 	if ( is_wp_error( $res ) ) {

@@ -1,7 +1,5 @@
 (() => {
 
-  const AI_ENDPOINT = 'https://ai.groundhogg.io'
-
   const BUTTON_TEXTS = [
     "Corralling groundhogs",
     "Checking for shadows",
@@ -54,18 +52,18 @@
     }, 5000 )
   })
 
-  const aiRequest = async (prompt) => {
+  /**
+   * Send a request to Groundhogg's AI using a prompt
+   *
+   * @param prompt
+   * @returns {Promise<any>}
+   */
+  const promptRequest = async (prompt) => {
 
-    let jobRes = await fetch( AI_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        license_key: GroundhoggAi.license_key,
-        prompt
-      })
-    } ).then( res => res.json() )
+    let jobRes = await Groundhogg.api.ajax({
+      action: 'generate_job_with_prompt',
+      prompt,
+    })
 
     if ( jobRes.error ){
       throw new Error( jobRes.error )
@@ -79,8 +77,9 @@
   }
 
   Groundhogg.ai = {
+    ...Groundhogg.ai,
     AiGeneratingText,
-    request: aiRequest,
+    request: promptRequest,
     poll: async job_id => {
       return JSON.parse( await pollAiResponse(job_id) )
     }
