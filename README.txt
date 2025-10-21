@@ -375,7 +375,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.6 (2025-10-20) =
+= 4.2.6 (2025-10-21) =
 * ADDED Frequency limits for triggers.
 * ADDED Batch scheduling for adding contacts to flows.
 * ADDED Support for `litespeed_finish_request()` in the `gh-cron.php` file.
@@ -384,7 +384,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED Broadcast delayed by 24 hours when using the *send in local timezone* setting with a dynamic segment.
 * FIXED `<title>` tag in HTML emails should be the same as the subject line.
 * FIXED safe-mode causing errors on multisite.
-* FIXED bug when duplicating or copying steps with unpublished changes.
+* FIXED Step settings not copied correctly when duplicating or copying steps with unpublished changes.
 * FIXED Turnstile/Recaptcha ignored if disabled in settings even if enabled in forms.
 
 = 4.2.5.3 (2025-08-30) =
