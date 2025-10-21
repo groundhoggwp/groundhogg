@@ -660,7 +660,7 @@
               className: 'pill yellow',
             }, sprintf(__('It will take at least %s to send to %s contacts.', 'groundhogg'), bold(getState().duration_estimate),
               formatNumber(getState().totalContacts)))
-            : Span({}, __('Estimating...', 'groundhogg')),
+            : Span({className:'loading-dots'}, __('Estimating', 'groundhogg')),
           ]) : null,
           '<div><hr></div>',
           Button({

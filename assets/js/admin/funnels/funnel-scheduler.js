@@ -59,6 +59,10 @@
     date         : date('Y-m-d'),
     time         : date('H:00:00', getDate().setHours(getDate().getHours() + 1)),
     finished     : false,
+    batching             : false,
+    batch_interval       : 'minutes',
+    batch_interval_length: 30,
+    batch_amount         : 100,
   }
 
   const getSearchMethods = () => {
@@ -108,6 +112,21 @@
   let State = {
     ...initialState,
   }
+
+  const updateDurationEstimate = Groundhogg.functions.debounce(() => Groundhogg.api.ajax({
+    action               : 'gh_estimate_send_duration',
+    total_contacts       : getState().totalContacts,
+    batch_interval       : getState().batch_interval,
+    batch_interval_length: getState().batch_interval_length,
+    batch_amount         : getState().batch_amount,
+  }).then(r => {
+
+    const { time } = r.data
+
+    setState({
+      duration_estimate: time,
+    })
+  }), 500)
 
   const getQuery = () => {
     let query = {}
@@ -256,77 +275,11 @@
               },
               onClick  : e => {
                 setState({
-                  step: 'schedule',
+                  step: 'contacts',
                 })
               },
-            }, sprintf('%s &rarr;', __('Schedule', 'groundhogg'))) : null,
+            }, sprintf('%s &rarr;', __('Contacts', 'groundhogg'))) : null,
           ]),
-        ])
-      },
-    },
-    'schedule' : {
-      name        : __('Schedule', 'groundhogg'),
-      icon        : Dashicon('calendar'),
-      requirements: () => getFunnel(),
-      render      : () => {
-
-        return Fragment([
-          Div({
-            className: 'space-between',
-          }, [
-            `<p>${ __('When do you want the flow to start?', 'groundhogg') }</p>`,
-            ButtonToggle({
-              id      : 'send-when',
-              options : [
-                {
-                  id  : 'later',
-                  text: 'Later',
-                },
-                {
-                  id  : 'now',
-                  text: 'Now',
-                },
-              ],
-              selected: getState().when,
-              onChange: when => setState({ when }),
-            }),
-          ]),
-          getState().when === 'later' ? Div({
-            className: 'gh-input-group',
-          }, [
-            Input({
-              type    : 'date',
-              id      : 'send-date',
-              name    : 'date',
-              value   : getState().date || '',
-              min     : date('Y-m-d'),
-              onChange: e => setState({
-                date: e.target.value,
-              }),
-            }),
-            Input({
-              type    : 'time',
-              id      : 'send-time',
-              name    : 'time',
-              value   : getState().time || '',
-              onChange: e => setState({
-                time: e.target.value,
-              }),
-            }),
-          ]) : null,
-          Button({
-            id       : 'go-to-contacts',
-            className: 'gh-button primary',
-            disabled : getState().when === 'later' && ! isInTheFuture(`${ getState().date } ${ getState().time }`),
-            style    : {
-              alignSelf: 'flex-end',
-            },
-            onClick  : e => {
-              setState({
-                step: 'contacts',
-              })
-            },
-          }, sprintf('%s &rarr;', __('Contacts', 'groundhogg'))),
         ])
       },
     },
@@ -403,6 +356,160 @@
             },
             onClick  : e => {
               setState({
+                step: 'schedule',
+              })
+            },
+          }, sprintf('%s &rarr;', __('Schedule', 'groundhogg'))),
+        ])
+      },
+    },
+    'schedule' : {
+      name        : __('Schedule', 'groundhogg'),
+      icon        : Dashicon('calendar'),
+      requirements: () => getFunnel(),
+      render      : () => {
+
+        return Fragment([
+          Div({
+            className: 'space-between',
+          }, [
+            `<p>${ __('When do you want the flow to start?', 'groundhogg') }</p>`,
+            ButtonToggle({
+              id      : 'send-when',
+              options : [
+                {
+                  id  : 'later',
+                  text: 'Later',
+                },
+                {
+                  id  : 'now',
+                  text: 'Now',
+                },
+              ],
+              selected: getState().when,
+              onChange: when => setState({ when }),
+            }),
+          ]),
+          getState().when === 'later' ? Div({
+            className: 'gh-input-group',
+          }, [
+            Input({
+              type    : 'date',
+              id      : 'send-date',
+              name    : 'date',
+              value   : getState().date || '',
+              min     : date('Y-m-d'),
+              onChange: e => setState({
+                date: e.target.value,
+              }),
+            }),
+            Input({
+              type    : 'time',
+              id      : 'send-time',
+              name    : 'time',
+              value   : getState().time || '',
+              onChange: e => setState({
+                time: e.target.value,
+              }),
+            }),
+          ]) : null,
+          //
+          '<div><hr></div>',
+          Div({
+            className: 'display-flex gap-10 align-center',
+          }, [
+            `<label for="send-in-batches"><p>${ __('Add in batches?', 'groundhogg') }</p></label>`,
+            MakeEl.Toggle({
+              id      : 'send-in-batches',
+              checked : getState().batching,
+              onLabel : __('Yes'),
+              offLabel: __('No'),
+              onChange: e => {
+                setState({
+                  batching: e.target.checked,
+                })
+                if (getState().batching) {
+                  updateDurationEstimate()
+                }
+              },
+            }),
+          ]),
+          getState().batching ? Fragment([
+            MakeEl.Pg({
+              className: 'display-flex gap-5 align-center',
+            }, [
+              'Add',
+              Input({
+                id       : 'batch-amount',
+                name     : 'batch_amount',
+                step     : getState().batch_amount <= 100 ? 10 : 50,
+                value    : getState().batch_amount,
+                onInput  : e => {
+                  setState({
+                    batch_amount: parseInt(e.target.value),
+                  }, false)
+                  updateDurationEstimate()
+                },
+                type     : 'number',
+                className: 'number',
+                style    : {
+                  width       : '100px',
+                  paddingRight: 0,
+                },
+              }),
+              'contacts every',
+              Input({
+                id       : 'batch-interval-length',
+                name     : 'batch_interval_length',
+                step     : getState().batch_interval === 'minutes' ? 5 : 1,
+                value    : getState().batch_interval_length,
+                onInput  : e => {
+                  setState({
+                    batch_interval_length: parseInt(e.target.value),
+                  }, false)
+                  updateDurationEstimate()
+                },
+                type     : 'number',
+                className: 'number',
+                style    : {
+                  width       : '60px',
+                  paddingRight: 0,
+                },
+              }),
+              MakeEl.Select({
+                id      : 'batch-interval',
+                name    : 'batch_interval',
+                selected: getState().batch_interval,
+                onChange: e => {
+                  setState({
+                    batch_interval: e.target.value,
+                  }, false)
+                  updateDurationEstimate()
+                },
+                options : {
+                  minutes: __('Minutes'),
+                  hours  : __('Hours'),
+                  days   : __('Days'),
+                },
+              }),
+            ]),
+            getState().duration_estimate
+            ? Span({
+              className: 'pill yellow',
+            }, sprintf(__('It will take at least %s to add %s contacts.', 'groundhogg'), bold(getState().duration_estimate),
+              formatNumber(getState().totalContacts)))
+            : Span({ className: 'loading-dots' }, __('Estimating', 'groundhogg')),
+          ]) : null,
+          '<div><hr></div>',
+          Button({
+            id       : 'go-to-contacts',
+            className: 'gh-button primary',
+            disabled : getState().when === 'later' && ! isInTheFuture(`${ getState().date } ${ getState().time }`),
+            style    : {
+              alignSelf: 'flex-end',
+            },
+            onClick  : e => {
+              setState({
                 step: 'review',
               })
             },
@@ -446,6 +553,10 @@
                 when = 'now',
                 date = '',
                 time = '',
+                batching= false,
+                batch_amount,
+                batch_interval,
+                batch_interval_length
               } = getState()
 
               FunnelsStore.addContacts({
@@ -455,6 +566,10 @@
                 now      : when === 'now',
                 date,
                 time,
+                batching,
+                batch_amount,
+                batch_interval,
+                batch_interval_length
               }).then(r => {
 
                 setState({
@@ -542,8 +657,8 @@
 
     const order = [
       'funnel',
-      'schedule',
       'contacts',
+      'schedule',
       'review',
       'scheduled',
     ]

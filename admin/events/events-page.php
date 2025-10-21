@@ -630,13 +630,16 @@ class Events_Page extends Tabbed_Admin_Page {
             $(document).on('click', '.do-task', e => {
 
               e.preventDefault()
+              let aref = e.currentTarget
+              aref.classList.add('loading-dots')
+              aref.innerText = 'Running'
               let row = e.target.closest('tr')
               let progressEl = row.querySelector('.task-progress')
               let taskId = progressEl.dataset.id
               let progress = progressEl.dataset.progress ?? 0
 
               const SmallProgressBar = (props = {}) => ProgressBar({
-                percent  : progress,
+                percent  : Math.min(progress, 100),
                 className: 'small',
                 ...props,
               })

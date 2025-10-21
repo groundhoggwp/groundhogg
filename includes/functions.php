@@ -6168,6 +6168,28 @@ function array_filter_by_keys( array $associative_array, array $keys_to_keep ) {
 }
 
 /**
+ * Given an array and a list of keys, extract those keys from the array and return them, as a new array
+ *
+ * @param $array
+ * @param $keys
+ *
+ * @return array
+ */
+function array_splice_keys( &$array, $keys ) {
+
+    $new = [];
+
+	foreach ( $keys as $key ) {
+        if ( isset( $array[ $key ] ) ) {
+            $new[ $key ] = $array[ $key ];
+            unset( $array[ $key ] );
+        }
+    }
+
+    return $new;
+}
+
+/**
  * Given an associative array apply a list of callbacks provided by the callbacks array
  *
  * @param array      $array     the items

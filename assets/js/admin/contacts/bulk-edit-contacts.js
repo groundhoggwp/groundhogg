@@ -445,6 +445,8 @@
           'groundhogg'), bold(formatNumber(totalContacts))) }</p>`,
         onConfirm: () => {
 
+          const { close } = loadingModal()
+
           ContactsStore.patchMany({
             bg: true,
             query,
@@ -452,6 +454,8 @@
             meta,
             ...payload,
           }).then(r => {
+
+            close()
 
             confirmationModal({
               width: 600,

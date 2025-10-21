@@ -16,6 +16,7 @@ use function Groundhogg\get_contactdata;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\is_a_contact;
 use function Groundhogg\is_template_site;
+use function Groundhogg\one_of;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -193,7 +194,14 @@ class Funnels_Api extends Base_Object_Api {
 			}
 		}
 
-		$scheduled = Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars );
+		$batching              = (bool) $request->get_param( 'batching' );
+		$batch_interval        = one_of( $request->get_param( 'batch_interval' ), [ 'minutes', 'hours', 'days' ] );
+		$batch_interval_length = absint( $request->get_param( 'batch_interval_length' ) );
+		$batch_amount          = absint( $request->get_param( 'batch_amount' ) );
+		$batch_delay           = 0;
+		$args                  = compact( 'batching', 'batch_interval', 'batch_interval_length', 'batch_amount', 'batch_delay' );
+
+		$scheduled = Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query_vars, 0, $args );
 
 		if ( is_wp_error( $scheduled ) ){
 			return $scheduled;
