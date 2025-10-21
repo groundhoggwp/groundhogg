@@ -377,6 +377,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.2.6 (2025-10-20) =
 * ADDED Frequency limits for triggers.
+* ADDED Batch scheduling for adding contacts to flows.
 * ADDED Support for `litespeed_finish_request()` in the `gh-cron.php` file.
 * ADDED Groundwork for AI in the email editor.
 * IMPROVED Exporting of custom fields and metadata.
