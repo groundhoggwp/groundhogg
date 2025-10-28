@@ -125,6 +125,8 @@ class Block_Registry {
 			'terms'     => $terms
 		] = $args;
 
+		$query->set( 'ignore_sticky_posts', true );
+
 		$query->set( 'post_type', $post_type );
 		$query->set( 'post_status', 'publish' );
 
