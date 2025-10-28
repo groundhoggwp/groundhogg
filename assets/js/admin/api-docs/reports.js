@@ -46,7 +46,14 @@
             id,
             rows: rows,
             cells: [
-              props => Input( props ),
+              ({value, ...props}) => MakeEl.Select({
+                options: GroundhoggReports,
+                selected: value,
+                style: {
+                  maxWidth: '100%'
+                },
+                ...props,
+              }),
             ],
             onChange: rows => {
               setInRequest(param, rows.map(([id]) => id))
@@ -142,6 +149,7 @@
       {
         param: 'report',
         type: 'string',
+        options: GroundhoggReports,
         required: true,
         description: () => Pg({}, __('The ID of the report to retrieve.', 'groundhogg')),
       },

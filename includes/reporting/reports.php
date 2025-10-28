@@ -102,6 +102,16 @@ class Reports {
 	}
 
 	/**
+	 * Return a list of all register reports
+	 *
+	 * @return string[]
+	 */
+	static public function get_registered_reports() {
+		$reports = new Reports( time(), time() );
+		return array_keys( $reports->reports );
+	}
+
+	/**
 	 * Get a param
 	 *
 	 * @param string $name
