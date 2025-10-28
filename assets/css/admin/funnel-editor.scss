@@ -1827,6 +1827,13 @@ button.button.save-button {
         border-radius: 3px;
       }
 
+      .dashicons-admin-comments {
+        color: var(--color);
+        .gh-tooltip {
+          max-width: 200px;
+        }
+      }
+
       .step-label {
         font-size: 10px;
         padding: 1px 6px;

@@ -20,6 +20,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\kses_e;
 use function Groundhogg\sanitize_payload;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -599,18 +600,29 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 				<?php if ( WP_DEBUG ): ?>
                     <div class="step-label">ID: <?php echo esc_html( $step->ID ); ?></div>
                     <div class="step-label">Pos: <?php echo esc_html( $step->get_order() ); ?>,<?php echo esc_html( $step->get_level() ); ?></div>
-				<?php endif; ?>
-				<?php $this->labels(); ?>
-				<?php if ( $step->is_entry() ): ?>
-					<?php dashicon_e( 'migrate' ); ?>
-				<?php endif; ?>
-				<?php if ( $step->is_conversion() ): ?>
-					<?php dashicon_e( 'flag' ); ?>
-				<?php endif; ?>
-				<?php if ( $step->is_locked() ): ?>
-					<?php dashicon_e( 'lock' ); ?>
-				<?php endif; ?>
-				<?php do_action( 'groundhogg/steps/sortable/labels', $step, $this ); ?>
+				<?php endif;
+
+				$this->labels();
+
+				$notes = $step->get_meta( 'step_notes' );
+
+				if ( ! empty( $notes ) ):
+                    ?><span class="dashicons dashicons-admin-comments">
+                    <span class="gh-tooltip right"><?php kses_e( $notes ); ?></span>
+                </span><?php
+				endif;
+
+				if ( $step->is_entry() ):
+					dashicon_e( 'migrate' );
+				endif;
+				if ( $step->is_conversion() ):
+					dashicon_e( 'flag' );
+				endif;
+				if ( $step->is_locked() ):
+					dashicon_e( 'lock' );
+				endif;
+				do_action( 'groundhogg/steps/sortable/labels', $step, $this );
+				?>
             </div>
 			<?php do_action( 'groundhogg/steps/sortable/inside', $step, $this ); ?>
 			<?php do_action( "groundhogg/steps/{$this->get_type()}/sortable/inside", $step ); ?>
