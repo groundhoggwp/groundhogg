@@ -292,6 +292,9 @@ If you have the Google Recaptcha integration enabled, scripts will be loaded fro
 ### Cloudflare Turnstile
 If you have the Cloudflare Turnstile integration enabled, scripts will be loaded from `https://challenges.cloudflare.com/turnstile/v0/api.js` and requests will be made to `https://challenges.cloudflare.com/turnstile/v0/siteverify` sharing only essential information (such as your turnstile site key) to facilitate the integration.
 
+### Geolocation services
+Groundhogg will attempt to use the free service [ipquery.io](https://ipquery.io) to determine a contact's location and timezone using their IP address.
+
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
 == Screenshots ==
@@ -380,12 +383,16 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED Batch scheduling for adding contacts to flows.
 * ADDED Support for `litespeed_finish_request()` in the `gh-cron.php` file.
 * ADDED Groundwork for AI in the email editor.
+* ADDED New API endpoint to fetch broadcast reports.
+* ADDED Step notes will appear in the flow editor, and now also support **basic** HTML.
 * IMPROVED Exporting of custom fields and metadata.
+* TWEAKED The flow emails table report will show *unique* clicks instead of *all* clicks.
 * FIXED Broadcast delayed by 24 hours when using the *send in local timezone* setting with a dynamic segment.
 * FIXED `<title>` tag in HTML emails should be the same as the subject line.
 * FIXED safe-mode causing errors on multisite.
 * FIXED Step settings not copied correctly when duplicating or copying steps with unpublished changes.
 * FIXED Turnstile/Recaptcha ignored if disabled in settings even if enabled in forms.
+* FIXED Export page not working if admin toolbar is disabled.
 
 = 4.2.5.3 (2025-08-30) =
 * FIXED Web form editor missing when adding a new blank Web Form trigger.
