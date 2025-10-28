@@ -551,22 +551,14 @@ class Location {
 			'city',
 			'location',
 			'address',
-			'time_zone'
-		];
-
-		$continents = [
-			"AF" => "Africa",
-			"AN" => "Antarctica",
-			"AS" => "Asia",
-			"EU" => "Europe",
-			"OC" => "Australia (Oceania)",
-			"NA" => "North America",
-			"SA" => "South America"
+			'time_zone',
+			'timezone',
+			'tz'
 		];
 
 		if ( in_array( $purpose, $support ) ) {
 
-			$ip_data = wp_remote_get( "http://www.geoplugin.net/json.gp?ip=" . $ip, [
+			$ip_data = wp_remote_get( "https://api.ipquery.io/" . $ip, [
 				'headers' => [
 					'Referer' => home_url()
 				]
@@ -590,44 +582,44 @@ class Location {
 						break;
 					case 'location':
 						$output = array(
-							"city"           => @$ip_data->geoplugin_city,
-							"region"         => @$ip_data->geoplugin_regionName,
-							"region_code"    => @$ip_data->geoplugin_regionCode,
-							"country"        => @$ip_data->geoplugin_countryName,
-							"country_code"   => @$ip_data->geoplugin_countryCode,
-							"continent"      => @$continents[ strtoupper( $ip_data->geoplugin_continentCode ) ],
-							"continent_code" => @$ip_data->geoplugin_continentCode,
-							"time_zone"      => @$ip_data->geoplugin_timezone
+							"city"           => @$ip_data->location->city,
+							"region"         => @$ip_data->location->state,
+//							"region_code"    => @$ip_data->location->,
+							"country"        => @$ip_data->location->country,
+							"country_code"   => @$ip_data->location->country_code,
+							"time_zone"      => @$ip_data->location->timezone,
 						);
 						break;
 					case 'address':
-						$address = array( $ip_data->geoplugin_countryName );
-						if ( @strlen( $ip_data->geoplugin_regionName ) >= 1 ) {
-							$address[] = $ip_data->geoplugin_regionName;
+						$address = array( $ip_data->location->country );
+						if ( @strlen( $ip_data->location->state ) >= 1 ) {
+							$address[] = $ip_data->location->state;
 						}
-						if ( @strlen( $ip_data->geoplugin_city ) >= 1 ) {
-							$address[] = $ip_data->geoplugin_city;
+						if ( @strlen( $ip_data->location->city ) >= 1 ) {
+							$address[] = $ip_data->location->city;
 						}
 						$output = implode( ", ", array_reverse( $address ) );
 						break;
 					case 'city':
-						$output = @$ip_data->geoplugin_city;
+						$output = @$ip_data->location->city;
 						break;
 					case 'region':
 					case 'province':
 					case 'state':
-						$output = @$ip_data->geoplugin_regionName;
+						$output = @$ip_data->location->state;
 						break;
 					case 'country':
-						$output = @$ip_data->geoplugin_countryName;
+						$output = @$ip_data->location->country;
 						break;
 					case 'countrycode':
 					case 'country_code':
 					case 'cc':
-						$output = @$ip_data->geoplugin_countryCode;
+						$output = @$ip_data->location->country_code;
 						break;
 					case 'time_zone':
-						$output = @$ip_data->geoplugin_timezone;
+					case 'timezone':
+					case 'tz':
+						$output = @$ip_data->location->timezone;
 						break;
 				}
 			}
