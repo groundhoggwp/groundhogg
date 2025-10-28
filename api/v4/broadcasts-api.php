@@ -33,10 +33,29 @@ class Broadcasts_Api extends Base_Object_Api {
 			'callback'            => [ $this, 'schedule_broadcast' ],
 		] );
 
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/report", [
+			'methods'             => WP_REST_Server::READABLE,
+			'permission_callback' => [ $this, 'read_permissions_callback' ],
+			'callback'            => [ $this, 'read_report' ],
+		] );
+
 		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/cancel", [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'permission_callback' => [ $this, 'update_permissions_callback' ],
 			'callback'            => [ $this, 'cancel_broadcast' ],
+		] );
+	}
+
+	public function read_report( WP_REST_Request $request ) {
+
+		$broadcast = new Broadcast( $request->get_param( $this->get_primary_key() ) );
+
+		if ( ! $broadcast->exists() ) {
+			return self::ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'report' => $broadcast->get_report_data()
 		] );
 	}
 
