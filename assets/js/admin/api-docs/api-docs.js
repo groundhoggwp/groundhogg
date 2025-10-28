@@ -213,6 +213,34 @@
         Pg({}, __('The meta object can contain any number of arbitrary key&rarr;value pairs.', 'groundhogg')),
       ]),
     } ),
+    before: () => ({
+      param: 'before',
+      type: 'string',
+      required: false,
+      control: ({ param, name, id }) => Input({
+        type: 'date',
+        name,
+        id,
+        value: getFromRequest(param),
+        className: 'code',
+        onInput: e => setInRequest(param, e.target.value),
+      }),
+      description: () => Pg({}, __('Only return items created before this date.', 'groundhogg')),
+    }),
+    after: () => ({
+      param: 'after',
+      type: 'string',
+      required: false,
+      control: ({ param, name, id }) => Input({
+        type: 'date',
+        name,
+        id,
+        value: getFromRequest(param),
+        className: 'code',
+        onInput: e => setInRequest(param, e.target.value),
+      }),
+      description: () => Pg({}, __('Only return items created after this date.', 'groundhogg')),
+    }),
   }
 
   const setInRequest = (param, value) => {
