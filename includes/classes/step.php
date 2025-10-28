@@ -2096,7 +2096,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			case '_trigger_frequency_x_days':
 				return absint( $value );
 			case 'step_notes':
-				return sanitize_textarea_field( $value );
+				return kses( $value, 'simple' );
 		}
 
 		return $value;
