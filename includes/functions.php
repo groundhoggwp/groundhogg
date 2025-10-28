@@ -75,6 +75,7 @@ add_constant_support( 'gh_recaptcha_secret_key' );
 add_constant_support( 'gh_recaptcha_site_key' );
 add_constant_support( 'gh_click_tracking_delay' );
 add_constant_support( 'gh_open_tracking_delay' );
+add_constant_support( 'gh_managed_page_name_override' );
 
 /**
  * If an email address is provided but a space is in place of a plus then swap out the space for a plus
@@ -3362,7 +3363,15 @@ function blacklist_check( $data = '' ) {
  * @return mixed|void
  */
 function get_managed_page_name() {
-	return apply_filters( 'groundhogg/managed_page_name', get_option( 'gh_managed_page_name_override', 'gh' ) );
+
+    $name = 'gh';
+
+    $option_override = get_option( 'gh_managed_page_name_override' );
+    if ( ! empty( $option_override ) ) {
+        $name = $option_override;
+    }
+
+	return apply_filters( 'groundhogg/managed_page_name', $name );
 }
 
 /**
