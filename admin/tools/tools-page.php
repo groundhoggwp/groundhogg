@@ -135,6 +135,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 			wp_enqueue_script( 'groundhogg-admin-filter-emails' );
 			do_action( 'groundhogg/enqueue_api_docs' );
 		}
+
+		if ( $this->get_current_tab() === 'export' ) {
+			wp_enqueue_script( 'groundhogg-make-el' );
+			wp_enqueue_script( 'groundhogg-admin-element' );
+		}
 	}
 
 	public function help() {
