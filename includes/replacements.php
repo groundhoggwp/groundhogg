@@ -722,7 +722,10 @@ class Replacements implements \JsonSerializable {
 	 * @return bool
 	 */
 	function has_replacement( $code ) {
-		return array_key_exists( $code, $this->replacement_codes );
+
+        $parsed = $this->parse_code( $code );
+
+        return array_key_exists( $parsed['code'], $this->replacement_codes );
 	}
 
 	/**
