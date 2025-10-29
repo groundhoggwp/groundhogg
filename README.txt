@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.6
+Stable tag: 4.2.6.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -378,7 +378,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.6 (2025-10-21) =
+= 4.2.6.1 (2025-10-29) =
+* FIXED Recaptcha field missing in rendered form if the recaptcha version is v3
+* FIXED Font style not parsed correctly from text blocks if no `<p>` tag is present.
+* FIXED Escaped HTML visible on the licenses page.
+
+= 4.2.6 (2025-10-28) =
 * ADDED Frequency limits for triggers.
 * ADDED Batch scheduling for adding contacts to flows.
 * ADDED Support for `litespeed_finish_request()` in the `gh-cron.php` file.

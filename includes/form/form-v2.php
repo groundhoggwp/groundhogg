@@ -1911,7 +1911,7 @@ class Form_v2 extends Step {
 		$turnstile = get_array_var( $config, 'turnstile', [] );
 		$button    = get_array_var( $config, 'button', [] );
 
-		if ( isset_not_empty( $recaptcha, 'enabled' ) && is_recaptcha_enabled() && get_option( 'gh_recaptcha_version' ) === 'v2' ) {
+		if ( isset_not_empty( $recaptcha, 'enabled' ) && is_recaptcha_enabled() ) {
 			$html .= $this->render_field( $recaptcha );
 		}
 

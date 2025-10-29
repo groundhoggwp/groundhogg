@@ -621,7 +621,7 @@ abstract class Extension {
 		$expires = $this->get_expiry() ? sprintf( esc_html__( 'expires on %1$s', 'groundhogg' ), html()->e('abbr', [ 'title' => $this->get_expiry() ], esc_html( $this->get_expiry() ) ) ) : esc_html__( 'never expires', 'groundhogg' );
 
 		/* translators: 1: license status (valid/invalid), 2: expiry string */
-		return sprintf( esc_html__( 'Your license is %1$s and %2$s.', 'groundhogg' ), bold_it( $status ), esc_html( $expires ) );
+		return sprintf( esc_html__( 'Your license is %1$s and %2$s.', 'groundhogg' ), bold_it( $status ), $expires );
 	}
 
 	/**

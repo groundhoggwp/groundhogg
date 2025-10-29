@@ -7423,7 +7423,7 @@
   // Register the text block
   registerBlock('text', 'Text', {
     attributes: {
-      p: el  => parseFontStyleFromTag(el, 'p'),
+      p: el  => parseFontStyleFromTag(el, 'p,li'),
       a: el  => parseFontStyleFromTag(el, 'a'),
       h1: el => parseFontStyleFromTag(el, 'h1'),
       h2: el => parseFontStyleFromTag(el, 'h2'),
