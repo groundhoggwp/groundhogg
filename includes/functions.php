@@ -3458,22 +3458,11 @@ function add_managed_rewrite_rule( $regex = '', $query = '', $after = 'top' ) {
 		$query = $ahead . $query;
 	}
 
-	if ( strpos( $regex, '^' . $managed_page_name ) !== 0 ) {
-		$regex = '^' . $managed_page_name . '/' . $regex;
+	if ( ! str_starts_with( $regex, '^' . $managed_page_name ) ) {
+		$regex = '^' . $managed_page_name . '/' . ltrim( $regex );
 	}
 
 	add_rewrite_rule( $regex, $query, $after );
-}
-
-/**
- * @deprecated since 2.0.9.2
- *
- * @param string $string
- *
- * @return string
- */
-function managed_rewrite_rule( $string = '' ) {
-	return sprintf( 'index.php?pagename=%s&', get_managed_page_name() ) . $string;
 }
 
 /**
@@ -5617,12 +5606,18 @@ function handle_ajax_user_meta_picker() {
 	}
 
 	$search = sanitize_text_field( get_post_var( 'term' ) );
+    $cache_key = 'ump/' . $search;
+	$keys = wp_cache_get( $cache_key, 'groundhogg/pickers', false, $found );
 
-	global $wpdb;
+	if ( ! $found ) {
+		global $wpdb;
 
-	$keys = $wpdb->get_col(
-		"SELECT DISTINCT meta_key FROM {$wpdb->usermeta} WHERE `meta_key` RLIKE '{$search}' ORDER BY meta_key ASC"
-	);
+		$keys = $wpdb->get_col(
+			$wpdb->prepare( "SELECT DISTINCT meta_key FROM {$wpdb->usermeta} WHERE `meta_key` RLIKE %s ORDER BY meta_key ASC", $search )
+		);
+
+        wp_cache_set( $cache_key, $keys, 'groundhogg/pickers', HOUR_IN_SECONDS );
+	}
 
 	$response = array_map( function ( $key ) {
 		return [
@@ -5655,14 +5650,20 @@ function handle_ajax_meta_picker() {
 	}
 
 	$search = sanitize_text_field( get_post_var( 'term' ) );
+	$cache_key = 'cmp/' . $search;
+	$keys = wp_cache_get( $cache_key, 'groundhogg/pickers', false, $found );
 
-	$table = get_db( 'contactmeta' );
+    if ( ! $found ) {
+	    $table = db()->contactmeta;
 
-	global $wpdb;
+	    global $wpdb;
 
-	$keys = $wpdb->get_col(
-		"SELECT DISTINCT meta_key FROM {$table->get_table_name()} WHERE `meta_key` RLIKE '{$search}' ORDER BY meta_key ASC"
-	);
+	    $keys = $wpdb->get_col(
+		    $wpdb->prepare( "SELECT DISTINCT meta_key FROM {$table->get_table_name()} WHERE `meta_key` RLIKE %s ORDER BY meta_key ASC", $search )
+	    );
+
+        wp_cache_set( $cache_key, $keys, 'groundhogg/pickers', HOUR_IN_SECONDS );
+    }
 
 	$response = array_map( function ( $key ) {
 		return [
@@ -5697,13 +5698,20 @@ function handle_ajax_meta_value_picker() {
 	$search   = sanitize_text_field( get_post_var( 'term' ) );
 	$meta_key = sanitize_text_field( get_post_var( 'meta_key' ) );
 
-	$table = get_db( 'contactmeta' );
+	$cache_key = 'cmp/' . $meta_key . '/' . $search;
+	$keys = wp_cache_get( $cache_key, 'groundhogg/pickers', false, $found );
 
-	global $wpdb;
+    if ( ! $found ){
+	    $table = db()->contactmeta;
 
-	$keys = $wpdb->get_col(
-		"SELECT DISTINCT meta_value FROM {$table->get_table_name()} WHERE `meta_key` = '{$meta_key}' AND `meta_value` RLIKE '{$search}' ORDER BY meta_value ASC"
-	);
+	    global $wpdb;
+
+	    $keys = $wpdb->get_col(
+		    $wpdb->prepare( "SELECT DISTINCT meta_value FROM {$table->get_table_name()} WHERE `meta_key` = %s AND `meta_value` RLIKE %s ORDER BY meta_value ASC", $meta_key, $search )
+	    );
+
+        wp_cache_set( $cache_key, $keys, 'groundhogg/pickers', HOUR_IN_SECONDS );
+    }
 
 	$response = array_map( function ( $key ) {
 		return [
@@ -6476,7 +6484,7 @@ function get_default_field_label( $field = '' ) {
  *
  * @return mixed[]
  */
-function array_map_to_class( &$array, $class ) {
+function array_map_to_class( array &$array, string $class ) {
 	foreach ( $array as &$mixed ) {
 
 		if ( is_a( $mixed, $class ) ) {
@@ -6497,7 +6505,7 @@ function array_map_to_class( &$array, $class ) {
  *
  * @return mixed[]
  */
-function map_to_class( $array, $class ) {
+function map_to_class( array $array, string $class ) {
 	foreach ( $array as &$mixed ) {
 
 		if ( is_a( $mixed, $class ) ) {
@@ -6513,9 +6521,11 @@ function map_to_class( $array, $class ) {
 /**
  * @param $array
  *
+ * @depreacted use `as_contacts()` instead
+ *
  * @return Contact[]
  */
-function array_map_to_contacts( &$array ) {
+function array_map_to_contacts( array &$array ) {
 	return array_map_to_class( $array, Contact::class );
 }
 
@@ -6524,8 +6534,50 @@ function array_map_to_contacts( &$array ) {
  *
  * @return Step[]
  */
-function array_map_to_step( &$array ) {
+function as_contacts( array $array ) {
+	return map_to_class( $array, Contact::class );
+}
+
+/**
+ * @param $array
+ *
+ * @depreacted use `as_steps()` instead
+ *
+ * @return Step[]
+ */
+function array_map_to_step( array &$array ) {
 	return array_map_to_class( $array, Step::class );
+}
+
+/**
+ * @param $array
+ *
+ * @return Step[]
+ */
+function as_steps( array $array ) {
+	return map_to_class( $array, Step::class );
+}
+
+/**
+ * @param $array
+ *
+ * @return Event_Queue_Item[]
+ */
+function as_event_queue_items( array $array ) {
+	return map_to_class( $array, Event_Queue_Item::class );
+}
+
+function as_class( array $array, string $class ) {
+	return map_to_class( $array, $class );
+}
+
+/**
+ * @param $array
+ *
+ * @return Event[]
+ */
+function as_events( array $array ) {
+	return map_to_class( $array, Event::class );
 }
 
 /**
