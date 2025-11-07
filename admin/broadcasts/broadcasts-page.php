@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Broadcast;
+use Groundhogg\Campaign;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 use function Groundhogg\admin_page_url;
@@ -12,6 +13,7 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\is_sms_plugin_active;
+use function Groundhogg\map_to_class;
 use function Groundhogg\notices;
 use function Groundhogg\verify_admin_ajax_nonce;
 
@@ -148,6 +150,45 @@ class Broadcasts_Page extends Admin_Page {
 
         /* translators: %d: the number of broadcasts getting cancelled */
 		$this->add_notice( 'cancelled', sprintf( _nx( '%d broadcasts cancelled', '%d broadcast cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+		return false;
+	}
+
+	public function process_add_campaigns() {
+		if ( ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+        $campaigns = wp_parse_id_list( get_post_var( 'bulk_campaigns' ) );
+        $campaigns = map_to_class( $campaigns, Campaign::class );
+		foreach ( $this->get_items() as $id ) {
+			$broadcast = new Broadcast( $id );
+            foreach ( $campaigns as $campaign ) {
+                $broadcast->create_relationship( $campaign );
+            }
+
+		}
+
+		$this->add_notice( 'updated', __( 'Broadcast campaigns updated!', 'groundhogg' ) );
+
+		return false;
+	}
+
+	public function process_remove_campaigns() {
+		if ( ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$campaigns = wp_parse_id_list( get_post_var( 'bulk_campaigns' ) );
+		$campaigns = map_to_class( $campaigns, Campaign::class );
+		foreach ( $this->get_items() as $id ) {
+			$broadcast = new Broadcast( $id );
+			foreach ( $campaigns as $campaign ) {
+				$broadcast->delete_relationship( $campaign );
+			}
+		}
+
+		$this->add_notice( 'updated', __( 'Broadcast campaigns updated!', 'groundhogg' ) );
 
 		return false;
 	}

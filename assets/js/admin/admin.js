@@ -790,4 +790,67 @@
     window.open(e.currentTarget.dataset.ghHref, '_self')
   })
 
+  function handleCampaignBulkEdit (e) {
+    let bulkActionSelect = e.currentTarget
+
+    // remove current element
+    let current = document.getElementById('bulk-edit-campaigns')
+
+    if ( current ) {
+      current.remove()
+    }
+
+    if (bulkActionSelect.value !== 'add_campaigns' && bulkActionSelect.value !== 'remove_campaigns') {
+      return
+    }
+
+    const State = Groundhogg.useState({
+      campaigns: [],
+    }, this)
+
+    bulkActionSelect.insertAdjacentElement('afterend', MakeEl.Div({ id: 'bulk-edit-campaigns', style: { float: 'left', marginRight: '5px' } }, morph => MakeEl.Fragment([
+      MakeEl.Input({type: 'hidden', name: 'bulk_campaigns', value: State.campaigns.map( c => c.id ).join(',') }),
+      MakeEl.ItemPicker({
+        id          : 'bulk-select-campaigns',
+        noneSelected: 'Select campaigns...',
+        tags        : true,
+        selected    : State.campaigns,
+        fetchOptions: async (search) => {
+          let campaigns = await Groundhogg.stores.campaigns.fetchItems({
+            search,
+            limit: 20,
+          })
+
+          return campaigns.map(({
+            ID,
+            data,
+          }) => ( {
+            id  : ID,
+            text: data.name,
+          } ))
+        },
+        createOption: async (id) => {
+          let campaign = await Groundhogg.stores.campaigns.create({
+            data: {
+              name: id,
+            },
+          })
+
+          return {
+            id  : campaign.ID,
+            text: campaign.data.name,
+          }
+        },
+        onChange    : items => {
+          State.set({ campaigns: items })
+          morph()
+        },
+      }),
+    ])))
+  }
+
+  $(()=>{
+    $('#bulk-action-selector-top, #bulk-action-selector-bottom').on('change', handleCampaignBulkEdit)
+  })
+
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

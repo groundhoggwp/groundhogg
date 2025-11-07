@@ -500,15 +500,17 @@ class Broadcasts_Table extends WP_List_Table {
 
 		$actions = [];
 
-		switch ( $this->get_view() ) {
-			default:
-			case 'scheduled':
-				$actions['cancel'] = _x( 'Cancel', 'List table bulk action', 'groundhogg' );
-				break;
-			case 'cancelled':
-			case 'sent':
-				$actions['delete'] = _x( 'Delete', 'List table bulk action', 'groundhogg' );
-				break;
+		if ( in_array( $this->get_view(), [ 'scheduled', 'pending', 'sending' ] ) ) {
+			$actions['cancel'] = _x( 'Cancel', 'List table bulk action', 'groundhogg' );
+		}
+
+		if ( in_array( $this->get_view(), [ 'scheduled', 'pending', 'sending', 'sent' ] ) ) {
+			$actions['add_campaigns'] = _x( 'Add to campaign', 'List table bulk action', 'groundhogg' );
+			$actions['remove_campaigns'] = _x( 'Remove from campaign', 'List table bulk action', 'groundhogg' );
+		}
+
+		if ( in_array( $this->get_view(), [ 'cancelled', 'sent' ] ) ) {
+			$actions['delete'] = _x( 'Delete', 'List table bulk action', 'groundhogg' );
 		}
 
 		return apply_filters( 'wpgh_broadcast_bulk_actions', $actions );

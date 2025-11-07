@@ -295,6 +295,8 @@ class Emails_Table extends Table {
 
 		switch ( $this->get_view() ) {
 			default:
+				$actions['add_campaigns']    = _x( 'Add to campaign', 'List table bulk action', 'groundhogg' );
+				$actions['remove_campaigns'] = _x( 'Remove from campaign', 'List table bulk action', 'groundhogg' );
 				$actions['trash'] = _x( 'Trash', 'List table bulk action', 'groundhogg' );
 				break;
 			case 'trash':

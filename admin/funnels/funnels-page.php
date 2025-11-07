@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Campaign;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
@@ -19,7 +20,6 @@ use function Groundhogg\db;
 use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\enqueue_groundhogg_modal;
-use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
@@ -29,6 +29,7 @@ use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\map_to_class;
 use function Groundhogg\notices;
 use function Groundhogg\one_of;
 use function Groundhogg\use_edit_lock;
@@ -300,6 +301,45 @@ class Funnels_Page extends Admin_Page {
 	}
 
 	public function help() {
+	}
+
+	public function process_add_campaigns() {
+		if ( ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$campaigns = wp_parse_id_list( get_post_var( 'bulk_campaigns' ) );
+		$campaigns = map_to_class( $campaigns, Campaign::class );
+		foreach ( $this->get_items() as $id ) {
+			$flow = new Funnel( $id );
+			foreach ( $campaigns as $campaign ) {
+				$flow->create_relationship( $campaign );
+			}
+
+		}
+
+		$this->add_notice( 'updated', __( 'Flow campaigns updated!', 'groundhogg' ) );
+
+		return false;
+	}
+
+	public function process_remove_campaigns() {
+		if ( ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$campaigns = wp_parse_id_list( get_post_var( 'bulk_campaigns' ) );
+		$campaigns = map_to_class( $campaigns, Campaign::class );
+		foreach ( $this->get_items() as $id ) {
+			$flow = new Funnel( $id );
+			foreach ( $campaigns as $campaign ) {
+				$flow->delete_relationship( $campaign );
+			}
+		}
+
+		$this->add_notice( 'updated', __( 'Flow campaigns updated!', 'groundhogg' ) );
+
+		return false;
 	}
 
 	public function process_delete() {

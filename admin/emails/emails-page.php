@@ -4,13 +4,17 @@ namespace Groundhogg\Admin\Emails;
 
 use Groundhogg;
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Campaign;
 use Groundhogg\Email;
+use Groundhogg\Funnel;
 use Groundhogg_Email_Services;
 use WP_Error;
 use function Groundhogg\get_db;
+use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\map_to_class;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -187,6 +191,45 @@ class Emails_Page extends Admin_Page {
 				'target' => '_self',
 			],
 		];
+	}
+
+	public function process_add_campaigns() {
+		if ( ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$campaigns = wp_parse_id_list( get_post_var( 'bulk_campaigns' ) );
+		$campaigns = map_to_class( $campaigns, Campaign::class );
+		foreach ( $this->get_items() as $id ) {
+			$email = new Email( $id );
+			foreach ( $campaigns as $campaign ) {
+				$email->create_relationship( $campaign );
+			}
+
+		}
+
+		$this->add_notice( 'updated', __( 'Email campaigns updated!', 'groundhogg' ) );
+
+		return false;
+	}
+
+	public function process_remove_campaigns() {
+		if ( ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$campaigns = wp_parse_id_list( get_post_var( 'bulk_campaigns' ) );
+		$campaigns = map_to_class( $campaigns, Campaign::class );
+		foreach ( $this->get_items() as $id ) {
+			$email = new Email( $id );
+			foreach ( $campaigns as $campaign ) {
+				$email->delete_relationship( $campaign );
+			}
+		}
+
+		$this->add_notice( 'updated', __( 'Email campaigns updated!', 'groundhogg' ) );
+
+		return false;
 	}
 
 	/**

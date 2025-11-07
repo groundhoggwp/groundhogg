@@ -253,6 +253,8 @@ class Funnels_Table extends Table {
 					'deactivate' => _x( 'Deactivate', 'List table bulk action', 'groundhogg' ),
 					'archive'    => _x( 'Archive', 'List table bulk action', 'groundhogg' ),
 					'export'     => _x( 'Export', 'List table bulk action', 'groundhogg' ),
+					'add_campaigns'    => _x( 'Add to campaign', 'List table bulk action', 'groundhogg' ),
+					'remove_campaigns' => _x( 'Remove from campaign', 'List table bulk action', 'groundhogg' ),
 				];
 				break;
 
@@ -261,6 +263,8 @@ class Funnels_Table extends Table {
 					'activate' => _x( 'Activate', 'List table bulk action', 'groundhogg' ),
 					'archive'  => _x( 'Archive', 'List table bulk action', 'groundhogg' ),
 					'export'   => _x( 'Export', 'List table bulk action', 'groundhogg' ),
+					'add_campaigns'    => _x( 'Add to campaign', 'List table bulk action', 'groundhogg' ),
+					'remove_campaigns' => _x( 'Remove from campaign', 'List table bulk action', 'groundhogg' ),
 				];
 				break;
 			case 'archived':
