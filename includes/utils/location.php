@@ -575,7 +575,7 @@ class Location {
 				return false;
 			}
 
-			if ( @strlen( trim( $ip_data->geoplugin_countryCode ) ) == 2 ) {
+			if ( @strlen( trim( $ip_data->location->country_code ) ) == 2 ) {
 				switch ( $purpose ) {
 					case 'raw':
 						$output = $ip_data;
@@ -584,7 +584,6 @@ class Location {
 						$output = array(
 							"city"           => @$ip_data->location->city,
 							"region"         => @$ip_data->location->state,
-//							"region_code"    => @$ip_data->location->,
 							"country"        => @$ip_data->location->country,
 							"country_code"   => @$ip_data->location->country_code,
 							"time_zone"      => @$ip_data->location->timezone,
