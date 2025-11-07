@@ -105,6 +105,8 @@ class Email extends Base_Object_With_Meta {
 			$this->title = $subject;
 		}
 
+		$this->is_template = boolval( $this->is_template );
+
 		$this->set_from_select();
 
 		// Maybe update from the meta message type
