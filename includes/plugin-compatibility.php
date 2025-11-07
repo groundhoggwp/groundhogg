@@ -37,6 +37,26 @@ class Plugin_Compatibility {
 		add_action( 'wp_ajax_gh_process_bg_task', [ $this, 'kill_qm'] );
 		add_action( 'groundhogg/background_tasks', [ $this, 'kill_qm'] );
 		add_action( 'groundhogg/event_queue/before_process', [ $this, 'kill_qm'] );
+
+		// Polylang
+		add_action( 'generate_rewrite_rules', [ $this, 'groundhogg_polylang_rules' ] );
+		add_filter( 'pll_rewrite_rules', fn( $rules ) => array_merge( $rules, [ 'groundhogg' ] )  );
+	}
+
+	/**
+	 * Handles polylang's translation filters for Groundhogg endpoints
+	 *
+	 * @param  \WP_Rewrite  $wp_rewrite
+	 *
+	 * @return void
+	 */
+	function groundhogg_polylang_rules( \WP_Rewrite $wp_rewrite ) {
+		// get the groundhogg rewrite rules
+		$rules = array_filter( $wp_rewrite->rules, fn( $index, $rule ) => str_starts_with( $rule, '^' . get_managed_page_name() ), ARRAY_FILTER_USE_BOTH );
+		// pass them to Polylang filters
+		$rules = apply_filters( 'groundhogg_rewrite_rules', $rules );
+		// add them back into the main rules array
+		$wp_rewrite->rules = array_merge( $rules, $wp_rewrite->rules );
 	}
 
 	/**
