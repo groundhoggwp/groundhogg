@@ -112,12 +112,6 @@ class Preferences {
 			return $template;
 		}
 
-		$page = get_query_var( 'subpage' );
-
-		if ( $page !== 'preferences' ) {
-			return $template;
-		}
-
 		$loader       = Plugin::$instance->rewrites->get_template_loader();
 		$new_template = $loader->get_template_part( 'preferences', '', false );
 
