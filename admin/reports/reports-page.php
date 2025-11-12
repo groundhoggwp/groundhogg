@@ -285,7 +285,9 @@ class Reports_Page extends Tabbed_Admin_Page {
 				'table_broadcast_stats',
 				'table_broadcast_link_clicked',
 			] : [
-				'table_all_broadcasts_performance'
+				'table_all_broadcasts_performance',
+				'total_emails_sent',
+				'num_broadcasts_sent',
 			],
 			'forms'      => [
 				'table_form_activity',

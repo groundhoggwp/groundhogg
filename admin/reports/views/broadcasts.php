@@ -35,12 +35,23 @@ if ( ! $has_sent_broadcasts ):
 	<?php include __DIR__ . '/broadcast-single.php' ?>
 <?php else: ?>
     <div class="display-grid gap-20">
-        <div class="gh-panel  span-3">
+        <div class="gh-panel span-3">
             <div class="inside">
                 <p><b><?php esc_html_e( 'Filter by campaign', 'groundhogg' ) ?></b></p>
                 <div id="report-campaign-filter"></div>
             </div>
         </div>
+
+	    <?php quick_stat_report( [
+		    'id'    => 'num_broadcasts_sent',
+		    'title' => esc_html__( 'Broadcasts Sent', 'groundhogg' )
+	    ] ); ?>
+
+	    <?php quick_stat_report( [
+		    'id'    => 'total_emails_sent',
+		    'title' => esc_html__( 'Emails Sent', 'groundhogg' )
+	    ] ); ?>
+
         <div class="gh-panel span-12">
             <div class="gh-panel-header">
                 <h2 class="title"><?php esc_html_e( 'All Broadcasts Performance', 'groundhogg' ); ?></h2>

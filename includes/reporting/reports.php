@@ -13,6 +13,7 @@ use Groundhogg\Reporting\New_Reports\Chart_New_Contacts;
 use Groundhogg\Reporting\New_Reports\Chart_Unsub_Reasons;
 use Groundhogg\Reporting\New_Reports\Email_Click_Rate;
 use Groundhogg\Reporting\New_Reports\Email_Open_Rate;
+use Groundhogg\Reporting\New_Reports\Num_Broadcasts_Sent;
 use Groundhogg\Reporting\New_Reports\Table_All_Broadcasts_Performance;
 use Groundhogg\Reporting\New_Reports\Table_All_Funnel_Emails_Performance;
 use Groundhogg\Reporting\New_Reports\Table_All_Funnels_Performance;
@@ -313,6 +314,10 @@ class Reports {
 			[
 				'id'       => 'table_all_funnel_emails_performance',
 				'callback' => [ $this, 'table_all_funnel_emails_performance' ]
+			],
+			[
+				'id'       => 'num_broadcasts_sent',
+				'callback' => [ $this, 'num_broadcasts_sent' ]
 			]
 		];
 
@@ -817,6 +822,12 @@ class Reports {
 
 	public function table_list_engagement() {
 		$report = new Table_List_Engagement( $this->start, $this->end );
+
+		return $report->get_data();
+	}
+
+	public function num_broadcasts_sent() {
+		$report = new Num_Broadcasts_Sent( $this->start, $this->end );
 
 		return $report->get_data();
 	}
