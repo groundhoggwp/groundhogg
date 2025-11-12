@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.6.1
+Stable tag: 4.2.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,15 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.7 (2025-11-12) =
+* ADDED Built-in support for Polylang for the preferences page.
+* ADDED Bulk editing campaigns for emails, broadcasts, and flows.
+* ADDED New broadcasts reports. Broadcasts sent and total broadcast emails sent.
+* TWEAKED More space between preview text and content.
+* SECURITY Patched vulnerability. Credit to WordFence for practicing responsible disclosure.
+* FIXED Email template toggle showing enabled even if disabled.
+* FIXED Broken GeoIP reference.
 
 = 4.2.6.1 (2025-10-29) =
 * FIXED Recaptcha field missing in rendered form if the recaptcha version is v3
