@@ -12,13 +12,11 @@ do_action( 'groundhogg/templates/email/preview-text/before' );
 
 if ( $email->get_pre_header() ):
 	?>
-	<div style="display: none; max-height: 0px; overflow: hidden;">
-		<?php echo esc_html( $email->get_merged_pre_header() ) ?>
-	</div>
-	<div style="display: none; max-height: 0px; overflow: hidden;">
-		<?php
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- string literal HTML
-        echo str_repeat( '&#847; &zwnj; &nbsp; &#8199; &shy;', 5 ); ?>
+	<div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0">
+		<?php echo esc_html( $email->get_merged_pre_header() );
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- string literal HTML
+		echo str_repeat( '&nbsp;&zwnj;&ZeroWidthSpace;&zwj;&lrm;&rlm;&#xFEFF;', 100 ); ?>
 	</div>
 <?php
 endif;
