@@ -564,6 +564,22 @@ function get_url_param( $key = '', $default = false ) {
 }
 
 /**
+ * Retrieve a URL param from the referrer
+ *
+ * @param $key string
+ * @param $default mixed
+ *
+ * @return mixed
+ */
+function get_referrer_url_param($key = '', $default = false ) {
+
+    $referrer = wpgh_get_referer();
+    wp_parse_str( wp_parse_url( $referrer, PHP_URL_QUERY ), $query );
+
+	return get_array_var( $query, $key, $default );
+}
+
+/**
  * base64 encode safe for url
  *
  * @param $stuff

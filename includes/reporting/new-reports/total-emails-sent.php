@@ -2,10 +2,12 @@
 
 namespace Groundhogg\Reporting\New_Reports;
 
+use Groundhogg\Broadcast;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
+use function Groundhogg\get_referrer_url_param;
 use function Groundhogg\get_url_var;
 
 class Total_Emails_Sent extends Base_Quick_Stat {
@@ -91,8 +93,9 @@ class Total_Emails_Sent extends Base_Quick_Stat {
 		            ->greaterThanEqualTo( 'time', $start )
 		            ->lessThanEqualTo( 'time', $end );
 
-		if ( get_url_var( 'tab' ) === 'broadcasts' ){
+		if ( get_referrer_url_param( 'tab' ) === 'broadcasts' ){
 			$eventsQuery->where()->equals( 'event_type', Event::BROADCAST );
+			$eventsQuery->where()->equals( 'funnel_id', Broadcast::FUNNEL_ID );
 		}
 
 		// filter results by campaign
