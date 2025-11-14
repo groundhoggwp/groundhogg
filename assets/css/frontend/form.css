@@ -53,7 +53,7 @@
 .gh-form-wrapper form.simple input[type=search][disabled],
 .gh-form-wrapper form.simple input[type=tel][disabled],
 .gh-form-wrapper form.simple input[type=url][disabled] {
-  background-color: #e6e6e6;
+  background-color: rgb(230, 230, 230);
   opacity: 0.3;
 }
 .gh-form-wrapper form.simple textarea[readonly],
@@ -69,7 +69,7 @@
 .gh-form-wrapper form.simple input[type=search][readonly],
 .gh-form-wrapper form.simple input[type=tel][readonly],
 .gh-form-wrapper form.simple input[type=url][readonly] {
-  background-color: #e6e6e6;
+  background-color: rgb(230, 230, 230);
 }
 .gh-form-wrapper form.simple input[type=button],
 .gh-form-wrapper form.simple input[type=submit],
@@ -145,7 +145,7 @@
 .gh-form-wrapper form.modern input[type=search][disabled],
 .gh-form-wrapper form.modern input[type=tel][disabled],
 .gh-form-wrapper form.modern input[type=url][disabled] {
-  background-color: #e6e6e6;
+  background-color: rgb(230, 230, 230);
   opacity: 0.3;
 }
 .gh-form-wrapper form.modern textarea[readonly],
@@ -161,7 +161,7 @@
 .gh-form-wrapper form.modern input[type=search][readonly],
 .gh-form-wrapper form.modern input[type=tel][readonly],
 .gh-form-wrapper form.modern input[type=url][readonly] {
-  background-color: #e6e6e6;
+  background-color: rgb(230, 230, 230);
 }
 .gh-form-wrapper form.modern input[type=button],
 .gh-form-wrapper form.modern input[type=submit],
@@ -242,7 +242,7 @@
 .gh-form-wrapper form.classic input[type=search][disabled],
 .gh-form-wrapper form.classic input[type=tel][disabled],
 .gh-form-wrapper form.classic input[type=url][disabled] {
-  background-color: #e6e6e6;
+  background-color: rgb(230, 230, 230);
   opacity: 0.3;
 }
 .gh-form-wrapper form.classic textarea[readonly],
@@ -258,14 +258,14 @@
 .gh-form-wrapper form.classic input[type=search][readonly],
 .gh-form-wrapper form.classic input[type=tel][readonly],
 .gh-form-wrapper form.classic input[type=url][readonly] {
-  background-color: #e6e6e6;
+  background-color: rgb(230, 230, 230);
 }
 .gh-form-wrapper form.classic input[type=button],
 .gh-form-wrapper form.classic input[type=submit],
 .gh-form-wrapper form.classic button[type=submit] {
   cursor: pointer;
   padding: 15px;
-  background-color: color-mix(in srgb, var(--gh-accent-color) 1%, rgba(255, 255, 255, 0.1));
+  background-color: color-mix(in srgb, var(--gh-accent-color) 25%, rgba(255, 255, 255, 0.1));
   color: color-mix(in srgb, var(--gh-accent-color) 50%, black);
   font-size: 18px;
   font-weight: bold;
@@ -392,7 +392,7 @@
   border-radius: 4px;
 }
 .gh-form-wrapper .gh-message-wrapper.gh-form-errors-wrapper {
-  color: #940e2e;
+  color: rgb(147.512195122, 14.487804878, 46.0975609756);
   background-color: rgba(233, 31, 79, 0.1);
   border-color: rgba(233, 31, 79, 0.5);
   margin-bottom: 20px;
@@ -436,7 +436,7 @@
   margin-top: 20px;
   padding: 20px;
   background: rgba(233, 31, 79, 0.1);
-  color: #080103;
+  color: rgb(8.1951219512, 0.8048780488, 2.5609756098);
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -462,7 +462,7 @@
   margin-top: 20px;
   padding: 20px;
   background: rgba(158, 206, 56, 0.1);
-  color: #040601;
+  color: rgb(4.2620967742, 5.6169354839, 1.3830645161);
   border-radius: 5px;
   display: flex;
   flex-direction: column;

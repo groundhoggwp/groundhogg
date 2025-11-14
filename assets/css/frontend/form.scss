@@ -246,7 +246,7 @@ $background-color: #F6F9FB;
       button[type='submit']{
         cursor: pointer;
         padding: 15px;
-        background-color: color-mix(in srgb, var(--gh-accent-color) 1%, rgba( 255, 255, 255, 0.1 ) );
+        background-color: color-mix(in srgb, var(--gh-accent-color) 25%, rgba( 255, 255, 255, 0.1 ) );
         //background-color: var(--gh-accent-color);
 
         color: color-mix(in srgb, var(--gh-accent-color) 50%, black );
