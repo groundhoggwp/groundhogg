@@ -882,6 +882,7 @@
           sort((a, b) => a.data.step_order - b.data.step_order)
       },
     }),
+    flows: this.funnels,
     steps: ObjectStore(Groundhogg.api.routes.v4.steps),
     emails: ObjectStore(Groundhogg.api.routes.v4.emails, {
       send (id, data) {
