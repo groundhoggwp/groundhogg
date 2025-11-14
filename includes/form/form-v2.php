@@ -1746,7 +1746,10 @@ class Form_v2 extends Step {
 	 * @return string
 	 */
 	public function get_shortcode() {
-		return sprintf( '[gh_form id="%d"]', $this->get_id() );
+		$theme       = $this->get_meta( 'theme' ) ?: 'default';
+		$accentColor = $this->get_meta( 'accent_color' ) ?: '#0073aa';
+
+		return sprintf( '[gh_form id="%d" theme="%s" accent_color="%s"]', $this->get_id(), $theme, $accentColor );
 	}
 
 	/**
@@ -2040,6 +2043,10 @@ class Form_v2 extends Step {
 			'ID'            => $this->get_id(),
 			'name'          => $this->get_name(),
 			'rendered'      => $this->shortcode(),
+			'settings' => [
+				'accentColor' => $this->get_meta( 'accent_color' ),
+				'theme'       => $this->get_meta( 'theme' ) ?: 'default'
+			],
 			'embed_methods' => [
 				'html'   => $this->get_html_embed_code(),
 				'iframe' => $this->get_iframe_embed_code(),
