@@ -19,8 +19,7 @@ class Blocks {
 	}
 
 	public function init_gutenberg() {
-//        include __DIR__ . '/gutenberg/gutenberg.php';
-		include __DIR__ . '/gutenberg/src/init.php';
+		include __DIR__ . '/gutenberg/bootstrap.php';
 	}
 
 	public function init_elementor_blocks() {

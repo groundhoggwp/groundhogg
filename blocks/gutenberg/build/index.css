@@ -1,0 +1,35 @@
+/*!****************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/editor.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************/
+/**
+ * The following styles get applied inside the editor only.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+.wp-block-groundhogg-forms .gh-form-shortcode-placeholder {
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 2em;
+  text-align: center;
+  color: #666;
+}
+.wp-block-groundhogg-forms .gh-form-shortcode-placeholder p:first-child {
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+.wp-block-groundhogg-forms .gh-form-shortcode-placeholder p:last-child {
+  margin-bottom: 0;
+  font-size: 0.9em;
+}
+.wp-block-groundhogg-forms .gh-form-shortcode-loading {
+  padding: 2em;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+.wp-block-groundhogg-forms .gh-form-shortcode-preview {
+  padding: 1em;
+}
+
+/*# sourceMappingURL=index.css.map*/

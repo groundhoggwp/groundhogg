@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "groundhogg/forms",
+  "version": "0.1.0",
+  "title": "Groundhogg Form Shortcode",
+  "category": "embed",
+  "icon": "forms",
+  "description": "Embed and render a Groundhogg form shortcode with customizable attributes",
+  "example": {
+    "attributes": {
+      "formId": "1",
+      "theme": "default",
+      "accentColor": "#0073aa"
+    }
+  },
+  "attributes": {
+    "formId": {
+      "type": "string",
+      "default": ""
+    },
+    "theme": {
+      "type": "string",
+      "default": "default"
+    },
+    "accentColor": {
+      "type": "string",
+      "default": "#0073aa"
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": true
+  },
+  "textdomain": "groundhogg",
+  "editorScript": "file:./index.js",
+  "editorStyle": [
+    "groundhogg-form",
+    "file:./index.css"
+  ],
+  "style": [
+    "groundhogg-form",
+    "file:./style-index.css"
+  ],
+  "render": "file:./render.php"
+}
