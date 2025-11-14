@@ -4374,7 +4374,7 @@
             },
             Toggle({
               id      : 'save-as-template',
-              checked : Boolean(is_template),
+              checked : is_template == 1,
               onChange: e => {
                 setEmailData({
                   is_template: e.target.checked,
@@ -7588,6 +7588,12 @@
         // separate support for li
         if (tag === 'p') {
           return `${ selector } p, ${ selector } li{${ fontStyle(style) }}`
+        }
+
+        // don't use fill here
+        if ( tag === 'a' ){
+          //language=CSS
+          return `${ selector } a{ ${objectToStyle(style)} }`
         }
 
         return `${ selector } ${ tag }{${ fontStyle(style) }}`
