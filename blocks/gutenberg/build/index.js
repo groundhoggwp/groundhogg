@@ -97,11 +97,8 @@ function Edit({
   // Fetch available forms
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
     setIsLoadingForms(true);
-    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
-      path: '/gh/v4/forms'
-    }).then(response => {
-      // Transform API response into options array
-      const formOptions = response.items.map(form => ({
+    window.Groundhogg.stores.forms.fetchItems().then(items => {
+      const formOptions = items.map(form => ({
         label: `${form.name} (#${form.ID})`,
         value: String(form.ID)
       }));
@@ -167,9 +164,14 @@ function Edit({
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Form', 'groundhogg'),
           value: formId,
           options: forms,
-          onChange: value => setAttributes({
-            formId: value
-          }),
+          onChange: value => {
+            const form = window.Groundhogg.stores.forms.get(parseInt(formId));
+            setAttributes({
+              formId: value,
+              accentColor: form.settings.accentColor,
+              theme: form.settings.theme
+            });
+          },
           help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Select the form to embed', 'groundhogg')
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
@@ -283,9 +285,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 let icon = window.MakeEl.htmlToReact(window.Groundhogg.element.icons.groundhogg);
-
-// console.log( icon )
-// icon = icon.props.children[1]
 
 /**
  * Every block starts by registering a new block type definition.
