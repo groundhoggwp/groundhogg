@@ -133,6 +133,11 @@
    * @returns {*}
    */
   function domElementToReact (element, props = {}) {
+
+    if ( element.nodeType !== Node.ELEMENT_NODE ) {
+      return element.nodeValue
+    }
+
     // Get the tag name
     let tagName = element.tagName.toLowerCase()
 
