@@ -101,22 +101,25 @@ abstract class Benchmark extends Funnel_Step {
 			}
 
 			if ( is_object( $value ) ) {
+				try {
+					if ( property_exists( $value, 'ID' ) ) {
+						$args[ $key ] = $value->ID;
+						continue;
+					}
 
-				if ( property_exists( $value, 'ID' ) ) {
-					$args[ $key ] = $value->ID;
+					if ( property_exists( $value, 'id' ) ) {
+						$args[ $key ] = $value->id;
+						continue;
+					}
+
+					if ( method_exists( $value, 'get_id' ) ) {
+						$args[ $key ] = $value->get_id();
+						continue;
+					}
+				} catch ( \Throwable $e ) {
+					// Skip this value if accessing properties or methods fails
 					continue;
 				}
-
-				if ( property_exists( $value, 'id' ) ) {
-					$args[ $key ] = $value->id;
-					continue;
-				}
-
-				if ( method_exists( $value, 'get_id' ) ) {
-					$args[ $key ] = $value->get_id();
-					continue;
-				}
-
 			}
 		}
 
