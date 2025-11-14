@@ -54,10 +54,12 @@ class Shortcodes {
 			'class'   => '',
 			'id'      => 0,
 			'fill'    => false,
-			'contact' => null
+			'contact'     => null,
+			'theme'       => '',
+			'accent-color' => ''
 		], $atts );
 
-		$step = new Step( $atts['id'] );
+		$step = new Step( absint( $atts['id'] ) );
 
 		if ( $step->type_is( 'form_fill' ) ) {
 			$form = new Form( $atts );

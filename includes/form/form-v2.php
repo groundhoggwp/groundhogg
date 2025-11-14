@@ -33,6 +33,7 @@ use function Groundhogg\is_recaptcha_enabled;
 use function Groundhogg\is_turnstile_enabled;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\managed_page_url;
+use function Groundhogg\one_of;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\process_events;
 use function Groundhogg\remote_post_json;
@@ -1658,6 +1659,13 @@ class Form_v2 extends Step {
 	protected $contact = false;
 
 	/**
+	 * Overrides provided by the shortcode
+	 *
+	 * @var array
+	 */
+	protected $shortcode_attrs = [];
+
+	/**
 	 * Manager constructor.
 	 */
 	public function __construct( $atts ) {
@@ -1673,7 +1681,9 @@ class Form_v2 extends Step {
 			'class'   => '',
 			'id'      => 0,
 			'contact' => 0,
-			'fill'    => false
+			'fill'         => false,
+			'accent-color' => '',
+			'theme'        => ''
 		], $atts );
 
 		// set the funnel
@@ -1708,6 +1718,8 @@ class Form_v2 extends Step {
 		if ( get_url_var( 'preview' ) && current_user_can( 'edit_funnels' ) ) {
 			$this->merge_changes();
 		}
+
+		$this->shortcode_attrs = $atts;
 	}
 
 	/**
@@ -1972,8 +1984,10 @@ class Form_v2 extends Step {
 			'data-id' => $this->get_id(),
 		];
 
-		$theme        = $this->get_meta( 'theme' );
-		$accent_color = $this->get_meta( 'accent_color' );
+		$theme = one_of( $this->shortcode_attrs['theme'] ?: $this->get_meta( 'theme' ), [ 'default', 'simple', 'modern', 'classic' ] );
+		$accent_color = sanitize_hex_color( $this->shortcode_attrs[ 'accent-color' ] ?: $this->get_meta( 'accent_color' ) );
+
+//		$accent_color = $this->shortcode_attrs['accent-color'];
 
 		if ( ! $accent_color ) {
 			$accent_color = '#000000'; // default to black
