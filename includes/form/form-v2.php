@@ -1928,10 +1928,12 @@ class Form_v2 extends Step {
 
 		if ( isset_not_empty( $recaptcha, 'enabled' ) && is_recaptcha_enabled() ) {
 			$html .= $this->render_field( $recaptcha );
+			wp_enqueue_script( 'groundhogg-google-recaptcha' );
 		}
 
 		if ( isset_not_empty( $turnstile, 'enabled' ) && is_turnstile_enabled() ) {
 			$html .= $this->render_field( $turnstile );
+			wp_enqueue_script( 'cf-turnstile' );
 		}
 
 		$html .= $this->render_field( $button );

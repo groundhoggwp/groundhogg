@@ -125,13 +125,13 @@ class Scripts {
 				'site_key' => $site_key
 			] );
 
-			$form_v2_dependencies[] = 'google-recaptcha';
+//			$form_v2_dependencies[] = 'google-recaptcha';
 			$form_dependencies[]    = 'groundhogg-google-recaptcha';
 		}
 
 		if ( is_turnstile_enabled() ){
 			wp_register_script( 'cf-turnstile', 'https://challenges.cloudflare.com/turnstile/v0/api.js' );
-			$form_v2_dependencies[] = 'cf-turnstile';
+//			$form_v2_dependencies[] = 'cf-turnstile';
 		}
 
 		wp_register_script( 'groundhogg-ajax-form', GROUNDHOGG_ASSETS_URL . 'js/frontend/ajax-form' . $dot_min . '.js', $form_dependencies, GROUNDHOGG_VERSION, true );
