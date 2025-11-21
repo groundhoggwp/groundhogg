@@ -2435,6 +2435,101 @@
   ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_date', 'Current Date', 'date', formatDate ))
   ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_time', 'Current Time', 'time', ( time ) => formatTime(`2000-01-01T${time}`) ))
 
+  const dayList = {
+    0: __('Sunday'),
+    1: __('Monday'),
+    2: __('Tuesday'),
+    3: __('Wednesday'),
+    4: __('Thursday'),
+    5: __('Friday'),
+    6: __('Saturday'),
+  }
+
+  ContactFilterRegistry.registerFilter(createFilter('day_of_week', 'Day of Week', 'date', {
+    edit   : ({
+      days = [],
+      updateFilter,
+    }) => {
+
+      return ItemPicker({
+        id          : 'days-of-week-picker',
+        noneSelected: 'Select a day',
+        fetchOptions: async (search) => assoc2array(dayList).filter(option => option.text.match(new RegExp(search, 'i'))),
+        selected    : days.map(day => ( {
+          id  : day,
+          text: dayList[day],
+        } )),
+        onChange    : items => {
+          updateFilter({
+            days: items.map(item => item.id),
+          })
+        },
+      })
+
+    },
+    display: ({ days = [] }) => sprintf(__('Today is a %s'), orList(days.map(day => bold(dayList[day])))),
+  }))
+
+  const dateList = {
+    1 : __('1st'),
+    2 : __('2nd'),
+    3 : __('3rd'),
+    4 : __('4th'),
+    5 : __('5th'),
+    6 : __('6th'),
+    7 : __('7th'),
+    8 : __('8th'),
+    9 : __('9th'),
+    10: __('10th'),
+    11: __('11th'),
+    12: __('12th'),
+    13: __('13th'),
+    14: __('14th'),
+    15: __('15th'),
+    16: __('16th'),
+    17: __('17th'),
+    18: __('18th'),
+    19: __('19th'),
+    20: __('20th'),
+    21: __('21st'),
+    22: __('22nd'),
+    23: __('23rd'),
+    24: __('24th'),
+    25: __('25th'),
+    26: __('26th'),
+    27: __('27th'),
+    28: __('28th'),
+    29: __('29th'),
+    30: __('30th'),
+    31: __('31st'),
+    0 : __('Last'),
+  }
+
+  ContactFilterRegistry.registerFilter(createFilter('day_of_month', 'Day of Month', 'date', {
+    edit   : ({
+      dates = [],
+      updateFilter,
+    }) => {
+
+      return ItemPicker({
+        id          : 'days-of-week-picker',
+        noneSelected: 'Select a day',
+        fetchOptions: async (search) => assoc2array(dateList).filter(option => option.text.match(new RegExp(search, 'i'))),
+        selected    : dates.map(date => ( {
+          id  : date,
+          text: dateList[date],
+        } )),
+        onChange    : items => {
+          updateFilter({
+            dates: items.map(item => item.id),
+          })
+        },
+      })
+
+    },
+    display: ({ dates = [] }) => sprintf(__('Today is the %s of the month'), orList(dates.map(date => bold(dateList[date])))),
+  }))
+
   registerFilterGroup( 'submissions', 'Submissions' )
 
   const SubmissionMetaFilters = (meta_filters, updateFilter) => InputRepeater({
@@ -2591,6 +2686,94 @@
       meta_filters: [],
     }))
   }
+
+  ContactFilterRegistry.registerFilter(createPastDateFilter('wp_fusion_activity', 'WP Fusion', 'activity', {
+    display: ({
+      event_name = '',
+      event_name_compare,
+      event_value = '',
+      event_value_compare,
+    }) => {
+
+      if (!event_name) {
+        return 'Any WP Fusion activity'
+      }
+
+      let text = sprintf(`WP Fusion Event: %s`,
+        ComparisonsTitleGenerators[event_name_compare](bold('Name'), `<code>${ event_name }</code>`),
+      )
+
+      if (event_value) {
+        text += ', ' + ComparisonsTitleGenerators[event_value_compare](bold('Value'), `<code>${ event_value }</code>`)
+      }
+
+      return text
+    },
+    edit   : ({
+      event_name = '',
+      event_value = '',
+      event_value_compare = 'equals',
+      event_name_compare = 'equals',
+      updateFilter = () => {},
+    }) => {
+
+      return Fragment([
+        MakeEl.Label({ for: 'event-name' }, 'Event Name'),
+        MakeEl.InputGroup([
+          Select({
+            id      : 'event-name-compare',
+            name    : 'event_name_compare',
+            selected: event_name_compare,
+            options : StringComparisons,
+            onChange: e => {
+              updateFilter({
+                event_name_compare: e.target.value,
+              })
+            },
+          }),
+          Input({
+            id         : 'event-name',
+            name       : 'event_name',
+            value      : event_name,
+            placeholder: 'Event Name',
+            onChange   : e => {
+              updateFilter({
+                event_name: e.target.value,
+              })
+            },
+          }),
+        ]),
+        MakeEl.Label({ for: 'event-value' }, 'Event Value'),
+        MakeEl.InputGroup([
+          Select({
+            id      : 'event-value-compare',
+            selected: event_value_compare,
+            options : AllComparisons,
+            onChange: e => {
+              updateFilter({
+                event_value_compare: e.target.value,
+              })
+            },
+          }),
+          Input({
+            id         : 'event-value',
+            value      : event_value,
+            placeholder: 'Event value',
+            onChange   : e => {
+              updateFilter({
+                event_value: e.target.value,
+              })
+            },
+          }),
+        ]),
+      ])
+    },
+  }, {
+    event_name_compare : 'equals',
+    event_name         : '',
+    event_value_compare: 'equals',
+    event_value        : '',
+  }))
 
   if (typeof Groundhogg.rawStepTypes.webhook_listener !== 'undefined') {
     ContactFilterRegistry.registerFilter(createPastDateFilter('webhook_request', 'Webhook Request', 'submissions', {
