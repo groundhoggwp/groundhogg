@@ -613,6 +613,7 @@ class Filters {
 			case 'not_contains':
 				$where->notContains( $column, $value );
 				break;
+			case '^':
 			case 'starts_with':
 			case 'begins_with':
 				$where->startsWith( $column, $value );
@@ -620,6 +621,7 @@ class Filters {
 			case 'does_not_start_with':
 				$where->notLike( $column, $where->esc_like( $value ) . '%' );
 				break;
+			case '$':
 			case 'ends_with':
 				$where->endsWith( $column, $value );
 				break;

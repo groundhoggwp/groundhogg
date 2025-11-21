@@ -268,6 +268,29 @@ class Where {
 	 */
 	public function compare( $column, $value, $compare = '=', $format = false ) {
 
+		// handle other comparisons by mapping to other functions
+		switch ( strtolower( $compare ) ) {
+			case 'contains':
+				return $this->contains( $column, $value );
+			case 'not_contains':
+				return $this->notContains( $column, $value );
+			case '^':
+			case 'starts_with':
+			case 'begins_with':
+				return $this->startsWith( $column, $value );
+			case '$':
+			case 'ends_with':
+				return $this->endsWith( $column, $value );
+			case 'does_not_start_with':
+				return $this->notLike( $column, $this->esc_like( $value ) . '%' );
+			case 'does_not_end_with':
+				return $this->notLike( $column, '%' . $this->esc_like( $value ) );
+			case 'empty':
+				return $this->empty( $column );
+			case 'not_empty':
+				return $this->notEmpty( $column );
+		}
+
 		$column  = $this->sanitize_column( $column );
 		$compare = $this->symbolize_comparison( $compare );
 
