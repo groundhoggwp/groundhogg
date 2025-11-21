@@ -1153,7 +1153,11 @@ class Contact_Query extends Table_Query {
 			}
 
 			$alias = $activityQuery->joinMeta( $key );
-			$activityQuery->where()->compare( "$alias.meta_value", $value, $compare );
+
+			Filters::string( "$alias.meta_value", [
+				'compare' => $compare,
+				'value'   => $value
+			], $activityQuery->where() );
 		}
 	}
 
@@ -1195,7 +1199,12 @@ class Contact_Query extends Table_Query {
 			}
 
 			$alias = $submissionQuery->joinMeta( $key );
-			$submissionQuery->where()->compare( "$alias.meta_value", $value, $compare );
+
+			Filters::string( "$alias.meta_value", [
+				'compare' => $compare,
+				'value'   => $value
+			], $submissionQuery->where() );
+
 		}
 
 		$where->in( 'ID', $submissionQuery );
