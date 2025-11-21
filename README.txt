@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.1
-Stable tag: 4.2.8
+Stable tag: 4.2.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,12 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.9 (2025-11-21) =
+* ADDED WP Fusion event tracking filter so you don't **have** to use the custom activity filter.
+* ADDED "Day of Week" and "Day of Month" filters for conditional logic.
+* IMPROVED Recaptcha and Turnstile scripts are now only enqueued if the fields are actually being used.
+* FIXED Some of the meta-comparisons for the custom activity filter and submission filters not returning correct results.
 
 = 4.2.8 (2025-11-14) =
 * IMPROVED Gutenberg form embed block has been updated to be compatible with latest Gutenberg standards.
