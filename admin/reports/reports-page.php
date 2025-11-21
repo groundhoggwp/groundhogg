@@ -140,6 +140,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				wp_enqueue_style( 'groundhogg-admin-loader' );
 				wp_enqueue_style( 'baremetrics-calendar' );
 				wp_enqueue_script( 'groundhogg-admin-reporting' );
+				wp_enqueue_script( 'groundhogg-admin-components' );
 
 				$start = get_request_var( 'start' );
 				$end   = get_request_var( 'end' );

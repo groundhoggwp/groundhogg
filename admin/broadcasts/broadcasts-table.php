@@ -243,6 +243,10 @@ class Broadcasts_Table extends WP_List_Table {
 			'href' => admin_page_url( $broadcast->is_email() ? 'gh_emails' : 'gh_sms', [ 'action' => 'edit', $broadcast->get_broadcast_type() => $broadcast->get_object_id() ] )
 		], $broadcast->is_email() ? esc_html__( 'Edit email', 'groundhogg' ) : esc_html__( 'Edit SMS' , 'groundhogg' ) );
 
+		if ( $broadcast->is_email() ){
+			$actions[] = html()->a( '#', esc_html__( 'Preview', 'groundhogg' ), [ 'class' => 'gh-email-preview', 'data-id' => $broadcast->get_object_id() ] );
+		}
+
 		// Add query action
 		$query = $broadcast->get_query();
 

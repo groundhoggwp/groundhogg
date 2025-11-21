@@ -1787,10 +1787,12 @@
   }
 
   $(() => {
-    $(document).on('click', 'table.wp-list-table .gh-email-preview', e => {
+    $(document).on('click', 'a.gh-email-preview', e => {
       e.preventDefault()
 
-      EmailPreviewModal(parseInt($(e.currentTarget).closest('tr').attr('id')), {})
+      let emailId = e.currentTarget.dataset.id ?? e.currentTarget.closest('tr').id
+
+      EmailPreviewModal(parseInt(emailId), {})
     })
   })
 

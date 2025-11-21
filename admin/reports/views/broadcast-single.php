@@ -15,6 +15,9 @@ $broadcast = new Broadcast( get_url_var( 'broadcast' ) );
 ?>
 <div class="display-flex gap-20 align-center">
     <h1 class="report-title"><?php echo esc_html( $broadcast->get_title() ) ?></h1>
+	<?php if ( $broadcast->is_email() ): ?>
+        <a href="#" class="gh-button secondary gh-email-preview" data-id="<?php echo esc_attr( $broadcast->get_object_id() ); ?>"><?php esc_html_e( 'Preview', 'groundhogg' ); ?></a>
+	<?php endif; ?>
 </div>
 <div class="display-grid gap-20">
     <div class="gh-panel span-6">

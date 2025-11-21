@@ -381,6 +381,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 4.2.9 (2025-11-21) =
 * ADDED WP Fusion event tracking filter so you don't **have** to use the custom activity filter.
 * ADDED "Day of Week" and "Day of Month" filters for conditional logic.
+* ADDED Email preview action to the broadcasts table and broadcast report.
 * IMPROVED Recaptcha and Turnstile scripts are now only enqueued if the fields are actually being used.
 * FIXED Some of the meta-comparisons for the custom activity filter and submission filters not returning correct results.
 

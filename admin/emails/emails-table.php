@@ -329,8 +329,8 @@ class Emails_Table extends Table {
 
 		switch ( $this->get_view() ) {
 			default:
-				$actions[] = [ 'class' => 'gh-email-preview', 'display' => esc_html__( 'Preview' , 'groundhogg' ), 'url' => '#' ];
 				$actions[] = [ 'class' => 'edit', 'display' => esc_html__( 'Edit' , 'groundhogg' ), 'url' => $item->admin_link() ];
+				$actions[] = [ 'class' => 'gh-email-preview', 'display' => esc_html__( 'Preview' , 'groundhogg' ), 'url' => '#' ];
 				$actions[] = [
 					'class'   => 'duplicate',
 					'display' => esc_html__( 'Duplicate' , 'groundhogg' ),
