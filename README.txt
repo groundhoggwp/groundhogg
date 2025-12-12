@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.1
-Stable tag: 4.2.9
+Stable tag: 4.2.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,13 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.10 (2025-12-12) =
+* ADDED Start tracking the date when a tag is added to a contact. *Not* retroactive.
+* FIXED UI issue in The Flow History filter.
+* FIXED Form selection in the Form Block not working unless a form was already selected.
+* FIXED Description formatting for the Advanced Timer action.
+* FIXED PHP Notice if a custom field tab was not configured correctly.
 
 = 4.2.9 (2025-11-21) =
 * ADDED WP Fusion event tracking filter so you don't **have** to use the custom activity filter.
