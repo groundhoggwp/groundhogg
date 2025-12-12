@@ -489,6 +489,7 @@
         dataCell: cellIndex,
         onChange: e => onCellChange(rowIndex, cellIndex, e.target.value),
         setValue: value => onCellChange(rowIndex, cellIndex, value),
+        onCellChange
       }, row)),
       // Sortable Handle
       sortable ? makeEl('span', {
