@@ -1637,117 +1637,239 @@
   registerFilterGroup('funnels',
     _x('Flows', 'noun meaning automation', 'groundhogg'))
 
-  registerFilter('funnel_history', 'funnels',
-    __('Flow History', 'groundhogg'), {
-      view ({
-        status = 'complete',
-        funnel_id = 0,
-        step_id = 0,
-        date_range = 'any',
-        before,
-        after,
-        ...rest
-      }) {
+  ContactFilterRegistry.registerFilter(createPastDateFilter('funnel_history', __('Flow History', 'groundhogg'), 'funnels', {
+    display: ({
+      funnel_id = false,
+      step_id = false,
+      status = 'complete'
+    }) => {
 
-        let prepend
+      let text = __('Completed any step in any flow', 'groundhogg')
 
-        if (funnel_id) {
+      if (funnel_id) {
 
-          const funnel = FunnelsStore.get(funnel_id)
-          const step = funnel.steps.find(s => s.ID === step_id)
+        const funnel = FunnelsStore.get(funnel_id)
+        const step = funnel.steps.find(s => s.ID === step_id)
 
-          prepend = status === 'complete' ? sprintf(
-            step ? __('Completed %2$s in %1$s', 'groundhogg') : __(
-              'Completed any step in %1$s', 'groundhogg'),
-            `<b>${ funnel.data.title }</b>`,
-            step ? `<b>${ step.data.step_title }</b>` : '') : sprintf(
-            step ? __('Will complete %2$s in %1$s', 'groundhogg') : __(
-              'Will complete any step in %1$s', 'groundhogg'),
-            `<b>${ funnel.data.title }</b>`,
-            step ? `<b>${ step.data.step_title }</b>` : '')
+        text = status === 'complete' ? sprintf(
+          step ? __('Completed %2$s in %1$s', 'groundhogg') : __(
+            'Completed any step in %1$s', 'groundhogg'),
+          `<b>${ funnel.data.title }</b>`,
+          step ? `<b>${ step.data.step_title }</b>` : '') : sprintf(
+          step ? __('Will complete %2$s in %1$s', 'groundhogg') : __(
+            'Will complete any step in %1$s', 'groundhogg'),
+          `<b>${ funnel.data.title }</b>`,
+          step ? `<b>${ step.data.step_title }</b>` : '')
 
-          if (status === 'waiting') {
-            return prepend
+        if (status === 'waiting') {
+          return text
+        }
+      }
+
+      return text
+    },
+    edit   : ({
+      funnel_id = false,
+      step_id = false,
+      updateFilter,
+    }) => Fragment([
+      ItemPicker({
+        id          : `select-a-funnel`,
+        noneSelected: __('Select a flow...', 'groundhogg'),
+        selected    : funnel_id ? {
+          id  : funnel_id,
+          text: FunnelsStore.get(funnel_id).data.title,
+        } : [],
+        multiple    : false,
+        style       : {
+          flexGrow: 1,
+        },
+        fetchOptions: (search) => {
+          return FunnelsStore.fetchItems({
+              search,
+            }).
+            then(funnels => funnels.map(({
+              ID,
+              data,
+            }) => ( {
+              id  : ID,
+              text: data.title,
+            } )))
+        },
+        onChange    : item => {
+          if (!item) {
+            updateFilter({
+              funnel_id: null,
+              step_id  : null,
+            }, true)
+            return
           }
 
-        }
-        else {
-          prepend = __('Completed any step in any flow', 'groundhogg')
-        }
-
-        return standardActivityDateTitle(prepend, {
-          date_range,
-          before,
-          after,
-          ...rest
-        })
-      },
-      edit ({
-        funnel_id,
-        step_id,
-        date_range,
-        before,
-        after,
-        ...rest
-      }) {
-
-        return `
-      ${ select({
-          id: 'filter-funnel',
-          name: 'funnel_id',
-        }, FunnelsStore.getItems().
-          map(f => ( {
-            value: f.ID,
-            text: f.data.title,
-          } )), funnel_id) }
-      ${ select({
-          id: 'filter-step',
-          name: 'step_id',
-        }, funnel_id ? FunnelsStore.get(funnel_id).steps.map(s => ( {
-          value: s.ID,
-          text: s.data.step_title,
-        } )) : [], step_id) }
-      ${ standardActivityDateOptions({
-          date_range,
-          before,
-          after,
-          ...rest
-        }) }`
-      },
-      onMount (filter, updateFilter) {
-        funnelPicker('#filter-funnel', false, (items) => {
-          FunnelsStore.itemsFetched(items)
-        }, {}, {
-          placeholder: __('Select a flow', 'groundhogg'),
-        }).on('select2:select', ({ target }) => {
           updateFilter({
-            funnel_id: parseInt($(target).val()),
-            step_id: 0,
+            funnel_id: item.id,
+            step_id  : FunnelsStore.get(item.id).steps[0].ID,
           }, true)
-        })
+        },
+      }),
+      funnel_id ? ItemPicker({
+        id          : `select-step-from-${ funnel_id }`,
+        noneSelected: __('Select a step...', 'groundhogg'),
+        selected    : step_id ? {
+          id  : step_id,
+          text: FunnelsStore.get(funnel_id).steps.find(s => s.ID === step_id).data.step_title,
+        } : [],
+        multiple    : false,
+        style       : {
+          flexGrow: 1,
+        },
+        fetchOptions: async (search) => FunnelsStore.get(funnel_id)
+          .steps
+          // only actions and triggers can be "completed"
+          .filter( s => s.data.step_group === 'action' || s.data.step_group === 'benchmark' )
+          .map(({
+            ID,
+            data,
+          }) => ( {
+            id  : ID,
+            text: data.step_title,
+          } ))
+          .filter(opt => opt.text.match(new RegExp(search, 'i'))),
+        onChange    : item => {
+          if (!item) {
+            updateFilter({
+              step_id: null,
+            })
+            return
+          }
 
-        $('#filter-step').select2({
-          placeholder: __('Select a step or leave empty for any step',
-            'groundhogg'),
-        }).on('select2:select', ({ target }) => {
           updateFilter({
-            step_id: parseInt($(target).val()),
+            step_id: item.id,
           })
-        })
+        },
+      }) : null,
+    ]),
+    preload: ({ funnel_id }) => {
+      if (funnel_id) {
+        return FunnelsStore.maybeFetchItem(funnel_id)
+      }
+    },
+  }, {
+    funnel_id: 0,
+    step_id  : 0,
+    status   : 'complete',
+  }))
 
-        standardActivityDateFilterOnMount(filter, updateFilter)
-      },
-      defaults: {
-        funnel_id: 0,
-        step_id  : 0,
-        status   : 'complete', ...standardActivityDateDefaults,
-      },
-      preload : ({ funnel_id }) => {
-        if (funnel_id) {
-          return FunnelsStore.maybeFetchItem(funnel_id)
-        }
-      },
-    })
+  // registerFilter('funnel_history', 'funnels',
+  //   __('Flow History', 'groundhogg'), {
+  //     view ({
+  //       status = 'complete',
+  //       funnel_id = 0,
+  //       step_id = 0,
+  //       date_range = 'any',
+  //       before,
+  //       after,
+  //       ...rest
+  //     }) {
+  //
+  //       let prepend
+  //
+  //       if (funnel_id) {
+  //
+  //         const funnel = FunnelsStore.get(funnel_id)
+  //         const step = funnel.steps.find(s => s.ID === step_id)
+  //
+  //         prepend = status === 'complete' ? sprintf(
+  //           step ? __('Completed %2$s in %1$s', 'groundhogg') : __(
+  //             'Completed any step in %1$s', 'groundhogg'),
+  //           `<b>${ funnel.data.title }</b>`,
+  //           step ? `<b>${ step.data.step_title }</b>` : '') : sprintf(
+  //           step ? __('Will complete %2$s in %1$s', 'groundhogg') : __(
+  //             'Will complete any step in %1$s', 'groundhogg'),
+  //           `<b>${ funnel.data.title }</b>`,
+  //           step ? `<b>${ step.data.step_title }</b>` : '')
+  //
+  //         if (status === 'waiting') {
+  //           return prepend
+  //         }
+  //
+  //       }
+  //       else {
+  //         prepend = __('Completed any step in any flow', 'groundhogg')
+  //       }
+  //
+  //       return standardActivityDateTitle(prepend, {
+  //         date_range,
+  //         before,
+  //         after,
+  //         ...rest
+  //       })
+  //     },
+  //     edit ({
+  //       funnel_id,
+  //       step_id,
+  //       date_range,
+  //       before,
+  //       after,
+  //       ...rest
+  //     }) {
+  //
+  //       return `
+  //     ${ select({
+  //         id: 'filter-funnel',
+  //         name: 'funnel_id',
+  //       }, FunnelsStore.getItems().
+  //         map(f => ( {
+  //           value: f.ID,
+  //           text: f.data.title,
+  //         } )), funnel_id) }
+  //     ${ select({
+  //         id: 'filter-step',
+  //         name: 'step_id',
+  //       }, funnel_id ? FunnelsStore.get(funnel_id).steps.map(s => ( {
+  //         value: s.ID,
+  //         text: s.data.step_title,
+  //       } )) : [], step_id) }
+  //     ${ standardActivityDateOptions({
+  //         date_range,
+  //         before,
+  //         after,
+  //         ...rest
+  //       }) }`
+  //     },
+  //     onMount (filter, updateFilter) {
+  //       funnelPicker('#filter-funnel', false, (items) => {
+  //         FunnelsStore.itemsFetched(items)
+  //       }, {}, {
+  //         placeholder: __('Select a flow', 'groundhogg'),
+  //       }).on('select2:select', ({ target }) => {
+  //         updateFilter({
+  //           funnel_id: parseInt($(target).val()),
+  //           step_id: 0,
+  //         }, true)
+  //       })
+  //
+  //       $('#filter-step').select2({
+  //         placeholder: __('Select a step or leave empty for any step',
+  //           'groundhogg'),
+  //       }).on('select2:select', ({ target }) => {
+  //         updateFilter({
+  //           step_id: parseInt($(target).val()),
+  //         })
+  //       })
+  //
+  //       standardActivityDateFilterOnMount(filter, updateFilter)
+  //     },
+  //     defaults: {
+  //       funnel_id: 0,
+  //       step_id  : 0,
+  //       status   : 'complete', ...standardActivityDateDefaults,
+  //     },
+  //     preload : ({ funnel_id }) => {
+  //       if (funnel_id) {
+  //         return FunnelsStore.maybeFetchItem(funnel_id)
+  //       }
+  //     },
+  //   })
 
   registerFilterGroup('broadcast',
     _x('Broadcast', 'noun meaning email blast', 'groundhogg'))
