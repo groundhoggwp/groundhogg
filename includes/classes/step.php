@@ -2281,6 +2281,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'data'   => $data,
 			'meta'   => $this->meta,
 			'export' => $this->export(),
+			'is_starting' => $this->is_starting(),
+
 		] );
 	}
 
