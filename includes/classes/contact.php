@@ -7,6 +7,7 @@ use Groundhogg\Classes\Note;
 use Groundhogg\Classes\Traits\File_Box;
 use Groundhogg\DB\DB;
 use Groundhogg\DB\Meta_DB;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Tag_Relationships;
 use Groundhogg\DB\Tags;
 use Groundhogg\Utils\DateTimeHelper;
@@ -49,6 +50,10 @@ class Contact extends Base_Object_With_Meta {
 	 * @var WP_User
 	 */
 	protected $owner;
+	/**
+	 * @var object[]
+	 */
+	protected array $tag_relationships = [];
 
 	/**
 	 * Contact constructor.
@@ -232,9 +237,27 @@ class Contact extends Base_Object_With_Meta {
 	 * @return void
 	 */
 	protected function post_setup() {
-		$this->tags  = wp_parse_id_list( $this->get_tag_rel_db()->get_relationships( $this->ID ) );
-		$this->user  = get_userdata( $this->get_user_id() );
-		$this->owner = get_userdata( $this->get_owner_id() );
+
+		$query = new Table_Query( db()->tag_relationships );
+		$query->setSelect( 'tag_id', 'date_created' );
+		$query->where( 'contact_id', $this->ID );
+
+		$relationships = $query->get_results();
+
+		$this->tags              = wp_parse_id_list( wp_list_pluck( $relationships, 'tag_id' ) );
+		$this->tag_relationships = array_reduce( $relationships, function ( $carry, $item ) {
+
+			if ( $item->date_created === null || $item->date_created === DateTimeHelper::ZERODATETIME ) {
+				return $carry;
+			}
+
+			$carry[ absint( $item->tag_id ) ] = $item->date_created;
+
+			return $carry;
+		}, [] );
+
+		$this->user              = get_userdata( $this->get_user_id() );
+		$this->owner             = get_userdata( $this->get_owner_id() );
 
 		$this->ID           = absint( $this->ID );
 		$this->user_id      = absint( $this->user_id );
@@ -842,7 +865,8 @@ class Contact extends Base_Object_With_Meta {
 
 		foreach ( $apply as $tag_id ) {
 
-			$this->tags[] = $tag_id;
+			$this->tags[]                       = $tag_id;
+			$this->tag_relationships[ $tag_id ] = Ymd_His();
 
 			$this->get_tag_rel_db()->batch_insert( [
 				'tag_id'     => $tag_id,
@@ -912,6 +936,9 @@ class Contact extends Base_Object_With_Meta {
 		$this->tags = array_diff( $this->tags, $remove );
 
 		foreach ( $remove as $tag_id ) {
+
+			unset( $this->tag_relationships[ $tag_id ] );
+
 			/**
 			 * When a tag relationship is removed
 			 *
@@ -1215,7 +1242,8 @@ class Contact extends Base_Object_With_Meta {
 				'is_marketable'  => $this->is_marketable(),
 				'is_deliverable' => $this->is_deliverable(),
 				'i18n'           => [
-					'created' => human_time_diff( time(), $this->get_date_created( true )->getTimestamp() )
+					'created'  => human_time_diff( time(), $this->get_date_created( true )->getTimestamp() ),
+					'tagDates' => array_map( fn($date) => (new DateTimeHelper($date))->wpDateTimeFormat(), $this->tag_relationships )
 				]
 			]
 		);

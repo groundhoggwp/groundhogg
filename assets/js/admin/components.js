@@ -123,6 +123,7 @@
     selected = [],
     removeTags = [],
     addTags = [],
+    dates = {},
     onChange = (changes) => {
 
     },
@@ -138,7 +139,7 @@
           <div class="gh-tags">
               ${ selected.map(tag => `<span class="gh-tag${ removeTags.includes(tag.ID)
                                                             ? ' remove'
-                                                            : '' }">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-tag dashicons dashicons-no-alt"></span></span>`).
+                                                            : '' }">${ tag.data.tag_name } ${dates.hasOwnProperty(tag.ID) ? `<span class="gh-tooltip top">${dates[tag.ID]}</span>` : ''}<span data-id="${ tag.ID }" class="remove-tag dashicons dashicons-no-alt"></span></span>`).
                       join('') }
               ${ addTags.map(id => TagsStore.get(id)).
                       map(tag => `<span class="gh-tag adding">${ tag.data.tag_name } <span data-id="${ tag.ID }" class="remove-adding-tag dashicons dashicons-no-alt"></span></span>`).

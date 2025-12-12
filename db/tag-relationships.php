@@ -5,6 +5,7 @@ namespace Groundhogg\DB;
 use Groundhogg\Contact;
 use Groundhogg\DB\Traits\Insert_Ignore;
 use function Groundhogg\get_db;
+use function Groundhogg\Ymd_His;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -81,6 +82,7 @@ class Tag_Relationships extends DB {
 		return [
 			'tag_id'     => '%d',
 			'contact_id' => '%d',
+			'date_created' => '%s',
 		];
 	}
 
@@ -94,6 +96,7 @@ class Tag_Relationships extends DB {
 		return array(
 			'tag_id'     => 0,
 			'contact_id' => 0,
+			'date_created' => Ymd_His(),
 		);
 	}
 
@@ -260,6 +263,7 @@ class Tag_Relationships extends DB {
 		return "CREATE TABLE " . $this->table_name . " (
 		tag_id bigint(20) unsigned NOT NULL,
 		contact_id bigint(20) unsigned NOT NULL,
+		date_created datetime NOT NULL,
 		PRIMARY KEY (tag_id,contact_id),
 		KEY tag_id (tag_id),
 		KEY contact_id (contact_id)
