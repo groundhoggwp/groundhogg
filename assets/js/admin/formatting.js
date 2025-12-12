@@ -3,7 +3,6 @@
   const formatTime = (time) => {
 
     // return wp.date.format( 'h:i a', time )
-    console.log(time);
 
     return Intl.DateTimeFormat(Groundhogg.locale, {
       timeStyle: 'short',
