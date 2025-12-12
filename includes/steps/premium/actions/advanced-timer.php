@@ -32,7 +32,7 @@ class Advanced_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_description() {
-		return _x( 'Use a <code>strtotime</code> friendly string to create a delay.', 'step_description', 'groundhogg' );
+		return _x( 'Use a `strtotime()` friendly string to create a delay.', 'step_description', 'groundhogg' );
 	}
 
 	/**
