@@ -419,7 +419,7 @@ function add_custom_property_replacements( $replacements ) {
 
 		$tab = Properties::instance()->get_group_tab( $group['id'] );
 
-		if ( ! $tab ) {
+		if ( ! $tab || ! isset( $tab['name'] ) || ! isset( $group['name'] ) ) {
 			continue;
 		}
 
