@@ -165,7 +165,7 @@ function Edit({
           value: formId,
           options: forms,
           onChange: value => {
-            const form = window.Groundhogg.stores.forms.get(parseInt(formId));
+            const form = window.Groundhogg.stores.forms.get(parseInt(value));
             setAttributes({
               formId: value,
               accentColor: form.settings.accentColor,
