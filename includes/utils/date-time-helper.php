@@ -8,6 +8,10 @@ use function Groundhogg\site_locale_is_english;
 
 class DateTimeHelper extends \DateTime {
 
+	const ZERODATE = "0000-00-00";
+	const ZEROTIME = "00:00:00";
+	const ZERODATETIME = "0000-00-00 00:00:00";
+
 	public function __construct( $datetime = 'now', \DateTimeZone $timezone = null ) {
 
 		if ( ! $timezone ) {
