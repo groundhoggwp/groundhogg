@@ -207,17 +207,22 @@ class Event extends Base_Object {
 	}
 
 	/**
+	 * @return Contact
+	 */
+	public function get_contact() {
+
+		if ( ! $this->contact ){
+			$this->contact = new Contact( $this->get_contact_id() );
+		}
+
+		return $this->contact;
+	}
+
+	/**
 	 * @return String
 	 */
 	public function get_failure_reason() {
 		return $this->get_error_code() . ': ' . $this->get_error_message();
-	}
-
-	/**
-	 * @return Contact
-	 */
-	public function get_contact() {
-		return $this->contact;
 	}
 
 	/**
@@ -338,7 +343,6 @@ class Event extends Base_Object {
 		if ( empty( $this->args ) && ! is_array( $this->args ) ) {
 			$this->args = []; // default to using an array if empty
 		}
-		$this->contact = new Contact( $this->get_contact_id() );
 
 		self::maybe_register_step_setup_callbacks();
 
