@@ -111,6 +111,13 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 			               ->contains( "$join->alias.plain_text", $search );
 		}
 
+		/**
+		 * Allow modifying the broadcast query, perhaps to restrict what can appear in the archive.
+		 *
+		 * @param $query Table_Query
+		 */
+		do_action_ref_array( 'groundhogg/archive/broadcast_query', [ &$broadcastQuery ] );
+
 		$items       = $broadcastQuery->get_objects();
 		$total_items = $broadcastQuery->get_found_rows();
 

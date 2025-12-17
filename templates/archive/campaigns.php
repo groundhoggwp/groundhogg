@@ -68,6 +68,13 @@ managed_page_head( __( 'Campaigns Archive', 'groundhogg' ), 'archive' );
 			               ->contains( 'description', $search );
 		}
 
+		/**
+		 * Allow modifying the campaigns query, perhaps to restrict what can appear in the archive.
+		 *
+		 * @param $query Table_Query
+		 */
+		do_action_ref_array( 'groundhogg/archive/campaigns_query', [ &$campaignsQuery ] );
+
 		$items       = $campaignsQuery->get_objects();
 		$total_items = $campaignsQuery->get_found_rows();
 

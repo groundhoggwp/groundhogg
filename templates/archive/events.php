@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Cli\Table;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Utils\DateTimeHelper;
 
@@ -103,6 +104,13 @@ managed_page_head( __( 'Email Archive', 'groundhogg' ), 'archive' );
 			            ->contains( "$join->alias.subject", $search )
 			            ->contains( "$join->alias.plain_text", $search );
 		}
+
+		/**
+         * Allow modifying the events query, perhaps to restrict what can appear in the archive.
+         *
+		 * @param $query Table_Query
+		 */
+        do_action_ref_array( 'groundhogg/archive/events_query', [ &$eventsQuery ] );
 
 		$events = $eventsQuery->get_results();
 
