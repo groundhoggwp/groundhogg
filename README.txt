@@ -380,6 +380,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.2.10 (2025-12-12) =
 * ADDED Start tracking the date when a tag is added to a contact. *Not* retroactive.
+* ADDED Developer filters to modify queries for the email archive.
 * FIXED UI issue in The Flow History filter.
 * FIXED Form selection in the Form Block not working unless a form was already selected.
 * FIXED Description formatting for the Advanced Timer action.
