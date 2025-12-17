@@ -3690,6 +3690,11 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 		$headers['Content-type'] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
 	}
 
+    // for some reason when body is false or null it breaks, just make it am empty array instead
+    if ( is_null( $body ) || $body === false ){
+        $body = [];
+    }
+
 	switch ( $method ) {
 		case 'POST':
 		case 'PUT':
