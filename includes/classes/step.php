@@ -183,16 +183,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 * @return int
 	 */
 	public function get_level() {
-		$level = absint( $this->step_level );
-
-		// level has not been initialized yet, maybe the upgrade script didn't run?
-		if ( $level < 1 ) {
-			$this->get_funnel()->set_step_levels();
-			$this->pull();
-			$level = absint( $this->step_level );
-		}
-
-		return $level;
+		return absint( $this->step_level );
 	}
 
 	public function get_type() {
