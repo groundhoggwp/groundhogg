@@ -901,7 +901,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		return array_merge( parent::get_as_array(), [
 			'object'           => $this->get_object(),
-			'date_sent_pretty' => $date->wpDateTimeFormat()
+			'date_sent_pretty' => $date->wpDateTimeFormat(),
+			'title' => $this->get_title(),
 		] );
 	}
 
