@@ -378,6 +378,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.2.11 (2026-01-14) =
+* FIXED Possible infinite recursion fatal error when editing flows.
+
 = 4.2.10 (2025-12-12) =
 * ADDED Start tracking the date when a tag is added to a contact. *Not* retroactive.
 * ADDED Developer filters to modify queries for the email archive.
