@@ -1070,11 +1070,24 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Extrapolate the contact's location from an IP.
 	 *
-	 * @param bool $override
+	 * @param  bool  $override
 	 *
 	 * @return array|bool
 	 */
 	public function extrapolate_location( $override = false ) {
+
+		// don't check if geolocation is disabled.
+		$disabled = is_option_enabled( 'gh_disable_geolocation_services' ); // should be false unless disabled in settings
+
+		/**
+		 * Filter geolocation functionality
+		 *
+		 * @param $enablaed bool whether to disable geolocation
+		 */
+		if ( ! apply_filters( 'groundhogg/should_extrapolate_location', ! $disabled ) ){
+			return false;
+		}
+
 		$ip_address = $this->get_ip_address();
 
 		/* Do not run for localhost IPv6 blank IP */

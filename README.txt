@@ -293,7 +293,7 @@ If you have the Google Recaptcha integration enabled, scripts will be loaded fro
 If you have the Cloudflare Turnstile integration enabled, scripts will be loaded from `https://challenges.cloudflare.com/turnstile/v0/api.js` and requests will be made to `https://challenges.cloudflare.com/turnstile/v0/siteverify` sharing only essential information (such as your turnstile site key) to facilitate the integration.
 
 ### Geolocation services
-Groundhogg will attempt to use the free service [ipquery.io](https://ipquery.io) to determine a contact's location and timezone using their IP address.
+Groundhogg will attempt (if licensed) to geolocate a contact (country, region, timezone, etc...) based on their IP address using our Geolocation service `https://ipinfo.groundhogg.io`. No data is stored remotely and no PII is used. We use a third party based in Romania to provide geolocation services.
 
 [](http://coderisk.com/wp/plugin/groundhogg/RIPS-RLU9faYUDI)
 
@@ -378,7 +378,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.11 (2026-01-14) =
+= 4.2.11 (2026-01-19) =
+* ADDED Setting in **Settings » Misc » Features** to disable geolocation services.
+* TWEAKED IP geolocation is now a licensed feature since there are no longer any free geolocation providers.
+* TWEAKED Use local `moment.js` for the chart library.
 * FIXED Possible infinite recursion fatal error when editing flows.
 
 = 4.2.10 (2025-12-12) =

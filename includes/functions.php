@@ -1854,7 +1854,7 @@ add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\maybe_validate_and
  */
 function extrapolate_location_after_signup( $contact ) {
 	// Update their location based on the current IP address.
-	if ( apply_filters( 'groundhogg/should_extrapolate_location', true ) && $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
+	if ( $contact->update_meta( 'ip_address', utils()->location->get_real_ip() ) ) {
 		$contact->extrapolate_location();
 	}
 }

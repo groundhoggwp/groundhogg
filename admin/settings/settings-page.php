@@ -519,6 +519,11 @@ class Settings_Page extends Admin_Page {
 				'title' => _x( 'Interface', 'settings_sections', 'groundhogg' ),
 				'tab'   => 'misc'
 			],
+			'features'              => [
+				'id'    => 'features',
+				'title' => _x( 'Features', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'misc'
+			],
 			'performance'           => [
 				'id'    => 'performance',
 				'title' => _x( 'Performance', 'settings_sections', 'groundhogg' ),
@@ -1005,6 +1010,20 @@ class Settings_Page extends Admin_Page {
 					'label' => __( 'Enable' , 'groundhogg' ),
 					'name'  => 'gh_use_object_cache',
 					'id'    => 'gh_use_object_cache',
+					'value' => 'on',
+				],
+			],
+			'gh_disable_geolocation_services' => [
+				'id'      => 'gh_disable_geolocation_services',
+				'section' => 'features',
+				'label'   => _x( 'Disable geolocation services', 'settings', 'groundhogg' ),
+				/* translators: the plugin/brand name */
+				'desc'    => sprintf( _x( 'By default, %s will attempt to determine the contact\'s country of origin and timezone based on their IP address.', 'settings', 'groundhogg' ), white_labeled_name() ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Disable', 'groundhogg' ),
+					'name'  => 'gh_disable_geolocation_services',
+					'id'    => 'gh_disable_geolocation_services',
 					'value' => 'on',
 				],
 			],
@@ -1787,6 +1806,9 @@ class Settings_Page extends Admin_Page {
 		];
 
 		// Dependent settings
+        if ( ! get_master_license() ){
+            unset( $settings['gh_disable_geolocation_services'] ); // don't show if unlicensed
+        }
 
 		return apply_filters( 'groundhogg/admin/settings/settings', $settings );
 	}

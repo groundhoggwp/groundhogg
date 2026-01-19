@@ -39,6 +39,14 @@ if ( ! current_user_can( 'view_contact', $contact ) ) {
 	wp_die( esc_html_x( 'You are not the owner of this contact.', 'contact_record', 'groundhogg' ) );
 }
 
+$country    = $contact->get_meta( 'country' );
+$ip_address = $contact->get_ip_address();
+
+// automatically attempt to extrapolate the location of a contact...
+if ( $ip_address && ! $country ){
+    $contact->extrapolate_location();
+}
+
 ?>
 <div class="contact-record">
     <div class="contact-editor-wrap">

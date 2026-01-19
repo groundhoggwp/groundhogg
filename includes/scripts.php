@@ -235,7 +235,9 @@ class Scripts {
 		wp_register_script( 'jquery-flot-categories', GROUNDHOGG_ASSETS_URL . 'lib/flot/jquery.flot.categories' . $dot_min . '.js', [ 'jquery-flot' ] );
 
 		//chartjs
-		wp_register_script( 'groundhogg-chart-js', GROUNDHOGG_ASSETS_URL . 'lib/chart/Chart.bundle.min.js' );
+		wp_register_script( 'groundhogg-chart-js', GROUNDHOGG_ASSETS_URL . 'lib/chart/Chart.min.js', [
+			'moment'
+		] );
 
 //		wp_register_script( 'moment-js', GROUNDHOGG_ASSETS_URL . 'lib/calendar/js/moment.min.js' );
 
