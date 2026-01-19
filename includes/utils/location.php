@@ -520,13 +520,18 @@ class Location {
 	/**
 	 * Get Geolocated information about an IP address
 	 *
-	 * @param null   $ip
-	 * @param string $purpose
-	 * @param bool   $deep_detect
+	 * @param  null|string  $ip  the contact's ip address to check
+	 * @param  string  $purpose  what to return, accepts location, cc, city, region, etc...
+	 * @param  null  $unused  unused now
 	 *
 	 * @return array|string|object
 	 */
-	public function ip_info( $ip = null, $purpose = "location", $deep_detect = true ) {
+	public function ip_info( $ip = null, $purpose = "location", $unused = null ) {
+
+		// from now on ip info will require having an active and installed master license
+		if ( ! get_master_license() ) {
+			return false;
+		}
 
 		$output = null;
 
@@ -558,11 +563,10 @@ class Location {
 
 		if ( in_array( $purpose, $support ) ) {
 
-			$ip_data = wp_remote_get( "https://api.ipquery.io/" . $ip, [
-				'headers' => [
-					'Referer' => home_url()
-				]
-			] );
+			$ip_data = wp_remote_get( add_query_arg( [
+				'ip'      => $ip,
+				'license' => get_master_license()
+			], "https://ipinfo.groundhogg.io" ) );
 
 			if ( is_wp_error( $ip_data ) || ! $ip_data || wp_remote_retrieve_response_code( $ip_data ) !== 200 ) {
 				return false;
@@ -575,50 +579,51 @@ class Location {
 				return false;
 			}
 
-			if ( @strlen( trim( $ip_data->location->country_code ) ) == 2 ) {
+			if ( @strlen( trim( $ip_data->countryCode ) ) == 2 ) {
 				switch ( $purpose ) {
 					case 'raw':
 						$output = $ip_data;
 						break;
 					case 'location':
 						$output = array(
-							"city"           => @$ip_data->location->city,
-							"region"         => @$ip_data->location->state,
-							"country"        => @$ip_data->location->country,
-							"country_code"   => @$ip_data->location->country_code,
-							"time_zone"      => @$ip_data->location->timezone,
+							"city"         => @$ip_data->city,
+							"region"       => @$ip_data->regionName,
+							"region_code"  => @$ip_data->region,
+							"country"      => @$ip_data->country,
+							"country_code" => @$ip_data->countryCode,
+							"time_zone"    => @$ip_data->timezone,
 						);
 						break;
 					case 'address':
-						$address = array( $ip_data->location->country );
-						if ( @strlen( $ip_data->location->state ) >= 1 ) {
-							$address[] = $ip_data->location->state;
+						$address = array( $ip_data->country );
+						if ( @strlen( $ip_data->regionName ) >= 1 ) {
+							$address[] = $ip_data->regionName;
 						}
-						if ( @strlen( $ip_data->location->city ) >= 1 ) {
-							$address[] = $ip_data->location->city;
+						if ( @strlen( $ip_data->city ) >= 1 ) {
+							$address[] = $ip_data->city;
 						}
 						$output = implode( ", ", array_reverse( $address ) );
 						break;
 					case 'city':
-						$output = @$ip_data->location->city;
+						$output = @$ip_data->city;
 						break;
 					case 'region':
 					case 'province':
 					case 'state':
-						$output = @$ip_data->location->state;
+					$output = @$ip_data->regionName;
 						break;
 					case 'country':
-						$output = @$ip_data->location->country;
+						$output = @$ip_data->country;
 						break;
 					case 'countrycode':
 					case 'country_code':
 					case 'cc':
-						$output = @$ip_data->location->country_code;
+					$output = @$ip_data->countryCode;
 						break;
 					case 'time_zone':
 					case 'timezone':
 					case 'tz':
-						$output = @$ip_data->location->timezone;
+					$output = @$ip_data->timezone;
 						break;
 				}
 			}
