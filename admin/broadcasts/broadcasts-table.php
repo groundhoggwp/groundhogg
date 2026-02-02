@@ -244,7 +244,7 @@ class Broadcasts_Table extends WP_List_Table {
 		], $broadcast->is_email() ? esc_html__( 'Edit email', 'groundhogg' ) : esc_html__( 'Edit SMS' , 'groundhogg' ) );
 
 		if ( $broadcast->is_email() ){
-			$actions[] = html()->a( '#', esc_html__( 'Preview', 'groundhogg' ), [ 'class' => 'gh-email-preview', 'data-id' => $broadcast->get_object_id() ] );
+			$actions[] = html()->a( '#gh-email-preview/' . $broadcast->get_object_id(), esc_html__( 'Preview', 'groundhogg' ) );
 		}
 
 		// Add query action

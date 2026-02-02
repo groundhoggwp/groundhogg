@@ -1795,6 +1795,14 @@
 
       EmailPreviewModal(parseInt(emailId), {})
     })
+
+    window.addEventListener('hashchange', e => {
+      let hash = window.location.hash.replace('#', '')
+      if ( hash.startsWith('gh-email-preview/') ) {
+        let emailId = hash.replace('gh-email-preview/', '')
+        EmailPreviewModal(parseInt(emailId), {})
+      }
+    })
   })
 
   const ImagePicker = ({
