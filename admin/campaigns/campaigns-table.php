@@ -46,10 +46,22 @@ class Campaigns_Table extends Table {
 	public function __construct() {
 		// Set parent defaults.
 		parent::__construct( array(
-			'singular' => 'tag',     // Singular name of the listed records.
-			'plural'   => 'tags',    // Plural name of the listed records.
+			'singular' => 'campaign',     // Singular name of the listed records.
+			'plural'   => 'campaigns',    // Plural name of the listed records.
 			'ajax'     => false,       // Does this table support ajax?
 		) );
+	}
+
+	/**
+	 * @return array An associative array containing all the bulk actions.
+	 */
+	protected function get_bulk_actions() {
+
+		$actions = array(
+			'delete' => _x( 'Delete', 'List table bulk action', 'groundhogg' ),
+		);
+
+		return apply_filters( 'groundhogg/admin/campaigns/table/bulk_actions', $actions );
 	}
 
 	/**
