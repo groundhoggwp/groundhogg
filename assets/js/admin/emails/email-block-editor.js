@@ -9642,6 +9642,7 @@
     odysee     : 'Odysee',
     discord    : 'Discord',
     rumble     : 'Rumble',
+    bluesky    : 'Bluesky',
   }
 
   const socialIconThemes = {
