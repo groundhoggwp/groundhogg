@@ -641,17 +641,17 @@ class Funnel extends Base_Object_With_Meta {
 			$query['step_status'] = 'active';
 		}
 
-		$last_changed = db()->steps->cache_get_last_changed();
-		$cache_key    = "$this->ID:steps:$last_changed:" . md5serialize( $query );
-		$steps        = wp_cache_get( $cache_key, db()->steps->get_cache_group(), false, $found );
-
-        // make sure all items in array are also steps
-		if ( $found && is_array( $steps ) && array_all( $steps, function ( $step ) {
-				return is_a( $step, Step::class );
-			} ) ) {
-
-			return $steps;
-		}
+//		$last_changed = db()->steps->cache_get_last_changed();
+//		$cache_key    = "$this->ID:steps:$last_changed:" . md5serialize( $query );
+//		$steps        = wp_cache_get( $cache_key, db()->steps->get_cache_group(), false, $found );
+//
+//        // make sure all items in array are also steps
+//		if ( $found && is_array( $steps ) && array_all( $steps, function ( $step ) {
+//				return is_a( $step, Step::class );
+//			} ) ) {
+//
+//			return $steps;
+//		}
 
 		$steps = $this->get_steps_db()->query( $query );
 		$steps = array_map_to_step( $steps );
@@ -673,7 +673,7 @@ class Funnel extends Base_Object_With_Meta {
 			} );
 		}
 
-		wp_cache_set( $cache_key, $steps, db()->steps->get_cache_group(), MINUTE_IN_SECONDS );
+//		wp_cache_set( $cache_key, $steps, db()->steps->get_cache_group(), MINUTE_IN_SECONDS );
 
 		return $steps;
 	}
