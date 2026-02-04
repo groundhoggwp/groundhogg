@@ -2589,7 +2589,7 @@ function maybe_string_to_bool( $bool_or_string ) {
  *
  * @return false|Contact
  */
-function update_contact_with_map( $contact, array $fields, array $map = [], $submission = [] ) {
+function update_contact_with_map( mixed $contact, array $fields, array $map = [], array $submission = [] ) {
 	return generate_contact_with_map( $fields, $map, $submission, $contact );
 }
 
@@ -2598,14 +2598,14 @@ function update_contact_with_map( $contact, array $fields, array $map = [], $sub
  *
  * @throws \Exception
  *
- * @param              $fields     array the raw data from the source
- * @param              $map        array map of field_ids to contact keys
+ * @param  array       $fields     the raw data from the source
+ * @param  array       $map        map of field_ids to contact keys
  * @param array        $submission settings for the submission
  * @param null|Contact $contact    an existing contact record to modify
  *
  * @return Contact|false
  */
-function generate_contact_with_map( $fields, $map = [], $submission = [], $contact = null ) {
+function generate_contact_with_map( array $fields, array $map = [], array $submission = [], mixed $contact = null ) {
 
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );
@@ -8272,7 +8272,7 @@ function get_default_contact_tab() {
  * @return false|int
  */
 function verify_admin_ajax_nonce() {
-	return wp_verify_nonce( get_request_var( 'gh_admin_ajax_nonce' ), 'admin_ajax' );
+	return check_ajax_referer( 'admin_ajax', 'gh_admin_ajax_nonce', false );
 }
 
 /**
