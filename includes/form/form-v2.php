@@ -1902,17 +1902,34 @@ class Form_v2 extends Step {
 
 	protected $hidden_fields = [];
 
+	public function is_turnstile_enabled() {
+		$turnstile = get_array_var( $this->get_cleaned_json_config(), 'turnstile', [] );
+		return isset_not_empty( $turnstile, 'enabled' ) && is_recaptcha_enabled();
+	}
+
+	public function is_recaptcha_enabled() {
+		$recaptcha = get_array_var( $this->get_cleaned_json_config(), 'recaptcha', [] );
+		return isset_not_empty( $recaptcha, 'enabled' ) && is_recaptcha_enabled();
+	}
+
+	/**
+	 * Get a cleaned assoc array of the form config
+	 *
+	 * @return array
+	 */
+	private function get_cleaned_json_config() {
+		$config = $this->get_meta( 'form' );
+		// encode and decode to fix potential mutation errors when importing/exporting
+		return json_decode( wp_json_encode( $config ), true );
+	}
+
 	/**
 	 * Get the HTML For the fields
 	 *
 	 * @return string
 	 */
 	function get_field_html() {
-
-		$config = $this->get_meta( 'form' );
-
-		$config = json_decode( wp_json_encode( $config ), true );
-
+		$config = $this->get_cleaned_json_config();
 		$fields = get_array_var( $config, 'fields', [] );
 
 		// Filter out hidden fields
@@ -2202,7 +2219,7 @@ class Form_v2 extends Step {
 	 * @return mixed
 	 */
 	public function get_fields() {
-		$config = json_decode( wp_json_encode( $this->get_meta( 'form' ) ), true );
+		$config = $this->get_cleaned_json_config();
 
 		if ( ! is_array( $config ) || ! isset( $config['fields'] ) ) {
 			return [];
@@ -2228,7 +2245,7 @@ class Form_v2 extends Step {
 		$posted_data = new Posted_Data();
 
 		// Ensure array and not stdClass
-		$config    = json_decode( wp_json_encode( $this->get_meta( 'form' ) ), true );
+		$config    = $this->get_cleaned_json_config();
 		$fields    = $config['fields'];
 		$recaptcha = $config['recaptcha'];
 		$turnstile = $config['turnstile'];
