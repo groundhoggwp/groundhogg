@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.1
-Stable tag: 4.2.10
+Stable tag: 4.2.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,11 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.2.12 (2026-01-19) =
+* ADDED Bluesky social icons for the email editor
+* ADDED Bulk delete bulk action for campaigns
+* FIXED Email preview link stopped working in the emails table
 
 = 4.2.11 (2026-01-19) =
 * ADDED Setting in **Settings » Misc » Features** to disable geolocation services.
