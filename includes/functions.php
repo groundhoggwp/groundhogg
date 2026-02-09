@@ -3861,7 +3861,7 @@ function file_access_url( $path, $download = false ) {
  * Triggers the API benchmark
  *
  * @param string $call_name   the name you wish to call
- * @param string $id_or_email id or email of the contact
+ * @param string|int|Contact $id_or_email id or email of the contact
  * @param bool   $by_user_id  whether the ID is the ID of a WP user
  */
 function do_api_trigger( $call_name = '', $id_or_email = '', $by_user_id = false ) {

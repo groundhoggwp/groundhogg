@@ -2247,15 +2247,15 @@ class Form_v2 extends Step {
 		// Ensure array and not stdClass
 		$config    = $this->get_cleaned_json_config();
 		$fields    = $config['fields'];
-		$recaptcha = $config['recaptcha'];
-		$turnstile = $config['turnstile'];
 
-		if ( $recaptcha['enabled'] ) {
-			$fields[] = $recaptcha;
+		// add the recaptcha to fields array for validation
+		if ( isset( $config[ 'recaptcha' ] ) &&  $config[ 'recaptcha' ]['enabled'] ){
+			$fields[] = $config['recaptcha'];
 		}
 
-		if ( $turnstile['enabled'] ) {
-			$fields[] = $turnstile;
+		// add the turnstile to fields array for validation
+		if ( isset( $config[ 'turnstile' ] ) &&  $config[ 'turnstile' ]['enabled'] ){
+			$fields[] = $config['turnstile'];
 		}
 
 		foreach ( $fields as $field ) {
