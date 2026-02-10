@@ -378,7 +378,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.2.12 (2026-02-09) =
+= 4.2.12 (2026-02-10) =
 * ADDED Bluesky social icons for the email editor.
 * ADDED Bulk delete bulk action for campaigns.
 * FIXED Email preview link stopped working in the emails table.
