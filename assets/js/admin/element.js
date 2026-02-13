@@ -3123,7 +3123,8 @@ ${ afterProgress() }`,
 </svg>`,
     magnet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <path fill="currentColor" d="M200 40h-40a16.018 16.018 0 0 0-16 16v88a16 16 0 0 1-32 0V56a16.018 16.018 0 0 0-16-16H56a16.018 16.018 0 0 0-16 16v88a88 88 0 0 0 87.995 88l.671-.002c48.156-.357 87.334-40.283 87.334-89.002V56a16.018 16.018 0 0 0-16-16ZM96 96H56V56h40Zm104 0h-40V56h40Z"/>
-</svg>`
+</svg>`,
+        global: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 3h1a28.42 28.42 0 0 0 0 18H8M15 3a28.42 28.42 0 0 1 0 18"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16v-1a28.42 28.42 0 0 0 18 0v1M3 9a28.42 28.42 0 0 1 18 0"/></svg>`
   }
 
   const bold = (text) => {

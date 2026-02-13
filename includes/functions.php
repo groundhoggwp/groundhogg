@@ -6912,6 +6912,11 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	], $extra );
 
 	wp_add_inline_script( 'groundhogg-email-block-editor', 'const _BlockEditor = ' . wp_json_encode( $localized ), 'before' );
+    // preload global blocks
+    $globalBlocksQuery = new Table_Query( 'emails' );
+    $globalBlocksQuery->where( 'message_type', 'global_block' );
+    $blocks = $globalBlocksQuery->get_objects( Email::class );
+	wp_add_inline_script( 'groundhogg-email-block-editor', 'Groundhogg.stores.emails.itemsFetched(' . wp_json_encode( $blocks ) . ');', 'before' );
 
 	do_action( 'groundhogg/enqueue_email_block_editor_assets' );
 }

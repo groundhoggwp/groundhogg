@@ -50,6 +50,11 @@ class Block_Registry {
 			'html'  => [ $this, 'queryloop' ],
 			'plain' => [ $this, 'queryloop' ],
 		] );
+
+		$this->register( 'global', [
+			'html'  => [ $this, 'global' ],
+			'plain' => [ $this, 'global_plain' ],
+		] );
 	}
 
 	/**
@@ -512,6 +517,50 @@ class Block_Registry {
 		}
 
 		return html2markdown( do_shortcode( $content ) );
+	}
+
+	/**
+	 * Handle replacing HTML content for global blocks
+	 *
+	 * @param  array  $props
+	 * @param  string  $content
+	 *
+	 * @return array|false|string
+	 */
+	public function global( array $props, string $content ) {
+		$templateId = $props['templateId'] ?? '';
+		if ( empty( $templateId ) ) {
+			return '';
+		}
+
+		$template = new Email( $templateId );
+		if ( ! $template->exists() || $template->get_message_type() !== 'global_block' ){
+			return '';
+		}
+
+		return $this->parse_blocks( $template->get_content(), 'html' );
+	}
+
+	/**
+	 * Handle replacing plain text content for global blocks
+	 *
+	 * @param  array  $props
+	 * @param  string  $content
+	 *
+	 * @return array|false|string
+	 */
+	public function global_plain( array $props, string $content ) {
+		$templateId = $props['templateId'] ?? '';
+		if ( empty( $templateId ) ) {
+			return '';
+		}
+
+		$template = new Email( $templateId );
+		if ( ! $template->exists() || $template->get_message_type() !== 'global_block' ){
+			return '';
+		}
+
+		return $this->parse_blocks( $template->get_alt_body(), 'plain' );
 	}
 
 	/**

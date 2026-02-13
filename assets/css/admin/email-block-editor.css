@@ -101,7 +101,7 @@
   background: #FFFFFF;
   cursor: pointer;
   margin-bottom: 5px;
-  color: #102640;
+  color: rgb(16, 38, 64);
   border: 1px solid rgba(16, 38, 64, 0.1);
 }
 .insert-block-grid .block-grid .block-wrap .block :hover {
@@ -152,7 +152,7 @@
   background: #FFFFFF;
   cursor: grab;
   margin-bottom: 5px;
-  color: #102640;
+  color: rgb(16, 38, 64);
 }
 #email-block-editor .block.dragging {
   cursor: grabbing;
@@ -194,7 +194,7 @@
   min-height: 667px;
   margin: auto;
   transition: 0.4s;
-  outline: 5px solid #102640;
+  outline: 5px solid rgb(16, 38, 64);
   border-radius: 20px;
   margin-bottom: 20px;
 }
@@ -252,20 +252,38 @@
 #email-block-editor #content #builder-content .builder-block .block-inner-content {
   margin: auto;
 }
-#email-block-editor #content #builder-content .builder-block:has(> div.filters-enabled) {
-  outline: 1px solid #6c19ad;
-}
-#email-block-editor #content #builder-content .builder-block div.filters-enabled {
-  background-color: #6c19ad;
-  color: #fff;
+#email-block-editor #content #builder-content .builder-block div.block-labels {
   position: absolute;
   top: 0;
   right: 0;
   left: auto;
+  display: flex;
+  flex-direction: column;
+}
+#email-block-editor #content #builder-content .builder-block div.block-labels > div {
   height: 22px;
   width: 22px;
-  border-bottom-left-radius: 5px;
   padding: 2px;
+}
+#email-block-editor #content #builder-content .builder-block div.block-labels > div:last-child {
+  border-bottom-left-radius: 5px;
+}
+#email-block-editor #content #builder-content .builder-block:has(> div.block-labels > div.filters-enabled) {
+  outline: 1px solid rgb(108, 25, 173);
+}
+#email-block-editor #content #builder-content .builder-block div.filters-enabled {
+  background-color: rgb(108, 25, 173);
+  color: #fff;
+}
+#email-block-editor #content #builder-content .builder-block:has(> div.block-labels > div.is-global-block-label) {
+  outline: 1px solid rgb(245, 129, 21);
+}
+#email-block-editor #content #builder-content .builder-block div.is-global-block-label {
+  background-color: rgb(245, 129, 21);
+  color: #fff;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=global] > div > .children {
+  outline: 2px dashed rgb(245, 129, 21);
 }
 #email-block-editor #content #builder-content .builder-block[data-type=image] .ui-wrapper {
   display: inline-block;
@@ -436,7 +454,7 @@
   display: none;
 }
 #email-block-editor #content #builder-content .builder-block.is-editing {
-  outline: 2px solid #0075ff !important;
+  outline: 2px solid rgb(0, 117, 255) !important;
   overflow: visible;
   z-index: 9;
 }
@@ -452,11 +470,11 @@
 }
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .move-block {
   color: #FFF;
-  background-color: #0075ff;
+  background-color: rgb(0, 117, 255);
 }
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .insert-block {
   color: #FFF;
-  background-color: #0075ff;
+  background-color: rgb(0, 117, 255);
 }
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar span.block-type {
   display: none;
@@ -592,7 +610,7 @@
   background: none;
 }
 #controls-panel .control-group:not(.closed) .controls .layouts .layout-choice span.col {
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
   border-radius: 3px;
   height: 33px;
   display: block;
@@ -601,7 +619,7 @@
   background-color: rgba(0, 117, 255, 0.5);
 }
 #controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.selected span {
-  background-color: #0075ff;
+  background-color: rgb(0, 117, 255);
 }
 #controls-panel .control-group:not(.closed) .controls .layouts .layout-choice.three_columns {
   grid-template-columns: repeat(3, 1fr);
@@ -729,7 +747,7 @@ body iframe#preview.desktop {
   padding: 10px;
   box-sizing: border-box;
   flex-shrink: 0;
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
 }
 #email-editor .gh-header .show-preview {
   width: 35px;
@@ -829,7 +847,7 @@ body iframe#preview.desktop {
   margin-bottom: 10px;
 }
 #email-editor .inline-label:focus-within {
-  border-color: #0075ff;
+  border-color: rgb(0, 117, 255);
 }
 #email-editor .inline-label label {
   font-weight: 500;
@@ -923,14 +941,14 @@ body iframe#preview.desktop {
   left: 0;
   right: 0;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.1);
-  outline: 2px solid #0075ff;
+  outline: 2px solid rgb(0, 117, 255);
 }
 #template-grid .template:hover iframe {
   height: 496px;
 }
 #template-grid .template:hover p {
   font-weight: 500;
-  color: #0075ff;
+  color: rgb(0, 117, 255);
 }
 
 @media only screen and (min-width: 2000px) {
@@ -987,7 +1005,7 @@ body iframe#preview.desktop {
   white-space: nowrap;
 }
 .global-font-select .select-font.selected {
-  color: #0075ff;
+  color: rgb(0, 117, 255);
 }
 .global-font-select .select-font:hover {
   background: rgba(16, 38, 64, 0.15);
@@ -1015,7 +1033,7 @@ body iframe#preview.desktop {
   border-color: rgba(16, 38, 64, 0.15);
   background-color: rgba(16, 38, 64, 0.05);
   width: 100%;
-  color: #102640;
+  color: rgb(16, 38, 64);
   align-items: center;
 }
 .block-inspector .inspector-block:hover {
@@ -1026,7 +1044,7 @@ body iframe#preview.desktop {
   width: 14px;
 }
 .block-inspector .inspector-block.active {
-  background-color: #0075ff;
+  background-color: rgb(0, 117, 255);
   color: #fff;
 }
 .block-inspector .inspector-column > div.column-header {
@@ -1060,7 +1078,7 @@ body iframe#preview.desktop {
 }
 .number-control .unit {
   background: rgba(16, 38, 64, 0.05);
-  color: #102640;
+  color: rgb(16, 38, 64);
   border: 1px solid rgba(16, 38, 64, 0.5);
   width: 22px;
   display: flex;

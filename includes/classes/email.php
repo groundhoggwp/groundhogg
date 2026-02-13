@@ -562,8 +562,8 @@ class Email extends Base_Object_With_Meta {
 			return 'html';
 		}
 
-		// New blocks
-		if ( $this->get_meta( 'blocks' ) ) {
+		// New blocks && support for global blocks as well
+		if ( $this->get_meta( 'blocks' ) || $this->get_message_type() === 'global_block' ) {
 			return 'blocks';
 		}
 
@@ -1455,10 +1455,14 @@ class Email extends Base_Object_With_Meta {
 				case 'subject':
 				case 'title':
 				case 'pre_header':
-				case 'status':
-				case 'message_type':
 				default:
 					$value = sanitize_text_field( $value );
+					break;
+				case 'status':
+					$value = one_of( $value, [ 'ready', 'draft', 'trash', 'global' ] );
+					break;
+				case 'message_type':
+					$value = one_of( $value, [ 'transactional', 'marketing', 'global_block' ] );
 					break;
 				case 'from_select':
 

@@ -691,6 +691,42 @@
     maybeCall(children, methods),
   ]))
 
+  const TextPrompt = ({
+    header,
+    text = '',
+    submitText = 'Save',
+    onSubmit = text => {}
+  }) => MakeEl.ModalWithHeader({
+    header,
+    onOpen: () => {
+      let input = document.getElementById('prompt-text')
+      input.focus()
+      input.select()
+    },
+  }, ({ close }) => MakeEl.Form({
+    onSubmit: e => {
+      e.preventDefault()
+      let fd = new FormData(e.currentTarget)
+      let text = fd.get('prompt_text')
+      onSubmit(text)
+      close()
+    },
+  }, [
+    Div({
+      className: 'display-flex gap-5',
+    }, [
+      Input({
+        id   : 'prompt-text',
+        name : 'prompt_text',
+        value: text,
+      }),
+      Button({
+        className: 'gh-button primary',
+        type     : 'submit',
+      }, submitText ),
+    ]),
+  ]))
+
   /**
    * Custom modal appended to the body.
    *
@@ -1754,6 +1790,7 @@
     ModalWithHeader,
     MiniModal,
     ModalFrame,
+    TextPrompt,
     ItemPicker,
     Iframe,
     Dashicon,
