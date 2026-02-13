@@ -1393,6 +1393,12 @@ body {
     }
   }
 
+  .inspector-columns:has( > .inspector-block.active ),
+  .inspector-parent:has( > .inspector-block.active )
+  {
+    border: 1px solid $primary-blue;
+  }
+
   .inspector-column {
     //padding-left: 16px;4
     > div.column-header {

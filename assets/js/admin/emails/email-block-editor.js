@@ -10472,6 +10472,7 @@
     },
     defaults  : {
       templateId: '', // the ID of the block template in the DB,
+      templateName: 'Global Block', // replaced by the email title when a template is selected
       children  : [],
     },
   })

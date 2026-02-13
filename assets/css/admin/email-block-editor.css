@@ -1047,6 +1047,10 @@ body iframe#preview.desktop {
   background-color: rgb(0, 117, 255);
   color: #fff;
 }
+.block-inspector .inspector-columns:has(> .inspector-block.active),
+.block-inspector .inspector-parent:has(> .inspector-block.active) {
+  border: 1px solid rgb(0, 117, 255);
+}
 .block-inspector .inspector-column > div.column-header {
   padding: 3px 8px;
   border-bottom: 1px solid rgba(16, 38, 64, 0.15);
