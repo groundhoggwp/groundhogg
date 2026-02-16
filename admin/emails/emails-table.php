@@ -314,6 +314,9 @@ class Emails_Table extends Table {
 				$actions['delete']  = _x( 'Delete Permanently', 'List table bulk action', 'groundhogg' );
 				$actions['restore'] = _x( 'Restore', 'List table bulk action', 'groundhogg' );
 				break;
+			case 'global-blocks':
+				$actions['delete'] = _x( 'Delete', 'List table bulk action', 'groundhogg' );
+				break;
 		}
 
 		return apply_filters( 'wpgh_email_bulk_actions', $actions );
@@ -362,6 +365,15 @@ class Emails_Table extends Table {
 				$actions[] = [
 					'class'   => 'trash',
 					'display' => esc_html__( 'Delete' , 'groundhogg' ),
+					'url'     => action_url( 'delete', [ 'email' => $item->get_id() ] )
+				];
+				break;
+			case 'global-blocks':
+				$actions[] = [ 'class' => 'edit', 'display' => esc_html__( 'Edit', 'groundhogg' ), 'url' => $item->admin_link() ];
+				$actions[] = [ 'class' => 'gh-email-preview', 'display' => esc_html__( 'Preview', 'groundhogg' ), 'url' => '#gh-email-preview/' . $item->get_id() ];
+				$actions[] = [
+					'class'   => 'trash',
+					'display' => esc_html__( 'Delete', 'groundhogg' ),
 					'url'     => action_url( 'delete', [ 'email' => $item->get_id() ] )
 				];
 				break;

@@ -282,8 +282,12 @@
   background-color: rgb(245, 129, 21);
   color: #fff;
 }
-#email-block-editor #content #builder-content .builder-block[data-type=global] > div > .children {
+#email-block-editor #content #builder-content .builder-block[data-type=global] > div {
   outline: 2px dashed rgb(245, 129, 21);
+  outline-offset: -2px;
+}
+#email-block-editor #content #builder-content .builder-block[data-type=global] > div > .children {
+  outline: none;
 }
 #email-block-editor #content #builder-content .builder-block[data-type=image] .ui-wrapper {
   display: inline-block;
@@ -407,6 +411,17 @@
   background-color: #66ACFF;
   z-index: 99;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  --dashicon-size: 14px;
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar .insert-block span.dashicons {
+  height: var(--dashicon-size);
+  width: var(--dashicon-size);
+  font-size: var(--dashicon-size);
+}
+#email-block-editor #content #builder-content .builder-block .block-toolbar .insert-block span.dashicons::before {
+  height: var(--dashicon-size);
+  width: var(--dashicon-size);
+  font-size: var(--dashicon-size);
 }
 #email-block-editor #content #builder-content .builder-block .block-toolbar .insert-block.insert-before {
   left: 50%;
@@ -460,10 +475,18 @@
 }
 #email-block-editor #content #builder-content .builder-block.is-editing:not(:has(.builder-block)) > .block-toolbar .block-buttons {
   top: initial;
-  bottom: -4px;
+  bottom: -2px;
   right: -2px;
   transform: translateY(100%);
   z-index: 99;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing:not(:has(.builder-block)) > .block-toolbar .block-buttons button:last-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 4px;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing:not(:has(.builder-block)) > .block-toolbar .block-buttons button:first-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 4px;
 }
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar {
   display: block;
@@ -482,11 +505,31 @@
 #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons {
   position: absolute;
   display: flex;
-  gap: 3px;
-  top: -4px;
+  top: -2px;
   right: -2px;
   transform: translateY(-100%);
   z-index: 99;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons button {
+  --dashicon-size: 14px;
+  line-height: 1;
+  border-radius: 0;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons button:last-child {
+  border-top-right-radius: 4px;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons button:first-child {
+  border-top-left-radius: 4px;
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons button span.dashicons {
+  width: var(--dashicon-size);
+  height: var(--dashicon-size);
+  font-size: var(--dashicon-size);
+}
+#email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons button span.dashicons::before {
+  width: var(--dashicon-size);
+  height: var(--dashicon-size);
+  font-size: var(--dashicon-size);
 }
 #email-block-editor #content #builder-content .builder-block .dynamic-content-loader {
   position: relative;

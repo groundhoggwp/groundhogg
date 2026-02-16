@@ -23,6 +23,22 @@ $action-green: rgb(158, 206, 56);
 $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
+@mixin small-dashicons {
+  --dashicon-size: 14px;
+
+  span.dashicons {
+    height: var(--dashicon-size);
+    width: var(--dashicon-size);
+    font-size: var(--dashicon-size);
+
+    &::before {
+      height: var(--dashicon-size);
+      width: var(--dashicon-size);
+      font-size: var(--dashicon-size);
+    }
+  }
+}
+
 @keyframes skeleton-loading {
   0% {
     background-color: $primary-dark-5;
@@ -382,8 +398,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         }
 
         &[data-type="global"] {
-          > div > .children {
+          > div {
             outline: 2px dashed $benchmark-orange;
+            outline-offset: -2px;
+
+            > .children {
+              outline: none;
+            }
           }
         }
 
@@ -560,6 +581,8 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             z-index: 99;
             box-shadow: $box-shadow;
 
+            @include small-dashicons;
+
             &.insert-before {
               left: 50%;
               top: 0;
@@ -633,11 +656,23 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
           &:not(:has(.builder-block)) {
             > .block-toolbar .block-buttons {
               top: initial;
-              bottom: -4px;
+              bottom: -2px;
               right: -2px;
               transform: translateY(100%);
               z-index: 99;
               //border-radius: 0 0 3px 3px;
+
+              button {
+                &:last-child {
+                  border-top-right-radius: 0;
+                  border-bottom-right-radius: 4px;
+                }
+
+                &:first-child {
+                  border-top-left-radius: 0;
+                  border-bottom-left-radius: 4px;
+                }
+              }
             }
           }
 
@@ -661,12 +696,40 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             .block-buttons {
               position: absolute;
               display: flex;
-              gap: 3px;
-              top: -4px;
+              top: -2px;
               right: -2px;
               transform: translateY(-100%);
               z-index: 99;
               //border-radius: 0 0 3px 3px;
+
+              button {
+                //height: 16px;
+                //width: 16px;
+                --dashicon-size: 14px;
+                //padding: 4px;
+                line-height: 1;
+                border-radius: 0;
+
+                &:last-child {
+                  border-top-right-radius: 4px;
+                }
+
+                &:first-child {
+                  border-top-left-radius: 4px;
+                }
+
+                span.dashicons {
+                  width: var(--dashicon-size);
+                  height:  var(--dashicon-size);
+                  font-size:  var(--dashicon-size);
+
+                  &::before {
+                    width:  var(--dashicon-size);
+                    height:  var(--dashicon-size);
+                    font-size:  var(--dashicon-size);
+                  }
+                }
+              }
             }
           }
         }

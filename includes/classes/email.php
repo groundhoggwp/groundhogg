@@ -468,7 +468,19 @@ class Email extends Base_Object_With_Meta {
 			$this->get_meta( 'template_css' ),
 		];
 
-		return implode( PHP_EOL, $parts );
+		$css = implode( PHP_EOL, $parts );
+		// quickly handle global block css inserts
+		$css = preg_replace_callback(
+			'@\.global-block\.t-(\d+)\{[^}]*\}@',
+			function ($matches) {
+				$block_id = (int) $matches[1];
+
+				return db()->emailmeta->get_meta( $block_id, 'css', true );
+			},
+			$css
+		);
+
+		return apply_filters( 'groundhogg/email/css', $css, $this );
 	}
 
 	/**

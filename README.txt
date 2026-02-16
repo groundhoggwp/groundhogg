@@ -380,6 +380,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.3 (2026-02-13) =
 * ADDED Global blocks (email template parts) in the email editor.
+* TWEAKED Reduced block toolbar icon sizes
 
 = 4.2.12 (2026-02-10) =
 * ADDED Bluesky social icons for the email editor.

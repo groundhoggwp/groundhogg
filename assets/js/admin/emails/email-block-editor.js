@@ -708,6 +708,43 @@
     })
   }
 
+  function createAlphaGenerator() {
+    let counter = 0;
+
+    return function () {
+      counter++;
+
+      let result = '';
+      let n = counter;
+
+      while (n > 0) {
+        n--; // shift because there is no 0 digit
+        result = String.fromCharCode(97 + (n % 26)) + result;
+        n = Math.floor(n / 26);
+      }
+
+      return result;
+    };
+  }
+
+  const nextGlobalIdPrefix = createAlphaGenerator()
+
+  /**
+   * Retrieve the global blocks from a template and prefix their IDs with the global block namespace
+   *
+   * @param templateId
+   * @param idPrefix
+   * @returns {*[]|[]}
+   */
+  const getGlobalBlocksFromTemplate = ( templateId, idPrefix ) => {
+    let blocks = parseBlocksFromContent(EmailsStore.get(templateId).data.content)
+    __walkBlocks( block => {
+      block.id = `${idPrefix}__${block.id}`
+    }, blocks )
+
+    return blocks
+  }
+
   /**
    * Updates global block content
    * Surprisingly I think this will handle nested global blocks out of the box as well.
@@ -717,28 +754,28 @@
     // find all of the global blocks being used in the email
     // for each of the global blocks, generate their HTML, plain text, and css
     // we can do an emailsStore.patchMany call to save them all at once.
-    let globalBlocks = []
-
-    __walkBlocks(block => {
-      if (block.type === 'global') {
-        globalBlocks.push(block)
-      }
-    }, getBlocks())
-
-    // no blocks, forget about it
-    if (globalBlocks.length === 0) {
-      return
-    }
-
     let patchPayload = []
 
     setIsGeneratingHTML(true)
 
-    globalBlocks.forEach(block => {
+    __walkBlocks(block => {
 
-      let css = renderBlocksCSS(block.children)
-      let content = renderBlocksHTML(block.children)
-      let plain_text = renderBlocksPlainText(block.children)
+      // skip non-global blocks
+      if (block.type !== 'global') {
+        return
+      }
+
+      // remove namespace
+      let children = block.children
+
+      // remove the namespace
+      __walkBlocks(block => {
+        block.id = block.id.replace(/^[^_]+__/, '');
+      }, children )
+
+      let css = renderBlocksCSS(children)
+      let content = renderBlocksHTML(children)
+      let plain_text = renderBlocksPlainText(children)
 
       patchPayload.push({
         ID  : parseInt(block.templateId),
@@ -751,9 +788,13 @@
         },
       })
 
-    })
+    }, getBlocksCopy())
 
     setIsGeneratingHTML(false)
+
+    if ( patchPayload.length === 0 ) {
+      return
+    }
 
     return EmailsStore.patchMany(patchPayload)
   }
@@ -2798,7 +2839,22 @@
             className: 'block-buttons',
           },
           [
-            block.type === 'global' ? null : Button({
+            block.type === 'global' ? Button({
+              className: 'gh-button primary small icon detach-block',
+              id       : `detach-${ block.id }`,
+              onClick: e => {
+
+                let curr = __findBlock( block.id, getBlocks() )
+
+                insertBlockBefore( __replaceId( curr.children ), curr.id )
+
+                deleteBlock(curr.id)
+
+              }
+            }, [
+              Dashicon('editor-unlink'),
+              ToolTip('Detach')
+            ]) : Button({
                 className: 'gh-button primary small icon globalize-block',
                 id       : `globalize-${ block.id }`,
                 onClick  : async e => {
@@ -2808,6 +2864,9 @@
                     header  : 'Name this global block',
                     text    : `Global ${ BlockRegistry.get(block.type).name }`,
                     onSubmit: text => {
+
+                      // pull the current state of the block
+                      block = __findBlock(block.id, getBlocks())
 
                       // get needed rendered format of the current block
                       setIsGeneratingHTML(true)
@@ -2836,7 +2895,7 @@
                         let globalBlock = createBlock('global', {
                           templateId  : item.ID,
                           templateName: item.data.title,
-                          children    : [__replaceId(block)],
+                          children    : getGlobalBlocksFromTemplate(item.ID, nextGlobalIdPrefix() ),
                         })
 
                         replaceBlock(block, globalBlock)
@@ -3138,7 +3197,7 @@
           }
 
           // Using the toolbar
-          if (clickedIn(e, '.delete-block, .duplicate-block, .insert-block')) {
+          if (clickedIn(e, '.delete-block, .duplicate-block, .insert-block, .detach-block')) {
             return
           }
 
@@ -3192,6 +3251,85 @@
           deleteBlock,
         }),
 
+      ])
+  }
+
+  /**
+   * The html of a block as shown in the editor
+   *
+   * @param block
+   * @return {*}
+   * @constructor
+   */
+  const BlockPreview = (block) => {
+
+    let {
+      advancedStyle = {},
+    } = block
+
+    let {
+      width = '',
+      a,
+    } = advancedStyle
+
+    if (!width) {
+      width = getEmailWidth()
+    }
+
+    let html = BlockRegistry.html(block)
+
+    if (isTopLevelBlock(block.id) && templateIs(FULL_WIDTH_CONTAINED)) {
+      html = Div({
+          className: 'block-inner-content',
+          style    : {
+            width: `${ width }px`,
+
+          },
+        },
+        html)
+    }
+
+    let classes = []
+
+    if (block.hide_on_mobile) {
+      classes.push('hide-on-mobile')
+    }
+
+    if (block.hide_on_desktop) {
+      classes.push('hide-on-desktop')
+    }
+
+    if (block.hide_in_browser) {
+      classes.push('hide-in-browser')
+    }
+
+    let blockLabels = []
+
+    if (block.filters_enabled) {
+      blockLabels.push(Div({
+          className: 'filters-enabled',
+        },
+        icons.eye))
+    }
+
+    return Div({
+        id: `preview-${ block.id }`,
+
+        className: `preview-block`,
+        dataId   : block.id,
+        dataType : block.type,
+        tabindex : 0,
+      },
+      [
+        Div({
+            id       : `b-${ block.id }`,
+            className: classes.join(' '),
+            style    : {
+              ...AdvancedStyleControls.getInlineStyle(block),
+            },
+          },
+          [html]),
+        blockLabels.length ? Div({ className: 'block-labels' }, blockLabels) : null,
       ])
   }
 
@@ -3501,6 +3639,11 @@
    * @private
    */
   const __replaceId = (block) => {
+
+    // if providing an array of blocks
+    if ( Array.isArray(block)){
+      return block.map( b => __replaceId(b) )
+    }
 
     if (block.columns && Array.isArray(block.columns)) {
       block.columns = block.columns.map(column => column.map(_block => __replaceId(_block)))
@@ -10383,12 +10526,14 @@
     },
   })
 
+  //
+  //
   // working here
   registerBlock('global', 'Global Block', {
     svg       : icons.global,
     attributes: {
       children    : (el, block) => {
-        return parseBlocksFromContent(EmailsStore.get(block.templateId).data.content)
+        return getGlobalBlocksFromTemplate(block.templateId, nextGlobalIdPrefix() )
       },
       templateName: (el, block) => {
         return EmailsStore.get(block.templateId).data.title
@@ -10425,7 +10570,7 @@
               onChange    : item => {
                 updateBlock({
                   templateId  : item.id,
-                  children    : parseBlocksFromContent(EmailsStore.get(item.id).data.content),
+                  children    : getGlobalBlocksFromTemplate(item.id, nextGlobalIdPrefix() ),
                   templateName: EmailsStore.get(item.id).data.title,
                 })
               },
@@ -10438,6 +10583,7 @@
 
     },
     html      : ({
+      id,
       children = [],
       templateId = null,
     }) => {
@@ -10457,8 +10603,17 @@
         ])
       }
 
-      return ChildBlocks({ children })
+      // verify that this block has not been placed within itself
+      // check the children, and if any of the children are global and the templateId is the same, prevent it
+      __walkBlocks( block => {
+        // self referential template, not allowed
+        if ( block.type === 'global' && block.templateId === templateId ){
+          block.templateId = null
+          block.children = []
+        }
+      }, children )
 
+      return ChildBlocks({ children })
     },
     plainText : ({
       children = [],
@@ -10469,6 +10624,10 @@
       }
 
       return renderBlocksPlainText(children)
+    },
+    css: ( {templateId }) => {
+      // language=CSS
+      return `.global-block.t-${templateId}{visibility: hidden;}`
     },
     defaults  : {
       templateId: '', // the ID of the block template in the DB,
