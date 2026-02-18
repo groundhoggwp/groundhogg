@@ -559,7 +559,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return bool
 	 */
 	public function has_footer_block() {
-		return $this->is_block_editor() && str_contains( $this->content, '<div id="footer"' );
+		return $this->is_block_editor() && str_contains( $this->parsed_content ?: $this->content, '<div id="footer"' );
 	}
 
 	/**
@@ -715,6 +715,7 @@ class Email extends Base_Object_With_Meta {
 			// Block Editor
 			case 'blocks':
 				$content = Block_Registry::instance()->parse_blocks( $content, 'html' );
+				$this->parsed_content = $content;
 
 				// this is now handled by Block_Registry::parse_blocks()
 //				$content = $this->maybe_hide_blocks( $content );

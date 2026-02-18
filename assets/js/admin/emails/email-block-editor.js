@@ -4436,9 +4436,11 @@
         name: 'Template Settings',
       },
       [
-        isGlobalBlockEditor() ? Pg({},
-          '⚠️ These settings will not have any affect on the templates where the global block is being used and are for visual aid only.') : null,
-        `<hr/>`,
+        isGlobalBlockEditor() ? Fragment([
+          Pg({},
+          '⚠️ These settings will not have any affect on the templates where the global block is being used and are for visual aid only.'),
+          `<hr/>`
+        ]) : null,
         Control({
             label: 'Template',
           },
