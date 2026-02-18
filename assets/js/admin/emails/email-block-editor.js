@@ -10543,6 +10543,10 @@
       templateId,
     }) => {
 
+      if ( ! EmailsStore.has(templateId) ) {
+        templateId = null
+      }
+
       return Fragment([
         ControlGroup({ name: 'Global Block Template' }, [
           Control({
@@ -10602,6 +10606,17 @@
           }, 'Select a global block template 👉<br/>No global blocks yet? Hover over any block and click the 🌐 icon!'),
         ])
       }
+
+      if (templateId && ! EmailsStore.get(templateId)) {{
+        return Fragment([
+          Pg({
+            className: 'gh-text error red',
+            style: {
+              textAlign: 'center',
+            },
+          }, '⚠️ The global block template that was selected is no longer available.'),
+        ])
+      }}
 
       // verify that this block has not been placed within itself
       // check the children, and if any of the children are global and the templateId is the same, prevent it
