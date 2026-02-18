@@ -379,8 +379,15 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.3 (2026-02-13) =
-* ADDED Global blocks (email template parts) in the email editor.
-* TWEAKED Reduced block toolbar icon sizes
+* ADDED 🌐 Global blocks (email template parts) in the email editor.
+ * Save any block as a Global Block
+ * Are synced across all your templates
+ * Can be edited inline
+ * Can be detached to edit separately
+ * Can be exported and imported
+* TWEAKED Editor design
+ * Reduced block toolbar icon sizes
+ * Added a container border for container blocks in the block inspector
 
 = 4.2.12 (2026-02-10) =
 * ADDED Bluesky social icons for the email editor.
