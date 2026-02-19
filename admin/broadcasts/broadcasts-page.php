@@ -49,10 +49,10 @@ class Broadcasts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$total_contacts  = get_post_var( 'total_contacts' );
-		$amount          = get_post_var( 'batch_amount' );
-		$interval        = get_post_var( 'batch_interval' );
-		$interval_length = get_post_var( 'batch_interval_length' );
+		$total_contacts  = absint( get_post_var( 'total_contacts' ) );
+		$amount          = absint( get_post_var( 'batch_amount' ) );
+		$interval        = absint( get_post_var( 'batch_interval' ) );
+		$interval_length = absint( get_post_var( 'batch_interval_length' ) );
 
 		$batches = floor( $total_contacts / $amount );
 
