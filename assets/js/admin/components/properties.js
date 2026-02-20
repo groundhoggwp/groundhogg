@@ -77,11 +77,43 @@
     },
     number: {
       name: __('Number', 'groundhogg'),
-      view: ({ label, ...props }) => {
+      view: ({ label, decimals = 0, ...props }) => {
+
+        let step = (1 / Math.pow(10, decimals)).toString()
         //language=HTML
         return `<label class="property-label" for="${props.id}">${label}</label>${input({ 
-            className: 'full-width', ...props, type: 'number', 
+            className: 'full-width', ...props, type: 'number', step
         })}`
+      },
+      edit: (field) => {
+
+        const { decimals = 0 } = field
+
+        //language=HTML
+        return `
+			<div class="gh-rows-and-columns">
+				<div class="gh-row">
+					<div class="gh-col">
+						<label>${__('Decimals', 'groundhogg')}</label>
+						${input({
+                type: 'number',
+                name: 'property_number_decimals',
+                id: 'property-number-decimals',
+                value: decimals,
+                min: 0,
+                max: 100,
+            })}
+					</div>
+				</div>
+			</div>
+        `
+      },
+      onEditMount: (field, updateField) => {
+        $('#property-number-decimals').on( 'change', (e) => {
+          updateField({
+            decimals: e.target.value,
+          })
+        })
       },
     },
     url: {

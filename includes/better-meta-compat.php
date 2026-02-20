@@ -61,7 +61,7 @@ function sanitize_custom_field( $value, $field_id ) {
 		case 'textarea':
 			return sanitize_textarea_field( $value );
 		case 'number':
-			return intval( $value );
+			return number_format( (float) $value, $field['decimals'] ?? 0 );
 		case 'time':
 			return date( 'H:i:s', strtotime( $value ) );
 		case 'date':
