@@ -222,6 +222,16 @@
           Dashicon('id'),
           ToolTip('Change contact', 'top'),
         ]),
+        Button({
+          id       : `view-profile-${ item.ID }`,
+          className: 'gh-button secondary text icon',
+          onClick  : ()=>{
+            window.open( Groundhogg.stores.contacts.get(State.contactId).admin, '_blank' )
+          },
+        }, [
+          Dashicon('external'),
+          ToolTip('View profile', 'top'),
+        ]),
       ]),
     }) : Button({
       id     : 'select-contact-for-simulator',
