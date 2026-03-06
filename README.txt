@@ -378,6 +378,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.3.1 (2026-03-06) =
+* ADDED Quarter (This Quarter, Next Quarter, Last Quarter) time ranges for date filters.
+* FIXED Missing support for event arguments in the simulator (backend magic wizardy).
+* FIXED Flow template categories and search not working if tollbar widget was disabled.
+
 = 4.3 (2026-02-13) =
 * ADDED 🌐 Global blocks (email template parts) in the email editor.
  * Save any block as a Global Block

@@ -178,41 +178,55 @@ class Filters {
 				$after->modify( 'tomorrow 00:00:00' );
 				$before->modify( 'tomorrow 23:59:59' );
 				break;
-			case 'this_week':
 
+			case 'this_week':
 				$startEnd = get_weekstartend( $after->ymdhis() );
 				$after->setTimestamp( $startEnd['start'] );
 				$before->setTimestamp( $startEnd['end'] );
-
 				break;
 			case 'last_week':
-
 				$after->modify( '7 days ago' );
 				$startEnd = get_weekstartend( $after->ymdhis() );
 				$after->setTimestamp( $startEnd['start'] );
 				$before->setTimestamp( $startEnd['end'] );
-
 				break;
-
+			case 'next_week':
+				$after->modify( '+7 days' );
+				$startEnd = get_weekstartend( $after->ymdhis() );
+				$after->setTimestamp( $startEnd['start'] );
+				$before->setTimestamp( $startEnd['end'] );
+				break;
 			case 'this_month':
 				$after->modify( 'first day of this month 00:00:00' );
 				$before->modify( 'last day of this month 23:59:59' );
-				break;
-			case 'this_quarter':
-				$after->toStartOfQuarter();
-				$before->toEndOfQuarter();
-				break;
-			case 'next_quarter':
-				$after->modify( '+3 months')->toStartOfQuarter();
-				$before->modify( '+3 months')->toEndOfQuarter();
 				break;
 			case 'last_month':
 				$after->modify( 'first day of last month 00:00:00' );
 				$before->modify( 'last day of last month 23:59:59' );
 				break;
+			case 'next_month':
+				$after->modify( 'first day of next month 00:00:00' );
+				$before->modify( 'last day of next month 23:59:59' );
+				break;
+			case 'this_quarter':
+				$after->toStartOfQuarter();
+				$before->toEndOfQuarter();
+				break;
+			case 'last_quarter':
+				$after->modify('-3 months')->toStartOfQuarter();
+				$before->modify('-3 months')->toEndOfQuarter();
+				break;
+			case 'next_quarter':
+				$after->modify( '+3 months')->toStartOfQuarter();
+				$before->modify( '+3 months')->toEndOfQuarter();
+				break;
 			case 'this_year':
 				$after->modify( 'first day of January this year 00:00:00' );
 				$before->modify( 'last day of December this year 23:59:59' );
+				break;
+			case 'last_year':
+				$after->modify('-1 year')->modify( 'first day of January this year 00:00:00' );
+				$before->modify('-1 year')->modify( 'last day of December this year 23:59:59' );
 				break;
 			case 'next_year':
 				$after->modify('+1 year')->modify( 'first day of January this year 00:00:00' );
