@@ -248,6 +248,14 @@
 
       },
 
+      setOtherDataAndRefresh: function (data) {
+        this.other = {
+          ...this.other,
+          ...data,
+        }
+        this.refresh(this.calendar)
+      },
+
       initCalendar: function () {
 
         var self = this
