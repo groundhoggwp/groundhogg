@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
 use Groundhogg\DB\Meta_DB;
@@ -8914,6 +8915,13 @@ function add_action_use_once( string $hook_name, callable $callback, int $priori
  * @return bool
  */
 function add_event_args( $args = [] ) {
+
+    // special handling for the simulator
+    if ( Simulator::is_simulating() ){
+        Simulator::set_event_args( $args );
+        return true;
+    }
+
 	if ( ! \Groundhogg\event_queue()::is_processing() ) {
 		return false;
 	}
@@ -8932,6 +8940,11 @@ function add_event_args( $args = [] ) {
  * @return bool|mixed false if the event queue is not running, otherwise the found arg or the given default
  */
 function get_event_arg( string $arg, $default = false ) {
+
+	// special handling for the simulator
+	if ( Simulator::is_simulating() ){
+		return Simulator::get_event_arg( $arg, $default );
+	}
 
 	if ( ! \Groundhogg\event_queue()::is_processing() ) {
 		return false;

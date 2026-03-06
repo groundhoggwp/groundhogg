@@ -12,6 +12,7 @@ use WP_CLI;
 use function cli\prompt;
 use function Groundhogg\array_find;
 use function Groundhogg\Cli\doing_cli;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\the_funnel;
 use function WP_CLI\Utils\format_items;
@@ -26,6 +27,41 @@ class Simulator {
 	protected static $options = [];
 	protected static $steps = [];
 	protected static $is_dry_run = true;
+
+	/**
+	 * @var Event
+	 */
+	protected static $curr_event;
+
+	/**
+	 * Allow for the persistence of event arguments during simulation
+	 *
+	 * @var array
+	 */
+	protected static $event_args = [];
+
+	/**
+	 * Allow adding new event args
+	 *
+	 * @param array $args
+	 *
+	 * @return void
+	 */
+	public static function set_event_args( $args ) {
+		self::$event_args = array_merge( self::$event_args, $args );
+	}
+
+	/**
+	 * Get an arg from the args array
+	 *
+	 * @param string $arg
+	 * @param        $default
+	 *
+	 * @return bool|mixed
+	 */
+	public static function get_event_arg( string $arg, $default = false ) {
+		return get_array_var( self::$event_args, $arg, $default );
+	}
 
 	/**
 	 * Whether the simulator is running or not
@@ -263,6 +299,9 @@ class Simulator {
 						'status'     => Event::WAITING,
 					] );
 
+					// add the event args here also
+					$event->set_args( self::$event_args );
+
 					if ( $current->type_is( Send_Email::TYPE ) ) {
 						$event->update( [ 'email_id' => $current->get_meta( 'email_id' ) ] );
 					}
@@ -270,6 +309,10 @@ class Simulator {
 					// run the step, but use a simulated event
 					$current->get_step_element()->pre_run( $contact, $event );
 					$result = $current->get_step_element()->run( $contact, $event );
+
+					// update event args if there were any changes
+					$event->set_args( self::$event_args );
+
 					if ( is_wp_error( $result ) ) {
 						self::log( sprintf( "⚠️ %s", $result->get_error_message() ) );
 						$event->update( [ 'status' => Event::FAILED ] );
