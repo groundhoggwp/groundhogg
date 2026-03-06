@@ -1719,4 +1719,23 @@ class HTML {
 		return $this->e( 'div', $attrs, $content, false, $echo );
 	}
 
+	/**
+     * An easy tooltip helper
+     *
+	 * @param  string  $text
+	 * @param  string  $position
+	 * @param $echo
+	 *
+	 * @return string
+	 */
+    public function info_tooltip( string $text, string $position = 'top', $echo = false ) {
+	    return $this->e( 'span', [ 'class' => 'dashicons dashicons-info' ], [
+            $this->e('span', [ 'class' => 'gh-tooltip ' . $position ], $text ),
+        ], '', $echo );
+    }
+
+    public function help_tooltip( string $text ) {
+
+    }
+
 }

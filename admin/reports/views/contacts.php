@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Admin\Reports\Views;
 
+use function Groundhogg\html;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
@@ -53,11 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="gh-panel-header">
             <h2 class="title">
 				<?php esc_html_e( 'Unsubscribe Reasons', 'groundhogg' ); ?>
-                <span class="gh-has-tooltip dashicons dashicons-info">
-                    <span class="gh-tooltip top">
-                        <?php esc_html_e( 'This chart shows individual unsubscribe events with their reasons, which may be larger that the total number of unsubscribed contacts.', 'groundhogg' ) ?>
-                    </span>
-                </span>
+                <?php html()->info_tooltip( esc_html( __( 'This chart shows individual unsubscribe events with their reasons, which may be larger that the total number of unsubscribed contacts.', 'groundhogg' ) ), 'top', true ); ?>
             </h2>
         </div>
         <div class="gh-donut-chart-wrap inside">
