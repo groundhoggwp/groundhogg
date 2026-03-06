@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.1
-Stable tag: 4.3
+Stable tag: 4.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -379,7 +379,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.3.1 (2026-03-06) =
-* ADDED Quarter (This Quarter, Next Quarter, Last Quarter) time ranges for date filters.
+* ADDED Quarter time ranges (This Quarter, Next Quarter, Last Quarter) for date filters.
 * FIXED Missing support for event arguments in the simulator (backend magic wizardy).
 * FIXED Flow template categories and search not working if tollbar widget was disabled.
 
