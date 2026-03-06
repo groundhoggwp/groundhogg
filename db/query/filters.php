@@ -198,6 +198,14 @@ class Filters {
 				$after->modify( 'first day of this month 00:00:00' );
 				$before->modify( 'last day of this month 23:59:59' );
 				break;
+			case 'this_quarter':
+				$after->toStartOfQuarter();
+				$before->toEndOfQuarter();
+				break;
+			case 'next_quarter':
+				$after->modify( '+3 months')->toStartOfQuarter();
+				$before->modify( '+3 months')->toEndOfQuarter();
+				break;
 			case 'last_month':
 				$after->modify( 'first day of last month 00:00:00' );
 				$before->modify( 'last day of last month 23:59:59' );
@@ -205,6 +213,10 @@ class Filters {
 			case 'this_year':
 				$after->modify( 'first day of January this year 00:00:00' );
 				$before->modify( 'last day of December this year 23:59:59' );
+				break;
+			case 'next_year':
+				$after->modify('+1 year')->modify( 'first day of January this year 00:00:00' );
+				$before->modify('+1 year')->modify( 'last day of December this year 23:59:59' );
 				break;
 			case '24_hours':
 				$after->modify( '24 hours ago' );

@@ -118,6 +118,39 @@ class DateTimeHelper extends \DateTime {
 	}
 
 	/**
+	 * Move to the start of the quarter relative to the current time
+	 *
+	 * @return $this
+	 */
+	public function toStartOfQuarter() {
+
+		$month = (int) $this->format('n');
+		$quarter = (int) ceil($month / 3);
+
+		$start = (clone $this)->setDate(
+			(int) $this->format('Y'),
+			(($quarter - 1) * 3) + 1,
+			1
+		)->setTime(0, 0, 0);
+
+		$this->setTimestamp( $start->getTimestamp() );
+
+		return $this;
+	}
+
+	/**
+	 * Move to the end of the quarter relative to the current time
+	 *
+	 * @throws \DateMalformedStringException
+	 * @return \DateTime|false
+	 */
+	public function toEndOfQuarter() {
+		return $this->toStartOfQuarter()
+		            ->modify('+3 months')
+		            ->modify('-1 second');
+	}
+
+	/**
 	 * Display the localized date
 	 *
 	 * @return string
