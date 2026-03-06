@@ -272,6 +272,7 @@ class Funnels_Page extends Admin_Page {
 				break;
 			case 'add':
 				wp_enqueue_style( 'groundhogg-admin-element' );
+                wp_enqueue_script( 'groundhogg-admin-data' ); // needed for createState
 				break;
 			case 'view':
 				$this->enqueue_table_filters( [
