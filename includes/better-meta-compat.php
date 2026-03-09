@@ -61,13 +61,26 @@ function sanitize_custom_field( $value, $field_id ) {
 		case 'textarea':
 			return sanitize_textarea_field( $value );
 		case 'number':
-			return number_format( (float) $value, $field['decimals'] ?? 0 );
+//			return number_format( (float) $value, $field['decimals'] ?? 0, '.', '' );
+			return number_format( (float) $value, $field['decimals'] ?? 0, '.', '' );
 		case 'time':
-			return date( 'H:i:s', strtotime( $value ) );
+			try {
+				return ( new DateTimeHelper( $value ) )->format( 'H:i:s' );
+			} catch ( \DateException $e ) {
+				return '';
+			}
 		case 'date':
-			return date( 'Y-m-d', strtotime( $value ) );
+			try {
+				return ( new DateTimeHelper( $value ) )->ymd();
+			} catch ( \DateException $e ) {
+				return '';
+			}
 		case 'datetime':
-			return date( 'Y-m-d H:i:s', strtotime( $value ) );
+			try {
+				return ( new DateTimeHelper( $value ) )->ymdhis();
+			} catch ( \DateException $e ) {
+				return '';
+			}
 		case 'dropdown':
 			// Multiple options can be selected
 			if ( isset_not_empty( $field, 'multiple' ) ) {
