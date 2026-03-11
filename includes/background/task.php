@@ -17,6 +17,8 @@ abstract class Task implements \JsonSerializable {
 
 	public function stop(){}
 
+	abstract public function get_progress();
+
 	public function __serialize(): array {
 		return get_object_vars( $this );
 	}
