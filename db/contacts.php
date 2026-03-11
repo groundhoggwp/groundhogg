@@ -502,8 +502,10 @@ class Contacts extends DB {
 					break;
 				case 'owner_id':
 				case 'user_id':
-				case 'is_free':
 					$cols[ $key ] = absint( $val );
+					break;
+				case 'is_free':
+					$cols[ $key ] = (bool) $val;
 					break;
 			}
 

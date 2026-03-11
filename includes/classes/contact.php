@@ -826,8 +826,10 @@ class Contact extends Base_Object_With_Meta {
 					break;
 				case 'owner_id':
 				case 'user_id':
-				case 'is_free':
 					$value = absint( $value );
+					break;
+				case 'is_free':
+					$value = (bool) $value;
 					break;
 				case 'optin_status':
 					$value = Preferences::sanitize( $value );

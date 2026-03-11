@@ -378,6 +378,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.3.3 (2026-03-09) =
+* ADDED Automatic detection of free inbox providers for contacts.
+* ADDED The "Is Free Email?" search filter to filter by free email inbox providers.
+* FIXED Settings page pickers not working due to missing script if toolbar widget is disabled.
+
 = 4.3.2 (2026-03-09) =
 * FIXED Sanitization issue with number fields causing numbers with more than 4 digits not to save.
 
