@@ -730,6 +730,11 @@ class Contact extends Base_Object_With_Meta {
 			if ( ! is_email( $new_email ) || is_email_address_in_use( $new_email ) ) {
 				unset( $data['email'] );
 			}
+
+			// set whether the new email address is free or not
+			if ( ! isset( $data['is_free'] ) ){
+				$data[ 'is_free' ] = is_free_email_provider( $new_email );
+			}
 		}
 
 		// prevent email being removed...
@@ -821,6 +826,7 @@ class Contact extends Base_Object_With_Meta {
 					break;
 				case 'owner_id':
 				case 'user_id':
+				case 'is_free':
 					$value = absint( $value );
 					break;
 				case 'optin_status':
@@ -1546,7 +1552,10 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	public function add_note( $note, $context = 'system', $user_id = false, $overrides = [] ) {
-		$note = do_replacements( $note, $this );
+
+		if ( is_string( $note ) ) {
+			$note = do_replacements( $note, $this );
+		}
 
 		return parent::add_note( $note, $context, $user_id, $overrides );
 	}
