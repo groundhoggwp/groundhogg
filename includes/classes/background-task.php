@@ -102,10 +102,15 @@ class Background_Task extends Base_Object {
 
 		$complete = false;
 
-		// While there is still more of the task to do
-		while ( ! Limits::limits_exceeded() && $complete === false && $timer->time_elapsed() < $max_time ) {
-			$complete = $this->theTask->process();
-			Limits::processed_action();
+		try {
+			// While there is still more of the task to do
+			while ( ! Limits::limits_exceeded() && $complete === false && $timer->time_elapsed() < $max_time ) {
+				$complete = $this->theTask->process();
+				Limits::processed_action();
+			}
+		} catch ( \Exception $e ) {
+			$this->update( [ 'status' => 'failed' ] );
+			throw $e;
 		}
 
 		// Cleanup
@@ -117,6 +122,10 @@ class Background_Task extends Base_Object {
 
 		if ( $complete === true ) {
 			$data['status'] = 'done';
+		}
+
+		if ( is_wp_error( $complete ) ) {
+			$data['status'] = 'failed';
 		}
 
 		// remove the manual claim

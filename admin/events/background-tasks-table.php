@@ -82,6 +82,11 @@ class Background_Tasks_Table extends Table {
 				'display' => esc_html__( 'Cancelled', 'groundhogg' ),
 				'query'   => [ 'status' => 'cancelled' ],
 			],
+			[
+				'view'    => 'failed',
+				'display' => esc_html__( 'Failed', 'groundhogg' ),
+				'query'   => [ 'status' => 'failed' ],
+			],
 		];
 	}
 
@@ -278,6 +283,7 @@ class Background_Tasks_Table extends Table {
 		$actions = [];
 
 		switch ( $item->status ) {
+			case 'failed':
 			case 'done':
 				break;
 			case 'cancelled':
