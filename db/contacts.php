@@ -9,6 +9,7 @@ use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Preferences;
 use function Groundhogg\add_action_use_once;
 use function Groundhogg\get_primary_owner_id;
+use function Groundhogg\is_free_email_provider;
 use function Groundhogg\safe_user_id_sync;
 
 
@@ -138,6 +139,7 @@ class Contacts extends DB {
 		return [
 			'ID'                        => '%d',
 			'email'                     => '%s',
+			'is_free' => '%d',
 			'first_name'                => '%s',
 			'last_name'                 => '%s',
 			'user_id'                   => '%d',
@@ -158,6 +160,7 @@ class Contacts extends DB {
 		return array(
 			'ID'                        => 0,
 			'email'                     => '',
+			'is_free' => 0,
 			'first_name'                => '',
 			'last_name'                 => '',
 			'user_id'                   => 0,
@@ -180,6 +183,11 @@ class Contacts extends DB {
 			$this->last_error = 'No email field provided.';
 
 			return false;
+		}
+
+		// fallback to set `is_free` when adding a new contact record
+		if ( ! isset( $data['is_free'] ) ) {
+			$data['is_free'] = is_free_email_provider( $data['email'] );
 		}
 
 		$data = $this->sanitize_columns( $data );
@@ -446,19 +454,8 @@ class Contacts extends DB {
 		return $args;
 	}
 
-	/**
-	 * Create the table
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function create_table() {
-
-		global $wpdb;
-
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+	public function create_table_sql_command() {
+		return "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		email varchar(50) NOT NULL,
 		first_name mediumtext NOT NULL,
@@ -466,20 +463,18 @@ class Contacts extends DB {
 		user_id bigint(20) unsigned NOT NULL,
 		owner_id bigint(20) unsigned NOT NULL,
 		optin_status int unsigned NOT NULL,
+		is_free tinyint(1) unsigned NOT NULL,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		date_optin_status_changed datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY (ID),
 		UNIQUE KEY email (email),
 		KEY user (user_id),
+		KEY is_free_inbox (is_free),
 		KEY owner_id (owner_id),
 		KEY optin_status (optin_status),
 		KEY date_created (date_created),
 		KEY date_optin_status_changed (date_optin_status_changed)
 		) {$this->get_charset_collate()};";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 
 	/**
@@ -507,6 +502,7 @@ class Contacts extends DB {
 					break;
 				case 'owner_id':
 				case 'user_id':
+				case 'is_free':
 					$cols[ $key ] = absint( $val );
 					break;
 			}

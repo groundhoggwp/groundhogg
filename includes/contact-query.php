@@ -399,6 +399,18 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
+	 * Whether the inbox provider is free or not
+	 *
+	 * @param $filter
+	 * @param  Where  $where
+	 *
+	 * @return void
+	 */
+	public static function filter_is_free_email_provider( $filter, Where $where ) {
+		$where->equals( 'is_free', (bool) $filter['is_free'] );
+	}
+
+	/**
 	 * Filter by primary object relationships
 	 * "Is Parent Of"
 	 *

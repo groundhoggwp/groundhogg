@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Background\Iterate_Over_List;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Steps\Actions\Send_Email;
 
@@ -260,8 +261,43 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					db()->tag_relationships->create_table(); // add the date_created column
 				}
+			],
+			'4.3.3'  => [
+				'automatic'   => true,
+				'description' => __( 'Add the `is_free` column to the contacts table.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->contacts->create_table();
+
+					Background_Tasks::add( new Iterate_Over_List(
+						__( 'Set `is_free` for all contacts', 'groundhogg' ),
+						get_free_email_providers(),
+						[ __CLASS__, 'v_433_bg_callback' ],
+						20
+					) );
+				},
 			]
 		];
+	}
+
+	/**
+	 * Callback for background task to update contacts based on their email provider
+	 *
+	 * @param $email_providers
+	 *
+	 * @return void
+	 */
+	public static function v_433_bg_callback( $email_providers ) {
+
+		$query = new Contact_Query();
+		$or = $query->where()->subWhere( 'OR' );
+
+		foreach ( $email_providers as $email_provider ) {
+			$or->endsWith( 'email', '@' . $email_provider );
+		}
+
+		$query->update( [
+			'is_free' => 1
+		] );
 	}
 
 	/**

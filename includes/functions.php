@@ -7540,6 +7540,22 @@ function get_email_address_hostname( $email ) {
 }
 
 /**
+ * List of free email providers
+ *
+ * @return array|mixed
+ */
+function get_free_email_providers() {
+	static $providers = [];
+
+	// initialize providers
+	if ( empty( $providers ) ) {
+		$providers = json_decode( files()->get( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
+	}
+
+    return $providers;
+}
+
+/**
  * If the given email is from a free inbox provider
  *
  * @param $email string
@@ -7550,14 +7566,7 @@ function is_free_email_provider( $email ) {
 		return false;
 	}
 
-	static $providers = [];
-
-	// initialize providers
-	if ( empty( $providers ) ) {
-		$providers = json_decode( files()->get( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
-	}
-
-	return apply_filters( 'groundhogg/is_free_email_provider', in_array( get_email_address_hostname( $email ), $providers ) );
+	return apply_filters( 'groundhogg/is_free_email_provider', in_array( get_email_address_hostname( $email ), get_free_email_providers() ) );
 }
 
 /**

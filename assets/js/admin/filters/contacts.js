@@ -47,6 +47,7 @@
 
   const {
     Fragment,
+    Toggle,
     ItemPicker,
     Select,
     Input,
@@ -114,6 +115,21 @@
     filters,
     onChange,
   })
+
+  const IncludeExcludeContactFilters = (id, filters, onChange) => {
+    return Div({
+      id,
+    }, [
+      Div({ class: 'include-search-filters'}, ContactFilters(`${id}-include`, filters.include, include => {
+        filters.include = include
+        onChange(filters)
+      } ) ),
+      Div({ class: 'exclude-search-filters'}, ContactFilters(`${id}-exclude`, filters.exclude, exclude => {
+        filters.exclude = exclude
+        onChange(filters)
+      } ) ),
+    ])
+  }
 
   const ContactFilterDisplay = (filters) => FilterDisplay({
     filters,
@@ -2932,11 +2948,38 @@
     }))
   }
 
+  ContactFilterRegistry.registerFilter(createFilter('is_free_email_provider', 'Free inbox?', 'contact', {
+    display: ({is_free}) => is_free ? 'Is a free inbox' : 'Is NOT a free inbox',
+    edit: ({ is_free, updateFilter }) => {
+      return Fragment([
+        Div({
+          className: 'display-flex gap-10'
+        },[
+          'Email provider is free',
+          Toggle({
+            onLabel: 'Yes',
+            offLabel: 'No',
+            id: 'is-free',
+            checked: is_free,
+            onChange: e => {
+              updateFilter({
+                is_free: e.target.checked,
+              })
+            },
+          })
+        ]),
+      ])
+    },
+  }, {
+    is_free: true,
+  }))
+
   if (!Groundhogg.filters) {
     Groundhogg.filters = {}
   }
 
   Groundhogg.filters.ContactFilters = ContactFilters
+  Groundhogg.filters.IncludeExcludeContactFilters = IncludeExcludeContactFilters
   Groundhogg.filters.ContactFilterDisplay = ContactFilterDisplay
   Groundhogg.filters.ContactFilterRegistry = ContactFilterRegistry
 
