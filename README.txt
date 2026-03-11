@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.1
-Stable tag: 4.3.2
+Stable tag: 4.3.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -378,9 +378,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.3.3 (2026-03-09) =
+= 4.3.3 (2026-03-11) =
 * ADDED Automatic detection of free inbox providers for contacts.
 * ADDED The "Is Free Email?" search filter to filter by free email inbox providers.
+* ADDED New base components and classes for use in addons.
 * FIXED Settings page pickers not working due to missing script if toolbar widget is disabled.
 
 = 4.3.2 (2026-03-09) =
