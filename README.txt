@@ -382,7 +382,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED Automatic detection of free inbox providers for contacts.
 * ADDED The "Is Free Email?" search filter to filter by free email inbox providers.
 * ADDED New base components and classes for use in addons.
-* FIXED Settings page pickers not working due to missing script if toolbar widget is disabled.
+* FIXED Settings page pickers were not working due to a missing script if the toolbar widget is disabled.
+* FIXED Broadcast send time estimate not showing correct time estimate.
 
 = 4.3.2 (2026-03-09) =
 * FIXED Sanitization issue with number fields causing numbers with more than 4 digits not to save.

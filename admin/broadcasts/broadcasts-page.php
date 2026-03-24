@@ -15,6 +15,7 @@ use function Groundhogg\get_url_var;
 use function Groundhogg\is_sms_plugin_active;
 use function Groundhogg\map_to_class;
 use function Groundhogg\notices;
+use function Groundhogg\one_of;
 use function Groundhogg\verify_admin_ajax_nonce;
 
 // Exit if accessed directly
@@ -51,7 +52,7 @@ class Broadcasts_Page extends Admin_Page {
 
 		$total_contacts  = absint( get_post_var( 'total_contacts' ) );
 		$amount          = absint( get_post_var( 'batch_amount' ) );
-		$interval        = absint( get_post_var( 'batch_interval' ) );
+		$interval        = one_of( get_post_var( 'batch_interval' ), [ 'minutes', 'hours', 'days' ] );
 		$interval_length = absint( get_post_var( 'batch_interval_length' ) );
 
 		$batches = floor( $total_contacts / $amount );
