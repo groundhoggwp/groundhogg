@@ -37,6 +37,7 @@ use function Groundhogg\one_of;
 use function Groundhogg\parse_tag_list;
 use function Groundhogg\process_events;
 use function Groundhogg\remote_post_json;
+use function Groundhogg\split_name;
 use function Groundhogg\the_funnel;
 use function Groundhogg\utils;
 use function Groundhogg\Ymd;
@@ -319,7 +320,13 @@ class Form_v2 extends Step {
 					return true;
 				},
 				'before'   => function ( $field, $posted_data, &$args ) {
-					$args['first_name'] = sanitize_text_field( $posted_data->first_name );
+
+					$parts = split_name( $posted_data->first_name );
+					$args['first_name'] = sanitize_text_field( $parts[0] );
+
+					if ( ! empty( $parts[1] ) ) {
+						$args['last_name'] = sanitize_text_field( $parts[1] );
+					}
 				},
 				'required' => function ( $field, $posted_data ) {
 					return isset( $posted_data['first_name'] ) && ! empty( $posted_data['first_name'] );
