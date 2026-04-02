@@ -1079,6 +1079,20 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				],
 			],
+			'gh_disable_email_detection'        => [
+				'id'      => 'gh_disable_email_detection',
+				'section' => 'interface',
+				'label'   => _x( 'Disable Admin Contact Peek Feature', 'settings', 'groundhogg' ),
+                /* translators: white label name of the plugin, usually Groundhogg */
+				'desc'    => sprintf( _x( 'Disable the appearance of the Contact Peek feature in non-%s admin screens.', 'settings', 'groundhogg' ), white_labeled_name() ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Disable', 'groundhogg' ),
+					'name'  => 'gh_disable_email_detection',
+					'id'    => 'gh_disable_email_detection',
+					'value' => 'on',
+				],
+			],
 			'gh_default_contact_tab'                 => [
 				'id'      => 'gh_default_contact_tab',
 				'section' => 'interface',

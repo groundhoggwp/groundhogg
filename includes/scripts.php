@@ -575,8 +575,7 @@ class Scripts {
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
-		// todo add setting to disable this script inclusion
-		if ( ! is_admin_groundhogg_page() ){
+		if ( ! is_admin_groundhogg_page() && ! is_option_enabled( 'gh_disable_email_detection' ) && current_user_can( 'view_others_contacts' ) ){
 			wp_enqueue_script( 'groundhogg-admin-email-detector' );
 		}
 
