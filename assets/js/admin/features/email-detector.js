@@ -1,0 +1,424 @@
+(function () {
+
+  const {
+    Div,
+    Form,
+    Fragment,
+    Input,
+    Pg,
+    Button,
+    An,
+    MiniModal,
+    Skeleton,
+    Dashicon,
+    ToolTip,
+  } = MakeEl
+
+  const {
+    icons,
+  } = Groundhogg.element
+
+  const {
+    quickEditContactModal,
+    ContactListItem,
+    emailModal,
+    addContactModal
+  } = Groundhogg.components
+
+  const email_regex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/ig
+
+  function load_styles () {
+
+    if (State.styles_added) {
+      return
+    }
+
+    State.set({ styles_added: true })
+
+    let styles = [
+      'admin',
+      'elements',
+    ]
+
+    styles.forEach(style => {
+      document.head.appendChild(MakeEl.makeEl('link', {
+        rel : 'stylesheet',
+        href: `${ Groundhogg.assets.path }css/admin/${ style }.css`,
+      }))
+    })
+  }
+
+  async function on_email_icon_click (email) {
+
+    load_styles()
+
+    let modal = MiniModal({
+      target: icon,
+      onOpen: modal => {
+        modal.style.border = '1px solid rgba(16, 38, 64, 0.15)'
+        modal.querySelector('.gh-modal-button-close').style.top = '0'
+        modal.querySelector('.gh-modal-button-close').style.right = '0'
+        modal.querySelector('.gh-modal-dialog').style.padding = '10px'
+        modal.querySelector('.gh-modal-dialog').style.maxWidth = '33vw'
+        modal.querySelector('.gh-modal-dialog').style.overflow = 'visible'
+      },
+    }, Div({
+      id   : 'contact-card-modal-content',
+      style: { maxWidth: '240px' },
+    }, [
+      Skeleton({
+        style: {
+          width: '200px',
+        },
+      }, [
+        'span-3',
+        'span-9',
+      ]),
+    ]))
+
+    State.set({
+      modal,
+      iniTop: modal.getBoundingClientRect().top + window.scrollY,
+    })
+
+    try {
+
+      let items = await Groundhogg.stores.contacts.fetchItems({
+        email,
+      })
+
+      // there is a contact
+      if (items.length) {
+
+        State.set({
+          contact: items[0],
+        })
+
+        const card = ContactListItem(State.contact, {
+          style: {
+            border : 'none',
+            padding: '0',
+          },
+          extra: item => Div({ className: 'display-flex align-center gap-10 flex-end' }, [
+            An({
+              href: '#',
+              style: {
+                textDecoration: 'none',
+              },
+              onClick: e => {
+                e.preventDefault()
+                quickEditContactModal({
+                  contact: item,
+                })
+              },
+            }, [
+              Dashicon('edit'),
+              ToolTip('Quick edit', 'top'),
+            ]),
+            // conditionally show compose email feature
+            typeof tinyMCE !== 'undefined' ? An({
+              style: {
+                textDecoration: 'none',
+              },
+              href  : '#',
+              onClick: e => {
+                e.preventDefault()
+                emailModal({
+                  to: [ item.data.email ],
+                })
+              },
+            }, [
+              Dashicon('email'),
+              ToolTip('Compose email', 'top'),
+            ]) : null,
+            An({
+              style: {
+                textDecoration: 'none',
+              },
+              href  : item.admin,
+              target: '_blank',
+            }, [
+              Dashicon('external'),
+              ToolTip('View profile', 'top'),
+            ]),
+          ]),
+        })
+
+        morphdom(modal.querySelector('#contact-card-modal-content'), card)
+        return
+      }
+
+      // no contacts found, show option to create a contact
+
+      morphdom(modal.querySelector('#contact-card-modal-content'), Div({
+        id: 'gh-quick-create-contact-form-wrap',
+      }, morph => Fragment([
+        Form({
+          id: 'gh-quick-create-contact-form',
+          className: 'display-flex column gap-10',
+          onSubmit: e => {
+            e.preventDefault()
+            if ( State.creating_contact ) return false
+
+            State.set({ creating_contact: true })
+            let fd = new FormData(e.target)
+
+            morph()
+
+            Groundhogg.stores.contacts.post({
+              data: {
+                first_name: fd.get('first_name'),
+                last_name : fd.get('last_name'),
+                email     : email,
+              },
+            }).then( item => {
+              State.set({
+                creating_contact: false,
+                first_name      : '',
+                last_name       : '',
+              })
+              morph()
+              quickEditContactModal({
+                contact: item,
+              })
+            })
+          }
+        }, [
+          Div({}, '<b>Create Contact</b>'),
+          Input({
+            name: 'first_name',
+            placeholder: 'First Name',
+            value: State.first_name,
+            onInput: e => State.set({ first_name: e.target.value })
+            // disabled: State.creating_contact,
+          }),
+          Input({
+            name: 'last_name',
+            placeholder: 'Last Name',
+            value: State.last_name,
+            onInput: e => State.set({ last_name: e.target.value })
+            // disabled: State.creating_contact,
+          }),
+          Input({
+            placeholder: 'Email Address',
+            name: 'email',
+            type: 'email',
+            value: email,
+            readOnly: true,
+            // disabled: State.creating_contact,
+          }),
+          Button({
+            className: `gh-button primary ${State.creating_contact ? 'loading-dots' : ''}`,
+            // disabled: State.creating_contact,
+          }, State.creating_contact ? 'Creating' : 'Create!')
+        ])
+      ])) )
+    }
+    catch (err) {}
+  }
+
+  const State = Groundhogg.createState({
+    email: null,
+    el   : null,
+    creating_contact: false,
+    first_name: '',
+    last_name : '',
+    modal: null,
+    iniTop: null,
+    contact: null,
+    styles_added: false,
+  })
+
+  let hide_timeout = null
+
+  const icon = Div({
+    id          : 'gh-email-detected-icon',
+    className   : 'gh-email-detected-icon',
+    style       : {
+      position      : 'absolute',
+      padding       : '4px',
+      height        : '22px',
+      width         : '22px',
+      background    : '#000',
+      color         : '#fff',
+      borderRadius  : '4px',
+      cursor        : 'pointer',
+      display       : 'none',
+      zIndex        : '9999',
+      justifyContent: 'center',
+      alignItems    : 'center',
+      boxSizing     : 'border-box',
+    },
+    onClick     : () => {
+      if (State.email) {
+        on_email_icon_click(State.email)
+      }
+    },
+    onMouseleave: () => {
+      schedule_hide()
+    },
+  }, Groundhogg.isWhiteLabeled ? icons.contactSearch : icons.groundhogg )
+
+  document.body.appendChild(icon)
+
+  function reposition_modal () {
+    if (State.modal && State.iniTop) {
+      State.modal.style.top = `${ State.iniTop - window.scrollY }px`
+    }
+  }
+
+  function position_icon () {
+
+    if (!State.el) {
+      icon.style.display = 'none'
+      return
+    }
+
+    const rect = State.el.getBoundingClientRect()
+
+    icon.style.left = rect.left + rect.width + window.scrollX + 5 + 'px'
+    icon.style.top = rect.top + window.scrollY + 'px'
+    icon.style.display = 'flex'
+  }
+
+  function schedule_hide () {
+    clearTimeout(hide_timeout)
+
+    hide_timeout = setTimeout(() => {
+      if (!icon.matches(':hover')) {
+        State.set({
+          el   : null,
+          email: null,
+        })
+        position_icon()
+      }
+    }, 100)
+  }
+
+  function get_caret_text_position (client_x, client_y) {
+    if (document.caretPositionFromPoint) {
+      const pos = document.caretPositionFromPoint(client_x, client_y)
+
+      if (!pos) return null
+
+      return {
+        node  : pos.offsetNode,
+        offset: pos.offset,
+      }
+    }
+
+    if (document.caretRangeFromPoint) {
+      const range = document.caretRangeFromPoint(client_x, client_y)
+
+      if (!range) return null
+
+      return {
+        node  : range.startContainer,
+        offset: range.startOffset,
+      }
+    }
+
+    return null
+  }
+
+  function get_email_from_input(el) {
+    if (!el || el.tagName !== 'INPUT' || el.type !== 'email') {
+      return null
+    }
+
+    const value = el.value || ''
+
+    if (!value) return null
+
+    const match = value.match(email_regex)
+
+    return match ? match[0] : null
+  }
+
+  function get_email_at_point (client_x, client_y, target) {
+
+    // ✅ NEW: handle input[type=email]
+    const input_email = get_email_from_input(target)
+    if (input_email) {
+      return {
+        email: input_email,
+        node : target,
+      }
+    }
+
+    const caret = get_caret_text_position(client_x, client_y)
+
+    if (!caret || !caret.node || caret.node.nodeType !== Node.TEXT_NODE) {
+      return null
+    }
+
+    const text_node = caret.node
+    const text = text_node.nodeValue || ''
+    const offset = caret.offset
+
+    if (!text.trim()) {
+      return null
+    }
+
+    email_regex.lastIndex = 0
+
+    let match
+
+    while (( match = email_regex.exec(text) ) !== null) {
+      const start = match.index
+      const end = start + match[0].length
+
+      if (offset >= start && offset <= end) {
+        return {
+          email: match[0],
+          node : text_node.parentElement || text_node.parentNode,
+        }
+      }
+    }
+
+    return null
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    if (icon.contains(e.target)) {
+      return
+    }
+
+    const result = get_email_at_point(e.clientX, e.clientY, e.target)
+
+    if (!result) {
+      schedule_hide()
+      return
+    }
+
+    clearTimeout(hide_timeout)
+    State.set({
+      email: result.email,
+      el   : result.node,
+    })
+    position_icon()
+  })
+
+  document.addEventListener('mouseout', (e) => {
+    const related = e.relatedTarget
+
+    if (related && related instanceof Element) {
+      if (icon.contains(related) || related === icon) {
+        return
+      }
+    }
+
+    schedule_hide()
+  }, true)
+
+  document.addEventListener('scroll', () => {
+    position_icon()
+    reposition_modal()
+  })
+
+  window.addEventListener('resize', () => {
+    position_icon()
+    reposition_modal()
+  })
+
+})()

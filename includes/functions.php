@@ -7550,6 +7550,13 @@ function get_free_email_providers() {
 	// initialize providers
 	if ( empty( $providers ) ) {
 		$providers = json_decode( files()->get( GROUNDHOGG_ASSETS_PATH . 'lib/free-email-providers.json' ), true );
+
+		/**
+         * Allow adding additional free providers
+         *
+		 * @param $providers array
+		 */
+        $providers = apply_filters( 'groundhogg/free_email_providers', $providers );
 	}
 
     return $providers;
@@ -7566,7 +7573,14 @@ function is_free_email_provider( $email ) {
 		return false;
 	}
 
-	return apply_filters( 'groundhogg/is_free_email_provider', in_array( get_email_address_hostname( $email ), get_free_email_providers() ) );
+	/**
+	 * Filter whether a given email is free or not
+     *
+     * @param bool $is_free whether the email was already marked as free
+     * @param string $email the full email address being checked
+     * @param string $hostname the parsed hostname of the email address
+	 */
+	return apply_filters( 'groundhogg/is_free_email_provider', in_array( get_email_address_hostname( $email ), get_free_email_providers() ), $email, get_email_address_hostname( $email ) );
 }
 
 /**

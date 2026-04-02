@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.1
-Stable tag: 4.3.3
+Stable tag: 4.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -378,12 +378,18 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.4 (2026-04-01) =
+* ADDED "Contact Peek" feature
+ * Allows you to instantly see basic contact details in any non-Groundhogg screen (like WooCommerce or MailHawk) in the WordPress admin whenever an email address is detected.
+ * If a contact does not exist, you'll be given the option to create one and edit it from where you are.
+* ADDED Developer filter to register additional free inbox providers.
+
 = 4.3.3 (2026-03-11) =
 * ADDED Automatic detection of free inbox providers for contacts.
 * ADDED The "Is Free Email?" search filter to filter by free email inbox providers.
 * ADDED New base components and classes for use in addons.
 * FIXED Settings page pickers were not working due to a missing script if the toolbar widget is disabled.
-* FIXED Broadcast send time estimate not showing correct time estimate.
+* FIXED Broadcast send time estimate is not showing the correct time estimate.
 
 = 4.3.2 (2026-03-09) =
 * FIXED Sanitization issue with number fields causing numbers with more than 4 digits not to save.

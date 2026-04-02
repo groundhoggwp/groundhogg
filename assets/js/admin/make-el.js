@@ -846,7 +846,7 @@
     ]))
 
     const close = () => {
-      onClose()
+      onClose( modal )
       modal.remove()
     }
 
@@ -854,7 +854,7 @@
     document.body.appendChild(modal)
 
     // Run before positioning
-    onOpen()
+    onOpen( modal )
 
     let targetElement = selector && target === null ? document.querySelector(selector) : target
 
@@ -870,12 +870,15 @@
       height,
     } = modal.getBoundingClientRect()
 
+    // console.log({right, left, bottom, top, width, height})
+
     switch (from) {
       case 'left':
         modal.style.left = left + 'px'
         break
       case 'right':
-        modal.style.left = ( right - width ) + 'px'
+        modal.style.right = ( window.innerWidth - right ) + 'px'
+        modal.style.left = 'auto'
         break
     }
 
@@ -886,7 +889,9 @@
       modal.style.top = top + 'px'
     }
 
-    modal.focus()
+    setTimeout(()=>{
+      modal.focus()
+    }, 100)
 
     return modal
   }

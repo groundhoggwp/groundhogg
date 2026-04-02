@@ -338,6 +338,10 @@ class Scripts {
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-email-detector', GROUNDHOGG_ASSETS_URL . 'js/admin/features/email-detector' . $dot_min . '.js', [
+			'groundhogg-admin-components',
+		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-notes', GROUNDHOGG_ASSETS_URL . 'js/admin/components/notes' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
@@ -570,6 +574,11 @@ class Scripts {
 		], GROUNDHOGG_VERSION, true );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
+
+		// todo add setting to disable this script inclusion
+		if ( ! is_admin_groundhogg_page() ){
+			wp_enqueue_script( 'groundhogg-admin-email-detector' );
+		}
 
 		wp_localize_script( 'groundhogg-admin', 'groundhogg_endpoints', [
 			'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
