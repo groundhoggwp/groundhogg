@@ -128,8 +128,8 @@ class Emails_Page extends Admin_Page {
 					'message_type' => [
 						'Message Type',
 						[
-							Groundhogg_Email_Services::MARKETING     => 'Marketing',
-							Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
+							Groundhogg_Email_Services::MARKETING     => Groundhogg_Email_Services::message_type_labels(Groundhogg_Email_Services::MARKETING),
+							Groundhogg_Email_Services::TRANSACTIONAL => Groundhogg_Email_Services::message_type_labels(Groundhogg_Email_Services::TRANSACTIONAL),
 						]
 					]
 				]

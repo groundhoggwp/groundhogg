@@ -102,11 +102,7 @@ class Events_Page extends Tabbed_Admin_Page {
 						'email_service' => [ 'Email service', Groundhogg_Email_Services::dropdown() ],
 						'message_type'  => [
 							'Message Type',
-							[
-								Groundhogg_Email_Services::MARKETING     => 'Marketing',
-								Groundhogg_Email_Services::TRANSACTIONAL => 'Transactional',
-								Groundhogg_Email_Services::WORDPRESS     => 'WordPress'
-							],
+							Groundhogg_Email_Services::message_type_labels()
 						],
 						'status'        => [
 							'Status',

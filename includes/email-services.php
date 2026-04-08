@@ -23,6 +23,27 @@ class Groundhogg_Email_Services {
 		return self::$email_services;
 	}
 
+	/**
+     * Get message type label
+	 *
+	 * @param  string  $type
+	 *
+	 * @return string[]|string|bool labels if no type is provided, label if a type is provided, if the type is invalid, then false
+	 */
+    public static function message_type_labels( string $type = '' ) {
+        $labels = [
+	        'marketing'     => esc_html_x( 'Marketing', 'email message type','groundhogg' ),
+	        'transactional' => esc_html_x( 'Transactional', 'email message type' , 'groundhogg' ),
+	        'wordpress'     => esc_html_x( 'WordPress', 'email message type' , 'groundhogg' ),
+        ];
+
+        if ( ! empty( $type ) ) {
+            return get_array_var( $labels, $type );
+        }
+
+        return $labels;
+    }
+
 	public static function init() {
 
 		foreach ( [ self::TRANSACTIONAL, self::MARKETING ] as $channel ) {

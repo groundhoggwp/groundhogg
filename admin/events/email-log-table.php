@@ -80,17 +80,17 @@ class Email_Log_Table extends Table {
 			],
 			[
 				'view'    => 'wordpress',
-				'display' => esc_html__( 'WordPress', 'groundhogg' ),
+				'display' => Groundhogg_Email_Services::message_type_labels( Groundhogg_Email_Services::WORDPRESS ),
 				'query'   => [ 'message_type' => Groundhogg_Email_Services::WORDPRESS ],
 			],
 			[
 				'view'    => 'transactional',
-				'display' => esc_html__( 'Transactional', 'groundhogg' ),
+				'display' =>  Groundhogg_Email_Services::message_type_labels( Groundhogg_Email_Services::TRANSACTIONAL ),
 				'query'   => [ 'message_type' => Groundhogg_Email_Services::TRANSACTIONAL ],
 			],
 			[
 				'view'    => 'marketing',
-				'display' => esc_html__( 'Marketing', 'groundhogg' ),
+				'display' =>  Groundhogg_Email_Services::message_type_labels( Groundhogg_Email_Services::MARKETING ),
 				'query'   => [ 'message_type' => Groundhogg_Email_Services::MARKETING ],
 			]
 		];
@@ -199,6 +199,8 @@ class Email_Log_Table extends Table {
 			'subject' => _x( 'Subject', 'Column label', 'groundhogg' ),
 			'to'      => _x( 'Recipients', 'Column label', 'groundhogg' ),
 			'status'  => _x( 'Status', 'Column label', 'groundhogg' ),
+			'type'    => _x( 'Type', 'Column label', 'groundhogg' ),
+			'service' => _x( 'Service', 'Column label', 'groundhogg' ),
 			'sent'    => _x( 'Sent', 'Column label', 'groundhogg' ),
 		);
 
@@ -244,8 +246,10 @@ class Email_Log_Table extends Table {
 	protected function get_sortable_columns() {
 
 		$sortable_columns = array(
-			'status' => array( 'status', false ),
-			'sent'   => array( 'date_sent', false ),
+			'status'    => array( 'status', false ),
+			'sent'      => array( 'date_sent', false ),
+			'type'      => array( 'message_type', false ),
+			'service'   => array( 'email_service', false ),
 		);
 
 		return apply_filters( 'groundhogg/log/sortable_columns', $sortable_columns );
@@ -382,6 +386,14 @@ class Email_Log_Table extends Table {
 
 		return '<abbr title="' . $date->format( DATE_RFC3339 ) . '">' . $time . '</abbr>';
 	}
+
+    protected function column_service( $email ) {
+	    return Groundhogg_Email_Services::get_service_display_name( $email->email_service );
+    }
+
+    protected function column_type( $email ) {
+        return Groundhogg_Email_Services::message_type_labels( $email->message_type );
+    }
 
 	/**
 	 * For more detailed insight into how columns are handled, take a look at

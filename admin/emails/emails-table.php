@@ -406,12 +406,12 @@ class Emails_Table extends Table {
 			],
 			[
 				'view'    => 'marketing',
-				'display' => esc_html__( 'Marketing', 'groundhogg' ),
+				'display' => \Groundhogg_Email_Services::message_type_labels( \Groundhogg_Email_Services::MARKETING ),
 				'query'   => [ 'message_type' => 'marketing', 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
 				'view'    => 'transactional',
-				'display' => esc_html__( 'Transactional', 'groundhogg' ),
+				'display' => \Groundhogg_Email_Services::message_type_labels( \Groundhogg_Email_Services::TRANSACTIONAL ),
 				'query'   => [ 'message_type' => 'transactional', 'status' => [ 'ready', 'draft' ] ],
 			],
 			[
