@@ -5,6 +5,8 @@ use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\extrapolate_wp_mail_plugin;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\gh_cron_installed;
+use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_staging_environment;
 use function Groundhogg\managed_page_url;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -113,6 +115,7 @@ function groundhogg_tools_sysinfo_get() {
 	$return .= 'WP_DEBUG:                 ' . ( defined( 'WP_DEBUG' ) ? WP_DEBUG ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 	$return .= 'Memory Limit:             ' . WP_MEMORY_LIMIT . "\n";
 	$return .= 'Registered Post Stati:    ' . implode( ', ', get_post_stati() ) . "\n";
+	$return .= 'Staging Env Detected:     ' . is_staging_environment() ? 'Yes' : 'No' . "\n";
 
 	$return = apply_filters( 'groundhogg_sysinfo_after_wordpress_config', $return );
 
@@ -149,6 +152,11 @@ function groundhogg_tools_sysinfo_get() {
 	$return .= 'WordPress Service:        ' . Groundhogg_Email_Services::get_service_display_name( Groundhogg_Email_Services::get_wordpress_service() ) . "\n";
 	$return .= 'Transactional Service:    ' . Groundhogg_Email_Services::get_service_display_name( Groundhogg_Email_Services::get_transactional_service() ) . "\n";
 	$return .= 'Marketing Service:        ' . Groundhogg_Email_Services::get_service_display_name( Groundhogg_Email_Services::get_marketing_service() ) . "\n";
+
+	if ( is_staging_environment() ){
+		$return .= 'Staging Email Allowed:    ' . is_option_enabled( 'gh_allow_email_in_staging' ) ? 'Yes' : 'No' . "\n";
+	}
+
 	$return = apply_filters( 'groundhogg_sysinfo_after_email_config', $return );
 
 	$return .= "\n" . '-- CRON Configuration' . "\n\n";

@@ -9294,3 +9294,71 @@ function get_by_dotn($data, $path, $default = null) {
 
 	return $data;
 }
+
+/**
+ * Best-effort detection of staging / dev environments
+ *
+ * @return bool
+ */
+function is_staging_environment() {
+
+	// --- 0. Manual override (always respect this) ---
+	if ( defined( 'GROUNDHOGG_IS_STAGING' ) ) {
+		return (bool) GROUNDHOGG_IS_STAGING;
+	}
+
+	// --- 1. WordPress environment (definitive if set correctly) ---
+	if ( function_exists( 'wp_get_environment_type' ) ) {
+		$env = wp_get_environment_type();
+
+		if ( in_array( $env, [ 'staging', 'development' ], true ) ) {
+			return true;
+		}
+	}
+
+	// --- 2. Known hosting/platform signals (definitive) ---
+	if ( defined( 'WP_STAGING' ) && WP_STAGING ) {
+		return true;
+	}
+
+	if ( defined( 'PANTHEON_ENVIRONMENT' ) && PANTHEON_ENVIRONMENT !== 'live' ) {
+		return true;
+	}
+
+	if ( defined( 'KINSTA_ENV' ) && KINSTA_ENV !== 'production' ) {
+		return true;
+	}
+
+	if ( defined( 'WPENGINE_ENV' ) && WPENGINE_ENV !== 'production' ) {
+		return true;
+	}
+
+	// --- 3. Local environments (very safe to assume staging) ---
+    // phpcs:ignore WordPress.Security we're not saving this anywhere
+	$host = $_SERVER['HTTP_HOST'] ?? '';
+
+	if (
+		$host === 'localhost' ||
+		$host === '127.0.0.1' ||
+		str_contains( $host, '.local' ) ||
+		str_contains( $host, '.test' ) ||
+		str_contains( $host, '.dev' ) ||
+		str_contains( $host, '.localhost' ) ||
+	    str_contains( $host, 'staging.' ) ||
+	    str_contains( $host, 'dev.' ) ||
+        str_contains( $host, 'development.' )
+	) {
+		return true;
+	}
+
+    if ( utils()->location->get_real_ip() === '::1' ){
+        return true;
+    }
+
+	// --- 4. Heuristic (last resort) ---
+	if ( $host && preg_match( '/(^|\.)((staging|dev|test|sandbox|preview))(\.|$)/i', $host ) ) {
+		return true;
+	}
+
+	return false;
+}

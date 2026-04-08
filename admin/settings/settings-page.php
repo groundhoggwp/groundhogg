@@ -27,8 +27,11 @@ use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\has_constant_support;
 use function Groundhogg\header_icon;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_staging_environment;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\kses_e;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\maybe_get_option_from_constant;
 use function Groundhogg\notices;
@@ -606,17 +609,29 @@ class Settings_Page extends Admin_Page {
 //				'tab'      => 'email',
 //				'callback' => [ SendWp::instance(), 'settings_connect_ui' ],
 //			],
-			'mailhawk'              => [
-				'id'       => 'mailhawk',
-				'title'    => _x( 'MailHawk', 'settings_sections', 'groundhogg' ),
-				'tab'      => 'email',
-				'callback' => [ Mailhawk::instance(), 'settings_connect_ui' ],
-			],
 			'outgoing_email_config' => [
 				'id'    => 'outgoing_email_config',
 				'title' => _x( 'Outgoing Email', 'settings_sections', 'groundhogg' ),
-				'tab'   => 'email'
+				'tab'   => 'email',
+				'callback' => function () {
+
+					if ( is_staging_environment() && ! is_option_enabled( 'gh_allow_email_in_staging' ) ){
+						?>
+                        <div class="">
+                            <span class="pill yellow">
+                                <?php kses_e( "<b>Marketing</b> and <b>Transactional</b> emails are <b>NOT</b> being sent because the site is detected in staging mode. To allow all email, enable the <b>Allow Outgoing Email In Staging</b> setting below.", 'groundhogg' ); ?>
+                            </span>
+                        </div>
+						<?php
+					}
+				},
 			],
+//			'mailhawk'              => [
+//				'id'       => 'mailhawk',
+//				'title'    => _x( 'MailHawk', 'settings_sections', 'groundhogg' ),
+//				'tab'      => 'email',
+//				'callback' => [ Mailhawk::instance(), 'settings_connect_ui' ],
+//			],
 			'overrides'             => [
 				'id'    => 'overrides',
 				'title' => _x( 'Defaults', 'settings_sections', 'groundhogg' ),
@@ -1674,11 +1689,27 @@ class Settings_Page extends Admin_Page {
 					'id'   => 'gh_url_tracking_exclusions',
 				],
 			],
+			'gh_allow_email_in_staging'                          => [
+				'id'      => 'gh_allow_email_in_staging',
+				'section' => 'outgoing_email_config',
+				'label'   => _x( 'Allow Outgoing Email In Staging', 'settings', 'groundhogg' ),
+				/* translators: %s: the plugin/brand name */
+				'desc'    => is_option_enabled( 'gh_allow_email_in_staging' )
+                    ? _x( 'All email is currently enabled! To prevent marketing and transactional emails from being sent, disable this setting.', 'settings', 'groundhogg' )
+                    : _x( 'A staging environment has been detected, so all email other than standard WordPress email is in <b>Log Only</b> mode. To send it instead, enable this setting.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Allow' , 'groundhogg' ),
+					'name'  => 'gh_allow_email_in_staging',
+					'id'    => 'gh_allow_email_in_staging',
+					'value' => 'on',
+				],
+			],
 			'gh_wordpress_email_service'             => [
 				'id'      => 'gh_wordpress_email_service',
 				'section' => 'outgoing_email_config',
 				'label'   => _x( 'WordPress Email', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'Choose which installed service should handle core WordPress email. This service will apply to <b>all WordPress email</b> and email from third party plugins like <b>LifterLMS</b> or <b>BuddyBoss</b>.</p><p class="description"><code>WordPress Default</code> is whichever email service WordPress is using at the moment. This could be your server\'s email or a third party SMTP plugin.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Choose which installed service should handle core WordPress email. This service will apply to <b>all WordPress email</b> and email from third party plugins like <b>WooCommerce</b>.</p><p class="description"><code>WordPress Default</code> is whichever email service WordPress is using at the moment. This could be your server\'s email or a third party SMTP plugin.', 'settings', 'groundhogg' ),
 				'type'    => 'dropdown',
 				'atts'    => [
 					'name'        => 'gh_wordpress_email_service',
@@ -1699,7 +1730,8 @@ class Settings_Page extends Admin_Page {
 					'name'        => 'gh_transactional_email_service',
 					'id'          => 'gh_transactional_email_service',
 					'option_none' => false,
-					'options'     => Groundhogg_Email_Services::dropdown()
+					'options'     => Groundhogg_Email_Services::dropdown(),
+//                    'disabled'    => is_staging_environment() && ! is_option_enabled( 'gh_allow_email_in_staging' )
 				],
 			],
 			'gh_marketing_email_service'             => [
@@ -1713,10 +1745,11 @@ class Settings_Page extends Admin_Page {
 					'name'        => 'gh_marketing_email_service',
 					'id'          => 'gh_marketing_email_service',
 					'option_none' => false,
-					'options'     => Groundhogg_Email_Services::dropdown()
+					'options'     => Groundhogg_Email_Services::dropdown(),
+//					'disabled'    => is_staging_environment() && ! is_option_enabled( 'gh_allow_email_in_staging' )
 				],
 			],
-			'gh_log_emails'                          => [
+            'gh_log_emails'                          => [
 				'id'      => 'gh_log_emails',
 				'section' => 'email_logging',
 				'label'   => _x( 'Enable Email Logging', 'settings', 'groundhogg' ),

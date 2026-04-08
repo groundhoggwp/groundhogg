@@ -4,6 +4,8 @@ use Groundhogg\Email_Logger;
 use Groundhogg\Mailer\Log_Only;
 use function Groundhogg\disable_emojis;
 use function Groundhogg\get_array_var;
+use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_staging_environment;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -64,14 +66,16 @@ class Groundhogg_Email_Services {
 
 	public static function register_core_services() {
 		self::register( 'wp_mail', esc_html__( 'WordPress Default', 'groundhogg' ), 'wp_mail' );
-		self::register( 'log_only', esc_html__( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
 
 		if ( function_exists( 'mailhawk_mail' ) ) {
 			self::register( 'mailhawk', esc_html__( 'MailHawk', 'groundhogg' ), 'mailhawk_mail' );
 		}
 
+        // register services from integrations
 		do_action( 'Groundhogg/email_services/init' );
 
+        // show after other services
+		self::register( 'log_only', esc_html__( 'Log Only', 'groundhogg' ), __NAMESPACE__ . '\log_only' );
 	}
 
 	public static function hide_conflicts() {
@@ -351,7 +355,7 @@ class Groundhogg_Email_Services {
 		disable_emojis();
 
 		/**
-		 * Allow hooks to swap wap out flags before the email is sent based on the current state of Groundhogg_Email_Services
+		 * Allow hooks to swap wap outF flags before the email is sent based on the current state of Groundhogg_Email_Services
 		 *
 		 * @param mixed  $to      the recipients of the email
 		 * @param string $subject the email subject line
@@ -359,6 +363,15 @@ class Groundhogg_Email_Services {
 		 * @param mixed  $headers the email headers
 		 */
 		do_action( 'groundhogg/email_services/before_send', $to, $subject, $message, $headers, $attachments );
+
+		// If we detect a staging environment, we should set the Marketing and Transactional streams to Log Only
+        // do this before getting the callback, and not modify the callback directly so logging records using the log-only service
+		if ( ! self::current_message_type_is_wordpress() // marketing or transactional only
+             && is_staging_environment() // we're in staging
+             && ! is_option_enabled( 'gh_allow_email_in_staging' ) // the override is not set
+        ) {
+			self::set_current_email_service( 'log_only' ); // forward to log only anyway
+		}
 
 		$callback = self::get_service_callback();
 
