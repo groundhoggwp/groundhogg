@@ -43,13 +43,25 @@
       error_message,
     } = logItem.data
 
+    const {
+      i18n
+    } = logItem
+
     Modal({}, ({close}) => Div({
       className: 'email-log-modal'
     }, [
 
       makeEl( 'p', {
         className: status === 'failed' ? 'gh-text danger' : ''
-      }, sprintf( status === 'failed' ? __('Failed to send to %s on %s', 'groundhogg' ) : __( 'Sent to %s on %s', 'groundhogg' ), andList( recipients.map( bold ) ), bold( formatDate( date_sent ) ) ) ),
+        /* translators: %s: message type, %s: email service, %s: recipients, %s: date*/
+      }, sprintf( status === 'failed'
+                  ? __('%s email via %s failed to send to %s on %s', 'groundhogg' )
+                  : __( '%s email sent via %s to %s on %s', 'groundhogg' ),
+        bold(i18n.type),
+        bold(i18n.service),
+        andList( recipients.map( bold ) ),
+        bold( formatDate( date_sent ) ) )
+      ),
 
       status === 'failed' ? makeEl( 'pre', {
         className: 'pill danger'
