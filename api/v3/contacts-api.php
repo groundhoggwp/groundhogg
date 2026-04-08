@@ -24,13 +24,11 @@ class Contacts_Api extends Base {
 
 	public function register_routes() {
 
-		$auth_callback = $this->get_auth_callback();
-
 		register_rest_route( self::NAME_SPACE, '/contacts', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_contacts' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'view_contacts' ),
 				'args'                => [
 					'query'       => [
 						'required'    => false,
@@ -65,7 +63,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_contact' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'add_contacts' ),
 				'args'                => [
 					'contact' => [
 						'required'    => false,
@@ -76,7 +74,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'update_contact' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -95,7 +93,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_contact' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'delete_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => false,
@@ -113,7 +111,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -128,7 +126,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'apply_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -147,7 +145,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'remove_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -169,7 +167,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'apply_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -191,7 +189,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'remove_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -213,7 +211,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_notes' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'view_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -228,7 +226,7 @@ class Contacts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'add_note' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,

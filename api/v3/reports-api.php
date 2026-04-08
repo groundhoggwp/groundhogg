@@ -8,9 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Groundhogg\Admin\Dashboard\Dashboard_Widgets;
-use function Groundhogg\get_db;
 use Groundhogg\Plugin;
-use function Groundhogg\show_groundhogg_branding;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -21,12 +19,11 @@ use Groundhogg\Admin\Dashboard\Widgets;
 class Reports_Api extends Base {
 
 	public function register_routes() {
-		$callback = $this->get_auth_callback();
 
 		register_rest_route( self::NAME_SPACE, '/reports', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'permission_callback' => $callback,
+				'permission_callback' => fn() => current_user_can( 'view_reports' ),
 				'callback'            => [ $this, 'get_report' ],
 				'args'                => [
 					'report'       => [
@@ -45,7 +42,7 @@ class Reports_Api extends Base {
 		register_rest_route( self::NAME_SPACE, '/reports/dashboard', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'permission_callback' => $callback,
+				'permission_callback' => fn() => current_user_can( 'view_reports' ),
 				'callback'            => [ $this, 'get_dashboard_reports' ],
 				'args'                => [
 					'reports' => [

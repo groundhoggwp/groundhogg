@@ -8,7 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use function Groundhogg\get_db;
-use Groundhogg\Plugin;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -17,13 +16,12 @@ use WP_Error;
 class Data_Api extends Base {
 
 	public function register_routes() {
-		$callback = $this->get_auth_callback();
 
 		// BASIC DB QUERY
 		register_rest_route( self::NAME_SPACE, '/data', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'permission_callback' => $callback,
+				'permission_callback' => fn() => current_user_can( 'manage_options' ),
 				'callback'            => [ $this, 'query' ],
 				'args'                => [
 					'db'    => [
@@ -36,7 +34,7 @@ class Data_Api extends Base {
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
-				'permission_callback' => $callback,
+				'permission_callback' => fn() => current_user_can( 'manage_options' ),
 				'callback'            => [ $this, 'add' ],
 				'args'                => [
 					'db'    => [
@@ -49,7 +47,7 @@ class Data_Api extends Base {
 			],
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
-				'permission_callback' => $callback,
+				'permission_callback' => fn() => current_user_can( 'manage_options' ),
 				'callback'            => [ $this, 'update' ],
 				'args'                => [
 					'db'    => [
@@ -65,7 +63,7 @@ class Data_Api extends Base {
 			],
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
-				'permission_callback' => $callback,
+				'permission_callback' => fn() => current_user_can( 'manage_options' ),
 				'callback'            => [ $this, 'delete' ],
 				'args'                => [
 					'db'    => [

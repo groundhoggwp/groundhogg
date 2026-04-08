@@ -33,7 +33,7 @@ class API_V3 {
 	 */
 	public function declare_base_endpoints() {
 		$this->contacts        = new Contacts_Api();
-		$this->authentication  = new Authentication_Api();
+//		$this->authentication  = new Authentication_Api();
 		$this->tags            = new Tags_Api();
 		$this->emails          = new Email_Api();
 		$this->tracking        = new Tracking_Api();

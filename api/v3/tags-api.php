@@ -27,7 +27,7 @@ class Tags_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'manage_tags' ),
 				'args'                => [
 					'select'  => [
 						'required'    => false,
@@ -50,7 +50,7 @@ class Tags_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'manage_tags' ),
 				'args'                => [
 					'tags' => [
 						'required'    => true,
@@ -61,7 +61,7 @@ class Tags_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_tag' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'manage_tags' ),
 				'args'                => [
 					'tag_id' => [
 						'required'    => true,
@@ -72,7 +72,7 @@ class Tags_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'update_tag' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'manage_tags' ),
 				'args'                => [
 					'tag_id'          => [
 						'required'    => true,
@@ -92,7 +92,7 @@ class Tags_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'apply_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,
@@ -114,7 +114,7 @@ class Tags_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'remove_tags' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'edit_contacts' ),
 				'args'                => [
 					'id_or_email' => [
 						'required'    => true,

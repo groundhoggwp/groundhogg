@@ -25,7 +25,7 @@ class Bulk_Job_Api extends Base
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [ $this, 'get_init_data' ],
-                'permission_callback' => $auth_callback,
+                'permission_callback' => fn() => current_user_can( 'perform_bulk_actions' ),
                 'args' => [
                     'bulk_action' => [
                         'required' => true
@@ -35,7 +35,7 @@ class Bulk_Job_Api extends Base
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [ $this, 'ajax' ],
-                'permission_callback' => $auth_callback,
+                'permission_callback' => fn() => current_user_can( 'perform_bulk_actions' ),
                 'args' => [
                     'bulk_action' => [
                         'required' => true

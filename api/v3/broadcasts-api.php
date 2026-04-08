@@ -27,14 +27,14 @@ class Broadcasts_Api extends Base {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_broadcast' ],
-				'permission_callback' => $auth_callback,
+				'permission_callback' => fn() => current_user_can( 'schedule_broadcasts' )
 			]
 		] );
 
 		register_rest_route( self::NAME_SPACE, '/broadcasts/schedule', array(
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'schedule_broadcast' ],
-			'permission_callback' => $auth_callback,
+			'permission_callback' => fn() => current_user_can( 'schedule_broadcasts' ),
 //            'args'=> array(
 //                'id_or_email' => [
 //                    'required'    => true,

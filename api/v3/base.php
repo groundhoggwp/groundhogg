@@ -253,7 +253,7 @@ abstract class Base {
 	public function auth( WP_REST_Request $request ) {
 
 		/* If the current user is logged in then we can bypass the key authentication */
-		if ( is_user_logged_in() ) {
+		if ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
 			return true;
 		}
 
