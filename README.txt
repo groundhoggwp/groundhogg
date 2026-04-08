@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.1
-Stable tag: 4.4
+Stable tag: 4.4.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,11 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.4.1 (2026-04-08) =
+* ADDED Automatic staging environment detection to prevent outgoing emails.
+* ADDED Message type and email service to the email log table and the details modal.
+* SECURITY Fixed 2 vulnerabilities responsibly disclosed to us by Patchstack.
 
 = 4.4 (2026-04-01) =
 * ADDED "Contact Peek" feature
