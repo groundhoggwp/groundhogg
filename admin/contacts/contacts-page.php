@@ -13,7 +13,6 @@ use Groundhogg\Saved_Searches;
 use WP_Error;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
-use function Groundhogg\bulk_jobs;
 use function Groundhogg\contact_and_user_match;
 use function Groundhogg\dashicon;
 use function Groundhogg\enqueue_filter_assets;
