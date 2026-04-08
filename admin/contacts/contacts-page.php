@@ -833,9 +833,8 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$file_name = sanitize_text_field( get_url_var( 'file' ) );
-
-		$contact = get_contactdata( absint( get_url_var( 'contact' ) ) );
+        $file_name = sanitize_file_name( get_request_var( 'file' ) );
+		$contact   = get_contactdata( absint( get_url_var( 'contact' ) ) );
 
 		if ( ! $contact ) {
 			return new WP_Error( 'error', 'The given contact does not exist.' );
