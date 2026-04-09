@@ -330,6 +330,11 @@ class Contacts_Table extends WP_List_Table {
 		$statusQuery = new Table_Query( 'contacts' );
 		$statusQuery->setSelect( 'optin_status', [ 'COUNT(ID)', 'contacts' ] )->setGroupby( 'optin_status' );
 
+        // should only see numbers for owned contacts
+        if ( ! current_user_can( 'view_others_contacts' ) ){
+            $statusQuery->where( 'owner_id', get_current_user_id() );
+        }
+
 		$statusCounts = $statusQuery->get_results();
 
 		$views = [
