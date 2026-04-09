@@ -263,7 +263,6 @@
   const Dashboard = () => Div({
     id: 'dashboard',
   }, [
-    Header(),
     WidgetsColumns(),
   ])
 
@@ -692,6 +691,61 @@
     })
 
   }
+
+  const Subscribers = () => {
+
+    const State = Groundhogg.useState({
+      loaded: false,
+    }, Subscribers)
+
+    return Div({
+      id: 'contact-reports',
+    }, morph => {
+
+      if (!State.loaded) {
+
+        Promise.all([
+
+          // recently created contacts
+          Groundhogg.stores.contacts.fetchItems({
+            orderby: 'date_created',
+            order  : 'DESC',
+            limit  : 5,
+          }).then(contacts => {
+            State.set({
+              contacts,
+            })
+          }),
+
+        ]).then(() => {
+          State.set({
+            loaded: true,
+          })
+
+          morph()
+        })
+
+        return Skeleton({
+          style: {
+            padding: '20px',
+          },
+        }, [
+          'full',
+          'full',
+          'full',
+        ])
+      }
+      return ContactList(State.contacts, {
+        itemProps: item => ( {
+          className: 'contact-list-item clickable',
+          onClick  : e => {
+            window.open(item.admin, '_self')
+          },
+        } ),
+      })
+    })
+  }
+
   const Broadcasts = () => {
 
     const State = Groundhogg.useState({
@@ -960,7 +1014,6 @@
 
     Widgets.add('news', {
       name  : 'News',
-      cap   : '',
       col   : 3,
       render: News,
     })
@@ -968,7 +1021,6 @@
 
   Widgets.add('checklist', {
     name    : 'Quickstart Checklist',
-    cap     : '',
     col     : 1,
     feedback: true,
     render  : QuickStart,
@@ -976,24 +1028,32 @@
 
   Widgets.add('recommendations', {
     name    : 'Recommendations',
-    cap     : '',
     col     : 1,
     feedback: true,
     render  : Recommendations,
   })
 
-  Widgets.add('summary', {
-    name  : 'Summary',
-    cap   : '',
-    col   : 2,
-    render: Summary,
-  })
+  if ( userHasCap('view_reports') ) {
+    Widgets.add('summary', {
+      name  : 'Summary',
+      col   : 2,
+      render: Summary,
+    })
+  } else {
+    Widgets.add('subscribers', {
+      name  : 'Recent Subscribers',
+      col   : 2,
+      render: Subscribers,
+    })
+  }
 
-  Widgets.add('broadcasts', {
-    name  : 'Recent Broadcasts',
-    col   : 2,
-    render: Broadcasts,
-  })
+  if ( userHasCap('schedule_broadcasts') ) {
+    Widgets.add('broadcasts', {
+      name  : 'Recent Broadcasts',
+      col   : 2,
+      render: Broadcasts,
+    })
+  }
 
   Widgets.add('searches', {
     name  : 'Searches',
@@ -1004,7 +1064,6 @@
   if (userHasCap('view_tasks')) {
     Widgets.add('tasks', {
       name    : 'My Tasks',
-      cap     : '',
       col     : 2,
       feedback: true,
       render  : () => Groundhogg.ObjectTasks({
@@ -1018,8 +1077,8 @@
   }
 
   $(() => {
-    console.log('render dashboard')
     morphDashboard()
+    document.getElementById('wpbody-content').prepend( Header() )
   })
 
   Groundhogg.dashboard = {

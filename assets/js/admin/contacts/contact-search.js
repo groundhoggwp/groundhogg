@@ -1,5 +1,6 @@
 ( function ($) {
 
+  const { urlEncodeFilters } = Groundhogg.filters
   const { createFilters } = Groundhogg.filters.functions
   const {
     searchOptionsWidget,
@@ -12,11 +13,8 @@
     objectEquals,
     toggle,
     moreMenu,
-    select,
     dangerConfirmationModal,
     confirmationModal,
-    clickInsideElement,
-    progressBar,
     dialog,
     bold,
     tooltip,
@@ -27,20 +25,13 @@
     addContactModal,
   } = Groundhogg.components
   const { ajax } = Groundhogg.api
-  const { base64_json_encode } = Groundhogg.functions
   const {
     searches: SearchesStore,
     contacts: ContactsStore,
-    tags: TagsStore,
-    funnels: FunnelsStore,
   } = Groundhogg.stores
-  const { tagPicker, funnelPicker } = Groundhogg.pickers
   const { userHasCap } = Groundhogg.user
   const {
     formatNumber,
-    formatTime,
-    formatDate,
-    formatDateTime,
   } = Groundhogg.formatting
   const { sprintf, __, _x, _n } = wp.i18n
 
@@ -85,8 +76,8 @@
       const { signal } = abortHandler
 
       ContactsStore.count({
-        filters: base64_json_encode(this.query.filters),
-        exclude_filters: base64_json_encode(
+        filters: urlEncodeFilters(this.query.filters),
+        exclude_filters: urlEncodeFilters(
           this.excludeEnabled ? this.query.exclude_filters : []),
       }, {
         signal,
@@ -334,11 +325,10 @@
         }
         else {
 
-          let query = `filters=${ base64_json_encode(this.query.filters) }`
+          let query = `filters=${ urlEncodeFilters(this.query.filters) }`
 
           if (this.excludeEnabled) {
-            query += `&exclude_filters=${ base64_json_encode(
-              this.query.exclude_filters) }`
+            query += `&exclude_filters=${ urlEncodeFilters(this.query.exclude_filters) }`
           }
 
           loadFilters(query)
@@ -549,8 +539,8 @@
               window.location.href = adminPageURL('gh_contacts', {
                 ...query,
                 action: 'bulk_edit',
-                filters: base64_json_encode(query.filters),
-                exclude_filters: base64_json_encode(
+                filters: urlEncodeFilters(query.filters),
+                exclude_filters: urlEncodeFilters(
                   query.exclude_filters),
               })
               break
@@ -560,9 +550,8 @@
                 action: 'choose_columns',
                 query: {
                   ...query,
-                  filters: base64_json_encode(query.filters),
-                  exclude_filters: base64_json_encode(
-                    query.exclude_filters),
+                  filters: urlEncodeFilters(query.filters),
+                  exclude_filters: urlEncodeFilters(query.exclude_filters),
                 },
               })
               break

@@ -1582,6 +1582,9 @@
     return el
   }
 
+  // basically does base64 json encode but also removed IDs since we don't need them for backend processing
+  const urlEncodeFilters = filters => base64_json_encode(filters.map(group => group.map(({id, ...filter}) => filter)))
+
   Groundhogg.filters.Filters = Filters
   Groundhogg.filters.FilterDisplay = FilterDisplay
   Groundhogg.filters.FilterRegistry = FilterRegistry
@@ -1594,6 +1597,7 @@
   Groundhogg.filters.createFutureDateFilter = createFutureDateFilter
   Groundhogg.filters.createDateFilter = createDateFilter
   Groundhogg.filters.createSelectFilter = createSelectFilter
+  Groundhogg.filters.urlEncodeFilters = urlEncodeFilters
   Groundhogg.filters.comparisons = {
     ComparisonsTitleGenerators,
     AllComparisons,
@@ -1629,7 +1633,7 @@
           filterRegistry: TableFilterRegistry,
           filters,
           onChange      : filters => document.querySelector(
-            'form.search-form input[name="include_filters"]').value = base64_json_encode(filters),
+            'form.search-form input[name="include_filters"]').value = urlEncodeFilters(filters),
         }))
       }
 

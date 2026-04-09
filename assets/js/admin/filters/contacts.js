@@ -559,13 +559,12 @@
                   map(k => ( {
                       value: k,
                       text: optin_status[k],
-                  } )), value) } `
+                  } )), value.map(id => `${id}`)) }`
     },
     onMount (filter, updateFilter) {
       $('#filter-value').select2()
       $('#filter-value, #filter-compare').on('change', function (e) {
         const $el = $(this)
-        // console.log($el.val())
         updateFilter({
           [$el.prop('name')]: $el.val(),
         })
