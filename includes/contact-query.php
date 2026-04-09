@@ -13,6 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Contact_Query extends Table_Query {
 
+	// flags
+	const IS_SUB_QUERY = 1 << 0;
+
 	/**
 	 * Query vars set by the user.
 	 *
@@ -50,12 +53,22 @@ class Contact_Query extends Table_Query {
 	 */
 	protected $legacy_query;
 
-	public function __construct( $query_vars = [] ) {
-		$this->query_vars = $query_vars;
+	/**
+	 * @var int flags for later
+	 */
+	protected int $flags;
+
+	public function __construct( $query_vars = [], int $flags = 0 ) {
+		$this->query_vars   = $query_vars;
+		$this->flags = $flags;
 		parent::__construct( 'contacts' );
 
 		// Nice...
 		$this->legacy_query = new Legacy_Contact_Query( $query_vars );
+	}
+
+	protected function is_flag_set( int $flag ): bool {
+		return (bool) ( $this->flags & $flag );
 	}
 
 	public static function filters() {
@@ -747,7 +760,7 @@ class Contact_Query extends Table_Query {
 
 		if ( $filter['compare'] === 'not_in' ) {
 
-			$subQuery = new Contact_Query( $search['query'] );
+			$subQuery = new Contact_Query( $search['query'], self::IS_SUB_QUERY );
 			$subQuery->set_query_var( 'select', 'ID' );
 			$subQuery->setSelect( 'ID' );
 
@@ -958,7 +971,6 @@ class Contact_Query extends Table_Query {
 
 		self::filter_link_clicked( $filter, $where );
 	}
-
 
 	/**
 	 * If they received a specific email
@@ -1752,11 +1764,6 @@ class Contact_Query extends Table_Query {
 			unset( $query_vars['number'] );
 		}
 
-		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_others_contacts' ) ) {
-			$query_vars['owner'] = get_current_user_id();
-		}
-
 		// Map 'ID' to 'Include'
 		if ( isset_not_empty( $query_vars, 'ID' ) ) {
 			$query_vars['include'] = wp_parse_id_list( $query_vars['ID'] );
@@ -1826,7 +1833,7 @@ class Contact_Query extends Table_Query {
 	 * @throws FilterException
 	 * @return void
 	 */
-	protected function maybe_setup_query() {
+	protected function maybe_setup_query( ) {
 
 		if ( $this->setup_flag ) {
 			return;
@@ -1869,6 +1876,8 @@ class Contact_Query extends Table_Query {
 					break;
 			}
 		}
+
+		$this->maybe_restrict_results_by_owner();
 	}
 
 	/**
@@ -1947,7 +1956,7 @@ class Contact_Query extends Table_Query {
 						$where->greaterThan( $date_key, $date->ymdhis() );
 					}
 					break;
-				case 'owner': // filter by owber
+				case 'owner': // filter by owner
 					if ( ! empty( $value ) ) {
 						$owner_ids = wp_parse_id_list( $value );
 						if ( count( $owner_ids ) === 1 ) {
@@ -2184,7 +2193,7 @@ class Contact_Query extends Table_Query {
 				case 'exclude_filters2':
 				case 'exclude_filters3':
 
-					if ( ! empty( $value ) ) {
+					if ( ! empty( $value ) && $value !== Filters::BASE64_JSON_ENCODED_EMPTY ) {
 
 						$exclude_query = new Contact_Query( [
 							'select'  => 'ID',
@@ -2192,7 +2201,7 @@ class Contact_Query extends Table_Query {
 							'order'   => false,
 							'orderby' => false,
 							'limit'   => 0
-						] );
+						], self::IS_SUB_QUERY );
 
 						$exclude_query->maybe_setup_query();
 
@@ -2511,6 +2520,19 @@ class Contact_Query extends Table_Query {
 	public static function register_filter( ...$args ) {
 		_deprecated_function( __METHOD__, '3.2', 'Contact_Query::filters()->register()' );
 		Legacy_Contact_Query::register_filter( ...$args );
+	}
+
+	/**
+	 * Call this when we want results restricted by owner access
+	 * Should only be used in the root query and not in any nested queries
+	 *
+	 * @return void
+	 */
+	protected function maybe_restrict_results_by_owner() {
+		// Only show contacts associated with the current owner...
+		if ( ! $this->is_flag_set( self::IS_SUB_QUERY ) && current_user_can( 'view_contacts' ) && ! current_user_can( 'view_others_contacts' ) ) {
+			$this->where->equals( 'owner_id', get_current_user_id() );
+		}
 	}
 
 	/**
