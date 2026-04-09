@@ -22,6 +22,8 @@ class FilterException extends Exception {
  */
 class Filters {
 
+	const BASE64_JSON_ENCODED_EMPTY = 'W10'; // if filters are base64 json encoded, but empty
+
 	/**
 	 * Registered filters
 	 *
