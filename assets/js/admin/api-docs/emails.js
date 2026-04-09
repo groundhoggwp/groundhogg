@@ -228,7 +228,7 @@
               filters = filters.map(group => group.map(({ id, ...filter }) => filter))
 
               if (currEndpoint().method === 'GET') {
-                filters = Groundhogg.functions.base64_json_encode(filters)
+                filters = Groundhogg.filters.urlEncodeFilters(filters)
               }
 
               setInRequest(param, filters)

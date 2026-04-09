@@ -35,7 +35,7 @@
   const ApiRegistry = Groundhogg.createRegistry()
 
   const { root: apiRoot } = Groundhogg.api.routes.v4
-  const { base64_json_encode, setNestedValue, getNestedValue, jsonCopy } = Groundhogg.functions
+  const { setNestedValue, getNestedValue, jsonCopy } = Groundhogg.functions
 
   const IdRepeater = ({ param, name, id }) => {
 
@@ -74,7 +74,7 @@
           filters = filters.map(group => group.map(({ id, ...filter }) => filter))
 
           if (currEndpoint().method === 'GET') {
-            filters = base64_json_encode(filters)
+            filters = Groundhogg.filters.urlEncodeFilters(filters)
           }
 
           setInRequest(param, filters)

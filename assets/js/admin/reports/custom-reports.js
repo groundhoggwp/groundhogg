@@ -34,8 +34,6 @@
       replace(/../g, color => ( '0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16) ).substr(-2))
   }
 
-  const { base64_json_encode } = Groundhogg.functions
-
   const openReportInContactsView = (report, filters = null ) => {
 
     const {
@@ -47,8 +45,8 @@
     if ( filters === null ){
 
       window.open(adminPageURL('gh_contacts', {
-        filters: base64_json_encode(include_filters),
-        exclude_filters: base64_json_encode(exclude_filters),
+        filters: Groundhogg.filters.urlEncodeFilters(include_filters),
+        exclude_filters: Groundhogg.filters.urlEncodeFilters(exclude_filters),
       }), '_blank')
 
       return;
@@ -65,7 +63,7 @@
     }
 
     window.open(adminPageURL('gh_contacts', {
-      filters: base64_json_encode(filters),
+      filters: Groundhogg.filters.urlEncodeFilters(filters),
     }), '_blank')
   }
 

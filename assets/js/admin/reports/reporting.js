@@ -31,11 +31,9 @@
     adminPageURL,
   } = Groundhogg.element
 
-  const { base64_json_encode } = Groundhogg.functions
-
   const openInContactsView = (filters) => {
     window.open(adminPageURL('gh_contacts', {
-      filters: base64_json_encode(filters),
+      filters: Groundhogg.filters.urlEncodeFilters(filters),
     }), '_blank')
   }
 
