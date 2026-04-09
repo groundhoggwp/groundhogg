@@ -10,6 +10,7 @@ use Groundhogg\background\Sync_Users_Last_Id;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
 use Groundhogg\Bulk_Jobs\Export_Contacts;
+use Groundhogg\Contact_Query;
 use Groundhogg\Files;
 use Groundhogg\Plugin;
 use Groundhogg\Properties;
@@ -734,7 +735,8 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		$query_args = get_request_var( 'query' );
 
-		$count = get_db( 'contacts' )->count( $query_args );
+        $contactQuery = new Contact_Query( $query_args );
+		$count = $contactQuery->count();
 
 		$default_exportable_fields = get_exportable_fields();
 		$custom_properties         = array_map( function ( $f ) {
@@ -808,68 +810,79 @@ class Tools_Page extends Tabbed_Admin_Page {
 				endif;
 				?>
             </div>
-            <form id="export-preview" method="post">
-				<?php action_input( 'choose_columns', true, true ); ?>
-                <h3><?php esc_html_e( 'Name your export', 'groundhogg' ); ?></h3>
-				<?php
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-				echo html()->input( [
-					'name'        => 'file_name',
-					'placeholder' => 'My export...',
-					'required'    => true,
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-					'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
-				] );
+            <div id="export-preview-wrap">
+                <form id="export-preview" class="gh-panel" method="post">
+                    <div class="gh-panel-header">
+                        <h2><?php esc_html_e( 'Export preview','groundhogg'); ?></h2>
+                    </div>
+		            <?php action_input( 'choose_columns', true, true ); ?>
+                    <div class="inside">
+                        <p><b><?php esc_html_e( 'Name your export', 'groundhogg' ); ?></b></p>
+	                    <?php
+	                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+	                    echo html()->input( [
+		                    'name'        => 'file_name',
+		                    'placeholder' => 'My export...',
+		                    'required'    => true,
+		                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+		                    'value'       => sanitize_file_name( sprintf( 'export-%s', current_time( 'Y-m-d' ) ) )
+	                    ] );
+	                    ?>
+                        <p><b><?php esc_html_e( 'Export preview', 'groundhogg' ); ?></b></p>
+	                    <?php
 
-				?>
-                <div class="sticky-preview">
-                    <h2><?php esc_html_e( 'Export preview', 'groundhogg' ); ?></h2>
-	                <?php
+	                    html()->export_columns_table( [] )
 
-	                html()->export_columns_table( [] )
+	                    ?>
+                        <table class="form-table">
+                            <tbody>
+                            <tr>
+                                <th><?php esc_html_e( 'Select the kind of column headers you want.', 'groundhogg' ); ?></th>
+                                <td>
+				                    <?php
 
-	                ?>
-                    <table class="form-table">
-                        <tbody>
-                        <tr>
-                            <th><?php esc_html_e( 'Select the kind of column headers you want.', 'groundhogg' ); ?></th>
-                            <td>
-				                <?php
+				                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+				                    echo html()->dropdown( [
+					                    'name'        => 'header_type',
+					                    'options'     => [
+						                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+						                    'basic'  => __( 'Field IDs', 'groundhogg' ),
+						                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+						                    'pretty' => __( 'Pretty Names', 'groundhogg' ),
+					                    ],
+					                    'option_none' => false
+				                    ] );
 
-				                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-				                echo html()->dropdown( [
-					                'name'        => 'header_type',
-					                'options'     => [
-						                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-						                'basic'  => __( 'Field IDs', 'groundhogg' ),
-						                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-						                'pretty' => __( 'Pretty Names', 'groundhogg' ),
-					                ],
-					                'option_none' => false
-				                ] );
+				                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses used
+				                    echo html()->description( kses( __( "Choose <b>Fields IDs</b> for <code>first_name</code> and <b>Pretty Names</b> for <code>First Name</code>.", 'groundhogg' ), 'simple' ) )
 
-				                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kses used
-				                echo html()->description( kses( __( "Choose <b>Fields IDs</b> for <code>first_name</code> and <b>Pretty Names</b> for <code>First Name</code>.", 'groundhogg' ), 'simple' ) )
-
-				                ?>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-	                <?php
-	                html( html()->button( [
-		                'type'  => 'submit',
-		                'class' => 'gh-button primary',
-		                /* translators: 1: number of contacts to export */
-		                'text'  => esc_html( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) )
-	                ] ) );
-	                ?>
-                </div>
-            </form>
+				                    ?>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+	                    <?php
+	                    html( html()->button( [
+		                    'type'  => 'submit',
+		                    'class' => 'gh-button primary',
+		                    /* translators: 1: number of contacts to export */
+		                    'text'  => esc_html( sprintf( _nx( 'Export %s contact', 'Export %s contacts', $count, 'action', 'groundhogg' ), number_format_i18n( $count ) ) )
+	                    ] ) );
+	                    ?>
+                    </div>
+                </form>
+            </div>
         </div>
         <style>
             #wpbody-content td {
                 vertical-align: middle;
+            }
+            #export-preview{
+                position: sticky;
+                top: 100px;
+                max-height: calc(100vh - 110px);
+                overflow-y: auto;
+                bottom: 0;
             }
             #export-preview .check-column input {
                 /*display: none;*/
@@ -930,7 +943,7 @@ class Tools_Page extends Tabbed_Admin_Page {
                     $(document.querySelector(`#select-columns input[name="${e.target.dataset.name}"]`)).prop('checked', false );
                     e.target.closest('tr').remove();
                   }
-                }, [ '✕', MakeEl.ToolTip( 'Remove', 'left' ) ] ))
+                }, [ '✕', MakeEl.ToolTip( 'Remove', 'right' ) ] ))
 
                 preview_tbody.appendChild(clone);
               });
