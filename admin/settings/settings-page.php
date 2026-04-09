@@ -1858,6 +1858,10 @@ class Settings_Page extends Admin_Page {
             unset( $settings['gh_disable_geolocation_services'] ); // don't show if unlicensed
         }
 
+        if ( ! is_staging_environment() ){
+            unset( $settings['gh_allow_email_in_staging'] ); // don't show this option if not in staging
+        }
+
 		return apply_filters( 'groundhogg/admin/settings/settings', $settings );
 	}
 
