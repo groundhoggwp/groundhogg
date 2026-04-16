@@ -735,6 +735,26 @@
     notice: id,
   })
 
+  function ordinal_suffix_of (i) {
+
+    if (i === 'last') {
+      return 'Last'
+    }
+
+    var j = i % 10,
+      k = i % 100
+    if (j == 1 && k != 11) {
+      return i + 'st'
+    }
+    if (j == 2 && k != 12) {
+      return i + 'nd'
+    }
+    if (j == 3 && k != 13) {
+      return i + 'rd'
+    }
+    return i + 'th'
+  }
+
   gh.functions.utf8_to_b64 = utf8_to_b64
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
@@ -745,6 +765,7 @@
   gh.functions.maybeCall = maybeCall
   gh.functions.dismissNotice = dismissNotice
   gh.functions.arrayToggle = arrayToggle
+  gh.functions.ordinal_suffix_of = ordinal_suffix_of
 
   $(document).on('click', 'button.hide-panel', e => {
 
@@ -852,5 +873,45 @@
   $(()=>{
     $('#bulk-action-selector-top, #bulk-action-selector-bottom').on('change', handleCampaignBulkEdit)
   })
+
+  class TokenList extends Array {
+    add (...tokens) {
+      tokens.forEach(t => {
+        if (!this.includes(t)) {
+          this.push(t)
+        }
+      })
+    }
+
+    remove (...tokens) {
+      tokens.forEach(t => {
+        const i = this.indexOf(t)
+        if (i > -1) {
+          this.splice(i, 1)
+        }
+      })
+    }
+
+    toggle (token) {
+      if (this.includes(token)) {
+        this.remove(token)
+        return false
+      }
+      else {
+        this.add(token)
+        return true
+      }
+    }
+
+    contains (token) {
+      return this.includes(token)
+    }
+
+    clear () {
+      this.length = 0;
+    }
+  }
+
+  Groundhogg.TokenList = TokenList
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)

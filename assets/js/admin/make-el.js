@@ -1590,6 +1590,75 @@
     return Div({ className: `gh-tooltip ${ position }` }, content)
   }
 
+  const MultiButtonToggle = ({
+    id = '',
+    options = [],
+    selected = [],
+    onChange = values => {},
+  }) => {
+
+    const tokens = new Groundhogg.TokenList
+
+    selected.forEach(value => {
+      tokens.add(value)
+    })
+
+    const render = () => Div({
+      id,
+      className: 'gh-input-group',
+    }, options.map(opt => ButtonOption(opt)))
+
+    const ButtonOption = option => Button({
+      id       : `${ id }-opt-${ option.id }`,
+      className: `gh-button gh-button small ${ tokens.contains(option.id) ? 'dark' : 'grey' }`,
+      onClick  : e => {
+        tokens.toggle(option.id)
+        morphdom(document.getElementById(id), render())
+        onChange([...tokens])
+      },
+    }, [
+      option.text,
+      option.tooltip ? ToolTip(option.tooltip) : null,
+    ])
+
+    return render()
+  }
+
+  const DayOfMonthPicker = ({
+    id = '',
+    selected = [],
+    onChange = days => {},
+  }) => {
+
+    const days = new Groundhogg.TokenList
+
+    selected.forEach(day => {
+      days.add(day)
+    })
+
+    let daysOfWeek = Array(32).fill(0).map((_, i) => {
+      return i === 31 ? 'last' : (i+1)
+    })
+
+    return Div({
+      id,
+      className: 'gh-dom-picker',
+    }, morph => Fragment([
+      ...daysOfWeek.map(day => {
+        return Button({
+          id       : `${ id }-day-${ day }`,
+          className: `gh-dom-date ${ days.contains(day) ? 'selected' : '' }`,
+          onClick  : e => {
+            days.toggle(day)
+            morph()
+            onChange([...days])
+          },
+        }, day === 'last' ? 'Last' : `${day}` )
+      })
+    ]) )
+
+  }
+
   const ButtonToggle = ({
     id = '',
     options = [],
@@ -1800,6 +1869,8 @@
     Iframe,
     Dashicon,
     ButtonToggle,
+    MultiButtonToggle,
+    DayOfMonthPicker,
     Autocomplete,
     ProgressBar,
     Accordion,
