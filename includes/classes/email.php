@@ -877,16 +877,27 @@ class Email extends Base_Object_With_Meta {
 			return $content;
 		}
 
-		$url = untrailingslashit( home_url() );
+		$urls = $this->utm_url_allowlist;
+
+		if ( empty( $urls ) ) {
+			$urls = untrailingslashit( home_url() );
+		}
+
+		$urls = explode( PHP_EOL, $urls );
+		$urls = array_map( function ( $url ){
+			return preg_quote( untrailingslashit( trim( $url ) ), '@' );
+		}, $urls );
+
+		$urls = implode( '|', $urls );
 
 		if ( $context === 'plain' ) {
-			return preg_replace_callback( "@\(({$url}[^)]*)\)@i", [
+			return preg_replace_callback( "@\]\(([^)]*(?:$urls)[^)]*)\)@i", [
 				$this,
 				'utm_link_callback_plain'
 			], $content );
 		}
 
-		return preg_replace_callback( "@href=[\"']({$url}[^\"']*)[\"']@i", [
+		return preg_replace_callback( "@href=[\"']([^\"']*(?:$urls)[^\"']*)[\"']@i", [
 			$this,
 			'utm_link_callback'
 		], $content );
@@ -1531,6 +1542,9 @@ class Email extends Base_Object_With_Meta {
 			case 'backgroundSize':
 			case 'backgroundRepeat':
 				$value = sanitize_text_field( $value );
+				break;
+			case 'utm_url_allowlist':
+				$value = sanitize_textarea_field( $value ); // preserve newlines
 				break;
 			case 'direction':
 				$value = one_of( $value, [ 'ltr', 'rtl' ] );

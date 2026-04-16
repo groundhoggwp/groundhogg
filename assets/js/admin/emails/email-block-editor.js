@@ -103,44 +103,7 @@
     imageSizes = [],
   } = _BlockEditor
 
-  class TokenList extends Array {
-    add (...tokens) {
-      tokens.forEach(t => {
-        if (!this.includes(t)) {
-          this.push(t)
-        }
-      })
-    }
-
-    remove (...tokens) {
-      tokens.forEach(t => {
-        const i = this.indexOf(t)
-        if (i > -1) {
-          this.splice(i, 1)
-        }
-      })
-    }
-
-    toggle (token) {
-      if (this.includes(token)) {
-        this.remove(token)
-        return false
-      }
-      else {
-        this.add(token)
-        return true
-        return true
-      }
-    }
-
-    contains (token) {
-      return this.includes(token)
-    }
-
-    clear () {
-      this.length = 0;
-    }
-  }
+  const { TokenList } = Groundhogg
 
   improveTinyMCE({})
 
@@ -4280,9 +4243,23 @@
         },
         [
           `<p>${ __(
-            'Automatically add UTM parameters to links that direct to your site. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.',
+            'Automatically add UTM parameters to links in your email. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.',
             'groundhogg') }</p>`,
           `<p>${ __('Replacements are currently <b>NOT</b> supported. Empty values are ignored.', 'groundhogg') }</p>`,
+          Control({
+              label  : 'URL Allowlist',
+              stacked: true,
+            },
+            Fragment([
+              Textarea({
+                name   : 'utm_url_allowlist',
+                id     : 'utm-url-allowlist',
+                value  : getEmail().meta.utm_url_allowlist ?? '',
+                placeholder: Groundhogg.url.home,
+                onInput: e => setEmailMeta({ utm_url_allowlist: e.target.value }),
+              }),
+              Pg({}, 'Target specific URLs to add UTM parameters, one per line. If empty, UTM parameters will be added to links to the current site.')
+            ])),
           Control({
               label  : 'Campaign Source',
               stacked: true,
@@ -4338,7 +4315,6 @@
               onInput: e => setEmailMeta({ utm_content: e.target.value }),
 
             })),
-
         ]),
       ControlGroup({
           name: 'Custom Headers',
