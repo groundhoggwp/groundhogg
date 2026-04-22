@@ -4858,6 +4858,95 @@ function get_owners() {
 }
 
 /**
+ * If the current
+ *
+ * @param int|\WP_User $user
+ *
+ * @return bool
+ */
+function has_team( $user = 0 ) {
+	return Main_Roles::is_sales_manager( $user ) && count( get_team_ids( $user ) ) > 0;
+}
+
+/**
+ * Get the team list of users
+ *
+ * @param  int|\WP_User  $user
+ *
+ * @return \WP_User[] list of WP_User or empty array if no team
+ */
+function get_team( $user = 0 ) {
+	return array_map( fn( $user_id ) => get_userdata( $user_id ), get_team_ids( $user ) );
+}
+
+/**
+ * Get the list of assigned owners for a team lead
+ * if no team is assigned for the user, return an empty array
+ * if there is a team, return the list of IDs inclusive of the user
+ *
+ * @param  int|\WP_User  $user
+ *
+ * @return int[]
+ */
+function get_team_ids( $user = 0 ){
+
+	if ( is_a( $user, '\WP_User' ) ) {
+		$user_id = $user->ID;
+	} else if ( is_numeric( $user ) && $user ) {
+		$user_id = absint( $user );
+	} else {
+		$user_id = get_current_user_id();
+	}
+
+    // must be at least a sales manager
+    if ( ! Main_Roles::is_sales_manager( $user_id ) ) {
+        return [];
+    }
+
+	$owner_ids = get_user_meta( $user_id, 'gh_sales_team_ids', true );
+
+    // if no team is assigned, then should return empty so they can see all contacts
+    if ( empty( $owner_ids ) ){
+        return [];
+    }
+
+    // double check in case permissions change
+    $owner_ids = array_filter( wp_parse_id_list( $owner_ids ), fn( $user_id ) => user_can( $user_id, 'view_contacts' ) );
+
+    // make sure the user is part of their team
+	$owner_ids[] = $user_id;
+
+	/**
+	 * Filter the sales team belonging to a specific sales manager
+	 */
+    return apply_filters( 'groundhogg/sales_team', $owner_ids );
+}
+
+/**
+ * Check if an owner belongs to the team of a given user
+ *
+ * @param int $owner_id then owner to check
+ * @param int $team_owner_id the team owner
+ *
+ * @return bool true, if the given user does not have a team, or if the given owner is in the team. false, if the owner is not in the team
+ */
+function owner_in_team( int $owner_id, int $team_owner_id = 0 ) {
+
+    if ( ! $team_owner_id ){
+	    $team_owner_id = get_current_user_id();
+    }
+
+    $team = get_team_ids( $team_owner_id );
+
+    if ( empty( $team ) ){
+        return true;
+    }
+
+	return in_array( $owner_id, $team );
+}
+
+
+/**
  * Shorthand for number formatting
  *
  * @param     $number
@@ -6856,7 +6945,7 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	$terms          = get_option( 'gh_terms' );
 	$privacy_policy = get_option( 'gh_privacy_policy' ) ?: get_privacy_policy_url();
 	$links          = [
-		'tel'     => $tel ? html()->e( 'a', [ 'href' => 'tel: ' . $tel ], $tel ) : false,
+		'tel'     => $tel ? html()->e( 'a', [ 'href' => 'tel:' . $tel ], $tel ) : false,
 		'privacy' => $privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], esc_html__( 'Privacy Policy', 'groundhogg' ) ) : false,
 		'terms'   => $terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms', 'groundhogg' ) ) : false,
 	];
@@ -7894,7 +7983,7 @@ function andList( $array ) {
 
 	/* translators: 1: all items in a list except the last, 2: the last item; used when joining with "and" */
 
-	return sprintf( _x( '%1$s and %2$s', 'and preceding the last item in a list', 'groundhogg' ),
+	return sprintf( esc_html_x( '%1$s and %2$s', 'and preceding the last item in a list', 'groundhogg' ),
 		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
 }
 
@@ -7908,7 +7997,7 @@ function orList( $array ) {
 
 	/* translators: 1: all items in a list except the last, 2: the last item; used when joining with "or" */
 
-	return sprintf( _x( '%1$s or %2$s', 'or preceding the last item in a list', 'groundhogg' ),
+	return sprintf( esc_html_x( '%1$s or %2$s', 'or preceding the last item in a list', 'groundhogg' ),
 		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
 }
 

@@ -6,9 +6,7 @@
     loadingDots,
     select,
     uuid,
-    addMediaToBasicTinyMCE,
     specialChars,
-    tinymceElement,
     searchOptionsWidget,
     input,
     isNumeric,
@@ -18,9 +16,6 @@
     regexp,
     isValidEmail,
     loadingModal,
-    textarea,
-    spinner,
-    skeleton,
     adminPageURL,
   } = Groundhogg.element
 
@@ -397,7 +392,7 @@
                               id  : `${ prefix }-owner`,
                               name: 'owner_id',
                           }, Groundhogg.filters.owners.map(u => ( {
-                              text : u.data.user_email,
+                              text : u.ID === currentUser.ID ? __( 'Me', 'groundhogg' ) : ( u.data.display_name !== u.data.user_email ? `${u.data.display_name} (${u.data.user_email})` : u.data.display_name ),
                               value: u.ID,
                           } )), contact.data.owner_id) }
                       </div>

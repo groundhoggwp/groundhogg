@@ -539,9 +539,8 @@
               window.location.href = adminPageURL('gh_contacts', {
                 ...query,
                 action: 'bulk_edit',
-                filters: urlEncodeFilters(query.filters),
-                exclude_filters: urlEncodeFilters(
-                  query.exclude_filters),
+                filters: urlEncodeFilters(query.filters ?? []),
+                exclude_filters: urlEncodeFilters(query.exclude_filters ?? []),
               })
               break
             case 'export':
@@ -550,8 +549,8 @@
                 action: 'choose_columns',
                 query: {
                   ...query,
-                  filters: urlEncodeFilters(query.filters),
-                  exclude_filters: urlEncodeFilters(query.exclude_filters),
+                  filters: urlEncodeFilters(query.filters ?? []),
+                  exclude_filters: urlEncodeFilters(query.exclude_filters ?? []),
                 },
               })
               break

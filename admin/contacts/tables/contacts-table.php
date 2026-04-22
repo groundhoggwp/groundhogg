@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Contacts\Tables;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Main_Roles;
 use Groundhogg\Preferences;
 use WP_List_Table;
 use wpdb;
@@ -18,6 +19,7 @@ use function Groundhogg\base64_json_decode;
 use function Groundhogg\get_gh_page_screen_id;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_var;
+use function Groundhogg\get_team_ids;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -330,10 +332,7 @@ class Contacts_Table extends WP_List_Table {
 		$statusQuery = new Table_Query( 'contacts' );
 		$statusQuery->setSelect( 'optin_status', [ 'COUNT(ID)', 'contacts' ] )->setGroupby( 'optin_status' );
 
-        // should only see numbers for owned contacts
-        if ( ! current_user_can( 'view_others_contacts' ) ){
-            $statusQuery->where( 'owner_id', get_current_user_id() );
-        }
+        $statusQuery->restrict_results_by_owner();
 
 		$statusCounts = $statusQuery->get_results();
 

@@ -33,6 +33,40 @@ class Main_Roles extends Roles {
 	];
 
 	/**
+	 * Whether the current user qualifies as a sales representative.
+	 * This makes that decision based on caps, and not the actual role itself so custom roles also act accordingly
+	 *
+	 * @param int|\WP_User $user
+	 *
+	 * @return bool
+	 */
+	public static function is_sales_representative( $user = 0 ) {
+
+		if ( ! $user ){
+			$user = wp_get_current_user();
+		}
+
+		return user_can( $user, 'view_contacts' ) && ! user_can( $user, 'view_others_contacts' );
+	}
+
+	/**
+	 * Whether the current user qualifies as a sales manager.
+	 * This makes that decision based on caps, and not the actual role itself so custom roles also act accordingly
+	 *
+	 * @param int|\WP_User $user
+	 *
+	 * @return bool
+	 */
+	public static function is_sales_manager( $user = 0 ) {
+
+		if ( ! $user ){
+			$user = wp_get_current_user();
+		}
+
+		return user_can( $user, 'view_others_contacts' ) && ! user_can( $user, 'delete_others_contacts' );
+	}
+
+	/**
 	 * Get the list of valid owner roles...
 	 *
 	 * @return mixed|void
@@ -180,10 +214,18 @@ class Main_Roles extends Roles {
 					case 'task':
 					case 'contact':
 					default:
-						// Most common methods for comparing
+
+						// when the owner is not the current user
 						if ( ( method_exists( $object, 'get_owner_id' ) && $object->get_owner_id() !== $user_id ) ) {
 							$caps[] = $action . '_others_' . $object_type . 's';
+
+							// if the current user has a team, make sure that the owner is in it
+							if ( ! owner_in_team( $object->get_owner_id(), $user_id ) ){
+								$caps[] = 'do_not_allow';
+							}
+
 						}
+
 						break;
 				}
 
@@ -232,6 +274,11 @@ class Main_Roles extends Roles {
 						// Trying to download files of contacts that don't belong to them
 						if ( ! $contact->owner_is( $user_id ) ) {
 							$caps[] = 'view_others_contacts';
+
+							// if the current user has a team, make sure that the owner is in it
+							if ( ! owner_in_team( $contact->get_owner_id(), $user_id ) ){
+								$caps[] = 'do_not_allow';
+							}
 						}
 
 						break;

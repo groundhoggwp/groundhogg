@@ -425,8 +425,10 @@ class Legacy_Contact_Query {
 		}
 
 		// Only show contacts associated with the current owner...
-		if ( current_user_can( 'view_contacts' ) && ! current_user_can( 'view_others_contacts' ) ) {
+		if ( Main_Roles::is_sales_representative() ) {
 			$this->query_vars['owner'] = get_current_user_id();
+		} else if ( has_team() ){
+			$this->query_vars['owner'] = get_team_ids();
 		}
 
 		// Fix number

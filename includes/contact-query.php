@@ -2530,9 +2530,11 @@ class Contact_Query extends Table_Query {
 	 */
 	protected function maybe_restrict_results_by_owner() {
 		// Only show contacts associated with the current owner...
-		if ( ! $this->is_flag_set( self::IS_SUB_QUERY ) && current_user_can( 'view_contacts' ) && ! current_user_can( 'view_others_contacts' ) ) {
-			$this->where->equals( 'owner_id', get_current_user_id() );
+		if ( $this->is_flag_set( self::IS_SUB_QUERY ) ) {
+			return;
 		}
+
+		$this->restrict_results_by_owner();
 	}
 
 	/**

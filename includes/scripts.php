@@ -661,7 +661,7 @@ class Scripts {
 				],
 				'filters'          => [
 					'optin_status'                 => Preferences::get_preference_names(),
-					'owners'                       => array_map( fn( $user ) => new Safe_WP_User( $user ), array_values( get_owners() ) ),
+					'owners'                       => array_map( fn( $user ) => new Safe_WP_User( $user ), array_values( has_team() ? get_team() : get_owners() ) ),
 					'current'                      => get_request_var( 'filters', [] ),
 					'roles'                        => get_editable_roles(),
 					'countries'                    => utils()->location->get_countries_list(),

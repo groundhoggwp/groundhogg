@@ -939,14 +939,15 @@ class HTML {
 			'multiple'          => false,
 			'option_none'       => __( 'Please select an owner', 'groundhogg' ),
 			'option_none_value' => 0,
-			'exclude'           => []
+			'exclude'           => [],
+            'option_callback'   => fn( $owner ) => sprintf( '%s (%s)', $owner->display_name, $owner->user_email ),
 		) );
 
 		$exclude = wp_parse_id_list( $a['exclude'] );
 
 		if ( empty( $a['options'] ) ) {
 
-			$owners = apply_filters( 'groundhogg/select_owners', get_owners() );
+			$owners = apply_filters( 'groundhogg/select_owners', has_team() ? get_team() : get_owners() );
 
 			/**
 			 * @var $owner \WP_User
@@ -957,8 +958,12 @@ class HTML {
 					continue;
 				}
 
-				$a['options'][ $owner->ID ] = sprintf( '%s (%s)', $owner->display_name, $owner->user_email );
-			}
+                if ( $owner->ID === get_current_user_id() ) {
+	                $a['options'][ $owner->ID ] = __('Me', 'groundhogg');
+                } else {
+	                $a['options'][ $owner->ID ] = call_user_func( $a['option_callback'], $owner ) ?: $owner->display_name . ' (' . $owner->user_email . ')' ;
+                }
+            }
 		}
 		if ( $a['multiple'] ) {
 			$a['option_none'] = false;

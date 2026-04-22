@@ -3,7 +3,10 @@
 namespace Groundhogg\DB\Query;
 
 use Exception;
+use Groundhogg\Main_Roles;
 use wpdb;
+use function Groundhogg\get_team_ids;
+use function Groundhogg\has_team;
 use function Groundhogg\md5serialize;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -806,6 +809,21 @@ class Query {
 
 	public static function cast2time( string $col ) {
 		return "CAST($col as TIME)";
+	}
+
+	/**
+	 * Adds an owner restriction based on the type of user querying the results
+	 *
+	 * @return void
+	 */
+	public function restrict_results_by_owner( string $column = 'owner_id' ) {
+
+		if ( has_team() ) {
+			$this->where->in( $column, get_team_ids() );
+		} else if ( Main_Roles::is_sales_representative() ){
+			$this->where->equals( $column, get_current_user_id() );
+		}
+
 	}
 
 }
