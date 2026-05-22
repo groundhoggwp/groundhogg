@@ -473,6 +473,7 @@ function more_allowed_css( $attr ) {
 	$attr[] = 'mso-table-lspace';
 	$attr[] = 'mso-table-rspace';
 	$attr[] = 'mso-style-priority';
+	$attr[] = 'mso-hide';
 	$attr[] = 'v-text-anchor';
 	$attr[] = '-ms-interpolation-mode';
 	$attr[] = 'outline';
@@ -495,16 +496,18 @@ function more_allowed_tags( $tags ) {
 //		'html' => true,
 //		'PUBLIC' => true,
 //	];
-	$tags['html']             = [];
+	$tags['html']             = [ 'dir' => true, 'xlmns' => true, 'xmlns:o' => true ];
 	$tags['head']             = [ 'xlmns' => true, 'xmlns:o' => true, ];
 	$tags['meta']             = [ 'charset' => true, 'content' => true, 'name' => true, 'http-equiv' => true, ];
 	$tags['title']            = [];
 	$tags['style']            = [ 'type' => true ];
-	$tags['link']             = [ 'href' => true ];
+	$tags['link']             = [ 'href' => true, 'rel' => true ];
 	$tags['center']           = [ 'id' => true, 'class' => true, 'style' => true, ];
 	$tags['body']             = [ 'id' => true, 'class' => true, 'style' => true, ];
 	$tags['td']['background'] = true;
 	$tags['table']['role']    = true;
+	$tags['table']['height']    = true;
+	$tags['table']['width']    = true;
 
 	// MSO
 	$tags['xml'] = [];
@@ -541,6 +544,182 @@ function more_allowed_tags( $tags ) {
 }
 
 /**
+ * Imported HTML Might have wonky style attributes
+ *
+ * @param $html
+ *
+ * @return array|string|string[]|null
+ */
+function normalize_style_attribute_quotes( $html ) {
+
+	return preg_replace_callback(
+		'/style\s*=\s*([\'"])(.*?)\1/is',
+		function ( $matches ) {
+
+			$style = $matches[2];
+
+			// Convert any double quotes inside the style value to single quotes.
+			$style = str_replace( '"', "'", $style );
+
+			// Normalize whitespace a bit.
+			$style = trim( $style );
+
+			// Always return style="" using double quotes.
+			return 'style="' . esc_attr( $style ) . '"';
+		},
+		$html
+	);
+}
+
+/**
+ * Strip quotes ONLY from font-family declarations before wp_kses().
+ *
+ * Example:
+ * font-family:arial, "helvetica neue", sans-serif;
+ *
+ * becomes:
+ *
+ * font-family:arial, helvetica neue, sans-serif;
+ */
+function remove_font_family_quotes( $html ) {
+	return preg_replace_callback(
+		'/font-family\s*:\s*([^;]+)(;?)/i',
+		function ( $matches ) {
+
+			$fonts = $matches[1];
+			$end   = $matches[2];
+
+			// Remove all quote characters.
+			$fonts = str_replace( [ '"', "'" ], '', $fonts );
+
+			return 'font-family:' . trim( $fonts ) . $end;
+		},
+		$html
+	);
+}
+
+/**
+ * Re-add quotes around multi-word font family names after wp_kses().
+ *
+ * Example:
+ * font-family:arial, helvetica neue, sans-serif;
+ *
+ * becomes:
+ *
+ * font-family:arial, 'helvetica neue', sans-serif;
+ */
+/**
+ * Restore quotes around font-family names that REQUIRE quoting.
+ *
+ * Will NOT quote:
+ * - Generic font families
+ * - CSS keywords like inherit/initial/unset
+ * - !important
+ */
+function restore_font_family_quotes( $html ) {
+
+	$generic_fonts = [
+		'serif',
+		'sans-serif',
+		'monospace',
+		'cursive',
+		'fantasy',
+		'system-ui',
+		'emoji',
+		'math',
+		'fangsong',
+		'ui-serif',
+		'ui-sans-serif',
+		'ui-monospace',
+		'ui-rounded',
+	];
+
+	$css_keywords = [
+		'inherit',
+		'initial',
+		'unset',
+		'revert',
+		'revert-layer',
+	];
+
+	return preg_replace_callback(
+		'/font-family\s*:\s*([^;]+)(;?)/i',
+		function ( $matches ) use ( $generic_fonts, $css_keywords ) {
+
+			$value = trim( $matches[1] );
+
+			// Preserve !important separately.
+			$important = '';
+
+			if ( preg_match( '/\s*!important\s*$/i', $value ) ) {
+				$value     = preg_replace( '/\s*!important\s*$/i', '', $value );
+				$important = ' !important';
+			}
+
+			$fonts = array_map( 'trim', explode( ',', $value ) );
+
+			$fonts = array_map(
+				function ( $font ) use ( $generic_fonts, $css_keywords ) {
+
+					$font = trim( $font );
+
+					if ( $font === '' ) {
+						return $font;
+					}
+
+					$lower = strtolower( $font );
+
+					// Skip generic families.
+					if ( in_array( $lower, $generic_fonts, true ) ) {
+						return $font;
+					}
+
+					// Skip CSS keywords.
+					if ( in_array( $lower, $css_keywords, true ) ) {
+						return $font;
+					}
+
+					// Already quoted.
+					if (
+						preg_match( '/^".*"$/', $font ) ||
+						preg_match( "/^'.*'$/", $font )
+					) {
+						return $font;
+					}
+
+					$needs_quotes = false;
+
+					// Starts with number.
+					if ( preg_match( '/^[0-9]/', $font ) ) {
+						$needs_quotes = true;
+					}
+
+					// Contains whitespace.
+					if ( preg_match( '/\s/', $font ) ) {
+						$needs_quotes = true;
+					}
+
+					// Contains special characters.
+					if ( preg_match( '/[^a-zA-Z0-9_-]/', $font ) ) {
+						$needs_quotes = true;
+					}
+
+					if ( $needs_quotes ) {
+						return "'" . $font . "'";
+					}
+
+					return $font;
+				},
+				$fonts
+			);
+
+			return 'font-family:' . implode( ', ', $fonts ) . $important . $matches[2];
+		},
+		$html
+	);
+}
+
+/**
  * Compat for email links and replacements
  *
  * @param $content
@@ -551,7 +730,7 @@ function email_kses( $content ) {
 
 	// KSES does not like RBG values...
 	$content = safe_css_filter_rgb_to_hex( $content );
-	$content = safe_css_font_quotes( $content );
+	$content = remove_font_family_quotes( $content ); // we'll add them back later
 
 	add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\more_allowed_tags' );
 	add_filter( 'safe_style_css', __NAMESPACE__ . '\more_allowed_css' );
@@ -580,6 +759,8 @@ function email_kses( $content ) {
 
 	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\more_allowed_tags' );
 	remove_filter( 'safe_style_css', __NAMESPACE__ . '\more_allowed_css' );
+
+	$content = restore_font_family_quotes( $content ); // restore quotes
 
 	// remove replacement protocols, we know they're safe(ish).
 	$content = preg_replace(
