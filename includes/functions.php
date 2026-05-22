@@ -4854,11 +4854,17 @@ function get_owners() {
 		}
 	}
 
+    // if the current user is logged in and can view contacts, let's make them the first item so they show first in dropdowns
+    if ( current_user_can('view_contacts') ) {
+        $users = array_filter( $users, fn( $user ) => $user->ID !== get_current_user_id() );
+        array_unshift( $users, wp_get_current_user() );
+    }
+
 	return apply_filters( 'groundhogg/owners', $users );
 }
 
 /**
- * If the current
+ * If a given user has a team
  *
  * @param int|\WP_User $user
  *
@@ -4869,7 +4875,7 @@ function has_team( $user = 0 ) {
 }
 
 /**
- * Get the team list of users
+ * Get the team list of users, there first item should be the user
  *
  * @param  int|\WP_User  $user
  *
@@ -4883,6 +4889,7 @@ function get_team( $user = 0 ) {
  * Get the list of assigned owners for a team lead
  * if no team is assigned for the user, return an empty array
  * if there is a team, return the list of IDs inclusive of the user
+ * Unless filtered, the first item will allways be the users ID
  *
  * @param  int|\WP_User  $user
  *
@@ -4914,7 +4921,7 @@ function get_team_ids( $user = 0 ){
     $owner_ids = array_filter( wp_parse_id_list( $owner_ids ), fn( $user_id ) => user_can( $user_id, 'view_contacts' ) );
 
     // make sure the user is part of their team
-	$owner_ids[] = $user_id;
+	array_unshift( $owner_ids, $user_id );
 
 	/**
 	 * Filter the sales team belonging to a specific sales manager
@@ -4928,7 +4935,7 @@ function get_team_ids( $user = 0 ){
  * @param int $owner_id then owner to check
  * @param int $team_owner_id the team owner
  *
- * @return bool true, if the given user does not have a team, or if the given owner is in the team. false, if the owner is not in the team
+ * @return bool true, if the given user does not have a team OR if the given owner is in the team. false, if the owner is not in the team
  */
 function owner_in_team( int $owner_id, int $team_owner_id = 0 ) {
 
@@ -6379,6 +6386,31 @@ function array_all( $array, $predicate ) {
 	return true;
 }
 
+/**
+ * Sorts elements given a specific order of items within the array
+ * If there are elements in $array not in $order, those elements are removed
+ * !!! does not preserve keys !!!
+ *
+ * @param  array  $array the array to sort
+ * @param  array  $order the item order
+ *
+ * @return array
+ */
+function array_order_sort( array $array, array $order ): array {
+
+	$order_map = array_flip( $order );
+
+	// filter out values not in $order
+	$array = array_filter( $array, function ( $item ) use ( $order_map ) {
+		return isset( $order_map[ $item ] );
+	});
+
+	usort( $array, function ( $a, $b ) use ( $order_map ) {
+		return $order_map[ $a ] <=> $order_map[ $b ];
+	});
+
+	return array_values( $array );
+}
 /**
  * Is something empty
  *
