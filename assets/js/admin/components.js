@@ -509,6 +509,8 @@
         },
       })
 
+      Groundhogg.Select2Picker( document.getElementById( `${ prefix }-owner` ) )
+
       $(`#${ prefix }-first-name, #${ prefix }-last-name, #${ prefix }-email, #${ prefix }-optin-status, #${ prefix }-owner`).
         on('change', (e) => {
           updateContact({
@@ -725,6 +727,8 @@
       })
     })
 
+    Groundhogg.Select2Picker( document.getElementById( `${ prefix }-owner` ) )
+
     $(`
     #${ prefix }-first-name,
     #${ prefix }-last-name,
@@ -751,7 +755,7 @@
       })
     })
 
-    $(`#${ prefix }-owner`).select2()
+    // $(`#${ prefix }-owner`).select2()
 
     $(`
     #${ prefix }-terms,
