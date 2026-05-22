@@ -58,8 +58,8 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Contact constructor.
 	 *
-	 * @param bool|int|string|array $_id_or_email_or_args
-	 * @param bool                  $by_user_id
+	 * @param  bool|int|string|array  $_id_or_email_or_args
+	 * @param  bool  $by_user_id
 	 *
 	 * @return void
 	 */
@@ -289,7 +289,6 @@ class Contact extends Base_Object_With_Meta {
 	 * @return Tag[]
 	 */
 	public function get_tags( $as_object = false ) {
-
 		return $as_object ? array_map( function ( $tag_id ) {
 			return new Tag( $tag_id );
 		}, $this->get_tag_ids() ) : $this->get_tag_ids();
@@ -479,7 +478,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Set the contact's locale
 	 *
-	 * @param string|bool $locale
+	 * @param  string|bool  $locale
 	 */
 	public function set_locale( $locale = false ) {
 		$this->update_meta( 'locale', $locale ?: get_locale() );
@@ -497,7 +496,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * @throws \Exception
 	 *
-	 * @param bool $as_date
+	 * @param  bool  $as_date
 	 *
 	 * @return bool|mixed
 	 */
@@ -513,7 +512,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Get the address
 	 *
-	 * @param string[] $exclude
+	 * @param  string[]  $exclude
 	 *
 	 * @return array
 	 */
@@ -561,8 +560,8 @@ class Contact extends Base_Object_With_Meta {
 		/**
 		 * Filter whether the contact is currently marketable
 		 *
-		 * @param bool    $is_marketable
-		 * @param Contact $contact
+		 * @param  bool  $is_marketable
+		 * @param  Contact  $contact
 		 */
 		return apply_filters( 'groundhogg/contact/is_marketable', Plugin::instance()->preferences->is_marketable( $this ), $this );
 	}
@@ -576,8 +575,8 @@ class Contact extends Base_Object_With_Meta {
 		/**
 		 * Filter whether the contact is currently deliverable
 		 *
-		 * @param bool    $is_deliverable
-		 * @param Contact $contact
+		 * @param  bool  $is_deliverable
+		 * @param  Contact  $contact
 		 */
 		return apply_filters( 'groundhogg/contact/is_deliverable', ! in_array( $this->get_optin_status(), [
 			Preferences::HARD_BOUNCE,
@@ -653,7 +652,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Set the locale when the contact is first created
 	 *
-	 * @param array $data
+	 * @param  array  $data
 	 *
 	 * @return bool
 	 */
@@ -680,7 +679,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Contact update wrapper
 	 *
-	 * @param array $data
+	 * @param  array  $data
 	 *
 	 * @return bool
 	 */
@@ -699,11 +698,11 @@ class Contact extends Base_Object_With_Meta {
 		$data = array_diff_assoc( $data, $this->data );
 
 		// if the contact is marked as spam or blocked, only an admin that can edit the contact can change the opt-in status.
-		if ( isset( $data[ 'optin_status' ] )
+		if ( isset( $data['optin_status'] )
 		     && $this->optin_status_is( [ Preferences::SPAM, Preferences::BLOCKED ] )
 		     && ! current_user_can( 'edit_contact', $this )
-		){
-			unset( $data[ 'optin_status' ] );
+		) {
+			unset( $data['optin_status'] );
 		}
 
 		// updating with existing data
@@ -981,7 +980,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * return whether the contact has a specific tag
 	 *
-	 * @param mixed $tag_id_or_name the ID or name or the tag or an array of tags
+	 * @param  mixed  $tag_id_or_name  the ID or name or the tag or an array of tags
 	 *
 	 * @return bool true if the contact has the tag, false if they don't or no tag valid tag is passed in the first place
 	 */
@@ -1131,7 +1130,7 @@ class Contact extends Base_Object_With_Meta {
 	 * Returns the local time of the contact
 	 * If time specified, converts the timestamp dependant on the timezone of the user.
 	 *
-	 * @param int $time UNIX timestamp
+	 * @param  int  $time  UNIX timestamp
 	 *
 	 * @return int UNIX timestamp
 	 */
@@ -1161,7 +1160,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Compensate for hour difference between local site time and the timezone of the contact.
 	 *
-	 * @param int $time
+	 * @param  int  $time
 	 *
 	 * @return int
 	 */
@@ -1256,9 +1255,7 @@ class Contact extends Base_Object_With_Meta {
 				'data'           => $contact,
 				'meta'           => $this->get_meta(),
 				'tags'           => array_values( $this->get_tags( true ) ),
-//				'files' => $this->get_files(),
 				'user'           => new Safe_WP_User( $this->user ),
-//				'notes' => $this->get_notes(),
 				'admin'          => $this->admin_link(),
 				'is_marketable'  => $this->is_marketable(),
 				'is_deliverable' => $this->is_deliverable(),
@@ -1296,7 +1293,7 @@ class Contact extends Base_Object_With_Meta {
 	 * - Move all files to $this' file folder
 	 * - Deletes $other
 	 *
-	 * @param int|string|Contact $other
+	 * @param  int|string|Contact  $other
 	 *
 	 * @return bool
 	 */
@@ -1313,8 +1310,8 @@ class Contact extends Base_Object_With_Meta {
 		/**
 		 * Before an object is merged
 		 *
-		 * @param Base_Object $original
-		 * @param Base_Object $other
+		 * @param  Base_Object  $original
+		 * @param  Base_Object  $other
 		 */
 		do_action( "groundhogg/contact/pre_merge", $this, $other );
 
@@ -1375,8 +1372,8 @@ class Contact extends Base_Object_With_Meta {
 		 * - Object Relationships
 		 * - Permissions Keys
 		 *
-		 * @param Base_Object $original
-		 * @param Base_Object $other
+		 * @param  Base_Object  $original
+		 * @param  Base_Object  $other
 		 */
 		do_action( "groundhogg/contact/merged", $this, $other );
 
@@ -1402,7 +1399,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Set various forms of GDPR consent
 	 *
-	 * @param string $type
+	 * @param  string  $type
 	 */
 	public function set_gdpr_consent( $type = 'gdpr' ) {
 		// Either GDPR or MARKETING always
@@ -1423,7 +1420,7 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Revoke various forms of GDPR consent
 	 *
-	 * @param string $type
+	 * @param  string  $type
 	 */
 	public function revoke_gdpr_consent( $type = 'gdpr' ) {
 		// Either GDPR or MARKETING always
@@ -1435,7 +1432,7 @@ class Contact extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * @param string $type
+	 * @param  string  $type
 	 *
 	 * @return bool
 	 */
@@ -1457,8 +1454,8 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Handle meta keys with special meaning
 	 *
-	 * @param string|array $key
-	 * @param false        $value
+	 * @param  string|array  $key
+	 * @param  false  $value
 	 *
 	 * @return bool
 	 */
