@@ -41,6 +41,8 @@ class Admin_User {
 			return;
 		}
 
+        wp_enqueue_style( 'groundhogg-admin-element' );
+
 //		add_filter( 'mce_css', function ( $mce_css ) {
 //			return $mce_css . ', ' . GROUNDHOGG_ASSETS_URL . 'css/admin/email-wysiwyg-style.css';
 //		} );
