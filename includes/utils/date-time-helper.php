@@ -24,6 +24,10 @@ class DateTimeHelper extends \DateTime {
 			$timestamp = $datetime;
 			$datetime  = 'now';
 		}
+		else if ( is_a( $datetime, 'DateTime' ) ){
+			$timestamp = $datetime->getTimestamp();
+			$datetime  = 'now';
+		}
 
 		parent::__construct( $datetime, $timezone );
 
@@ -115,6 +119,10 @@ class DateTimeHelper extends \DateTime {
 
 	public function date_i18n() {
 		return $this->i18n( get_option( 'date_format' ) );
+	}
+
+	public function datetime_i18n() {
+		return $this->i18n( get_date_time_format() );
 	}
 
 	/**
