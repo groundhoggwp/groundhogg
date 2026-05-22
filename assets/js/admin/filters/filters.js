@@ -1573,7 +1573,7 @@
       // need to preload
     }
 
-    let el = Span({}, ['Loading...'])
+    let el = Span({className:'loading-dots'}, ['Loading'])
 
     filterRegistry.preloadFilters(filters).finally(r => {
       morphdom(el, renderFilters())
