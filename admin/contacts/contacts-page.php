@@ -615,10 +615,7 @@ class Contacts_Page extends Admin_Page {
 
 			// If is valid date
 			if ( checkdate( $birthday[1], $birthday[2], $birthday[0] ) ) {
-				$time     = mktime( 0, 0, 0, $birthday[1], $birthday[2], $birthday[0] );
-				$birthday = Ymd( $time );
-
-				$contact->update_meta( 'birthday', $birthday );
+				$contact->update_meta( 'birthday', sprintf( '%04d-%02d-%02d', $birthday[0], $birthday[1], $birthday[2] ));
 			} else {
 				$this->add_notice( new WP_Error( 'invalid_date', esc_html__( 'The birthday date provided is not a valid date.' , 'groundhogg' ) ) );
 			}

@@ -1242,14 +1242,14 @@ class Form_v2 extends Step {
 						'label'     => '',
 					] );
 
-					$years  = array_reverse( range( date( 'Y' ) - 100, date( 'Y' ) ) );
+					$years  = array_reverse( range( date( 'Y' ) - 100, gmdate( 'Y' ) ) );
 					$years  = array_combine( $years, $years );
 					$days   = range( 1, 31 );
 					$days   = array_combine( $days, $days );
 					$months = [];
 
 					for ( $i = 1; $i <= 12; $i ++ ) {
-						$timestamp    = mktime( 0, 0, 0, $i, 1, date( 'Y' ) );
+						$timestamp    = mktime( 0, 0, 0, $i, 1, gmdate( 'Y' ) );
 						$months[ $i ] = date_i18n( "F", $timestamp );
 					}
 
@@ -1358,7 +1358,7 @@ class Form_v2 extends Step {
 
 					[ 'month' => $month, 'day' => $day, 'year' => $year ] = (array) $input;
 
-					$date             = Ymd( mktime( 0, 0, 0, $month, $day, $year ) );
+					$date             = sprintf( '%04d-%02d-%02d', $year, $month, $day );
 					$meta['birthday'] = $date;
 				},
 				'required' => function ( $field, $posted_data ) {
