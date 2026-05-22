@@ -314,20 +314,27 @@ abstract class Base_Object_With_Meta extends Base_Object {
 		$class = get_class( $this );
 
 		/**
-		 * @var $object Base_Object_With_Meta
+		 * @var $new Base_Object_With_Meta
 		 */
-		$object = new $class;
+		$new = new $class;
 
-		$object->create( array_merge( $data, $overrides ) );
-		$object->update_meta( array_merge( $meta, $meta_overrides ) );
+		$new->create( array_merge( $data, $overrides ) );
+		$new->update_meta( array_merge( $meta, $meta_overrides ) );
+
+		// copy associations (to handle campaigns and stuff)
+		// todo only handles relationships where $this is primary
+		$related = $this->get_related_objects( $new );
+		foreach ( $related as $relative ) {
+			$new->create_relationship( $relative );
+		}
 
 		/**
 		 * @param $new  Base_Object_With_Meta the new object
 		 * @param $orig Base_Object_With_Meta the original object
 		 */
-		do_action( "groundhogg/{$this->get_object_type()}/duplicated", $object, $this );
+		do_action( "groundhogg/{$this->get_object_type()}/duplicated", $new, $this );
 
-		return $object;
+		return $new;
 	}
 
 	/**
