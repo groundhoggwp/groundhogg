@@ -29,11 +29,11 @@ class Files_Api extends Base_Api {
 				'callback'            => [ $this, 'read_imports' ],
 				'permission_callback' => [ $this, 'read_imports_permissions_callback' ]
 			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_imports' ],
-				'permission_callback' => [ $this, 'delete_imports_permissions_callback' ]
-			],
+//			[
+//				'methods'             => WP_REST_Server::DELETABLE,
+//				'callback'            => [ $this, 'delete_imports' ],
+//				'permission_callback' => [ $this, 'delete_imports_permissions_callback' ]
+//			],
 		] );
 
 		register_rest_route( self::NAME_SPACE, "/files/exports", [
@@ -47,11 +47,11 @@ class Files_Api extends Base_Api {
 				'callback'            => [ $this, 'read_exports' ],
 				'permission_callback' => [ $this, 'read_exports_permissions_callback' ]
 			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_exports' ],
-				'permission_callback' => [ $this, 'delete_exports_permissions_callback' ]
-			],
+//			[
+//				'methods'             => WP_REST_Server::DELETABLE,
+//				'callback'            => [ $this, 'delete_exports' ],
+//				'permission_callback' => [ $this, 'delete_exports_permissions_callback' ]
+//			],
 		] );
 	}
 
