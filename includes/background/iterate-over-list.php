@@ -8,7 +8,7 @@ class Iterate_Over_List extends Task {
 
 	protected array $list;
 	protected int $items; // count($list)
-	protected mixed $callback;
+	protected $callback;
 	protected int $batchsize;
 	protected int $batch = 0;
 	protected string $display; // what's shown in the table itself
