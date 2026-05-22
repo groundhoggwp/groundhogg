@@ -913,5 +913,6 @@
   }
 
   Groundhogg.TokenList = TokenList
+  Groundhogg.Select2Picker = Select2Picker
 
 } )(jQuery, groundhogg_nonces, groundhogg_endpoints, Groundhogg)
