@@ -961,13 +961,26 @@ class HTML {
                 if ( $owner->ID === get_current_user_id() ) {
 	                $a['options'][ $owner->ID ] = __('Me', 'groundhogg');
                 } else {
-	                $a['options'][ $owner->ID ] = call_user_func( $a['option_callback'], $owner ) ?: $owner->display_name . ' (' . $owner->user_email . ')' ;
+
+                    $text = '';
+
+                    if ( is_callable( $a['option_callback'] ) ) {
+	                    $text = call_user_func( $a['option_callback'], $owner );
+                    }
+
+                    if ( empty( $text ) ) {
+	                    $text = $owner->display_name . ' (' . $owner->user_email . ')';
+                    }
+
+	                $a['options'][ $owner->ID ] = $text;
                 }
             }
 		}
 		if ( $a['multiple'] ) {
 			$a['option_none'] = false;
 		}
+
+        unset( $a['option_callback'] );
 
 		return apply_filters( 'groundhogg/html/dropdown_owners', $this->dropdown( $a ), $a );
 	}

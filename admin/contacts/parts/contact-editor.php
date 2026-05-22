@@ -182,8 +182,13 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                         <div class="gh-row">
                             <div class="gh-col">
                                 <label for="owner_id"><?php esc_html_e( 'Contact Owner', 'groundhogg' ) ?></label>
-								<?php html( html()->dropdown_owners( array( 'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0 ) ) ); ?>
+								<?php html( html()->dropdown_owners( [
+                                        'selected' => ( $contact->get_ownerdata() ) ? $contact->get_owner_id() : 0,
+                                    'class' => 'gh-select-2-picker gh-owner-picker',
+                                ] ) ); ?>
                             </div>
+                        </div>
+                        <div class="gh-row">
                             <div class="gh-col">
                                 <label><?php esc_html_e( 'Birthday', 'groundhogg' ); ?></label>
 								<?php
