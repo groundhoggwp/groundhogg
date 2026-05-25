@@ -657,13 +657,13 @@
         confirmText: __('Delete'),
         alert: `<p>${ sprintf(
           __('Are you sure you want to delete %s?', 'groundhogg'), bold(
-            `${ contact.data.first_name } ${ contact.data.last_name }`)) }</p>`,
+            contact.i18n.displayAs )) }</p>`,
         onConfirm: () => {
           ContactsStore.delete(contact.ID).then(() => {
             $(`#contact-${ contact.ID }`).remove()
             dialog({
               message: sprintf(__('%s was deleted!', 'groundhogg'),
-                `${ contact.data.first_name } ${ contact.data.last_name }`),
+                contact.i18n.displayAs ),
             })
           })
         },
