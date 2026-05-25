@@ -75,6 +75,7 @@ class Autoloader {
 		'Event_Queue_Item'                  => 'includes/classes/event-queue-item.php',
 		'Tag'                               => 'includes/classes/tag.php',
 		'Broadcast'                         => 'includes/classes/broadcast.php',
+		'Recurring_Broadcast'               => 'includes/classes/recurring-broadcast.php',
 		'Funnel'                            => 'includes/classes/funnel.php',
 		'Step'                              => 'includes/classes/step.php',
 //		'Background_Task'                   => 'includes/classes/background-task.php',
