@@ -3453,7 +3453,56 @@ div:has( > button.hide-panel) {
     .dashicons-arrow-down-alt2 {
       cursor: pointer;
     }
+  }
+}
 
+.gh-dom-picker {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  grid-template-rows: repeat(5, 30px);
+  gap: 3px;
 
+  .gh-dom-date {
+    border-radius: 4px;
+    background-color: $primary-dark-5;
+    border: none;
+    outline: 1px solid $primary-dark;
+    padding: 3px;
+
+    &:hover{
+      background-color: $primary-dark-15;
+    }
+
+    &.selected {
+      background-color: $primary-dark;
+      //outline-color: $primary-blue;
+      color: #fff;
+    }
+  }
+}
+
+.requires-pro-features-wrapper {
+  width: fit-content;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 5px 5px 8px;
+  border-color: $benchmark-orange;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+
+  .require-pro-features{
+    //opacity: 0.5;
+    //pointer-events: none;
+  }
+
+  .pro-pill {
+    border-radius: 4px;
+    display: inline-block;
+    padding: 3px 8px;
+    color: #FFF;
+    background-color: $benchmark-orange;
+    justify-self: end;
   }
 }

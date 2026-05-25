@@ -89,6 +89,7 @@ class Broadcasts extends DB {
 			'ID'             => '%d',
 			'object_id'      => '%d',
 			'object_type'    => '%s',
+			'schedule_id'    => '%d',
 			'scheduled_by'   => '%d',
 			'send_time'      => '%d',
 			'query'          => '%s',
@@ -107,6 +108,7 @@ class Broadcasts extends DB {
 		return [
 			'ID'             => 0,
 			'object_id'      => 0,
+			'schedule_id'    => 0,
 			'object_type'    => 'email',
 			'scheduled_by'   => get_current_user_id(),
 			'send_time'      => 0,
@@ -154,16 +156,12 @@ class Broadcasts extends DB {
 	 * @access  public
 	 * @since   2.1
 	 */
-	public function create_table() {
-
-		global $wpdb;
-
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$sql = "CREATE TABLE " . $this->table_name . " (
+	public function create_table_sql_command() {
+		return "CREATE TABLE " . $this->table_name . " (
 		ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         object_id bigint(20) unsigned NOT NULL,
         object_type VARCHAR(20) NOT NULL,
+        schedule_id bigint(20) unsigned NOT NULL,
         scheduled_by bigint(20) unsigned NOT NULL,
         send_time bigint(20) unsigned NOT NULL,
         query longtext NOT NULL,
@@ -172,9 +170,5 @@ class Broadcasts extends DB {
         PRIMARY KEY (ID),
         KEY send_time (send_time)
 		) {$this->get_charset_collate()};";
-
-		dbDelta( $sql );
-
-		update_option( $this->table_name . '_db_version', $this->version );
 	}
 }

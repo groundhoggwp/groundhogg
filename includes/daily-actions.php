@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Classes\Recurring_Broadcast;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reporting\Email_Reports;
 use Groundhogg\Utils\DateTimeHelper;
 
@@ -13,6 +15,7 @@ class Daily_Actions {
 		add_action( 'init', [ $this, 'schedule_event' ] );
 
 //		add_action( 'groundhogg/daily', [ $this, 'send_status_report' ] );
+		add_action( 'groundhogg/daily', [ $this, 'schedule_recurring_broadcasts' ] );
 		add_action( 'groundhogg/daily', [ $this, 'send_broadcast_reports' ] );
 		add_action( 'groundhogg/daily', [ $this, 'maybe_send_overview_report' ] );
 	}
@@ -30,6 +33,27 @@ class Daily_Actions {
 		$date = new DateTimeHelper( 'tomorrow 9:00 AM' );
 
 		wp_schedule_event( $date->getTimestamp(), 'daily', 'groundhogg/daily' );
+	}
+
+	/**
+	 * Loop through any due schedules and schedule the next email
+	 *
+	 * @return void
+	 */
+	public function schedule_recurring_broadcasts() {
+
+		// fetch active recurring broadcasts whose send time is < current time
+		$query = new Table_Query( 'broadcasts' );
+		$query->where
+			->equals( 'status', 'active' )
+			->equals( 'object_type', 'recurring_broadcast' )
+			->lessThan( 'send_time', (new DateTimeHelper( 'tomorrow' ))->getTimestamp() );
+
+		$schedules = $query->get_objects( Recurring_Broadcast::class );
+
+		foreach ( $schedules as $schedule ) {
+			$schedule->schedule_next();
+		}
 	}
 
 	public function send_status_report() {

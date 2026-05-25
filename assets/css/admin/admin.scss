@@ -34,6 +34,51 @@ $action-green-5: rgba($action-green, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
+body.groundhogg-admin-page {
+  --gh-primary-blue: #{$primary-blue};
+  --gh-primary-blue-60: #{$primary-blue-60};
+  --gh-primary-blue-50: #{$primary-blue-50};
+  --gh-primary-blue-20: #{$primary-blue-20};
+  --gh-primary-blue-10: #{$primary-blue-10};
+  --gh-primary-blue-7: #{$primary-blue-7};
+  --gh-primary-blue-2: #{$primary-blue-2};
+
+  --gh-primary-dark: #{$primary-dark};
+  --gh-primary-dark-50: #{$primary-dark-50};
+  --gh-primary-dark-30: #{$primary-dark-30};
+  --gh-primary-dark-15: #{$primary-dark-15};
+  --gh-primary-dark-10: #{$primary-dark-10};
+  --gh-primary-dark-5: #{$primary-dark-5};
+
+  --gh-error-red: #{$error-red};
+  --gh-error-red-50: #{$error-red-50};
+  --gh-error-red-10: #{$error-red-10};
+
+  --gh-secondary-purple: #{$secondary-purple};
+  --gh-secondary-purple-25: #{$secondary-purple-25};
+  --gh-secondary-purple-10: #{$secondary-purple-10};
+  --gh-secondary-purple-5: #{$secondary-purple-5};
+
+  --gh-alert-yellow: #{$alert-yellow};
+  --gh-alert-yellow-50: #{$alert-yellow-50};
+
+  --gh-benchmark-orange: #{$benchmark-orange};
+  --gh-benchmark-orange-50: #{$benchmark-orange-50};
+  --gh-benchmark-orange-25: #{$benchmark-orange-25};
+  --gh-benchmark-orange-10: #{$benchmark-orange-10};
+  --gh-benchmark-orange-5: #{$benchmark-orange-5};
+
+  --gh-action-green-dark: #{$action-green-dark};
+  --gh-action-green: #{$action-green};
+  --gh-action-green-50: #{$action-green-50};
+  --gh-action-green-25: #{$action-green-25};
+  --gh-action-green-10: #{$action-green-10};
+  --gh-action-green-5: #{$action-green-5};
+
+  --gh-box-shadow: #{$box-shadow};
+  --gh-background-color: #{$background-color};
+}
+
 .mce-ico {
   &.mce-i-gh_replacements {
     font-family: 'dashicons';
@@ -1350,10 +1395,14 @@ body.gh-full-screen {
   }
 }
 
-.groundhogg-admin-page .gh-header + h2.gh-nav {
-  margin: 0 0 0 -20px !important;
-  padding: 10px 0 0 20px !important;
-  background-color: #fff;
+.groundhogg-admin-page {
+
+  .gh-header + h2.gh-nav {
+    margin: 0 0 0 -20px !important;
+    padding: 10px 0 0 20px !important;
+    background-color: #fff;
+  }
+
 }
 
 .gh-site {
@@ -1569,4 +1618,230 @@ body.gh-full-screen {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+}
+
+.flow-timeline {
+  position: relative;
+  margin-top: 10px;
+
+  &.collapsed {
+    ul.activity-timeline {
+      display: none;
+    }
+  }
+
+  .flow-header-container {
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+    //padding: 10px 20px;
+
+    button.flow-toggle-button {
+      //margin: 5px;
+    }
+
+    .flow-sep-line {
+      border-top: 1.5px solid $primary-dark-15;
+      flex-grow: 1;
+      margin: 0 20px;
+    }
+
+    h2.flow-header {
+      margin: 0;
+      //margin-left: 20px;
+    }
+  }
+}
+
+ul.activity-timeline {
+
+  padding-left: 10px;
+
+  code {
+    border-radius: 4px;
+  }
+
+  li.activity-item {
+
+    border-left: 2px solid $primary-dark-15;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    position: relative;
+    margin: 0;
+
+    &:last-child{
+      border-left-color: transparent;
+      padding-bottom: 0;
+    }
+
+    &:has(.benchmark.starting) {
+      border-left-color: transparent;
+    }
+
+    .activity-icon{
+      position: absolute;
+      top: 0;
+      left: -1px;
+      transform: translateX(-50%);
+    }
+
+    .activity-content {
+      padding: 3px 0;
+    }
+
+    .activity-date {
+      font-size: 11px;
+      color: $primary-dark-50;
+      text-transform: uppercase;
+    }
+
+    table{
+      td:first-child {
+        word-break:normal;
+      }
+    }
+
+    &:not(:hover,:active,:focus){
+      .event-more,.event-queue-more{
+        display: none;
+      }
+    }
+
+    .activity-info {
+      font-size: 15px;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .contact-input {
+      padding: 5px 10px;
+      background-color: $primary-dark-5;
+      font-size: 14px;
+      border-radius: 5px;
+      margin-top: 5px;
+      width: fit-content;
+    }
+
+    .event-extra,
+    .diff-time {
+      color: $primary-dark-50;
+
+      .step-type {
+        &.action {
+          color: $action-green;
+        }
+        &.benchmark {
+          color: $benchmark-orange;
+        }
+      }
+    }
+
+    .diff-time:first-letter {
+      text-transform: capitalize;
+    }
+
+    .activity-rendered.gh-panel {
+      padding: 5px 10px;
+    }
+
+    .activity-icon.no-frame {
+      position: absolute;
+      left: -1px;
+      transform: translateX(-50%);
+      height: 30px;
+      width: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .activity-icon:not(.no-frame) {
+
+      position: absolute;
+      left: -1px;
+      box-sizing: border-box;
+
+      height: 25px;
+      width: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      background: $primary-blue;
+      color: #FFFFFF;
+
+      img {
+        max-width: 100%;
+      }
+
+      &.unsubscribed,
+      &.bounce,
+      &.complaint{
+        background-color: $error-red;
+      }
+
+      &.page-visit{
+        background: $primary-dark;
+      }
+
+      &.soft_bounce{
+        background-color: $alert-yellow;
+        color: $primary-dark;
+      }
+
+      &.benchmark {
+        --color: #{$benchmark-orange};
+        --color-5: #{$benchmark-orange-5};
+        --color-10: #{$benchmark-orange-10};
+
+        border: 2px solid var(--color);
+        background-color: #fff;
+        background-image: linear-gradient(var(--color-5),var(--color-10));
+        border-radius: 50px;
+
+        &.pending{
+          border: none;
+          background-color: var(--color);
+        }
+
+        &:not(.pending){
+          svg {
+            fill: var(--color) !important;
+          }
+        }
+      }
+
+      &.action {
+        --color: #{$action-green};
+        --color-5: #{$action-green-5};
+        --color-10: #{$action-green-10};
+
+        border: 2px solid var(--color);
+        background-color: #fff;
+        background-image: linear-gradient(var(--color-5),var(--color-10));
+
+        &.pending{
+          border: none;
+          background-color: var(--color);
+        }
+
+        &:not(.pending){
+          svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--color) !important;
+          }
+        }
+      }
+
+      &.broadcast{
+        background-color: $action-green;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
 }

@@ -275,6 +275,13 @@ class Main_Updater extends Old_Updater {
 						20
 					) );
 				},
+			],
+			'4.5'  => [
+				'automatic'   => true,
+				'description' => __( 'Upgrade the broadcasts table for recurring schedules.', 'groundhogg' ),
+				'callback'    => function () {
+					db()->broadcasts->create_table();
+				},
 			]
 		];
 	}

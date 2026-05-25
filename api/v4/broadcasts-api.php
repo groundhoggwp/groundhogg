@@ -3,15 +3,14 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Broadcast;
-use Groundhogg\Campaign;
-use Groundhogg\Email;
-use Groundhogg\Utils\Micro_Time_Tracker;
+use Groundhogg\DraftException;
+use Groundhogg\NoContactsException;
+use Groundhogg\SchedulingException;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
-use function Groundhogg\create_object_from_type;
-use function Groundhogg\get_db;
+use function Groundhogg\sanitize_payload;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -70,140 +69,57 @@ class Broadcasts_Api extends Base_Object_Api {
 	 */
 	public function create( WP_REST_Request $request ) {
 
-		$meta = [];
+		try {
 
-		$object_id   = absint( $request->get_param( 'object_id' ) );
-		$object_type = sanitize_text_field( $request->get_param( 'object_type' ) ) ?: 'email';
+			$broadcast = Broadcast::schedule( [
+				'object_id'                     => absint( $request->get_param( 'object_id' ) ),
+				'object_type'                   => sanitize_text_field( $request->get_param( 'object_type' ) ),
+				'date'                          => sanitize_text_field( $request->get_param( 'date' ) ),
+				'time'                          => sanitize_text_field( $request->get_param( 'time' ) ),
+				'dates'                         => $request->get_param( 'dates' ), // sanitized downstream
+				'segment_type'                  => sanitize_text_field( $request->get_param( 'segment_type' ) ),
+				'send_now'                      => (bool) $request->get_param( 'send_now' ),
+				'send_in_local_time'            => (bool) $request->get_param( 'send_in_local_time' ),
+				'batching'                      => (bool) $request->get_param( 'batching' ),
+				'batch_interval'                => sanitize_text_field( $request->get_param( 'batch_interval' ) ),
+				'batch_interval_length'         => absint( $request->get_param( 'batch_interval_length' ) ),
+				'batch_amount'                  => absint( $request->get_param( 'batch_amount' ) ),
+				'campaigns'                     => wp_parse_id_list( $request->get_param( 'campaigns' ) ),
+				'query'                         => sanitize_payload( $request->get_param( 'query' ) ),
+				'is_recurring'                  => (bool) $request->get_param( 'is_recurring' ),
+				// sanitization happens downstream
+				'repeats_every_amount'          => $request->get_param( 'repeats_every_amount' ),
+				'repeats_every_interval'        => $request->get_param( 'repeats_every_interval' ),
+				'repeats_dow'                   => $request->get_param( 'repeats_dow' ),
+				'repeats_dow_occurrence'        => $request->get_param( 'repeats_dow_occurrence' ),
+				'repeats_month_occurrence_type' => $request->get_param( 'repeats_month_occurrence_type' ),
+				'repeats_dom'                   => $request->get_param( 'repeats_dom' ),
+				'repeats_until'                 => $request->get_param( 'repeats_until' ),
+				'repeats_until_date'            => $request->get_param( 'repeats_until_date' ),
+				'repeats_until_occurrences'     => $request->get_param( 'repeats_until_occurrences' ),
+			] );
 
-		$object = create_object_from_type( $object_id, $object_type );
+			return self::SUCCESS_RESPONSE( [
+				'item' => $broadcast
+			] );
 
-		if ( $object_type === 'email' ) {
+		} catch ( DraftException $e ) {
 
-			$email = new Email( $object_id );
+			return self::ERROR_400( 'draft_error', $e->getMessage() );
 
-			if ( $email->is_draft() ) {
-				return self::ERROR_401( 'email_in_draft_mode', esc_html__( 'You cannot schedule an email while it is in draft mode.', 'groundhogg' ) );
-			}
+		} catch ( NoContactsException $e ) {
+
+			return self::ERROR_400( 'no_contacts', $e->getMessage() );
+
+		} catch ( SchedulingException $e ) {
+
+			return self::ERROR_400( 'scheduling_error', $e->getMessage() );
+
+		} catch ( \DateException $e ) {
+
+			return self::ERROR_400( 'date_error', $e->getMessage() );
+
 		}
-
-		$date = sanitize_text_field( $request->get_param( 'date' ) ) ?: date( 'Y-m-d', strtotime( 'tomorrow' ) );
-		$time = sanitize_text_field( $request->get_param( 'time' ) ) ?: '9:00:00';
-
-		$time_string = $date . ' ' . $time;
-
-		$date = new \DateTime( $time_string, wp_timezone() );
-
-		$segment_type = $request->get_param( 'segment_type' ) ?: 'fixed';
-
-		/* convert to UTC */
-		if ( $request->get_param( 'send_now' ) ) {
-			$meta['send_now'] = true;
-			$date->setTimestamp( time() + 10 );
-
-			// when using Send Now the segment type is fixed anyway
-			$segment_type = 'fixed';
-		}
-
-		$meta['segment_type'] = $segment_type;
-
-		// Save batching meta
-		if ( $request->get_param( 'batching' ) ) {
-			$meta['batch_interval']        = sanitize_text_field( $request->get_param( 'batch_interval' ) );
-			$meta['batch_interval_length'] = absint( $request->get_param( 'batch_interval_length' ) );
-			$meta['batch_amount']          = absint( $request->get_param( 'batch_amount' ) );
-			$meta['batch_delay']           = 0; // initialize batch offset at 0
-		}
-
-		if ( $date->getTimestamp() < time() ) {
-			return self::ERROR_401( 'invalid_date', esc_html__( 'Please select a time in the future', 'groundhogg' ) );
-		}
-
-		$query = map_deep( $request->get_param( 'query' ), 'sanitize_text_field' ) ?: [];
-		unset( $query['order'] );
-		unset( $query['orderby'] );
-		unset( $query['limit'] );
-		unset( $query['number'] );
-
-		$is_transactional         = method_exists( $object, 'is_transactional' ) ? $object->is_transactional() : false;
-		$meta['is_transactional'] = $is_transactional;
-
-		if ( ! $is_transactional ) {
-			$query['marketable'] = true;
-		}
-
-		$num_contacts = get_db()->contacts->count( $query );
-
-		if ( $num_contacts === 0 ) {
-			return self::ERROR_401( 'error', esc_html__( 'No contacts match the given filters.', 'groundhogg' ) );
-		}
-
-		$meta['total_contacts'] = $num_contacts;
-
-		$broadcast = new Broadcast();
-
-		$broadcast->create( [
-			'object_id'    => $object_id,
-			'object_type'  => $object_type,
-			'send_time'    => $date->getTimestamp(),
-			'scheduled_by' => get_current_user_id(),
-			'status'       => 'pending',
-			'query'        => $query,
-		] );
-
-		if ( $request->get_param( 'send_in_local_time' ) ) {
-			$meta['send_in_local_time'] = true;
-		}
-
-		$broadcast->update_meta( $meta );
-
-		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
-
-		foreach ( $campaigns as $campaign ) {
-			$broadcast->create_relationship( new Campaign( $campaign ) );
-		}
-
-		/**
-		 * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
-		 *
-		 * @param int   $broadcast_id the ID of the broadcast
-		 * @param array $meta         the config object which is passed to the scheduler
-		 */
-		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast->get_id(), $meta, $broadcast );
-
-		// We can jumpstart the process if the segment is fixed
-		if ( $segment_type === 'fixed' ) {
-
-			// Sets up the initial state for the scheduler
-			$items_scheduled = $broadcast->enqueue_batch();
-
-			// Something is wrong scheduling the broadcast
-			if ( ! $items_scheduled ) {
-
-				$broadcast->cancel();
-				$broadcast->delete();
-
-				return self::ERROR_500( 'db_error', 'Unable to schedule events', $broadcast );
-			}
-
-			$tracker = new Micro_Time_Tracker();
-
-			// schedule 5 seconds worth. Should cover most small broadcasts
-			while ( $broadcast->is_pending() && $tracker->time_elapsed() < 5 ) {
-				$broadcast->enqueue_batch();
-			}
-		}
-
-		// If the broadcast is still pending, create a background task
-		$broadcast->maybe_schedule_in_background();
-
-		wp_send_json( [
-			'status' => 'success',
-			'item'   => $broadcast
-		] );
-
-		return self::SUCCESS_RESPONSE( [
-			'item' => $broadcast
-		] );
 	}
 
 	/**

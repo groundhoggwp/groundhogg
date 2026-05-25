@@ -106,6 +106,7 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 
 		$callbacks = [
 			"process_{$this->get_current_tab()}_{$this->get_current_action()}",
+			"process_{$this->get_current_action()}_{$this->get_current_tab()}",
 			"{$this->get_current_tab()}_{$this->get_current_action()}_process",
 			"process_{$this->get_current_action()}",
 			"{$this->get_current_action()}_process",

@@ -6949,6 +6949,16 @@ function enqueue_broadcast_assets() {
 	wp_enqueue_style( 'groundhogg-admin-element' );
 	enqueue_filter_assets();
 
+    $query = new Table_Query( 'broadcasts' );
+    $query->setSelect( 'query' )->setLimit(10)
+                                ->where()
+                                ->contains( 'query', 'filters' ); // custom filter query
+    $queries = array_unique( wp_list_pluck( $query->get_results(), 'query' ) );
+    $queries = array_map( fn( $query ) => maybe_unserialize( $query ), $queries );
+    // only include queries that have filters
+
+    wp_add_inline_script( 'groundhogg-admin-send-broadcast', "var RecentQueries = " . wp_json_encode( $queries ) . ";", 'before' );
+
 	do_action( 'groundhogg_enqueue_broadcast_assets' );
 }
 

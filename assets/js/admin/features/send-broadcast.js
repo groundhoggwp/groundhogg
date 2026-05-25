@@ -3,6 +3,7 @@
   const {
     adminPageURL,
     bold,
+    andList,
     icons,
     dialog,
   } = Groundhogg.element
@@ -12,18 +13,27 @@
     contacts : ContactsStore,
     campaigns: CampaignsStore,
   } = Groundhogg.stores
+
   const {
     routes,
     post,
     ajax,
   } = Groundhogg.api
+
+  const {
+    urlEncodeFilters,
+    ContactFilterDisplay,
+  } = Groundhogg.filters
   const { createFilters } = Groundhogg.filters.functions
+
   const {
     formatNumber,
     formatDateTime,
   } = Groundhogg.formatting
   const {
     debounce,
+    ordinal_suffix_of,
+    base64_json_encode,
   } = Groundhogg.functions
   const {
     sprintf,
@@ -42,6 +52,7 @@
     Div,
     Button,
     Pg,
+    An,
     Modal,
     Textarea,
     Select,
@@ -52,30 +63,103 @@
     Iframe,
     makeEl,
     ButtonToggle,
+    MultiButtonToggle,
+    DayOfMonthPicker,
     Label,
     Span,
     Toggle,
     Dashicon,
+    ToolTip,
+    RequiresPro,
+    InputRepeater,
   } = MakeEl
 
+  let savedDefaults = localStorage.getItem('gh-broadcast-scheduler-defaults')
+  savedDefaults = savedDefaults ? JSON.parse(savedDefaults) : {}
+
   const initialState = {
-    step                 : 'object',
-    steps                : [],
-    object               : null,
-    when                 : 'later',
-    campaigns            : [],
-    searchMethod         : 'filters', // 'filters' or 'search'
-    searchMethods        : [],
-    totalContacts        : 0,
-    date                 : date('Y-m-d'),
-    time                 : date('H:00:00', getDate().setHours(getDate().getHours() + 1)),
-    broadcast            : null,
-    segment_type         : 'fixed',
-    batching             : false,
-    batch_interval       : 'minutes',
-    batch_interval_length: 30,
-    batch_amount         : 100,
-    send_in_local_time   : false,
+    step                         : 'object',
+    steps                        : [],
+    object                       : null,
+    when                         : 'later',
+    campaigns                    : [],
+    searchMethod                 : 'filters', // 'filters' or 'search'
+    searchMethods                : [],
+    totalContacts                : 0,
+    date                         : date('Y-m-d'),
+    time                         : date('H:00:00', getDate().setHours(getDate().getHours() + 1)),
+    dates                        : [],
+    broadcast                    : null,
+    segment_type                 : 'fixed',
+    batching                     : false,
+    batch_interval               : 'minutes',
+    batch_interval_length        : 30,
+    batch_amount                 : 100,
+    send_in_local_time           : false,
+    use_optimized_send_time      : false,
+    is_recurring                 : false,
+    repeats_every_interval       : 'weeks',
+    repeats_every_amount         : 1,
+    repeats_dow                  : [wp.date.format('l', getDate()).toLowerCase()],
+    repeats_until                : 'never',
+    repeats_until_date           : wp.date.format('Y-m-d', getDate().setMonth(getDate().getMonth() + 1)),
+    repeats_until_occurrences    : 10,
+    repeats_dom                  : [getDate().getDate()],
+    repeats_dow_occurrence       : [get_weekday_occurrence(getDate())],
+    repeats_month_occurrence_type: 'm',
+    tzDisplay                    : wp.date.getSettings().timezone.abbr || wp.date.getSettings().timezone.string ||
+      `UTC${ wp.date.getSettings().timezone.offsetFormatted }`,
+    ...savedDefaults,
+  }
+
+  const labels = {
+    monday   : __('Monday', 'groundhogg'),
+    tuesday  : __('Tuesday', 'groundhogg'),
+    wednesday: __('Wednesday', 'groundhogg'),
+    thursday : __('Thursday', 'groundhogg'),
+    friday   : __('Friday', 'groundhogg'),
+    saturday : __('Saturday', 'groundhogg'),
+    sunday   : __('Sunday', 'groundhogg'),
+    first    : __('first', 'groundhogg'),
+    second   : __('second', 'groundhogg'),
+    third    : __('third', 'groundhogg'),
+    fourth   : __('fourth', 'groundhogg'),
+    last     : __('last', 'groundhogg'),
+  }
+
+  /**
+   * Save some of the settings to local storage so they're there the next
+   * time we schedule a broadcast on the same device
+   */
+  function saveDefaultsToLocalStorage () {
+    localStorage.setItem('gh-broadcast-scheduler-defaults', JSON.stringify({
+      send_in_local_time     : getState().send_in_local_time,
+      use_optimized_send_time: getState().use_optimized_send_time,
+      batch_interval         : getState().batch_interval,
+      batch_interval_length  : getState().batch_interval_length,
+      batch_amount           : getState().batch_amount,
+    }))
+  }
+
+  function get_weekday_occurrence (date) {
+    const d = new Date(date)
+
+    const day_of_month = d.getDate() // 1–31
+    const occurrence = Math.ceil(day_of_month / 7) // 1–5
+
+    // Check if it's the last occurrence of this weekday in the month
+    const next_week = new Date(d)
+    next_week.setDate(d.getDate() + 7)
+
+    const is_last = next_week.getMonth() !== d.getMonth()
+
+    return is_last ? 'last' : [
+      'first',
+      'second',
+      'third',
+      'fourth',
+      'fifth',
+    ][occurrence - 1]
   }
 
   const getSearchMethods = () => {
@@ -119,6 +203,34 @@
             saved_search: id,
           } ),
         } )),
+      ...RecentQueries.map(query => {
+
+        let {
+          filters = [],
+          exclude_filters = [],
+        } = query
+
+        let parts = []
+
+        if (filters.length) {
+          parts.push(`Includes (${ ContactFilterDisplay(filters).outerHTML })`)
+        }
+
+        if (exclude_filters.length) {
+          parts.push(`Excludes (${ ContactFilterDisplay(exclude_filters).outerHTML })`)
+        }
+
+        let text = parts.join(' AND ')
+
+        return {
+          id   : base64_json_encode(query),
+          text,
+          query: () => ( {
+            filters,
+            exclude_filters,
+          } ),
+        }
+      }),
     ]
   }
 
@@ -146,11 +258,67 @@
    * @returns {Promise<T>}
    */
   const updateTotalContacts = (morph = true) => {
-    return ContactsStore.count(getQuery()).then(total => {
+
+    let query = getQuery()
+
+    const filterAttrs = [
+      'filters',
+      'filters1',
+      'filters2',
+      'exclude_filters',
+      'exclude_filters1',
+      'exclude_filters2',
+      'include_filters'
+    ];
+
+    filterAttrs.forEach(attribute => {
+
+      // check if set
+      if (!(attribute in query)) {
+        return;
+      }
+
+      const value = query[attribute];
+
+      // check if array
+      if (Array.isArray(value)) {
+        query[attribute] = urlEncodeFilters(value);
+      }
+    });
+
+    return ContactsStore.count(query).then(total => {
       setState({
         totalContacts: total,
       }, morph)
     })
+  }
+
+  const hasValidDates = () => {
+
+    const { dates, date, time, when } = getState()
+
+    if ( when !== 'later' ) {
+      return true
+    }
+
+    if ( dates.length ) {
+      return dates.every(([date, time]) => {
+        return date && time && isInTheFuture( `${date} ${time}` )
+      })
+    }
+
+    return date && time && isInTheFuture( `${date} ${time}` )
+
+  }
+
+  const sendDatesPreview = () => {
+    const { dates, date, time } = getState()
+
+    if ( dates.length ) {
+      return andList( dates.map(([date, time]) => bold( formatDateTime(`${date} ${time}`)) )  )
+    }
+
+    return bold( formatDateTime(`${date } ${ time }`) )
   }
 
   const updateDurationEstimate = debounce(() => ajax({
@@ -183,9 +351,13 @@
         console.log(e)
       }
     }
+
+    saveDefaultsToLocalStorage()
   }
 
   const getObject = () => getState().object
+
+  const isEmailObject = () => getObject() && typeof getObject().data.plain_text !== 'undefined'
 
   /**
    *
@@ -215,6 +387,75 @@
       // From Email
     ]),
   ])
+
+  const RecurringSchedulePreview = ({
+    repeats_every_interval,
+    repeats_every_amount,
+    repeats_dow,
+    repeats_dow_occurrence,
+    repeats_month_occurrence_type,
+    repeats_dom,
+    repeats_until,
+    repeats_until_date,
+    repeats_until_occurrences,
+  }) => {
+
+    let recurring_preview
+
+    switch (repeats_every_interval) {
+      case 'days':
+        recurring_preview = sprintf(_n('repeat every %s day', 'repeat every %s days', repeats_every_amount, 'groundhogg'),
+          bold(repeats_every_amount))
+        break
+      case 'weeks':
+        recurring_preview = sprintf(
+          _n('repeat every %s week on %s', 'repeat every %s weeks on %s', repeats_every_amount, 'groundhogg'),
+          bold(repeats_every_amount),
+          andList(repeats_dow.map(dow => bold(labels[dow]))),
+        )
+        break
+      case 'months':
+
+        if (repeats_month_occurrence_type === 'm') {
+          recurring_preview = sprintf(
+            _n('repeat every %s month on the %s day of the month', 'repeat every %s months on %s day of the month',
+              repeats_every_amount, 'groundhogg'),
+            bold(repeats_every_amount),
+            andList(repeats_dom.map(dom => bold(ordinal_suffix_of(dom)))),
+          )
+        }
+        else if (repeats_month_occurrence_type === 'w') {
+          recurring_preview = sprintf(
+            _n('repeat every %s month on the %s %s', 'repeat every %s months on the %s %s',
+              repeats_every_amount, 'groundhogg'),
+            bold(repeats_every_amount),
+            andList(repeats_dow_occurrence.map(occurrence => bold(labels[occurrence]))),
+            andList(repeats_dow.map(dow => bold(labels[dow]))),
+          )
+        }
+
+        break
+      case 'years':
+        recurring_preview = sprintf(_n('repeat every %s year', 'repeat every %s years', repeats_every_amount, 'groundhogg'),
+          bold(repeats_every_amount))
+        break
+    }
+
+    switch (repeats_until) {
+      case 'never':
+        recurring_preview += __(' indefinitely.', 'groundhogg')
+        break
+      case 'date':
+        recurring_preview += sprintf(__(' until %s.', 'groundhogg'), wp.date.dateI18n(wp.date.getSettings().formats.date, repeats_until_date))
+        break
+      case 'occurrences':
+        recurring_preview += sprintf(_n(' %s time.', ' %s times.', repeats_until_occurrences, 'groundhogg'),
+          bold(repeats_until_occurrences))
+        break
+    }
+
+    return recurring_preview
+  }
 
   /**
    *
@@ -381,7 +622,7 @@
     },
     'contacts' : {
       name        : __('Contacts', 'groundhogg'),
-      requirements: () => getObject() && ( getState().when === 'now' || ( getState().time && getState().date ) ),
+      requirements: () => getObject() && hasValidDates(),
       icon        : icons.contact,
       render      : () => {
 
@@ -532,35 +773,103 @@
                 },
               ],
               selected: getState().when,
-              onChange: when => setState({ when }),
+              onChange: when => {
+                setState({
+                  when,
+                  is_recurring: when === 'now' ? false : getState().is_recurring,
+                })
+              },
             }),
           ]),
-          getState().when === 'later' ? Div({
-            className: 'gh-input-group',
-          }, [
-            Input({
-              type    : 'date',
-              id      : 'send-date',
-              name    : 'date',
-              value   : getState().date || '',
-              min     : date('Y-m-d'),
-              onChange: e => setState({
-                date: e.target.value,
+          getState().when === 'later' ? Fragment([
+            getState().dates.length
+            ? Fragment([
+              InputRepeater({
+                id       : 'send-dates',
+                rows     : getState().dates,
+                cells    : [
+                  (props, row) => Input({ type: 'date', min: date( 'Y-m-d' ), style: { backgroundColor: isInTheFuture( row.join(' ') ) ? 'transparent' : 'var(--gh-error-red-10)' }, ...props }),
+                  (props, row) => Input({ type: 'time', style: { backgroundColor: isInTheFuture( row.join(' ') ) ? 'transparent' : 'var(--gh-error-red-10)' }, ...props }),
+                  props => Button({
+                    className: 'gh-button grey small',
+                    disabled : true,
+                  }, getState().tzDisplay ),
+                ],
+                fillRow  : () => {
+
+                  let lastDate = getState().dates[getState().dates.length - 1]
+
+                  let newDate = getDate(lastDate[0])
+                  newDate.setMonth(newDate.getMonth() + 1)
+
+                  return [
+                    wp.date.format('Y-m-d', newDate),
+                    lastDate[1],
+                  ]
+                },
+                onChange: dates => {
+                  setState({
+                    dates,
+                  })
+                },
               }),
-            }),
-            Input({
-              type    : 'time',
-              id      : 'send-time',
-              name    : 'time',
-              value   : getState().time || '',
-              onChange: e => setState({
-                time: e.target.value,
-              }),
-            }),
-            Button({
-              className: 'gh-button grey small',
-              disabled : true,
-            }, wp.date.getSettings().timezone.abbr || wp.date.getSettings().timezone.string || `UTC${ wp.date.getSettings().timezone.offsetFormatted }`),
+              hasValidDates() ? null : Span({className: 'pill yellow'}, __('⚠️ Make sure all dates are in the future!', 'groundhogg')),
+            ])
+            : Fragment([
+              Div({
+                className: 'gh-input-group',
+              }, [
+                Input({
+                  type    : 'date',
+                  id      : 'send-date',
+                  name    : 'date',
+                  value   : getState().date || '',
+                  min     : date('Y-m-d'),
+                  style: { backgroundColor: isInTheFuture( `${getState().date} ${getState().time}` ) ? 'transparent' : 'var(--gh-error-red-10)' },
+                  onChange: e => {
+
+                    let date = getDate(e.target.value)
+                    let endDate = getDate(e.target.value)
+                    endDate.setMonth(endDate.getMonth() + 1)
+
+                    setState({
+                      date                  : e.target.value,
+                      repeats_dow           : [wp.date.format('l', endDate).toLowerCase()],
+                      repeats_dow_occurrence: [get_weekday_occurrence(date)],
+                      repeats_dom           : [date.getDate()],
+                      repeats_until_date    : wp.date.format('Y-m-d', endDate),
+                    })
+                  },
+                }),
+                Input({
+                  type    : 'time',
+                  id      : 'send-time',
+                  name    : 'time',
+                  value   : getState().time || '',
+                  onChange: e => setState({
+                    time: e.target.value,
+                  }),
+                }),
+                Button({
+                  className: 'gh-button grey small',
+                  disabled : true,
+                }, getState().tzDisplay ),
+              ]),
+              hasValidDates() ? null : Span({className: 'pill yellow'}, __('⚠️ Select a date and time in the future!', 'groundhogg')),
+              An({
+                onClick: e => {
+                  e.preventDefault()
+                  setState({
+                    dates: [
+                      [
+                        getState().date,
+                        getState().time,
+                      ],
+                    ],
+                  })
+                },
+              }, '+ Add additional dates'),
+            ]),
           ]) : null,
           getState().when === 'later' ? Div({
             className: 'display-flex gap-10 align-center',
@@ -576,6 +885,22 @@
               }),
             }),
           ]) : null,
+          getState().when === 'later' && isEmailObject() ? RequiresPro(Div({
+            className: 'display-flex gap-10 align-center',
+          }, [
+            `<label for="use-optimized-send-time"><p>${ __('Use send time optimization?', 'groundhogg') }</p></label>`,
+            Toggle({
+              id      : 'use-optimized-send-time',
+              checked : getState().use_optimized_send_time,
+              onLabel : __('Yes'),
+              offLabel: __('No'),
+              onChange: e => setState({
+                use_optimized_send_time: e.target.checked,
+              }),
+            }),
+            Dashicon('editor-help',
+              ToolTip('Schedules each email based on contacts\' past <br>behaviour to maximize opens and clicks. <a href="#">Read more...</a>', 'bottom')),
+          ])) : null,
           '<div><hr></div>',
           Div({
             className: 'display-flex gap-10 align-center',
@@ -660,13 +985,212 @@
               className: 'pill yellow',
             }, sprintf(__('It will take at least %s to send to %s contacts.', 'groundhogg'), bold(getState().duration_estimate),
               formatNumber(getState().totalContacts)))
-            : Span({className:'loading-dots'}, __('Estimating', 'groundhogg')),
+            : Span({ className: 'loading-dots' }, __('Estimating', 'groundhogg')),
+          ]) : null,
+          getState().when === 'later' ? Fragment([
+            '<div><hr></div>',
+            Div({
+              className: 'display-flex gap-10 align-center',
+            }, [
+              `<label for="is-recurring"><p>${ __('Recurring broadcast?', 'groundhogg') }</p></label>`,
+              Toggle({
+                id      : 'is-recurring',
+                checked : getState().is_recurring,
+                onLabel : __('Yes'),
+                offLabel: __('No'),
+                onChange: e => {
+                  setState({
+                    is_recurring: e.target.checked,
+                  })
+                },
+              }),
+            ]),
+          ]) : null,
+          getState().is_recurring && getState().when === 'later' ? Fragment([
+            // repeats every
+            Pg({ className: 'display-flex gap-5 align-center' }, [
+              __('Repeats every'),
+              Input({
+                name     : 'repeats_every_amount',
+                type     : 'number',
+                className: 'number',
+                style    : {
+                  width       : '60px',
+                  paddingRight: 0,
+                },
+                value    : getState().repeats_every_amount,
+                onInput  : e => setState({
+                  repeats_every_amount: parseInt(e.target.value),
+                }),
+              }),
+              Select({
+                name    : 'repeats_every_interval',
+                options : {
+                  days  : _n('Day', 'Days', getState().repeats_every_amount, 'groundhogg'),
+                  weeks : _n('Week', 'Weeks', getState().repeats_every_amount, 'groundhogg'),
+                  months: _n('Month', 'Months', getState().repeats_every_amount, 'groundhogg'),
+                  years : _n('Year', 'Years', getState().repeats_every_amount, 'groundhogg'),
+                },
+                selected: getState().repeats_every_interval,
+                onChange: e => setState({
+                  repeats_every_interval: e.target.value,
+                }),
+              }),
+            ]),
+            getState().repeats_every_interval === 'weeks' ? Fragment([
+              MultiButtonToggle({
+                id      : 'repeats-dow',
+                selected: getState().repeats_dow,
+                options : Groundhogg.functions.assoc2array({
+                  monday   : __('Monday'),
+                  tuesday  : __('Tuesday'),
+                  wednesday: __('Wednesday'),
+                  thursday : __('Thursday'),
+                  friday   : __('Friday'),
+                  saturday : __('Saturday'),
+                  sunday   : __('Sunday'),
+                }),
+                onChange: days => setState({
+                  repeats_dow: days,
+                }),
+              }),
+            ]) : null,
+            getState().repeats_every_interval === 'months' ? Fragment([
+              ButtonToggle({
+                id      : 'repeats_month_occurrence_type',
+                options : Groundhogg.functions.assoc2array({
+                  m: __('Day of Month'),
+                  w: __('Day of Week'),
+                }),
+                selected: getState().repeats_month_occurrence_type,
+                onChange: repeats_month_occurrence_type => setState({
+                  repeats_month_occurrence_type,
+                }),
+              }),
+              getState().repeats_month_occurrence_type === 'm' ? DayOfMonthPicker({
+                id      : 'repeats-dom',
+                selected: getState().repeats_dom,
+                onChange: dom => setState({
+                  repeats_dom: dom,
+                }),
+              }) : null,
+              getState().repeats_month_occurrence_type === 'w' ? Div({ className: 'display-flex gap-5 column' }, [
+                MultiButtonToggle({
+                  id      : 'repeats-dow-occurrence',
+                  selected: getState().repeats_dow_occurrence,
+                  options : Groundhogg.functions.assoc2array({
+                    first : __('First'),
+                    second: __('Second'),
+                    third : __('Third'),
+                    fourth: __('Fourth'),
+                    last  : __('Last'),
+                  }),
+                  onChange: which => setState({
+                    repeats_dow_occurrence: which,
+                  }),
+                }),
+                MultiButtonToggle({
+                  id      : 'repeats-month-dow',
+                  selected: getState().repeats_dow,
+                  options : Groundhogg.functions.assoc2array({
+                    monday   : __('Monday'),
+                    tuesday  : __('Tuesday'),
+                    wednesday: __('Wednesday'),
+                    thursday : __('Thursday'),
+                    friday   : __('Friday'),
+                    saturday : __('Saturday'),
+                    sunday   : __('Sunday'),
+                  }),
+                  onChange: days => setState({
+                    repeats_dow: days,
+                  }),
+                }),
+              ]) : null,
+            ]) : null,
+            Pg({}, __('Ends')),
+            Div({ className: 'display-flex gap-5 column' }, [
+              Div({ className: 'display-flex gap-5 align-center' }, [
+                Input({
+                  type    : 'radio',
+                  id      : 'repeats-never',
+                  name    : 'repeats_until',
+                  checked : getState().repeats_until === 'never',
+                  onChange: e => {
+                    if (e.target.checked) {
+                      setState({
+                        repeats_until: 'never',
+                      })
+                    }
+                  },
+                }),
+                Label({ for: 'repeats-never' }, __('Never')),
+              ]),
+              Div({ className: 'display-flex gap-5 align-center' }, [
+                Input({
+                  type    : 'radio',
+                  id      : 'repeats-until-date',
+                  name    : 'repeats_until',
+                  checked : getState().repeats_until === 'date',
+                  onChange: e => {
+                    if (e.target.checked) {
+                      setState({
+                        repeats_until: 'date',
+                      })
+                    }
+                  },
+                }),
+                Label({ for: 'repeats-until-date' }, __('On')),
+                Input({
+                  type    : 'date',
+                  id      : 'repeats-until-date-value',
+                  name    : 'repeats_until_date',
+                  value   : getState().repeats_until_date,
+                  min     : getState().dates.length ? getState().dates[getState().dates.length - 1][0] : getState().date,
+                  onChange: e => setState({
+                    repeats_until_date: e.target.value,
+                  }),
+                  disabled: getState().repeats_until !== 'date',
+                }),
+              ]),
+              Div({ className: 'display-flex gap-5 align-center' }, [
+                Input({
+                  type    : 'radio',
+                  id      : 'repeats-until-occurrences',
+                  name    : 'repeats_until',
+                  checked : getState().repeats_until === 'occurrences',
+                  onChange: e => {
+                    if (e.target.checked) {
+                      setState({
+                        repeats_until: 'occurrences',
+                      })
+                    }
+                  },
+                }),
+                Label({ for: 'repeats-until-occurrences' }, __('After')),
+                Input({
+                  type     : 'number',
+                  className: 'number',
+                  id       : 'repeats-until-occurrences-amount',
+                  name     : 'repeats_until_occurrences',
+                  value    : getState().repeats_until_occurrences,
+                  onInput  : e => setState({
+                    repeats_until_occurrences: parseInt(e.target.value),
+                  }),
+                  style    : {
+                    width       : '60px',
+                    paddingRight: 0,
+                  },
+                  disabled : getState().repeats_until !== 'occurrences',
+                }),
+                Label({ for: 'repeats-until-occurrences-amount' }, __('occurrences')),
+              ]),
+            ]),
           ]) : null,
           '<div><hr></div>',
           Button({
             id       : 'go-to-contacts',
             className: 'gh-button primary',
-            disabled : getState().when === 'later' && !isInTheFuture(`${ getState().date } ${ getState().time }`),
+            disabled : getState().when === 'later' && !hasValidDates(),
             style    : {
               alignSelf: 'flex-end',
             },
@@ -682,8 +1206,7 @@
     'review'   : {
       name        : 'Review',
       icon        : Dashicon('thumbs-up'),
-      requirements: () => getObject() && ( getState().when === 'now' || ( getState().time && getState().date ) ) &&
-        getState().totalContacts,
+      requirements: () => getObject() && hasValidDates() && getState().totalContacts,
       render      : () => {
 
         let preview
@@ -696,11 +1219,12 @@
         else {
           preview = sprintf(__('Send %1$s to %2$s contacts on %3$s.', 'groundhogg'), bold(getObject().data.title),
             bold(formatNumber(
-              getState().totalContacts)), formatDateTime(`${ getState().date } ${ getState().time }`))
+              getState().totalContacts)), sendDatesPreview() )
         }
 
         return Fragment([
           `<p>${ preview }</p>`,
+          getState().is_recurring ? `<p>Then ${ RecurringSchedulePreview(getState()) }</p>` : null,
           getObject() ? EmailPreview() : null,
           Button({
             id       : 'confirm-and-schedule',
@@ -713,13 +1237,26 @@
                 when = 'now',
                 date = '',
                 time = '',
+                dates = [],
                 send_in_local_time = false,
+                use_send_time_optimization = false,
                 campaigns = [],
                 segment_type = 'fixed',
                 batching = false,
                 batch_interval,
                 batch_interval_length,
                 batch_amount,
+                is_recurring = false,
+                repeats_every_amount = 1,
+                repeats_every_interval = 'days',
+                repeats_dow = [],
+                repeats_dow_occurrence = [],
+                repeats_month_occurrence_type = 'm',
+                repeats_dom = [],
+                repeats_until = 'never',
+                repeats_until_date = '',
+                repeats_until_occurrences = 1,
+                use_optimized_send_time = false,
               } = getState()
 
               post(routes.v4.broadcasts, {
@@ -728,14 +1265,27 @@
                 query      : getQuery(),
                 date,
                 time,
+                dates,
                 send_now   : when === 'now',
                 send_in_local_time,
+                use_send_time_optimization,
                 campaigns  : campaigns.map(({ ID }) => ID),
                 segment_type,
                 batching,
                 batch_interval,
                 batch_interval_length,
                 batch_amount,
+                is_recurring,
+                repeats_every_amount,
+                repeats_every_interval,
+                repeats_dow,
+                repeats_dow_occurrence,
+                repeats_month_occurrence_type,
+                repeats_dom,
+                repeats_until,
+                repeats_until_date,
+                repeats_until_occurrences,
+                use_optimized_send_time
               }).then(r => {
 
                 setState({
@@ -748,8 +1298,6 @@
                   message: err.message,
                   type   : 'error',
                 })
-
-                console.log(err)
 
                 switch (err.code) {
                   case 'invalid_date':
@@ -874,6 +1422,12 @@
       }),
     ])
   }
+
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.schedule-preview').forEach(el => {
+      el.innerHTML = RecurringSchedulePreview(CurrentTable.items.find(s => s.ID == el.dataset.id).meta)
+    })
+  })
 
   Groundhogg.BroadcastScheduler = (newState = {}) => {
 

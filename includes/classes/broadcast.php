@@ -2,15 +2,21 @@
 
 namespace Groundhogg;
 
+use DateException;
+use DateMalformedStringException;
+use DateTimeInterface;
 use Groundhogg\Background\Schedule_Broadcast;
 use Groundhogg\Classes\Background_Task;
+use Groundhogg\Classes\Recurring_Broadcast;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
+use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reporting\New_Reports\Traits\Broadcast_Stats;
 use Groundhogg\Utils\DateTimeHelper;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use GroundhoggSMS\Classes\SMS;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -266,7 +272,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Calls the background task to schedule the broadcast
 	 *
-	 * @return bool|\WP_Error
+	 * @return bool|WP_Error
 	 */
 	public function maybe_schedule_in_background() {
 
@@ -464,6 +470,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$batch_amount          = absint( $this->get_meta( 'batch_amount' ) ) ?: 100;
 		$batch_delay           = absint( $this->get_meta( 'batch_delay' ) ) ?: 0;
 
+		$inserts = [];
+
 		foreach ( $contacts as $contact ) {
 
 			$last_id = $contact->ID;
@@ -522,7 +530,20 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 				$args['email_id'] = $this->get_object_id();
 			}
 
-			event_queue_db()->batch_insert( $args );
+			$inserts[] = $args;
+		}
+
+		/**
+		 * Allow modifying the batch inserts before we actually insert them
+		 *
+		 * @param  array  $inserts  list of events to insert
+		 * @param  Broadcast  $broadcast  the current broadcast
+		 */
+		$inserts = apply_filters( 'groundhogg/broadcast/pre_insert_batch', $inserts, $this );
+
+		// add all batch inserts
+		foreach ( $inserts as $insert ) {
+			event_queue_db()->batch_insert( $insert );
 		}
 
 		$inserted = event_queue_db()->commit_batch_insert();
@@ -774,7 +795,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	 * @param $contact Contact
 	 * @param $event   Event
 	 *
-	 * @return bool|\WP_Error whether the email sent or not.
+	 * @return bool|WP_Error whether the email sent or not.
 	 */
 	public function run( $contact, $event = null ) {
 
@@ -797,7 +818,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$object = apply_filters( "groundhogg/broadcast/{$this->get_broadcast_type()}/object", $this->get_object(), $this, $contact, $event );
 
 		if ( ! $object || ! $object->exists() ) {
-			return new \WP_Error( 'object_error', 'Could not find email or SMS to send.' );
+			return new WP_Error( 'object_error', 'Could not find email or SMS to send.' );
 		}
 
 		$result = $object->send( $contact, $event );
@@ -959,5 +980,345 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$total  = absint( $this->get_meta( 'total_contacts' ) );
 
 		return percentage( $total, $offset );
+	}
+
+	protected function sanitize_columns( $data = [] ) {
+		return array_apply_callbacks( $data, [
+			'object_id'      => fn( $val ) => absint( $val ),
+			'object_type'    => fn( $val ) => one_of( $val, [ 'email', 'sms' ] ),
+			'scheduled_by'   => fn( $val ) => absint( $val ),
+			'send_time'      => fn( $val ) => ( new DateTimeHelper( $val ) )->getTimestamp(),
+			'query'          => fn( $val ) => sanitize_payload( $val ) ?: [],
+			'status'         => fn( $val ) => one_of( $val, [ 'pending', 'scheduled', 'sending', 'sent', 'cancelled' ] ),
+			'date_scheduled' => fn( $val ) => ( new DateTimeHelper( $val ) )->ymdhis(),
+		] );
+	}
+
+	protected function sanitize_meta( $key, $value ) {
+
+		// getting deleted
+		if ( empty( $value ) ) {
+			return $value;
+		}
+
+		switch ( $key ) {
+			case 'is_transactional':
+			case 'send_now':
+			case 'is_scheduled':
+			case 'use_optimized_send_time':
+				return (bool) $value;
+			case 'num_scheduled':
+			case 'total_contacts':
+			case 'batch_interval_length':
+			case 'batch_amount':
+			case 'batch_delay':
+			case 'schedule_lock':
+			case 'last_id':
+			case 'task_id':
+				return absint( $value );
+			case 'segment_type':
+				return one_of( $value, [ 'fixed', 'dynamic' ] );
+			case 'batch_interval':
+				return one_of( $value, [ 'minutes', 'hours', 'days' ] );
+			default:
+				return $value;
+		}
+	}
+
+
+	/**
+	 * Checks if the current broadcast is being used by a schedule
+	 *
+	 * @return bool
+	 */
+	public function in_use_by_schedule() {
+		return db()->broadcasts->exists( [ 'object_id' => $this->get_id(), 'status' => 'active', 'object_type' => 'recurring_broadcast' ] );
+	}
+
+	/**
+	 * If the broadcast is being used by a schedule, prevent deletion to avoid the schedule failing in the future.
+	 *
+	 * @return bool
+	 */
+	public function delete() {
+
+		// prevent deleting the broadcast if in use by an active schedule
+		if ( $this->in_use_by_schedule() ) {
+			return false;
+		}
+
+		return parent::delete();
+	}
+
+	protected static $use_jumpstart = true;
+
+	/**
+	 * Static function to schedule a broadcast programmatically
+	 *
+	 * @throws DraftException
+	 * @throws NoContactsException
+	 * @throws SchedulingException
+	 * @throws DateMalformedStringException|DateException
+	 *
+	 * @param  array  $args
+	 *
+	 * @return Broadcast the scheduled broadcast
+	 */
+	public static function schedule( array $args ) {
+
+		$args = wp_parse_args( $args, [
+			'object_id'                     => 0,
+			'object_type'                   => 'email',
+			'date'                          => wp_date( 'Y-m-d', strtotime( 'tomorrow' ) ),
+			'time'                          => '9:00:00',
+			'dates'                         => [], // provide an array of dates [[ date, time], [date, time], ...]
+			'segment_type'                  => 'fixed',
+			'send_now'                      => false,
+			'send_in_local_time'            => false,
+			'batching'                      => false,
+			'batch_interval'                => 'minutes',
+			'batch_interval_length'         => 10,
+			'batch_amount'                  => 100,
+			'campaigns'                     => [],
+			'query'                         => [],
+			'is_recurring'                  => false,
+			'repeats_every_amount'          => 1,
+			'repeats_every_interval'        => 'days',
+			'repeats_dow'                   => [],
+			'repeats_dow_occurrence'        => [],
+			'repeats_month_occurrence_type' => 'm',
+			'repeats_dom'                   => [],
+			'repeats_until'                 => 'never',
+			'repeats_until_date'            => wp_date( 'Y-m-d', strtotime( 'tomorrow' ) ),
+			'repeats_until_occurrences'     => 7,
+			'use_optimized_send_time'       => false,
+		] );
+
+		// if an array of dates was provided
+		if ( is_array( $args['dates'] ) && count( $args['dates'] ) > 0 ) {
+
+			$dates = $args['dates'];
+
+			// normalize dates
+			foreach ( $dates as &$date ) {
+
+				if ( is_string( $date ) ) {
+					continue;
+				} else if ( is_a( $date, DateTimeInterface::class ) ) {
+					$date = $date->format( 'Y-m-d H:i:s' );
+				} else if ( is_array( $date ) && count( $date ) === 2 ) {
+					$date = "$date[0] $date[1]"; // condense into "Y-m-d H:i:s"
+				}
+			}
+
+			// sort the dates by date & time in ascending order
+			usort( $dates, function ( $a, $b ) {
+				return strtotime( $a ) <=> strtotime( $b );
+			} );
+
+			$scheduled = [];
+			$last_index = count( $dates ) - 1;
+
+			unset( $date ); // clear date variable reference
+
+			foreach ( $dates as $i => $date ) {
+
+				$copy = $args;
+
+				// set date & time
+				$copy['date'] = $date; // date & time combined
+				$copy['time'] = null;
+
+				// don't resen dates
+				unset( $copy['dates'] );
+
+				// force non-recurring unless this is the last date, as the recurring schedule will take over after the last date
+				if ( $i !== $last_index ){
+					$copy['is_recurring'] = false;
+				}
+
+				$scheduled[] = self::schedule( $copy );
+
+				// disable jumpstart after the first broadcast is scheduled
+				self::$use_jumpstart = false;
+			}
+
+			return $scheduled[0]; // next scheduled broadcast
+		}
+
+		$meta = [];
+
+		$object_id   = $args['object_id'] ?: 0;
+		$object_type = one_of( $args['object_type'], [ 'email', 'sms' ] );
+
+		$object = create_object_from_type( $object_id, $object_type );
+
+		if ( $object_type === 'email' ) {
+
+			$email = new Email( $object_id );
+
+			if ( $email->is_draft() ) {
+				throw new DraftException( 'Cannot schedule a draft email' );
+			}
+		}
+
+		if ( $args['time'] !== null ){
+			$date = new DateTimeHelper( $args['date'] . ' ' . $args['time'] );
+		} else {
+			$date = new DateTimeHelper( $args['date'] );
+		}
+
+		$segment_type = one_of( $args['segment_type'], [ 'fixed', 'dynamic', 'static' ] );
+		// map 'static' to 'fixed'
+		if ( $segment_type === 'static' ) {
+			$segment_type = 'fixed';
+		}
+
+		/* convert to UTC */
+		if ( $args['send_now'] ) {
+			$meta['send_now'] = true;
+
+			$args['is_recurring'] = false; // not allowed
+			$args['use_optimized_send_time'] = false; // not allowed
+
+			$date->setTimestamp( time() + 10 );
+
+			// when using Send Now the segment type is fixed anyway
+			$segment_type = 'fixed';
+		}
+
+		if ( $date->getTimestamp() < time() ) {
+			throw new DateException( 'Cannot schedule a broadcast in the past' );
+		}
+
+		$meta['segment_type'] = $segment_type;
+
+		// Save batching meta
+		if ( $args['batching'] ) {
+			$meta['batch_interval']        = one_of( $args['batch_interval'], [ 'minutes', 'hours', 'days' ] );
+			$meta['batch_interval_length'] = $args['batch_interval_length'];
+			$meta['batch_amount']          = $args['batch_amount'];
+			$meta['batch_delay'] = 0; // initialize batch offset at 0
+		}
+
+		if ( $args['use_optimized_send_time'] ) {
+			$meta['use_optimized_send_time'] = true;
+		}
+
+		$query = $args['query'];
+		unset( $query['order'] );
+		unset( $query['orderby'] );
+		unset( $query['limit'] );
+		unset( $query['number'] );
+
+		$is_transactional         = method_exists( $object, 'is_transactional' ) ? $object->is_transactional() : false;
+		$meta['is_transactional'] = $is_transactional;
+
+		if ( ! $is_transactional ) {
+			$query['marketable'] = true;
+		}
+
+		$num_contacts = db()->contacts->count( $query );
+
+		if ( $num_contacts === 0 ) {
+			throw new NoContactsException( 'No contacts match the given filters.' );
+		}
+
+		$meta['total_contacts'] = $num_contacts;
+
+		$broadcast = new Broadcast();
+
+		$broadcast->create( [
+			'object_id'    => $object_id,
+			'object_type'  => $object_type,
+			'send_time'    => $date->getTimestamp(),
+			'scheduled_by' => get_current_user_id(),
+			'status'       => 'pending',
+			'query'        => $query,
+		] );
+
+		if ( $args['send_in_local_time'] ) {
+			$meta['send_in_local_time'] = true;
+		}
+
+		$broadcast->update_meta( $meta );
+
+		$campaigns = wp_parse_id_list( $args['campaigns'] );
+
+		foreach ( $campaigns as $campaign ) {
+			$broadcast->create_relationship( new Campaign( $campaign ) );
+		}
+
+		// create the schedule if recurring
+		if ( $args['is_recurring'] ) {
+
+			$recurring_schedule = new Recurring_Broadcast();
+			$recurring_schedule->create( [
+				'object_id'    => $broadcast->get_id(), // set to the initially scheduled broadcast
+				'status'       => 'active',
+				'send_time'    => $date->getTimestamp(),
+				'scheduled_by' => get_current_user_id(),
+			] );
+
+			$schedule_keys = [
+				'repeats_every_amount',
+				'repeats_every_interval',
+				'repeats_dow',
+				'repeats_dow_occurrence',
+				'repeats_month_occurrence_type',
+				'repeats_dom',
+				'repeats_until',
+				'repeats_until_date',
+				'repeats_until_occurrences',
+			];
+
+			foreach ( $schedule_keys as $key ) {
+				// sanitization occurs within the class itself, see Recurring_Broadcast::sanitize_meta()
+				$recurring_schedule->update_meta( $key, $args[ $key ] );
+			}
+
+			$broadcast->update( [
+				'schedule_id' => $recurring_schedule->get_id(),
+			] );
+
+			$recurring_schedule->start();
+		}
+
+		/**
+		 * Fires after the broadcast is added to the DB but before the user is redirected to the scheduler
+		 *
+		 * @param  int  $broadcast_id  the ID of the broadcast
+		 * @param  array  $meta  the config object which is passed to the scheduler
+		 * @param  Broadcast  $broadcast  the broadcast object
+		 */
+		do_action( 'groundhogg/admin/broadcast/scheduled', $broadcast->get_id(), $meta, $broadcast );
+
+		// We can jumpstart the process if the segment is fixed
+		if ( $segment_type === 'fixed' && self::$use_jumpstart ) {
+
+			// Sets up the initial state for the scheduler
+			$items_scheduled = $broadcast->enqueue_batch();
+
+			// Something is wrong scheduling the broadcast
+			if ( ! $items_scheduled ) {
+
+				$broadcast->cancel();
+				$broadcast->delete();
+
+				throw new SchedulingException( 'Unable to schedule events' );
+			}
+
+			$tracker = new Micro_Time_Tracker();
+
+			// schedule 5 seconds worth. Should cover most small broadcasts
+			while ( $broadcast->is_pending() && $tracker->time_elapsed() < 5 ) {
+				$broadcast->enqueue_batch();
+			}
+		}
+
+		// If the broadcast is still pending, create a background task
+		$broadcast->maybe_schedule_in_background();
+
+		return $broadcast;
 	}
 }

@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .bg-dark {
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
 }
 .bg-dark-75 {
   background-color: rgba(16, 38, 64, 0.75);
@@ -142,7 +142,6 @@
     display: flex;
     flex-direction: column;
   }
-
   .display-flex.stack-on-mobile {
     flex-direction: column;
   }
@@ -474,7 +473,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
   font-size: 12px;
 }
 .notes-widget .note .note-header .summary {
-  color: #102640;
+  color: rgb(16, 38, 64);
 }
 .notes-widget .note .note-header input.select-note {
   display: none;
@@ -549,7 +548,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
 }
 .tasks-widget .task .task-activity-timeline {
   padding-left: 10px;
-  border-left: 2px solid #102640;
+  border-left: 2px solid rgb(16, 38, 64);
 }
 .tasks-widget .task .task-activity-timeline .task-activity-item {
   position: relative;
@@ -557,7 +556,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
 .tasks-widget .task .task-activity-timeline .task-activity-item .timeline-dot {
   position: absolute;
   left: -16px;
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
   top: 50%;
   transform: translateY(-50%);
   width: 10px;
@@ -586,7 +585,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
 }
 .tasks-widget .task a.associated-object:hover {
   text-decoration: none;
-  color: #102640;
+  color: rgb(16, 38, 64);
   transition: 0.2s;
 }
 .tasks-widget .task a.associated-object img {
@@ -626,7 +625,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
   color: rgba(16, 38, 64, 0.3);
 }
 .tasks-widget .task .task-header .summary {
-  color: #102640;
+  color: rgb(16, 38, 64);
 }
 .tasks-widget .task .task-header input.select-task {
   display: none;
@@ -690,11 +689,11 @@ h2.nav-tab-wrapper.gh button .dashicons {
 }
 
 input:invalid {
-  border-color: #e91f4f;
+  border-color: rgb(233, 31, 79);
 }
 input:invalid:focus {
-  border-color: #e91f4f;
-  box-shadow: 0 0 0 1px #e91f4f;
+  border-color: rgb(233, 31, 79);
+  box-shadow: 0 0 0 1px rgb(233, 31, 79);
   outline: 2px solid transparent;
 }
 
@@ -722,7 +721,7 @@ body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .se
   padding: 10px;
   box-sizing: border-box;
   flex-shrink: 0;
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
   color: white;
   font-size: 16px;
   display: flex;
@@ -748,7 +747,7 @@ body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .se
   padding: 10px;
   box-sizing: border-box;
   flex-shrink: 0;
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
 }
 .gh-header.is-sticky {
   position: sticky;
@@ -787,7 +786,7 @@ a.action-link {
   border-radius: 5px;
   display: inline-block;
   padding: 3px 8px;
-  color: #102640;
+  color: rgb(16, 38, 64);
 }
 .pill.tag {
   background-color: #f2f2f2;
@@ -797,29 +796,29 @@ a.action-link {
 }
 .pill.attention, .pill.yellow {
   background: rgba(255, 238, 88, 0.5);
-  color: #3f3800;
+  color: rgb(62.5, 56.1377245509, 0);
 }
 .pill.warning, .pill.orange {
   background: rgba(245, 129, 21, 0.25);
-  color: #542a04;
+  color: rgb(83.9139344262, 42.3155737705, 3.5860655738);
 }
 .pill.notice, .pill.blue {
   background: rgba(0, 117, 255, 0.5);
 }
 .pill.success, .pill.green {
   background: rgba(158, 206, 56, 0.5);
-  color: #334310;
+  color: rgb(50.8407258065, 67.002016129, 16.497983871);
 }
 .pill.danger, .pill.red {
   background: rgba(233, 31, 79, 0.25);
-  color: #4e0818;
+  color: rgb(77.8536585366, 7.6463414634, 24.3292682927);
 }
 .pill.dark {
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
   color: #fff;
 }
 .pill.purple {
-  background-color: #6c19ad;
+  background-color: rgb(108, 25, 173);
   color: #fff;
 }
 .pill.semi-dark {
@@ -846,7 +845,7 @@ pre.gh-text.red,
 pre.gh-text.danger,
 span.gh-text.red,
 span.gh-text.danger {
-  color: #e91f4f;
+  color: rgb(233, 31, 79);
 }
 svg.red.dark, svg.danger.dark,
 p.gh-text.red.dark,
@@ -855,7 +854,7 @@ pre.gh-text.red.dark,
 pre.gh-text.danger.dark,
 span.gh-text.red.dark,
 span.gh-text.danger.dark {
-  color: #4e0818;
+  color: rgb(77.8536585366, 7.6463414634, 24.3292682927);
 }
 svg.orange, svg.warning,
 p.gh-text.orange,
@@ -864,19 +863,19 @@ pre.gh-text.orange,
 pre.gh-text.warning,
 span.gh-text.orange,
 span.gh-text.warning {
-  color: #f58115;
+  color: rgb(245, 129, 21);
 }
 svg.purple,
 p.gh-text.purple,
 pre.gh-text.purple,
 span.gh-text.purple {
-  color: #6c19ad;
+  color: rgb(108, 25, 173);
 }
 svg.green,
 p.gh-text.green,
 pre.gh-text.green,
 span.gh-text.green {
-  color: #9ece38;
+  color: rgb(158, 206, 56);
 }
 svg.md,
 p.gh-text.md,
@@ -969,7 +968,7 @@ span.gh-text.bold {
 .gh-panel .gh-panel-header button.panel-handle-order-higher:focus,
 .gh-panel .gh-panel-header button.panel-handle-order-lower:focus,
 .gh-panel .gh-panel-header button.toggle-indicator:focus {
-  box-shadow: 0 0 0 1px #0075ff, 0 0 2px 1px rgba(0, 117, 255, 0.6);
+  box-shadow: 0 0 0 1px rgb(0, 117, 255), 0 0 2px 1px rgba(0, 117, 255, 0.6);
   outline: 1px solid transparent;
 }
 .gh-panel .gh-panel-header button.panel-handle-order-higher::before,
@@ -986,19 +985,19 @@ span.gh-text.bold {
   border-top-right-radius: 5px;
 }
 .gh-panel .gh-panel-header button.toggle-indicator::before {
-  content: "";
+  content: "\f142";
 }
 .gh-panel .gh-panel-header button.panel-handle-order-lower::before {
-  content: "";
+  content: "\f347";
 }
 .gh-panel .gh-panel-header button.panel-handle-order-higher::before {
-  content: "";
+  content: "\f343";
 }
 .gh-panel.closed .gh-panel-header {
   border-bottom: none;
 }
 .gh-panel.closed .gh-panel-header button.toggle-indicator::before {
-  content: "";
+  content: "\f140";
 }
 .gh-panel .inside {
   padding: 20px;
@@ -1098,7 +1097,7 @@ input[type=submit].gh-button.more-nav:after,
 input[type=submit].gh-submit.more-nav:after,
 button.gh-button.more-nav:after,
 button.gh-submit.more-nav:after {
-  content: "";
+  content: "\f347";
   display: inline-block;
   font: normal 18px/1 dashicons;
   vertical-align: middle;
@@ -1120,7 +1119,7 @@ button.gh-submit.dropdown {
   gap: 10px;
   border: 1px solid rgba(16, 38, 64, 0.5);
   background: #FFFFFF;
-  color: #102640;
+  color: rgb(16, 38, 64);
   padding: 5px 10px;
 }
 a.gh-button.dropdown::after, a.gh-submit.dropdown::after,
@@ -1130,7 +1129,7 @@ input[type=submit].gh-button.dropdown::after,
 input[type=submit].gh-submit.dropdown::after,
 button.gh-button.dropdown::after,
 button.gh-submit.dropdown::after {
-  content: "";
+  content: "\f140";
   display: inline-block;
   font: normal 20px/1 dashicons;
   speak: never;
@@ -1154,7 +1153,7 @@ input[type=submit].gh-button.action,
 input[type=submit].gh-submit.action,
 button.gh-button.action,
 button.gh-submit.action {
-  background: #9ece38;
+  background: rgb(158, 206, 56);
 }
 a.gh-button.action:hover:not(:disabled), a.gh-submit.action:hover:not(:disabled),
 input[type=button].gh-button.action:hover:not(:disabled),
@@ -1163,7 +1162,7 @@ input[type=submit].gh-button.action:hover:not(:disabled),
 input[type=submit].gh-submit.action:hover:not(:disabled),
 button.gh-button.action:hover:not(:disabled),
 button.gh-submit.action:hover:not(:disabled) {
-  background: #80a92a;
+  background: rgb(128.4717741935, 169.310483871, 41.689516129);
 }
 a.gh-button#gh-submit, a.gh-button.primary, a.gh-submit#gh-submit, a.gh-submit.primary,
 input[type=button].gh-button#gh-submit,
@@ -1178,7 +1177,7 @@ button.gh-button#gh-submit,
 button.gh-button.primary,
 button.gh-submit#gh-submit,
 button.gh-submit.primary {
-  background: #0075ff;
+  background: rgb(0, 117, 255);
 }
 a.gh-button#gh-submit.text, a.gh-button.primary.text, a.gh-submit#gh-submit.text, a.gh-submit.primary.text,
 input[type=button].gh-button#gh-submit.text,
@@ -1194,7 +1193,7 @@ button.gh-button.primary.text,
 button.gh-submit#gh-submit.text,
 button.gh-submit.primary.text {
   background-color: transparent;
-  color: #0075ff;
+  color: rgb(0, 117, 255);
 }
 a.gh-button#gh-submit:hover:not(:disabled), a.gh-button.primary:hover:not(:disabled), a.gh-submit#gh-submit:hover:not(:disabled), a.gh-submit.primary:hover:not(:disabled),
 input[type=button].gh-button#gh-submit:hover:not(:disabled),
@@ -1209,7 +1208,7 @@ button.gh-button#gh-submit:hover:not(:disabled),
 button.gh-button.primary:hover:not(:disabled),
 button.gh-submit#gh-submit:hover:not(:disabled),
 button.gh-submit.primary:hover:not(:disabled) {
-  background: #005ecc;
+  background: rgb(0, 93.6, 204);
 }
 a.gh-button#gh-submit:hover:not(:disabled).text, a.gh-button.primary:hover:not(:disabled).text, a.gh-submit#gh-submit:hover:not(:disabled).text, a.gh-submit.primary:hover:not(:disabled).text,
 input[type=button].gh-button#gh-submit:hover:not(:disabled).text,
@@ -1225,7 +1224,7 @@ button.gh-button.primary:hover:not(:disabled).text,
 button.gh-submit#gh-submit:hover:not(:disabled).text,
 button.gh-submit.primary:hover:not(:disabled).text {
   background-color: rgba(0, 117, 255, 0.1);
-  color: #0075ff;
+  color: rgb(0, 117, 255);
 }
 a.gh-button.grey, a.gh-submit.grey,
 input[type=button].gh-button.grey,
@@ -1235,7 +1234,7 @@ input[type=submit].gh-submit.grey,
 button.gh-button.grey,
 button.gh-submit.grey {
   background: rgba(16, 38, 64, 0.05);
-  color: #102640;
+  color: rgb(16, 38, 64);
   padding: 5px 10px;
   border: 1px solid rgba(16, 38, 64, 0.5);
 }
@@ -1256,7 +1255,7 @@ input[type=submit].gh-submit.dark,
 button.gh-button.dark,
 button.gh-submit.dark {
   border: none;
-  background: #102640;
+  background: rgb(16, 38, 64);
   color: #fff;
   padding: 5px 10px;
 }
@@ -1278,7 +1277,7 @@ button.gh-button.secondary,
 button.gh-submit.secondary {
   border: 1px solid rgba(0, 117, 255, 0.6);
   background: #FFFFFF;
-  color: #0075ff;
+  color: rgb(0, 117, 255);
   padding: 5px 10px;
 }
 a.gh-button.secondary.page-title-action:has(.dashicons), a.gh-submit.secondary.page-title-action:has(.dashicons),
@@ -1300,7 +1299,7 @@ button.gh-button.secondary.text,
 button.gh-submit.secondary.text {
   border: none;
   background: transparent;
-  color: #102640;
+  color: rgb(16, 38, 64);
 }
 a.gh-button.secondary:hover:not(:disabled), a.gh-submit.secondary:hover:not(:disabled),
 input[type=button].gh-button.secondary:hover:not(:disabled),
@@ -1309,8 +1308,8 @@ input[type=submit].gh-button.secondary:hover:not(:disabled),
 input[type=submit].gh-submit.secondary:hover:not(:disabled),
 button.gh-button.secondary:hover:not(:disabled),
 button.gh-submit.secondary:hover:not(:disabled) {
-  color: #005ecc;
-  border-color: #0075ff;
+  color: rgb(0, 93.6, 204);
+  border-color: rgb(0, 117, 255);
   background-color: rgba(0, 117, 255, 0.02);
 }
 a.gh-button.secondary:hover:not(:disabled).text, a.gh-submit.secondary:hover:not(:disabled).text,
@@ -1322,7 +1321,7 @@ button.gh-button.secondary:hover:not(:disabled).text,
 button.gh-submit.secondary:hover:not(:disabled).text {
   border: none;
   background: rgba(16, 38, 64, 0.1);
-  color: #102640;
+  color: rgb(16, 38, 64);
 }
 a.gh-button.danger, a.gh-submit.danger,
 input[type=button].gh-button.danger,
@@ -1331,7 +1330,7 @@ input[type=submit].gh-button.danger,
 input[type=submit].gh-submit.danger,
 button.gh-button.danger,
 button.gh-submit.danger {
-  background: #e91f4f;
+  background: rgb(233, 31, 79);
 }
 a.gh-button.danger.text, a.gh-submit.danger.text,
 input[type=button].gh-button.danger.text,
@@ -1340,7 +1339,7 @@ input[type=submit].gh-button.danger.text,
 input[type=submit].gh-submit.danger.text,
 button.gh-button.danger.text,
 button.gh-submit.danger.text {
-  color: #e91f4f;
+  color: rgb(233, 31, 79);
   background-color: transparent;
 }
 a.gh-button.danger:hover:not(:disabled), a.gh-submit.danger:hover:not(:disabled),
@@ -1350,7 +1349,7 @@ input[type=submit].gh-button.danger:hover:not(:disabled),
 input[type=submit].gh-submit.danger:hover:not(:disabled),
 button.gh-button.danger:hover:not(:disabled),
 button.gh-submit.danger:hover:not(:disabled) {
-  background: #c2133d;
+  background: rgb(193.9512195122, 19.0487804878, 60.6097560976);
 }
 a.gh-button.danger:hover:not(:disabled).text, a.gh-submit.danger:hover:not(:disabled).text,
 input[type=button].gh-button.danger:hover:not(:disabled).text,
@@ -1359,7 +1358,7 @@ input[type=submit].gh-button.danger:hover:not(:disabled).text,
 input[type=submit].gh-submit.danger:hover:not(:disabled).text,
 button.gh-button.danger:hover:not(:disabled).text,
 button.gh-submit.danger:hover:not(:disabled).text {
-  color: #e91f4f;
+  color: rgb(233, 31, 79);
   background-color: rgba(233, 31, 79, 0.1);
 }
 a.gh-button.dashicon, a.gh-submit.dashicon,
@@ -1370,7 +1369,7 @@ input[type=submit].gh-submit.dashicon,
 button.gh-button.dashicon,
 button.gh-submit.dashicon {
   border: 1px solid rgba(16, 38, 64, 0.5);
-  color: #102640;
+  color: rgb(16, 38, 64);
   background-color: #FFF;
   padding: 4px 5px;
 }
@@ -1568,7 +1567,7 @@ button.gh-submit .gh-spinner {
   margin: 0;
 }
 .search-options-widget-wrap .search-options-widget .search-options .option.focused, .search-options-widget-wrap .search-options-widget .search-options .option:hover {
-  background: #0075ff;
+  background: rgb(0, 117, 255);
   color: #FFFFFF;
 }
 
@@ -1586,19 +1585,19 @@ button.gh-submit .gh-spinner {
 }
 .gh-dialog.gh-dialog-success {
   color: #FFFFFF;
-  background-color: #9ece38;
+  background-color: rgb(158, 206, 56);
 }
 .gh-dialog.gh-dialog-error {
   color: #FFFFFF;
-  background-color: #e91f4f;
+  background-color: rgb(233, 31, 79);
 }
 .gh-dialog.gh-dialog-warning {
   color: #FFFFFF;
-  background-color: #f58115;
+  background-color: rgb(245, 129, 21);
 }
 .gh-dialog.gh-dialog-info {
   color: #FFFFFF;
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
 }
 
 #modal-log-details {
@@ -1866,7 +1865,7 @@ input.ui-autocomplete-input.focus-visible {
 
 p.error,
 .commit-errors {
-  color: #e91f4f;
+  color: rgb(233, 31, 79);
 }
 
 .wp-editor-container textarea {
@@ -2014,7 +2013,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-step-nav .gh-step-nav-join {
   width: 100%;
-  border-top: 1px solid #0075ff;
+  border-top: 1px solid rgb(0, 117, 255);
   border-bottom: none;
 }
 .gh-step-nav button:disabled + hr.gh-step-nav-join {
@@ -2043,12 +2042,12 @@ button:has(.gh-dropdown-menu) {
   background-color: #FFF;
 }
 .gh-step-nav .gh-step-nav-step-num.current .gh-step-nav-step-num-label {
-  color: #0075ff;
+  color: rgb(0, 117, 255);
 }
 .gh-step-nav .gh-step-nav-step-num.current .gh-step-nav-step-num-circle {
   color: #FFFFFF;
-  background-color: #0075ff;
-  border-color: #0075ff;
+  background-color: rgb(0, 117, 255);
+  border-color: rgb(0, 117, 255);
   font-weight: 500;
 }
 
@@ -2081,17 +2080,17 @@ button:has(.gh-dropdown-menu) {
   font-size: 12px;
   display: flex;
   align-items: center;
-  color: #102640;
+  color: rgb(16, 38, 64);
 }
 .gh-tags a.gh-tag.remove,
 .gh-tags span.gh-tag.remove {
   background: rgba(233, 31, 79, 0.5);
-  color: #4e0818;
+  color: rgb(77.8536585366, 7.6463414634, 24.3292682927);
 }
 .gh-tags a.gh-tag.adding,
 .gh-tags span.gh-tag.adding {
   background: rgba(158, 206, 56, 0.5);
-  color: #334310;
+  color: rgb(50.8407258065, 67.002016129, 16.497983871);
 }
 .gh-tags a.gh-tag .dashicons,
 .gh-tags span.gh-tag .dashicons {
@@ -2161,12 +2160,12 @@ button:has(.gh-dropdown-menu) {
   background-color: rgba(233, 31, 79, 0.1);
 }
 .gh-progress-bar.error .gh-progress-bar-fill, .gh-progress-bar.gh-error .gh-progress-bar-fill {
-  background-color: #e91f4f;
+  background-color: rgb(233, 31, 79);
 }
 .gh-progress-bar .gh-progress-bar-fill {
   box-sizing: border-box;
   width: 1px;
-  background-color: #0075ff;
+  background-color: rgb(0, 117, 255);
   padding: 8px;
   display: flex;
   align-items: center;
@@ -2177,10 +2176,10 @@ button:has(.gh-dropdown-menu) {
   margin-left: 10px;
 }
 .gh-progress-bar.complete {
-  border-color: #9ece38;
+  border-color: rgb(158, 206, 56);
 }
 .gh-progress-bar.complete .gh-progress-bar-fill {
-  background-color: #9ece38;
+  background-color: rgb(158, 206, 56);
 }
 .gh-progress-bar.small .gh-progress-bar-fill {
   padding: 4px;
@@ -2205,7 +2204,7 @@ button:has(.gh-dropdown-menu) {
   width: max-content;
   display: none;
   position: absolute;
-  background-color: #102640;
+  background-color: rgb(16, 38, 64);
   color: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   z-index: 999999;
@@ -2239,7 +2238,7 @@ button:has(.gh-dropdown-menu) {
   width: 0;
   height: 0;
   border-top: 7px solid transparent;
-  border-right: 7px solid #102640;
+  border-right: 7px solid rgb(16, 38, 64);
   border-bottom: 7px solid transparent;
   transform: translate(0, -50%);
   top: 50%;
@@ -2259,7 +2258,7 @@ button:has(.gh-dropdown-menu) {
   width: 0;
   height: 0;
   border-top: 7px solid transparent;
-  border-right: 7px solid #102640;
+  border-right: 7px solid rgb(16, 38, 64);
   border-bottom: 7px solid transparent;
   transform: translate(0, -50%) rotate(180deg);
   top: 50%;
@@ -2280,7 +2279,7 @@ button:has(.gh-dropdown-menu) {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid #102640;
+  border-bottom: 7px solid rgb(16, 38, 64);
   transform: translate(-50%, 0) rotate(180deg);
   bottom: -5px;
   left: 50%;
@@ -2300,7 +2299,7 @@ button:has(.gh-dropdown-menu) {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid #102640;
+  border-bottom: 7px solid rgb(16, 38, 64);
   transform: translate(-50%, 0);
   top: -5px;
   left: 50%;
@@ -2319,7 +2318,7 @@ button:has(.gh-dropdown-menu) {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid #102640;
+  border-bottom: 7px solid rgb(16, 38, 64);
   transform: translate(-50%, 0);
   top: -4px;
   right: 5%;
@@ -2373,10 +2372,10 @@ button:has(.gh-dropdown-menu) {
   height: 25px;
 }
 .select2-step.benchmark svg {
-  color: #f58115;
+  color: rgb(245, 129, 21);
 }
 .select2-step.action svg {
-  color: #9ece38;
+  color: rgb(158, 206, 56);
 }
 .select2-step .step-name {
   overflow: hidden;
@@ -2490,7 +2489,7 @@ button:has(.gh-dropdown-menu) {
   border-radius: 4px;
 }
 .gh-form-wrapper .gh-message-wrapper.gh-form-errors-wrapper {
-  color: #940e2e;
+  color: rgb(147.512195122, 14.487804878, 46.0975609756);
   background-color: rgba(233, 31, 79, 0.1);
   border-color: rgba(233, 31, 79, 0.5);
   margin-bottom: 20px;
@@ -2530,7 +2529,7 @@ button:has(.gh-dropdown-menu) {
   padding: 40px;
 }
 .gh-media-uploader .droppable-handler.dragover {
-  border-color: #0075ff;
+  border-color: rgb(0, 117, 255);
   background: rgba(0, 117, 255, 0.2);
 }
 .gh-media-uploader #uploaded-files:not(:empty),
@@ -2554,11 +2553,9 @@ button:has(.gh-dropdown-menu) {
 
 /* Using the ::after pseudo-element for dots */
 .loading-dots::after {
-  content: "";
-  /* Start with no dots */
+  content: ""; /* Start with no dots */
   display: inline-block;
-  animation: dots 2s steps(4, end) infinite;
-  /* Steps animation controls dots */
+  animation: dots 2s steps(4, end) infinite; /* Steps animation controls dots */
 }
 
 /* Keyframes for the dots */
@@ -2677,7 +2674,7 @@ button:has(.gh-dropdown-menu) {
   overflow: hidden;
 }
 .gh-autocomplete-results a.pointer {
-  color: #102640;
+  color: rgb(16, 38, 64);
   background: rgba(0, 117, 255, 0.07);
 }
 
@@ -2741,7 +2738,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-picker .gh-picker-selected > .gh-picker-item.is-invalid {
   background: rgba(233, 31, 79, 0.1);
-  color: #c2133d;
+  color: rgb(193.9512195122, 19.0487804878, 60.6097560976);
 }
 .gh-picker .gh-picker-selected > .gh-picker-item .gh-picker-item-delete {
   display: inline-block;
@@ -2750,7 +2747,7 @@ button:has(.gh-dropdown-menu) {
   cursor: pointer;
 }
 .gh-picker .gh-picker-selected > .gh-picker-item .gh-picker-item-delete:hover {
-  color: #102640;
+  color: rgb(16, 38, 64);
   font-weight: bold;
 }
 .gh-picker:focus-within {
@@ -2788,7 +2785,7 @@ button:has(.gh-dropdown-menu) {
   overflow: hidden;
 }
 .gh-picker .gh-picker-options .gh-picker-option:hover {
-  color: #102640;
+  color: rgb(16, 38, 64);
   background: rgba(0, 117, 255, 0.07);
 }
 
@@ -2821,7 +2818,7 @@ button:has(.gh-dropdown-menu) {
 
 #remote-notifications .gh-button.dismiss {
   background: transparent;
-  color: #102640;
+  color: rgb(16, 38, 64);
   margin: 3px;
   padding: 4px 4px;
 }
@@ -2986,6 +2983,47 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
 .gh-accordion-item .dashicons-arrow-up-alt2,
 .gh-accordion-item .dashicons-arrow-down-alt2 {
   cursor: pointer;
+}
+
+.gh-dom-picker {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  grid-template-rows: repeat(5, 30px);
+  gap: 3px;
+}
+.gh-dom-picker .gh-dom-date {
+  border-radius: 4px;
+  background-color: rgba(16, 38, 64, 0.05);
+  border: none;
+  outline: 1px solid rgb(16, 38, 64);
+  padding: 3px;
+}
+.gh-dom-picker .gh-dom-date:hover {
+  background-color: rgba(16, 38, 64, 0.15);
+}
+.gh-dom-picker .gh-dom-date.selected {
+  background-color: rgb(16, 38, 64);
+  color: #fff;
+}
+
+.requires-pro-features-wrapper {
+  width: fit-content;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 5px 5px 8px;
+  border-color: rgb(245, 129, 21);
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+}
+.requires-pro-features-wrapper .pro-pill {
+  border-radius: 4px;
+  display: inline-block;
+  padding: 3px 8px;
+  color: #FFF;
+  background-color: rgb(245, 129, 21);
+  justify-self: end;
 }
 
 /*# sourceMappingURL=elements.css.map */

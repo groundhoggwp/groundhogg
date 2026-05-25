@@ -3,8 +3,10 @@
 namespace Groundhogg\Admin\Broadcasts;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Broadcast;
 use Groundhogg\Campaign;
+use Groundhogg\Classes\Recurring_Broadcast;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 use function Groundhogg\admin_page_url;
@@ -38,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @license     https://opensource.org/licenses/GPL-3.0 GNU Public License v3
  * @package     Admin
  */
-class Broadcasts_Page extends Admin_Page {
+class Broadcasts_Page extends Tabbed_Admin_Page {
 
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_estimate_send_duration', [ $this, 'ajax_estimate_send_duration' ] );
@@ -150,7 +152,41 @@ class Broadcasts_Page extends Admin_Page {
 		}
 
         /* translators: %d: the number of broadcasts getting cancelled */
-		$this->add_notice( 'cancelled', sprintf( _nx( '%d broadcasts cancelled', '%d broadcast cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+		$this->add_notice( 'cancelled', sprintf( _nx( '%d broadcast cancelled', '%d broadcasts cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+		return false;
+	}
+
+	public function process_cancel_recurring() {
+		if ( ! current_user_can( 'cancel_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		foreach ( $this->get_items() as $id ) {
+
+			$broadcast = new Recurring_Broadcast( $id );
+			$broadcast->cancel();
+		}
+
+		/* translators: %d: the number of broadcasts getting cancelled */
+		$this->add_notice( 'cancelled', sprintf( _nx( '%d schedule cancelled', '%d schedules cancelled', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
+
+		return false;
+	}
+
+	public function process_resume_recurring() {
+		if ( ! current_user_can( 'cancel_broadcasts' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		foreach ( $this->get_items() as $id ) {
+
+			$broadcast = new Recurring_Broadcast( $id );
+			$broadcast->resume();
+		}
+
+		/* translators: %d: the number of broadcasts getting resumed */
+		$this->add_notice( 'resumed', sprintf( _nx( '%d schedule resumed', '%d schedules resumed', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ) );
 
 		return false;
 	}
@@ -200,20 +236,52 @@ class Broadcasts_Page extends Admin_Page {
 	 * @return bool|WP_Error
 	 */
 	public function process_delete() {
-		if ( ! current_user_can( 'schedule_broadcasts' ) ) {
+		if ( ! current_user_can( 'delete_emails' ) ) {
 			$this->wp_die_no_access();
 		}
 
+        $deleted = 0;
+
 		foreach ( $this->get_items() as $id ) {
-			if ( ! get_db( 'broadcasts' )->delete( $id ) ) {
-				return new WP_Error( 'unable_to_delete_broadcast', "Something went wrong while deleting the broadcast.", 'groundhogg' );
+			$broadcast = new Broadcast( $id );
+			if ( $broadcast->delete() ){
+                $deleted++;
+            }
+		}
+
+		$this->add_notice(
+			esc_attr( 'deleted' ),
+			/* translators: %d: the number of broadcasts getting deleted */
+			sprintf( _nx( 'Deleted %d broadcast', 'Deleted %d broadcasts', $deleted, 'notice', 'groundhogg' ), $deleted ),
+			'success'
+		);
+
+		return false;
+	}
+
+	/**
+	 * Delete
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function process_delete_recurring() {
+		if ( ! current_user_can( 'delete_emails' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$deleted = 0;
+
+		foreach ( $this->get_items() as $id ) {
+			$schedule = new Recurring_Broadcast( $id );
+			if ( $schedule->delete() ){
+				$deleted++;
 			}
 		}
 
 		$this->add_notice(
 			esc_attr( 'deleted' ),
 			/* translators: %d: the number of broadcasts getting deleted */
-			sprintf( _nx( 'Deleted %d broadcast', 'Deleted %d broadcasts', count( $this->get_items() ), 'notice', 'groundhogg' ), count( $this->get_items() ) ),
+			sprintf( _nx( 'Deleted %d schedule', 'Deleted %d schedules', $deleted, 'notice', 'groundhogg' ), $deleted ),
 			'success'
 		);
 
@@ -271,6 +339,26 @@ class Broadcasts_Page extends Admin_Page {
 	}
 
 	/**
+	 * Display the table
+	 */
+	public function view_recurring() {
+
+		$broadcasts_table = new Recurring_Schedules_Table();
+
+		$this->search_form( esc_html__( 'Search', 'groundhogg' ) );
+		$broadcasts_table->views(); ?>
+        <form method="post" class="wp-clearfix">
+            <!-- search form -->
+			<?php $broadcasts_table->prepare_items(); ?>
+			<?php $broadcasts_table->display(); ?>
+        </form>
+
+		<?php
+
+	}
+
+
+	/**
 	 * Display the scheduling page
 	 */
 	public function add() {
@@ -279,5 +367,20 @@ class Broadcasts_Page extends Admin_Page {
 		}
 
 		include __DIR__ . '/add.php';
+	}
+
+	protected function get_tabs() {
+		$tabs = [
+			[
+				'name' => esc_html__( 'Broadcasts', 'groundhogg' ),
+				'slug' => 'broadcasts'
+			],
+			[
+				'name' => esc_html__( 'Recurring Schedules', 'groundhogg' ),
+				'slug' => 'recurring'
+			],
+		];
+
+		return $tabs;
 	}
 }

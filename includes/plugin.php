@@ -402,6 +402,7 @@ class Plugin {
 	 * Include other files
 	 */
 	private function includes() {
+		require __DIR__ . '/exceptions.php';
 		require __DIR__ . '/polyfill.php';
 		require __DIR__ . '/functions.php';
 		require __DIR__ . '/kses.php';

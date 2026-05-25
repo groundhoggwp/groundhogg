@@ -260,7 +260,8 @@ class Broadcasts_Table extends WP_List_Table {
 
 		if ( ! $broadcast->is_sent() ) {
 			$actions['trash'] = html()->e( 'a', [
-				'href' => action_url( 'cancel', [
+				'class' => 'danger-confirm',
+				'href'  => action_url( 'cancel', [
 					'broadcast' => $broadcast->get_id(),
 				] ),
 			], esc_html__( 'Cancel', 'groundhogg' ) );
@@ -544,8 +545,8 @@ class Broadcasts_Table extends WP_List_Table {
 		$paged    = $this->get_pagenum();
 		$offset   = $per_page * ( $paged - 1 );
 		$search   = sanitize_text_field( get_url_var( 's' ) );
-		$order    = get_url_var( 'order', 'DESC' );
-		$orderby  = get_url_var( 'orderby', 'ID' );
+		$order    = get_url_var( 'order', in_array( $this->get_view(), [ 'pending', 'sending', 'scheduled' ] ) ? 'ASC' : 'DESC' );
+		$orderby  = get_url_var( 'orderby', 'send_time' );
 
 		// Only look for emails.
 

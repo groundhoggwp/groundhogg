@@ -1835,6 +1835,20 @@
     }))
   }
 
+  const RequiresPro = ( children ) => {
+
+    // if ( Groundhogg.isProFeaturesActive ){
+    //   return Fragment(children)
+    // }
+
+    return Div({
+      className: 'requires-pro-features-wrapper',
+    }, [
+      Div({ className: 'require-pro-features' }, children ),
+      Span({ className: 'pro-pill' }, 'Pro Feature' )
+    ] )
+  }
+
   window.MakeEl = {
     Skeleton,
     TinyMCE,
@@ -1887,6 +1901,7 @@
     H4,
     Hr,
     Nav,
+    RequiresPro,
     maybeCall,
     forDom,
     forReact,
