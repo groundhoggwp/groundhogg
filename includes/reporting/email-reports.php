@@ -421,7 +421,7 @@ class Email_Reports extends Notification_Builder {
 					'#admin#'          => untrailingslashit( admin_url() ),
 					'#home#'           => untrailingslashit( home_url() ),
 					'#name#'           => get_bloginfo(),
-					'#display_name#'   => wp_get_current_user()->display_name || 'Admin',
+					'#display_name#'   => wp_get_current_user()->display_name,
 				] );
 
 				return $html . $replacer->replace( self::get_template_part( 'remote-notice' ) );

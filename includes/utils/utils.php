@@ -179,7 +179,7 @@ class Utils {
 	 * @param        $string |int the thing to encrypt/decrypt
 	 * @param string $action whether to encrypt or decrypt
 	 *
-	 * @return bool|string false if failur, the result and success.
+	 * @return bool|string false if failure, the result and success.
 	 */
 	public function encrypt_decrypt( $string, $action = 'e' ) {
 
