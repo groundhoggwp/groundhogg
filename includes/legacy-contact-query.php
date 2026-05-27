@@ -5,6 +5,7 @@ namespace Groundhogg;
 // Exit if accessed directly
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Contacts;
+use Groundhogg\DB\Query\Where;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -3034,39 +3035,81 @@ class Legacy_Contact_Query {
 			case '=':
 			case '!=':
 			case 'not_equals':
-				$clause2 = sprintf( "%s = '%s'", $column, $value );
+				$clause2 = $wpdb->prepare( "%i = %s", $column, $value );
 				break;
 			case 'contains':
 			case 'not_contains':
-				$clause2 = sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) . '%' );
+				$clause2 = $wpdb->prepare( "%i LIKE %s", $column, '%' . $wpdb->esc_like( $value ) . '%' );
 				break;
 			case 'starts_with':
 			case 'begins_with':
 			case 'does_not_start_with':
-				$clause2 = sprintf( "%s LIKE '%s'", $column, $wpdb->esc_like( $value ) . '%' );
+				$clause2 = $wpdb->prepare( "%i LIKE %s", $column, $wpdb->esc_like( $value ) . '%' );
 				break;
 			case 'ends_with':
 			case 'does_not_end_with':
-				$clause2 = sprintf( "%s LIKE '%s'", $column, '%' . $wpdb->esc_like( $value ) );
+				$clause2 = $wpdb->prepare( "%i LIKE %s", $column, '%' . $wpdb->esc_like( $value ) );
 				break;
 			case 'empty':
 			case 'not_empty':
-				$clause2 = sprintf( "%s != ''", $column );
+				$clause2 = $wpdb->prepare( "%i != ''", $column );
 				break;
 			case 'regex':
-				$clause2 = sprintf( "%s REGEXP BINARY '%s'", $column, $value );
+				$clause2 = $wpdb->prepare( "%i REGEXP BINARY %s", $column, $value );
 				break;
 			case 'less_than':
-				$clause2 = sprintf( "%s < %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+
+				switch ( Where::guessPlaceholderFormat( $value ) ){
+					case '%f':
+						$clause2 = $wpdb->prepare( "%i < %f", $column, $value );
+						break;
+					case '%d':
+						$clause2 = $wpdb->prepare( "%i < %d", $column, $value );
+						break;
+					case '%s':
+						$clause2 = $wpdb->prepare( "%i < %s", $column, $value );
+						break;
+				}
 				break;
 			case 'greater_than':
-				$clause2 = sprintf( "%s > %s", $column, is_numeric( $value ) ? $value : "'$value'" );
+
+				switch ( Where::guessPlaceholderFormat( $value ) ){
+					case '%f':
+						$clause2 = $wpdb->prepare( "%i > %f", $column, $value );
+						break;
+					case '%d':
+						$clause2 = $wpdb->prepare( "%i > %d", $column, $value );
+						break;
+					case '%s':
+						$clause2 = $wpdb->prepare( "%i > %s", $column, $value );
+						break;
+				}
 				break;
 			case 'greater_than_or_equal_to':
-				$clause2 = sprintf( "%s >= %s", $column, $value );
+				switch ( Where::guessPlaceholderFormat( $value ) ){
+					case '%f':
+						$clause2 = $wpdb->prepare( "%i >= %f", $column, $value );
+						break;
+					case '%d':
+						$clause2 = $wpdb->prepare( "%i >= %d", $column, $value );
+						break;
+					case '%s':
+						$clause2 = $wpdb->prepare( "%i >= %s", $column, $value );
+						break;
+				}
 				break;
 			case 'less_than_or_equal_to':
-				$clause2 = sprintf( "%s <= %s", $column, $value );
+				switch ( Where::guessPlaceholderFormat( $value ) ){
+					case '%f':
+						$clause2 = $wpdb->prepare( "%i <= %f", $column, $value );
+						break;
+					case '%d':
+						$clause2 = $wpdb->prepare( "%i <= %d", $column, $value );
+						break;
+					case '%s':
+						$clause2 = $wpdb->prepare( "%i <= %s", $column, $value );
+						break;
+				}
 				break;
 		}
 

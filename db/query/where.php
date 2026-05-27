@@ -221,8 +221,35 @@ class Where {
 			return get_array_var( $column_formats, $column, is_numeric( $value ) ? '%d' : '%s' );
 		}
 
-		if ( is_numeric( $value ) ) {
-			return str_contains( $value, '.' ) ? '%f' : '%d';
+		return self::guessPlaceholderFormat( $value );
+	}
+
+	/**
+	 * Guess the placeholder format if unknown
+	 *
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	public static function guessPlaceholderFormat( $value ) {
+
+		if ( is_int( $value ) ) {
+			return '%d';
+		}
+
+		if ( is_float( $value ) ) {
+			return '%f';
+		}
+
+		if ( is_string( $value ) ) {
+
+			if ( preg_match( '/^-?\d+$/', $value ) ) {
+				return '%d';
+			}
+
+			if ( is_numeric( $value ) ) {
+				return '%f';
+			}
 		}
 
 		return '%s';
