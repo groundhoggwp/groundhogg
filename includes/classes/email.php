@@ -414,10 +414,17 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_open_tracking_src() {
-		return managed_page_url( sprintf(
-			"o/%s/%s",
+
+		$payload = implode( '|', [
+			'o',
 			dechex( $this->get_contact()->get_id() ),
-			dechex( $this->get_event()->get_id( true ) )
+			dechex( $this->get_event()->get_id( true ) ),
+		] );
+
+		return managed_page_url( sprintf(
+			'o/%s.%s',
+			base64url_encode( $payload ),
+			base64url_encode( compute_signature( $payload, 16 ) )
 		) );
 	}
 
@@ -425,8 +432,12 @@ class Email extends Base_Object_With_Meta {
 	 * Return the tracking link for this email when a link is clicked.
 	 *
 	 * @return string
+	 * @deprecated 4.5 insecure
 	 */
 	public function get_click_tracking_link() {
+
+		_deprecated_function( __METHOD__, '4.5' );
+
 		return managed_page_url( sprintf(
 			'c/%s/%s/',
 			dechex( $this->get_contact()->get_id() ),
@@ -851,9 +862,20 @@ class Email extends Base_Object_With_Meta {
 			$clean_url = '/';
 		}
 
-		$tracking_link = trailingslashit( $this->get_click_tracking_link() . base64url_encode( $clean_url ) );
+		$payload = implode( '|', [
+			$clean_url,
+			dechex( $this->get_contact()->get_id() ),
+			dechex( $this->get_event()->get_id( true ) ),
+		] );
 
-		return sprintf( $replacement, $tracking_link );
+		// Example: https://groundhogg.dev/gh/c/L3ZlcnNpb24tMy03LTIvfDF8MTgyNzM.S9cLmojPjxsRxGKLsTYyvw/
+		$tracking_url = managed_page_url( sprintf(
+			'c/%s.%s',
+			base64url_encode( $payload ),
+			base64url_encode( compute_signature( $payload, 16 ) )
+		) );
+
+		return sprintf( $replacement, $tracking_url );
 	}
 
 	/**

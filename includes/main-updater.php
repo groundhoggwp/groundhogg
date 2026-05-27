@@ -281,6 +281,7 @@ class Main_Updater extends Old_Updater {
 				'description' => __( 'Upgrade the broadcasts table for recurring schedules.', 'groundhogg' ),
 				'callback'    => function () {
 					db()->broadcasts->create_table();
+					flush_rewrite_rules();
 				},
 			]
 		];

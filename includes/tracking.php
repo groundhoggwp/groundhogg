@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Classes\Activity;
+use WP_User;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -124,6 +125,18 @@ class Tracking {
 	 */
 	public function add_rewrite_rules() {
 
+		// Hardened routes with signature
+		add_managed_rewrite_rule(
+			'c/((?:[^/]+)\.(?:[^/]+))/?$',
+			'subpage=tracking&tracking_via=email&tracking_action=click&tracking_payload=$matches[1]'
+		);
+
+		add_managed_rewrite_rule(
+			'o/((?:[^/]+)\.(?:[^/]+))/?$',
+			'subpage=tracking&tracking_via=email&tracking_action=open&tracking_payload=$matches[1]'
+		);
+
+		### LEGACY SUPPORT ###
 		// Shortened for clicks
 		add_managed_rewrite_rule(
 			'c/([^/]*)/([^/]*)/(.+)$',
@@ -135,8 +148,6 @@ class Tracking {
 			'o/([^/]*)/([^/]*)/?$',
 			'subpage=tracking&tracking_via=email&tracking_action=open&contact_id=$matches[1]&event_id=$matches[2]'
 		);
-
-		### LEGACY SUPPORT ###
 
 		// With Ref attribute
 		add_managed_rewrite_rule(
@@ -181,6 +192,7 @@ class Tracking {
 		$vars[] = 'event_id';
 		$vars[] = 'email_id';
 		$vars[] = 'target_url';
+		$vars[] = 'tracking_payload';
 
 		return $vars;
 	}
@@ -289,6 +301,8 @@ class Tracking {
 		}
 	}
 
+	public static $use_safe_redirect = false;
+
 	/**
 	 * Do a tracking redirect during the template_redirect hook
 	 */
@@ -303,11 +317,37 @@ class Tracking {
 			return;
 		}
 
-		$tracking_via    = get_query_var( 'tracking_via' );
-		$tracking_action = get_query_var( 'tracking_action' );
+		$tracking_via     = get_query_var( 'tracking_via' );
+		$tracking_action  = get_query_var( 'tracking_action' );
+		$tracking_payload = get_query_var( 'tracking_payload' );
 
-		$contact_id = absint( get_query_var( 'contact_id' ) );
-		$event_id   = absint( get_query_var( 'event_id' ) );
+		if ( ! empty( $tracking_payload ) ){
+
+			$payload_parts = explode( '.', $tracking_payload );
+
+			$id_payload = base64url_decode( $payload_parts[0] );
+			$signature  = base64url_decode( $payload_parts[1] );
+
+			if ( ! check_signature( $id_payload, $signature, 16 ) ){
+				wp_die( 'Invalid signature.' );
+			}
+
+			$link_parts = explode( '|', $id_payload ); // url | contact | event
+			$url        = $link_parts[0];
+			$contact_id = absint( hexdec( $link_parts[1] ) );
+			$event_id   = absint( hexdec( $link_parts[2] ) );
+
+			set_query_var( 'target_url', $url );
+			set_query_var( 'contact_id', $contact_id );
+			set_query_var( 'event_id', $event_id );
+
+		} else {
+			$contact_id = absint( get_query_var( 'contact_id' ) );
+			$event_id   = absint( get_query_var( 'event_id' ) );
+
+			// this method of click tracking does not have a signature, so we'll use safe redirect now
+			self::$use_safe_redirect = true;
+		}
 
 		$contact = get_contactdata( $contact_id );
 
@@ -655,7 +695,7 @@ class Tracking {
 	 * Setup the tracking cookie vars for when a user logs in.
 	 *
 	 * @param $user_login string
-	 * @param $user       \WP_User
+	 * @param $user       WP_User
 	 */
 	public function wp_login( $user_login, $user ) {
 		$this->add_tracking_cookie_param( 'user_login', $user_login );
@@ -765,6 +805,13 @@ class Tracking {
 	 * Redirects to the target URL
 	 */
 	protected function redirect_to_target() {
+
+		// safe redirects only
+		if ( self::$use_safe_redirect ){
+			wp_safe_redirect( $this->get_target_url(), $this->redirect_http_status_code() );
+			exit;
+		}
+
 		// phpcs:ignore WordPress.Security.SafeRedirect -- user-defined redirect
 		wp_redirect( $this->get_target_url(), $this->redirect_http_status_code() );
 		exit;

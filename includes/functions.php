@@ -9493,3 +9493,41 @@ function is_staging_environment() {
 
 	return false;
 }
+
+/**
+ * Computes a signature based on the auth salt in raw binary data
+ *
+ * @param  string  $data
+ * @param  int  $length
+ *
+ * @return string
+ */
+function compute_signature( string $data, int $length = 0 ){
+	$signature = hash_hmac( 'sha256', $data, wp_salt( 'auth' ), true );
+    return $length > 0 ? substr( $signature, 0, $length ) : $signature;
+}
+
+/**
+ * Check a signature
+ *
+ * @param  string  $data
+ * @param  string  $signature
+ * @param  int  $length optional, only compare the first n bytes of the expected and given
+ *
+ * @return bool
+ */
+function check_signature( string $data, string $signature, int $length = 0 ) {
+
+    $expected = compute_signature( $data );
+
+    if ( $length > 0 ){
+
+        if ( strlen( $signature ) !== $length ){
+            return false;
+        }
+
+        $expected  = substr( $expected, 0, $length );
+    }
+
+	return hash_equals( $expected, $signature );
+}
