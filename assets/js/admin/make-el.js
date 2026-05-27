@@ -1835,17 +1835,22 @@
     }))
   }
 
-  const RequiresPro = ( children ) => {
+  const RequiresPro = ( children, props = {} ) => {
 
-    // if ( Groundhogg.isProFeaturesActive ){
-    //   return Fragment(children)
-    // }
+    if ( Groundhogg.isProFeaturesActive ){
+      return Fragment(children)
+    }
+
+    let {
+      pillText = 'Pro Feature',
+      toolTipText = 'This feature requires a <a href="https://groundhogg.io/pricing/">paid license</a>.',
+    } = props
 
     return Div({
       className: 'requires-pro-features-wrapper',
     }, [
       Div({ className: 'require-pro-features' }, children ),
-      Span({ className: 'pro-pill' }, 'Pro Feature' )
+      Span({ className: 'pro-pill' }, [ pillText, ToolTip( toolTipText, 'top' ) ] )
     ] )
   }
 
