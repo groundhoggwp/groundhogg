@@ -10,7 +10,6 @@ use Groundhogg\Classes\Background_Task;
 use Groundhogg\Classes\Recurring_Broadcast;
 use Groundhogg\DB\Broadcast_Meta;
 use Groundhogg\DB\Broadcasts;
-use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reporting\New_Reports\Traits\Broadcast_Stats;
 use Groundhogg\Utils\DateTimeHelper;
