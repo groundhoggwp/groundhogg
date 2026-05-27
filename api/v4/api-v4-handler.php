@@ -50,7 +50,7 @@ class API_V4_HANDLER {
 		$this->reports     = new Reports_Api();
 		$this->email_log   = new Email_Log_Api();
 		$this->unsubscribe = new Unsubscribe_Api();
-		$this->campaings   = new Campaigns_Api();
+		$this->campaigns   = new Campaigns_Api();
 		$this->tracking    = new Tracking_Api();
 		$this->forms       = new Forms_Api();
 		$this->options     = new Options_Api();
