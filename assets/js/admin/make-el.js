@@ -1854,6 +1854,43 @@
     ] )
   }
 
+  const RequiresProModal = () => {
+
+    if ( Groundhogg.isProFeaturesActive ){
+      return
+    }
+
+    ModalFrame({}, ({ morph, close }) => Fragment([
+      Div({ className: 'full gh-site' }, Div({
+        className: 'gh-primary-card display-flex align-center',
+        style: {
+          position: 'relative',
+        }
+      },[
+        Div({
+          style: {
+            padding: '2rem'
+          }
+        },[
+          Button({
+            id: 'dismiss-pro-ad',
+            className: 'gh-button secondary icon text',
+            style: {
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+            },
+            onClick: e => close()
+          }, Dashicon( 'no-alt' ) ),
+          H3({}, 'Do cron jobs give you <i>anxiety</i>?' ),
+          Pg({}, 'Let our team help you set them up correctly! First time customers can have our team install Groundhogg, import contacts, connect SMTP, and set up cron jobs!'),
+          Pg({}, An( { href: 'https://www.groundhogg.io/downloads/initial-setup-installation', className: 'bold' }, 'MORE DETAILS &rarr;' ) ),
+        ]),
+        Img({ src: `${Groundhogg.assets.images}/phil-cutoff.png` })
+      ]))
+    ]))
+  }
+
   window.MakeEl = {
     Skeleton,
     TinyMCE,
@@ -1907,6 +1944,7 @@
     Hr,
     Nav,
     RequiresPro,
+    RequiresProModal,
     maybeCall,
     forDom,
     forReact,

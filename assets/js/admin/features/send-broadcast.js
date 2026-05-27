@@ -71,6 +71,7 @@
     Dashicon,
     ToolTip,
     RequiresPro,
+    RequiresProModal,
     InputRepeater,
   } = MakeEl
 
@@ -480,6 +481,120 @@
         },
       }, getObject().context.built),
     ])
+  }
+
+  const ReviewScreen = ({
+    objectPreview = null,
+    args = {}
+  }) => {
+
+    let preview
+
+    if (getState().when === 'now') {
+      preview = sprintf(__('Send %1$s to %2$s contacts <b>now</b>!', 'groundhogg'), bold(getObject().data.title),
+        bold(formatNumber(
+          getState().totalContacts)))
+    }
+    else {
+      preview = sprintf(__('Send %1$s to %2$s contacts on %3$s.', 'groundhogg'), bold(getObject().data.title),
+        bold(formatNumber(
+          getState().totalContacts)), sendDatesPreview() )
+    }
+
+    return Fragment([
+      `<p>${ preview }</p>`,
+      getState().is_recurring ? `<p>Then ${ RecurringSchedulePreview(getState()) }</p>` : null,
+      getObject() ? objectPreview : null,
+      Button({
+        id       : 'confirm-and-schedule',
+        className: 'gh-button primary medium',
+        onClick  : e => {
+
+          e.target.innerHTML = `<span class="gh-spinner"></span>`
+
+          const {
+            when = 'now',
+            date = '',
+            time = '',
+            dates = [],
+            send_in_local_time = false,
+            use_send_time_optimization = false,
+            campaigns = [],
+            segment_type = 'fixed',
+            batching = false,
+            batch_interval,
+            batch_interval_length,
+            batch_amount,
+            is_recurring = false,
+            repeats_every_amount = 1,
+            repeats_every_interval = 'days',
+            repeats_dow = [],
+            repeats_dow_occurrence = [],
+            repeats_month_occurrence_type = 'm',
+            repeats_dom = [],
+            repeats_until = 'never',
+            repeats_until_date = '',
+            repeats_until_occurrences = 1,
+            use_optimized_send_time = false,
+          } = getState()
+
+          post(routes.v4.broadcasts, {
+            object_id  : getObject().ID,
+            object_type: 'email',
+            query      : getQuery(),
+            date,
+            time,
+            dates,
+            send_now   : when === 'now',
+            send_in_local_time,
+            use_send_time_optimization,
+            campaigns  : campaigns.map(({ ID }) => ID),
+            segment_type,
+            batching,
+            batch_interval,
+            batch_interval_length,
+            batch_amount,
+            is_recurring,
+            repeats_every_amount,
+            repeats_every_interval,
+            repeats_dow,
+            repeats_dow_occurrence,
+            repeats_month_occurrence_type,
+            repeats_dom,
+            repeats_until,
+            repeats_until_date,
+            repeats_until_occurrences,
+            use_optimized_send_time,
+            ...args
+          }).then(r => {
+
+            setState({
+              step     : 'scheduled',
+              broadcast: r.item,
+            })
+
+          }).catch(err => {
+            dialog({
+              message: err.message,
+              type   : 'error',
+            })
+
+            switch (err.code) {
+              case 'invalid_date':
+                setState({
+                  step: 'schedule',
+                })
+                break
+              default:
+                setState({})
+                break
+            }
+          })
+
+        },
+      }, __('Confirm and schedule!', 'groundhogg')),
+    ])
+
   }
 
   const Steps = {
@@ -894,13 +1009,19 @@
               checked : getState().use_optimized_send_time,
               onLabel : __('Yes'),
               offLabel: __('No'),
-              onChange: e => setState({
-                use_optimized_send_time: e.target.checked,
-              }),
+              disabled: ! Groundhogg.isProFeaturesActive,
+              onChange: e => {
+                setState({
+                  use_optimized_send_time: e.target.checked,
+                })
+              },
             }),
             Dashicon('editor-help',
               ToolTip('Schedules each email based on contacts\' past <br>behaviour to maximize opens and clicks. <a href="#">Read more...</a>', 'bottom')),
-          ])) : null,
+          ]), {
+            pillText: 'Advanced Feature',
+            toolTipText: 'This feature requires the Advanced <br>Features add-on to be installed.',
+          } ) : null,
           '<div><hr></div>',
           Div({
             className: 'display-flex gap-10 align-center',
@@ -1207,115 +1328,9 @@
       name        : 'Review',
       icon        : Dashicon('thumbs-up'),
       requirements: () => getObject() && hasValidDates() && getState().totalContacts,
-      render      : () => {
-
-        let preview
-
-        if (getState().when === 'now') {
-          preview = sprintf(__('Send %1$s to %2$s contacts <b>now</b>!', 'groundhogg'), bold(getObject().data.title),
-            bold(formatNumber(
-              getState().totalContacts)))
-        }
-        else {
-          preview = sprintf(__('Send %1$s to %2$s contacts on %3$s.', 'groundhogg'), bold(getObject().data.title),
-            bold(formatNumber(
-              getState().totalContacts)), sendDatesPreview() )
-        }
-
-        return Fragment([
-          `<p>${ preview }</p>`,
-          getState().is_recurring ? `<p>Then ${ RecurringSchedulePreview(getState()) }</p>` : null,
-          getObject() ? EmailPreview() : null,
-          Button({
-            id       : 'confirm-and-schedule',
-            className: 'gh-button primary medium',
-            onClick  : e => {
-
-              e.target.innerHTML = `<span class="gh-spinner"></span>`
-
-              const {
-                when = 'now',
-                date = '',
-                time = '',
-                dates = [],
-                send_in_local_time = false,
-                use_send_time_optimization = false,
-                campaigns = [],
-                segment_type = 'fixed',
-                batching = false,
-                batch_interval,
-                batch_interval_length,
-                batch_amount,
-                is_recurring = false,
-                repeats_every_amount = 1,
-                repeats_every_interval = 'days',
-                repeats_dow = [],
-                repeats_dow_occurrence = [],
-                repeats_month_occurrence_type = 'm',
-                repeats_dom = [],
-                repeats_until = 'never',
-                repeats_until_date = '',
-                repeats_until_occurrences = 1,
-                use_optimized_send_time = false,
-              } = getState()
-
-              post(routes.v4.broadcasts, {
-                object_id  : getObject().ID,
-                object_type: 'email',
-                query      : getQuery(),
-                date,
-                time,
-                dates,
-                send_now   : when === 'now',
-                send_in_local_time,
-                use_send_time_optimization,
-                campaigns  : campaigns.map(({ ID }) => ID),
-                segment_type,
-                batching,
-                batch_interval,
-                batch_interval_length,
-                batch_amount,
-                is_recurring,
-                repeats_every_amount,
-                repeats_every_interval,
-                repeats_dow,
-                repeats_dow_occurrence,
-                repeats_month_occurrence_type,
-                repeats_dom,
-                repeats_until,
-                repeats_until_date,
-                repeats_until_occurrences,
-                use_optimized_send_time
-              }).then(r => {
-
-                setState({
-                  step     : 'scheduled',
-                  broadcast: r.item,
-                })
-
-              }).catch(err => {
-                dialog({
-                  message: err.message,
-                  type   : 'error',
-                })
-
-                switch (err.code) {
-                  case 'invalid_date':
-                    setState({
-                      step: 'schedule',
-                    })
-                    break
-                  default:
-                    setState({})
-                    break
-                }
-              })
-
-            },
-          }, __('Confirm and schedule!', 'groundhogg')),
-        ])
-
-      },
+      render      : () => ReviewScreen({
+        objectPreview: EmailPreview()
+      }),
     },
     'scheduled': {
       name        : __('Scheduled'),
@@ -1419,6 +1434,7 @@
         getObject,
         setState,
         getQuery,
+        ReviewScreen
       }),
     ])
   }

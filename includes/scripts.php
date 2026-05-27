@@ -684,8 +684,8 @@ class Scripts {
 				'whiteLabelName'   => white_labeled_name(),
 				'isSuperAdmin'     => is_super_admin(),
 				'isWPFusionActive' => is_wp_fusion_active(),
+				'isProFeaturesActive' => is_pro_features_active(),
 				'timeZone'         => wp_timezone()->getName(),
-//				'siteTime'         => ( new DateTimeHelper() )->wpDateTimeFormat(),
 				'recaptcha'        => [
 					'enabled' => is_recaptcha_enabled(),
 					'version' => get_option( 'gh_recaptcha_version' )
