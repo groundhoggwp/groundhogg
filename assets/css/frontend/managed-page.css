@@ -62,7 +62,7 @@ body.managed-page.view #main .pagination .active, body.managed-page.archive #mai
   background: #FFFFFF;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   border: none;
 }
 #main .box > p:first-child {
@@ -162,7 +162,7 @@ p#credit img {
   padding: 8px 20px;
   display: inline-block;
   width: 100%;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   font-size: 14px;
 }
 
@@ -177,7 +177,7 @@ p#credit img {
 
 #main .preference-options a.preference-unsubscribe:hover,
 #main .preference-options a.preference-gdpr_delete:hover {
-  color: #c2133d;
+  color: rgb(194, 19, 61);
   background-color: rgba(194, 19, 61, 0.05);
 }
 
@@ -204,7 +204,7 @@ p#credit img {
 #main input[type=datetime-local],
 #main input[type=text] {
   background: #fbfbfb;
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
   font-size: 15px;
   width: 100%;
   padding: 4px 8px;
@@ -233,11 +233,11 @@ p#credit img {
   white-space: nowrap;
   border: none;
   color: #FFFFFF;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   padding: 6px 10px;
   font-size: 16px;
   font-weight: 400;
-  background: #0075ff;
+  background: rgb(0, 117, 255);
   cursor: pointer;
 }
 #main #gh-submit *,
@@ -253,8 +253,8 @@ p#credit img {
 #main #gh-submit.secondary,
 #main button[type=submit].secondary,
 #main .button.secondary {
-  background-color: rgba(0, 117, 255, 0.02);
-  color: #102640;
+  background-color: var(--gh-primary-2);
+  color: var(--gh-dark);
 }
 #main #gh-submit.danger,
 #main button[type=submit].danger,

@@ -1637,7 +1637,7 @@ class HTML {
 				'value'   => $args['value'],
 				'checked' => $args['checked'],
 			] ),
-			$this->e( 'span', [ 'class' => 'slider round' ], '', false ),
+			$this->e( 'span', [ 'class' => 'slider' ], '', false ),
 			$this->e( 'span', [ 'class' => 'on' ], esc_html( $args['onLabel'] ) ),
 			$this->e( 'span', [ 'class' => 'off' ], esc_html( $args['offLabel'] ) ),
 		] );

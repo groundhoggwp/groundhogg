@@ -1,5 +1,5 @@
 .groundhogg-toolbar-quick-search .gh-spinner-wrap {
-  color: rgba(16, 38, 64, 0.1);
+  color: var(--gh-dark-10);
 }
 .groundhogg-toolbar-quick-search #quick-search-input {
   width: 100%;

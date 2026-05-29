@@ -144,12 +144,12 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
       img {
         width: 180px;
-        border-radius: 4px;
+        border-radius: var(--gh-border-radius);
       }
 
       .plugin-actions {
         //background: $primary-blue-2;
-        border-top: 1px solid $primary-dark-10;
+        border-top: 1px solid var(--gh-dark-10);
         padding: 20px;
       }
 

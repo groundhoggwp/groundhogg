@@ -1,21 +1,21 @@
 @charset "UTF-8";
 .bg-dark {
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
 }
 .bg-dark-75 {
   background-color: rgba(16, 38, 64, 0.75);
 }
 .bg-dark-50 {
-  background-color: rgba(16, 38, 64, 0.5);
+  background-color: var(--gh-dark-50);
 }
 .bg-dark-30 {
-  background-color: rgba(16, 38, 64, 0.3);
+  background-color: var(--gh-dark-30);
 }
 .bg-dark-15 {
-  background-color: rgba(16, 38, 64, 0.15);
+  background-color: var(--gh-dark-15);
 }
 .bg-dark-10 {
-  background-color: rgba(16, 38, 64, 0.1);
+  background-color: var(--gh-dark-10);
 }
 
 .overflow-hidden {
@@ -223,27 +223,27 @@
 }
 
 .space-above-5 {
-  margin-top: 10px;
+  margin-top: 5px;
 }
 .space-above-10 {
   margin-top: 10px;
 }
 .space-above-20 {
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .space-below-5 {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 .space-below-10 {
   margin-bottom: 10px;
 }
 .space-below-20 {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .border-radius-5 {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .property-groups {
@@ -301,7 +301,7 @@ body.groundhogg-admin-page {
 }
 #search-results img {
   width: 25px;
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
 }
 #search-results table {
   border-collapse: collapse;
@@ -315,17 +315,17 @@ body.groundhogg-admin-page {
   padding-left: 20px;
 }
 #search-results tr:nth-child(even) {
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
 }
 #search-results tr {
   cursor: pointer;
 }
 #search-results tr:hover {
-  background-color: rgba(0, 117, 255, 0.02);
+  background-color: var(--gh-primary)-2;
 }
 
 .groundhogg-admin-page h2.nav-tab-wrapper {
-  border-bottom: 1px solid rgba(16, 38, 64, 0.15);
+  border-bottom: 1px solid var(--gh-dark-15);
   padding-top: 0;
   margin-top: 20px;
 }
@@ -333,7 +333,7 @@ body.groundhogg-admin-page {
   margin-top: 0;
 }
 .groundhogg-admin-page h2.nav-tab-wrapper .nav-tab {
-  border-radius: 3px 3px 0 0;
+  border-radius: var(--gh-border-radius) var(--gh-border-radius) 0 0;
   border: 1px solid #D3DAE0;
   border-bottom: none;
   background-color: #D3DAE0;
@@ -341,7 +341,7 @@ body.groundhogg-admin-page {
   margin-right: 5px;
 }
 .groundhogg-admin-page h2.nav-tab-wrapper .nav-tab.nav-tab-active {
-  border: 1px solid rgba(16, 38, 64, 0.15);
+  border: 1px solid var(--gh-dark-15);
   background: #F6F9FB;
   border-bottom: 1px solid #F6F9FB;
   margin-bottom: -1px;
@@ -352,7 +352,7 @@ h2.nav-tab-wrapper.gh {
   padding-top: 0;
 }
 h2.nav-tab-wrapper.gh .nav-tab {
-  border-radius: 3px 3px 0 0;
+  border-radius: var(--gh-border-radius) var(--gh-border-radius) 0 0;
   border: none;
   margin-left: 0;
   margin-right: 5px;
@@ -366,14 +366,14 @@ h2.nav-tab-wrapper.gh button {
   align-items: center;
   justify-content: center;
   padding: 3px;
-  border-radius: 3px;
+  border-radius: var(--gh-border-radius);
   background: none;
   border: none;
   cursor: pointer;
   margin: 4px 0;
 }
 h2.nav-tab-wrapper.gh button:hover {
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
 }
 h2.nav-tab-wrapper.gh button .dashicons {
   margin: 0;
@@ -451,7 +451,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
   width: fit-content;
 }
 .notes-widget .note {
-  border-top: 1px solid rgba(16, 38, 64, 0.1);
+  border-top: 1px solid var(--gh-dark-10);
   padding-top: 10px;
 }
 .notes-widget .note > .icon {
@@ -467,13 +467,13 @@ h2.nav-tab-wrapper.gh button .dashicons {
 .notes-widget .note .note-header > svg {
   width: 18px;
   height: 18px;
-  color: rgba(16, 38, 64, 0.3);
+  color: var(--gh-dark-30);
 }
 .notes-widget .note .note-header .added-by {
   font-size: 12px;
 }
 .notes-widget .note .note-header .summary {
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
 }
 .notes-widget .note .note-header input.select-note {
   display: none;
@@ -507,7 +507,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
 }
 .saved-replies-widget .reply {
   padding: 10px 30px;
-  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-top: 1px solid var(--gh-dark-15);
 }
 
 .tasks-widget {
@@ -537,7 +537,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
   padding-bottom: 10px;
 }
 .tasks-widget .task {
-  border-top: 1px solid rgba(16, 38, 64, 0.1);
+  border-top: 1px solid var(--gh-dark-10);
   padding-top: 10px;
 }
 .tasks-widget .task:has(.task-activity-timeline, .toggle-activity) {
@@ -548,7 +548,7 @@ h2.nav-tab-wrapper.gh button .dashicons {
 }
 .tasks-widget .task .task-activity-timeline {
   padding-left: 10px;
-  border-left: 2px solid rgb(16, 38, 64);
+  border-left: 2px solid var(--gh-dark);
 }
 .tasks-widget .task .task-activity-timeline .task-activity-item {
   position: relative;
@@ -556,17 +556,17 @@ h2.nav-tab-wrapper.gh button .dashicons {
 .tasks-widget .task .task-activity-timeline .task-activity-item .timeline-dot {
   position: absolute;
   left: -16px;
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
   top: 50%;
   transform: translateY(-50%);
   width: 10px;
   height: 10px;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 .tasks-widget .task .task-activity-timeline .task-activity-item .task-activity-note {
   padding: 5px 8px;
-  background-color: rgba(16, 38, 64, 0.05);
-  border-radius: 4px;
+  background-color: var(--gh-dark-5);
+  border-radius: var(--gh-border-radius);
 }
 .tasks-widget .task .task-activity-timeline .task-activity-item .task-activity-note > * {
   line-height: 1.1;
@@ -585,11 +585,11 @@ h2.nav-tab-wrapper.gh button .dashicons {
 }
 .tasks-widget .task a.associated-object:hover {
   text-decoration: none;
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
   transition: 0.2s;
 }
 .tasks-widget .task a.associated-object img {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: 18px;
   margin-right: 5px;
 }
@@ -622,10 +622,10 @@ h2.nav-tab-wrapper.gh button .dashicons {
 }
 .tasks-widget .task .task-header > svg {
   width: 18px;
-  color: rgba(16, 38, 64, 0.3);
+  color: var(--gh-dark-30);
 }
 .tasks-widget .task .task-header .summary {
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
 }
 .tasks-widget .task .task-header input.select-task {
   display: none;
@@ -714,14 +714,14 @@ body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .se
   min-height: 60px;
   box-sizing: border-box;
   position: relative;
-  gap: 20px;
+  gap: calc(var(--gh-item-padding) * 3);
 }
 .gh-header span.white-label-icon {
   height: 60px;
   padding: 10px;
   box-sizing: border-box;
   flex-shrink: 0;
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
   color: white;
   font-size: 16px;
   display: flex;
@@ -747,7 +747,7 @@ body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .se
   padding: 10px;
   box-sizing: border-box;
   flex-shrink: 0;
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
 }
 .gh-header.is-sticky {
   position: sticky;
@@ -772,7 +772,7 @@ body.modal-open .select2-dropdown, body.groundhogg-toolbar-quick-search-open .se
   font-weight: 500;
 }
 .gh-header .title-wrap h1.breadcrumbs .dashicons {
-  color: rgba(16, 38, 64, 0.3);
+  color: var(--gh-dark-30);
 }
 
 a.action-link {
@@ -782,17 +782,17 @@ a.action-link {
 }
 
 .pill {
-  background: rgba(0, 117, 255, 0.07);
-  border-radius: 5px;
+  background: var(--gh-primary-7);
+  border-radius: var(--gh-border-radius);
   display: inline-block;
   padding: 3px 8px;
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
 }
 .pill.tag {
   background-color: #f2f2f2;
 }
 .pill.tag:is(a):hover {
-  background-color: rgba(16, 38, 64, 0.15);
+  background-color: var(--gh-dark-15);
 }
 .pill.attention, .pill.yellow {
   background: rgba(255, 238, 88, 0.5);
@@ -803,7 +803,7 @@ a.action-link {
   color: rgb(83.9139344262, 42.3155737705, 3.5860655738);
 }
 .pill.notice, .pill.blue {
-  background: rgba(0, 117, 255, 0.5);
+  background: var(--gh-primary-50);
 }
 .pill.success, .pill.green {
   background: rgba(158, 206, 56, 0.5);
@@ -814,7 +814,7 @@ a.action-link {
   color: rgb(77.8536585366, 7.6463414634, 24.3292682927);
 }
 .pill.dark {
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
   color: #fff;
 }
 .pill.purple {
@@ -918,7 +918,7 @@ span.gh-text.bold {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   border: none;
 }
 .gh-panel a {
@@ -929,7 +929,7 @@ span.gh-text.bold {
 }
 .gh-panel.outlined {
   box-shadow: none;
-  border: 1px solid rgba(16, 38, 64, 0.15);
+  border: 1px solid var(--gh-dark-15);
 }
 .gh-panel.outlined:not(:last-child) {
   margin-bottom: 10px;
@@ -938,7 +938,7 @@ span.gh-text.bold {
   border-top-left-radius: 0;
 }
 .gh-panel .gh-panel-header {
-  border-bottom: 1px solid rgba(16, 38, 64, 0.1);
+  border-bottom: 1px solid var(--gh-dark-10);
   display: flex;
   justify-content: space-between;
 }
@@ -963,12 +963,12 @@ span.gh-text.bold {
 .gh-panel .gh-panel-header button.panel-handle-order-higher:hover,
 .gh-panel .gh-panel-header button.panel-handle-order-lower:hover,
 .gh-panel .gh-panel-header button.toggle-indicator:hover {
-  background: rgba(16, 38, 64, 0.05);
+  background: var(--gh-dark-5);
 }
 .gh-panel .gh-panel-header button.panel-handle-order-higher:focus,
 .gh-panel .gh-panel-header button.panel-handle-order-lower:focus,
 .gh-panel .gh-panel-header button.toggle-indicator:focus {
-  box-shadow: 0 0 0 1px rgb(0, 117, 255), 0 0 2px 1px rgba(0, 117, 255, 0.6);
+  box-shadow: var(--gh-focused-shadow);
   outline: 1px solid transparent;
 }
 .gh-panel .gh-panel-header button.panel-handle-order-higher::before,
@@ -982,7 +982,7 @@ span.gh-text.bold {
   text-decoration: none;
 }
 .gh-panel .gh-panel-header button.toggle-indicator {
-  border-top-right-radius: 5px;
+  border-top-right-radius: var(--gh-border-radius);
 }
 .gh-panel .gh-panel-header button.toggle-indicator::before {
   content: "\f142";
@@ -1066,8 +1066,9 @@ button.gh-submit {
   white-space: nowrap;
   border: none;
   color: #FFFFFF;
-  border-radius: 5px;
-  padding: 6px 10px;
+  border-radius: var(--gh-border-radius);
+  padding: 0 calc(var(--gh-item-padding) * 3);
+  line-height: var(--gh-button-line-height);
   font-size: 16px;
   font-weight: 400;
 }
@@ -1117,10 +1118,9 @@ button.gh-submit.dropdown {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  border: 1px solid rgba(16, 38, 64, 0.5);
+  border: 1px solid var(--gh-dark-50);
   background: #FFFFFF;
-  color: rgb(16, 38, 64);
-  padding: 5px 10px;
+  color: var(--gh-dark);
 }
 a.gh-button.dropdown::after, a.gh-submit.dropdown::after,
 input[type=button].gh-button.dropdown::after,
@@ -1164,6 +1164,15 @@ button.gh-button.action:hover:not(:disabled),
 button.gh-submit.action:hover:not(:disabled) {
   background: rgb(128.4717741935, 169.310483871, 41.689516129);
 }
+a.gh-button.display-flex, a.gh-submit.display-flex,
+input[type=button].gh-button.display-flex,
+input[type=button].gh-submit.display-flex,
+input[type=submit].gh-button.display-flex,
+input[type=submit].gh-submit.display-flex,
+button.gh-button.display-flex,
+button.gh-submit.display-flex {
+  align-items: center;
+}
 a.gh-button#gh-submit, a.gh-button.primary, a.gh-submit#gh-submit, a.gh-submit.primary,
 input[type=button].gh-button#gh-submit,
 input[type=button].gh-button.primary,
@@ -1177,7 +1186,8 @@ button.gh-button#gh-submit,
 button.gh-button.primary,
 button.gh-submit#gh-submit,
 button.gh-submit.primary {
-  background: rgb(0, 117, 255);
+  background: var(--gh-primary);
+  border: 1px solid var(--gh-primary);
 }
 a.gh-button#gh-submit.text, a.gh-button.primary.text, a.gh-submit#gh-submit.text, a.gh-submit.primary.text,
 input[type=button].gh-button#gh-submit.text,
@@ -1193,7 +1203,8 @@ button.gh-button.primary.text,
 button.gh-submit#gh-submit.text,
 button.gh-submit.primary.text {
   background-color: transparent;
-  color: rgb(0, 117, 255);
+  color: var(--gh-primary);
+  border: none;
 }
 a.gh-button#gh-submit:hover:not(:disabled), a.gh-button.primary:hover:not(:disabled), a.gh-submit#gh-submit:hover:not(:disabled), a.gh-submit.primary:hover:not(:disabled),
 input[type=button].gh-button#gh-submit:hover:not(:disabled),
@@ -1208,7 +1219,7 @@ button.gh-button#gh-submit:hover:not(:disabled),
 button.gh-button.primary:hover:not(:disabled),
 button.gh-submit#gh-submit:hover:not(:disabled),
 button.gh-submit.primary:hover:not(:disabled) {
-  background: rgb(0, 93.6, 204);
+  background: var(--gh-primary-darker);
 }
 a.gh-button#gh-submit:hover:not(:disabled).text, a.gh-button.primary:hover:not(:disabled).text, a.gh-submit#gh-submit:hover:not(:disabled).text, a.gh-submit.primary:hover:not(:disabled).text,
 input[type=button].gh-button#gh-submit:hover:not(:disabled).text,
@@ -1223,8 +1234,9 @@ button.gh-button#gh-submit:hover:not(:disabled).text,
 button.gh-button.primary:hover:not(:disabled).text,
 button.gh-submit#gh-submit:hover:not(:disabled).text,
 button.gh-submit.primary:hover:not(:disabled).text {
-  background-color: rgba(0, 117, 255, 0.1);
-  color: rgb(0, 117, 255);
+  background-color: var(--gh-primary-10);
+  color: var(--gh-primary);
+  border: none;
 }
 a.gh-button.grey, a.gh-submit.grey,
 input[type=button].gh-button.grey,
@@ -1233,10 +1245,9 @@ input[type=submit].gh-button.grey,
 input[type=submit].gh-submit.grey,
 button.gh-button.grey,
 button.gh-submit.grey {
-  background: rgba(16, 38, 64, 0.05);
-  color: rgb(16, 38, 64);
-  padding: 5px 10px;
-  border: 1px solid rgba(16, 38, 64, 0.5);
+  background: var(--gh-dark-5);
+  color: var(--gh-dark);
+  border: 1px solid var(--gh-dark-50);
 }
 a.gh-button.grey:hover:not(:disabled), a.gh-submit.grey:hover:not(:disabled),
 input[type=button].gh-button.grey:hover:not(:disabled),
@@ -1245,7 +1256,7 @@ input[type=submit].gh-button.grey:hover:not(:disabled),
 input[type=submit].gh-submit.grey:hover:not(:disabled),
 button.gh-button.grey:hover:not(:disabled),
 button.gh-submit.grey:hover:not(:disabled) {
-  background: rgba(16, 38, 64, 0.15);
+  background: var(--gh-dark-15);
 }
 a.gh-button.dark, a.gh-submit.dark,
 input[type=button].gh-button.dark,
@@ -1255,9 +1266,8 @@ input[type=submit].gh-submit.dark,
 button.gh-button.dark,
 button.gh-submit.dark {
   border: none;
-  background: rgb(16, 38, 64);
+  background: var(--gh-dark);
   color: #fff;
-  padding: 5px 10px;
 }
 a.gh-button.dark:hover:not(:disabled), a.gh-submit.dark:hover:not(:disabled),
 input[type=button].gh-button.dark:hover:not(:disabled),
@@ -1266,7 +1276,7 @@ input[type=submit].gh-button.dark:hover:not(:disabled),
 input[type=submit].gh-submit.dark:hover:not(:disabled),
 button.gh-button.dark:hover:not(:disabled),
 button.gh-submit.dark:hover:not(:disabled) {
-  background: rgba(16, 38, 64, 0.5);
+  background: var(--gh-dark-50);
 }
 a.gh-button.secondary, a.gh-submit.secondary,
 input[type=button].gh-button.secondary,
@@ -1275,20 +1285,20 @@ input[type=submit].gh-button.secondary,
 input[type=submit].gh-submit.secondary,
 button.gh-button.secondary,
 button.gh-submit.secondary {
-  border: 1px solid rgba(0, 117, 255, 0.6);
+  border: 1px solid var(--gh-primary-60);
   background: #FFFFFF;
-  color: rgb(0, 117, 255);
-  padding: 5px 10px;
+  color: var(--gh-primary);
 }
-a.gh-button.secondary.page-title-action:has(.dashicons), a.gh-submit.secondary.page-title-action:has(.dashicons),
-input[type=button].gh-button.secondary.page-title-action:has(.dashicons),
-input[type=button].gh-submit.secondary.page-title-action:has(.dashicons),
-input[type=submit].gh-button.secondary.page-title-action:has(.dashicons),
-input[type=submit].gh-submit.secondary.page-title-action:has(.dashicons),
-button.gh-button.secondary.page-title-action:has(.dashicons),
-button.gh-submit.secondary.page-title-action:has(.dashicons) {
+a.gh-button.secondary:has(.dashicons), a.gh-submit.secondary:has(.dashicons),
+input[type=button].gh-button.secondary:has(.dashicons),
+input[type=button].gh-submit.secondary:has(.dashicons),
+input[type=submit].gh-button.secondary:has(.dashicons),
+input[type=submit].gh-submit.secondary:has(.dashicons),
+button.gh-button.secondary:has(.dashicons),
+button.gh-submit.secondary:has(.dashicons) {
   display: flex;
-  gap: 5px;
+  align-items: center;
+  gap: calc(var(--gh-item-padding) * 1.5);
 }
 a.gh-button.secondary.text, a.gh-submit.secondary.text,
 input[type=button].gh-button.secondary.text,
@@ -1299,7 +1309,7 @@ button.gh-button.secondary.text,
 button.gh-submit.secondary.text {
   border: none;
   background: transparent;
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
 }
 a.gh-button.secondary:hover:not(:disabled), a.gh-submit.secondary:hover:not(:disabled),
 input[type=button].gh-button.secondary:hover:not(:disabled),
@@ -1308,9 +1318,9 @@ input[type=submit].gh-button.secondary:hover:not(:disabled),
 input[type=submit].gh-submit.secondary:hover:not(:disabled),
 button.gh-button.secondary:hover:not(:disabled),
 button.gh-submit.secondary:hover:not(:disabled) {
-  color: rgb(0, 93.6, 204);
-  border-color: rgb(0, 117, 255);
-  background-color: rgba(0, 117, 255, 0.02);
+  color: var(--gh-primary-darker);
+  border-color: var(--gh-primary);
+  background-color: var(--gh-primary-2);
 }
 a.gh-button.secondary:hover:not(:disabled).text, a.gh-submit.secondary:hover:not(:disabled).text,
 input[type=button].gh-button.secondary:hover:not(:disabled).text,
@@ -1320,8 +1330,8 @@ input[type=submit].gh-submit.secondary:hover:not(:disabled).text,
 button.gh-button.secondary:hover:not(:disabled).text,
 button.gh-submit.secondary:hover:not(:disabled).text {
   border: none;
-  background: rgba(16, 38, 64, 0.1);
-  color: rgb(16, 38, 64);
+  background: var(--gh-dark-10);
+  color: var(--gh-dark);
 }
 a.gh-button.danger, a.gh-submit.danger,
 input[type=button].gh-button.danger,
@@ -1368,10 +1378,14 @@ input[type=submit].gh-button.dashicon,
 input[type=submit].gh-submit.dashicon,
 button.gh-button.dashicon,
 button.gh-submit.dashicon {
-  border: 1px solid rgba(16, 38, 64, 0.5);
-  color: rgb(16, 38, 64);
+  border: 1px solid var(--gh-dark-50);
+  color: var(--gh-dark);
   background-color: #FFF;
-  padding: 4px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1/1;
+  line-height: 1;
 }
 a.gh-button.dashicon.filled, a.gh-submit.dashicon.filled,
 input[type=button].gh-button.dashicon.filled,
@@ -1380,7 +1394,7 @@ input[type=submit].gh-button.dashicon.filled,
 input[type=submit].gh-submit.dashicon.filled,
 button.gh-button.dashicon.filled,
 button.gh-submit.dashicon.filled {
-  background: rgba(16, 38, 64, 0.1);
+  background: var(--gh-dark-10);
 }
 a.gh-button.dashicon:hover, a.gh-submit.dashicon:hover,
 input[type=button].gh-button.dashicon:hover,
@@ -1389,7 +1403,7 @@ input[type=submit].gh-button.dashicon:hover,
 input[type=submit].gh-submit.dashicon:hover,
 button.gh-button.dashicon:hover,
 button.gh-submit.dashicon:hover {
-  background-color: rgba(16, 38, 64, 0.1);
+  background-color: var(--gh-dark-10);
 }
 a.gh-button.icon, a.gh-submit.icon,
 input[type=button].gh-button.icon,
@@ -1398,9 +1412,12 @@ input[type=submit].gh-button.icon,
 input[type=submit].gh-submit.icon,
 button.gh-button.icon,
 button.gh-submit.icon {
-  padding: 7px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  aspect-ratio: 1/1;
+  line-height: 1;
+  padding: calc(var(--gh-item-padding) * 2);
 }
 a.gh-button.icon svg, a.gh-submit.icon svg,
 input[type=button].gh-button.icon svg,
@@ -1430,7 +1447,16 @@ input[type=submit].gh-submit.big,
 button.gh-button.big,
 button.gh-submit.big {
   font-size: 24px;
-  padding: 15px 32px;
+  padding: 0 calc(var(--gh-item-padding) * 5);
+}
+a.gh-button.big .gh-spinner, a.gh-submit.big .gh-spinner,
+input[type=button].gh-button.big .gh-spinner,
+input[type=button].gh-submit.big .gh-spinner,
+input[type=submit].gh-button.big .gh-spinner,
+input[type=submit].gh-submit.big .gh-spinner,
+button.gh-button.big .gh-spinner,
+button.gh-submit.big .gh-spinner {
+  width: 20px;
 }
 a.gh-button.medium, a.gh-submit.medium,
 input[type=button].gh-button.medium,
@@ -1440,7 +1466,7 @@ input[type=submit].gh-submit.medium,
 button.gh-button.medium,
 button.gh-submit.medium {
   font-size: 18px;
-  padding: 11px 22px;
+  padding: 0 calc(var(--gh-item-padding) * 4);
 }
 a.gh-button.medium.icon, a.gh-submit.medium.icon,
 input[type=button].gh-button.medium.icon,
@@ -1449,7 +1475,16 @@ input[type=submit].gh-button.medium.icon,
 input[type=submit].gh-submit.medium.icon,
 button.gh-button.medium.icon,
 button.gh-submit.medium.icon {
-  gap: 10px;
+  gap: calc(var(--gh-item-padding) * 3);
+}
+a.gh-button.medium .gh-spinner, a.gh-submit.medium .gh-spinner,
+input[type=button].gh-button.medium .gh-spinner,
+input[type=button].gh-submit.medium .gh-spinner,
+input[type=submit].gh-button.medium .gh-spinner,
+input[type=submit].gh-submit.medium .gh-spinner,
+button.gh-button.medium .gh-spinner,
+button.gh-submit.medium .gh-spinner {
+  width: 18px;
 }
 a.gh-button.small, a.gh-submit.small,
 input[type=button].gh-button.small,
@@ -1459,7 +1494,6 @@ input[type=submit].gh-submit.small,
 button.gh-button.small,
 button.gh-submit.small {
   font-size: 14px;
-  padding: 4px 6px;
 }
 a.gh-button.bold, a.gh-submit.bold,
 input[type=button].gh-button.bold,
@@ -1486,10 +1520,11 @@ input[type=submit].gh-button .gh-spinner,
 input[type=submit].gh-submit .gh-spinner,
 button.gh-button .gh-spinner,
 button.gh-submit .gh-spinner {
-  display: block;
+  display: inline-block;
+  top: 6px;
   margin: 0 auto;
-  height: 15px;
-  width: 15px;
+  aspect-ratio: 1;
+  width: 16px;
   border: 5px solid rgba(255, 255, 255, 0.4);
   border-bottom-color: #ffffff;
   border-radius: 50%;
@@ -1520,7 +1555,7 @@ button.gh-submit .gh-spinner {
   display: flex;
   flex-direction: column;
   background: #FFFFFF;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   min-width: 170px;
 }
@@ -1562,12 +1597,12 @@ button.gh-submit .gh-spinner {
 }
 .search-options-widget-wrap .search-options-widget .search-options .option {
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: var(--gh-border-radius);
   padding: 2px 5px;
   margin: 0;
 }
 .search-options-widget-wrap .search-options-widget .search-options .option.focused, .search-options-widget-wrap .search-options-widget .search-options .option:hover {
-  background: rgb(0, 117, 255);
+  background: var(--gh-primary);
   color: #FFFFFF;
 }
 
@@ -1581,7 +1616,7 @@ button.gh-submit .gh-spinner {
   padding: 10px 20px;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   z-index: 9999999;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 .gh-dialog.gh-dialog-success {
   color: #FFFFFF;
@@ -1597,7 +1632,7 @@ button.gh-submit .gh-spinner {
 }
 .gh-dialog.gh-dialog-info {
   color: #FFFFFF;
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
 }
 
 #modal-log-details {
@@ -1702,7 +1737,7 @@ button.gh-submit .gh-spinner {
 }
 .gh-modal-overlay {
   position: fixed;
-  background: rgba(16, 38, 64, 0.5);
+  background: var(--gh-dark-50);
   bottom: 0;
   left: 0;
   right: 0;
@@ -1724,7 +1759,7 @@ button.gh-submit .gh-spinner {
 .gh-modal-dialog {
   box-sizing: border-box;
   background: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   position: relative;
   max-width: calc(100vw - 100px);
   max-height: calc(92vh - 64px);
@@ -1828,6 +1863,16 @@ input.ui-autocomplete-input.focus-visible {
 .input-wrap textarea.bigger {
   flex-grow: 2;
 }
+.gh-input-group input[type=number], .gh-input-group select[type=number], .gh-input-group textarea[type=number],
+.input-wrap input[type=number],
+.input-wrap select[type=number],
+.input-wrap textarea[type=number] {
+  padding-right: 0;
+}
+.gh-input-group.wrap,
+.input-wrap.wrap {
+  flex-wrap: wrap;
+}
 .gh-input-group > *:not(:first-child),
 .input-wrap > *:not(:first-child) {
   border-left: 0 !important;
@@ -1896,6 +1941,7 @@ p.error,
   border-radius: 0;
   margin: 0;
   flex-grow: 1;
+  min-height: auto;
 }
 .gh-input-repeater .gh-input-repeater-row .input-wrap {
   width: 100%;
@@ -1910,16 +1956,19 @@ p.error,
   border-radius: 0;
 }
 .gh-input-repeater .gh-input-repeater-row span.handle {
-  border-bottom: 1px solid #8c8f94;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--gh-border-gray);
   border-radius: 0;
-  padding: 6px;
+  line-height: var(--gh-item-line-height);
   border-top-width: 0;
   background-color: #FFFFFF;
+  padding: 0 var(--gh-item-padding);
 }
 .gh-input-repeater .gh-input-repeater-row button {
-  border: 1px solid #8c8f94;
+  border: 1px solid var(--gh-border-gray);
   border-radius: 0;
-  padding: 6px;
+  line-height: var(--gh-item-line-height);
   border-top-width: 0;
 }
 .gh-input-repeater .gh-input-repeater-row button:not(:last-child) {
@@ -1928,23 +1977,23 @@ p.error,
 .gh-input-repeater .gh-input-repeater-row:first-child > select:first-child,
 .gh-input-repeater .gh-input-repeater-row:first-child > button:first-child,
 .gh-input-repeater .gh-input-repeater-row:first-child > input:first-child {
-  border-top-left-radius: 4px;
+  border-top-left-radius: var(--gh-border-radius);
 }
 .gh-input-repeater .gh-input-repeater-row:first-child span.handle {
-  border-top: 1px solid #8c8f94;
+  border-top: 1px solid var(--gh-border-gray);
 }
 .gh-input-repeater .gh-input-repeater-row:first-child button {
   border-top-width: 1px;
 }
 .gh-input-repeater .gh-input-repeater-row:first-child > button:last-child {
-  border-top-right-radius: 4px;
+  border-top-right-radius: var(--gh-border-radius);
 }
 .gh-input-repeater .gh-input-repeater-row:not(:first-child) * {
   border-top-width: 0;
 }
 .gh-input-repeater .gh-input-repeater-row:nth-last-child(2) > select:first-child,
 .gh-input-repeater .gh-input-repeater-row:nth-last-child(2) > input:first-child {
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: var(--gh-border-radius);
 }
 .gh-input-repeater .gh-input-repeater-row-add {
   display: flex;
@@ -1953,14 +2002,21 @@ p.error,
   width: 100%;
 }
 .gh-input-repeater .gh-input-repeater-row-add button {
-  padding: 5px 6px;
-  border: 1px solid #8c8f94;
+  line-height: var(--gh-item-line-height);
+  aspect-ratio: 1/1;
+  border: 1px solid var(--gh-border-gray);
   border-top: none;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 var(--gh-border-radius) var(--gh-border-radius);
 }
 .gh-input-repeater .gh-input-repeater-row-add:first-child button {
-  border-top: 1px solid #8c8f94;
-  border-radius: 4px 4px 4px 4px;
+  border-top: 1px solid var(--gh-border-gray);
+  border-radius: var(--gh-border-radius);
+}
+.gh-input-repeater .gh-color-picker {
+  flex-grow: 1;
+}
+.gh-input-repeater .gh-color-picker button {
+  border-right-width: 0;
 }
 
 button:has(.gh-dropdown-menu) {
@@ -1976,7 +2032,7 @@ button:has(.gh-dropdown-menu) {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   min-width: 120px;
-  border-radius: 5px 0 5px 5px;
+  border-radius: var(--gh-border-radius) 0 var(--gh-border-radius) var(--gh-border-radius);
   border: 1px solid #8c8f94;
   padding: 5px;
   gap: 5px;
@@ -1992,7 +2048,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-dropdown-menu-item {
   padding: 5px 10px;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2001,7 +2057,7 @@ button:has(.gh-dropdown-menu) {
   gap: 10px;
 }
 .gh-dropdown-menu-item:hover {
-  background-color: rgba(16, 38, 64, 0.1);
+  background-color: var(--gh-dark-10);
   cursor: pointer;
 }
 
@@ -2013,7 +2069,7 @@ button:has(.gh-dropdown-menu) {
 }
 .gh-step-nav .gh-step-nav-join {
   width: 100%;
-  border-top: 1px solid rgb(0, 117, 255);
+  border-top: 1px solid var(--gh-primary);
   border-bottom: none;
 }
 .gh-step-nav button:disabled + hr.gh-step-nav-join {
@@ -2038,16 +2094,16 @@ button:has(.gh-dropdown-menu) {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid rgba(16, 38, 64, 0.5);
+  border: 1px solid var(--gh-dark-50);
   background-color: #FFF;
 }
 .gh-step-nav .gh-step-nav-step-num.current .gh-step-nav-step-num-label {
-  color: rgb(0, 117, 255);
+  color: var(--gh-primary);
 }
 .gh-step-nav .gh-step-nav-step-num.current .gh-step-nav-step-num-circle {
   color: #FFFFFF;
-  background-color: rgb(0, 117, 255);
-  border-color: rgb(0, 117, 255);
+  background-color: var(--gh-primary);
+  border-color: var(--gh-primary);
   font-weight: 500;
 }
 
@@ -2060,13 +2116,13 @@ button:has(.gh-dropdown-menu) {
 .gh-tags button.add-tag {
   padding-left: 3px;
   padding-right: 3px;
-  border-radius: 3px;
+  border-radius: var(--gh-border-radius);
   background: none;
   border: none;
   cursor: pointer;
 }
 .gh-tags button.add-tag:hover {
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
 }
 .gh-tags button.add-tag .dashicons {
   margin: 0;
@@ -2076,11 +2132,11 @@ button:has(.gh-dropdown-menu) {
   background: #f2f2f2;
   padding: 3px 9px;
   gap: 5px;
-  border-radius: 3px;
+  border-radius: var(--gh-border-radius);
   font-size: 12px;
   display: flex;
   align-items: center;
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
 }
 .gh-tags a.gh-tag.remove,
 .gh-tags span.gh-tag.remove {
@@ -2096,11 +2152,11 @@ button:has(.gh-dropdown-menu) {
 .gh-tags span.gh-tag .dashicons {
   margin-right: -6px;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: var(--gh-border-radius);
 }
 .gh-tags a.gh-tag .dashicons:hover,
 .gh-tags span.gh-tag .dashicons:hover {
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
 }
 
 .gh-rows-and-columns {
@@ -2134,15 +2190,15 @@ button:has(.gh-dropdown-menu) {
 #select-email-preview {
   width: 100%;
   height: 300px;
-  border-radius: 5px;
-  border: 1px solid rgba(16, 38, 64, 0.5);
+  border-radius: var(--gh-border-radius);
+  border: 1px solid var(--gh-dark-50);
 }
 
 #gh-send-broadcast-form #gh-broadcast-email-preview {
   width: 100%;
   height: 300px;
-  border-radius: 5px;
-  border: 1px solid rgba(16, 38, 64, 0.5);
+  border-radius: var(--gh-border-radius);
+  border: 1px solid var(--gh-dark-50);
 }
 #gh-send-broadcast-form label {
   display: inline-block;
@@ -2151,8 +2207,8 @@ button:has(.gh-dropdown-menu) {
 
 .gh-progress-bar {
   min-width: 300px;
-  background-color: rgba(0, 117, 255, 0.1);
-  border-radius: 5px;
+  background-color: var(--gh-primary-10);
+  border-radius: var(--gh-border-radius);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -2165,7 +2221,7 @@ button:has(.gh-dropdown-menu) {
 .gh-progress-bar .gh-progress-bar-fill {
   box-sizing: border-box;
   width: 1px;
-  background-color: rgb(0, 117, 255);
+  background-color: var(--gh-primary);
   padding: 8px;
   display: flex;
   align-items: center;
@@ -2204,15 +2260,16 @@ button:has(.gh-dropdown-menu) {
   width: max-content;
   display: none;
   position: absolute;
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
   color: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   z-index: 999999;
   padding: 5px 8px;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   font-size: 13px;
   font-weight: normal;
   font-family: "system-ui", Arial, "Helvetica Neue", Helvetica, sans-serif;
+  line-height: 1.4;
 }
 .gh-has-tooltip .gh-tooltip a,
 :has(> .gh-tooltip) .gh-tooltip a {
@@ -2238,7 +2295,7 @@ button:has(.gh-dropdown-menu) {
   width: 0;
   height: 0;
   border-top: 7px solid transparent;
-  border-right: 7px solid rgb(16, 38, 64);
+  border-right: 7px solid var(--gh-dark);
   border-bottom: 7px solid transparent;
   transform: translate(0, -50%);
   top: 50%;
@@ -2258,7 +2315,7 @@ button:has(.gh-dropdown-menu) {
   width: 0;
   height: 0;
   border-top: 7px solid transparent;
-  border-right: 7px solid rgb(16, 38, 64);
+  border-right: 7px solid var(--gh-dark);
   border-bottom: 7px solid transparent;
   transform: translate(0, -50%) rotate(180deg);
   top: 50%;
@@ -2279,7 +2336,7 @@ button:has(.gh-dropdown-menu) {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid rgb(16, 38, 64);
+  border-bottom: 7px solid var(--gh-dark);
   transform: translate(-50%, 0) rotate(180deg);
   bottom: -5px;
   left: 50%;
@@ -2299,7 +2356,7 @@ button:has(.gh-dropdown-menu) {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid rgb(16, 38, 64);
+  border-bottom: 7px solid var(--gh-dark);
   transform: translate(-50%, 0);
   top: -5px;
   left: 50%;
@@ -2318,7 +2375,7 @@ button:has(.gh-dropdown-menu) {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid rgb(16, 38, 64);
+  border-bottom: 7px solid var(--gh-dark);
   transform: translate(-50%, 0);
   top: -4px;
   right: 5%;
@@ -2391,7 +2448,7 @@ button:has(.gh-dropdown-menu) {
   width: 500px;
 }
 .contact-quick-edit .gh-header img {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .gh-form-fields {
@@ -2486,7 +2543,7 @@ button:has(.gh-dropdown-menu) {
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid;
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
 }
 .gh-form-wrapper .gh-message-wrapper.gh-form-errors-wrapper {
   color: rgb(147.512195122, 14.487804878, 46.0975609756);
@@ -2524,13 +2581,13 @@ button:has(.gh-dropdown-menu) {
 }
 
 .gh-media-uploader .droppable-handler {
-  border: dashed 5px rgba(16, 38, 64, 0.5);
+  border: dashed 5px var(--gh-dark-50);
   text-align: center;
   padding: 40px;
 }
 .gh-media-uploader .droppable-handler.dragover {
-  border-color: rgb(0, 117, 255);
-  background: rgba(0, 117, 255, 0.2);
+  border-color: var(--gh-primary);
+  background: var(--gh-primary-20);
 }
 .gh-media-uploader #uploaded-files:not(:empty),
 .gh-media-uploader #uploading-files:not(:empty) {
@@ -2599,30 +2656,30 @@ button:has(.gh-dropdown-menu) {
   }
 }
 .gh-color-picker {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: stretch;
 }
 .gh-color-picker .current-color {
-  width: 28px;
-  height: 28px;
-  border-radius: 5px 0 0 5px;
-  border: 1px solid rgba(16, 38, 64, 0.3);
+  border-radius: var(--gh-border-radius) 0 0 var(--gh-border-radius);
+  border: 1px solid var(--gh-dark-30);
   border-right-width: 0;
-  padding: 7px;
-  box-sizing: border-box;
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
+  aspect-ratio: 1/1;
+  height: 100%;
+  position: relative;
 }
 .gh-color-picker .current-color::after {
+  position: absolute;
+  inset: calc(var(--gh-item-padding) * 2);
   display: block;
   box-sizing: border-box;
   content: "";
-  height: 100%;
-  width: 100%;
-  border-radius: 3px;
+  border-radius: var(--gh-border-radius);
   background-color: var(--color);
 }
 .gh-color-picker .current-color.not-set::after {
-  background-color: rgba(16, 38, 64, 0.1);
+  background-color: var(--gh-dark-10);
 }
 .gh-color-picker button.gh-button {
   border-top-left-radius: 0;
@@ -2632,11 +2689,13 @@ button:has(.gh-dropdown-menu) {
 .gh-color-picker-grid {
   display: grid;
   grid-template-areas: "input clear" "picker picker";
-  align-items: flex-start;
+  align-items: stretch;
+  gap: var(--gh-item-padding);
 }
 .gh-color-picker-grid input {
   grid-area: input;
   width: 145px;
+  margin: 0;
 }
 .gh-color-picker-grid button {
   grid-area: clear;
@@ -2656,10 +2715,10 @@ button:has(.gh-dropdown-menu) {
   display: flex;
   flex-direction: column;
   border-top: none;
-  border-color: #2271b1;
-  box-shadow: 0 0 0 1px #2271b1;
+  border-color: var(--gh-primary);
+  box-shadow: var(--gh-focused-shadow);
   outline: 2px solid transparent;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 var(--gh-border-radius) var(--gh-border-radius);
   background: #FFF;
   overflow-y: auto;
 }
@@ -2674,33 +2733,37 @@ button:has(.gh-dropdown-menu) {
   overflow: hidden;
 }
 .gh-autocomplete-results a.pointer {
-  color: rgb(16, 38, 64);
-  background: rgba(0, 117, 255, 0.07);
+  color: var(--gh-dark);
+  background: var(--gh-primary-7);
 }
 
 .gh-picker {
-  min-height: 31px;
   background-color: #fff;
   position: relative;
-  border: 1px solid #8c8f94;
-  border-radius: 5px;
+  border: 1px solid var(--gh-border-gray);
+  border-radius: var(--gh-border-radius);
+}
+.gh-picker * {
+  line-height: var(--gh-item-line-height);
 }
 .gh-picker.options-visible {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+  border-radius: var(--gh-border-radius) var(--gh-border-radius) 0 0;
+}
+.gh-picker.options-visible:has(.gh-picker-options-above) {
+  border-radius: 0 0 var(--gh-border-radius) var(--gh-border-radius);
 }
 .gh-picker.options-visible .gh-picker-options {
   display: block;
 }
 .gh-picker .gh-picker-label {
-  padding: 3px;
+  padding: 0 var(--gh-item-padding);
 }
 .gh-picker .gh-picker-selected {
-  padding: 3px;
+  padding: var(--gh-item-padding);
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 3px;
+  gap: var(--gh-item-padding);
 }
 .gh-picker .gh-picker-selected.single .gh-picker-item {
   background: none;
@@ -2719,8 +2782,7 @@ button:has(.gh-dropdown-menu) {
   flex-grow: 1;
   width: 150px;
   border: none;
-  min-height: 0;
-  line-height: 1.7;
+  min-height: auto;
 }
 .gh-picker .gh-picker-selected > .gh-picker-search:focus {
   border: none;
@@ -2728,31 +2790,31 @@ button:has(.gh-dropdown-menu) {
   outline: none;
 }
 .gh-picker .gh-picker-selected > .gh-picker-item {
-  padding: 3px 3px 3px 7px;
-  background: rgba(16, 38, 64, 0.1);
-  border-radius: 3px;
+  padding: 0 var(--gh-item-padding) 0 calc(var(--gh-item-padding) * 1.5);
+  background: var(--gh-dark-10);
+  border-radius: calc(var(--gh-border-radius) / 2);
   display: flex;
-  gap: 5px;
+  gap: calc(var(--gh-item-padding) * 1.5);
   align-items: center;
   min-width: 0;
 }
 .gh-picker .gh-picker-selected > .gh-picker-item.is-invalid {
-  background: rgba(233, 31, 79, 0.1);
-  color: rgb(193.9512195122, 19.0487804878, 60.6097560976);
+  background: var(--gh-error-red-10);
+  color: var(--gh-error-red-dark);
 }
 .gh-picker .gh-picker-selected > .gh-picker-item .gh-picker-item-delete {
   display: inline-block;
-  padding: 3px;
+  padding: var(--gh-item-padding);
   line-height: 1;
   cursor: pointer;
 }
 .gh-picker .gh-picker-selected > .gh-picker-item .gh-picker-item-delete:hover {
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
   font-weight: bold;
 }
 .gh-picker:focus-within {
-  border-color: #2271b1;
-  box-shadow: 0 0 0 1px #2271b1;
+  border-color: var(--gh-primary);
+  box-shadow: var(--gh-focused-shadow);
   outline: 2px solid transparent;
 }
 .gh-picker .gh-picker-options {
@@ -2760,41 +2822,46 @@ button:has(.gh-dropdown-menu) {
   z-index: 9999;
   display: none;
   border-top: none;
-  border-color: #2271b1;
-  box-shadow: 0 0 0 1px #2271b1;
+  border-color: var(--gh-primary);
+  box-shadow: var(--gh-focused-shadow);
   outline: 2px solid transparent;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 var(--gh-border-radius) var(--gh-border-radius);
   background: #FFF;
   overflow-y: auto;
+}
+.gh-picker .gh-picker-options.gh-picker-options-above {
+  border-radius: var(--gh-border-radius) var(--gh-border-radius) 0 0;
 }
 .gh-picker .gh-picker-options > .gh-picker-search {
   margin: 5px;
   position: relative;
   width: calc(100% - 10px);
-  line-height: 1.7;
+  line-height: var(--gh-option-line-height);
 }
 .gh-picker .gh-picker-options .gh-picker-no-options {
   font-size: 14px;
-  padding: 5px 10px;
+  padding: 0 calc(var(--gh-item-padding) * 2);
+  line-height: var(--gh-option-line-height);
 }
 .gh-picker .gh-picker-options .gh-picker-option {
   cursor: pointer;
   font-size: 14px;
-  padding: 5px 10px;
+  padding: 0 calc(var(--gh-item-padding) * 2);
+  line-height: var(--gh-option-line-height);
   text-overflow: ellipsis;
   overflow: hidden;
 }
 .gh-picker .gh-picker-options .gh-picker-option:hover {
-  color: rgb(16, 38, 64);
-  background: rgba(0, 117, 255, 0.07);
+  color: var(--gh-dark);
+  background: var(--gh-primary-7);
 }
 
 .image-picker .image-input-preview {
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
+  border-top-right-radius: var(--gh-border-radius);
+  border-top-left-radius: var(--gh-border-radius);
   border: 1px solid #8c8f94;
   border-bottom: none;
-  background-color: rgba(16, 38, 64, 0.1);
+  background-color: var(--gh-dark-10);
   cursor: pointer;
   transition: 0.4s;
   background-size: contain;
@@ -2806,7 +2873,7 @@ button:has(.gh-dropdown-menu) {
   box-sizing: border-box;
 }
 .image-picker .image-input-preview:hover {
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
   padding: 24px;
 }
 .image-picker .image-input-preview + .gh-input-group input {
@@ -2818,12 +2885,12 @@ button:has(.gh-dropdown-menu) {
 
 #remote-notifications .gh-button.dismiss {
   background: transparent;
-  color: rgb(16, 38, 64);
+  color: var(--gh-dark);
   margin: 3px;
   padding: 4px 4px;
 }
 #remote-notifications .gh-button.dismiss:hover {
-  background: rgba(16, 38, 64, 0.1);
+  background: var(--gh-dark-10);
 }
 #remote-notifications p.all-dismissed {
   font-size: 16px;
@@ -2832,10 +2899,10 @@ button:has(.gh-dropdown-menu) {
 
 @keyframes skeleton-loading {
   0% {
-    background-color: rgba(16, 38, 64, 0.05);
+    background-color: var(--gh-dark-5);
   }
   100% {
-    background-color: rgba(16, 38, 64, 0.3);
+    background-color: var(--gh-dark-30);
   }
 }
 .skeleton-loading {
@@ -2866,10 +2933,10 @@ button:has(.gh-dropdown-menu) {
   gap: 3px;
 }
 .contact-list-item:last-of-type {
-  border-bottom: 1px solid rgba(16, 38, 64, 0.1);
+  border-bottom: 1px solid var(--gh-dark-10);
 }
 .contact-list-item .subscribed {
-  color: rgba(16, 38, 64, 0.3);
+  color: var(--gh-dark-30);
 }
 .contact-list-item .name {
   font-weight: 500;
@@ -2892,7 +2959,7 @@ button:has(.gh-dropdown-menu) {
   padding: 2px 5px;
 }
 .contact-list-item img.avatar {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: 30px;
   height: 30px;
 }
@@ -2916,11 +2983,11 @@ button:has(.gh-dropdown-menu) {
 }
 .contact-list-item {
   padding: 10px 10px 10px 20px;
-  border-top: 1px solid rgba(16, 38, 64, 0.1);
+  border-top: 1px solid var(--gh-dark-10);
 }
 
 .gh-striped .row:nth-child(odd) {
-  background-color: rgba(0, 117, 255, 0.02);
+  background-color: var(--gh-primary-2);
 }
 
 .relationship-editor h4 {
@@ -2950,10 +3017,10 @@ div:has(> button.hide-panel) > button.hide-panel {
   align-items: center;
   border: none;
   background-color: transparent;
-  border-radius: 3px;
+  border-radius: calc(var(--gh-border-radius) / 2);
 }
 div:has(> button.hide-panel) > button.hide-panel:hover {
-  background-color: rgba(16, 38, 64, 0.15);
+  background-color: var(--gh-dark-15);
 }
 
 .gh-accordion {
@@ -2963,12 +3030,12 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
 }
 .gh-accordion-item {
   background-color: #fff;
-  border-radius: 3px;
+  border-radius: calc(var(--gh-border-radius) / 2);
   padding: 10px;
   padding-left: 12px;
 }
 .gh-accordion-item.outlined {
-  border: 1px solid rgba(16, 38, 64, 0.15);
+  border: 1px solid var(--gh-dark-15);
 }
 .gh-accordion-item.expanded .gh-accordion-item-title {
   font-weight: 500;
@@ -2987,22 +3054,24 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
 
 .gh-dom-picker {
   display: grid;
-  grid-template-columns: repeat(7, 30px);
-  grid-template-rows: repeat(5, 30px);
-  gap: 3px;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: var(--gh-item-padding);
+  width: min-content;
 }
 .gh-dom-picker .gh-dom-date {
-  border-radius: 4px;
-  background-color: rgba(16, 38, 64, 0.05);
+  border-radius: var(--gh-border-radius);
+  background-color: var(--gh-dark-5);
   border: none;
-  outline: 1px solid rgb(16, 38, 64);
-  padding: 3px;
+  outline: 1px solid var(--gh-dark);
+  aspect-ratio: 1/1;
+  line-height: var(--gh-item-line-height);
 }
 .gh-dom-picker .gh-dom-date:hover {
-  background-color: rgba(16, 38, 64, 0.15);
+  background-color: var(--gh-dark-15);
 }
 .gh-dom-picker .gh-dom-date.selected {
-  background-color: rgb(16, 38, 64);
+  background-color: var(--gh-dark);
   color: #fff;
 }
 
@@ -3013,12 +3082,12 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
   align-items: center;
   padding: 5px 5px 5px 8px;
   border-color: rgb(245, 129, 21);
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
   border-width: 1px;
   border-style: solid;
 }
 .requires-pro-features-wrapper .pro-pill {
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
   display: inline-block;
   padding: 3px 8px;
   color: #FFF;

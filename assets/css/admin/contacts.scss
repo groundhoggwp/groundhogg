@@ -25,7 +25,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 .row-title {
   img {
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
   }
 }
 
@@ -88,7 +88,7 @@ span#search-name {
 
   &:hover{
     background: $primary-dark-1;
-    border-color: $primary-dark-50;
+    border-color: var(--gh-dark-50);
   }
 }
 

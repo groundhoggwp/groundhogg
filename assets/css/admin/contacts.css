@@ -1,6 +1,5 @@
-@charset "UTF-8";
 .row-title img {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 #wpbody-content .inline-edit-row-contact .inline-edit-col-left {
@@ -61,7 +60,7 @@ span#search-name {
 }
 #search-panel button.enable-filters:hover {
   background: rgba(16, 38, 64, 0.01);
-  border-color: rgba(16, 38, 64, 0.5);
+  border-color: var(--gh-dark-50);
 }
 
 .search-param {
@@ -164,7 +163,7 @@ td.column-tags_col .tags .tag {
 }
 
 .more-actions:after {
-  content: "";
+  content: "\f347";
   display: inline-block;
   font: normal 18px/1 dashicons;
   vertical-align: middle;
@@ -177,7 +176,7 @@ td.column-tags_col .tags .tag {
 
 td.address .time-zone:before,
 td.address .ip-address:before {
-  content: "";
+  content: "\f11f";
   display: inline-block;
   font: normal 13px/1 dashicons;
   speak: never;
@@ -189,7 +188,7 @@ td.address .ip-address:before {
 }
 
 td.address .time-zone:before {
-  content: "";
+  content: "\f469";
 }
 
 td.tel_numbers .dashicons {
@@ -214,28 +213,24 @@ td.tel_numbers .dashicons {
 
 @media only screen and (min-width: 782px) {
   .wp-list-table th#email,
-.wp-list-table th#tags_col {
+  .wp-list-table th#tags_col {
     width: 400px;
   }
-
   .wp-list-table th,
-.wp-list-table #first_name,
-.wp-list-table #user_id,
-.wp-list-table #owner_id,
-.wp-list-table #tel_numbers,
-.wp-list-table #last_name {
+  .wp-list-table #first_name,
+  .wp-list-table #user_id,
+  .wp-list-table #owner_id,
+  .wp-list-table #tel_numbers,
+  .wp-list-table #last_name {
     width: 125px;
   }
-
   .wp-list-table #birthday,
-.wp-list-table #date_created {
+  .wp-list-table #date_created {
     width: 200px;
   }
-
   .wp-list-table #address {
     width: 300px;
   }
-
   .table-scroll {
     position: relative;
     width: 100%;
@@ -243,54 +238,47 @@ td.tel_numbers .dashicons {
     margin: auto;
     overflow-y: auto;
   }
-
   .table-scroll table {
     width: 100%;
     min-width: 1280px;
     margin: auto;
   }
-
   .table-wrap {
     position: relative;
   }
-
   .table-scroll thead th {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
   }
-
   /* safari and ios need the tfoot itself to be position:sticky also */
   .table-scroll tfoot,
-.table-scroll tfoot th,
-.table-scroll tfoot td {
+  .table-scroll tfoot th,
+  .table-scroll tfoot td {
     position: -webkit-sticky;
     position: sticky;
     bottom: 0;
     z-index: 2;
   }
-
   tbody th.check-column,
-tfoot td.check-column,
-thead td.check-column {
+  tfoot td.check-column,
+  thead td.check-column {
     position: -webkit-sticky;
     position: sticky;
     left: 0;
     z-index: 4;
   }
-
   thead th.column-email,
-tfoot th.column-email,
-tbody td.column-email {
+  tfoot th.column-email,
+  tbody td.column-email {
     position: -webkit-sticky;
     position: sticky;
     left: 33px;
     z-index: 4;
   }
-
   td.check-column,
-thead th.column-email,
-tfoot th.column-email {
+  thead th.column-email,
+  tfoot th.column-email {
     background: #ffffff;
   }
 }
@@ -301,15 +289,12 @@ tfoot th.column-email {
     flex-direction: column;
     gap: 20px;
   }
-
   #load-saved-search {
     margin-bottom: 0;
   }
-
   .tablenav.top .gh-actions {
     display: none;
   }
-
   #search-panel {
     flex-direction: column;
     gap: 20px;

@@ -29,20 +29,20 @@ $background-color: #F6F9FB;
 #search-loading-dots-pill {
   display: inline-block;
   background: $secondary-purple;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   padding: 1px 5px;
   color: #FFFFFF;
 }
 
 .filter-placeholder {
-  background: $primary-dark;
+  background: var(--gh-dark);
   opacity: 0.2;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .include-filters-wrap, .exclude-filters-wrap {
   border: 1px solid $secondary-purple;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   padding: 20px 10px 10px 10px;
   position: relative;
 
@@ -53,7 +53,7 @@ $background-color: #F6F9FB;
   .include-block, .exclude-block {
     position: absolute;
     background: $secondary-purple;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     left: 10px;
     top: -10px;
     padding: 1px 5px;
@@ -65,7 +65,7 @@ $background-color: #F6F9FB;
   .filters-loading {
     display: inline-block;
     background: $secondary-purple;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     padding: 1px 5px;
     color: #FFFFFF;
   }
@@ -102,7 +102,7 @@ $background-color: #F6F9FB;
       display: inline-block;
       position: absolute;
       background: $secondary-purple;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
       left: 10px;
       top: -10px;
       padding: 1px 5px;
@@ -131,7 +131,7 @@ $background-color: #F6F9FB;
       //padding: 5px 8px;
       background: #FFFFFF;
       border: 1px solid #8c8f94;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
     }
   }
 
@@ -146,7 +146,7 @@ $background-color: #F6F9FB;
       flex-direction: column;
       gap: 5px;
       background: #FFFFFF;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
       box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 
       &.mount-from-bottom {
@@ -202,7 +202,7 @@ $background-color: #F6F9FB;
       padding: 5px 8px;
       background: #FFFFFF;
       border: 1px solid #8c8f94;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
       cursor: pointer;
       display: flex;
       gap: 5px;
@@ -224,7 +224,7 @@ $background-color: #F6F9FB;
         margin-right: -3px;
 
         &:hover{
-          background: $primary-dark-5;
+          background: var(--gh-dark-5);
           border-radius: 3px;
         }
       }
@@ -243,7 +243,7 @@ $background-color: #F6F9FB;
         gap: 5px;
         position: absolute;
         background: #FFFFFF;
-        border-radius: 5px;
+        border-radius: var(--gh-border-radius);
         z-index: 999;
         box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 

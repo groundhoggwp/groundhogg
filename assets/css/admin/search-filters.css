@@ -1,21 +1,21 @@
 .search-filters .filters-loading,
 #search-loading-dots-pill {
   display: inline-block;
-  background: #6c19ad;
-  border-radius: 5px;
+  background: rgb(108, 25, 173);
+  border-radius: var(--gh-border-radius);
   padding: 1px 5px;
   color: #FFFFFF;
 }
 
 .filter-placeholder {
-  background: #102640;
+  background: var(--gh-dark);
   opacity: 0.2;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .include-filters-wrap, .exclude-filters-wrap {
-  border: 1px solid #6c19ad;
-  border-radius: 5px;
+  border: 1px solid rgb(108, 25, 173);
+  border-radius: var(--gh-border-radius);
   padding: 20px 10px 10px 10px;
   position: relative;
 }
@@ -24,8 +24,8 @@
 }
 .include-filters-wrap .include-block, .include-filters-wrap .exclude-block, .exclude-filters-wrap .include-block, .exclude-filters-wrap .exclude-block {
   position: absolute;
-  background: #6c19ad;
-  border-radius: 5px;
+  background: rgb(108, 25, 173);
+  border-radius: var(--gh-border-radius);
   left: 10px;
   top: -10px;
   padding: 1px 5px;
@@ -34,8 +34,8 @@
 
 .search-filters .filters-loading {
   display: inline-block;
-  background: #6c19ad;
-  border-radius: 5px;
+  background: rgb(108, 25, 173);
+  border-radius: var(--gh-border-radius);
   padding: 1px 5px;
   color: #FFFFFF;
 }
@@ -57,7 +57,7 @@
 #search-filters-editor .or-separator {
   /*border: 1px solid #cccccc;*/
   height: 1px;
-  background: #6c19ad;
+  background: rgb(108, 25, 173);
   position: relative;
   margin: 15px 0;
 }
@@ -65,8 +65,8 @@
 #search-filters-editor .or-separator .or-circle {
   display: inline-block;
   position: absolute;
-  background: #6c19ad;
-  border-radius: 5px;
+  background: rgb(108, 25, 173);
+  border-radius: var(--gh-border-radius);
   left: 10px;
   top: -10px;
   padding: 1px 5px;
@@ -94,7 +94,7 @@
 #search-filters-editor button.white {
   background: #FFFFFF;
   border: 1px solid #8c8f94;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 .search-filters-editor .add-filter-wrap,
 #search-filters-editor .add-filter-wrap {
@@ -109,7 +109,7 @@
   flex-direction: column;
   gap: 5px;
   background: #FFFFFF;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 }
 .search-filters-editor .add-filter-wrap .add-filter.mount-from-bottom,
@@ -165,7 +165,7 @@
   padding: 5px 8px;
   background: #FFFFFF;
   border: 1px solid #8c8f94;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   cursor: pointer;
   display: flex;
   gap: 5px;
@@ -178,7 +178,7 @@
 }
 .search-filters-editor .filter.filter-view.filter-broken,
 #search-filters-editor .filter.filter-view.filter-broken {
-  border-color: #e91f4f;
+  border-color: rgb(233, 31, 79);
   background: rgba(233, 31, 79, 0.1);
 }
 .search-filters-editor .filter.filter-view .delete-filter,
@@ -187,7 +187,7 @@
 }
 .search-filters-editor .filter.filter-view .delete-filter:hover,
 #search-filters-editor .filter.filter-view .delete-filter:hover {
-  background: rgba(16, 38, 64, 0.05);
+  background: var(--gh-dark-5);
   border-radius: 3px;
 }
 .search-filters-editor .filter.filter-edit-wrap,
@@ -205,7 +205,7 @@
   gap: 5px;
   position: absolute;
   background: #FFFFFF;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   z-index: 999;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 }

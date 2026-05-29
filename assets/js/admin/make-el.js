@@ -413,7 +413,7 @@
         type: 'checkbox',
       }),
       //language=HTML
-      `<span class="slider round"></span>
+      `<span class="slider"></span>
       <span class="on">${ onLabel }</span>
       <span class="off">${ offLabel }</span>
       `,
@@ -1397,6 +1397,7 @@
 
             }
             else {
+              optionsContainer.classList.add('gh-picker-options-above')
               optionsContainer.style.bottom = window.innerHeight - top + 'px'
               optionsContainer.style.left = left + 'px'
               optionsContainer.style.width = width + 'px'
@@ -1664,6 +1665,7 @@
     options = [],
     selected = '',
     onChange = value => {},
+    icons = false
   }) => {
 
     const render = () => Div({
@@ -1673,7 +1675,7 @@
 
     const ButtonOption = option => Button({
       id       : `${ id }-opt-${ option.id }`,
-      className: `gh-button gh-button small ${ selected === option.id ? 'dark' : 'grey' }`,
+      className: `gh-button gh-button small ${icons ? 'icon' : ''} ${ selected === option.id ? 'dark' : 'grey' }`,
       onClick  : e => {
         selected = option.id
         morphdom(document.getElementById(id), render())

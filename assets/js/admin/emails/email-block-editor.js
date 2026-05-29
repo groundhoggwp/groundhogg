@@ -796,6 +796,7 @@
           email,
           changes   : {},
           hasChanges: false,
+          savingDraft: false
         })
 
         onSave(email)
@@ -817,6 +818,7 @@
         email,
         changes   : {},
         hasChanges: false,
+        savingDraft: false
       })
 
       onSave(email)
@@ -1474,8 +1476,9 @@
     }
 
     return Div({
-        className: 'gh-color-picker',
         id,
+        className: 'gh-color-picker',
+        ...attributes
       },
       [
         Div({
@@ -1520,9 +1523,6 @@
                       type     : 'text',
                       id       : `${ id }-picker`,
                       className: 'full-width code',
-                      style    : {
-                        marginBottom: '10px',
-                      },
                       value,
                     }),
                     Button({
@@ -1547,7 +1547,7 @@
 
             },
           },
-          'Select Color'),
+          value ? value : 'Select Color'),
 
       ])
   }
@@ -1789,9 +1789,9 @@
         id  : direction,
         text: Dashicon(direction === 'justify' ? 'editor-justify' : `editor-align${ direction }`),
       } )),
-
       selected: alignment,
       onChange,
+      icons: true,
     })
   }
 
@@ -2803,7 +2803,7 @@
           },
           [
             block.type === 'global' ? Button({
-              className: 'gh-button primary small icon detach-block',
+              className: 'toolbar-button detach-block',
               id       : `detach-${ block.id }`,
               onClick: e => {
 
@@ -2818,7 +2818,7 @@
               Dashicon('editor-unlink'),
               ToolTip('Detach')
             ]) : Button({
-                className: 'gh-button primary small icon globalize-block',
+                className: 'toolbar-button globalize-block',
                 id       : `globalize-${ block.id }`,
                 onClick  : async e => {
 
@@ -2884,7 +2884,7 @@
                 ToolTip('Save as Global'),
               ]),
             block.type === 'global' ? null : Button({
-                className: 'gh-button primary small icon duplicate-block',
+                className: 'toolbar-button duplicate-block',
                 id       : `duplicate-${ block.id }`,
                 onClick  : e => {
                   duplicateBlock(block.id)
@@ -2895,7 +2895,7 @@
                 ToolTip('Duplicate'),
               ]),
             Button({
-                className: 'gh-button primary small delete-block',
+                className: 'toolbar-button delete-block',
                 id       : `delete-${ block.id }`,
                 onClick  : e => {
                   deleteBlock(block.id)
@@ -4866,38 +4866,19 @@
           InputRepeater({
             id      : 'global-colors',
             rows    : colorPalette.map(color => [
-              '',
               color,
             ]),
             maxRows : 8,
             cells   : [
-              ({
-                onChange,
-                value,
-                setValue,
+              ({setValue, value, id, name, dataRow, dataCell}) => ColorPicker({
+                id,
                 name,
-                ...props
-              }, row) => Div({
-                style: {
-                  width          : '33px',
-                  flexShrink     : 0,
-                  border         : 'solid white',
-                  borderWidth    : '3px 0 3px 3px',
-                  borderRadius   : '5px 0 0 5px',
-                  backgroundColor: row[1],
-                },
-                ...props,
-              }),
-              ({
-                setValue,
-                ...props
-              }) => Input({
-                ...props,
-                placeholder: '#FFFFFF',
-              }),
+                value,
+                onChange: setValue
+              })
             ],
             onChange: rows => {
-              colorPalette = rows.map(r => r[1])
+              colorPalette = rows.map(r => r[0])
             },
           }),
 
@@ -5020,7 +5001,7 @@
             },
             __('Advanced')),
           isBlockEditor() ? Button({
-              className: `gh-button secondary text small ${ getEmailControlsTab() === 'editor' ? 'active' : 'inactive' }`,
+              className: `gh-button secondary text icon ${ getEmailControlsTab() === 'editor' ? 'active' : 'inactive' }`,
 
               onClick: e => {
                 setEmailControlsTab('editor')
@@ -5718,12 +5699,16 @@
       [
         isDraft() ? Button({
             id       : 'save-draft',
-            className: 'gh-button secondary text',
+            className: `gh-button secondary text ${getState().savingDraft ? 'loading-dots' : ''}`,
             onClick  : e => {
-              saveEmail()
+              setState({
+                savingDraft: true
+              })
+              morphHeader()
+              saveEmail().finally( morphHeader )
             },
           },
-          'Save draft') : Button({
+          getState().savingDraft ? 'Saving draft' : 'Save draft') : Button({
             id       : 'switch-to-draft',
             className: 'gh-button danger text',
             onClick  : e => {

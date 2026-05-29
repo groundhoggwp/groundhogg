@@ -1,11 +1,3 @@
-$primary-blue: rgb(0, 117, 255);
-$primary-blue-60: rgba(0, 117, 255, 0.60);
-$primary-blue-60-hex: #66ACFF;
-$primary-blue-50: rgba(0, 117, 255, 0.50);
-$primary-blue-20: rgba(0, 117, 255, 0.20);
-$primary-blue-10: rgba(0, 117, 255, 0.10);
-$primary-blue-7: rgba(0, 117, 255, 0.07);
-$primary-blue-2: rgba(0, 117, 255, 0.02);
 $primary-dark: rgb(16, 38, 64);
 $primary-dark-50: rgba(16, 38, 64, 0.5);
 $primary-dark-30: rgba(16, 38, 64, 0.3);
@@ -41,10 +33,10 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 @keyframes skeleton-loading {
   0% {
-    background-color: $primary-dark-5;
+    background-color: var(--gh-dark-5);
   }
   100% {
-    background-color: $primary-dark-30;
+    background-color: var(--gh-dark-30);
   }
 }
 
@@ -99,7 +91,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     background: #ffffff;
   }
 
-  background: $primary-blue-7;
+  background: var(--gh-primary-7);
   padding: 60px 0;
 }
 
@@ -154,15 +146,15 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         height: 40px;
         width: 40px;
         padding: 10px;
-        border-radius: 8px;
+        border-radius: var(--gh-border-radius);
         background: #FFFFFF;
         cursor: pointer;
         margin-bottom: 5px;
-        color: $primary-dark;
-        border: 1px solid $primary-dark-10;
+        color: var(--gh-dark);
+        border: 1px solid var(--gh-border-gray-light);
 
-        :hover {
-          border-color: $primary-dark-15;
+        &:hover {
+          border-color: var(--gh-border-gray);
           transition: 0.4s;
           transform: scale(1.05);
         }
@@ -214,6 +206,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   }
 
   .block-wrap {
+
+    &#add-global{
+      .block-name {
+        font-size: 11px;
+      }
+    }
+
     .block-name {
       text-align: center;
       font-weight: 300;
@@ -228,11 +227,18 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     height: 60px;
     width: 60px;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     background: #FFFFFF;
     cursor: grab;
     margin-bottom: 5px;
-    color: $primary-dark;
+    color: var(--gh-dark);
+    border: 1px solid var(--gh-border-gray-light);
+
+    &:hover:not(.dragging) {
+      border-color: var(--gh-border-gray);
+      transition: 0.4s;
+      transform: scale(1.05);
+    }
 
     &.dragging {
       cursor: grabbing;
@@ -285,7 +291,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         min-height: 667px;
         margin: auto;
         transition: 0.4s;
-        outline: 5px solid $primary-dark;
+        outline: 5px solid var(--gh-dark);
         border-radius: 20px;
         margin-bottom: 20px;
 
@@ -341,7 +347,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       }
 
       .block-placeholder {
-        background-color: $primary-blue-50;
+        background-color: var(--gh-primary-50);
         border-radius: 2px;
         width: 100%;
         height: 5px;
@@ -414,7 +420,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
         &[data-type="spacer"] {
           .spacer-block {
-            background-color: $primary-dark-15;
+            background-color: var(--gh-dark-15);
           }
         }
 
@@ -533,15 +539,15 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
         .children.empty,
         .column.empty {
-          background-color: $primary-dark-5;
-          border-radius: 5px;
+          background-color: var(--gh-dark-5);
+          border-radius: var(--gh-border-radius);
           height: 40px;
           margin: 5px;
           min-width: 40px;
         }
 
         .children {
-          outline: 2px dashed $primary-dark-15;
+          outline: 2px dashed var(--gh-dark-15);
         }
 
         .block-toolbar {
@@ -561,7 +567,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             display: inline-block;
             font-size: 12px;
             padding: 2px 6px;
-            background-color: $primary-blue-60-hex;
+            background-color: var(--gh-primary-light);
             color: #fff;
             z-index: 99;
             box-shadow: $box-shadow;
@@ -577,7 +583,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             border-radius: 3px 3px 0 0;
             position: absolute;
             color: #FFF;
-            background-color: $primary-blue-60-hex;
+            background-color: var(--gh-primary-light);
             z-index: 99;
             box-shadow: $box-shadow;
 
@@ -610,7 +616,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
             top: 50%;
             transform: translateY(-50%);
             color: #FFF;
-            background-color: $primary-blue-60-hex;
+            background-color: var(--gh-primary-light);
             z-index: 99;
             box-shadow: $box-shadow;
 
@@ -625,11 +631,11 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
         &:hover:not(:has(.builder-block:hover)) {
           //transition: 0.4s;
           //z-index: 10;
-          outline: 2px solid $primary-blue-60-hex;
+          outline: 2px solid var(--gh-primary-light);
 
           > .block-toolbar {
             display: block;
-            background-color: $primary-blue-60-hex;
+            background-color: var(--gh-primary-light);
           }
         }
 
@@ -649,7 +655,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
         &.is-editing {
           //transition: 0.4s;
-          outline: 2px solid $primary-blue !important;
+          outline: 2px solid var(--gh-primary) !important;
           overflow: visible;
           z-index: 9;
 
@@ -662,7 +668,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
               z-index: 99;
               //border-radius: 0 0 3px 3px;
 
-              button {
+              button.toolbar-button {
                 &:last-child {
                   border-top-right-radius: 0;
                   border-bottom-right-radius: 4px;
@@ -681,12 +687,12 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
             .move-block {
               color: #FFF;
-              background-color: $primary-blue;
+              background-color: var(--gh-primary);
             }
 
             .insert-block {
               color: #FFF;
-              background-color: $primary-blue;
+              background-color: var(--gh-primary);
             }
 
             span.block-type {
@@ -702,13 +708,24 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
               z-index: 99;
               //border-radius: 0 0 3px 3px;
 
-              button {
-                //height: 16px;
-                //width: 16px;
+              button.toolbar-button {
+                height: 26px;
                 --dashicon-size: 14px;
                 //padding: 4px;
                 line-height: 1;
                 border-radius: 0;
+                background-color: var(--gh-primary);
+                aspect-ratio: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #FFF;
+                border: none;
+                box-shadow: none;
+
+                &:hover {
+                  background-color: var(--gh-primary-light);
+                }
 
                 &:last-child {
                   border-top-right-radius: 4px;
@@ -775,7 +792,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     }
   }
 
-  border-left: 1px solid $primary-dark-15;
+  border-left: 1px solid var(--gh-dark-15);
 
   .controls-nav {
     display: flex;
@@ -795,7 +812,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       text-transform: uppercase;
 
       span.slash {
-        color: $primary-dark-50;
+        color: var(--gh-dark-50);
         font-size: 12px;
       }
     }
@@ -807,9 +824,9 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       button.tab {
 
         //border-radius: 0 0;
-        border: 1px solid $primary-dark-15;
+        border: 1px solid var(--gh-dark-15);
         border-bottom-width: 0;
-        background: $primary-dark-5;
+        background: var(--gh-dark-5);
         font-size: 14px;
         padding: 6px 12px;
         border-radius: 2px 2px 0 0;
@@ -823,8 +840,8 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
       }
 
       .active .dashicons-admin-settings{
-        outline: 2px solid $primary-dark-50;
-        border-radius: 4px;
+        outline: 2px solid var(--gh-dark-50);
+        border-radius: var(--gh-border-radius);
       }
     }
   }
@@ -894,13 +911,13 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
           &:hover {
             span {
-              background-color: $primary-blue-50;
+              background-color: var(--gh-primary-50);
             }
           }
 
           &.selected {
             span {
-              background-color: $primary-blue;
+              background-color: var(--gh-primary);
             }
           }
 
@@ -949,7 +966,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   > .gh-panel {
     border-radius: 0;
     box-shadow: none;
-    border: solid $primary-dark-15;
+    border: solid var(--gh-dark-15);
     border-width: 1px 0 0 0;
 
     &:last-of-type {
@@ -1004,14 +1021,14 @@ $margin: 1rem;
 
 @mixin panel() {
   background: #FFFFFF;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
   margin-bottom: $margin;
   padding: 20px;
 }
 
 body {
-  background: $primary-blue-2;
+  background: var(--gh-primary-2);
 
   #wpcontent {
     padding: 0;
@@ -1195,7 +1212,7 @@ body {
     margin-bottom: 10px;
 
     &:focus-within {
-      border-color: $primary-blue;
+      border-color: var(--gh-primary);
     }
 
     label {
@@ -1233,7 +1250,7 @@ body {
 .gh-modal-frame {
   #email-editor {
     background: #F6F9FB;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     overflow: hidden;
     width: 90vw !important;
     height: 85vh !important;
@@ -1315,7 +1332,7 @@ body {
         left: 0;
         right: 0;
         box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.10);
-        outline: 2px solid $primary-blue;
+        outline: 2px solid var(--gh-primary);
       }
 
       iframe {
@@ -1324,7 +1341,7 @@ body {
 
       p {
         font-weight: 500;
-        color: $primary-blue;
+        color: var(--gh-primary);
       }
     }
   }
@@ -1405,11 +1422,11 @@ body {
     white-space: nowrap;
 
     &.selected {
-      color: $primary-blue;
+      color: var(--gh-primary);
     }
 
     &:hover {
-      background: $primary-dark-15;
+      background: var(--gh-dark-15);
     }
   }
 }
@@ -1425,7 +1442,7 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  border-left: 1px solid $primary-dark-15;
+  border-left: 1px solid var(--gh-dark-15);
   overflow-y: auto;
   flex-shrink: 0;
 
@@ -1435,14 +1452,14 @@ body {
     border-width: 0 0 1px 0;
     border-radius: 0;
     padding: 6px 12px;
-    border-color: $primary-dark-15;
-    background-color: $primary-dark-5;
+    border-color: var(--gh-dark-15);
+    background-color: var(--gh-dark-5);
     width: 100%;
     color: $primary-dark;
     align-items: center;
 
     &:hover {
-      background-color: $primary-dark-15;
+      background-color: var(--gh-dark-15);
     }
 
     svg {
@@ -1451,7 +1468,7 @@ body {
     }
 
     &.active {
-      background-color: $primary-blue;
+      background-color: var(--gh-primary);
       color: #fff;
     }
   }
@@ -1459,14 +1476,14 @@ body {
   .inspector-columns:has( > .inspector-block.active ),
   .inspector-parent:has( > .inspector-block.active )
   {
-    border: 1px solid $primary-blue;
+    border: 1px solid var(--gh-primary);
   }
 
   .inspector-column {
     //padding-left: 16px;4
     > div.column-header {
       padding: 3px 8px;
-      border-bottom: 1px solid $primary-dark-15;
+      border-bottom: 1px solid var(--gh-dark-15);
       //padding-left: calc( 12px * ( 12px * var(--depth) ));
     }
 
@@ -1492,7 +1509,7 @@ body {
     &:not(.primary)#select-white-icons,
     &:not(.primary)#select-white-circle,
     &:not(.primary)#select-white-boxed {
-      background-color: $primary-dark-15;
+      background-color: var(--gh-dark-15);
     }
   }
 }
@@ -1501,7 +1518,7 @@ body {
   &.white-icons,
   &.white-circle,
   &.white-boxed {
-    background-color: $primary-dark-10;
+    background-color: var(--gh-dark-10);
   }
 }
 
@@ -1513,9 +1530,9 @@ body {
   }
 
   .unit {
-    background: $primary-dark-5;
+    background: var(--gh-dark-5);
     color: $primary-dark;
-    border: 1px solid $primary-dark-50;
+    border: 1px solid var(--gh-dark-50);
     width: 22px;
     display: flex;
     align-items: center;

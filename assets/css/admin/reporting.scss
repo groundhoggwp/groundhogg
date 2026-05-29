@@ -50,7 +50,7 @@ body.gh_reporting {
   .gh-panel {
     .notice {
       margin: 10px;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
     }
 
     h2.title:has(.dashicons) {
@@ -120,7 +120,7 @@ body.gh_reporting {
 }
 
 .groundhogg-report {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   background: #FFF;
   border: 1px solid #ccd0d4;
   box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
@@ -215,7 +215,7 @@ body.gh_reporting {
   background: #FFF;
   padding: 20px;
   border: 1px solid #ccd0d4;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .groundhogg-chart-no-padding {
@@ -225,7 +225,7 @@ body.gh_reporting {
   /*border-left: 1px solid #ccd0d4;;*/
   background: #FFF;
   border: 1px solid #ccd0d4;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   /*min-height: 200px;*/
 }
 
@@ -250,7 +250,7 @@ body.gh_reporting {
   margin-bottom: 15px;
   margin-top: 15px;
   display: flex;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .percentage-change.bad {
@@ -329,7 +329,7 @@ body.gh_reporting {
 
 /* NEW CSS FOR TABLE */
 table.groundhogg-report-table tbody tr:nth-child(odd) {
-  background-color: $primary-blue-2;
+  background-color: var(--gh-primary-2);
 }
 
 .groundhogg-table-box {
@@ -549,7 +549,7 @@ table.groundhogg-report-table td:last-child {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: $primary-dark;
+      background-color: var(--gh-dark);
       color: #fff;
       height: var(--spacer-height);
       line-height: 0;
@@ -602,7 +602,7 @@ table.groundhogg-report-table td:last-child {
     /* padding: 17px 20px 15px; */
     background: #FFF;
     border: 1px solid #d6e2ed;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     min-height: 200px;
   }
 
@@ -613,7 +613,7 @@ table.groundhogg-report-table td:last-child {
     /*padding: 17px 20px 15px;*/
     background: #FFF;
     border: 1px solid #d6e2ed;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     min-height: 250px;
     padding: 0px;
     float: left;

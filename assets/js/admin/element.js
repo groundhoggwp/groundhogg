@@ -576,7 +576,7 @@
                   ...props,
                   type: 'checkbox',
               }) }
-              <span class="slider round"></span>
+              <span class="slider"></span>
               <span class="on">${ onLabel }</span>
               <span class="off">${ offLabel }</span>
           </label>`

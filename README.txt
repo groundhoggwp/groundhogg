@@ -384,11 +384,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED Sales Manager team assignments.
 * ADDED URL allowlist and filter for UTM params in emails.
 * ADDED Draft indicator in Flow email picker.
-* TWEAKED GDPR Consents will also appear on the "Manage Preferences" screen.
-* FIXED Trashed emails appearing in the Flow email picker.
-
-= 4.4.2 (2026-04-09) =
 * IMPROVED Export preview UI.
+* TWEAKED GDPR Consents will also appear on the "Manage Preferences" screen.
+* TWEAKED Moved the unsubscribe form to the top of "Manage Preferences" screen so it's not hidden.
+* FIXED Trashed emails appearing in the Flow email picker.
 * FIXED Some Sales Rep dashboard widgets not loading.
 * FIXED Contact count preview showing 0 for sales reps.
 

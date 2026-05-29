@@ -1,20 +1,30 @@
 body.groundhogg-admin-page {
-  --gh-primary-blue: rgb(0, 117, 255);
-  --gh-primary-blue-60: rgba(0, 117, 255, 0.6);
-  --gh-primary-blue-50: rgba(0, 117, 255, 0.5);
-  --gh-primary-blue-20: rgba(0, 117, 255, 0.2);
-  --gh-primary-blue-10: rgba(0, 117, 255, 0.1);
-  --gh-primary-blue-7: rgba(0, 117, 255, 0.07);
-  --gh-primary-blue-2: rgba(0, 117, 255, 0.02);
-  --gh-primary-dark: rgb(16, 38, 64);
-  --gh-primary-dark-50: rgba(16, 38, 64, 0.5);
-  --gh-primary-dark-30: rgba(16, 38, 64, 0.3);
-  --gh-primary-dark-15: rgba(16, 38, 64, 0.15);
-  --gh-primary-dark-10: rgba(16, 38, 64, 0.1);
-  --gh-primary-dark-5: rgba(16, 38, 64, 0.05);
+  --gh-primary: var(--wp-admin-theme-color, rgb(0, 117, 255) );
+  --gh-primary-rgb: var(--wp-admin-theme-color--rgb, 0, 117, 255 );
+  --gh-primary-60: rgba(var(--gh-primary-rgb), 0.6);
+  --gh-primary-50: rgba(var(--gh-primary-rgb), 0.5);
+  --gh-primary-20: rgba(var(--gh-primary-rgb), 0.2);
+  --gh-primary-10: rgba(var(--gh-primary-rgb), 0.1);
+  --gh-primary-7: rgba(var(--gh-primary-rgb), 0.07);
+  --gh-primary-2: rgba(var(--gh-primary-rgb), 0.02);
+  --gh-primary-light: color-mix(in srgb, var(--gh-primary) 80%, white);
+  --gh-primary-lightest: color-mix(in srgb, var(--gh-primary) 60%, white);
+  --gh-primary-darker: color-mix(in srgb, var(--gh-primary) 80%, black);
+  --gh-primary-darkest: color-mix(in srgb, var(--gh-primary) 60%, black);
+  --gh-border-gray: #949494;
+  --gh-border-gray-light: #e0e0e0;
+  --gh-dark: rgb(16, 38, 64);
+  --gh-dark-50: rgba(16, 38, 64, 0.5);
+  --gh-dark-30: rgba(16, 38, 64, 0.3);
+  --gh-dark-15: rgba(16, 38, 64, 0.15);
+  --gh-dark-10: rgba(16, 38, 64, 0.1);
+  --gh-dark-5: rgba(16, 38, 64, 0.05);
   --gh-error-red: rgb(233, 31, 79);
   --gh-error-red-50: rgba(233, 31, 79, 0.5);
   --gh-error-red-10: rgba(233, 31, 79, 0.1);
+  --gh-error-red-dark: color-mix(in srgb, var(--gh-error-red) 90%, black);
+  --gh-error-red-darker: rgba(233, 31, 79, 0.1);
+  --gh-error-red-darkest: rgba(233, 31, 79, 0.1);
   --gh-secondary-purple: rgb(108, 25, 173);
   --gh-secondary-purple-25: rgba(108, 25, 173, 0.25);
   --gh-secondary-purple-10: rgba(108, 25, 173, 0.1);
@@ -34,6 +44,18 @@ body.groundhogg-admin-page {
   --gh-action-green-5: rgba(158, 206, 56, 0.05);
   --gh-box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   --gh-background-color: #F6F9FB;
+  --gh-border-radius: 2px;
+  --gh-panel-border-radius: var(--gh-border-radius);
+  --gh-border-button-radius: var(--gh-border-radius);
+  --gh-focused-shadow: 0 0 0 2px var(--gh-primary);
+  --gh-item-padding: 4px;
+  --gh-input-min-height: 40px;
+  --gh-item-line-height: 2.2;
+  --gh-button-line-height: 2.5;
+  --gh-option-line-height: 2;
+}
+body.groundhogg-admin-page input:not([type=checkbox], [type=radio]), body.groundhogg-admin-page select {
+  margin: 0;
 }
 
 .mce-ico.mce-i-gh_replacements {
@@ -117,7 +139,7 @@ input[type=range].slider::-webkit-slider-thumb {
   border: 1px solid #cccccc;
   height: 27px;
   width: 14px;
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
   background: #f7f7f7;
   cursor: pointer;
   -webkit-appearance: none;
@@ -143,7 +165,7 @@ input[type=range].slider::-moz-range-thumb {
   border: 1px solid #cccccc;
   height: 27px;
   width: 14px;
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
   background: #f7f7f7;
   cursor: pointer;
 }
@@ -176,7 +198,7 @@ input[type=range].slider::-ms-thumb {
   border: 1px solid #cccccc;
   height: 27px;
   width: 14px;
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
   background: #f7f7f7;
   cursor: pointer;
   height: 13.4px;
@@ -210,8 +232,8 @@ input[type=range].slider:focus::-ms-fill-upper {
   display: block;
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid rgba(16, 38, 64, 0.5);
-  border-radius: 5px;
+  border: 1px solid var(--gh-dark-50);
+  border-radius: var(--gh-border-radius);
   height: 100%;
   box-sizing: border-box;
 }
@@ -281,7 +303,7 @@ input[type=range].slider:focus::-ms-fill-upper {
   border-width: 1px;
   border-style: solid;
   transition: all 0.3s ease-in 0s;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   /*box-shadow: 0 1px 0 #ccd0d4;*/
 }
 
@@ -519,7 +541,7 @@ label.block {
   border: 1px solid rgba(16, 38, 64, 0.15);
   /* box-shadow: 5px 5px 30px rgb(24 45 70 / 5%); */
   box-sizing: border-box;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   position: fixed;
   box-shadow: 5px 5px 30px rgba(24, 45, 70, 0.05);
 }
@@ -628,6 +650,7 @@ label.gh-switch .slider {
   background-color: #ccc;
   -webkit-transition: 0.4s;
   transition: 0.4s;
+  border-radius: var(--gh-border-radius);
 }
 label.gh-switch .slider:before {
   position: absolute;
@@ -639,6 +662,7 @@ label.gh-switch .slider:before {
   background-color: white;
   -webkit-transition: 0.4s;
   transition: 0.4s;
+  border-radius: calc(var(--gh-border-radius) / 2);
 }
 label.gh-switch .slider.round {
   border-radius: 34px;
@@ -647,10 +671,10 @@ label.gh-switch .slider.round:before {
   border-radius: 50%;
 }
 label.gh-switch input:checked + .slider {
-  background-color: #2196F3;
+  background-color: var(--gh-primary);
 }
 label.gh-switch input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px var(--gh-primary);
 }
 label.gh-switch input:disabled + .slider {
   opacity: 0.5;
@@ -690,7 +714,7 @@ label.gh-switch input:checked ~ span.off {
   cursor: pointer;
 }
 .big-number:hover {
-  color: rgb(0, 117, 255);
+  color: var(--gh-primary);
 }
 
 .report-grid {
@@ -707,20 +731,20 @@ label.gh-switch input:checked ~ span.off {
   font-size: 18px;
 }
 .report-grid .add-new-report {
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
   border: none;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px 0;
 }
 .report-grid .add-new-report:hover {
-  background-color: rgba(16, 38, 64, 0.15);
+  background-color: var(--gh-dark-15);
 }
 .report-grid .report-placeholder {
-  background-color: rgba(16, 38, 64, 0.15);
-  border-radius: 5px;
+  background-color: var(--gh-dark-15);
+  border-radius: var(--gh-border-radius);
 }
 .report-grid .report-placeholder.header {
   grid-column: span 4;
@@ -749,7 +773,7 @@ label.gh-switch input:checked ~ span.off {
   cursor: pointer;
 }
 .report-grid .report.table .number-total:hover, .report-grid .report.pie_chart .number-total:hover {
-  color: rgb(0, 117, 255);
+  color: var(--gh-primary);
 }
 .report-grid .report h2 {
   cursor: move;
@@ -836,7 +860,7 @@ label.gh-switch input:checked ~ span.off {
   top: 0;
   padding: 3px 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: max-content;
 }
 
@@ -864,7 +888,7 @@ label.gh-switch input:checked ~ span.off {
   top: 0;
   padding: 3px 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: max-content;
 }
 
@@ -880,7 +904,7 @@ label.gh-switch input:checked ~ span.off {
   flex-direction: column;
   align-items: stretch;
   background-color: #fff;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   overflow: hidden;
 }
 .email-preview iframe {
@@ -911,7 +935,7 @@ label.gh-switch input:checked ~ span.off {
   width: 640px;
 }
 .email-log-modal .email-preview {
-  border: 1px solid rgba(16, 38, 64, 0.15);
+  border: 1px solid var(--gh-dark-15);
 }
 .email-log-modal .email-preview iframe {
   height: 500px;
@@ -994,14 +1018,14 @@ body.gh-full-screen #wpadminbar {
   background-color: rgb(16, 38, 64);
 }
 #api-docs code {
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
 }
 #api-docs code.get {
   background-color: rgb(158, 206, 56);
   color: #fff;
 }
 #api-docs code.post, #api-docs code.patch {
-  background-color: rgb(0, 117, 255);
+  background-color: var(--gh-primary);
   color: #fff;
 }
 #api-docs code.delete {
@@ -1029,10 +1053,10 @@ body.gh-full-screen #wpadminbar {
   font-weight: 600;
 }
 #api-docs nav li.current > a {
-  background-color: rgba(16, 38, 64, 0.15);
+  background-color: var(--gh-dark-15);
 }
 #api-docs nav li.current li.current > a {
-  background-color: rgba(16, 38, 64, 0.5);
+  background-color: var(--gh-dark-50);
   color: #FFF;
 }
 #api-docs nav li.current > ul a {
@@ -1054,7 +1078,7 @@ body.gh-full-screen #wpadminbar {
 }
 #api-docs #endpoint-display .parameter {
   padding: 10px 0;
-  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-top: 1px solid var(--gh-dark-15);
 }
 #api-docs #endpoint-display code.param {
   background-color: transparent;
@@ -1155,7 +1179,7 @@ body.gh-full-screen #wpadminbar {
   --color: rgb(158, 206, 56);
   --color-25: rgba(158, 206, 56, 0.25);
   --color-5: rgba(158, 206, 56, 0.05);
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 .funnel-preview div.step-preview div.step-icon.benchmark {
   --color: rgb(245, 129, 21);
@@ -1315,7 +1339,7 @@ body.gh-full-screen #wpadminbar {
   z-index: 98 !important;
   position: fixed;
   border-style: solid;
-  border-color: rgba(16, 38, 64, 0.15);
+  border-color: var(--gh-dark-15);
   border-radius: 10px;
   background: transparent;
   top: 0;
@@ -1387,7 +1411,7 @@ body.gh-full-screen #wpadminbar {
   z-index: 10;
 }
 .flow-timeline .flow-header-container .flow-sep-line {
-  border-top: 1.5px solid rgba(16, 38, 64, 0.15);
+  border-top: 1.5px solid var(--gh-dark-15);
   flex-grow: 1;
   margin: 0 20px;
 }
@@ -1399,10 +1423,10 @@ ul.activity-timeline {
   padding-left: 10px;
 }
 ul.activity-timeline code {
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
 }
 ul.activity-timeline li.activity-item {
-  border-left: 2px solid rgba(16, 38, 64, 0.15);
+  border-left: 2px solid var(--gh-dark-15);
   padding-left: 20px;
   padding-bottom: 20px;
   position: relative;
@@ -1426,7 +1450,7 @@ ul.activity-timeline li.activity-item .activity-content {
 }
 ul.activity-timeline li.activity-item .activity-date {
   font-size: 11px;
-  color: rgba(16, 38, 64, 0.5);
+  color: var(--gh-dark-50);
   text-transform: uppercase;
 }
 ul.activity-timeline li.activity-item table td:first-child {
@@ -1442,15 +1466,15 @@ ul.activity-timeline li.activity-item .activity-info {
 }
 ul.activity-timeline li.activity-item .contact-input {
   padding: 5px 10px;
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
   font-size: 14px;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   margin-top: 5px;
   width: fit-content;
 }
 ul.activity-timeline li.activity-item .event-extra,
 ul.activity-timeline li.activity-item .diff-time {
-  color: rgba(16, 38, 64, 0.5);
+  color: var(--gh-dark-50);
 }
 ul.activity-timeline li.activity-item .event-extra .step-type.action,
 ul.activity-timeline li.activity-item .diff-time .step-type.action {
@@ -1485,8 +1509,8 @@ ul.activity-timeline li.activity-item .activity-icon:not(.no-frame) {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  background: rgb(0, 117, 255);
+  border-radius: var(--gh-border-radius);
+  background: var(--gh-primary);
   color: #FFFFFF;
 }
 ul.activity-timeline li.activity-item .activity-icon:not(.no-frame) img {

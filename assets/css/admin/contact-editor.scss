@@ -338,10 +338,10 @@ code.meta-replacement-code {
 #activity-timeline {
 
   margin-left: 15px;
-  border-left: 2px solid $primary-dark-10;
+  border-left: 2px solid var(--gh-dark-10);
 
   code {
-    border-radius: 4px;
+    border-radius: var(--gh-border-radius);
   }
 
   li.activity-item {
@@ -373,16 +373,16 @@ code.meta-replacement-code {
 
     .contact-input {
       padding: 5px 10px;
-      background-color: $primary-dark-5;
+      background-color: var(--gh-dark-5);
       font-size: 14px;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
       margin-top: 5px;
       width: fit-content;
     }
 
     .event-extra,
     .diff-time {
-      color: $primary-dark-50;
+      color: var(--gh-dark-50);
 
       .step-type {
         &.action {
@@ -424,8 +424,8 @@ code.meta-replacement-code {
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
-      background: $primary-blue;
+      border-radius: var(--gh-border-radius);
+      background: var(--gh-primary);
       color: #FFFFFF;
 
       img {

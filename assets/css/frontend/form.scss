@@ -123,7 +123,7 @@ $background-color: #F6F9FB;
         font-weight: 400;
         line-height: 20px;
 
-        border-radius: 5px;
+        border-radius: var(--gh-border-radius);
         border-color: var( --gh-accent-color );
         border-style: solid;
         border-width: 1px;
@@ -170,7 +170,7 @@ $background-color: #F6F9FB;
         //text-transform: uppercase;
 
         border: none;
-        border-radius: 5px;
+        border-radius: var(--gh-border-radius);
 
         box-shadow: none;
         transition: 0.4s;
@@ -395,10 +395,10 @@ $background-color: #F6F9FB;
     width: 100%;
     padding: 30px;
     box-sizing: border-box;
-    background: $primary-dark-5;
-    border: 3px dashed $primary-dark-50;
+    background: var(--gh-dark-5);
+    border: 3px dashed var(--gh-dark-50);
     text-align: center;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
   }
 
   .gh-birthday{
@@ -410,7 +410,7 @@ $background-color: #F6F9FB;
     padding: 15px;
     margin-bottom: 20px;
     border: 1px solid;
-    border-radius: 4px;
+    border-radius: var(--gh-border-radius);
 
     &.gh-form-errors-wrapper {
       color: darken( $error-red, 20 );
@@ -471,7 +471,7 @@ $background-color: #F6F9FB;
     padding: 20px;
     background: $error-red-10;
     color: darken( $error-red, 50 );
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -501,7 +501,7 @@ $background-color: #F6F9FB;
     padding: 20px;
     background: $action-green-10;
     color: darken( $action-green, 50 );
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     display: flex;
     flex-direction: column;
     gap: 10px;

@@ -25,7 +25,7 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 .groundhogg-toolbar-quick-search {
 
   .gh-spinner-wrap {
-    color: $primary-dark-10;
+    color: var(--gh-dark-10);
   }
 
   #quick-search-input {

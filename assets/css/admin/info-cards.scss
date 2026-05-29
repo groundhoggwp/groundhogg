@@ -417,8 +417,8 @@ div.info-card.postbox {
 
   .sortable-placeholder {
     border: none;
-    background: $primary-dark-15;
-    border-radius: 5px;
+    background: var(--gh-dark-15);
+    border-radius: var(--gh-border-radius);
     margin-bottom: 0;
   }
 

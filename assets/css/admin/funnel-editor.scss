@@ -40,7 +40,7 @@ $background-color: #F6F9FB;
   position: absolute;
   padding: 3px 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: max-content;
   top: -70px;
   left: 50%;
@@ -88,14 +88,18 @@ body:has(#funnel-form) {
   }
 
   &.saving {
-    .funnel-editor-header button > .button-text {
-      display: none;
+    .funnel-editor-header button {
+      > .button-text {
+        display: none;
+      }
     }
   }
 
   &:not(.saving) {
-    .funnel-editor-header button > .gh-spinner {
-      display: none;
+    .funnel-editor-header button {
+      > .gh-spinner {
+        display: none;
+      }
     }
   }
 
@@ -123,19 +127,19 @@ body:has(#funnel-form) {
 }
 
 .pulse-shadow {
-  box-shadow: 0 0 0 $primary-dark-50;
+  box-shadow: 0 0 0 var(--gh-dark-50);
   animation: pulseBoxShadow 2s infinite;
 }
 
 @keyframes pulseBoxShadow {
   0% {
-    box-shadow: 0 0 0 0 $primary-dark-50;
+    box-shadow: 0 0 0 0 var(--gh-dark-50);
   }
   70% {
-    box-shadow: 0 0 20px 0 $primary-dark-50;
+    box-shadow: 0 0 20px 0 var(--gh-dark-50);
   }
   100% {
-    box-shadow: 0 0 0 0 $primary-dark-50;
+    box-shadow: 0 0 0 0 var(--gh-dark-50);
   }
 }
 
@@ -144,7 +148,7 @@ body.gh-moving-step {
   #step-flow {
 
     button.add-step {
-      box-shadow: 0 0 0 $primary-dark-50;
+      box-shadow: 0 0 0 var(--gh-dark-50);
       animation: pulseBoxShadow 2s infinite;
     }
 
@@ -291,7 +295,7 @@ body.gh-screenshot-mode {
   position: relative;
   width: clamp(800px, 60%, 1000px);
   transition: width 0.3s ease-out, opacity 0.3s ease-out;
-  border-left: 1px solid $primary-dark-15;
+  border-left: 1px solid var(--gh-dark-15);
   background-color: var(--bg-color);;
   box-shadow: $box-shadow;
   container-type: inline-size;
@@ -325,7 +329,7 @@ body.gh-screenshot-mode {
     top: 50%;
     left: 1px;
     border-radius: 10px 0 0 10px;
-    border-color: $primary-dark-15;
+    border-color: var(--gh-dark-15);
     border-style: solid;
     border-width: 1px 0 1px 1px;
     transform: translate(-100%, -50%);
@@ -369,7 +373,7 @@ body.gh-screenshot-mode {
         flex-grow: 1;
         padding: 20px 30px 30px 30px;
         overflow-y: auto;
-        border-top: 1px solid $primary-dark-15;
+        border-top: 1px solid var(--gh-dark-15);
 
         .flow-continue-item {
           flex-grow: 1;
@@ -383,7 +387,7 @@ body.gh-screenshot-mode {
         div.flow-log-item {
           padding: 10px;
           background-color: #fff;
-          border-radius: 5px;
+          border-radius: var(--gh-border-radius);
           box-shadow: $box-shadow;
 
           .step-name {
@@ -489,7 +493,7 @@ body.gh-screenshot-mode {
           display: flex;
           gap: 20px;
           flex-wrap: wrap;
-          border-radius: 5px;
+          border-radius: var(--gh-border-radius);
           border: 1px solid var(--color);
           padding: 20px;
           background-color: $background-color;
@@ -528,7 +532,7 @@ body.gh-screenshot-mode {
             //font-weight: bold;
             left: 20px;
             color: white;
-            border-radius: 5px;
+            border-radius: var(--gh-border-radius);
             padding: 3px 8px;
             background-color: var(--color);
 
@@ -539,7 +543,7 @@ body.gh-screenshot-mode {
 
         .select-step {
           width: var(--icon-size);
-          border-radius: 5px;
+          border-radius: var(--gh-border-radius);
           //padding: 5px;
           cursor: pointer;
 
@@ -583,7 +587,7 @@ body.gh-screenshot-mode {
             justify-content: center;
             align-items: center;
             height: var(--icon-size);
-            border-radius: 5px;
+            border-radius: var(--gh-border-radius);
             margin: 0;
             overflow: hidden;
             position: relative;
@@ -642,8 +646,8 @@ body.gh-screenshot-mode {
     }
 
     code {
-      border-radius: 5px;
-      background-color: $primary-dark-5;
+      border-radius: var(--gh-border-radius);
+      background-color: var(--gh-dark-5);
     }
 
     .field-map-wrapper {
@@ -681,7 +685,7 @@ body.gh-screenshot-mode {
 
     .notice {
       margin: 0;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
       /*border-width: 2px;*/
       border-width: 0 0 0 5px;
     }
@@ -719,7 +723,7 @@ body.gh-screenshot-mode {
         .step-locked {
           z-index: 99;
           display: flex;
-          background-color: $primary-dark-15;
+          background-color: var(--gh-dark-15);
           position: absolute;
           top: 0;
           right: 0;
@@ -727,7 +731,7 @@ body.gh-screenshot-mode {
           bottom: 0;
           justify-content: center;
           align-items: center;
-          border-radius: 5px;
+          border-radius: var(--gh-border-radius);
 
           .dashicons {
             height: 40px;
@@ -740,7 +744,7 @@ body.gh-screenshot-mode {
       .step.editing {
 
         .step-title-wrap ~ .custom-settings {
-          border-top: 1px solid $primary-dark-15;
+          border-top: 1px solid var(--gh-dark-15);
         }
 
         .custom-settings {
@@ -791,8 +795,8 @@ body.gh-screenshot-mode {
 
             .step-notes-textarea {
               width: 100%;
-              background: $primary-dark-5;
-              border-radius: 5px;
+              background: var(--gh-dark-5);
+              border-radius: var(--gh-border-radius);
               font-weight: 400;
               border: none;
               padding: 12px;
@@ -813,18 +817,18 @@ body.gh-screenshot-mode {
 
               hr {
                 border: 0;
-                border-top: 1px solid $primary-dark-15;
+                border-top: 1px solid var(--gh-dark-15);
                 border-bottom: none;
                 margin: 0 -20px;
               }
             }
 
             table.wp-list-table {
-              border-radius: 5px;
+              border-radius: var(--gh-border-radius);
               //overflow: hidden;
 
               &.striped > tbody > :nth-child(odd) {
-                //background-color: $primary-dark-5;
+                //background-color: var(--gh-dark-5);
               }
 
 
@@ -917,7 +921,7 @@ body.gh-screenshot-mode {
     padding: 10px;
     box-sizing: border-box;
     border: 3px solid var(--color);
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     background-color: #fff;
     background-image: linear-gradient(var(--color-5), var(--color-10));
 
@@ -965,7 +969,7 @@ body.gh-screenshot-mode {
   .actions {
     display: flex;
     gap: 10px;
-    align-items: stretch;
+    align-items: center;
   }
 
   .status-options {
@@ -1121,7 +1125,7 @@ button.button.save-button {
   .the-end {
     padding: 3px 8px;
     color: white;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     width: max-content;
     background-color: $error-red;
   }
@@ -1168,7 +1172,7 @@ button.button.save-button {
     flex-direction: column;
     align-items: stretch;
 
-    background-image: radial-gradient(circle at 1px 1px, $primary-dark-10 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, var(--gh-dark-10) 1px, transparent 0);
     background-position: center center;
     background-size: 20px 20px;
 
@@ -1383,8 +1387,8 @@ button.button.save-button {
         display: flex;
         justify-content: center;
         align-items: center;
-        color: $primary-dark-50;
-        border-color: $primary-dark-50;
+        color: var(--gh-dark-50);
+        border-color: var(--gh-dark-50);
         background-color: #fff;
         border-width: var(--logic-line-width);
         box-sizing: border-box;
@@ -1440,7 +1444,7 @@ button.button.save-button {
         width: 300px;
         height: 3px;
         border-radius: 3px;
-        background-color: $primary-blue;
+        background-color: var(--gh-primary);
         border: none;
         margin: 20px 0;
       }
@@ -1470,10 +1474,10 @@ button.button.save-button {
       //  &::before {
       //    width: 100%;
       //    height: 60px;
-      //    background-color: $primary-dark-15;
+      //    background-color: var(--gh-dark-15);
       //    content: 'Drag a step into the flow';
       //    display: flex;
-      //    border-radius: 5px;
+      //    border-radius: var(--gh-border-radius);
       //    justify-content: center;
       //    align-items: center;
       //  }
@@ -1487,7 +1491,7 @@ button.button.save-button {
     right: 36px;
     bottom: 36px;
     box-shadow: $box-shadow;
-    background-color: $primary-blue;
+    background-color: var(--gh-primary);
     color: white;
     border-radius: 50%;
     height: 50px;
@@ -1499,7 +1503,7 @@ button.button.save-button {
     z-index: 99;
 
     &:hover {
-      background-color: $primary-blue-50;
+      background-color: var(--gh-primary-50);
     }
   }
 
@@ -1513,7 +1517,7 @@ button.button.save-button {
   .benchmark-pill {
     padding: 3px 8px;
     color: white;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     width: max-content;
     z-index: 2;
     background-color: $benchmark-orange;
@@ -1531,7 +1535,7 @@ button.button.save-button {
   .benchmark-or {
     padding: 3px 8px;
     color: white;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     width: max-content;
     background-color: $secondary-purple;
     margin-top: 20px;
@@ -1590,7 +1594,7 @@ button.button.save-button {
   //}
 
   .step {
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     box-shadow: $box-shadow;
     //margin: 30px 0;
     background: white;
@@ -1611,7 +1615,7 @@ button.button.save-button {
       padding: 2px 8px;
       top: 0;
       right: -5px;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
       transform: translateX(100%);
       max-width: 150px;
     }
@@ -1672,7 +1676,7 @@ button.button.save-button {
       }
 
       .hndle-icon {
-        border-radius: 5px;
+        border-radius: var(--gh-border-radius);
       }
 
       &.delay_timer,
@@ -1797,7 +1801,7 @@ button.button.save-button {
       //flex-direction: column;
       visibility: hidden;
       background-color: #ffffff;
-      border-radius: 5px;
+      border-radius: var(--gh-border-radius);
       z-index: 99;
 
       button.gh-button {
@@ -1940,7 +1944,7 @@ button.button.save-button {
           text-align: center;
 
           code {
-            border-radius: 4px;
+            border-radius: var(--gh-border-radius);
             padding: 1px 3px;
           }
         }
@@ -2008,7 +2012,7 @@ table.embed-options td {
 }
 
 #groundhogg-notices .notice {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   /*border-width: 2px;*/
   border-width: 0 0 0 5px;
 }
@@ -2079,7 +2083,7 @@ table.embed-options td {
       .field-placeholder {
         //border-style: none;
         background: #0001;
-        border-radius: 5px;
+        border-radius: var(--gh-border-radius);
         //flex-direction: column;
         //margin: auto;
       }

@@ -44,23 +44,23 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
 }
 
 .pulse-shadow {
-  box-shadow: 0 0 0 rgba(16, 38, 64, 0.5);
+  box-shadow: 0 0 0 var(--gh-dark-50);
   animation: pulseBoxShadow 2s infinite;
 }
 
 @keyframes pulseBoxShadow {
   0% {
-    box-shadow: 0 0 0 0 rgba(16, 38, 64, 0.5);
+    box-shadow: 0 0 0 0 var(--gh-dark-50);
   }
   70% {
-    box-shadow: 0 0 20px 0 rgba(16, 38, 64, 0.5);
+    box-shadow: 0 0 20px 0 var(--gh-dark-50);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(16, 38, 64, 0.5);
+    box-shadow: 0 0 0 0 var(--gh-dark-50);
   }
 }
 body.gh-moving-step #step-flow button.add-step {
-  box-shadow: 0 0 0 rgba(16, 38, 64, 0.5);
+  box-shadow: 0 0 0 var(--gh-dark-50);
   animation: pulseBoxShadow 2s infinite;
 }
 body.gh-moving-step #step-flow .sortable-item:has(> .step.editing) {
@@ -174,7 +174,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   position: relative;
   width: clamp(800px, 60%, 1000px);
   transition: width 0.3s ease-out, opacity 0.3s ease-out;
-  border-left: 1px solid rgba(16, 38, 64, 0.15);
+  border-left: 1px solid var(--gh-dark-15);
   background-color: var(--bg-color);
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
   container-type: inline-size;
@@ -196,7 +196,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   top: 50%;
   left: 1px;
   border-radius: 10px 0 0 10px;
-  border-color: rgba(16, 38, 64, 0.15);
+  border-color: var(--gh-dark-15);
   border-style: solid;
   border-width: 1px 0 1px 1px;
   transform: translate(-100%, -50%);
@@ -235,7 +235,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   flex-grow: 1;
   padding: 20px 30px 30px 30px;
   overflow-y: auto;
-  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-top: 1px solid var(--gh-dark-15);
 }
 #step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log .flow-continue-item {
   flex-grow: 1;
@@ -248,7 +248,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 #step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log div.flow-log-item {
   padding: 10px;
   background-color: #fff;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
 }
 #step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log div.flow-log-item .step-name {
@@ -328,7 +328,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   border: 1px solid var(--color);
   padding: 20px;
   background-color: #F6F9FB;
@@ -361,13 +361,13 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   top: -12px;
   left: 20px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   padding: 3px 8px;
   background-color: var(--color);
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .select-step {
   width: var(--icon-size);
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   cursor: pointer;
 }
 #step-settings-container #step-settings-inner #add-steps .steps-select .select-step .step-element.premium .step-icon {
@@ -377,7 +377,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   position: absolute;
   padding: 3px 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: max-content;
   top: -70px;
   left: 50%;
@@ -406,7 +406,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   justify-content: center;
   align-items: center;
   height: var(--icon-size);
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   margin: 0;
   overflow: hidden;
   position: relative;
@@ -439,8 +439,8 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   display: none;
 }
 #step-settings-container #step-settings-inner code {
-  border-radius: 5px;
-  background-color: rgba(16, 38, 64, 0.05);
+  border-radius: var(--gh-border-radius);
+  background-color: var(--gh-dark-5);
 }
 #step-settings-container #step-settings-inner .field-map-wrapper {
   max-height: 500px;
@@ -470,7 +470,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 }
 #step-settings-container #step-settings-inner .notice {
   margin: 0;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   /*border-width: 2px;*/
   border-width: 0 0 0 5px;
 }
@@ -496,7 +496,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 #step-settings-container #step-settings-inner .step-settings .step.settings.locked .step-locked {
   z-index: 99;
   display: flex;
-  background-color: rgba(16, 38, 64, 0.15);
+  background-color: var(--gh-dark-15);
   position: absolute;
   top: 0;
   right: 0;
@@ -504,7 +504,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   bottom: 0;
   justify-content: center;
   align-items: center;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 #step-settings-container #step-settings-inner .step-settings .step.settings.locked .step-locked .dashicons {
   height: 40px;
@@ -512,7 +512,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   font-size: 40px;
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-title-wrap ~ .custom-settings {
-  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-top: 1px solid var(--gh-dark-15);
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .custom-settings .gh-rows-and-columns label {
   font-weight: 500;
@@ -549,8 +549,8 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-notes .step-notes-textarea {
   width: 100%;
-  background: rgba(16, 38, 64, 0.05);
-  border-radius: 5px;
+  background: var(--gh-dark-5);
+  border-radius: var(--gh-border-radius);
   font-weight: 400;
   border: none;
   padding: 12px;
@@ -567,12 +567,12 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-edit .custom-settings hr {
   border: 0;
-  border-top: 1px solid rgba(16, 38, 64, 0.15);
+  border-top: 1px solid var(--gh-dark-15);
   border-bottom: none;
   margin: 0 -20px;
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-edit table.wp-list-table {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-edit table.wp-list-table:not(:last-child) {
   margin-bottom: 10px;
@@ -631,7 +631,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
   padding: 10px;
   box-sizing: border-box;
   border: 3px solid var(--color);
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   background-color: #fff;
   background-image: linear-gradient(var(--color-5), var(--color-10));
 }
@@ -670,7 +670,7 @@ body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line 
 .funnel-editor-header .actions {
   display: flex;
   gap: 10px;
-  align-items: stretch;
+  align-items: center;
 }
 .funnel-editor-header .status-options .save-button {
   gap: 7px;
@@ -780,7 +780,7 @@ button.button.save-button {
 .funnel-end .the-end {
   padding: 3px 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: max-content;
   background-color: rgb(233, 31, 79);
 }
@@ -821,7 +821,7 @@ button.button.save-button {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background-image: radial-gradient(circle at 1px 1px, rgba(16, 38, 64, 0.1) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, var(--gh-dark-10) 1px, transparent 0);
   background-position: center center;
   background-size: 20px 20px;
 }
@@ -967,8 +967,8 @@ button.button.save-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: rgba(16, 38, 64, 0.5);
-  border-color: rgba(16, 38, 64, 0.5);
+  color: var(--gh-dark-50);
+  border-color: var(--gh-dark-50);
   background-color: #fff;
   border-width: var(--logic-line-width);
   box-sizing: border-box;
@@ -1014,7 +1014,7 @@ button.button.save-button {
   width: 300px;
   height: 3px;
   border-radius: 3px;
-  background-color: rgb(0, 117, 255);
+  background-color: var(--gh-primary);
   border: none;
   margin: 20px 0;
 }
@@ -1028,7 +1028,7 @@ button.button.save-button {
   right: 36px;
   bottom: 36px;
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
-  background-color: rgb(0, 117, 255);
+  background-color: var(--gh-primary);
   color: white;
   border-radius: 50%;
   height: 50px;
@@ -1040,7 +1040,7 @@ button.button.save-button {
   z-index: 99;
 }
 #step-flow button.add-step-button-flow:hover {
-  background-color: rgba(0, 117, 255, 0.5);
+  background-color: var(--gh-primary-50);
 }
 #step-flow .flow-stop {
   width: 30px;
@@ -1051,7 +1051,7 @@ button.button.save-button {
 #step-flow .benchmark-pill {
   padding: 3px 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: max-content;
   z-index: 2;
   background-color: rgb(245, 129, 21);
@@ -1066,7 +1066,7 @@ button.button.save-button {
 #step-flow .benchmark-or {
   padding: 3px 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   width: max-content;
   background-color: rgb(108, 25, 173);
   margin-top: 20px;
@@ -1091,7 +1091,7 @@ button.button.save-button {
   height: 20px;
 }
 #step-flow .step {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   box-shadow: 5px 5px 30px 0 rgba(4, 45, 70, 0.05);
   background: white;
   outline: var(--logic-line-width) solid transparent;
@@ -1110,7 +1110,7 @@ button.button.save-button {
   padding: 2px 8px;
   top: 0;
   right: -5px;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   transform: translateX(100%);
   max-width: 150px;
 }
@@ -1158,7 +1158,7 @@ button.button.save-button {
   margin-bottom: 16px;
 }
 #step-flow .step.action .hndle-icon {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 #step-flow .step.action.delay_timer, #step-flow .step.action.date_timer, #step-flow .step.action.field_timer, #step-flow .step.action.advanced_timer, #step-flow .step.action.delay_timer {
   max-width: 280px;
@@ -1235,7 +1235,7 @@ button.button.save-button {
   display: flex;
   visibility: hidden;
   background-color: #ffffff;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   z-index: 99;
 }
 #step-flow .step .actions button.gh-button {
@@ -1338,7 +1338,7 @@ button.button.save-button {
   text-align: center;
 }
 #step-flow .step > .hndle > div:not(.hndle-icon) span.step-title code {
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
   padding: 1px 3px;
 }
 #step-flow .step > .hndle > div:not(.hndle-icon) span.step-name {
@@ -1400,7 +1400,7 @@ table.embed-options td {
 }
 
 #groundhogg-notices .notice {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   /*border-width: 2px;*/
   border-width: 0 0 0 5px;
 }
@@ -1455,7 +1455,7 @@ table.embed-options td {
 }
 .form-builder-main .fields-editor .form-fields .field-placeholder, .form-builder-main .fields-editor .special-fields .field-placeholder {
   background: rgba(0, 0, 0, 0.0666666667);
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 .form-builder-main .fields-editor .form-fields .form-field, .form-builder-main .fields-editor .special-fields .form-field {
   background: #FFFFFF;

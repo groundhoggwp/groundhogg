@@ -94,11 +94,11 @@
 #troubleshooter #services .download.gh-panel img,
 #guided-setup #services .download.gh-panel img {
   width: 180px;
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
 }
 #troubleshooter #services .download.gh-panel .plugin-actions,
 #guided-setup #services .download.gh-panel .plugin-actions {
-  border-top: 1px solid rgba(16, 38, 64, 0.1);
+  border-top: 1px solid var(--gh-dark-10);
   padding: 20px;
 }
 #troubleshooter #services .download.gh-panel h2,

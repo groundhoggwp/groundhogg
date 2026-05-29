@@ -1,4 +1,3 @@
-@charset "UTF-8";
 .wp-heading-inline, .page-title-action, #screen-meta-links {
   display: none !important;
 }
@@ -101,7 +100,7 @@ a.change-status.complained:hover {
 
 .basic-details .email p.marketable-reason {
   font-size: 12px;
-  color: #e91f4f;
+  color: rgb(233, 31, 79);
   margin-top: 5px;
 }
 .basic-details .details {
@@ -274,10 +273,10 @@ code.meta-replacement-code {
 
 #activity-timeline {
   margin-left: 15px;
-  border-left: 2px solid rgba(16, 38, 64, 0.1);
+  border-left: 2px solid var(--gh-dark-10);
 }
 #activity-timeline code {
-  border-radius: 4px;
+  border-radius: var(--gh-border-radius);
 }
 #activity-timeline li.activity-item {
   position: relative;
@@ -299,23 +298,23 @@ code.meta-replacement-code {
 }
 #activity-timeline li.activity-item .contact-input {
   padding: 5px 10px;
-  background-color: rgba(16, 38, 64, 0.05);
+  background-color: var(--gh-dark-5);
   font-size: 14px;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   margin-top: 5px;
   width: fit-content;
 }
 #activity-timeline li.activity-item .event-extra,
 #activity-timeline li.activity-item .diff-time {
-  color: rgba(16, 38, 64, 0.5);
+  color: var(--gh-dark-50);
 }
 #activity-timeline li.activity-item .event-extra .step-type.action,
 #activity-timeline li.activity-item .diff-time .step-type.action {
-  color: #9ece38;
+  color: rgb(158, 206, 56);
 }
 #activity-timeline li.activity-item .event-extra .step-type.benchmark,
 #activity-timeline li.activity-item .diff-time .step-type.benchmark {
-  color: #f58115;
+  color: rgb(245, 129, 21);
 }
 #activity-timeline li.activity-item .diff-time:first-letter {
   text-transform: capitalize;
@@ -342,25 +341,25 @@ code.meta-replacement-code {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  background: #0075ff;
+  border-radius: var(--gh-border-radius);
+  background: var(--gh-primary);
   color: #FFFFFF;
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) img {
   max-width: 100%;
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).unsubscribed, #activity-timeline li.activity-item .activity-icon:not(.no-frame).bounce, #activity-timeline li.activity-item .activity-icon:not(.no-frame).complaint {
-  background-color: #e91f4f;
+  background-color: rgb(233, 31, 79);
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
-  background: #102640;
+  background: rgb(16, 38, 64);
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).soft_bounce {
-  background-color: #ffee58;
-  color: #102640;
+  background-color: rgb(255, 238, 88);
+  color: rgb(16, 38, 64);
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark {
-  --color: #f58115;
+  --color: rgb(245, 129, 21);
   --color-5: rgba(245, 129, 21, 0.05);
   --color-10: rgba(245, 129, 21, 0.1);
   border: 2px solid var(--color);
@@ -376,7 +375,7 @@ code.meta-replacement-code {
   fill: var(--color) !important;
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).action {
-  --color: #9ece38;
+  --color: rgb(158, 206, 56);
   --color-5: rgba(158, 206, 56, 0.05);
   --color-10: rgba(158, 206, 56, 0.1);
   border: 2px solid var(--color);
@@ -393,7 +392,7 @@ code.meta-replacement-code {
   fill: var(--color) !important;
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).broadcast {
-  background-color: #9ece38;
+  background-color: rgb(158, 206, 56);
 }
 #activity-timeline li.activity-item .activity-icon:not(.no-frame) svg {
   width: 16px;
@@ -401,7 +400,7 @@ code.meta-replacement-code {
 }
 
 #primary-tabs-wrap #custom-tabs-menu::after {
-  content: "";
+  content: "\f347";
   display: inline-block;
   font: normal 16px/1 dashicons;
   speak: never;

@@ -17,7 +17,7 @@ body.gh_reporting .groundhogg-quick-stat-number {
 }
 body.gh_reporting .gh-panel .notice {
   margin: 10px;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 body.gh_reporting .gh-panel h2.title:has(.dashicons) {
   display: flex;
@@ -71,7 +71,7 @@ body.gh_reporting .nav-tab-wrapper {
 }
 
 .groundhogg-report {
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   background: #FFF;
   border: 1px solid #ccd0d4;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
@@ -159,7 +159,7 @@ body.gh_reporting .nav-tab-wrapper {
   background: #FFF;
   padding: 20px;
   border: 1px solid #ccd0d4;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .groundhogg-chart-no-padding {
@@ -169,7 +169,7 @@ body.gh_reporting .nav-tab-wrapper {
   /*border-left: 1px solid #ccd0d4;;*/
   background: #FFF;
   border: 1px solid #ccd0d4;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
   /*min-height: 200px;*/
 }
 
@@ -194,7 +194,7 @@ body.gh_reporting .nav-tab-wrapper {
   margin-bottom: 15px;
   margin-top: 15px;
   display: flex;
-  border-radius: 5px;
+  border-radius: var(--gh-border-radius);
 }
 
 .percentage-change.bad {
@@ -242,7 +242,7 @@ body.gh_reporting .nav-tab-wrapper {
 }
 /* NEW CSS FOR TABLE */
 table.groundhogg-report-table tbody tr:nth-child(odd) {
-  background-color: rgba(0, 117, 255, 0.02);
+  background-color: var(--gh-primary-2);
 }
 
 .groundhogg-table-box {
@@ -431,7 +431,7 @@ table.groundhogg-report-table td:last-child {
   font-size: 14px;
 }
 #chart_funnel_breakdown div.funnel-labels div.funnel-stage-label a {
-  color: #f58115;
+  color: rgb(245, 129, 21);
 }
 #chart_funnel_breakdown div.funnel-stages {
   display: flex;
@@ -445,7 +445,7 @@ table.groundhogg-report-table td:last-child {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #102640;
+  background-color: var(--gh-dark);
   color: #fff;
   height: var(--spacer-height);
   line-height: 0;
@@ -468,7 +468,7 @@ table.groundhogg-report-table td:last-child {
 }
 #chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer:hover {
   color: #fff;
-  background-color: #f58115;
+  background-color: rgb(245, 129, 21);
 }
 #chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer:hover a {
   color: #fff;
@@ -481,7 +481,6 @@ table.groundhogg-report-table td:last-child {
     margin-top: 0px;
     width: 100%;
   }
-
   .groundhogg-chart-no-padding {
     width: 100%;
     margin-top: 15px;
@@ -489,10 +488,9 @@ table.groundhogg-report-table td:last-child {
     /* padding: 17px 20px 15px; */
     background: #FFF;
     border: 1px solid #d6e2ed;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     min-height: 200px;
   }
-
   .groundhogg-chart {
     width: 100%;
     margin-top: 15px;
@@ -500,12 +498,11 @@ table.groundhogg-report-table td:last-child {
     /*padding: 17px 20px 15px;*/
     background: #FFF;
     border: 1px solid #d6e2ed;
-    border-radius: 5px;
+    border-radius: var(--gh-border-radius);
     min-height: 250px;
     padding: 0px;
     float: left;
   }
-
   div:not(#table_broadcast_stats) > table.groundhogg-report-table tr {
     position: relative;
   }
@@ -536,7 +533,6 @@ table.groundhogg-report-table td:last-child {
     text-overflow: ellipsis;
     text-align: left;
   }
-
   #edit-funnel {
     display: none;
   }

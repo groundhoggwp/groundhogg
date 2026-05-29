@@ -225,7 +225,7 @@
       [
         Button({
             id       : 'editor-undo',
-            className: 'gh-button secondary text',
+            className: 'gh-button secondary text icon',
             disabled : !UndoRedoManager.canUndo(),
             onClick  : e => {
               UndoRedoManager.undo()
@@ -237,7 +237,7 @@
           ]),
         Button({
             id       : 'editor-redo',
-            className: 'gh-button secondary text',
+            className: 'gh-button secondary text icon',
             disabled : !UndoRedoManager.canRedo(),
             onClick  : e => {
               UndoRedoManager.redo()

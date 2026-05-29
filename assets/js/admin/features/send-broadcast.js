@@ -1399,7 +1399,7 @@
       id       : 'broadcast-scheduler',
       className: 'display-flex column gap-10',
       style    : {
-        width   : '500px',
+        width   : '600px',
         maxWidth: '100%',
       },
     }, [

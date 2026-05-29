@@ -112,6 +112,8 @@ class Emails_Page extends Admin_Page {
 				'email'    => $email
 			] );
 
+            Groundhogg\enqueue_broadcast_assets();
+
 			Groundhogg\use_edit_lock( $email );
 		}
 
@@ -410,7 +412,7 @@ class Emails_Page extends Admin_Page {
 
             <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search', 'groundhogg' ); ?>:</label>
 
-            <div style="float: right" class="gh-input-group">
+            <div style="float: right" class="gh-input-group space-below-10">
                 <input type="search" id="gh-post-search-input" name="s"
                        value="<?php echo esc_attr( get_request_var( 's' ) ); ?>">
 				<?php

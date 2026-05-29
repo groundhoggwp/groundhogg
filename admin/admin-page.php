@@ -460,7 +460,7 @@ abstract class Admin_Page extends Supports_Errors {
 		        ] );
 			endif; ?>
             <label class="screen-reader-text" for="gh-post-search-input"><?php echo esc_html( $title ); ?>:</label>
-            <div style="float: right" class="gh-input-group">
+            <div style="float: right" class="gh-input-group space-below-10">
                 <input type="search" id="gh-post-search-input" name="<?php echo esc_attr( $name ) ?>"
                        value="<?php echo esc_attr( get_request_var( $name ) ); ?>">
                 <button type="submit" id="search-submit" class="gh-button primary small">
