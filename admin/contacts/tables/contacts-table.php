@@ -116,12 +116,11 @@ class Contacts_Table extends WP_List_Table {
 		$full_name = split_name( $search );
 
 		if ( $full_name[0] && $full_name[1] ) {
-			$query['first_name']         = $full_name[0];
-			$query['first_name_compare'] = 'starts_with';
-			$query['last_name']          = $full_name[1];
-			$query['last_name_compare']  = 'starts_with';
-			// If search by first and last clear regular search
 			$search = null;
+            add_action( 'groundhogg/contact_query/pre_get_contacts',
+                fn( Contact_Query $query ) => $query->where
+                    ->startsWith( 'first_name', $full_name[0] )
+                    ->startsWith( 'last_name', $full_name[1] ) );
 		}
 
 		// Since unconfirmed is 0 (aside maybe we should change that) we need to specify we actually want it still.
