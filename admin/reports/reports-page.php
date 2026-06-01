@@ -376,11 +376,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 			[
 				'name' => esc_html__( 'Forms', 'groundhogg' ),
 				'slug' => 'forms'
-			],
-			[
-				'name' => esc_html__( 'Custom', 'groundhogg' ),
-				'slug' => 'custom'
-			],
+			]
 		];
 
 		// Add the custom registered tabs...
@@ -391,7 +387,15 @@ class Reports_Page extends Tabbed_Admin_Page {
 			];
 		}
 
-		return apply_filters( 'groundhogg/admin/reporting/tabs', $tabs );
+		$tabs = apply_filters( 'groundhogg/admin/reporting/tabs', $tabs );
+
+        // add the custom tab last
+        $tabs[] = [
+	        'name' => esc_html__( 'Custom', 'groundhogg' ),
+	        'slug' => 'custom'
+        ];
+
+        return $tabs;
 	}
 
 	protected function get_title_actions() {
