@@ -180,7 +180,7 @@
         //language=HTML
         return `
             <div class="enable-filters-wrap">
-                <button class="enable-filters white"><span
+                <button class="gh-button icon purple enable-filters"><span
                         class="dashicons dashicons-filter"></button>
             </div>
             <div class="search-filters-wrap">
@@ -232,7 +232,7 @@
 
       //language=HTML
       return `
-          <button class="enable-filters white" style="padding-right: 10px"><span
+          <button class="gh-button purple enable-filters small" style="padding-right: 10px"><span
                   class="dashicons dashicons-filter"></span>
               ${ this.currentSearch ? __('Edit Filters', 'groundhogg') : __(
                       'Filter Contacts', 'groundhogg') }
@@ -240,7 +240,7 @@
           ${ this.savedSearchEnabled
                   ? `<div id="searches-picker"></div>`
                   : ( ContactSearch.searches.length
-                                  ? `<button id="load-saved-search" class="has-dashicon button button-secondary"><span class="dashicons dashicons-search" style="line-height: 1"></span> <span class="text">${ this.loadingSearch
+                                  ? `<button id="load-saved-search" class="gh-button secondary small"><span class="dashicons dashicons-search" style="line-height: 1"></span> <span class="text">${ this.loadingSearch
                                           ? __('Loading search', 'groundhogg')
                                           : __('Load saved search',
                                                   'groundhogg') }</span></button>`

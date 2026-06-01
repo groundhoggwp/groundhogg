@@ -1453,16 +1453,26 @@ button {
       }
     }
 
+    &.purple {
+      border: none;
+      background: var(--gh-purple);
+      color: #fff;
+
+      &:hover:not(:disabled) {
+        background: var(--gh-purple-dark);
+      }
+    }
+
+    &:has(.dashicons) {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--gh-item-padding) * 1.5);
+    }
+
     &.secondary {
       border: 1px solid var(--gh-primary-60);
       background: #FFFFFF;
       color: var(--gh-primary);
-
-      &:has(.dashicons) {
-        display: flex;
-        align-items: center;
-        gap: calc(var(--gh-item-padding) * 1.5);
-      }
 
       &.text {
         border: none;

@@ -5787,10 +5787,12 @@
                       return
                     }
 
+                    let email = EmailsStore.get(getEmailId())
+
                     Modal({},
                       () => Groundhogg.BroadcastScheduler({
-                        object: EmailsStore.get(getEmailId()),
-
+                        object: email,
+                        campaigns: email.campaigns
                       }))
 
                   },

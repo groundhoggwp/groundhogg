@@ -67,10 +67,12 @@ body.groundhogg-admin-page {
   --gh-error-red-darker: #{$error-red-10};
   --gh-error-red-darkest: #{$error-red-10};
 
-  --gh-secondary-purple: #{$secondary-purple};
-  --gh-secondary-purple-25: #{$secondary-purple-25};
-  --gh-secondary-purple-10: #{$secondary-purple-10};
-  --gh-secondary-purple-5: #{$secondary-purple-5};
+  --gh-purple: #{$secondary-purple};
+  --gh-purple-25: #{$secondary-purple-25};
+  --gh-purple-10: #{$secondary-purple-10};
+  --gh-purple-5: #{$secondary-purple-5};
+  --gh-purple-dark: color-mix(in srgb, var(--gh-purple) 90%, black);
+  --gh-purple-light: color-mix(in srgb, var(--gh-purple) 90%, white);
 
   --gh-alert-yellow: #{$alert-yellow};
   --gh-alert-yellow-50: #{$alert-yellow-50};

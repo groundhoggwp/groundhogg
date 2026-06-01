@@ -1281,6 +1281,37 @@ button.gh-button.dark:hover:not(:disabled),
 button.gh-submit.dark:hover:not(:disabled) {
   background: var(--gh-dark-50);
 }
+a.gh-button.purple, a.gh-submit.purple,
+input[type=button].gh-button.purple,
+input[type=button].gh-submit.purple,
+input[type=submit].gh-button.purple,
+input[type=submit].gh-submit.purple,
+button.gh-button.purple,
+button.gh-submit.purple {
+  border: none;
+  background: var(--gh-purple);
+  color: #fff;
+}
+a.gh-button.purple:hover:not(:disabled), a.gh-submit.purple:hover:not(:disabled),
+input[type=button].gh-button.purple:hover:not(:disabled),
+input[type=button].gh-submit.purple:hover:not(:disabled),
+input[type=submit].gh-button.purple:hover:not(:disabled),
+input[type=submit].gh-submit.purple:hover:not(:disabled),
+button.gh-button.purple:hover:not(:disabled),
+button.gh-submit.purple:hover:not(:disabled) {
+  background: var(--gh-purple-dark);
+}
+a.gh-button:has(.dashicons), a.gh-submit:has(.dashicons),
+input[type=button].gh-button:has(.dashicons),
+input[type=button].gh-submit:has(.dashicons),
+input[type=submit].gh-button:has(.dashicons),
+input[type=submit].gh-submit:has(.dashicons),
+button.gh-button:has(.dashicons),
+button.gh-submit:has(.dashicons) {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gh-item-padding) * 1.5);
+}
 a.gh-button.secondary, a.gh-submit.secondary,
 input[type=button].gh-button.secondary,
 input[type=button].gh-submit.secondary,
@@ -1291,17 +1322,6 @@ button.gh-submit.secondary {
   border: 1px solid var(--gh-primary-60);
   background: #FFFFFF;
   color: var(--gh-primary);
-}
-a.gh-button.secondary:has(.dashicons), a.gh-submit.secondary:has(.dashicons),
-input[type=button].gh-button.secondary:has(.dashicons),
-input[type=button].gh-submit.secondary:has(.dashicons),
-input[type=submit].gh-button.secondary:has(.dashicons),
-input[type=submit].gh-submit.secondary:has(.dashicons),
-button.gh-button.secondary:has(.dashicons),
-button.gh-submit.secondary:has(.dashicons) {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--gh-item-padding) * 1.5);
 }
 a.gh-button.secondary.text, a.gh-submit.secondary.text,
 input[type=button].gh-button.secondary.text,

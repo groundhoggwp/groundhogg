@@ -110,6 +110,7 @@
     repeats_month_occurrence_type: 'm',
     tzDisplay                    : wp.date.getSettings().timezone.abbr || wp.date.getSettings().timezone.string ||
       `UTC${ wp.date.getSettings().timezone.offsetFormatted }`,
+    recentQueries                : [],
     ...savedDefaults,
   }
 
@@ -204,7 +205,7 @@
             saved_search: id,
           } ),
         } )),
-      ...RecentQueries.map(query => {
+      ...getState().recentQueries.map(query => {
 
         let {
           filters = [],
@@ -1460,6 +1461,12 @@
     if (getState().searchMethod !== 'filters') {
       updateTotalContacts(false)
     }
+
+    Groundhogg.api.get( `${routes.v4.broadcasts}/queries` ).then( r => {
+      setState({
+        recentQueries: r.queries
+      })
+    })
 
     return BroadcastScheduler()
   }

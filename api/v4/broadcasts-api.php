@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Broadcast;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DraftException;
 use Groundhogg\NoContactsException;
 use Groundhogg\SchedulingException;
@@ -26,6 +27,12 @@ class Broadcasts_Api extends Base_Object_Api {
 		$route = $this->get_route();
 		$key   = $this->get_primary_key();
 
+		register_rest_route( self::NAME_SPACE, "/{$route}/queries", [
+			'methods'             => WP_REST_Server::READABLE,
+			'permission_callback' => [ $this, 'create_permissions_callback' ],
+			'callback'            => [ $this, 'read_recent_queries' ],
+		] );
+
 		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/schedule", [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'permission_callback' => [ $this, 'create_permissions_callback' ],
@@ -43,6 +50,28 @@ class Broadcasts_Api extends Base_Object_Api {
 			'permission_callback' => [ $this, 'update_permissions_callback' ],
 			'callback'            => [ $this, 'cancel_broadcast' ],
 		] );
+	}
+
+	/**
+	 * Get recent queries used in broadcasts
+	 *
+	 * @param  WP_REST_Request  $request
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function read_recent_queries( WP_REST_Request $request ) {
+
+		$limit = absint( $request->get_param( 'limit' ) ) ?: 10;
+
+		$query = new Table_Query( 'broadcasts' );
+		$query->setSelect( 'query' )->setLimit( $limit )
+		      ->where()
+		      ->contains( 'query', 'filters' ); // custom filter query
+		$queries = array_unique( wp_list_pluck( $query->get_results(), 'query' ) );
+		$queries = array_map( fn( $query ) => maybe_unserialize( $query ), $queries );
+		// only include queries that have filters
+
+		return self::SUCCESS_RESPONSE( ['queries' => $queries] );
 	}
 
 	public function read_report( WP_REST_Request $request ) {

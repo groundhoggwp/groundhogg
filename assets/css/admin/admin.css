@@ -25,10 +25,12 @@ body.groundhogg-admin-page {
   --gh-error-red-dark: color-mix(in srgb, var(--gh-error-red) 90%, black);
   --gh-error-red-darker: rgba(233, 31, 79, 0.1);
   --gh-error-red-darkest: rgba(233, 31, 79, 0.1);
-  --gh-secondary-purple: rgb(108, 25, 173);
-  --gh-secondary-purple-25: rgba(108, 25, 173, 0.25);
-  --gh-secondary-purple-10: rgba(108, 25, 173, 0.1);
-  --gh-secondary-purple-5: rgba(108, 25, 173, 0.05);
+  --gh-purple: rgb(108, 25, 173);
+  --gh-purple-25: rgba(108, 25, 173, 0.25);
+  --gh-purple-10: rgba(108, 25, 173, 0.1);
+  --gh-purple-5: rgba(108, 25, 173, 0.05);
+  --gh-purple-dark: color-mix(in srgb, var(--gh-purple) 90%, black);
+  --gh-purple-light: color-mix(in srgb, var(--gh-purple) 90%, white);
   --gh-alert-yellow: rgb(255, 238, 88);
   --gh-alert-yellow-50: rgba(255, 238, 88, 0.5);
   --gh-benchmark-orange: rgb(245, 129, 21);
