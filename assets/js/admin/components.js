@@ -828,38 +828,30 @@
 
         const onMount = () => {
           $('#cancel').on('click', () => close())
-          $(`#select-form`).ghPicker({
-            endpoint   : FormsStore.route,
-            width      : '100%',
-            placeholder: __('Type to select a form...', 'groundhogg'),
-            data       : [
-              {
-                id  : '',
-                text: '',
-              },
-              ...FormsStore.getItems().map(f => ( {
-                id      : f.ID,
-                text    : f.name,
-                selected: selectedForm && f.ID == selectedForm.ID,
-              } )),
-            ],
-            getParams  : (q) => ( {
-              ...q,
-              search : q.term,
-              active : true,
-              contact: contact.ID,
-            } ),
-            getResults : ({ items }) => {
-              FormsStore.itemsFetched(items)
+
+          let select = document.getElementById('select-form')
+          select.replaceWith(MakeEl.ItemPicker({
+            id: 'select-form',
+            fetchOptions: async search => {
+              const items = await FormsStore.fetchItems({
+                search,
+                active: true,
+                contact: contact.ID,
+              })
+
               return items.map(f => ( {
                 id  : f.ID,
                 text: f.name,
               } ))
             },
-          }).on('select2:select', (e) => {
-            selectedForm = FormsStore.get(e.params.data.id)
-            reMount()
-          })
+            selected: selectedForm ? [{ id: selectedForm.ID, text: selectedForm.name }] : [],
+            noneSelected: 'Select a form...',
+            multiple: false,
+            onChange: form => {
+              selectedForm = FormsStore.get(form.id)
+              reMount()
+            }
+          }))
 
           if (selectedForm) {
             $('.internal-form-wrap form.gh-form').on('submit', (e) => {
@@ -1081,37 +1073,30 @@
 
       }
       else {
-        $(`#${ prefix }-select-form`).ghPicker({
-          endpoint   : FormsStore.route,
-          width      : '100%',
-          placeholder: __('Type to search...', 'groundhogg'),
-          data       : [
-            {
-              id  : '',
-              text: '',
-            },
-            ...FormsStore.getItems().map(f => ( {
-              id      : f.ID,
-              text    : f.name,
-              selected: selectedForm && f.ID == selectedForm.ID,
-            } )),
-          ],
-          getParams  : (q) => ( {
-            ...q,
-            search: q.term,
-            active: true,
-          } ),
-          getResults : ({ items }) => {
-            FormsStore.itemsFetched(items)
+
+
+        let select = document.getElementById(`${ prefix }-select-form`)
+        select.replaceWith(MakeEl.ItemPicker({
+          id: `${ prefix }-select-form`,
+          fetchOptions: async search => {
+            const items = await FormsStore.fetchItems({
+              search,
+              active: true,
+            })
+
             return items.map(f => ( {
               id  : f.ID,
               text: f.name,
             } ))
           },
-        }).on('select2:select', (e) => {
-          selectedForm = FormsStore.get(e.params.data.id)
-          reMount()
-        })
+          selected: selectedForm ? [{ id: selectedForm.ID, text: selectedForm.name }] : [],
+          multiple: false,
+          noneSelected: 'Select a form...',
+          onChange: form => {
+            selectedForm = FormsStore.get(form.id)
+            reMount()
+          }
+        }))
 
         if (selectedForm) {
           $('.quick-add-wrap form.gh-form').on('submit', (e) => {
