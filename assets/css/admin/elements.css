@@ -981,6 +981,9 @@ span.gh-text.bold {
   -moz-osx-font-smoothing: grayscale;
   text-decoration: none;
 }
+.gh-panel .gh-panel-header button {
+  line-height: 1;
+}
 .gh-panel .gh-panel-header button.toggle-indicator {
   border-top-right-radius: var(--gh-border-radius);
 }
@@ -1405,6 +1408,16 @@ button.gh-button.dashicon:hover,
 button.gh-submit.dashicon:hover {
   background-color: var(--gh-dark-10);
 }
+a.gh-button svg, a.gh-submit svg,
+input[type=button].gh-button svg,
+input[type=button].gh-submit svg,
+input[type=submit].gh-button svg,
+input[type=submit].gh-submit svg,
+button.gh-button svg,
+button.gh-submit svg {
+  width: 20px;
+  height: 20px;
+}
 a.gh-button.icon, a.gh-submit.icon,
 input[type=button].gh-button.icon,
 input[type=button].gh-submit.icon,
@@ -1418,16 +1431,6 @@ button.gh-submit.icon {
   aspect-ratio: 1/1;
   line-height: 1;
   padding: calc(var(--gh-item-padding) * 2);
-}
-a.gh-button.icon svg, a.gh-submit.icon svg,
-input[type=button].gh-button.icon svg,
-input[type=button].gh-submit.icon svg,
-input[type=submit].gh-button.icon svg,
-input[type=submit].gh-submit.icon svg,
-button.gh-button.icon svg,
-button.gh-submit.icon svg {
-  width: 20px;
-  height: 20px;
 }
 a.gh-button.icon.small svg, a.gh-submit.icon.small svg,
 input[type=button].gh-button.icon.small svg,
@@ -2116,6 +2119,7 @@ button:has(.gh-dropdown-menu) {
 .gh-tags button.add-tag {
   padding-left: 3px;
   padding-right: 3px;
+  aspect-ratio: 1/1;
   border-radius: var(--gh-border-radius);
   background: none;
   border: none;

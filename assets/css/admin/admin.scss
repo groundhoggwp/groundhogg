@@ -106,6 +106,65 @@ body.groundhogg-admin-page {
   input:not([type=checkbox],[type=radio]), select{
     margin: 0;
   }
+
+  .alignleft.actions.bulkactions{
+    display: flex;
+    margin-bottom: 5px;
+  }
+
+  .select2-results {
+    .select2-results__option{
+
+      &[aria-selected=true]{
+        background-color: var(--gh-dark-10);
+      }
+
+      &.select2-results__option--highlighted{
+        background-color: var(--gh-primary);
+      }
+    }
+  }
+
+  .select2{
+
+    .select2-selection {
+      border-color: var(--gh-border-gray);
+      border-radius: var(--gh-border-radius);
+    }
+
+    ul.select2-selection__rendered {
+      padding: var(--gh-item-padding);
+      display: flex;
+      gap: var(--gh-item-padding);
+      flex-wrap: wrap;
+    }
+
+    .select2-selection__choice {
+      margin: 0;
+      border-radius: var(--gh-border-radius);
+      line-height: var(--gh-item-line-height);
+      padding: 0 var(--gh-item-padding) 0 calc( var(--gh-item-padding) * 2);
+      border: none;
+      background-color: var(--gh-dark-10);
+      display: flex;
+      flex-direction: row-reverse;
+      gap: var(--gh-item-padding);
+
+      .select2-selection__choice__remove {
+        margin: 0;
+      }
+    }
+
+    li {
+      margin: 0;
+    }
+
+    .select2-search__field {
+      margin: 0;
+      min-height: auto;
+      line-height: var(--gh-item-line-height);
+    }
+  }
 }
 
 .mce-ico {
@@ -392,23 +451,6 @@ input[type=range].slider:focus::-ms-fill-upper {
 .select2-container {
   min-width: 200px;
   //max-width: 400px !important;
-}
-
-.select2-container .select2-search--inline .select2-search__field {
-  min-height: 0;
-  line-height: 1;
-  width: initial !important;
-  //padding-left: 10px;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__rendered li {
-  margin-bottom: 0;
-  line-height: 1.4em;
-  /*padding: 1px 3px 4px 3px;*/
-}
-
-.postbox .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-  margin: 0 0 5px 0 !important;
 }
 
 a.danger {

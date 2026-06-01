@@ -1244,6 +1244,8 @@ span.gh-text {
 
     button {
 
+      line-height: 1;
+
       &.toggle-indicator {
         border-top-right-radius: var(--gh-border-radius);
       }
@@ -1519,6 +1521,11 @@ button {
       }
     }
 
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
     &.icon {
       //background: #FFFFFF;
       //border: 1.2px solid rgba(16, 38, 64, 0.15);
@@ -1530,11 +1537,6 @@ button {
       padding: calc(var(--gh-item-padding) * 2);
 
       //color: var(--gh-primary);
-
-      svg {
-        width: 20px;
-        height: 20px;
-      }
 
       &.small {
         svg {
@@ -2338,6 +2340,7 @@ button:has(.gh-dropdown-menu) {
 
     padding-left: 3px;
     padding-right: 3px;
+    aspect-ratio: 1 / 1;
 
     &:hover {
       background-color: var(--gh-dark-5);
