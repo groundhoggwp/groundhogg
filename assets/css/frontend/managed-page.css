@@ -18,6 +18,9 @@ html, body.managed-page, #main {
   margin: auto;
 }
 
+body.managed-page {
+  --gh-border-radius: 2px;
+}
 body.managed-page p {
   font-size: 14px;
 }
@@ -253,8 +256,8 @@ p#credit img {
 #main #gh-submit.secondary,
 #main button[type=submit].secondary,
 #main .button.secondary {
-  background-color: var(--gh-primary-2);
-  color: var(--gh-dark);
+  background-color: rgba(0, 117, 255, 0.02);
+  color: rgb(16, 38, 64);
 }
 #main #gh-submit.danger,
 #main button[type=submit].danger,
