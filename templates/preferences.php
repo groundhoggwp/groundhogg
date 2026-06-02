@@ -312,6 +312,69 @@ if ( ! function_exists( __NAMESPACE__ . '\send_archive_link' ) ) {
 	}
 }
 
+class GDPR_Consent_Form {
+    public static function display( $contact ) {
+	    ?>
+        <form class="gdpr-consent" method="post">
+		    <?php wp_nonce_field( 'update_gdpr_consent' );
+
+		    html( 'p', [], html()->checkbox( [
+			    'label'   => get_default_field_label( 'gdpr_consent' ),
+			    'name'    => 'gdpr_consent',
+			    'id'      => 'gdpr_consent',
+			    'class'   => 'gh-gdpr',
+			    'value'   => 'yes',
+			    'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
+			    'checked' => $contact->get_meta( 'gdpr_consent' ) === 'yes',
+		    ] ) );
+
+		    html( 'p', [], html()->checkbox( [
+			    'label'   => get_default_field_label( 'marketing_consent' ),
+			    'name'    => 'marketing_consent',
+			    'id'      => 'marketing_consent',
+			    'class'   => 'gh-gdpr',
+			    'value'   => 'yes',
+			    'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
+			    'checked' => $contact->get_meta( 'marketing_consent' ) === 'yes',
+		    ] ) )
+
+		    ?>
+            <button class="button" type="submit"><?php esc_html_e( 'Update Consent', 'groundhogg' );; ?></button>
+        </form>
+        <?php
+    }
+
+	/**
+     * Handle submitting the GDPR consent form
+     *
+	 * @param $contact
+	 *
+	 * @return void
+	 */
+    public static function maybe_process_submission( $contact ) {
+	    if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_gdpr_consent' ) ) {
+
+		    $processing_consent = get_post_var( 'gdpr_consent' );
+		    $marketing_consent  = get_post_var( 'marketing_consent' );
+
+		    if ( $processing_consent !== 'yes' ) {
+			    $contact->revoke_gdpr_consent();
+		    } else {
+			    $contact->set_gdpr_consent();
+		    }
+
+		    if ( $marketing_consent !== 'yes' ) {
+			    $contact->revoke_gdpr_consent( 'marketing' );
+		    } else {
+			    $contact->set_gdpr_consent( 'marketing' );
+		    }
+
+		    add_notice( 'notice_profile_updated' );
+	    }
+    }
+
+}
+
 $contact         = get_contactdata();
 $permissions_key = get_permissions_key( 'preferences', true );
 
@@ -457,26 +520,7 @@ switch ( $action ):
 			}
 		}
 
-		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'update_gdpr_consent' ) ) {
-
-			$processing_consent = get_post_var( 'gdpr_consent' );
-			$marketing_consent  = get_post_var( 'marketing_consent' );
-
-			if ( $processing_consent !== 'yes' ) {
-				$contact->revoke_gdpr_consent();
-			} else {
-				$contact->set_gdpr_consent();
-			}
-
-			if ( $marketing_consent !== 'yes' ) {
-				$contact->revoke_gdpr_consent( 'marketing' );
-			} else {
-				$contact->set_gdpr_consent( 'marketing' );
-			}
-
-			add_notice( 'notice_profile_updated' );
-
-		}
+		GDPR_Consent_Form::maybe_process_submission( $contact );
 
 		managed_page_head( __( 'Update Profile', 'groundhogg' ), 'profile' );
 
@@ -570,32 +614,9 @@ switch ( $action ):
         <div class="box">
             <h2 class="no-margin-top"><?php esc_html_e( 'Consent & Compliance', 'groundhogg' ); ?></h2>
             <p><?php esc_html_e( 'If you wish to update your consent please do so below. Changes to your consent will be honored instantly.', 'groundhogg' ); ?></p>
-            <form class="gdpr-consent" method="post">
-				<?php wp_nonce_field( 'update_gdpr_consent' );
-
-                html( 'p', [], html()->checkbox( [
-	                'label'   => get_default_field_label( 'gdpr_consent' ),
-	                'name'    => 'gdpr_consent',
-	                'id'      => 'gdpr_consent',
-	                'class'   => 'gh-gdpr',
-	                'value'   => 'yes',
-	                'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
-	                'checked' => $contact->get_meta( 'gdpr_consent' ) === 'yes',
-                ] ) );
-
-                html( 'p', [], html()->checkbox( [
-	                'label'   => get_default_field_label( 'marketing_consent' ),
-	                'name'    => 'marketing_consent',
-	                'id'      => 'marketing_consent',
-	                'class'   => 'gh-gdpr',
-	                'value'   => 'yes',
-	                'title'   => _x( 'I Consent', 'form_default', 'groundhogg' ),
-	                'checked' => $contact->get_meta( 'marketing_consent' ) === 'yes',
-                ] ) )
-
-                ?>
-                <button class="button" type="submit"><?php esc_html_e( 'Update Consent', 'groundhogg' );; ?></button>
-            </form>
+            <?php
+            GDPR_Consent_Form::display( $contact );
+            ?>
             <p><?php esc_html_e( 'Click below to email yourself an audit of all personal information currently on file.', 'groundhogg' ); ?></p>
             <p>
                 <a id="downloadprofile" class="button"
@@ -682,6 +703,8 @@ switch ( $action ):
 			redirect_with_notice( managed_page_url( 'preferences/unsubscribed' ), 'notice_unsubscribed' );
 		}
 
+        GDPR_Consent_Form::maybe_process_submission( $contact );
+
 		managed_page_head( __( 'Manage Preferences', 'groundhogg' ), 'manage' );
 
 		// Show option to resubscribe first if the contact is unsubscribed
@@ -705,8 +728,6 @@ switch ( $action ):
             </div>
 		<?php endif;
 
-		do_action( 'groundhogg/preferences/manage/form/before' );
-
 		if ( ! $contact->optin_status_is( Preferences::UNSUBSCRIBED ) ): ?>
             <form method="post" class="box" id="unsubscribe-form">
 				<?php wp_nonce_field( 'unsubscribe' ) ?>
@@ -714,13 +735,13 @@ switch ( $action ):
 					<?php esc_html_e( 'Unsubscribe', 'groundhogg' ); ?>
                 </h2>
                 <p><?php
-		            printf(
-		                /* translators: 1: open <b>, 2: closing </b>, 3: site name */
-                        esc_html__( 'Complete this form if you no longer want to receive %1$smarketing%2$s from %3$s. You may still receive transactional information related to your account.', 'groundhogg' ),
-                        '<b>',
-                        '</b>',
-                        esc_html( get_bloginfo() )
-                    ); ?></p>
+					printf(
+					/* translators: 1: open <b>, 2: closing </b>, 3: site name */
+						esc_html__( 'Complete this form if you no longer want to receive %1$smarketing%2$s from %3$s. You may still receive transactional information related to your account.', 'groundhogg' ),
+						'<b>',
+						'</b>',
+						esc_html( get_bloginfo() )
+					); ?></p>
                 <label for="reason"><?php esc_html_e( "Can you tell us why you're unsubscribing?", 'groundhogg' ); ?> <span class="optional"><?php esc_html_e( '(optional)', 'groundhogg' ) ?></span></label>
 				<?php html( html()->dropdown( [
 					'id'      => 'reason',
@@ -753,6 +774,16 @@ switch ( $action ):
                 </p>
             </form>
 		<?php endif;
+
+		do_action( 'groundhogg/preferences/manage/form/before' );
+
+        ?>
+        <div class="box">
+            <h2 class="no-margin-top"><?php esc_html_e( 'Consent & Compliance', 'groundhogg' ); ?></h2>
+            <p><?php esc_html_e( 'If you wish to update your consent please do so below. Changes to your consent will be honored instantly.', 'groundhogg' ); ?></p>
+            <?php GDPR_Consent_Form::display( $contact ); ?>
+        </div>
+        <?php
 
 		do_action( 'groundhogg/preferences/manage/form/after' );
 
