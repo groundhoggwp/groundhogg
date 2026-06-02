@@ -445,13 +445,13 @@
 
     switch (repeats_until) {
       case 'never':
-        recurring_preview += __(' indefinitely.', 'groundhogg')
+        recurring_preview += __(', indefinitely.', 'groundhogg')
         break
       case 'date':
-        recurring_preview += sprintf(__(' until %s.', 'groundhogg'), wp.date.dateI18n(wp.date.getSettings().formats.date, repeats_until_date))
+        recurring_preview += sprintf(__(', until %s.', 'groundhogg'), wp.date.dateI18n(wp.date.getSettings().formats.date, repeats_until_date))
         break
       case 'occurrences':
-        recurring_preview += sprintf(_n(' %s time.', ' %s times.', repeats_until_occurrences, 'groundhogg'),
+        recurring_preview += sprintf(_n(', %s time.', ', %s times.', repeats_until_occurrences, 'groundhogg'),
           bold(repeats_until_occurrences))
         break
     }

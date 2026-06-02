@@ -1094,6 +1094,14 @@
                         'M',
                       ],
                     ],
+                    [
+                      'Insert replacement code',
+                      [
+                        'CTRL',
+                        'SHIFT',
+                        '{',
+                      ],
+                    ],
                     // [ 'Undo', [ 'CTRL', 'Z' ] ],
                     // [ 'Redo', [ 'CTRL', 'Shift', 'Z' ] ],
                   ]
