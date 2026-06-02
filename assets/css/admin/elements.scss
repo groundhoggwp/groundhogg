@@ -1585,6 +1585,7 @@ button {
     &.small {
       font-size: 14px;
       line-height: 2.2;
+      padding: 0 calc(var(--gh-item-padding) * 2);
       //padding: 4px 6px;
     }
 
