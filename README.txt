@@ -378,7 +378,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.5 (2026-05-) = // TODO
+= 4.5 (2026-06-02) =
 * ADDED Recurring broadcast scheduler and schedules admin.
 * ADDED Recent recipient queries will appear in the segmentation step when scheduling broadcasts.
 * ADDED Necessary groundwork for send time optimization advanced feature.
