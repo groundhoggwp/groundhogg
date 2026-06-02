@@ -1517,6 +1517,7 @@ input[type=submit].gh-submit.small,
 button.gh-button.small,
 button.gh-submit.small {
   font-size: 14px;
+  line-height: 2.2;
 }
 a.gh-button.bold, a.gh-submit.bold,
 input[type=button].gh-button.bold,

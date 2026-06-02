@@ -141,6 +141,12 @@ body.groundhogg-admin-page {
       flex-wrap: wrap;
     }
 
+    .select2-search:first-child {
+      input {
+        padding-left: calc( var(--gh-item-padding) * 2 );
+      }
+    }
+
     .select2-selection__choice {
       margin: 0;
       border-radius: var(--gh-border-radius);
