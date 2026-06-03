@@ -767,19 +767,4 @@ class Scripts {
 		do_action( 'groundhogg/scripts/after_register_admin_styles' );
 	}
 
-	public static function enqueue_advanced_search_filters_scripts() {
-		wp_enqueue_script( 'groundhogg-admin-contact-advanced-search' );
-
-		$components = [
-			'filterGroup',
-			'orSeparator'
-		];
-
-		foreach ( $components as $component ) {
-			wp_enqueue_script( 'groundhogg-admin-contact-advanced-search-' . $component );
-		}
-
-		wp_enqueue_script( 'groundhogg-admin-contact-advanced-search-mounting' );
-	}
-
 }
