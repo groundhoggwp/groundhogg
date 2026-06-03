@@ -4,7 +4,7 @@ Contributors: trainingbusinesspros, Groundhogg
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.1
 Stable tag: 4.5
 License: GPLv3
