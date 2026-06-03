@@ -599,6 +599,14 @@ class Replacements implements \JsonSerializable {
 				'code'         => 'redact',
 				'callback'     => [ $this, 'replacement_redact' ],
 			],
+			[
+				'group'        => 'formatting',
+				'default_args' => 'text',
+				'name'         => __( 'urlencode', 'groundhogg' ),
+				'description'  => _x( 'Encodes text for use in URL params.', 'replacement', 'groundhogg' ),
+				'code'         => 'urlencode',
+				'callback'     => [ $this, 'replacement_urlencode' ],
+			],
 		];
 
 		$replacements = apply_filters( 'groundhogg/replacements/defaults', $replacements );
@@ -1577,8 +1585,7 @@ class Replacements implements \JsonSerializable {
 		$return = "";
 
 		foreach ( $notes as $note ) {
-			$return .= sprintf( "\n\n===== %s =====", date( get_date_time_format(), $note->timestamp ) );
-			$return .= sprintf( "\n\n%s", $note->content );
+			$return .= sprintf( "\n\n===== %s =====", (new DateTimeHelper($note->timestamp))->i18n() );
 			$return .= sprintf( "\n\n%s", $note->content );
 		}
 
@@ -2911,6 +2918,14 @@ class Replacements implements \JsonSerializable {
         add_redaction( $text );
 
         return $text;
+    }
+
+    public function replacement_urlencode( $text = '') {
+	    if ( ! is_string( $text ) ) {
+		    return '';
+	    }
+
+        return urlencode( $text );
     }
 
 	/**

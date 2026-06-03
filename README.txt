@@ -386,6 +386,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED URL allowlist and filter for UTM params in emails.
 * ADDED Draft indicator in Flow email picker.
 * ADDED `meta_compare` support in the `{posts}` replacement code.
+* ADDED `{urlencode}` replacement code.
 * IMPROVED Updated Groundhogg UI and colors to match moder WordPress admin theme.
 * IMPROVED Export preview UI.
 * IMPROVED New tracking link structure offers shorter but hardened links.
