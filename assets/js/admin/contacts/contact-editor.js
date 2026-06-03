@@ -1688,6 +1688,14 @@
 
   }
 
+  const handleGeoLocate = () => {
+    $('#geolocate').on( 'click', e => {
+      let $saveButton = $('#save-primary')
+      $saveButton[0].insertAdjacentElement('afterend', MakeEl.Input({ type: 'hidden', name: 'geolocate', value: '1' }) )
+      $saveButton.click()
+    } )
+  }
+
   const handleFormSubmit = () => {
 
     $('#primary-form').on('submit', e => {
@@ -2296,6 +2304,7 @@
 
       betterTagPicker('#gh-better-tag-picker', {
         selected: getContact().tags,
+        dates: getContact().i18n.tagDates,
         onChange: ({
           addTags   : _addTags,
           removeTags: _removeTags,
@@ -2338,6 +2347,7 @@
 
     init () {
 
+      handleGeoLocate()
       handleFormSubmit()
       contactMoreActions()
       manageTags()
