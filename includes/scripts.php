@@ -598,106 +598,108 @@ class Scripts {
 			'_ajax_linking_nonce' => wp_create_nonce( 'internal-linking' ),
 		] );
 
-		wp_add_inline_script( 'groundhogg-admin', 'var Groundhogg = ' . wp_json_encode( [
-				'name'             => get_bloginfo( 'name' ),
-				'locale'           => str_replace( '_', '-', get_locale() ),
-				'user_test_email'  => get_user_test_email(),
-				'user_test_emails' => get_user_meta( get_current_user_id(), 'gh_test_emails', true ) ?: [],
-				'assets'           => [
-					'path'    => GROUNDHOGG_ASSETS_URL,
-					'images'  => GROUNDHOGG_ASSETS_URL . 'images/',
-					'spinner' => is_white_labeled() ? GROUNDHOGG_ASSETS_URL . 'images/loading-gears.svg' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-spinner.svg',
-				],
-				'api'              => [
-					'routes' => [
-						'base'  => rest_url(),
-						'wp'    => [
-							'v2'         => rest_url( 'wp/v2' ),
-							'posts'      => rest_url( 'wp/v2/posts' ),
-							'categories' => rest_url( 'wp/v2/categories' ),
-							'tags'       => rest_url( 'wp/v2/tags' ),
-						],
-						'posts' => rest_url( 'wp/v2/posts' ),
-						'v3'    => [
-							'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
-							'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
-							'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
-							'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
-						],
-						'v4'    => [
-							'root'        => rest_url( Base_Api::NAME_SPACE ),
-							'tags'        => rest_url( Base_Api::NAME_SPACE . '/tags' ),
-							'activity'    => rest_url( Base_Api::NAME_SPACE . '/activity' ),
-							'events'      => rest_url( Base_Api::NAME_SPACE . '/events' ),
-							'event_queue' => rest_url( Base_Api::NAME_SPACE . '/event_queue' ),
-							'notes'       => rest_url( Base_Api::NAME_SPACE . '/notes' ),
-							'contacts'    => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
-							'forms'       => rest_url( Base_Api::NAME_SPACE . '/forms' ),
-							'emails'      => rest_url( Base_Api::NAME_SPACE . '/emails' ),
-							'funnels'     => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
-							'steps'       => rest_url( Base_Api::NAME_SPACE . '/steps' ),
-							'searches'    => rest_url( Base_Api::NAME_SPACE . '/searches' ),
-							'reports'     => rest_url( Base_Api::NAME_SPACE . '/reports' ),
-							'campaigns'   => rest_url( Base_Api::NAME_SPACE . '/campaigns' ),
-							'broadcasts'  => rest_url( Base_Api::NAME_SPACE . '/broadcasts' ),
-							'options'     => rest_url( Base_Api::NAME_SPACE . '/options' ),
-							'page_visits' => rest_url( Base_Api::NAME_SPACE . '/page_visits' ),
-							'submissions' => rest_url( Base_Api::NAME_SPACE . '/submissions' ),
-							'tasks'       => rest_url( Base_Api::NAME_SPACE . '/tasks' ),
-							'email_log'   => rest_url( Base_Api::NAME_SPACE . '/email_log' ),
-						]
+		$data = apply_filters( 'groundhogg/script/data', [
+			'name'             => get_bloginfo( 'name' ),
+			'locale'           => str_replace( '_', '-', get_locale() ),
+			'user_test_email'  => get_user_test_email(),
+			'user_test_emails' => get_user_meta( get_current_user_id(), 'gh_test_emails', true ) ?: [],
+			'assets'           => [
+				'path'    => GROUNDHOGG_ASSETS_URL,
+				'images'  => GROUNDHOGG_ASSETS_URL . 'images/',
+				'spinner' => is_white_labeled() ? GROUNDHOGG_ASSETS_URL . 'images/loading-gears.svg' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-spinner.svg',
+			],
+			'api'              => [
+				'routes' => [
+					'base'  => rest_url(),
+					'wp'    => [
+						'v2'         => rest_url( 'wp/v2' ),
+						'posts'      => rest_url( 'wp/v2/posts' ),
+						'categories' => rest_url( 'wp/v2/categories' ),
+						'tags'       => rest_url( 'wp/v2/tags' ),
+					],
+					'posts' => rest_url( 'wp/v2/posts' ),
+					'v3'    => [
+						'tags'     => rest_url( 'gh/v3/tags?select2=true' ),
+						'emails'   => rest_url( 'gh/v3/emails?select2=true&status[]=ready&status[]=draft' ),
+						'sms'      => rest_url( 'gh/v3/sms?select2=true' ),
+						'contacts' => rest_url( 'gh/v3/contacts?select2=true' ),
+					],
+					'v4'    => [
+						'root'        => rest_url( Base_Api::NAME_SPACE ),
+						'tags'        => rest_url( Base_Api::NAME_SPACE . '/tags' ),
+						'activity'    => rest_url( Base_Api::NAME_SPACE . '/activity' ),
+						'events'      => rest_url( Base_Api::NAME_SPACE . '/events' ),
+						'event_queue' => rest_url( Base_Api::NAME_SPACE . '/event_queue' ),
+						'notes'       => rest_url( Base_Api::NAME_SPACE . '/notes' ),
+						'contacts'    => rest_url( Base_Api::NAME_SPACE . '/contacts' ),
+						'forms'       => rest_url( Base_Api::NAME_SPACE . '/forms' ),
+						'emails'      => rest_url( Base_Api::NAME_SPACE . '/emails' ),
+						'funnels'     => rest_url( Base_Api::NAME_SPACE . '/funnels' ),
+						'steps'       => rest_url( Base_Api::NAME_SPACE . '/steps' ),
+						'searches'    => rest_url( Base_Api::NAME_SPACE . '/searches' ),
+						'reports'     => rest_url( Base_Api::NAME_SPACE . '/reports' ),
+						'campaigns'   => rest_url( Base_Api::NAME_SPACE . '/campaigns' ),
+						'broadcasts'  => rest_url( Base_Api::NAME_SPACE . '/broadcasts' ),
+						'options'     => rest_url( Base_Api::NAME_SPACE . '/options' ),
+						'page_visits' => rest_url( Base_Api::NAME_SPACE . '/page_visits' ),
+						'submissions' => rest_url( Base_Api::NAME_SPACE . '/submissions' ),
+						'tasks'       => rest_url( Base_Api::NAME_SPACE . '/tasks' ),
+						'email_log'   => rest_url( Base_Api::NAME_SPACE . '/email_log' ),
 					]
-				],
-				'defaults'         => [
-					'from_name'  => get_default_from_name(),
-					'from_email' => get_default_from_email(),
-				],
-				'replacements'     => [
-					'groups' => Plugin::instance()->replacements->replacement_code_groups,
-					'codes'  => Plugin::instance()->replacements->get_codes_for_frontend(),
-				],
-				'fields'           => [
-					'mappable' => get_mappable_fields()
-				],
-				'filters'          => [
-					'optin_status'                 => Preferences::get_preference_names(),
-					'owners'                       => array_map( fn( $user ) => new Safe_WP_User( $user ), array_values( has_team() ? get_team() : get_owners() ) ),
-					'current'                      => get_request_var( 'filters', [] ),
-					'roles'                        => get_editable_roles(),
-					'countries'                    => utils()->location->get_countries_list(),
-					'gh_contact_custom_properties' => Properties::instance()->get_all(),
-					'unsubReasons'                 => get_unsub_reasons(),
-				],
-				'managed_page'     => [
-					'root' => managed_page_url()
-				],
-				'url'              => [
-					'admin'   => admin_url(),
-					'home'    => home_url(),
-					'content' => WP_CONTENT_URL,
-					'plugins' => WP_PLUGIN_URL,
-				],
-				'rawStepTypes'     => Plugin::instance()->step_manager->get_elements(),
-				'currentUser'      => new Safe_WP_User( wp_get_current_user() ),
-				'isMultisite'      => is_multisite(),
-				'isWhiteLabeled'   => is_white_labeled(),
-				'whiteLabelName'   => white_labeled_name(),
-				'isSuperAdmin'     => is_super_admin(),
-				'isWPFusionActive' => is_wp_fusion_active(),
-				'isProFeaturesActive' => is_pro_features_active(),
-				'timeZone'         => wp_timezone()->getName(),
-				'recaptcha'        => [
-					'enabled' => is_recaptcha_enabled(),
-					'version' => get_option( 'gh_recaptcha_version' )
-				],
-				'turnstile'        => [
-					'enabled' => is_turnstile_enabled(),
-				],
-				'screen' => get_current_screen(),
-				'ai'     => [
-					'enabled' => false
 				]
-			] ), 'before' );
+			],
+			'defaults'         => [
+				'from_name'  => get_default_from_name(),
+				'from_email' => get_default_from_email(),
+			],
+			'replacements'     => [
+				'groups' => Plugin::instance()->replacements->replacement_code_groups,
+				'codes'  => Plugin::instance()->replacements->get_codes_for_frontend(),
+			],
+			'fields'           => [
+				'mappable' => get_mappable_fields()
+			],
+			'filters'          => [
+				'optin_status'                 => Preferences::get_preference_names(),
+				'owners'                       => array_map( fn( $user ) => new Safe_WP_User( $user ), array_values( has_team() ? get_team() : get_owners() ) ),
+				'current'                      => get_request_var( 'filters', [] ),
+				'roles'                        => get_editable_roles(),
+				'countries'                    => utils()->location->get_countries_list(),
+				'gh_contact_custom_properties' => Properties::instance()->get_all(),
+				'unsubReasons'                 => get_unsub_reasons(),
+			],
+			'managed_page'     => [
+				'root' => managed_page_url()
+			],
+			'url'              => [
+				'admin'   => admin_url(),
+				'home'    => home_url(),
+				'content' => WP_CONTENT_URL,
+				'plugins' => WP_PLUGIN_URL,
+			],
+			'rawStepTypes'     => Plugin::instance()->step_manager->get_elements(),
+			'currentUser'      => new Safe_WP_User( wp_get_current_user() ),
+			'isMultisite'      => is_multisite(),
+			'isWhiteLabeled'   => is_white_labeled(),
+			'whiteLabelName'   => white_labeled_name(),
+			'isSuperAdmin'     => is_super_admin(),
+			'isWPFusionActive' => is_wp_fusion_active(),
+			'isProFeaturesActive' => is_pro_features_active(),
+			'timeZone'         => wp_timezone()->getName(),
+			'recaptcha'        => [
+				'enabled' => is_recaptcha_enabled(),
+				'version' => get_option( 'gh_recaptcha_version' )
+			],
+			'turnstile'        => [
+				'enabled' => is_turnstile_enabled(),
+			],
+			'screen' => get_current_screen(),
+			'ai'     => [
+				'enabled' => false
+			],
+		] );
+
+		wp_add_inline_script( 'groundhogg-admin', 'var Groundhogg = ' . wp_json_encode( $data ), 'before' );
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
