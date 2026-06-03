@@ -54,8 +54,6 @@
     submissions: SubmissionsStore,
   } = Groundhogg.stores
 
-  const { emailPicker } = Groundhogg.pickers
-
   const {
     post,
     delete: _delete,
