@@ -608,6 +608,7 @@ class Contact_Query extends Table_Query {
 		] );
 
 		$countries = maybe_explode( $filter['country'] );
+		$countries = array_intersect( $countries, array_keys( utils()->location->get_countries_list() ) );
 
 		if ( empty( $countries ) ) {
 			return;
@@ -687,7 +688,9 @@ class Contact_Query extends Table_Query {
 		$col     = "COALESCE($alias.meta_value,'$default')";
 		$query->add_safe_column( $col );
 
-		$where->in( $col, $filter['locales'] );
+		$locales = array_intersect( maybe_explode( $filter['locales'] ), array_keys( wp_get_available_translations() ) );
+
+		$where->in( $col, $locales );
 	}
 
 	/**
@@ -764,7 +767,7 @@ class Contact_Query extends Table_Query {
 			$subQuery->set_query_var( 'select', 'ID' );
 			$subQuery->setSelect( 'ID' );
 
-			$where->notIn( 'ID', $subQuery->get_sql() );
+			$where->notIn( 'ID', $subQuery );
 		} else {
 			self::set_where_conditions( $search['query'], $where );
 		}
@@ -1925,21 +1928,13 @@ class Contact_Query extends Table_Query {
 				case 'optin_status': // Include by opt-in status
 					if ( ! empty( $value ) ) {
 						$optin_stati = wp_parse_id_list( $value );
-						if ( count( $optin_stati ) === 1 ) {
-							$where->equals( 'optin_status', $optin_stati[0] );
-						} else {
-							$where->in( 'optin_status', $optin_stati );
-						}
+						$where->in( 'optin_status', $optin_stati );
 					}
 					break;
 				case 'optin_status_exclude': // Exclude by opt-in status
 					if ( ! empty( $value ) ) {
 						$optin_stati = wp_parse_id_list( $value );
-						if ( count( $optin_stati ) === 1 ) {
-							$where->notEquals( 'optin_status', $optin_stati[0] );
-						} else {
-							$where->notIn( 'optin_status', $optin_stati );
-						}
+						$where->notIn( 'optin_status', $optin_stati );
 					}
 					break;
 				case 'before': // Date before
@@ -1959,11 +1954,7 @@ class Contact_Query extends Table_Query {
 				case 'owner': // filter by owner
 					if ( ! empty( $value ) ) {
 						$owner_ids = wp_parse_id_list( $value );
-						if ( count( $owner_ids ) === 1 ) {
-							$where->equals( 'owner_id', $owner_ids[0] );
-						} else {
-							$where->in( 'owner_id', $owner_ids );
-						}
+						$where->in( 'owner_id', $owner_ids );
 					}
 					break;
 				case 'email': // Email search
@@ -2206,7 +2197,7 @@ class Contact_Query extends Table_Query {
 						$exclude_query->maybe_setup_query();
 
 						if ( ! $exclude_query->where->isEmpty() ) {
-							$where->notIn( 'ID', "$exclude_query" );
+							$where->notIn( 'ID', $exclude_query );
 						}
 					}
 
@@ -2386,23 +2377,21 @@ class Contact_Query extends Table_Query {
 		$tags = wp_parse_id_list( $tags );
 
 		if ( count( $tags ) === 1 ) {
-			$where->notIn( 'ID', get_db( 'tag_relationships' )->get_sql( [
-				'select'  => 'contact_id',
-				'tag_id'  => $tags[0],
-				'orderby' => false,
-				'order'   => false,
-			] ) );
+
+			$tagQuery = new Table_Query( 'tag_relationships' );
+			$tagQuery->setSelect( 'contact_id' )->where->equals( 'tag_id', $tags[0] );
+
+			$where->notIn( 'ID', $tagQuery );
 
 			return;
 		}
 
 		if ( $all ) {
-			$where->notIn( 'ID', get_db( 'tag_relationships' )->get_sql( [
-				'select'  => 'contact_id',
-				'tag_id'  => $tags,
-				'orderby' => false,
-				'order'   => false,
-			] ) );
+
+			$tagQuery = new Table_Query( 'tag_relationships' );
+			$tagQuery->setSelect( 'contact_id' )->where->in( 'tag_id', $tags );
+
+			$where->notIn( 'ID', $tagQuery );
 
 			return;
 		}
@@ -2410,12 +2399,11 @@ class Contact_Query extends Table_Query {
 		$subWhere = $where->subWhere();
 
 		foreach ( $tags as $tag ) {
-			$subWhere->notIn( 'ID', get_db( 'tag_relationships' )->get_sql( [
-				'select'  => 'contact_id',
-				'tag_id'  => $tag,
-				'orderby' => false,
-				'order'   => false,
-			] ) );
+
+			$tagQuery = new Table_Query( 'tag_relationships' );
+			$tagQuery->setSelect( 'contact_id' )->where->in( 'tag_id', $tag );
+
+			$subWhere->notIn( 'ID', $tagQuery );
 		}
 	}
 

@@ -218,7 +218,7 @@ class Where {
 				$column = substr( $column, strpos( $column, '.' ) + 1 );
 			}
 
-			return get_array_var( $column_formats, $column, is_numeric( $value ) ? '%d' : '%s' );
+			return get_array_var( $column_formats, $column, self::guessPlaceholderFormat( $value ) );
 		}
 
 		return self::guessPlaceholderFormat( $value );
@@ -438,24 +438,28 @@ class Where {
 	 */
 	public function in( $column, $values ) {
 
+		if ( is_string( $values ) && str_starts_with( $values, 'SELECT' ) ) {
+			_doing_it_wrong( __METHOD__, 'Use the \Groundhogg\Query class for sub queries', '4.5' );
+			return $this;
+		}
+
 		$column = $this->sanitize_column( $column );
 
-		if ( ( is_string( $values ) && str_starts_with( $values, 'SELECT' ) ) || is_a( $values, Query::class ) ) {
+		if ( is_a( $values, Query::class ) ) {
 			$this->addCondition( "$column IN ( $values )" );
 
 			return $this;
 		}
 
 		$values = array_values( ensure_array( $values ) );
-		$values = map_deep( $values, 'sanitize_text_field' );
 
 		if ( count( $values ) === 1 ) {
 			return $this->equals( $column, $values[0] );
 		}
 
-		$values = maybe_implode_in_quotes( $values );
+		$placeholders = implode( ',', array_map( fn( $value ) => $this->getColumnFormat( $column, $value ), $values ) );
 
-		return $this->addCondition( "$column IN ( $values )" );
+		return $this->addCondition( $this->prepare( "$column IN ( $placeholders )", $values ) );
 	}
 
 	/**
@@ -468,24 +472,28 @@ class Where {
 	 */
 	public function notIn( $column, $values ) {
 
+		if ( is_string( $values ) && str_starts_with( $values, 'SELECT' ) ) {
+			_doing_it_wrong( __METHOD__, 'Use the \Groundhogg\Query class for sub queries', '4.5' );
+			return $this;
+		}
+
 		$column = $this->sanitize_column( $column );
 
-		if ( is_string( $values ) && str_starts_with( $values, 'SELECT' ) ) {
+		if ( is_a( $values, Query::class ) ) {
 			$this->addCondition( "$column NOT IN ( $values )" );
 
 			return $this;
 		}
 
 		$values = array_values( ensure_array( $values ) );
-		$values = map_deep( $values, 'sanitize_text_field' );
 
 		if ( count( $values ) === 1 ) {
 			return $this->notEquals( $column, $values[0] );
 		}
 
-		$values = maybe_implode_in_quotes( $values );
+		$placeholders = implode( ',', array_map( fn( $value ) => $this->getColumnFormat( $column, $value ), $values ) );
 
-		return $this->addCondition( "$column NOT IN ( $values )" );
+		return $this->addCondition( $this->prepare( "$column NOT IN ( $placeholders )", $values ) );
 	}
 
 	/**

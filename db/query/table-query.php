@@ -100,7 +100,7 @@ class Table_Query extends Query {
 					$exclude_query->parseFilters( $value );
 
 					if ( ! $exclude_query->where->isEmpty() ) {
-						$this->where()->notIn( $this->db_table->get_primary_key(), "$exclude_query" );
+						$this->where()->notIn( $this->db_table->get_primary_key(), $exclude_query );
 					}
 
 					break;

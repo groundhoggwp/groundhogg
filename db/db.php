@@ -1107,7 +1107,7 @@ abstract class DB {
 					$where[]       = [
 						'col'     => $this->get_primary_key(),
 						'compare' => 'IN',
-						'val'     => $wpdb->prepare( "SELECT primary_object_id FROM {$relationships->table_name} WHERE secondary_object_id = %d AND secondary_object_type = '%s' AND primary_object_type = '%s'", $val['ID'], $val['type'], $this->get_object_type() )
+						'val'     => $wpdb->prepare( "SELECT primary_object_id FROM %i WHERE secondary_object_id = %d AND secondary_object_type = %s AND primary_object_type = %s", $relationships->table_name, $val['ID'], $val['type'], $this->get_object_type() )
 					];
 
 					break;
@@ -1124,7 +1124,7 @@ abstract class DB {
 					$where[]       = [
 						'col'     => $this->get_primary_key(),
 						'compare' => 'IN',
-						'val'     => $wpdb->prepare( "SELECT secondary_object_id FROM {$relationships->table_name} WHERE primary_object_id = %d AND primary_object_type = '%s' AND secondary_object_type = '%s'", $val['ID'], $val['type'], $this->get_object_type() )
+						'val'     => $wpdb->prepare( "SELECT secondary_object_id FROM %i WHERE primary_object_id = %d AND primary_object_type = %s AND secondary_object_type = %s", $relationships->table_name, $val['ID'], $val['type'], $this->get_object_type() )
 					];
 					break;
 				case 'count':
@@ -1177,7 +1177,7 @@ abstract class DB {
 
 						// Select Clause
 						if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
-							$where[] = [ 'col' => $key, 'val' => $val, 'compare' => 'IN' ];
+							_doing_it_wrong( __METHOD__, 'Use the \Groundhogg\Query class for sub queries', '4.5.1' );
 							break;
 						}
 
@@ -1561,7 +1561,7 @@ abstract class DB {
 					$this->parse_filters( $val, $exclude_query->where() );
 
 					if ( ! $exclude_query->where->isEmpty() ) {
-						$query->where()->notIn( $this->get_primary_key(), "$exclude_query" );
+						$query->where()->notIn( $this->get_primary_key(), $exclude_query );
 					}
 
 					break;
@@ -1609,7 +1609,7 @@ abstract class DB {
 
 					// Select Clause
 					if ( is_string( $val ) && strpos( $val, 'SELECT' ) !== false ) {
-						$query->whereIn( $key, $val );
+						_doing_it_wrong( __METHOD__, 'Use the \Groundhogg\Query class for sub queries', '4.5.1' );
 						break;
 					}
 

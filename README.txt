@@ -378,6 +378,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.5 (2026-06-05) =
+* SECURITY Fixed possible SQL injection attack.
+
 = 4.5 (2026-06-03) =
 * ADDED Recurring broadcast scheduler and schedules admin.
 * ADDED Recent recipient queries will appear in the segmentation step when scheduling broadcasts.
