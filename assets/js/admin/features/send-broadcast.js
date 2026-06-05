@@ -1005,11 +1005,30 @@
             `<label for="use-optimized-send-time"><p>${ __('Use send time optimization?', 'groundhogg') }</p></label>`,
             Toggle({
               id      : 'use-optimized-send-time',
-              checked : getState().use_optimized_send_time,
+              checked : getState().use_optimized_send_time && Groundhogg.stores.options.get( 'gh_is_send_time_optimization_enabled' ),
               onLabel : __('Yes'),
               offLabel: __('No'),
               disabled: ! Groundhogg.isProFeaturesActive,
               onChange: e => {
+
+                if ( ! Groundhogg.stores.options.get( 'gh_is_send_time_optimization_enabled' ) && e.target.checked ){
+                  Groundhogg.element.confirmationModal({
+                    alert: `<p>Using send time optimization will require additional storage for tracking.<br/>Would you like to enable this feature? <a target="_blank" href="https://www.groundhogg.io/doc/send-time-optimization/">More details.</a></p>`,
+                    confirmText: __('Enable', 'groundhogg'),
+                    onConfirm: () => {
+
+                      setState({
+                        use_optimized_send_time: e.target.checked,
+                      })
+
+                      Groundhogg.stores.options.patch({
+                        gh_is_send_time_optimization_enabled: true,
+                      })
+                    }
+                  })
+                  return
+                }
+
                 setState({
                   use_optimized_send_time: e.target.checked,
                 })
@@ -1465,6 +1484,8 @@
         recentQueries: r.queries
       })
     })
+
+    Groundhogg.stores.options.fetch( [ 'gh_is_send_time_optimization_enabled' ] )
 
     return BroadcastScheduler()
   }

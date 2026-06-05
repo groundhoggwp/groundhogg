@@ -64,14 +64,16 @@ class Broadcasts_Api extends Base_Object_Api {
 		$limit = absint( $request->get_param( 'limit' ) ) ?: 10;
 
 		$query = new Table_Query( 'broadcasts' );
-		$query->setSelect( 'query' )->setLimit( $limit )
+		$query->setSelect( 'query' )->setLimit( $limit )->setOrderby( [ 'send_time', 'DESC' ] )
 		      ->where()
 		      ->contains( 'query', 'filters' ); // custom filter query
 		$queries = array_unique( wp_list_pluck( $query->get_results(), 'query' ) );
-		$queries = array_map( fn( $query ) => maybe_unserialize( $query ), $queries );
+		// make sure not keyed
+
+		$queries = array_values( array_map( fn( $query ) => maybe_unserialize( $query ), $queries ) );
 		// only include queries that have filters
 
-		return self::SUCCESS_RESPONSE( ['queries' => $queries] );
+		return self::SUCCESS_RESPONSE( ['queries' => $queries ] );
 	}
 
 	public function read_report( WP_REST_Request $request ) {

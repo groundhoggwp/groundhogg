@@ -34,7 +34,7 @@ $action-green-5: rgba($action-green, 0.05);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 $background-color: #F6F9FB;
 
-body.groundhogg-admin-page {
+body {
   --gh-primary: var(--wp-admin-theme-color, rgb(0, 117, 255) );
   --gh-primary-rgb: var(--wp-admin-theme-color--rgb, 0, 117, 255 );
   --gh-primary-60: rgba(var(--gh-primary-rgb), 0.6);
@@ -104,6 +104,9 @@ body.groundhogg-admin-page {
   --gh-button-line-height: 2.5;
 
   --gh-option-line-height: 2;
+}
+
+body.groundhogg-admin-page {
 
   input:not([type=checkbox],[type=radio]), select{
     margin: 0;
