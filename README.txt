@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5
+Stable tag: 4.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -379,7 +379,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.5 (2026-06-05) =
-* SECURITY Fixed possible SQL injection attack.
+* SECURITY Fixed possible SQL injection vulnerability.
 
 = 4.5 (2026-06-03) =
 * ADDED Recurring broadcast scheduler and schedules admin.
