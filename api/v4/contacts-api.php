@@ -238,21 +238,22 @@ class Contacts_Api extends Base_Object_Api {
 	/**
 	 * Unable to edit
 	 *
+	 * @return WP_Error
+	 */
+	public static function ERROR_INVALID_PERMISSIONS_CANT_VIEW() {
+		return self::ERROR_401( 'error', 'You do not have sufficient permissions to view this contact.'  );
+	}
+
+
+	/**
+	 * Unable to edit
+	 *
 	 * @param $contact Contact
 	 *
 	 * @return WP_Error
 	 */
-	public static function ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact ) {
-
-		if ( ! is_a_contact( $contact ) || ! $contact->exists() ) {
-			return self::ERROR_401( 'error', 'The requested contact does not exist.', [
-				'given' => $contact
-			] );
-		}
-
-		return self::ERROR_401( 'error', 'You do not have sufficient permissions to edit this contact.', [
-			'id' => $contact->get_id()
-		] );
+	public static function ERROR_INVALID_PERMISSIONS_CANT_EDIT() {
+		return self::ERROR_401( 'error', 'You do not have sufficient permissions to edit this contact.' );
 	}
 
 	/**
@@ -433,6 +434,10 @@ class Contacts_Api extends Base_Object_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
+		if ( ! current_user_can( 'view_contact', $object ) ){
+			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
+		}
+
 		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
 	}
 
@@ -448,7 +453,12 @@ class Contacts_Api extends Base_Object_Api {
 		// First order stuff
 		if ( $request->has_param( 'email' ) ) {
 			$fields  = $request->get_json_params();
-			$existed = is_email_address_in_use( $request->get_param( 'email' ) );
+			$email_address = $request->get_param( 'email' );
+			$existed = is_email_address_in_use( $email_address );
+
+			if ( $existed && ! current_user_can( 'edit_contact', $email_address ) ) {
+				return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT();
+			}
 
 			try {
 				$contact = generate_contact_with_map( $fields, [], [
@@ -495,6 +505,11 @@ class Contacts_Api extends Base_Object_Api {
 		if ( is_email_address_in_use( $email_address ) ) {
 			$existed = true;
 			$contact = new Contact( $email_address );
+
+			if ( ! current_user_can( 'edit_contact', $contact ) ) {
+				return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT();
+			}
+
 			$contact->update( $data );
 		} // Create new contact record
 		else {
@@ -534,7 +549,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT();
 		}
 
 		$add_tag_params = [ 'tags', 'add_tags', 'apply_tags' ];
@@ -600,6 +615,10 @@ class Contacts_Api extends Base_Object_Api {
 
 		if ( ! $object->exists() ) {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		if ( ! current_user_can( 'delete_contact', $object ) ) {
+			return self::ERROR_401( 'error', 'You do not have sufficient permissions to delete this contact.' );
 		}
 
 		$object->delete();
@@ -684,7 +703,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT();
 		}
 
 		$tags = $request->get_json_params();
@@ -713,7 +732,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'view_contact', $contact ) ) {
-			return self::ERROR_401();
+			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
 		}
 
 		return self::SUCCESS_RESPONSE( [ 'tags' => $contact->get_tags() ] );
@@ -747,7 +766,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT();
 		}
 
 		$tags = $request->get_json_params();
@@ -772,6 +791,10 @@ class Contacts_Api extends Base_Object_Api {
 
 		if ( ! is_a_contact( $contact ) ) {
 			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		if ( ! current_user_can( 'edit_contact', $contact ) ) {
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT();
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- API KEY previously validated
@@ -809,6 +832,10 @@ class Contacts_Api extends Base_Object_Api {
 
 		if ( ! is_a_contact( $contact ) ) {
 			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		if ( ! current_user_can( 'view_contact', $contact ) ) {
+			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
 		}
 
 		$data = $contact->get_files();
@@ -873,7 +900,7 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		if ( ! current_user_can( 'edit_contact', $contact ) ) {
-			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT( $contact );
+			return self::ERROR_INVALID_PERMISSIONS_CANT_EDIT();
 		}
 
 		$others = $request->has_param( 'others' )
@@ -900,6 +927,10 @@ class Contacts_Api extends Base_Object_Api {
 
 		if ( ! is_a_contact( $contact ) ) {
 			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		if ( ! current_user_can( 'view_contact', $contact ) ) {
+			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
 		}
 
 		$msgs = Plugin::instance()->imap_inbox->fetch( $contact );
@@ -1021,7 +1052,7 @@ class Contacts_Api extends Base_Object_Api {
 		$contact = get_contactdata( $request->get_param( 'contact' ) );
 
 		if ( ! current_user_can( 'view_contact', $contact ) ) {
-			return self::ERROR_401();
+			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
 		}
 
 		$contactTable = new Contacts_Table;
