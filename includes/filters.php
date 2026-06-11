@@ -583,7 +583,7 @@ function normalize_style_attribute_quotes( $html ) {
  */
 function remove_font_family_quotes( $html ) {
 	return preg_replace_callback(
-		'/font-family\s*:\s*([^;]+)(;?)/i',
+		'/font-family\s*:\s*([^";]+)(;?)/i',  // added `"` because inline style rule might not preserve ending `;`
 		function ( $matches ) {
 
 			$fonts = $matches[1];
@@ -643,7 +643,7 @@ function restore_font_family_quotes( $html ) {
 	];
 
 	return preg_replace_callback(
-		'/font-family\s*:\s*([^;]+)(;?)/i',
+		'/font-family\s*:\s*([^;"]+)(;?)/i', // added `"` because inline style rule might not preserve ending `;`
 		function ( $matches ) use ( $generic_fonts, $css_keywords ) {
 
 			$value = trim( $matches[1] );
