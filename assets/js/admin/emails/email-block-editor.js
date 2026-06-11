@@ -7547,7 +7547,7 @@
             [
               Button({
                   id       : `${ tag }-use-global`,
-                  className: `gh-button small ${ GlobalFonts.has(use) ? 'primary' : 'secondary' }`,
+                  className: `gh-button small icon ${ GlobalFonts.has(use) ? 'dark' : 'grey' }`,
                   onClick  : e => {
                     MiniModal({
                         selector     : `#${ tag }-use-global`,
@@ -7562,7 +7562,7 @@
                 Dashicon('admin-site')),
               Button({
                   id       : `${ tag }-use-custom`,
-                  className: `gh-button small ${ !GlobalFonts.has(use) ? 'primary' : 'secondary' }`,
+                  className: `gh-button small icon ${ !GlobalFonts.has(use) ? 'dark' : 'grey' }`,
                   onClick  : e => {
 
                     updateStyle({
