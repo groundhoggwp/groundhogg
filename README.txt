@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.2
+Stable tag: 4.5.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,11 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.5.3 (2026-06-11) =
+* FIXED Broken email processing rule causing some links to not work.
+* FIXED Broken permissions check on the contact API for sales representatives.
+* FIXED Icon sizes wrong for global/custom font controls in the email editor.
 
 = 4.5.2 (2026-06-05) =
 * FIXED Groundhogg components CSS broken on non-Groundhogg admin screens.
