@@ -451,6 +451,7 @@
           id,
           noneSelected: 'Select a campaign...',
           selected: [],
+          multiple: false,
           fetchOptions: async (search) => {
             let campaigns = await Groundhogg.stores.campaigns.fetchItems({
               search,
@@ -459,7 +460,7 @@
 
             return campaigns.map(({ data }) => ( { id: data.slug, text: data.name } ))
           },
-          onChange: items => setInRequest(param, items.map(({ id }) => id)),
+          onChange: item => setInRequest(param, item.id),
         }),
       },
       CommonParams.per_page('broadcasts'),

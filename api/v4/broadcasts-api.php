@@ -76,7 +76,7 @@ class Broadcasts_Api extends Base_Object_Api {
 				'page'     => absint( $request->get_param( 'page' ) ) ?: 1,
 				'per_page' => absint( $request->get_param( 'per_page' ) ) ?: 10,
 				'search'   => sanitize_text_field( $request->get_param( 'search' ) ),
-				'campaign' => $request->get_param( 'campaign' ),
+				'campaign' => sanitize_text_field( $request->get_param( 'campaign' ) ),
 			] );
 		} catch ( \Exception $e ) {
 			return self::ERROR_401( 'error', $e->getMessage() );

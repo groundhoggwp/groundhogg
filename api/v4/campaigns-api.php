@@ -2,10 +2,7 @@
 
 namespace Groundhogg\Api\V4;
 
-use Groundhogg\Broadcast;
-use Groundhogg\Utils\DateTimeHelper;
 use WP_REST_Server;
-use function Groundhogg\list_broadcasts_archive;
 use function Groundhogg\list_campaigns_archive;
 
 // Exit if accessed directly
