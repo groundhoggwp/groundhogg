@@ -116,6 +116,18 @@
       type: 'int',
       default: 20,
     } ),
+    per_page: (plural) => ( {
+      param: 'per_page',
+      description: () => Pg({}, sprintf(__('The number of %s per page.', 'groundhogg'), plural)),
+      type: 'int',
+      default: 10,
+    } ),
+    page: (plural) => ( {
+      param: 'page',
+      description: () => Pg({}, sprintf(__('The page of %s to return', 'groundhogg'), plural)),
+      type: 'int',
+      default: 1,
+    } ),
     id: (singular) => ( {
       param: 'id',
       description: () => Pg({}, sprintf(__('The ID of the %s to return.', 'groundhogg'), singular)),

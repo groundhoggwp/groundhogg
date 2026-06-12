@@ -126,6 +126,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'broadcasts',
 				'emails',
 				'funnels',
+                'campaigns',
 				'relationships',
 				'activity',
 				'reports',

@@ -430,4 +430,45 @@
       status:'success'
     }
   })
+
+  ApiRegistry.broadcasts.endpoints.add('archive', {
+    name: __('List broadcast archive', 'groundhogg'),
+    description: () => Pg({}, __('List broadcasts that belong to a public archive.', 'groundhogg')),
+    method: 'GET',
+    endpoint: `${ apiRoot }/broadcasts/archive`,
+    params: [
+      {
+        param: 'campaign',
+        type: 'int|string',
+        required: true,
+        description: () => Fragment([
+          Pg({},
+            __(
+              'The ID or slug of the campaign to filter by',
+              'groundhogg')),
+        ]),
+        control: ({ param, id }) => MakeEl.ItemPicker({
+          id,
+          noneSelected: 'Select a campaign...',
+          selected: [],
+          fetchOptions: async (search) => {
+            let campaigns = await Groundhogg.stores.campaigns.fetchItems({
+              search,
+              limit: 30,
+            })
+
+            return campaigns.map(({ data }) => ( { id: data.slug, text: data.name } ))
+          },
+          onChange: items => setInRequest(param, items.map(({ id }) => id)),
+        }),
+      },
+      CommonParams.per_page('broadcasts'),
+      CommonParams.page('broadcasts'),
+      CommonParams.search('broadcasts', [ 'email.subject', 'email.content' ] ),
+    ],
+    request: {},
+    response: {
+      status:'success'
+    }
+  })
 })()
