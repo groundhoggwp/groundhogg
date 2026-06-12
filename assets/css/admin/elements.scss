@@ -490,8 +490,10 @@ h2.nav-tab-wrapper.gh {
     margin-right: 5px;
 
     &.nav-tab-active {
-      border: none;
+      border: 1px solid var(--gh-panel-gray);
+      border-bottom: none;
       background-color: #FFFFFF;
+      //box-shadow: 0 0 2 -1px #FFFFFF;
     }
   }
 
@@ -1172,8 +1174,8 @@ span.gh-text {
   background: #FFFFFF;
   box-shadow: $box-shadow;
   /*margin: 20px;*/
-  border-radius: var(--gh-border-radius);
-  border: none;
+  border-radius: var(--gh-panel-border-radius);
+  border: 1px solid var(--gh-panel-gray);
 
   a {
     text-decoration: none;
@@ -1198,7 +1200,7 @@ span.gh-text {
 
   .gh-panel-header {
 
-    border-bottom: 1px solid var(--gh-dark-10);
+    border-bottom: 1px solid var(--gh-panel-gray);
     display: flex;
     justify-content: space-between;
 
@@ -1247,7 +1249,7 @@ span.gh-text {
       line-height: 1;
 
       &.toggle-indicator {
-        border-top-right-radius: var(--gh-border-radius);
+        border-top-right-radius: var(--gh-panel-border-radius);
       }
 
       &.toggle-indicator::before {
@@ -1907,12 +1909,12 @@ button {
 
     box-sizing: border-box;
     background: white;
-    border-radius: var(--gh-border-radius);
     position: relative;
     max-width: calc(100vw - 100px);
     max-height: calc(92vh - 64px);
     overflow: auto;
     overflow-x: hidden;
+    border-radius: var(--gh-panel-border-radius);
 
     .gh-header {
       position: sticky;

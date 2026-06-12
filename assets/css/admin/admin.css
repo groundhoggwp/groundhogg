@@ -12,6 +12,7 @@ body {
   --gh-primary-darker: color-mix(in srgb, var(--gh-primary) 80%, black);
   --gh-primary-darkest: color-mix(in srgb, var(--gh-primary) 60%, black);
   --gh-border-gray: #949494;
+  --gh-panel-gray: #c3c4c7;
   --gh-border-gray-light: #e0e0e0;
   --gh-dark: rgb(16, 38, 64);
   --gh-dark-50: rgba(16, 38, 64, 0.5);
@@ -47,7 +48,7 @@ body {
   --gh-box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   --gh-background-color: #F6F9FB;
   --gh-border-radius: 2px;
-  --gh-panel-border-radius: var(--gh-border-radius);
+  --gh-panel-border-radius: 8px;
   --gh-border-button-radius: var(--gh-border-radius);
   --gh-focused-shadow: 0 0 0 2px var(--gh-primary);
   --gh-item-padding: 4px;
@@ -875,7 +876,7 @@ label.gh-switch input:checked ~ span.off {
 #filters-here {
   padding: 20px;
   border: 1px solid rgb(108, 25, 173);
-  border-radius: 10px;
+  border-radius: var(--gh-panel-border-radius);
   position: relative;
   margin-top: 20px;
 }
@@ -903,7 +904,7 @@ label.gh-switch input:checked ~ span.off {
 #exclude-filters-here {
   padding: 20px;
   border: 1px solid rgb(108, 25, 173);
-  border-radius: 10px;
+  border-radius: var(--gh-panel-border-radius);
   position: relative;
   margin-top: 20px;
 }
@@ -936,7 +937,7 @@ label.gh-switch input:checked ~ span.off {
   flex-direction: column;
   align-items: stretch;
   background-color: #fff;
-  border-radius: var(--gh-border-radius);
+  border-radius: var(--gh-panel-border-radius);
   overflow: hidden;
 }
 .email-preview iframe {

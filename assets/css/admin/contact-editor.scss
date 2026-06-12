@@ -136,6 +136,7 @@ a.change-status.complained:hover {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  border-radius: 0 0 var(--gh-panel-border-radius) var(--gh-panel-border-radius);
 }
 
 #contact-full-name{

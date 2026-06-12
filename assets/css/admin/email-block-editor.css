@@ -181,6 +181,9 @@
   margin: 20px;
   position: relative;
 }
+#email-block-editor #content .gh-panel {
+  border: none;
+}
 #email-block-editor #content #block-editor-toolbar {
   position: sticky;
   top: 50%;

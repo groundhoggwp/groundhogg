@@ -358,7 +358,8 @@ h2.nav-tab-wrapper.gh .nav-tab {
   margin-right: 5px;
 }
 h2.nav-tab-wrapper.gh .nav-tab.nav-tab-active {
-  border: none;
+  border: 1px solid var(--gh-panel-gray);
+  border-bottom: none;
   background-color: #FFFFFF;
 }
 h2.nav-tab-wrapper.gh button {
@@ -918,8 +919,8 @@ span.gh-text.bold {
   background: #FFFFFF;
   box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
   /*margin: 20px;*/
-  border-radius: var(--gh-border-radius);
-  border: none;
+  border-radius: var(--gh-panel-border-radius);
+  border: 1px solid var(--gh-panel-gray);
 }
 .gh-panel a {
   text-decoration: none;
@@ -938,7 +939,7 @@ span.gh-text.bold {
   border-top-left-radius: 0;
 }
 .gh-panel .gh-panel-header {
-  border-bottom: 1px solid var(--gh-dark-10);
+  border-bottom: 1px solid var(--gh-panel-gray);
   display: flex;
   justify-content: space-between;
 }
@@ -985,7 +986,7 @@ span.gh-text.bold {
   line-height: 1;
 }
 .gh-panel .gh-panel-header button.toggle-indicator {
-  border-top-right-radius: var(--gh-border-radius);
+  border-top-right-radius: var(--gh-panel-border-radius);
 }
 .gh-panel .gh-panel-header button.toggle-indicator::before {
   content: "\f142";
@@ -1784,12 +1785,12 @@ button.gh-submit .gh-spinner {
 .gh-modal-dialog {
   box-sizing: border-box;
   background: white;
-  border-radius: var(--gh-border-radius);
   position: relative;
   max-width: calc(100vw - 100px);
   max-height: calc(92vh - 64px);
   overflow: auto;
   overflow-x: hidden;
+  border-radius: var(--gh-panel-border-radius);
 }
 .gh-modal-dialog .gh-header {
   position: sticky;

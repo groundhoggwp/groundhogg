@@ -51,6 +51,7 @@ body {
   --gh-primary-darkest: color-mix(in srgb, var(--gh-primary) 60%, black);
 
   --gh-border-gray: #949494;
+  --gh-panel-gray: #c3c4c7;
   --gh-border-gray-light: #e0e0e0;
 
   --gh-dark: #{$primary-dark};
@@ -94,7 +95,7 @@ body {
   --gh-background-color: #{$background-color};
 
   --gh-border-radius: 2px;
-  --gh-panel-border-radius: var(--gh-border-radius);
+  --gh-panel-border-radius: 8px;
   --gh-border-button-radius: var(--gh-border-radius);
 
   --gh-focused-shadow: 0 0 0 2px var(--gh-primary);
@@ -1034,7 +1035,7 @@ label.gh-switch {
 @mixin filters {
   padding: 20px;
   border: 1px solid $secondary-purple;
-  border-radius: 10px;
+  border-radius: var(--gh-panel-border-radius);
   position: relative;
   margin-top: 20px;
 }
@@ -1095,7 +1096,7 @@ label.gh-switch {
   flex-direction: column;
   align-items: stretch;
   background-color: #fff;
-  border-radius: var(--gh-border-radius);
+  border-radius: var(--gh-panel-border-radius);
   overflow: hidden;
 
   iframe {

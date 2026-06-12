@@ -15,7 +15,7 @@
 
 .include-filters-wrap, .exclude-filters-wrap {
   border: 1px solid rgb(108, 25, 173);
-  border-radius: var(--gh-border-radius);
+  border-radius: var(--gh-panel-border-radius);
   padding: 20px 10px 10px 10px;
   position: relative;
 }
