@@ -8866,6 +8866,92 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 }
 
 /**
+ * Convert a small subset of Markdown to HTML.
+ *
+ * Supported:
+ * - # Heading 1 through ###### Heading 6
+ * - Paragraphs
+ * - [text](url) links
+ * - ![alt](url) images
+ * - *italic* and _italic_
+ * - **bold** and __bold__
+ */
+function markdown2html( string $markdown ): string {
+
+	// Normalize line endings.
+	$markdown = str_replace( [ "\r\n", "\r" ], "\n", trim( $markdown ) );
+
+	$lines = explode( "\n", $markdown );
+	$html  = [];
+
+	foreach ( $lines as $line ) {
+
+		$line = trim( $line );
+
+		// Empty line = paragraph break.
+		if ( $line === '' ) {
+			continue;
+		}
+
+		// Images: ![alt](url)
+		$line = preg_replace_callback(
+			'/!\[(.*?)\]\((.*?)\)/',
+			function ( $matches ) {
+				return sprintf(
+					'<img src="%s" alt="%s">',
+					esc_url( $matches[2] ),
+					esc_attr( $matches[1] )
+				);
+			},
+			$line
+		);
+
+		// Links: [text](url)
+		$line = preg_replace_callback(
+			'/(?<!!)\[(.*?)\]\((.*?)\)/',
+			function ( $matches ) {
+				return sprintf(
+					'<a href="%s">%s</a>',
+					esc_url( $matches[2] ),
+					esc_html( $matches[1] )
+				);
+			},
+			$line
+		);
+
+		// Bold: **text** or __text__
+		$line = preg_replace(
+			'/\*\*(.+?)\*\*|__(.+?)__/',
+			'<strong>$1$2</strong>',
+			$line
+		);
+
+		// Italic: *text* or _text_
+		$line = preg_replace(
+			'/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)|(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/',
+			'<em>$1$2</em>',
+			$line
+		);
+
+		// Headings.
+		if ( preg_match( '/^(#{1,6})\s+(.*)$/', $line, $matches ) ) {
+			$level = strlen( $matches[1] );
+
+			$html[] = sprintf(
+				'<h%d>%s</h%d>',
+				$level,
+				$matches[2],
+				$level
+			);
+		} else {
+			$html[] = "<p>{$line}</p>";
+		}
+	}
+
+	return implode( "\n", $html );
+}
+
+/**
  * Returns a string representing Good Fiar or Poor given specific thresholds
  *
  * @param int $number

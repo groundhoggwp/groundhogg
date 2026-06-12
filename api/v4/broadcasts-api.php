@@ -73,8 +73,8 @@ class Broadcasts_Api extends Base_Object_Api {
 
 		try {
 			$list = list_broadcasts_archive( [
-				'page'     => absint( $request->get_param( 'page' ) ),
-				'per_page' => absint( $request->get_param( 'per_page' ) ),
+				'page'     => absint( $request->get_param( 'page' ) ) ?: 1,
+				'per_page' => absint( $request->get_param( 'per_page' ) ) ?: 10,
 				'search'   => sanitize_text_field( $request->get_param( 'search' ) ),
 				'campaign' => $request->get_param( 'campaign' ),
 			] );
@@ -87,15 +87,24 @@ class Broadcasts_Api extends Base_Object_Api {
 
 			$email = $item->get_object();
 
-			return [
+			$json = [
+				'ID'         => $item->get_id(),
 				'subject'    => $email->get_merged_subject_line(),
 				'preview'    => $email->get_merged_pre_header(),
-				'contact'    => $email->build(),
+				'content'    => $email->build(),
 				'plain'      => $email->get_merged_alt_body(),
 				'sent'       => ( new DateTimeHelper( $item->get_send_time() ) )->date_i18n(),
 				'from_name'  => $email->get_from_name(),
 				'from_email' => $email->get_from_email(),
 			];
+
+			/**hj
+			 * Allow modifying the response object of an individual item
+			 *
+			 * @param $json array the response item
+			 * @param $item Broadcast the original broadcast
+			 */
+			return apply_filters( 'groundhogg/api/broadcasts/archive/item', $json, $item );
 		}, $list['items'] );
 
 		return self::SUCCESS_RESPONSE( $list );

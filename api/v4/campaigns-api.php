@@ -39,8 +39,8 @@ class Campaigns_Api extends Base_Object_Api {
 	public function read_archive( \WP_REST_Request $request ) {
 
 		$list = list_campaigns_archive( [
-			'page'     => absint( $request->get_param( 'page' ) ),
-			'per_page' => absint( $request->get_param( 'per_page' ) ),
+			'page'     => absint( $request->get_param( 'page' ) ) ?: 1,
+			'per_page' => absint( $request->get_param( 'per_page' ) ) ?: 10,
 			'search'   => sanitize_text_field( $request->get_param( 'search' ) ),
 		] );
 
