@@ -2,7 +2,6 @@
 
 namespace Groundhogg;
 
-use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Utils\DateTimeHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,7 +58,7 @@ $campaign_slug = get_query_var( 'campaign' );
 
 $campaign = new Campaign( $campaign_slug, 'slug' );
 
-if ( ! $campaign->exists() ) {
+if ( ! $campaign->exists() || ! $campaign->is_public() ) {
 	return;
 }
 
@@ -81,47 +80,18 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 
 		$per_page     = 10;
 		$current_page = absint( get_url_var( '_page', 1 ) );
-
 		$search = sanitize_text_field( get_url_var( 'filter' ) );
 
-		$broadcastQuery = new Table_Query( 'broadcasts' );
-		$broadcastQuery
-			->setLimit( $per_page )
-			->setOffset( ( $current_page - 1 ) * $per_page )
-			->setFoundRows( true )
-			->setOrderby( [ 'send_time', 'DESC' ] )
-			->where()
-			->equals( 'object_type', 'email' )
-			->equals( 'status', 'sent' );
+		$list = list_broadcasts_archive( [
+            'per_page' => $per_page,
+            'page' => $current_page,
+            'search' => $search,
+            'campaign' => $campaign,
+        ] );
 
-		$broadcastQuery->parseFilters( [
-			[
-				[
-					'type'      => 'campaigns',
-					'campaigns' => [ $campaign->get_id() ]
-				]
-			]
-		] );
-
-		if ( $search ) {
-			$join = $broadcastQuery->addJoin( 'LEFT', 'emails' );
-			$join->onColumn( 'ID', 'object_id' );
-			$broadcastQuery->where()->subWhere()
-			               ->contains( "$join->alias.subject", $search )
-			               ->contains( "$join->alias.plain_text", $search );
-		}
-
-		/**
-		 * Allow modifying the broadcast query, perhaps to restrict what can appear in the archive.
-		 *
-		 * @param $query Table_Query
-		 */
-		do_action_ref_array( 'groundhogg/archive/broadcast_query', [ &$broadcastQuery ] );
-
-		$items       = $broadcastQuery->get_objects();
-		$total_items = $broadcastQuery->get_found_rows();
-
-		$total_pages = ceil( $total_items / $per_page );
+		$items       = $list['items'];
+		$total_items = $list['total_items'];
+		$total_pages = $list['total_pages'];
 
 		$contact = get_contactdata();
 

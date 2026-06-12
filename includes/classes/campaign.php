@@ -10,6 +10,16 @@ namespace Groundhogg;
  */
 class Campaign extends Base_Object {
 
+	public function __construct( $identifier_or_args = 0, $field = null ) {
+
+		// use slug if not numeric
+		if ( $field === null && is_string( $identifier_or_args ) && ! is_numeric( $identifier_or_args ) ){
+			$field = 'slug';
+		}
+
+		parent::__construct( $identifier_or_args, $field );
+	}
+
 	protected function post_setup() {
 		// TODO: Implement post_setup() method.
 	}

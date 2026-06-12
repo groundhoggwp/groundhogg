@@ -9520,3 +9520,148 @@ function check_signature( string $data, string $signature, int $length = 0 ) {
 
 	return hash_equals( $expected, $signature );
 }
+
+/**
+ * List public campaigns
+ *
+ * @param  array  $args
+ *
+ * @return array
+ */
+function list_campaigns_archive( array $args ) {
+
+	$args = wp_parse_args( $args, [
+		'page'     => 1,
+		'per_page' => 10,
+		'search'   => '',
+	] );
+
+	$per_page     = max( 1, min( 100, $args['per_page'] ) );
+	$current_page = $args['page'];
+
+	$assetsQuery = new Table_Query( 'object_relationships' );
+	$assetsQuery->setSelect( [ 'COUNT(primary_object_id)', 'total' ], [ 'secondary_object_id', 'campaign_id' ] )->setGroupby( 'secondary_object_id' )
+	            ->where()
+	            ->equals( 'primary_object_type', 'broadcast' )
+	            ->equals( 'secondary_object_type', 'campaign' );
+
+	$campaignsQuery = new Table_Query( 'campaigns' );
+
+	$join = $campaignsQuery->addJoin( 'LEFT', [ $assetsQuery, 'assets' ] );
+	$join->onColumn( 'campaign_id' );
+
+	$campaignsQuery->add_safe_column( "$campaignsQuery->alias.*" );
+
+	$campaignsQuery
+		->setSelect( "$campaignsQuery->alias.*", "$join->alias.total" )
+		->setLimit( $per_page )
+		->setOffset( ( $current_page - 1 ) * $per_page )
+		->setOrderby( [ $join->alias . '.total', 'DESC' ] )
+		->setFoundRows( true )
+		->where()
+		->greaterThan( $join->alias . '.total', 0 )
+		->equals( 'visibility', 'public' );
+
+	if ( $args['search'] ) {
+		$campaignsQuery->where()->subWhere()
+		               ->contains( 'name', $args['search'] )
+		               ->contains( 'description', $args['search'] );
+	}
+
+	/**
+	 * Allow modifying the campaigns query, perhaps to restrict what can appear in the archive.
+	 *
+	 * @param $query Table_Query
+	 */
+	do_action_ref_array( 'groundhogg/archive/campaigns_query', [ &$campaignsQuery ] );
+
+	$items       = $campaignsQuery->get_objects();
+	$total_items = $campaignsQuery->get_found_rows();
+
+	$total_pages = ceil( $total_items / $per_page );
+
+	return [
+		'items'       => $items,
+		'total_items' => $total_items,
+		'total_pages' => $total_pages,
+	];
+}
+
+/**
+ * List public broadcasts given a specific campaign
+ *
+ * @param  array  $args
+ *
+ * @return array
+ */
+function list_broadcasts_archive( array $args ) {
+
+	$args = wp_parse_args( $args, [
+		'page'     => 1,
+		'per_page' => 10,
+		'search'   => '',
+        'campaign' => null
+	] );
+
+    if ( $args['campaign'] === null ){
+        throw new \Exception( 'Missing campaign ID' );
+    }
+
+    $campaign = $args['campaign'];
+
+    if ( ! is_a( $campaign, Campaign::class ) ){
+	    $campaign = new Campaign( $campaign );
+    }
+
+    if ( ! $campaign->is_public() ){
+        throw new \Exception( 'Campaign is not public' );
+    }
+
+	$per_page     = max( 1, min( 100, $args['per_page'] ) );
+	$current_page = $args['page'];
+	$search       = $args['search'];
+
+	$broadcastQuery = new Table_Query( 'broadcasts' );
+	$broadcastQuery
+		->setLimit( $per_page )
+		->setOffset( ( $current_page - 1 ) * $per_page )
+		->setFoundRows( true )
+		->setOrderby( [ 'send_time', 'DESC' ] )
+		->where()
+		->equals( 'object_type', 'email' )
+		->equals( 'status', 'sent' );
+
+	$broadcastQuery->parseFilters( [
+		[
+			[
+				'type'      => 'campaigns',
+				'campaigns' => [ $campaign->get_id() ]
+			]
+		]
+	] );
+
+	if ( $search ) {
+		$join = $broadcastQuery->addJoin( 'LEFT', 'emails' );
+		$join->onColumn( 'ID', 'object_id' );
+		$broadcastQuery->where()->subWhere()
+		               ->contains( "$join->alias.subject", $search )
+		               ->contains( "$join->alias.plain_text", $search );
+	}
+
+	/**
+	 * Allow modifying the broadcast query, perhaps to restrict what can appear in the archive.
+	 *
+	 * @param $query Table_Query
+	 */
+	do_action_ref_array( 'groundhogg/archive/broadcast_query', [ &$broadcastQuery ] );
+
+	$items       = $broadcastQuery->get_objects();
+	$total_items = $broadcastQuery->get_found_rows();
+	$total_pages = ceil( $total_items / $per_page );
+
+    return [
+        'items'       => $items,
+        'total_items' => $total_items,
+        'total_pages' => $total_pages,
+    ];
+}

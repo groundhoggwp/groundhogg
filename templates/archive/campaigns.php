@@ -36,49 +36,17 @@ managed_page_head( __( 'Campaigns Archive', 'groundhogg' ), 'archive' );
 
 		$per_page     = 10;
 		$current_page = absint( get_url_var( '_page', 1 ) );
+        $search       = sanitize_text_field( get_url_var( 'filter' ) );
 
-		$search = sanitize_text_field( get_url_var( 'filter' ) );
+        $list = list_campaigns_archive( [
+            'search' => $search,
+            'page' => $current_page,
+            'per_page' => 10,
+        ] );
 
-		$assetsQuery = new Table_Query( 'object_relationships' );
-		$assetsQuery->setSelect( [ 'COUNT(primary_object_id)', 'total' ], [ 'secondary_object_id', 'campaign_id' ] )->setGroupby( 'secondary_object_id' )
-		            ->where()
-		            ->equals( 'primary_object_type', 'broadcast' )
-		            ->equals( 'secondary_object_type', 'campaign' );
-
-		$campaignsQuery = new Table_Query( 'campaigns' );
-
-		$join = $campaignsQuery->addJoin( 'LEFT', [ $assetsQuery, 'assets' ] );
-		$join->onColumn( 'campaign_id' );
-
-		$campaignsQuery->add_safe_column( "$campaignsQuery->alias.*" );
-
-		$campaignsQuery
-			->setSelect( "$campaignsQuery->alias.*", "$join->alias.total" )
-			->setLimit( $per_page )
-			->setOffset( ( $current_page - 1 ) * $per_page )
-			->setOrderby( [ $join->alias . '.total', 'DESC' ] )
-			->setFoundRows( true )
-			->where()
-            ->greaterThan( $join->alias . '.total', 0 )
-			->equals( 'visibility', 'public' );
-
-		if ( $search ) {
-			$campaignsQuery->where()->subWhere()
-			               ->contains( 'name', $search )
-			               ->contains( 'description', $search );
-		}
-
-		/**
-		 * Allow modifying the campaigns query, perhaps to restrict what can appear in the archive.
-		 *
-		 * @param $query Table_Query
-		 */
-		do_action_ref_array( 'groundhogg/archive/campaigns_query', [ &$campaignsQuery ] );
-
-		$items       = $campaignsQuery->get_objects();
-		$total_items = $campaignsQuery->get_found_rows();
-
-		$total_pages = ceil( $total_items / $per_page );
+		$items       = $list['items'];
+		$total_items = $list['total_items'];
+		$total_pages = $list['total_pages'];
 
 		$contact = get_contactdata();
 
