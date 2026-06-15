@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use WP_Error;
+
 /**
  * Notices
  *
@@ -23,7 +25,7 @@ class Notices {
 	const TRANSIENT = 'groundhogg_notices';
 	const DISMISSED_NOTICES_OPTION = 'gh_dismissed_notices';
 	const READ_NOTICES_OPTION = 'gh_read_notices';
-	const REMOTE_NOTICES_URL = 'https://groundho.gg/wp-json/wp/v2/plugin-notification/';
+	const REMOTE_NOTICES_URL = 'https://groundhogg.io/wp-json/gh/v4/broadcasts/archive';
 
 	public static $dismissed_notices = [];
 	public static $read_notices = [];
@@ -141,19 +143,30 @@ class Notices {
 	 */
 	function fetch_remote_notices() {
 
-		$response = wp_remote_get( self::REMOTE_NOTICES_URL );
+		$response = remote_post_json( self::REMOTE_NOTICES_URL, [ 'campaign' => 'dashboard-notifications' ], 'GET', [], true, DAY_IN_SECONDS );
 
 		if ( is_wp_error( $response ) ) {
-			return [];
+			return $response;
+//            return [];
 		}
 
-		$json = json_decode( wp_remote_retrieve_body( $response ), true );
+		$json = $response;
 
 		if ( ! $json ) {
-			return [];
+			return new WP_Error( 'no_json', __( 'No JSON returned from remote server.', 'groundhogg' ) );
 		}
 
-		return $json;
+		$items = $json['items'];
+
+		return array_map( function ( $item ) {
+
+			return [
+				'id'      => absint( $item['ID'] ),
+                'title'   => sanitize_text_field( $item['subject'] ),
+				'content' => html(  'div', [], wp_kses_post( markdown2html( $item['plain'] ) ), false ),
+			];
+
+		}, $items );
 	}
 
 	/**
