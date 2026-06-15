@@ -47,6 +47,7 @@
     dismissed    : [],
     notifications: [],
     read         : false,
+    loaded       : false
   })
 
   if (typeof GroundhoggNotifications !== 'undefined') {
@@ -71,7 +72,7 @@
   const fetchNotifications = () => ajax({
     action: 'gh_remote_notifications',
   }).then(notifications => {
-    State.set({ notifications })
+    State.set({ notifications, loaded: true })
     return notifications
   })
 
@@ -99,7 +100,6 @@
     id,
     title,
     content,
-    acf,
     morph,
   }) => Div({
     id       : `n-${ id }`,
@@ -108,7 +108,7 @@
     Div({
       className: 'gh-panel-header',
     }, [
-      H2({}, title.rendered),
+      H2({}, title),
       State.show === 'active' ? Button({
         id       : `dismiss-${ id }`,
         className: 'gh-button dismiss small',
@@ -124,12 +124,7 @@
     Div({
       className: 'inside',
     }, [
-      doReplacements(content.rendered),
-      acf.cta_text ? An({
-        className: 'gh-button primary small',
-        href     : doReplacements(acf.cta_url),
-        target   : '_blank',
-      }, doReplacements(acf.cta_text)) : null,
+      doReplacements(content),
     ]),
   ])
 
@@ -138,7 +133,7 @@
     className: 'notifications',
   }, morph => {
 
-    if (!State.notifications.length) {
+    if (!State.loaded) {
       fetchNotifications().then(() => morph())
       return Skeleton({}, [
         'full',
