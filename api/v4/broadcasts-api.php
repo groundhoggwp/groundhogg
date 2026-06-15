@@ -83,7 +83,7 @@ class Broadcasts_Api extends Base_Object_Api {
 		}
 
 		// sanitize the items for the public endpoint
-		$list['items'] = array_map( function ( Broadcast $item ) {
+		$list['items'] = array_map( function ( Broadcast $item ) use ( $request ) {
 
 			$email = $item->get_object();
 
@@ -103,8 +103,9 @@ class Broadcasts_Api extends Base_Object_Api {
 			 *
 			 * @param $json array the response item
 			 * @param $item Broadcast the original broadcast
+			 * @param $request WP_REST_Request the current request
 			 */
-			return apply_filters( 'groundhogg/api/broadcasts/archive/item', $json, $item );
+			return apply_filters( 'groundhogg/api/broadcasts/archive/item', $json, $item, $request );
 		}, $list['items'] );
 
 		return self::SUCCESS_RESPONSE( $list );
