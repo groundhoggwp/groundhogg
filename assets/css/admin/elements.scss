@@ -1416,6 +1416,7 @@ button {
     &.primary {
       background: var(--gh-primary );
       border: 1px solid var(--gh-primary);
+      color: #ffffff;
 
       &.text {
         background-color: transparent;
@@ -1425,6 +1426,7 @@ button {
 
       &:hover:not(:disabled) {
         background: var(--gh-primary-darker);
+        color: #ffffff;
 
         &.text {
           background-color: var(--gh-primary-10);
@@ -3269,6 +3271,11 @@ button:has(.gh-dropdown-menu) {
       line-height: var(--gh-option-line-height);
       text-overflow: ellipsis;
       overflow: hidden;
+
+      &.highlighted {
+        color: #fff;
+        background: var(--gh-primary);
+      }
 
       &:hover {
         color: var(--gh-dark);

@@ -227,6 +227,7 @@
             id       : 'editor-undo',
             className: 'gh-button secondary text icon',
             disabled : !UndoRedoManager.canUndo(),
+            type: 'button',
             onClick  : e => {
               UndoRedoManager.undo()
             },
@@ -238,6 +239,7 @@
         Button({
             id       : 'editor-redo',
             className: 'gh-button secondary text icon',
+            type: 'button',
             disabled : !UndoRedoManager.canRedo(),
             onClick  : e => {
               UndoRedoManager.redo()
@@ -998,6 +1000,7 @@
         header.append(Button({
           id       : 'funnel-more',
           className: 'gh-button secondary text icon',
+          type     : 'button',
           onClick  : e => {
             moreMenu('#funnel-more', [
               {

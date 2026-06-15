@@ -1192,6 +1192,7 @@ button.gh-submit#gh-submit,
 button.gh-submit.primary {
   background: var(--gh-primary);
   border: 1px solid var(--gh-primary);
+  color: #ffffff;
 }
 a.gh-button#gh-submit.text, a.gh-button.primary.text, a.gh-submit#gh-submit.text, a.gh-submit.primary.text,
 input[type=button].gh-button#gh-submit.text,
@@ -1224,6 +1225,7 @@ button.gh-button.primary:hover:not(:disabled),
 button.gh-submit#gh-submit:hover:not(:disabled),
 button.gh-submit.primary:hover:not(:disabled) {
   background: var(--gh-primary-darker);
+  color: #ffffff;
 }
 a.gh-button#gh-submit:hover:not(:disabled).text, a.gh-button.primary:hover:not(:disabled).text, a.gh-submit#gh-submit:hover:not(:disabled).text, a.gh-submit.primary:hover:not(:disabled).text,
 input[type=button].gh-button#gh-submit:hover:not(:disabled).text,
@@ -2877,6 +2879,10 @@ button:has(.gh-dropdown-menu) {
   line-height: var(--gh-option-line-height);
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.gh-picker .gh-picker-options .gh-picker-option.highlighted {
+  color: #fff;
+  background: var(--gh-primary);
 }
 .gh-picker .gh-picker-options .gh-picker-option:hover {
   color: var(--gh-dark);

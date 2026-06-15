@@ -898,7 +898,7 @@
 
   const Autocomplete = ({
     fetchResults = async search => {},
-    onInput,
+    onInput = e => {},
     ...attributes
   }) => {
 
@@ -1065,27 +1065,8 @@
 
   const Ellipses = (content, atts = {}) => Span({
     ...atts,
-    onCreate: el => {
-
-      let ellipses = ''
-      let count = 0
-
-      let interval = setInterval(() => {
-
-        // parentNode will be null once removed from the dom
-        if (!el.parentNode) {
-          clearInterval(interval)
-          return
-        }
-
-        count = ( count + 1 ) % 4
-        ellipses = '.'.repeat(count)
-        el.textContent = content + ellipses
-
-      }, 500)
-
-    },
-  }, content + '...')
+    className: 'loading-dots'
+  }, content)
 
   const ItemPicker = ({
     id = '',
@@ -1234,6 +1215,7 @@
 
       setState({
         search: '',
+        optionsIndex: -1,
       })
 
       morph()
@@ -1307,7 +1289,7 @@
       text,
     }, index) => {
       return Div({
-        className: 'gh-picker-option',
+        className: `gh-picker-option ${index === state.optionsIndex ? 'highlighted' : '' }`,
         dataId   : id,
         tabindex : '0',
         id       : `option-${ index }-${ id }`,
@@ -1316,6 +1298,8 @@
         },
       }, text)
     }
+
+    const selectableOptions = () => state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id))
 
     /**
      * The item picker options
@@ -1368,7 +1352,7 @@
       }
 
       // Filter out already selected options
-      let options = state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id))
+      let options = selectableOptions()
 
       return Div({
         className: 'gh-picker-options',
@@ -1435,6 +1419,7 @@
       setState({
         search,
         searching: true,
+        optionsIndex: -1,
       }, 'start search')
 
       if (timeout) {
@@ -1451,6 +1436,7 @@
 
           setState({
             searching: false,
+            optionsIndex: -1,
             options,
           }, 'options fetched')
         })
@@ -1477,12 +1463,18 @@
         startSearch(e.target.value)
       },
       onKeydown  : e => {
-        if (tags) {
-          if (e.key !== 'Enter' && e.key !== ',') {
-            return
-          }
+        if (e.key !== 'Enter' && e.key !== ',') {
+          return
+        }
 
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        e.preventDefault()
+
+        if (tags && ! state.optionsIndex) {
           handleCreateOption(e.target.value)
+        } else {
+          handleSelectOption(selectableOptions()[state.optionsIndex].id)
         }
       },
     })
@@ -1506,9 +1498,28 @@
         if (e.key === 'Escape') {
           setState({
             searching: false,
+            optionsIndex: -1,
             focused  : false,
           })
           morph()
+        }
+
+        if ( optionsVisible() && ['ArrowUp', 'ArrowDown', 'Up', 'Down'].includes(e.key) ) {
+
+          let index
+
+          if (e.key === 'ArrowDown') {
+            index = Math.min(state.options.length, state.optionsIndex + 1)
+          }
+
+          if (e.key === 'ArrowUp') {
+            index = Math.max(0, state.optionsIndex - 1)
+          }
+
+          setState({
+            search      : selectableOptions()[index].text,
+            optionsIndex: index,
+          })
         }
       },
       onCreate : el => {
@@ -1522,6 +1533,7 @@
 
             setState({
               search   : '',
+              optionsIndex: -1,
               options  : [],
               searching: false,
               focused  : false,
