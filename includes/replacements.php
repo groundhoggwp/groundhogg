@@ -107,6 +107,7 @@ class Replacements implements \JsonSerializable {
 			'email'      => __( 'Email', 'groundhogg' ),
 			'other'      => __( 'Other', 'groundhogg' ),
 			'formatting' => __( 'Formatting', 'groundhogg' ),
+			'conditionals' => __( 'Conditionals', 'groundhogg' ),
 		];
 
 		$replacement_groups = apply_filters( 'groundhogg/replacements/default_groups', $groups );
@@ -606,6 +607,24 @@ class Replacements implements \JsonSerializable {
 				'description'  => _x( 'Encodes text for use in URL params.', 'replacement', 'groundhogg' ),
 				'code'         => 'urlencode',
 				'callback'     => [ $this, 'replacement_urlencode' ],
+			],
+			[
+				'group'        => 'conditionals',
+				'default_args' => 'text',
+				'name'         => __( 'HTML context', 'groundhogg' ),
+				'description'  => _x( 'Content that will only appear in HTML email context.', 'replacement', 'groundhogg' ),
+				'code'         => 'html_context',
+				'callback'     => [ $this, 'replacement_html_context' ],
+				'callback_plain'     => '__return_empty_string',
+			],
+			[
+				'group'        => 'conditionals',
+				'default_args' => 'text',
+				'name'         => __( 'Plain-text context',  'groundhogg' ),
+				'description'  => _x( 'Content that will only appear in plain-text email context.', 'replacement', 'groundhogg' ),
+				'code'         => 'plain_context',
+				'callback'     => '__return_empty_string',
+                'callback_plain' => [ $this, 'replacement_plain_context' ],
 			],
 		];
 
@@ -2927,6 +2946,30 @@ class Replacements implements \JsonSerializable {
 
         return urlencode( $text );
     }
+
+	public function replacement_html_context( $text = '') {
+		if ( ! is_string( $text ) ) {
+			return '';
+		}
+
+        if ( $this->context_is_html() ){
+            return $text;
+        }
+
+		return '';
+	}
+
+	public function replacement_plain_context( $text = '') {
+		if ( ! is_string( $text ) ) {
+			return '';
+		}
+
+		if ( $this->context_is_plain() ){
+			return $text;
+		}
+
+		return '';
+	}
 
 	/**
 	 * We don't want this to be serialized
