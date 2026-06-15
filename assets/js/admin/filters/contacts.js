@@ -853,61 +853,30 @@
     },
   })
 
-  registerFilter('user_meta', 'user', __('User Meta', 'groundhogg'), {
-    view ({
-      meta,
-      compare,
-      value,
-    }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ meta }</b>`,
-        `<b>"${ value }"</b>`)
-    },
-    edit ({
-      meta,
-      compare,
-      value,
-    }, filterGroupIndex, filterIndex) {
-      // language=html
-      return `
-          ${ input({
-              id       : 'filter-meta',
-              name     : 'meta',
-              className: 'meta-picker',
-              dataGroup: filterIndex,
-              dataKey  : filterIndex,
-              value    : meta,
-          }) }
-          ${ select({
-              id       : 'filter-compare',
-              name     : 'compare',
-              dataGroup: filterIndex,
-              dataKey  : filterIndex,
-          }, AllComparisons, compare) } ${ input({
-              id       : 'filter-value',
-              name     : 'value',
-              dataGroup: filterIndex,
-              dataKey  : filterIndex,
-              value,
-          }) }`
-    },
-    onMount (filter, updateFilter) {
-
-      userMetaPicker('#filter-meta')
-
-      $('#filter-compare, #filter-value, #filter-meta').
-        on('change blur', function (e) {
-          const $el = $(this)
-          const { compare } = updateFilter({
-            [$el.prop('name')]: $el.val(),
+  ContactFilterRegistry.registerFilter(createMixedFilter( 'user_meta', __('User meta', 'groundhogg'), 'user' , {
+    edit: ({ meta, updateFilter }) => {
+      return Autocomplete({
+        fetchResults: async search => {
+          let results = await Groundhogg.api.ajax({
+            action: 'gh_meta_picker',
+            term: search,
+            nonce: Groundhogg.nonces._meta_nonce
           })
-        })
+          return results.map(r => ({id: r.id, text: r.label}))
+        },
+        id: 'filter-meta-key',
+        value: meta,
+        onChange: e => {
+          updateFilter({
+            meta: e.target.value,
+          })
+        }
+      })
     },
-    defaults: {
-      meta   : '',
-      compare: 'equals',
-      value  : '',
-    },
-  })
+    display: ({meta}) => Fragment(bold(meta))
+  }, {
+    meta: ''
+  }))
 
   ContactFilterRegistry.registerFilter(createNumberFilter( 'user_id', __('User ID', 'groundhogg'), 'user' ))
 
@@ -995,19 +964,9 @@
     },
   })
 
-  registerFilter('street_address_1', 'location',
-    __('Line 1', 'groundhogg'), {
-      ...BasicTextFilter(__('Street Address 1', 'groundhogg')),
-    })
-
-  registerFilter('street_address_2', 'location',
-    __('Line 2', 'groundhogg'), {
-      ...BasicTextFilter(__('Street Address 2', 'groundhogg')),
-    })
-
-  registerFilter('zip_code', 'location', __('Zip/Postal Code', 'groundhogg'), {
-    ...BasicTextFilter(__('Zip/Postal Code', 'groundhogg')),
-  })
+  ContactFilterRegistry.registerFilter(createStringFilter('street_address_1', __('Line 1', 'groundhogg'),'location'))
+  ContactFilterRegistry.registerFilter(createStringFilter('street_address_2', __('Line 2', 'groundhogg'),'location'))
+  ContactFilterRegistry.registerFilter(createStringFilter('zip_code', __('Zip/Postal Code', 'groundhogg'),'location'))
 
   registerFilter('locale', 'location', __('Locale', 'groundhogg'), {
     view ({
