@@ -132,6 +132,7 @@ body.groundhogg-admin-page .select2 .select2-search__field {
   content: "\f121";
 }
 
+ul.list-disc,
 ul.styled {
   list-style: disc;
   padding-left: 20px;
