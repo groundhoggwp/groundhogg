@@ -53,6 +53,8 @@
     greater_than_or_equal_to: _x('Greater than or equal to', 'comparison', 'groundhogg'),
     empty                   : _x('Is empty', 'comparison', 'groundhogg'),
     not_empty               : _x('Is not empty', 'comparison', 'groundhogg'),
+    any_of                  : _x('Is any of', 'comparison', 'groundhogg'),
+    none_of                 : _x('Is none of', 'comparison', 'groundhogg'),
     // null: _x('Is null', 'comparison', 'groundhogg'),
     // not_null: _x('Is not null', 'comparison', 'groundhogg'),
   }
@@ -68,6 +70,8 @@
     does_not_end_with  : _x('Does not end with', 'comparison', 'groundhogg'),
     empty              : _x('Is empty', 'comparison', 'groundhogg'),
     not_empty          : _x('Is not empty', 'comparison', 'groundhogg'),
+    any_of             : _x('Is any of', 'comparison', 'groundhogg'),
+    none_of            : _x('Is none of', 'comparison', 'groundhogg'),
   }
 
   const NumericComparisons = {
@@ -79,6 +83,8 @@
     greater_than            : _x('Greater than', 'comparison', 'groundhogg'),
     greater_than_or_equal_to: _x('Greater than or equal to', 'comparison',
       'groundhogg'),
+    any_of             : _x('Is any of', 'comparison', 'groundhogg'),
+    none_of            : _x('Is none of', 'comparison', 'groundhogg'),
   }
 
   const ComparisonsTitleGenerators = {
@@ -123,6 +129,12 @@
         'groundhogg'), k, v),
     not_in                  : (k, v) => sprintf(
       _x('%1$s is not %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
+    any_of                      : (k, v) => sprintf(
+      _x('%1$s is any of %2$s', '%1 is a key and %2 is user defined value',
+        'groundhogg'), k, v),
+    none_of                  : (k, v) => sprintf(
+      _x('%1$s is none of %2$s', '%1 is a key and %2 is user defined value',
         'groundhogg'), k, v),
     empty                   : (k, v) => sprintf(
       _x('%1$s is empty', '%1 is a key and %2 is user defined value',
@@ -294,11 +306,103 @@
    * @returns {{defaults: {}, edit: (function(): null), display: (function():
    *   null), name, type, preload: preload, group}}
    */
+  const createMixedFilter = (
+    type, name, group,
+    {
+      edit = () => null,
+      display = () => bold(name),
+      preload = () => {},
+    } = {},
+    defaults = {}) => createFilter(
+    type,
+    name,
+    group,
+    {
+      edit   : ({
+        value,
+        compare,
+        updateFilter,
+        ...rest
+      }) => Fragment([
+        edit({
+          ...rest,
+          updateFilter,
+        }),
+        Select({
+          id      : 'filter-compare',
+          name    : 'filter_compare',
+          options : AllComparisons,
+          selected: compare,
+          onChange: e => updateFilter({
+            compare: e.target.value,
+          }, true),
+        }),
+        [
+          'empty',
+          'not_empty',
+          'any_of',
+          'none_of'
+        ].includes(compare) ? null : Input({
+          id      : 'filter-value',
+          value: Array.isArray(value) ? ( value[0] ?? '' ) : value,
+          onChange: e => updateFilter({
+            value: e.target.value,
+          }),
+        }),
+        [
+          'any_of',
+          'none_of'
+        ].includes(compare) ? OfPicker({value, updateFilter}) : null,
+      ]),
+      display: ({
+        compare,
+        value,
+        ...rest
+      }) => {
+
+        if ( Array.isArray(value) && ['any_of', 'none_of'].includes(compare)) {
+
+          let values = value.map( v => bold(v) )
+          let list = compare === 'any_of' ? orList(values) : andList(values)
+
+          return Fragment([
+            display(rest),
+            ComparisonsTitleGenerators[compare]('', list )
+          ])
+        }
+
+        return Fragment([
+          display(rest),
+          ComparisonsTitleGenerators[compare]('', bold(value))
+        ])
+      },
+      preload,
+    },
+    {
+      value  : '',
+      compare: 'equals',
+      ...defaults,
+    },
+  )
+
+  /**
+   * Create a string comparison filter
+   *
+   * @param type
+   * @param name
+   * @param group
+   * @param edit
+   * @param display
+   * @param preload
+   * @param defaults
+   * @returns {{defaults: {}, edit: (function(): null), display: (function():
+   *   null), name, type, preload: preload, group}}
+   */
   const createStringFilter = (
     type, name, group,
     {
       edit = () => null,
-      display = () => null,
+      display = () => bold(name),
       preload = () => {},
     } = {},
     defaults = {}) => createFilter(
@@ -328,21 +432,41 @@
         [
           'empty',
           'not_empty',
+          'any_of',
+          'none_of'
         ].includes(compare) ? null : Input({
           id      : 'filter-value',
-          value,
+          value: Array.isArray(value) ? ( value[0] ?? '' ) : value,
           onChange: e => updateFilter({
             value: e.target.value,
           }),
         }),
+        [
+          'any_of',
+          'none_of'
+        ].includes(compare) ? OfPicker({value, updateFilter}) : null,
       ]),
       display: ({
         compare,
         value,
         ...rest
       }) => {
-        return Fragment(
-          ComparisonsTitleGenerators[compare](bold(name), bold(value)))
+
+        if ( Array.isArray(value) && ['any_of', 'none_of'].includes(compare)) {
+
+          let values = value.map( v => bold(v) )
+          let list = compare === 'any_of' ? orList(values) : andList(values)
+
+          return Fragment([
+            display(rest),
+            ComparisonsTitleGenerators[compare]('', list )
+          ])
+        }
+
+        return Fragment([
+          display(rest),
+          ComparisonsTitleGenerators[compare]('', bold(value))
+        ])
       },
       preload,
     },
@@ -370,7 +494,7 @@
     type, name, group,
     {
       edit = () => null,
-      display = () => null,
+      display = () => bold(name),
       preload = () => {},
     } = {},
     defaults = {}) => createFilter(
@@ -395,24 +519,45 @@
           selected: compare,
           onChange: e => updateFilter({
             compare: e.target.value,
-          }),
+          }, true),
         }),
-        Input({
+        [
+          'any_of',
+          'none_of'
+        ].includes(compare) ? OfPicker({
+          value,
+          updateFilter,
+          isValidSelection: (v) => `${parseInt(v)}` === v,
+        }) : Input({
           type    : 'number',
           id      : 'filter-value',
-          value,
+          value: Array.isArray(value) ? ( value[0] ?? '' ) : value,
           onChange: e => updateFilter({
             value: e.target.value,
           }),
-        }),
+        })
       ]),
       display: ({
         compare,
         value,
         ...rest
       }) => {
-        return Fragment(
-          ComparisonsTitleGenerators[compare](bold(name), bold(formatNumber(value))))
+
+        if ( Array.isArray(value) && ['any_of', 'none_of'].includes(compare)) {
+
+          let values = value.map( v => bold(formatNumber(v)) )
+          let list = compare === 'any_of' ? orList(values) : andList(values)
+
+          return Fragment([
+            display(rest),
+            ComparisonsTitleGenerators[compare]('', list )
+          ])
+        }
+
+        return Fragment([
+          display(rest),
+          ComparisonsTitleGenerators[compare]('', bold(formatNumber(value)))
+        ])
       },
       preload,
     },
@@ -422,6 +567,23 @@
       ...defaults,
     },
   )
+
+  const OfPicker = ({
+    value,
+    updateFilter,
+    isValidSelection = v => Boolean(v),
+  }) => ItemPicker({
+    id: 'filter-values',
+    noneSelected: 'Select values',
+    placeholder: 'Select values',
+    selected: Array.isArray(value) ? value.map( v => ({id: `${v}`, text: `${v}`})) : ( value ? [{id: `${value}`, text: `${value}`}] : [] ),
+    onChange: (values) => updateFilter({
+      value: values.map(v => v.id),
+    }),
+    multiple: true,
+    isValidSelection,
+    fetchOptions: async search => [{id: search, text: search}],
+  })
 
   /**
    * Create a filter that allow you to compare a time value
@@ -1366,6 +1528,7 @@
           return Filter(filter, group, index)
         }
         catch (err) {
+          console.log(err)
           return FilterBroken(filter, group, index, err)
         }
 
@@ -1590,6 +1753,7 @@
   Groundhogg.filters.FilterRegistry = FilterRegistry
   Groundhogg.filters.createFilter = createFilter
   Groundhogg.filters.createGroup = createGroup
+  Groundhogg.filters.createMixedFilter = createMixedFilter
   Groundhogg.filters.createStringFilter = createStringFilter
   Groundhogg.filters.createNumberFilter = createNumberFilter
   Groundhogg.filters.createTimeFilter = createTimeFilter

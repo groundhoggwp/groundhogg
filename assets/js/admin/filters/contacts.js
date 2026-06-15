@@ -53,7 +53,8 @@
     Input,
     Div,
     makeEl,
-    InputRepeater
+    InputRepeater,
+    Autocomplete,
   } = MakeEl
 
   const {
@@ -67,6 +68,7 @@
     createStringFilter,
     createNumberFilter,
     createTimeFilter,
+    createMixedFilter,
     unsubReasons,
   } = Groundhogg.filters
 
@@ -81,6 +83,12 @@
   } = Groundhogg.filters.comparisons
 
   const ContactFilterRegistry = FilterRegistry({})
+
+  const {
+    any_of,
+    none_of,
+    ...BasicStringComparisons
+  } = StringComparisons
 
   const uid = function () {
     return Date.now().toString(36) + Math.random().toString(36).substring(2)
@@ -413,7 +421,7 @@
       return `${ select({
           id  : 'filter-compare',
           name: 'compare',
-      }, StringComparisons, compare) } ${ input({
+      }, BasicStringComparisons, compare) } ${ input({
           id  : 'filter-value',
           name: 'value',
           value,
@@ -445,17 +453,10 @@
   registerFilterGroup('activity',
     _x('Activity', 'noun referring to a persons past activities', 'groundhogg'))
 
-  registerFilter('first_name', 'contact', {
-    ...BasicTextFilter(__('First Name', 'groundhogg')),
-  })
 
-  registerFilter('last_name', 'contact', {
-    ...BasicTextFilter(__('Last Name', 'groundhogg')),
-  })
-
-  registerFilter('email', 'contact', {
-    ...BasicTextFilter(__('Email Address', 'groundhogg')),
-  })
+  ContactFilterRegistry.registerFilter(createStringFilter('first_name', __('First Name', 'groundhogg'), 'contact'))
+  ContactFilterRegistry.registerFilter(createStringFilter('last_name', __('Last Name', 'groundhogg'), 'contact'))
+  ContactFilterRegistry.registerFilter(createStringFilter('email', __('Email', 'groundhogg'), 'contact'))
 
   const phoneTypes = {
     primary: __('Primary Phone', 'groundhogg'),
@@ -486,7 +487,7 @@
       ${ select({
           id  : 'filter-compare',
           name: 'compare',
-      }, StringComparisons, compare) } ${ input({
+      }, BasicStringComparisons, compare) } ${ input({
           id  : 'filter-value',
           name: 'value',
           value,
@@ -778,111 +779,32 @@
       },
     })
 
-  registerFilter('meta', 'contact', __('Custom meta', 'groundhogg'), {
-    view ({
-      meta,
-      compare,
-      value,
-    }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ meta }</b>`,
-        `<b>"${ value }"</b>`)
-    },
-    edit ({
-      meta,
-      compare,
-      value,
-    }, filterGroupIndex, filterIndex) {
-
-      // language=html
-      return [
-        input({
-          id       : 'filter-meta',
-          name     : 'meta',
-          className: 'meta-picker',
-          dataGroup: filterIndex,
-          dataKey  : filterIndex,
-          value    : meta,
-        }),
-
-        select({
-          id       : 'filter-compare',
-          name     : 'compare',
-          dataGroup: filterIndex,
-          dataKey  : filterIndex,
-        }, AllComparisons, compare),
-
-        [
-          'empty',
-          'not_empty',
-        ].includes(compare) ? '' : input({
-          id       : 'filter-value',
-          name     : 'value',
-          dataGroup: filterIndex,
-          dataKey  : filterIndex,
-          value,
-        }),
-      ].join('')
-
-    },
-    onMount (filter, updateFilter) {
-
-      metaPicker('#filter-meta')
-
-      $('#filter-compare, #filter-value, #filter-meta').
-        on('change blur', function (e) {
-          const $el = $(this)
+  ContactFilterRegistry.registerFilter(createMixedFilter( 'meta', __('Custom meta', 'groundhogg'), 'contact' , {
+    edit: ({ meta, updateFilter }) => {
+      return Autocomplete({
+        fetchResults: async search => {
+          let results = await Groundhogg.api.ajax({
+            action: 'gh_meta_picker',
+            term: search,
+            nonce: Groundhogg.nonces._meta_nonce
+          })
+          return results.map(r => ({id: r.id, text: r.label}))
+        },
+        id: 'filter-meta-key',
+        value: meta,
+        onChange: e => {
           updateFilter({
-            [$el.prop('name')]: $el.val(),
-          }, true)
-        })
-
-    },
-    defaults: {
-      meta   : '',
-      compare: 'equals',
-      value  : '',
-    },
-  })
-
-  registerFilter('contact_id', 'contact', __('Contact ID', 'groundhogg'), {
-    view ({
-      compare,
-      value,
-    }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ __('Contact ID') }</b>`,
-        `<b>${ value }</b>`)
-    },
-    edit ({
-      compare,
-      value,
-    }) {
-      // language=html
-      return `
-          ${ select({
-              id  : 'filter-compare',
-              name: 'compare',
-          }, NumericComparisons, compare) } ${ input({
-              id  : 'filter-value',
-              name: 'value',
-              type: 'number',
-              step: '0.01',
-              value,
-          }) }`
-    },
-    onMount (filter, updateFilter) {
-
-      $('#filter-compare, #filter-value').on('change', function (e) {
-        const $el = $(this)
-        updateFilter({
-          [$el.prop('name')]: $el.val(),
-        })
+            meta: e.target.value,
+          })
+        }
       })
     },
-    defaults: {
-      compare: 'equals',
-      value  : '',
-    },
-  })
+    display: ({meta}) => Fragment(bold(meta))
+  }, {
+    meta: ''
+  }))
+
+  ContactFilterRegistry.registerFilter(createNumberFilter( 'contact_id', __('Contact ID', 'groundhogg'), 'contact' ))
 
   registerFilter('is_user', 'user', __('Has User Account', 'groundhogg'), {
     view () {
@@ -987,45 +909,7 @@
     },
   })
 
-  registerFilter('user_id', 'user', __('User ID', 'groundhogg'), {
-    view ({
-      compare,
-      value,
-    }) {
-      return ComparisonsTitleGenerators[compare](`<b>${ __('User ID') }</b>`,
-        `<b>${ value }</b>`)
-    },
-    edit ({
-      compare,
-      value,
-    }) {
-      // language=html
-      return `
-          ${ select({
-              id  : 'filter-compare',
-              name: 'compare',
-          }, NumericComparisons, compare) } ${ input({
-              id  : 'filter-value',
-              name: 'value',
-              type: 'number',
-              step: '0.01',
-              value,
-          }) }`
-    },
-    onMount (filter, updateFilter) {
-
-      $('#filter-compare, #filter-value').on('change', function (e) {
-        const $el = $(this)
-        updateFilter({
-          [$el.prop('name')]: $el.val(),
-        })
-      })
-    },
-    defaults: {
-      compare: 'equals',
-      value  : '',
-    },
-  })
+  ContactFilterRegistry.registerFilter(createNumberFilter( 'user_id', __('User ID', 'groundhogg'), 'user' ))
 
   registerFilter('country', 'location', __('Country', 'groundhogg'), {
     view ({ country }) {
@@ -2861,7 +2745,7 @@
             id      : 'event-name-compare',
             name    : 'event_name_compare',
             selected: event_name_compare,
-            options : StringComparisons,
+            options : BasicStringComparisons,
             onChange: e => {
               updateFilter({
                 event_name_compare: e.target.value,

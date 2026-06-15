@@ -482,6 +482,22 @@ class Filters {
 			'value'   => 0
 		] );
 
+		// handle any/none of
+		if ( is_array( $value ) ) {
+
+			if ( $compare === 'any_of' ) {
+				$where->in( $column, $value );
+				return;
+			}
+
+			if ( $compare === 'none_of' ) {
+				$where->notIn( $column, $value );
+				return;
+			}
+
+			$value = array_shift( $value );
+		}
+
 		// Convert to float or int to be on the safe side
 		if ( is_string( $value ) ) {
 			if ( str_contains( $value, ',' ) ) {
@@ -621,9 +637,28 @@ class Filters {
 			'value'   => 0
 		] );
 
-		$value = sanitize_text_field( $value );
-
 		$where->setColumnFormat( $column, '%s' );
+
+		// handle any/none of
+		if ( is_array( $value ) ) {
+
+
+			$value = map_deep( $value, 'sanitize_text_field' );
+
+			if ( $compare === 'any_of' ) {
+				$where->in( $column, $value );
+				return;
+			}
+
+			if ( $compare === 'none_of' ) {
+				$where->notIn( $column, $value );
+				return;
+			}
+
+			$value = array_shift( $value );
+		}
+
+		$value = sanitize_text_field( $value );
 
 		switch ( $compare ) {
 			default:
