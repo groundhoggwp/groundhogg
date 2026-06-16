@@ -8868,87 +8868,171 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 /**
  * Convert a small subset of Markdown to HTML.
  *
- * Supported:
- * - # Heading 1 through ###### Heading 6
+ * Supports:
+ * - Headings: # through ######
  * - Paragraphs
- * - [text](url) links
- * - ![alt](url) images
- * - *italic* and _italic_
- * - **bold** and __bold__
+ * - Links: [text](url)
+ * - Images: ![alt](url)
+ * - Bold: **text** or __text__
+ * - Italic: *text* or _text_
+ * - Unordered lists: - item or * item
+ * - Ordered lists: 1. item
  */
 function markdown2html( string $markdown ): string {
 
-	// Normalize line endings.
 	$markdown = str_replace( [ "\r\n", "\r" ], "\n", trim( $markdown ) );
 
 	$lines = explode( "\n", $markdown );
 	$html  = [];
 
+	$in_ul = false;
+	$in_ol = false;
+
 	foreach ( $lines as $line ) {
 
 		$line = trim( $line );
 
-		// Empty line = paragraph break.
 		if ( $line === '' ) {
+			if ( $in_ul ) {
+				$html[] = '</ul>';
+				$in_ul = false;
+			}
+
+			if ( $in_ol ) {
+				$html[] = '</ol>';
+				$in_ol = false;
+			}
+
 			continue;
 		}
 
-		// Images: ![alt](url)
-		$line = preg_replace_callback(
-			'/!\[(.*?)\]\((.*?)\)/',
-			function ( $matches ) {
-				return sprintf(
-					'<img src="%s" alt="%s">',
-					esc_url( $matches[2] ),
-					esc_attr( $matches[1] )
-				);
-			},
-			$line
-		);
+		$line = markdown2html_inline_formatting( $line );
 
-		// Links: [text](url)
-		$line = preg_replace_callback(
-			'/(?<!!)\[(.*?)\]\((.*?)\)/',
-			function ( $matches ) {
-				return sprintf(
-					'<a href="%s">%s</a>',
-					esc_url( $matches[2] ),
-					esc_html( $matches[1] )
-				);
-			},
-			$line
-		);
+		if ( preg_match( '/^[-*]\s+(.*)$/', $line, $matches ) ) {
 
-		// Bold: **text** or __text__
-		$line = preg_replace(
-			'/\*\*(.+?)\*\*|__(.+?)__/',
-			'<strong>$1$2</strong>',
-			$line
-		);
+			if ( $in_ol ) {
+				$html[] = '</ol>';
+				$in_ol = false;
+			}
 
-		// Italic: *text* or _text_
-		$line = preg_replace(
-			'/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)|(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/',
-			'<em>$1$2</em>',
-			$line
-		);
+			if ( ! $in_ul ) {
+				$html[] = '<ul class="list-disc">';
+				$in_ul = true;
+			}
 
-		// Headings.
+			$html[] = '<li>' . $matches[1] . '</li>';
+			continue;
+		}
+
+		if ( preg_match( '/^\d+\.\s+(.*)$/', $line, $matches ) ) {
+
+			if ( $in_ul ) {
+				$html[] = '</ul>';
+				$in_ul = false;
+			}
+
+			if ( ! $in_ol ) {
+				$html[] = '<ol>';
+				$in_ol = true;
+			}
+
+			$html[] = '<li>' . $matches[1] . '</li>';
+			continue;
+		}
+
+		if ( $in_ul ) {
+			$html[] = '</ul>';
+			$in_ul = false;
+		}
+
+		if ( $in_ol ) {
+			$html[] = '</ol>';
+			$in_ol = false;
+		}
+
 		if ( preg_match( '/^(#{1,6})\s+(.*)$/', $line, $matches ) ) {
 			$level = strlen( $matches[1] );
-
-			$html[] = sprintf(
-				'<h%d>%s</h%d>',
-				$level,
-				$matches[2],
-				$level
-			);
-		} else {
-			$html[] = "<p>{$line}</p>";
+			$html[] = sprintf( '<h%d>%s</h%d>', $level, $matches[2], $level );
+			continue;
 		}
+
+        if ( str_contains( $line, '<img' ) ){
+	        $html[] = '<div>' . $line . '</div>';
+            continue;
+        }
+
+		$html[] = '<p>' . $line . '</p>';
+	}
+
+	if ( $in_ul ) {
+		$html[] = '</ul>';
+	}
+
+	if ( $in_ol ) {
+		$html[] = '</ol>';
 	}
 
 	return implode( "\n", $html );
+}
+
+/**
+ * Handle inline Markdown formatting.
+ */
+function markdown2html_inline_formatting( string $text ): string {
+
+	// Escape first so raw HTML does not pass through.
+	$text = esc_html( $text );
+
+	// Images: ![alt](url)
+	$text = preg_replace_callback(
+		'/!\[(.*?)\]\((.*?)\)/',
+		function ( $matches ) {
+			return sprintf(
+				'<img src="%s" alt="%s">',
+				esc_url( $matches[2] ),
+				esc_attr( $matches[1] )
+			);
+		},
+		$text
+	);
+
+	// Links: [text](url)
+	$text = preg_replace_callback(
+		'/(?<!!)\[(.*?)\]\((.*?)\)/',
+		function ( $matches ) {
+			return sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( $matches[2] ),
+				$matches[1]
+			);
+		},
+		$text
+	);
+
+	// Inline code: `code`
+	$text = preg_replace_callback(
+		'/`([^`]+)`/',
+		function ( $matches ) {
+			return '<code>' . esc_html( html_entity_decode( $matches[1] ) ) . '</code>';
+		},
+		$text
+	);
+
+	// Bold: **text** or __text__
+	$text = preg_replace(
+		'/\*\*(.+?)\*\*|__(.+?)__/',
+		'<strong>$1$2</strong>',
+		$text
+	);
+
+	// Italic: *text* or _text_
+	$text = preg_replace(
+		'/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)|(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/',
+		'<em>$1$2</em>',
+		$text
+	);
+
+	return $text;
 }
 
 /**
