@@ -96,7 +96,7 @@ class Tag_Relationships extends DB {
 		return array(
 			'tag_id'     => 0,
 			'contact_id' => 0,
-			'date_created' => Ymd_His(),
+			'date_created' => Ymd_His(), // oops, shoulda used current_time( 'mysql' )
 		);
 	}
 

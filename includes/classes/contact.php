@@ -1262,7 +1262,7 @@ class Contact extends Base_Object_With_Meta {
 				'i18n'           => [
 					'displayAs' => $this->get_full_name() ?: $this->get_email(),
 					'created'   => human_time_diff( time(), $this->get_date_created( true )->getTimestamp() ),
-					'tagDates'  => array_map( fn($date) => (new DateTimeHelper($date))->wpDateTimeFormat(), $this->tag_relationships )
+					'tagDates'  => array_map( fn($date) => (new DateTimeHelper($date, 'UTC'))->setTimezone(wp_timezone())->wpDateTimeFormat(), $this->tag_relationships )
 				]
 			]
 		);
