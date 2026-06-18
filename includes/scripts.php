@@ -333,7 +333,6 @@ class Scripts {
 		] );
 
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/features/admin-bar' . $dot_min . '.js', [
-			'groundhogg-admin-remote-notifications',
 			'groundhogg-admin-components',
 			'groundhogg-admin-send-broadcast'
 		], GROUNDHOGG_VERSION, true );
