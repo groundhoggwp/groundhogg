@@ -12,10 +12,14 @@ class DateTimeHelper extends \DateTime {
 	const ZEROTIME = "00:00:00";
 	const ZERODATETIME = "0000-00-00 00:00:00";
 
-	public function __construct( $datetime = 'now', \DateTimeZone $timezone = null ) {
+	public function __construct( $datetime = 'now', \DateTimeZone|string $timezone = null ) {
 
 		if ( ! $timezone ) {
 			$timezone = wp_timezone();
+		}
+
+		if ( is_string( $timezone ) ) {
+			$timezone = new \DateTimeZone( $timezone );
 		}
 
 		$timestamp = false;
