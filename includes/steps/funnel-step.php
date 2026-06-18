@@ -21,6 +21,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\kses_e;
+use function Groundhogg\markdown2html;
 use function Groundhogg\sanitize_payload;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -604,11 +605,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 				$this->labels();
 
-				$notes = $step->get_meta( 'step_notes' );
+				$notes = markdown2html( $step->get_meta( 'step_notes' ), true );
 
 				if ( ! empty( $notes ) ):
                     ?><span class="dashicons dashicons-admin-comments">
-                    <span class="gh-tooltip right"><?php kses_e( $notes ); ?></span>
+                    <span class="gh-tooltip right"><?php echo wp_kses_post( $notes ); ?></span>
                 </span><?php
 				endif;
 
@@ -875,7 +876,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 						'id'          => $this->setting_id_prefix( 'step-notes' ),
 						'name'        => 'step_notes',
 						'value'       => $step->get_step_notes(),
-						'placeholder' => __( 'You can use this area to store custom notes about the step.', 'groundhogg' ),
+						'placeholder' => __( 'You can use this area to store custom notes about the step. Accepts HTML and basic markdown.', 'groundhogg' ),
 						'class'       => 'step-notes-textarea'
 					] ) );
 
