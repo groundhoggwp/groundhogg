@@ -3,6 +3,7 @@
 namespace Groundhogg\DB\Query;
 
 use Exception;
+use function Groundhogg\db;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_array_var;
 use function Groundhogg\maybe_implode_in_quotes;
@@ -633,6 +634,25 @@ class Where {
 	 */
 	public function prepare( ...$args ) {
 		return $this->query->db->prepare( ...$args );
+	}
+
+	/**
+	 * Like prepare, but we don't know the best placeholder to use
+	 * Give a query with all placeholders using %u and we'll fill it with a guess
+	 * example, 'optin_status = %u' and it will get replaced with 'optin_status = %d'
+	 *
+	 * @param $query-
+	 * @param ...$args
+	 *
+	 * @return string|null
+	 */
+	public static function guess_prepare( $query, ...$args ) {
+
+		$placeholders = array_map( [__CLASS__, 'guessPlaceholderFormat'], $args );
+		$unknowns     = array_fill( 0, count( $placeholders ), '%u' );
+
+		// phpcs:ignore -- This will be a properly placeholdered query
+		return db()->wpdb->prepare( str_replace( $unknowns, $placeholders, $query ), ...$args );
 	}
 
 	/**

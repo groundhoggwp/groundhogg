@@ -26,6 +26,8 @@ class Manager {
 
 	protected $initialized = false;
 
+	public $wpdb;
+
 	/**
 	 * Manager constructor.
 	 */
@@ -35,6 +37,10 @@ class Manager {
 
 		// Re-init the DBS if a new plugin is activated, like an extension.
 		add_action( 'activate_plugin', [ $this, 'listen_for_addons' ], 1 );
+
+		global $wpdb;
+		$this->wpdb = $wpdb;
+
 	}
 
 	public function listen_for_addons() {

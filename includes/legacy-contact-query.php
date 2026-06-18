@@ -5,6 +5,7 @@ namespace Groundhogg;
 // Exit if accessed directly
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Contacts;
+use Groundhogg\DB\Query\Query;
 use Groundhogg\DB\Query\Where;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -703,6 +704,7 @@ class Legacy_Contact_Query {
 
 		$this->generate_request();
 
+		// phpcs:ignore WordPress.DB -- previously prepared
 		return $wpdb->get_results( $this->request );
 	}
 
@@ -730,6 +732,7 @@ class Legacy_Contact_Query {
 			 */
 			$found_items_query = apply_filters( 'gh_found_contacts_query', 'SELECT FOUND_ROWS()', $this );
 
+			// phpcs:ignore WordPress.DB -- previously prepared
 			$this->found_items = (int) $wpdb->get_var( $found_items_query );
 		}
 	}
@@ -1164,7 +1167,7 @@ class Legacy_Contact_Query {
 
 		$searches = array();
 		foreach ( $columns as $column ) {
-			$searches[] = $wpdb->prepare( "{$this->table_name}.$column LIKE %s", $like );
+			$searches[] = $wpdb->prepare( "%i.%i LIKE %s", $this->table_name, $column, $like );
 		}
 
 		return '(' . implode( ' OR ', $searches ) . ')';
@@ -2993,8 +2996,8 @@ class Legacy_Contact_Query {
 
 		$meta_table_name = get_db( 'contactmeta' )->table_name;
 
-		$year = date( 'Y' );
-		$time = date( 'H:i:s' );
+		$year = gmdate( 'Y' );
+		$time = gmdate( 'H:i:s' );
 
 		return "{$query->table_name}.ID IN ( select {$meta_table_name}.contact_id FROM {$meta_table_name} WHERE {$meta_table_name}.meta_key = 'birthday' AND CONCAT( '$year', SUBSTRING( {$meta_table_name}.meta_value, 5 ), '$time' ) {$clause} ) ";
 	}
@@ -3026,7 +3029,6 @@ class Legacy_Contact_Query {
 
 		$clause1 = self::generic_text_compare( 'meta.meta_key', '=', $filter_vars['meta'] );
 		$value   = sanitize_text_field( $filter_vars['value'] );
-		$column  = 'meta.meta_value';
 		$compare = $filter_vars['compare'];
 
 		switch ( $filter_vars['compare'] ) {
@@ -3035,81 +3037,40 @@ class Legacy_Contact_Query {
 			case '=':
 			case '!=':
 			case 'not_equals':
-				$clause2 = $wpdb->prepare( "%i = %s", $column, $value );
+				$clause2 = $wpdb->prepare( "meta.meta_value = %s", $value );
 				break;
 			case 'contains':
 			case 'not_contains':
-				$clause2 = $wpdb->prepare( "%i LIKE %s", $column, '%' . $wpdb->esc_like( $value ) . '%' );
+				$clause2 = $wpdb->prepare( "meta.meta_value LIKE %s", '%' . $wpdb->esc_like( $value ) . '%' );
 				break;
 			case 'starts_with':
 			case 'begins_with':
 			case 'does_not_start_with':
-				$clause2 = $wpdb->prepare( "%i LIKE %s", $column, $wpdb->esc_like( $value ) . '%' );
+				$clause2 = $wpdb->prepare( "meta.meta_value LIKE %s", $wpdb->esc_like( $value ) . '%' );
 				break;
 			case 'ends_with':
 			case 'does_not_end_with':
-				$clause2 = $wpdb->prepare( "%i LIKE %s", $column, '%' . $wpdb->esc_like( $value ) );
+				$clause2 = $wpdb->prepare( "meta.meta_value LIKE %s", '%' . $wpdb->esc_like( $value ) );
 				break;
 			case 'empty':
 			case 'not_empty':
-				$clause2 = $wpdb->prepare( "%i != ''", $column );
+				$clause2 = "meta.meta_value != ''";
 				break;
 			case 'regex':
-				$clause2 = $wpdb->prepare( "%i REGEXP BINARY %s", $column, $value );
+				$clause2 =  $wpdb->prepare( "meta.meta_value REGEXP BINARY %s", $value );
 				break;
 			case 'less_than':
-
-				switch ( Where::guessPlaceholderFormat( $value ) ){
-					case '%f':
-						$clause2 = $wpdb->prepare( "%i < %f", $column, $value );
-						break;
-					case '%d':
-						$clause2 = $wpdb->prepare( "%i < %d", $column, $value );
-						break;
-					case '%s':
-						$clause2 = $wpdb->prepare( "%i < %s", $column, $value );
-						break;
-				}
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholder used
+				$clause2 =  Where::guess_prepare( 'meta.meta_value < %u', $value );
 				break;
 			case 'greater_than':
-
-				switch ( Where::guessPlaceholderFormat( $value ) ){
-					case '%f':
-						$clause2 = $wpdb->prepare( "%i > %f", $column, $value );
-						break;
-					case '%d':
-						$clause2 = $wpdb->prepare( "%i > %d", $column, $value );
-						break;
-					case '%s':
-						$clause2 = $wpdb->prepare( "%i > %s", $column, $value );
-						break;
-				}
+				$clause2 =  Where::guess_prepare( 'meta.meta_value > %u', $value );
 				break;
 			case 'greater_than_or_equal_to':
-				switch ( Where::guessPlaceholderFormat( $value ) ){
-					case '%f':
-						$clause2 = $wpdb->prepare( "%i >= %f", $column, $value );
-						break;
-					case '%d':
-						$clause2 = $wpdb->prepare( "%i >= %d", $column, $value );
-						break;
-					case '%s':
-						$clause2 = $wpdb->prepare( "%i >= %s", $column, $value );
-						break;
-				}
+				$clause2 =  Where::guess_prepare( 'meta.meta_value >= %u', $value );
 				break;
 			case 'less_than_or_equal_to':
-				switch ( Where::guessPlaceholderFormat( $value ) ){
-					case '%f':
-						$clause2 = $wpdb->prepare( "%i <= %f", $column, $value );
-						break;
-					case '%d':
-						$clause2 = $wpdb->prepare( "%i <= %d", $column, $value );
-						break;
-					case '%s':
-						$clause2 = $wpdb->prepare( "%i <= %s", $column, $value );
-						break;
-				}
+				$clause2 =  Where::guess_prepare( 'meta.meta_value <= %u', $value );
 				break;
 		}
 
@@ -3343,45 +3304,37 @@ class Legacy_Contact_Query {
 			default:
 			case 'equals':
 			case '=':
-				return $wpdb->prepare( "$column = %s", $value );
+				return $column . $wpdb->prepare( " = %s", $value );
 			case '!=':
 			case 'not_equals':
-				return $wpdb->prepare( "$column != %s", $column, $value );
+				return $column . $wpdb->prepare( " != %s", $value );
 			case 'contains':
-				return $wpdb->prepare( "$column LIKE %s", '%' . $wpdb->esc_like( $value ) . '%' );
+				return $column . $wpdb->prepare( " LIKE %s", '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'not_contains':
-				return $wpdb->prepare( "$column NOT LIKE %s", '%' . $wpdb->esc_like( $value ) . '%' );
+				return $column . $wpdb->prepare( " NOT LIKE %s", '%' . $wpdb->esc_like( $value ) . '%' );
 			case 'starts_with':
 			case 'begins_with':
-				return $wpdb->prepare( "$column LIKE %s", $wpdb->esc_like( $value ) . '%' );
+				return $column . $wpdb->prepare( " LIKE %s", $wpdb->esc_like( $value ) . '%' );
 			case 'does_not_start_with':
-				return $wpdb->prepare( "$column NOT LIKE %s", $wpdb->esc_like( $value ) . '%' );
+				return $column . $wpdb->prepare( " NOT LIKE %s", $wpdb->esc_like( $value ) . '%' );
 			case 'ends_with':
-				return $wpdb->prepare( "$column LIKE %s", '%' . $wpdb->esc_like( $value ) );
+				return $column . $wpdb->prepare( " LIKE %s", '%' . $wpdb->esc_like( $value ) );
 			case 'does_not_end_with':
-				return $wpdb->prepare( "$column NOT LIKE %s", '%' . $wpdb->esc_like( $value ) );
+				return $column . $wpdb->prepare( " NOT LIKE %s", '%' . $wpdb->esc_like( $value ) );
 			case 'empty':
 				return "$column = ''";
 			case 'not_empty':
 				return "$column != ''";
 			case 'regex':
-				return $wpdb->prepare( "$column REGEXP BINARY %s", $value );
+				return $column . $wpdb->prepare( " REGEXP BINARY %s", $value );
 			case 'less_than':
-				$rep = is_numeric( $value ) ? '%d' : '%s';
-
-				return $wpdb->prepare( "$column < $rep", $value );
+				return Where::guess_prepare( "$column < %u", $value );
 			case 'greater_than':
-				$rep = is_numeric( $value ) ? '%d' : '%s';
-
-				return $wpdb->prepare( "$column > $rep", $value );
+				return Where::guess_prepare( "$column > %u", $value );
 			case 'greater_than_or_equal_to':
-				$rep = is_numeric( $value ) ? '%d' : '%s';
-
-				return $wpdb->prepare( "$column >= $rep", $value );
+				return Where::guess_prepare( "$column >= %u", $value );
 			case 'less_than_or_equal_to':
-				$rep = is_numeric( $value ) ? '%d' : '%s';
-
-				return $wpdb->prepare( "$column <= $rep", $value );
+				return Where::guess_prepare( "$column <= %u", $value );
 		}
 	}
 
@@ -3399,17 +3352,17 @@ class Legacy_Contact_Query {
 		switch ( $compare ) {
 			default:
 			case 'equals':
-				return $wpdb->prepare( "$column = %d", $value );
+				return $column . $wpdb->prepare( " = %d", $value );
 			case 'not_equals':
-				return $wpdb->prepare( "$column != %d", $value );
+				return $column . $wpdb->prepare( " != %d", $value );
 			case 'greater_than':
-				return $wpdb->prepare( "$column > %d", $value );
+				return $column . $wpdb->prepare( " > %d", $value );
 			case 'less_than':
-				return $wpdb->prepare( "$column < %d", $value );
+				return $column . $wpdb->prepare( " < %d", $value );
 			case 'greater_than_or_equal_to':
-				return $wpdb->prepare( "$column >= %d", $value );
+				return $column . $wpdb->prepare( " >= %d", $value );
 			case 'less_than_or_equal_to':
-				return $wpdb->prepare( "$column <= %d", $value );
+				return $column . $wpdb->prepare( " <= %d", $value );
 		}
 	}
 

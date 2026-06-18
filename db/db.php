@@ -1148,10 +1148,8 @@ abstract class DB {
 					$query_vars['func'] = strtoupper( $val );
 					break;
 				case 'include_filters':
-
 					// Parse the filters
 //					$where[] = $this->parse_filters( $val );
-
 					break;
 				case 'exclude_filters':
 					// Parse the filters
