@@ -1725,6 +1725,31 @@ button.gh-submit .gh-spinner {
   top: 0;
   box-sizing: border-box;
 }
+.gh-modal.sidebar {
+  right: 0;
+  top: 32px;
+  bottom: 0;
+  left: auto;
+  width: 400px;
+  background: #FFF;
+  border-left: 1px solid var(--gh-panel-gray);
+  box-shadow: var(--gh-box-shadow);
+  display: block;
+}
+.gh-modal.sidebar .gh-header {
+  z-index: 1;
+}
+.gh-modal.sidebar .gh-modal-dialog {
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  padding: 0;
+  border-radius: 0;
+}
+.gh-modal.sidebar .gh-modal-dialog-content {
+  padding: 10px;
+}
 .gh-modal.hidden {
   display: none;
 }
@@ -2916,16 +2941,29 @@ button:has(.gh-dropdown-menu) {
   border-top-right-radius: 0 !important;
 }
 
-#remote-notifications .gh-button.dismiss {
+.remote-notifications .gh-button.dismiss {
   background: transparent;
   color: var(--gh-dark);
   margin: 3px;
   padding: 4px 4px;
 }
-#remote-notifications .gh-button.dismiss:hover {
+.remote-notifications .gh-button.dismiss:hover {
   background: var(--gh-dark-10);
 }
-#remote-notifications p.all-dismissed {
+.remote-notifications .gh-panel .show-more {
+  display: block;
+  margin: 1em auto 1em 20px;
+}
+.remote-notifications .gh-panel img {
+  max-width: 100%;
+}
+.remote-notifications .gh-panel.collapsed .inside {
+  height: 200px;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+}
+.remote-notifications p.all-dismissed {
   font-size: 16px;
   text-align: center;
 }

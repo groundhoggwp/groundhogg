@@ -1756,4 +1756,25 @@ class HTML {
 
     }
 
+    public function notifications_button() {
+
+        // don't show on white labeled installs
+        if ( is_white_labeled() ){
+            return;
+        }
+
+        $class = [
+            'gh-button secondary text icon'
+        ];
+
+        if ( notices()->count_unread() ){
+            $class[] = 'has-notifications unread-notices';
+        }
+
+        $this->e( 'a', [
+            'href' => '#gh-show-notifications',
+            'class' => implode( ' ', $class )
+        ], dashicon('bell'), '', true );
+    }
+
 }

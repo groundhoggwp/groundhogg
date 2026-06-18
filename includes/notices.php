@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Utils\Replacer;
 use WP_Error;
 
 /**
@@ -158,12 +159,19 @@ class Notices {
 
 		$items = $json['items'];
 
-		return array_map( function ( $item ) {
+        $replacer = new Replacer( [
+            'siteowner' => wp_get_current_user()->first_name,
+        ] );
+
+		return array_map( function ( $item ) use ( $replacer ){
+
+            $content = wp_kses_post( markdown2html( $item['plain'] ) );
+            $content = $replacer->replace( $content );
 
 			return [
 				'id'      => absint( $item['ID'] ),
                 'title'   => sanitize_text_field( $item['subject'] ),
-				'content' => html(  'div', [], wp_kses_post( markdown2html( $item['plain'] ) ), false ),
+				'content' => $content,
 			];
 
 		}, $items );

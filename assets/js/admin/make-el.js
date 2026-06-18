@@ -584,6 +584,101 @@
    * @param (object) options Config options to overwrite defaults.
    * @param children
    */
+  const Sidebar = ({
+    dialogClasses = '',
+    className = '',
+    onOpen = () => {},
+    onClose = () => {},
+    width = 'auto',
+    closeButton = true,
+    header = 'Groundhogg'
+  }, children) => {
+
+    const Dialog = ({
+      content = null,
+    }) => Div({
+      className: `gh-modal-dialog ${ dialogClasses }`,
+      style    : {
+        width,
+      },
+    }, [
+      Div({
+        className: 'gh-header modal-header',
+      }, [
+        MakeEl.H3({}, header),
+        closeButton ? MakeEl.Button({
+          className: 'gh-button icon secondary text',
+          onClick  : () => close(),
+        }, MakeEl.Dashicon('no-alt')) : null,
+      ]),
+      Div({
+        className: 'gh-modal-dialog-content',
+      }, content),
+    ])
+
+    let modal = Div({
+      className: `gh-modal sidebar ${ className }`,
+      tabindex : 0,
+      onFocusout: e => {
+        // close()
+      }
+    }, [
+      Dialog({
+        content: null,
+      }),
+    ])
+
+    const close = () => {
+      onClose(modal)
+      modal.remove()
+    }
+
+    const morph = (args = {}) => {
+
+      let content = getContent()
+
+      morphdom(modal.querySelector('.gh-modal-dialog'), Dialog({
+        content,
+      }), args)
+    }
+
+    const getContent = () => maybeCall(children, {
+      close,
+      modal,
+      morph,
+    })
+
+    document.body.appendChild(modal)
+
+    morph()
+
+    // Run before positioning
+    onOpen({
+      modal,
+      close,
+      morph,
+    })
+
+    if (!modal.contains(document.activeElement)) {
+      modal.focus()
+    }
+
+    return modal
+  }
+
+  /**
+   * Custom modal appended to the body.
+   *
+   * options:
+   * (bool) isConfirmation Shows confirmation button if true.
+   * (bool) closeOnOverlayClick Close the modal when the background overlay is clicked.
+   * (bool) showCloseButton Show the close button at the top of the modal.
+   * (string) messageHtml Html to be showed at the top of the modal.
+   * (function) confirmCallBack Called when "confirm" button is clicked.
+   *
+   * @param (object) options Config options to overwrite defaults.
+   * @param children
+   */
   const Modal = ({
     dialogClasses = '',
     className = '',
@@ -1930,6 +2025,7 @@
     Tr,
     Td,
     Th,
+    Sidebar,
     Modal,
     ModalWithHeader,
     MiniModal,

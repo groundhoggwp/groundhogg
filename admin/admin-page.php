@@ -11,6 +11,7 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_decode;
 use function Groundhogg\base64_json_encode;
 use function Groundhogg\create_object_from_type;
+use function Groundhogg\dashicon_e;
 use function Groundhogg\ensure_array;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_url_var;
@@ -206,6 +207,10 @@ abstract class Admin_Page extends Supports_Errors {
 		// we just gunna start using this everywhere
 		wp_enqueue_style( 'groundhogg-admin' );
 		wp_enqueue_style( 'groundhogg-admin-element' );
+
+        if ( ! is_white_labeled() ){
+	        wp_enqueue_script( 'groundhogg-admin-remote-notifications' );
+        }
 
 		/**
 		 * To enqueue relates scripts for this page
@@ -662,6 +667,7 @@ abstract class Admin_Page extends Supports_Errors {
         <div id="<?php echo esc_attr( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
 			<?php header_icon(); ?>
             <h1><?php echo esc_html( $this->get_title() ); ?></h1>
+            <?php html()->notifications_button(); ?>
 			<?php $this->do_title_actions(); ?>
         </div>
         <script>

@@ -47,7 +47,8 @@
     dismissed    : [],
     notifications: [],
     read         : false,
-    loaded       : false
+    loaded       : false,
+    is_expanded  : new Groundhogg.TokenList()
   })
 
   if (typeof GroundhoggNotifications !== 'undefined') {
@@ -103,7 +104,7 @@
     morph,
   }) => Div({
     id       : `n-${ id }`,
-    className: 'gh-panel outlined overflow-visible',
+    className: `gh-panel outlined ${ State.is_expanded.contains( id ) ? '' : 'collapsed' }`,
   }, [
     Div({
       className: 'gh-panel-header',
@@ -118,7 +119,7 @@
         },
       }, [
         Dashicon('no-alt'),
-        ToolTip('Dismiss', 'right'),
+        ToolTip('Dismiss', 'left'),
       ]) : null,
     ]),
     Div({
@@ -126,11 +127,22 @@
     }, [
       doReplacements(content),
     ]),
+    An({
+      type: 'button',
+      className: 'show-more',
+      href : `#n-${ id }`,
+      id: `#expand-${id}`,
+      onClick: e => {
+        e.preventDefault()
+        State.is_expanded.toggle(id)
+        morph()
+      }
+    },  State.is_expanded.contains( id ) ? 'See less' : 'Read more...' )
   ])
 
-  const Notifications = () => Div({
-    id       : 'remote-notifications',
-    className: 'notifications',
+  const Notifications = ({ id = 'remote-notifications'}) => Div({
+    id,
+    className: 'remote-notifications',
   }, morph => {
 
     if (!State.loaded) {
@@ -184,6 +196,35 @@
     ])
   })
 
+  const NotificationsSidebar = () => MakeEl.Sidebar({
+    header: '🔔 Notifications',
+    onClose: () => {
+      // clear the fragment
+      history.pushState(
+        {},
+        document.title,
+        window.location.pathname + window.location.search
+      );
+    }
+  }, [
+    Groundhogg.Notifications({
+      id: 'sidebar-notifications',
+    })
+  ])
+
   Groundhogg.Notifications = Notifications
+  Groundhogg.NotificationsSidebar = NotificationsSidebar
+
+  const handleHashChange = () => {
+    let hash = window.location.hash.replace('#', '')
+    if ( ! hash.startsWith('gh-show-notifications') ) {
+      return
+    }
+
+    NotificationsSidebar()
+  }
+
+  window.addEventListener('hashchange', handleHashChange )
+  window.addEventListener('load', handleHashChange )
 
 } )(jQuery)

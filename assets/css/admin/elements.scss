@@ -1831,6 +1831,35 @@ button {
   top: 0;
   box-sizing: border-box;
 
+  &.sidebar {
+    right: 0;
+    top: 32px;
+    bottom: 0;
+    left: auto;
+    width: 400px;
+    background: #FFF;
+    border-left: 1px solid var(--gh-panel-gray);
+    box-shadow: var(--gh-box-shadow);
+    display: block;
+
+    .gh-header {
+      z-index: 1;
+    }
+
+    .gh-modal-dialog {
+      height: 100%;
+      width: 100%;
+      max-height: 100%;
+      max-width: 100%;
+      padding: 0;
+      border-radius: 0;
+
+      &-content{
+        padding: 10px;
+      }
+    }
+  }
+
   &.hidden {
     display: none;
   }
@@ -3322,7 +3351,7 @@ button:has(.gh-dropdown-menu) {
   }
 }
 
-#remote-notifications {
+.remote-notifications {
   .gh-button.dismiss {
     background: transparent;
     color: var(--gh-dark);
@@ -3331,6 +3360,42 @@ button:has(.gh-dropdown-menu) {
 
     &:hover {
       background: var(--gh-dark-10);
+    }
+  }
+
+  .gh-panel {
+
+    .show-more {
+      display: block;
+      margin: 1em auto 1em 20px;
+    }
+    
+    img {
+      max-width: 100%;
+    }
+
+    &.collapsed {
+
+      .inside {
+
+        height: 200px;
+        overflow: hidden;
+
+        mask-image: linear-gradient(
+                        to bottom,
+                        black 0%,
+                        black 70%,
+                        transparent 100%
+        );
+
+        -webkit-mask-image: linear-gradient(
+                        to bottom,
+                        black 0%,
+                        black 70%,
+                        transparent 100%
+        );
+
+      }
     }
   }
 

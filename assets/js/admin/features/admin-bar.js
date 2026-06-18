@@ -80,28 +80,6 @@
     },
   }
 
-  if (!isWhiteLabeled) {
-
-    Tabs.notifications = {
-      cap: 'manage_options',
-      //language=HTML
-      tooltip: `Notifications`,
-      svg: icons.bell,
-      view: () => {
-        // language=HTML
-        return `
-            <div id="gh-notifications">
-                ${ spinner('gray') }
-            </div>`
-      },
-      onMount: ({ setTab, remMount }) => {
-        morphdom( document.getElementById( 'gh-notifications' ), Groundhogg.Notifications() )
-      },
-    }
-
-
-  }
-
   $(() => {
 
     const $menuItem = $('#wp-admin-bar-groundhogg')
@@ -194,10 +172,6 @@
         $(`.${ classPrefix }-close`).on('click', () => {
           close()
         })
-
-        if (!isWhiteLabeled && GroundhoggToolbar.unread > 0) {
-          $('#gh-tab-notifications').addClass('unread-notices gh-has-notifications')
-        }
       }
 
       const $quickSearch = $(renderQuickSearch())
@@ -216,10 +190,5 @@
       mountQuickSearch()
 
     })
-
-    // Notices
-    if (!isWhiteLabeled && GroundhoggToolbar.unread > 0) {
-      $menuItem.addClass('unread-notices gh-has-notifications')
-    }
   })
 } )(jQuery)

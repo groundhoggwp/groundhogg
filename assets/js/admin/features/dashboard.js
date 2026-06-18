@@ -182,6 +182,10 @@
   }, [
     Groundhogg.isWhiteLabeled ? Span({ className: 'white-label-icon'}, Groundhogg.whiteLabelName ) : icons.groundhogg,
     H1({}, `👋 Hey ${ Groundhogg.currentUser.data.display_name }!`),
+    An({
+      href: '#gh-show-notifications',
+      className: `gh-button secondary text icon ${ GroundhoggNotifications.unread > 0 ? 'has-notifications unread-notices' : ''}`
+    }, Dashicon('bell')),
     Button({
       className: 'gh-button primary more-nav small',
       id       : 'quick-actions',
@@ -996,21 +1000,6 @@
         ])
       },
     })
-
-    if (userHasCap('install_plugins')) {
-      Widgets.add('notifications', {
-        name  : 'Notifications',
-        cap   : '',
-        col   : 3,
-        render: () => Div({
-          style: {
-            padding  : '10px',
-            maxHeight: '500px',
-            overflow : 'auto',
-          },
-        }, Groundhogg.Notifications()),
-      })
-    }
 
     Widgets.add('news', {
       name  : 'News',

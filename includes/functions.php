@@ -8878,7 +8878,7 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
  * - Unordered lists: - item or * item
  * - Ordered lists: 1. item
  */
-function markdown2html( string $markdown ): string {
+function markdown2html( string $markdown, bool $br = false ): string {
 
 	$markdown = str_replace( [ "\r\n", "\r" ], "\n", trim( $markdown ) );
 
@@ -8893,14 +8893,17 @@ function markdown2html( string $markdown ): string {
 		$line = trim( $line );
 
 		if ( $line === '' ) {
+
 			if ( $in_ul ) {
 				$html[] = '</ul>';
 				$in_ul = false;
+                continue;
 			}
 
 			if ( $in_ol ) {
 				$html[] = '</ol>';
 				$in_ol = false;
+                continue;
 			}
 
 			continue;
@@ -8961,7 +8964,7 @@ function markdown2html( string $markdown ): string {
             continue;
         }
 
-		$html[] = '<p>' . $line . '</p>';
+		$html[] = $br ?  $line . '<br>' : '<p>' . $line . '</p>';
 	}
 
 	if ( $in_ul ) {
@@ -8981,7 +8984,7 @@ function markdown2html( string $markdown ): string {
 function markdown2html_inline_formatting( string $text ): string {
 
 	// Escape first so raw HTML does not pass through.
-	$text = esc_html( $text );
+//	$text = esc_html( $text );
 
 	// Images: ![alt](url)
 	$text = preg_replace_callback(
