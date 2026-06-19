@@ -407,30 +407,6 @@ class Email_Reports extends Notification_Builder {
 			}
 		}
 
-		// Do not fetch notices if the site is white labeled
-		$notices = is_white_labeled() ? [] : notices()->fetch_remote_notices();
-
-		if ( ! empty( $notices ) && ! is_white_labeled() ) {
-			$notices = array_reduce( $notices, function ( $html, $notice ) {
-
-				$replacer = new Replacer( [
-					'cta_url'          => $notice['acf']['cta_url'],
-					'cta_text'         => $notice['acf']['cta_text'],
-					'title_rendered'   => $notice['title']['rendered'],
-					'content_rendered' => $notice['content']['rendered'],
-					'#admin#'          => untrailingslashit( admin_url() ),
-					'#home#'           => untrailingslashit( home_url() ),
-					'#name#'           => get_bloginfo(),
-					'#display_name#'   => wp_get_current_user()->display_name,
-				] );
-
-				return $html . $replacer->replace( self::get_template_part( 'remote-notice' ) );
-
-			}, '' );
-		} else {
-			$notices = self::get_template_part( 'up-to-date' );
-		}
-
 		$replacer = new Replacer( [
 			'compare_text'             => $totalNewContacts['compare']['text'],
 			'broadcast_results_table'  => $broadcasts_table,
@@ -469,7 +445,6 @@ class Email_Reports extends Notification_Builder {
 			'create_new_funnel'        => admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ),
 			'create_better_journey'    => '#',
 			'what_funnel_to_create'    => '#',
-			'remote_notices'           => $notices,
 			'get_pro'                  => has_premium_features() ? '' : self::get_template_part( 'funnels-upgrade-to-pro' ),
 		] );
 
