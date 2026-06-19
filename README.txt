@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.3
+Stable tag: 4.5.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,17 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.5.4 (2026-06-19) =
+* ADDED REST API endpoints for email archives.
+* ADDED Conditional replacements to show content in plain text or HTML context only.
+* ADDED Simple markdown support in flow step notes.
+* IMPROVED Item Picker keyboard accessibility.
+* IMPROVED Notifications now pull from Groundhogg's updates email archive, and only show when clicking the 🔔 icon.
+* REMOVED Notifications from the weekly/monthly email report.
+* TWEAKED Use `wp_safe_redirect()` when using auto-login.
+* FIXED Broken meta-queries when using `Legacy_Contact_Query`
+* FIXED Tag applied dates showing in incorrect timezone.
 
 = 4.5.3 (2026-06-11) =
 * FIXED Broken email processing rule causing some links to not work.
