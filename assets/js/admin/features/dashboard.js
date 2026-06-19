@@ -904,12 +904,12 @@
           [
             'welcome-learn-more',
             __('Learn'),
-            'https://academy.groundhogg.io',
+            'https://www.groundhogg.io/events/',
           ],
           [
             'media-document',
             __('Documentation'),
-            'https://help.groundhogg.io',
+            'https://groundhogg.io/documentation/',
           ],
           [
             'sos',
