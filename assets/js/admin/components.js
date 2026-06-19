@@ -1707,6 +1707,22 @@
     close()
 
     return ModalFrame({
+      onClose: () => {
+
+        // confirm we used hash preview
+        let hash = window.location.hash.replace('#', '')
+        if ( ! hash.startsWith('gh-email-preview/') ) {
+          return
+        }
+
+        // clear the hash if there is one...
+        history.pushState(
+          {},
+          document.title,
+          window.location.pathname + window.location.search
+        );
+
+      },
       frameAttributes: {
         className: 'gh-modal-frame gh-email-preview-modal',
       },
@@ -1779,15 +1795,18 @@
 
       EmailPreviewModal(parseInt(emailId), {})
     })
-
-    window.addEventListener('hashchange', e => {
-      let hash = window.location.hash.replace('#', '')
-      if ( hash.startsWith('gh-email-preview/') ) {
-        let emailId = hash.replace('gh-email-preview/', '')
-        EmailPreviewModal(parseInt(emailId), {})
-      }
-    })
   })
+
+  const handleEmailPreviewHashChange = e => {
+    let hash = window.location.hash.replace('#', '')
+    if ( hash.startsWith('gh-email-preview/') ) {
+      let emailId = hash.replace('gh-email-preview/', '')
+      EmailPreviewModal(parseInt(emailId), {})
+    }
+  }
+
+  window.addEventListener('hashchange', handleEmailPreviewHashChange )
+  window.addEventListener('load', handleEmailPreviewHashChange )
 
   const ImagePicker = ({
     multiple = false,
