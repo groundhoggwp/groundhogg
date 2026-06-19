@@ -4415,10 +4415,12 @@ add_action( 'admin_menu', function () {
  */
 function maybe_print_menu_styles() {
 
+    $unread = notices()->count_unread();
+
 	?>
     <style>
 
-        <?php if ( $unread = notices()->count_unread() > 0 ): ?>
+        <?php if ( $unread > 0 ): ?>
         .unread-notices::after {
             content: '<?php echo esc_attr( $unread ) ?>' !important;
         }

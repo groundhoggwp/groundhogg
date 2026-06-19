@@ -1,34 +1,9 @@
 ( ($) => {
 
-  const {
-    spinner,
-  } = Groundhogg.element
-
   const { ajax } = Groundhogg.api
   const {
-    sprintf,
     __,
-    _x,
-    _n,
   } = wp.i18n
-
-  const doReplacements = (content) => {
-
-    const replacements = {
-      admin       : Groundhogg.url.admin,
-      home        : Groundhogg.url.home,
-      name        : Groundhogg.name,
-      display_name: Groundhogg.currentUser.data.display_name,
-    }
-
-    Object.keys(replacements).forEach(s => {
-
-      let regex = new RegExp(`#${s}#`, 'g')
-      content = content.replaceAll(regex, replacements[s])
-    })
-
-    return content
-  }
 
   const {
     Div,
@@ -101,6 +76,7 @@
     id,
     title,
     content,
+    sent,
     morph,
   }) => Div({
     id       : `n-${ id }`,
@@ -109,7 +85,14 @@
     Div({
       className: 'gh-panel-header',
     }, [
-      H2({}, title),
+      H2({}, [
+        title,
+        '<br>',
+        MakeEl.makeEl( 'abbr', {title: 'sent on', style: {
+          fontSize: '12px',
+          fontWeight: '400'
+        }}, sent )
+      ]),
       State.show === 'active' ? Button({
         id       : `dismiss-${ id }`,
         className: 'gh-button dismiss small',
@@ -125,7 +108,7 @@
     Div({
       className: 'inside',
     }, [
-      doReplacements(content),
+      content,
     ]),
     An({
       type: 'button',
@@ -147,7 +130,15 @@
 
     if (!State.loaded) {
       fetchNotifications().then(() => morph())
-      return Skeleton({}, [
+      return Skeleton({
+        cellAttributes: {
+          style: {
+            height: '200px',
+            borderRadius: '8px'
+          }
+        },
+        className: 'display-grid gap-10',
+      }, [
         'full',
         'full',
         'full',

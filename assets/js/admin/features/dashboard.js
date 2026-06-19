@@ -184,7 +184,7 @@
     H1({}, `👋 Hey ${ Groundhogg.currentUser.data.display_name }!`),
     An({
       href: '#gh-show-notifications',
-      className: `gh-button secondary text icon ${ GroundhoggNotifications.unread > 0 ? 'has-notifications unread-notices' : ''}`
+      className: `gh-button secondary text icon ${ GroundhoggNotifications.unread > 0 ? 'gh-has-notifications unread-notices' : ''}`
     }, Dashicon('bell')),
     Button({
       className: 'gh-button primary more-nav small',

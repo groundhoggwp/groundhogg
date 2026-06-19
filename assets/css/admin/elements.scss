@@ -3355,8 +3355,9 @@ button:has(.gh-dropdown-menu) {
   .gh-button.dismiss {
     background: transparent;
     color: var(--gh-dark);
-    margin: 3px;
-    padding: 4px 4px;
+    margin: 8px;
+    //padding: 4px 4px;
+    aspect-ratio: 1 / 1;
 
     &:hover {
       background: var(--gh-dark-10);
@@ -3369,7 +3370,7 @@ button:has(.gh-dropdown-menu) {
       display: block;
       margin: 1em auto 1em 20px;
     }
-    
+
     img {
       max-width: 100%;
     }

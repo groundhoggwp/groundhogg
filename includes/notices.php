@@ -148,7 +148,6 @@ class Notices {
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
-//            return [];
 		}
 
 		$json = $response;
@@ -172,22 +171,10 @@ class Notices {
 				'id'      => absint( $item['ID'] ),
                 'title'   => sanitize_text_field( $item['subject'] ),
 				'content' => $content,
-			];
+                'sent'    => sanitize_text_field( $item['sent'] )
+  			];
 
 		}, $items );
-	}
-
-	/**
-	 * Fetches only the  remote notices
-	 *
-	 * @return array|mixed
-	 */
-	function fetch_unread_remote_notices() {
-		$notices = $this->fetch_remote_notices();
-
-		return array_filter( $notices, function ( $notice ) {
-			return ! in_array( $notice['id'], self::$read_notices );
-		} );
 	}
 
 	/**
@@ -196,15 +183,9 @@ class Notices {
 	 * @return int
 	 */
 	function count_unread() {
-		$ids = get_transient( 'gh_notification_ids' );
+		$ids = wp_parse_id_list( wp_list_pluck( $this->fetch_remote_notices(), 'id' ) );
 
-        // expired, fetch from remote
-		if ( $ids === false ) {
-			$ids = wp_parse_id_list( wp_list_pluck( $this->fetch_remote_notices(), 'id' ) );
-			set_transient( 'gh_notification_ids', $ids, DAY_IN_SECONDS );
-		}
-
-		return count( array_diff( $ids, array_values( Notices::$read_notices ) ) );
+		return count( array_diff( $ids, array_values( self::$read_notices ) ) );
 	}
 
 	/**

@@ -1768,7 +1768,7 @@ class HTML {
         ];
 
         if ( notices()->count_unread() ){
-            $class[] = 'has-notifications unread-notices';
+            $class[] = 'gh-has-notifications unread-notices';
         }
 
         $this->e( 'a', [

@@ -1836,14 +1836,15 @@
   const H4 = (props, children) => makeEl('h4', props, children)
   const Hr = (props, children) => makeEl('hr', props, children)
 
-  const Skeleton = (attributes, pieces) => Div({
+  const Skeleton = ({ cellAttributes = {}, ...attributes }, pieces) => Div({
     className: 'display-grid gap-10',
     ...attributes,
   }, pieces.map(span => Div({
     className: `${ span } skeleton-loading`,
     style    : {
-      height: `40px`,
+      height: '40px',
     },
+    ...cellAttributes
   })))
 
   const useState = (initialState, id) => {
