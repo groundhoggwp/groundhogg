@@ -58,7 +58,7 @@ function notice_admin_logged_in_testing_warning(){
         <p><?php printf(
 	            /* translators: 1: open <a>, 2: closing </a> */
                 esc_html__( 'If you are trying to test with another contact record (not the one associated with your user account) use an incognito window, logout, or %1$sdisable logged in user precedence in the settings%2$s.', 'groundhogg' ),
-                "<a href='https://help.groundhogg.io/article/294-why-is-my-email-not-being-confirmed'>",
+                "<a href='https://www.groundhogg.io/doc/tracking-links-superlinks-not-working/#loggedin-usercontact-mismatch'>",
                 "</a>"
             ); ?></p>
     </div>

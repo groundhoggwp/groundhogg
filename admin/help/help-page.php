@@ -130,7 +130,13 @@ class Help_Page extends Tabbed_Admin_Page {
 		}
 
 		$query = sanitize_text_field( get_post_var( 'query' ) );
-		$json  = remote_post_json( 'https://help.groundhogg.io/search/typeahead?query=' . $query, [], 'GET', [], '', DAY_IN_SECONDS );
+
+		$json = remote_post_json( 'https://groundhogg.io/wp-json/wp/v2/doc', [
+			'search'   => $query,
+			'per_page' => 20,
+            'context'  => 'view',
+		], 'GET', [], false, DAY_IN_SECONDS );
+
 		wp_send_json( $json );
 	}
 
@@ -499,25 +505,25 @@ class Help_Page extends Tabbed_Admin_Page {
 				'title'       => __( '💡 New to Groundhogg?', 'groundhogg' ),
 				'description' => __( 'If you are new to Groundhogg, try browsing our getting started articles to learn what you need to know!', 'groundhogg' ),
 				'button_text' => __( 'I need help getting started!', 'groundhogg' ),
-				'button_link' => 'https://help.groundhogg.io/collection/1-getting-started'
+				'button_link' => 'https://groundhogg.io/documentation/#getting-started'
 			],
 			[
 				'title'       => __( '🏗️ Building something?', 'groundhogg' ),
 				'description' => __( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ),
 				'button_text' => __( 'I need help with development!', 'groundhogg' ),
-				'button_link' => 'https://help.groundhogg.io/collection/141-developers'
+				'button_link' => 'https://www.groundhogg.io/documentation/#developers'
 			],
 			[
 				'title'       =>__( '🙋‍♂️ Have a question?', 'groundhogg' ),
 				'description' =>__( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ),
 				'button_text' =>__( 'I have a question!', 'groundhogg' ),
-				'button_link' => 'https://help.groundhogg.io/collection/6-faqs'
+				'button_link' => 'https://www.groundhogg.io/documentation/#getting-started'
 			],
 			[
 				'title'       => __( '🔌 Installing an extension?', 'groundhogg' ),
 				'description' => __( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ),
 				'button_text' => __( 'I need help with an extension!', 'groundhogg' ),
-				'button_link' => 'https://help.groundhogg.io/collection/24-extensions'
+				'button_link' => 'https://www.groundhogg.io/doc/installation-guide/#installing-extensions-using-the-groundhogg-helper-plugin'
 			],
 			[
 				'title'       => __( '💬 Didn\'t find what you need?', 'groundhogg' ),

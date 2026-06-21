@@ -4263,7 +4263,7 @@
         },
         [
           `<p>${ __(
-            'Automatically add UTM parameters to links in your email. <a href="https://help.groundhogg.io/article/903-utm-parameters-in-emails">About UTM</a>.',
+            'Automatically add UTM parameters to links in your email. <a href="https://www.groundhogg.io/doc/utm-parameters/">About UTM</a>.',
             'groundhogg') }</p>`,
           `<p>${ __('Replacements are currently <b>NOT</b> supported. Empty values are ignored.', 'groundhogg') }</p>`,
           Control({
@@ -4667,7 +4667,7 @@
             })),
           Control({
               label  : 'Message type',
-              tooltip: '<a href="https://help.groundhogg.io/article/523-what-is-transactional-email">Transactional</a> emails bypass contact marketability.<br><b>Marketing</b> emails respect contact marketability.',
+              tooltip: '<a href="https://www.groundhogg.io/doc/transactional-vs-marketing-emails/">Transactional</a> emails bypass contact marketability.<br><b>Marketing</b> emails respect contact marketability.',
             },
             Select({
               id      : 'message-type',
@@ -5564,7 +5564,7 @@
                         one will be created.</p>
                     <p>When testing links, we recommend opening them in an incognito window or different
                         browser. See our <a target="_blank"
-                                            href="https://help.groundhogg.io/article/888-testing-funnels-and-emails">recommended
+                                            href="https://www.groundhogg.io/doc/recommended-test-procedures/">recommended
                             testing procedures.</a></p>
                     <p>
                         ❌ <b>[TEST]</b> in subject line.<br/>

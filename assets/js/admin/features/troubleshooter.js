@@ -358,7 +358,7 @@
                     content: `<p>${ __(
                             'Marketing emails and SMS cannot be sent to contacts that are not marketable. If you believe that the contacts should be marketable then you may have set your compliance settings to strict.',
                             'groundhogg') }</p>
-<p><a href="https://help.groundhogg.io/article/203-why-are-my-contacts-unmarketable" target="_blank">${ __(
+<p><a href="https://www.groundhogg.io/doc/opt-in-status-marketability/#why-are-my-contacts-unmarketable" target="_blank">${ __(
                             'Why are my contacts unmarketable?') }</a></p>
 <p><a  class="gh-button primary" href="${ adminPageURL('gh_events', {
                         status: 'failed',
@@ -373,7 +373,7 @@
                     content: `<p>${ __(
                             'Your email could not be sent due to an SMTP error. This could be a result of a issue with your SMTP configuration, or lack of one.',
                             'groundhogg') }</p>
-<p><a href="https://help.groundhogg.io/article/410-why-do-i-need-an-smtp-service" target="_blank">${ __(
+<p><a href="https://www.groundhogg.io/doc/what-is-smtp/#do-i-need-a-3rdparty-stmp-service" target="_blank">${ __(
                             'Why do I need an SMTP service?') }</a></p>
 <button class="gh-button primary" id="fix-smtp">${ __('Fix SMTP issues.') }</button>`,
                 }) }
@@ -524,7 +524,7 @@
                         <p>
                             ${ __('Instead, you will have to create cron jobs through the SiteGround admin panel.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/469-setting-up-a-cron-job-on-siteground">${ __(
+                              href="https://www.groundhogg.io/doc/cron-jobs/#cronjoborg">${ __(
                             'Read the guide') }</a></p>`,
                 }) }
                 ${ faq({
@@ -535,7 +535,7 @@
                             ${ __(
                             'Instead, you will have to contact Kinsta Support and have them create the cron jobs for you using their internal system.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/444-all-the-cron-jobs-for-groundhogg">${ __(
+                              href="https://www.groundhogg.io/doc/cron-jobs/#kinsta">${ __(
                             'Provide them with this article.') }</a></p>`,
                 }) }
                 ${ faq({
@@ -547,10 +547,10 @@
                             ${ __(
                             'If you have not already done so, you will need to exclude multiple Groundhogg files and assets from being cached by your CDN.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/438-cloudflare-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Cloudflare') }</a></p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -559,7 +559,7 @@
                             ${ __(
                             'Sometimes caching plugins can be overly aggressive in what they choose to cache. You can prevent this by excluding some Groundhogg assets from being cached.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -617,7 +617,7 @@
                     // language=HTML
                     content: `<p>${ __(
                             'Cron-Job.org is free, and incredibly reliable. If your host allows it, cron-job.org is a great alternative to server based cron jobs.') }</p>
-<p><a href="https://help.groundhogg.io/article/49-add-an-external-cron-job-cron-job-org" target="_blank">${ __(
+<p><a href="https://www.groundhogg.io/doc/cron-jobs/#cronjoborg" target="_blank">${ __(
                             'Use Cron-Job.org instead!') }</a></p>`,
                 }) }
                 ${ faq({
@@ -691,7 +691,7 @@
                     // language=HTML
                     content: `<p>${ __(
                             'Cron-Job.org is free, and incredibly reliable. If your host allows it, cron-job.org is a great alternative to server based cron jobs.') }</p>
-<p><a href="https://help.groundhogg.io/article/49-add-an-external-cron-job-cron-job-org" target="_blank">${ __(
+<p><a href="https://www.groundhogg.io/doc/cron-jobs/#cronjoborg" target="_blank">${ __(
                             'Use Cron-Job.org instead!') }</a></p>`,
                 }) }
                 ${ faq({
@@ -765,7 +765,7 @@
                     // language=HTML
                     content: `<p>${ __(
                             'Cron-Job.org is free, and incredibly reliable. If your host allows it, cron-job.org is a great alternative to server based cron jobs.') }</p>
-<p><a href="https://help.groundhogg.io/article/49-add-an-external-cron-job-cron-job-org" target="_blank">${ __(
+<p><a href="https://www.groundhogg.io/doc/cron-jobs/#cronjoborg" target="_blank">${ __(
                             'Use Cron-Job.org instead!') }</a></p>`,
                 }) }
                 ${ faq({
@@ -799,7 +799,7 @@
                         <p>
                             ${ __('Instead, you will have to create cron jobs through the SiteGround admin panel.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/469-setting-up-a-cron-job-on-siteground">${ __(
+                              href="https://www.groundhogg.io/doc/cron-jobs/#siteground">${ __(
                             'Read the guide') }</a></p>`,
                 }) }
                 ${ faq({
@@ -810,7 +810,7 @@
                             ${ __(
                             'Instead, you will have to contact Kinsta Support and have them create the cron jobs for you using their internal system.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/444-all-the-cron-jobs-for-groundhogg">${ __(
+                              href="https://www.groundhogg.io/doc/cron-jobs/#kinsta">${ __(
                             'Provide them with this article.') }</a></p>`,
                 }) }
                 ${ faq({
@@ -822,10 +822,10 @@
                             ${ __(
                             'If you have not already done so, you will need to exclude multiple Groundhogg files and assets from being cached by your CDN.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/438-cloudflare-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Cloudflare') }</a></p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -834,7 +834,7 @@
                             ${ __(
                             'Sometimes caching plugins can be overly aggressive in what they choose to cache. You can prevent this by excluding some Groundhogg assets from being cached.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -1253,7 +1253,7 @@
                             <li>${ __('Page Caching *') }</li>
                         </ul>
                         <p>${ __('Read our docs on the subject to configure your caching for the best results:') } <a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -1269,7 +1269,7 @@
                             <li>${ __('Page Caching *') }</li>
                         </ul>
                         <p>${ __('Read our docs on the subject to configure your caching for the best results:') } <a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -1346,7 +1346,7 @@
                             ${ __(
                             'SendGrid by default rewrites links in your emails before they are sent to the recipient. We recommend you disable this functionality.') }</p>
                         <p><a target="_blank"
-                              href="https://help.groundhogg.io/article/313-disable-tracking-links-on-sendgrid">${ __(
+                              href="https://www.groundhogg.io/doc/sendgrid/#disable-link-tracking-recommended">${ __(
                             'Disable tracking links in SendGrid') }</a></p>`,
                 }) }
                 ${ faq({
@@ -1370,7 +1370,7 @@
                             <li>${ __('Page Caching *') }</li>
                         </ul>
                         <p>${ __('Read our docs on the subject to configure your caching for the best results:') } <a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -1386,7 +1386,7 @@
                             <li>${ __('Page Caching *') }</li>
                         </ul>
                         <p>${ __('Read our docs on the subject to configure your caching for the best results:') } <a target="_blank"
-                              href="https://help.groundhogg.io/article/208-caching-compatibility">${ __(
+                              href="https://www.groundhogg.io/doc/caching-compatibility/">${ __(
                             'Groundhogg & Caching') }</a></p>`,
                 }) }
                 ${ faq({
@@ -1470,32 +1470,13 @@
 
       onMount: ({ next, prev }) => {
 
-        let timeout
         let search
 
-        $('#question').on('input change', e => {
-          search = e.target.value
-          maybeSearch()
-        })
+        const setDocResults = (results) => {
 
-        const maybeSearch = () => {
-
-          if (timeout) {
-            clearTimeout(timeout)
-          }
-          else {
-            $('#doc-results').html(spinner())
-          }
-
-          timeout = setTimeout(() => {
-            ajax({
-              action: 'groundhogg_doc_search',
-              query: search,
-            }).then((r) => {
-
-              $('#doc-results').
-                html(`${ r.articles.results.map(a => `<li><a href="${ a.url }" target="_blank">📄 ${ a.name }</a></li>`).
-                  join('') }
+          $('#doc-results').
+            html(`${ results.map(a => `<li>📄 <a href="${ a.link }" target="_blank">${ a.title.rendered }</a></li>`).
+              join('') }
                 <div class="space-between align-center"
                      style="margin-top: 40px">
                     <button id="ticket" class="gh-button secondary text">
@@ -1503,10 +1484,10 @@
                     </button>
                 </div>`)
 
-              $('#ticket').on('click', () => {
-                ticket.subject = search
-                //language=HTML
-                ticket.message = `
+          $('#ticket').on('click', () => {
+            ticket.subject = search
+            //language=HTML
+            ticket.message = `
                     <p><i>This message was generated by the Groundhogg troubleshooter.</i></p>
                     <p><b>What are you expecting to happen?</b></p>
                     <p></p>
@@ -1515,13 +1496,27 @@
                     <p><b>Any other details you think are relevant?</b></p>
                     <p></p>
                 `
-                next('ticket')
-              })
-
-            })
-          }, 2000)
+            next('ticket')
+          })
 
         }
+
+        const searchDocs = Groundhogg.functions.debounce( async () => {
+
+          let results = await ajax({
+            action: 'groundhogg_doc_search',
+            query: search,
+          })
+
+          setDocResults(results)
+
+        }, 500 )
+
+        $('#question').on('input change', e => {
+          search = e.target.value
+          $('#doc-results').html(spinner())
+          searchDocs()
+        })
 
       }, next: () => '',
 
@@ -2004,10 +1999,10 @@
                 <ul>
                     <li><a href="https://www.facebook.com/groups/groundhoggwp/" target="_blank">${ __(
                             'Join our Facebook User Group.') }</a></li>
-                    <li><a href="https://help.groundhogg.io/" target="_blank">${ __('Search our documentation.') }</a>
+                    <li><a href="https://groundhogg.io/documentation/" target="_blank">${ __('Search our documentation.') }</a>
                     </li>
-                    <li><a href="https://academy.groundhogg.io/" target="_blank">${ __(
-                            'Take a course on Groundhogg Academy.') }</a></li>
+                    <li><a href="https://groundhogg.io/events/" target="_blank">${ __(
+                            'Watch a training on Groundhogg.') }</a></li>
                     <li><a href="https://www.youtube.com/Groundhogg" target="_blank">${ __(
                             'Subscribe to our YouTube channel!') }</a></li>
                 </ul>`
@@ -2095,10 +2090,10 @@
                 <ul>
                     <li><a href="https://www.facebook.com/groups/groundhoggwp/" target="_blank">${ __(
                             'Join our Facebook User Group.') }</a></li>
-                    <li><a href="https://help.groundhogg.io/" target="_blank">${ __('Search our documentation.') }</a>
+                    <li><a href="https://groundhogg.io/documentation/" target="_blank">${ __('Search our documentation.') }</a>
                     </li>
-                    <li><a href="https://academy.groundhogg.io/" target="_blank">${ __(
-                            'Take a course on Groundhogg Academy.') }</a></li>
+                    <li><a href="https://groundhogg.io/events" target="_blank">${ __(
+                            'Watch a training video on Groundhogg.') }</a></li>
                     <li><a href="https://www.youtube.com/Groundhogg" target="_blank">${ __(
                             'Subscribe to our YouTube channel!') }</a></li>
                 </ul>

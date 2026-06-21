@@ -12,7 +12,7 @@ Do your business a favor and switch to Groundhogg.
 
 Businesses that switch to Groundhogg save on average **$240/m** on CRM fees.
 
-👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://help.groundhogg.io/) | 🎓 [Groundhogg Academy](https://academy.groundhogg.io/)
+👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://groundhogg.io/documentation/) | 🎓 [Training](https://groundhogg.io/events/)
 
 🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg) | [Ⅹ (Twitter)](https://twitter.com/Groundhoggwp/)
 
@@ -75,7 +75,7 @@ Groundhoggers are very generous with their business intelligence. Just as the Gr
 * 🚀 [**Free** 1-Hour Quickstart Course!](https://academy.groundhogg.io/course/groundhogg-quickstart/)
 * 🌎 Community care & support in the [open Facebook group!](https://www.facebook.com/groups/groundhoggwp/)
 * 📺 Over **60 hours** of easy Groundhogg [Youtube tutorials!](https://www.youtube.com/groundhogg)
-* 📃 Use our [Knowledge Centre](https://help.groundhogg.io/) to get the answers you need.
+* 📃 Use our [Knowledge Centre](https://groundhogg.io/documentation/) to get the answers you need.
 * 🎙️ Ask your burning questions in **Office Hours** on our _live Facebook stream every Tuesday!_
 
 ## 🤷‍♂️ Who can benefit from Groundhogg CRM and Marketing Automation?
