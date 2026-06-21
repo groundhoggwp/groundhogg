@@ -382,6 +382,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED REST API endpoints for email archives.
 * ADDED Conditional replacements to show content in plain text or HTML context only.
 * ADDED Simple markdown support in flow step notes.
+* IMPROVED Updated all documentation references to the new [documentation site](https://groundhogg.io/documenation).
 * IMPROVED Item Picker keyboard accessibility.
 * IMPROVED Notifications now pull from Groundhogg's updates email archive, and only show when clicking the 🔔 icon.
 * TWEAKED Use `wp_safe_redirect()` when using auto-login.
