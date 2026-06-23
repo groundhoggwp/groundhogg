@@ -71,6 +71,8 @@ function maybe_get_option_from_constant( $value, $option_name ) {
 	return $value;
 }
 
+add_constant_support( 'gh_secret_key' );
+add_constant_support( 'gh_secret_iv' );
 add_constant_support( 'gh_master_license' );
 add_constant_support( 'gh_recaptcha_secret_key' );
 add_constant_support( 'gh_recaptcha_site_key' );
@@ -5721,7 +5723,7 @@ function track_activity_actions( $activity ) {
  */
 function handle_ajax_user_meta_picker() {
 
-	if ( ! current_user_can( 'edit_users' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
+	if ( ! current_user_can( 'list_users' ) || ! wp_verify_nonce( get_post_var( 'nonce' ), 'meta-picker' ) ) {
 		wp_send_json_error();
 	}
 
@@ -9666,8 +9668,13 @@ function is_staging_environment() {
  *
  * @return string
  */
-function compute_signature( string $data, int $length = 0 ){
-	$signature = hash_hmac( 'sha256', $data, wp_salt( 'auth' ), true );
+function compute_signature( string $data, int $length = 0, string $secret = '' ){
+
+    if ( empty( $secret ) ){
+        $secret = utils::get_secret_key();
+    }
+
+	$signature = hash_hmac( 'sha256', $data, $secret, true );
     return $length > 0 ? substr( $signature, 0, $length ) : $signature;
 }
 
@@ -9682,18 +9689,24 @@ function compute_signature( string $data, int $length = 0 ){
  */
 function check_signature( string $data, string $signature, int $length = 0 ) {
 
-    $expected = compute_signature( $data );
-
-    if ( $length > 0 ){
-
-        if ( strlen( $signature ) !== $length ){
-            return false;
-        }
-
-        $expected  = substr( $expected, 0, $length );
+    if ( $length > 0 && strlen( $signature ) !== $length ){
+        return false;
     }
 
-	return hash_equals( $expected, $signature );
+    $secrets = [
+        utils::get_secret_key(),
+	    wp_salt( 'auth' ) // back compat for using the auth salt
+    ];
+
+    foreach ( $secrets as $secret ){
+	    $expected = compute_signature( $data, $length, $secret );
+
+        if ( hash_equals( $signature, $expected ) ){
+            return true;
+        }
+    }
+
+	return false;
 }
 
 /**

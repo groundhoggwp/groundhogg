@@ -173,17 +173,7 @@ class Utils {
 	static $secret_iv = '';
 	static $encrypt_method = "AES-256-CBC";
 
-	/**
-	 * Provides a quick way to instill a contact session and tie events to a particluar contact.
-	 *
-	 * @param        $string |int the thing to encrypt/decrypt
-	 * @param string $action whether to encrypt or decrypt
-	 *
-	 * @return bool|string false if failure, the result and success.
-	 */
-	public function encrypt_decrypt( $string, $action = 'e' ) {
-
-		// you may change these values to your own
+	public static function get_secret_key() {
 		if ( ! self::$secret_key ){
 
 			self::$secret_key = get_option( 'gh_secret_key', false );
@@ -194,6 +184,10 @@ class Utils {
 			}
 		}
 
+		return self::$secret_key;
+	}
+
+	public static function get_secret_iv() {
 		if ( ! self::$secret_iv ){
 
 			self::$secret_iv = get_option( 'gh_secret_iv', false );
@@ -202,6 +196,25 @@ class Utils {
 				self::$secret_iv = bin2hex( openssl_random_pseudo_bytes( 16 ) );
 				update_option( 'gh_secret_iv', self::$secret_iv );
 			}
+		}
+
+		return self::$secret_iv;
+	}
+
+	/**
+	 * Provides a quick way to instill a contact session and tie events to a particluar contact.
+	 *
+	 * @param        $string |int the thing to encrypt/decrypt
+	 * @param string $action whether to encrypt or decrypt
+	 *
+	 * @return bool|string false if failure, the result and success.
+	 */
+	public function encrypt_decrypt( $string, $action = 'e' ) {
+
+		// initialize if not already
+		if ( ! self::$secret_key || ! self::$secret_iv ){
+			self::get_secret_key();
+			self::get_secret_iv();
 		}
 
 		if ( in_array( strtolower( self::$encrypt_method ), map_deep( openssl_get_cipher_methods(), 'strtolower' ) ) ) {

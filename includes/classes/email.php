@@ -55,6 +55,8 @@ class Email extends Base_Object_With_Meta {
 	 */
 	protected $from_userdata;
 
+	protected $_use_legacy_tracking_links = false;
+
 	/**
 	 * Return the DB instance that is associated with items of this type.
 	 *
@@ -862,6 +864,19 @@ class Email extends Base_Object_With_Meta {
 			$clean_url = '/';
 		}
 
+		// if using legacy format without computing the signature
+		if ( $this->_use_legacy_tracking_links ) {
+
+			$tracking_url = managed_page_url( sprintf(
+				'c/%s/%s/%s',
+				dechex( $this->get_contact()->get_id() ),
+				dechex( $this->get_event()->get_id( true ) ),
+				base64url_encode( $clean_url )
+			) );;
+
+			return sprintf( $replacement, $tracking_url );
+		}
+
 		$payload = implode( '|', [
 			$clean_url,
 			dechex( $this->get_contact()->get_id() ),
@@ -876,6 +891,18 @@ class Email extends Base_Object_With_Meta {
 		) );
 
 		return sprintf( $replacement, $tracking_url );
+	}
+
+	/**
+	 * Toggle whether to use the new tracking link format or the legacy format.
+	 *
+	 * @param $use
+	 *
+	 * @return mixed|true
+	 */
+	public function use_legacy_tracking_links( $use = true ) {
+		return $this->_use_legacy_tracking_links = $use;
+
 	}
 
 	/**
