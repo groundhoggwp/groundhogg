@@ -67,7 +67,7 @@ class Info_Cards {
 
 		self::register( 'user', esc_html__( 'WordPress User', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/user.php';
-		}, 100, 'edit_users' );
+		}, 100, 'list_users' );
 
 		self::register( 'page_visits', esc_html__( 'Page Visits', 'groundhogg' ), function ( $contact ) {
 			include __DIR__ . '/cards/page-visits.php';
@@ -170,7 +170,12 @@ class Info_Cards {
 			return current_user_can( $card['capability'] );
 		} );
 
-		return $cards;
+		/**
+		 * Allow filtering the user's cards priority, capabilities, etc... directly.
+         *
+         * @param array $cards the list of info cards
+		 */
+		return apply_filters( 'groundhogg/admin/contact/cards', $cards );
 	}
 
 	/**

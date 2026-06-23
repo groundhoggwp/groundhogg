@@ -58,6 +58,7 @@ if ( $contact->get_userdata() ):
 <?php endif; ?>
 <?php else: ?>
     <p><?php esc_html_e( 'This contact does not have a WordPress user account.', 'groundhogg' ); ?></p>
+    <?php if ( current_user_can( 'create_users' ) ): ?>
     <form id="create-user-form" action="<?php echo esc_url( admin_url( 'user-new.php' ) ); ?>" method="post">
         <input type="hidden" name="createuser" value="1">
         <input type="hidden" name="first_name" value="<?php echo esc_attr( $contact->get_first_name() ); ?>">
@@ -70,5 +71,5 @@ if ( $contact->get_userdata() ):
             </button>
         </p>
     </form>
-
+    <?php endif; ?>
 <?php endif;
