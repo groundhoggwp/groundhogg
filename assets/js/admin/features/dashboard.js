@@ -703,7 +703,7 @@
     }, Subscribers)
 
     return Div({
-      id: 'contact-reports',
+      id: 'recent-subscribers',
     }, morph => {
 
       if (!State.loaded) {
