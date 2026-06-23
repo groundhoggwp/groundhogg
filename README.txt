@@ -378,7 +378,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.5.4 (2026-06-19) =
+= 4.5.4 (2026-06-23) =
 * ADDED REST API endpoints for email archives.
 * ADDED Conditional replacements to show content in plain text or HTML context only.
 * ADDED Simple markdown support in flow step notes.
@@ -389,6 +389,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * REMOVED Notifications from the weekly/monthly email report.
 * FIXED Broken meta-queries when using `Legacy_Contact_Query`
 * FIXED Tag applied dates showing in incorrect timezone.
+* FIXED Tracking links stopped working after WordPress salt rotation.
+* FIXED WordPress User info card not showing for users with `list_users` cap in multisite.
 
 = 4.5.3 (2026-06-11) =
 * FIXED Broken email processing rule causing some links to not work.
