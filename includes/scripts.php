@@ -326,11 +326,11 @@ class Scripts {
 			'groundhogg-admin-data',
 		], GROUNDHOGG_VERSION, true );
 
-		wp_localize_script( 'groundhogg-admin-remote-notifications', 'GroundhoggNotifications', [
+		wp_add_inline_script( 'groundhogg-admin-remote-notifications', 'var GroundhoggNotifications = ' . wp_json_encode( [
 			'dismissed_notices' => array_values( parse_maybe_numeric_list( Notices::$dismissed_notices ) ),
 			'read_notices'      => array_values( parse_maybe_numeric_list( Notices::$read_notices ) ),
 			'unread'            => notices()->count_unread(),
-		] );
+		] ) );
 
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/features/admin-bar' . $dot_min . '.js', [
 			'groundhogg-admin-components',
