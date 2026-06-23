@@ -2097,7 +2097,7 @@
   }
 
   const ContactList = (contacts = [], {
-    noContacts = () => null,
+    noContacts = () => Pg({ style: { textAlign:'center' } }, __('No contacts found.')),
     itemProps = {},
   } = {}) => {
 
