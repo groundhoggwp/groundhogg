@@ -281,7 +281,14 @@ class Main_Updater extends Old_Updater {
 				'description' => __( 'Upgrade the broadcasts table for recurring schedules.', 'groundhogg' ),
 				'callback'    => function () {
 					db()->broadcasts->create_table();
-					flush_rewrite_rules();
+					install_custom_rewrites();
+				},
+			],
+			'4.5.4'  => [
+				'automatic'   => true,
+				'description' => __( 'Make sure rewrites are super duper flushed!', 'groundhogg' ),
+				'callback'    => function () {
+					install_custom_rewrites();
 				},
 			]
 		];
