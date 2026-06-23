@@ -23,12 +23,21 @@
     notifications: [],
     read         : false,
     loaded       : false,
-    is_expanded  : new Groundhogg.TokenList()
+    is_expanded  : new Groundhogg.TokenList(),
+    unread       : 3,
   })
 
   if (typeof GroundhoggNotifications !== 'undefined') {
+
+    let { unread = 3, dismissed_notices = [] } = GroundhoggNotifications
+
+    if ( ! unread ){
+      unread = 3
+    }
+
     State.set({
-      dismissed: GroundhoggNotifications.dismissed_notices,
+      dismissed: dismissed_notices,
+      unread
     })
   }
 
@@ -36,10 +45,16 @@
    * Mark all notifications as read
    * @returns {*}
    */
-  const readAllNotifications = () => ajax({
-    action: 'gh_read_notice',
-    notice: State.notifications.map(n => n.id),
-  })
+  const readAllNotifications = () => {
+
+    // clear the class from the UI as well
+    document.querySelectorAll( '.gh-has-notifications.unread-notices' ).forEach(el => el.classList.remove('unread-notices', 'gh-has-notifications') )
+
+    return ajax({
+      action: 'gh_read_notice',
+      notice: State.notifications.map(n => n.id),
+    })
+  }
 
   /**
    * Fetch remote notifications
@@ -138,11 +153,7 @@
           }
         },
         className: 'display-grid gap-10',
-      }, [
-        'full',
-        'full',
-        'full',
-      ])
+      }, Array( State.unread ).fill('full' ) )
     }
 
     let notifications, button
