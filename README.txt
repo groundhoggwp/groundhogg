@@ -379,7 +379,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.5.5 (2026-06-24) =
-* FIXED Email embed shortcode
+* FIXED Email embed shortcode.
+* FIXED Vulnerability responsibly disclosed by WordFence.
+* FIXED Legacy tracking link and open backwards compatibility.
 
 = 4.5.4 (2026-06-23) =
 * ADDED REST API endpoints for email archives.
