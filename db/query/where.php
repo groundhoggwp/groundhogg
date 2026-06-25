@@ -473,16 +473,16 @@ class Where {
 	 */
 	public function notIn( $column, $values ) {
 
-		if ( is_string( $values ) && str_starts_with( $values, 'SELECT' ) ) {
-			_doing_it_wrong( __METHOD__, 'Use the \Groundhogg\Query class for sub queries', '4.5' );
-			return $this;
-		}
-
 		$column = $this->sanitize_column( $column );
 
 		if ( is_a( $values, Query::class ) ) {
 			$this->addCondition( "$column NOT IN ( $values )" );
 
+			return $this;
+		}
+
+		if ( is_string( $values ) && str_starts_with( $values, 'SELECT' ) ) {
+			_doing_it_wrong( __METHOD__, 'Use the \Groundhogg\Query class for sub queries', '4.5' );
 			return $this;
 		}
 
