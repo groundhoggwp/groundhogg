@@ -8,6 +8,7 @@ use Exception;
 use Groundhogg\Contact;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
+use Groundhogg\DB\Query\Query;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Query\Where;
 use Groundhogg\DB_Object;
@@ -328,15 +329,14 @@ abstract class DB {
 	 * @return string
 	 */
 	public function generate_search( $s = '' ) {
-		global $wpdb;
 
-		$where_args = array();
+		$where = new Where( new Table_Query( $this ), "OR" );
 
 		foreach ( $this->get_searchable_columns() as $column ) {
-			$where_args[ $column ] = "%" . $wpdb->esc_like( $s ) . "%";
+			$where->contains( $column, $s );
 		}
 
-		return $this->generate_where( $where_args, "OR" );
+		return "$where";
 	}
 
 	/**
@@ -394,27 +394,24 @@ abstract class DB {
 	 */
 	public function generate_where( $args = array(), $relationship = "AND" ) {
 
-		$where = array();
+		$where = new Where( new Table_Query( $this ), $relationship );
+
 		if ( ! empty( $args ) && is_array( $args ) ) {
 			foreach ( $args as $key => $value ) {
 
 				if ( is_array( $value ) ) {
-					$where[] = "$key IN (" . maybe_implode_in_quotes( $value ) . ")";
+					$where->in( $key, $value );
 				} else {
-					if ( is_string( $value ) ) {
-						$value = "'" . $value . "'";
-					}
-
-					if ( strpos( $value, '%' ) !== false ) {
-						$where[] = $key . " LIKE " . $value;
+					if ( str_contains( $value, '%' ) ) {
+						$where->like( $key, $value );
 					} else {
-						$where[] = $key . " = " . $value;
+						$where->equals( $key, $value );
 					}
 				}
 			}
 		}
 
-		return implode( " {$relationship} ", $where );
+		return "$where";
 
 	}
 

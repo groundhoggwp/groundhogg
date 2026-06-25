@@ -746,11 +746,30 @@ class Legacy_Contact_Query {
 	 *
 	 */
 	protected function construct_request_fields() {
+
+		global $wpdb;
+
 		if ( $this->query_vars['count'] ) {
 			return "COUNT($this->table_name.$this->primary_key) AS count";
 		}
 
-		return "$this->table_name.{$this->query_vars['select']}";
+		$select = $this->query_vars['select'];
+
+		if ( is_array( $select ) ) {
+
+			$columns = array_filter( $select, fn ( $column ) => is_string( $column ) && $this->gh_db_contacts->has_column( $column ) );
+
+			if ( ! empty( $columns ) ) {
+				$columns = array_map( fn ( $column ) => $wpdb->prepare( '%i.%i', $this->table_name, $column ), $columns );
+				return implode( ',', $columns );
+			}
+		}
+
+		if ( is_string( $select ) && $this->gh_db_contacts->has_column( $select ) ) {
+			$wpdb->prepare( '%i.%i', $this->table_name, $select );
+		}
+
+		return "$this->table_name.*";
 	}
 
 	/**

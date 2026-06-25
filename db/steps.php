@@ -3,6 +3,9 @@
 namespace Groundhogg\DB;
 
 // Exit if accessed directly
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Step;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -154,23 +157,24 @@ class Steps extends DB {
 	/**
 	 * Delete steps when a funnel is deleted...
 	 *
-	 * @param bool|int $id Funnel ID
+	 * @param bool|int $funnel_id Funnel ID
 	 *
 	 * @return bool|false|int
 	 */
-	public function delete_steps( $id = false ) {
-		if ( empty( $id ) ) {
+	public function delete_steps( $funnel_id = false ) {
+
+		if ( empty( $funnel_id ) ) {
 			return false;
 		}
 
-		$steps = $this->get_steps( array( 'funnel_id' => $id ) );
+		$query = new Table_Query( $this );
+		$query->where( 'funnel_id', $funnel_id );
+		$steps = $query->get_objects( Step::class );
 
-		$result = 0;
+		$result = false;
 
-		if ( $steps ) {
-			foreach ( $steps as $step ) {
-				$result = $this->delete( $step->ID );
-			}
+		foreach ( $steps as $step ) {
+			$result = $this->delete( $step->ID );
 		}
 
 		return $result;
@@ -207,61 +211,6 @@ class Steps extends DB {
 		}
 
 		return parent::get_by( $field, $value );
-	}
-
-
-	/**
-	 * Retrieve steps from the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function get_steps( $data = array(), $order = 'step_order' ) {
-
-		global $wpdb;
-
-		if ( ! is_array( $data ) ) {
-			return false;
-		}
-
-		$data = (array) $data;
-
-		$extra = '';
-
-		if ( isset( $data['search'] ) ) {
-
-			$extra .= sprintf( " AND (%s)", $this->generate_search( $data['search'] ) );
-
-		}
-
-		// Initialise column format array
-		$column_formats = $this->get_columns();
-
-		// Force fields to lower case
-		$data = array_change_key_case( $data );
-
-		// White list columns
-		$data = array_intersect_key( $data, $column_formats );
-
-		$where = $this->generate_where( $data );
-
-		if ( empty( $where ) ) {
-
-			$where = "1=1";
-
-		}
-
-		return $wpdb->get_results( "SELECT * FROM $this->table_name WHERE $where $extra ORDER BY `$order` ASC" );
-	}
-
-	/**
-	 * Count the total number of steps in the database
-	 *
-	 * @access  public
-	 * @since   2.1
-	 */
-	public function count( $args = array() ) {
-		return count( $this->get_steps( $args ) );
 	}
 
 	/**

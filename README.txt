@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.5
+Stable tag: 4.5.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -378,9 +378,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.5.6 (2026-06-25) =
+* FIXED Vulnerability responsibly disclosed by WordFence.
+
 = 4.5.5 (2026-06-24) =
 * FIXED Email embed shortcode.
-* FIXED Vulnerability responsibly disclosed by WordFence.
 * FIXED Legacy tracking link and open backwards compatibility.
 
 = 4.5.4 (2026-06-23) =
