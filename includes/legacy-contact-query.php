@@ -1010,11 +1010,11 @@ class Legacy_Contact_Query {
 		}
 
 		if ( $this->query_vars['after'] ) {
-			$where['after'] = "$this->table_name.$this->date_key >= '{$this->query_vars['after']}'";
+			$where['after'] = $wpdb->prepare( "{$this->table_name}.{$this->date_key} >= %s", $this->query_vars['after'] );
 		}
 
 		if ( $this->query_vars['before'] ) {
-			$where['before'] = "$this->table_name.$this->date_key <= '{$this->query_vars['before']}'";
+			$where['before'] = $wpdb->prepare( "{$this->table_name}.{$this->date_key} <= %s", $this->query_vars['before'] );
 		}
 
 		if ( ! empty( $this->meta_query_clauses['where'] ) ) {

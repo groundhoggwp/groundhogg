@@ -78,7 +78,6 @@ class Contacts_Page extends Admin_Page {
 		add_action( 'wp_ajax_groundhogg_contact_upload_file', [ $this, 'ajax_upload_file' ] );
 		add_action( 'wp_ajax_groundhogg_edit_contact', [ $this, 'ajax_edit_contact' ] );
 		add_action( 'wp_ajax_groundhogg_contact_table_row', [ $this, 'ajax_contact_table_row' ] );
-		add_action( 'wp_ajax_groundhogg_get_contacts_table', [ $this, 'ajax_get_table' ] );
 	}
 
 	/**
@@ -760,33 +759,6 @@ class Contacts_Page extends Admin_Page {
 		set_request_var( 'status', Preferences::UNCONFIRMED );
 
 		return $this->process_status_change();
-	}
-
-
-	public function ajax_get_table() {
-
-//		if ( ! current_user_can( 'view_contacts' ) ){
-//			return;
-//		}
-
-		ob_start();
-
-		$contacts_table = new Tables\Contacts_Table();
-
-		?>
-        <form method="post" id="contacts-table-form">
-			<?php
-			$contacts_table->prepare_items();
-			$contacts_table->display();
-			?>
-        </form>
-		<?php
-
-		$table = ob_get_clean();
-
-		wp_send_json_success( [
-			'html' => $table
-		] );
 	}
 
 	/**
