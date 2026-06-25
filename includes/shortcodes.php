@@ -98,7 +98,11 @@ class Shortcodes {
 			return '';
 		}
 
-		$email->set_contact( get_contactdata() );
+		try {
+			$email->set_contact( get_contactdata() );
+		} catch ( InvalidContactException $e ) {
+			// never mind
+		}
 
 		if ( ! defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) ) {
 			define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );

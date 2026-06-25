@@ -17,8 +17,16 @@ if ( ! $email->exists() ){
     wp_die( 'Invalid email.' );
 }
 
-$email->set_contact( get_contactdata() );
-$email->set_event( Plugin::$instance->tracking->get_current_event() );
+try {
+	$email->set_contact( get_contactdata() );
+} catch ( InvalidContactException $e ) {
+
+}
+try {
+	$email->set_event( Plugin::$instance->tracking->get_current_event() );
+} catch ( InvalidEventException $e ) {
+
+}
 
 status_header( 200 );
 header( 'Content-Type: text/html; charset=utf-8' );

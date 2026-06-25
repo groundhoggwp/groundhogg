@@ -10,3 +10,5 @@ class SchedulingException extends \Exception {}
 class NoItemsException extends \Exception {}
 class NoContactsException extends \Exception {}
 class InvalidFiltersException extends \Exception {}
+class InvalidContactException extends \Exception {}
+class InvalidEventException extends \Exception {}

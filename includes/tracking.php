@@ -304,6 +304,20 @@ class Tracking {
 	public static $use_safe_redirect = false;
 
 	/**
+	 * Show when a link is invalid
+	 *
+	 * @return void
+	 */
+	public function invalid_link_screen() {
+		wp_die( 'This link is currently unavailable.', 'Invalid Link', [
+			'response' => 404,
+			// translators: %s is the blog name
+			'link_text' => sprintf( esc_html__( 'Return to %s', 'groundhogg' ), esc_html( get_bloginfo( 'name', 'display' ) ) ),
+			'link_url'  => esc_url( home_url() )
+		] );
+	}
+
+	/**
 	 * Do a tracking redirect during the template_redirect hook
 	 */
 	public function template_redirect() {
@@ -321,71 +335,99 @@ class Tracking {
 		$tracking_action  = get_query_var( 'tracking_action' );
 		$tracking_payload = get_query_var( 'tracking_payload' );
 
-		if ( ! empty( $tracking_payload ) ){
+		try {
 
-			$payload_parts = explode( '.', $tracking_payload );
-			$encoded_payload   = $payload_parts[0];
-			$encoded_signature = $payload_parts[1];
+			if ( ! empty( $tracking_payload ) ){
 
-			$id_payload = base64url_decode( $encoded_payload );
-			$signature  = base64url_decode( $encoded_signature );
-			$link_parts = explode( '|', $id_payload ); // url | contact | event
-			$event_id   = absint( hexdec( array_pop( $link_parts ) ) );
-			$contact_id = absint( hexdec( array_pop( $link_parts ) ) );
-			// in case the url contains `|` we re-implode and start from the back
-			$target_url = esc_url_raw( sanitize_text_field( implode( '|', $link_parts ) ) );
+				$payload_parts = explode( '.', $tracking_payload );
+				$encoded_payload   = $payload_parts[0];
+				$encoded_signature = $payload_parts[1];
 
-			// signature check failed,
-			if ( ! check_signature( $id_payload, $signature, 16 ) ){
+				$id_payload = base64url_decode( $encoded_payload );
+				$signature  = base64url_decode( $encoded_signature );
+				$link_parts = explode( '|', $id_payload ); // url | contact | event
+				$event_id   = absint( hexdec( array_pop( $link_parts ) ) );
+				$contact_id = absint( hexdec( array_pop( $link_parts ) ) );
+				// in case the url contains `|` we re-implode and start from the back
+				$target_url = esc_url_raw( sanitize_text_field( implode( '|', $link_parts ) ) );
+
+				// signature check failed,
+				if ( ! check_signature( $id_payload, $signature, 16 ) ){
+
+					// todo check against the email log?
+
+					// let's check the payload against the generated content itself
+					// in the event the signature changes, we can test against the actual content
+					$event = get_event_by_queued_id( $event_id );
+
+					if ( ! $event || ! $event->exists() ){
+						$this->invalid_link_screen();
+						return;
+					}
+
+					$email = $event->get_email();
+					$email->set_contact( $contact_id );
+					$email->set_event( $event );
+					$generated_content = $email->build();
+
+					if ( ! str_contains( $generated_content, $encoded_payload ) ){
+						$this->invalid_link_screen();
+						return;
+					}
+
+				}
+
+				set_query_var( 'target_url', $target_url );
+				set_query_var( 'contact_id', $contact_id );
+				set_query_var( 'event_id', $event_id );
+
+			}
+			else if ( $tracking_action === 'click' ) { // legacy tracking link
 
 				// todo check against the email log?
 
-				// let's check the payload against the generated content itself
-				// in the event the signature changes, we can test against the actual content
+				// if we have a legacy tracking link, let's check against the content
+				$contact_id = absint( get_query_var( 'contact_id' ) );
+				$event_id   = absint( get_query_var( 'event_id' ) );
+				$target_url = get_query_var( 'target_url' );
+
 				$event = get_event_by_queued_id( $event_id );
+
+				if ( ! $event || ! $event->exists() ){
+					$this->invalid_link_screen();
+					return;
+				}
+
 				$email = $event->get_email();
 				$email->set_contact( $contact_id );
 				$email->set_event( $event );
+				// make sure using the legacy tracking link format
+				$email->use_legacy_tracking_links();
+
 				$generated_content = $email->build();
 
-				if ( ! str_contains( $generated_content, $encoded_payload ) ){
-					wp_die( 'Invalid link.' );
+				// rebuild our tracking link url from the provided data
+				$legacy_tracking_url = sprintf( 'c/%s/%s/%s',
+					dechex( $contact_id ),
+					dechex( $event_id ),
+					base64url_encode( $target_url )
+				);
+
+				if ( ! str_contains( $generated_content, $legacy_tracking_url ) ){
+					$this->invalid_link_screen();
+					return;
 				}
-
+			}
+			else if ( $tracking_action === 'open' ) { // legacy open
+				$contact_id = absint( get_query_var( 'contact_id' ) );
+				$event_id   = absint( get_query_var( 'event_id' ) );
+			}
+			else {
+				return;
 			}
 
-			set_query_var( 'target_url', $target_url );
-			set_query_var( 'contact_id', $contact_id );
-			set_query_var( 'event_id', $event_id );
-
-		} else {
-
-			// todo check against the email log?
-
-			// if we have a legacy tracking link, let's check against the content
-			$contact_id = absint( get_query_var( 'contact_id' ) );
-			$event_id   = absint( get_query_var( 'event_id' ) );
-			$target_url = get_query_var( 'target_url' );
-
-			$event = get_event_by_queued_id( $event_id );
-			$email = $event->get_email();
-			$email->set_contact( $contact_id );
-			$email->set_event( $event );
-			// make sure using the legacy tracking link format
-			$email->use_legacy_tracking_links();
-
-			$generated_content = $email->build();
-
-			// rebuild our tracking link url from the provided data
-			$legacy_tracking_url = sprintf( 'c/%s/%s/%s',
-				dechex( $contact_id ),
-				dechex( $event_id ),
-				base64url_encode( $target_url )
-			);
-
-			if ( ! str_contains( $generated_content, $legacy_tracking_url ) ){
-				wp_die( 'Invalid link.' );
-			}
+		} catch ( \Throwable $e ){
+			$this->invalid_link_screen();
 		}
 
 		$contact = get_contactdata( $contact_id );

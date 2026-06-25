@@ -417,6 +417,14 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_open_tracking_src() {
 
+		if ( $this->_use_legacy_tracking_links ){
+			return managed_page_url( sprintf(
+				"o/%s/%s",
+				dechex( $this->get_contact()->get_id() ),
+				dechex( $this->get_event()->get_id( true ) )
+			) );
+		}
+
 		$payload = implode( '|', [
 			'o',
 			dechex( $this->get_contact()->get_id() ),
@@ -1268,7 +1276,14 @@ class Email extends Base_Object_With_Meta {
 	 * @param $contact Contact|int
 	 */
 	public function set_contact( $contact ) {
-		$this->contact = get_contactdata( $contact );
+
+		$contact =  get_contactdata( $contact );
+
+		if ( ! is_a_contact( $contact ) ) {
+			throw new InvalidContactException( 'Invalid contact provided.' );
+		}
+
+		$this->contact = $contact;
 	}
 
 	/**
@@ -1282,6 +1297,10 @@ class Email extends Base_Object_With_Meta {
 
 		if ( is_int( $event ) ) {
 			$event = get_queued_event_by_id( $event );
+		}
+
+		if ( ! $event || ! $event->exists() ) {
+			throw new InvalidEventException( 'Invalid event provided.' );
 		}
 
 		$this->event = $event;
