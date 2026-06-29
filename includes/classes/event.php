@@ -478,7 +478,13 @@ class Event extends Base_Object {
 			call_user_func( [ $step, 'run_after' ], $this->get_contact(), $this );
 		}
 
-		do_action( 'groundhogg/event/run/after', $this );
+		/**
+		 * Do actions after an event has been run
+		 *
+		 * @param Event $event
+		 * @param bool|WP_Error $result
+		 */
+		do_action( 'groundhogg/event/run/after', $this, $result );
 
 		return $result;
 	}
