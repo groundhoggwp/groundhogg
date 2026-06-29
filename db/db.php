@@ -394,24 +394,26 @@ abstract class DB {
 	 */
 	public function generate_where( $args = array(), $relationship = "AND" ) {
 
-		$where = new Where( new Table_Query( $this ), $relationship );
+		$tableQuery = new Table_Query( $this );
+		$alias = $tableQuery->alias;
+
+		$where = new Where( $tableQuery, $relationship );
 
 		if ( ! empty( $args ) && is_array( $args ) ) {
 			foreach ( $args as $key => $value ) {
 
 				if ( is_array( $value ) ) {
 					$where->in( $key, $value );
+				} else if ( str_contains( $value, '%' ) ) {
+					$where->like( $key, $value );
 				} else {
-					if ( str_contains( $value, '%' ) ) {
-						$where->like( $key, $value );
-					} else {
-						$where->equals( $key, $value );
-					}
+					$where->equals( $key, $value );
 				}
 			}
 		}
 
-		return "$where";
+		// remove the column alias before returning for backwards compatibility
+		return str_replace( "$alias.", '', "$where" );
 
 	}
 
