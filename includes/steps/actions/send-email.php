@@ -264,12 +264,10 @@ class Send_Email extends Action {
 
 		$sent = $email->send( $contact, $event );
 
-		if ( $sent === true ) {
-			Simulator::log( sprintf( '📨 Sent %s', bold_it( $email->get_title() ) ) );
-		}
-
 		// Thread stuff only if email was sent successfully
 		if ( $sent === true ) {
+
+			Simulator::log( sprintf( '📨 Sent %s', bold_it( $email->get_title() ) ) );
 
 			$subject = $email->get_merged_subject_line();
 			$from    = $email->get_from_header();
@@ -298,7 +296,11 @@ class Send_Email extends Action {
 					'from'       => $from
 				] );
 			}
-		}
+		} else if ( is_wp_error( $sent ) ) {
+			Simulator::log( sprintf( '❌ %s failed to send: %s', bold_it( $email->get_title() ), $sent->get_error_message() ) );
+        } else {
+			Simulator::log( sprintf( '❌ Something went wrong sending %s', bold_it( $email->get_title() ) ) );
+        }
 
 		remove_filter( 'groundhogg/email/headers', [ $this, 'set_thread_headers' ] );
 		remove_filter( 'groundhogg/email/subject', [ $this, 'set_thread_subject' ] );
