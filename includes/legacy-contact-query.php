@@ -5,7 +5,6 @@ namespace Groundhogg;
 // Exit if accessed directly
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Contacts;
-use Groundhogg\DB\Query\Query;
 use Groundhogg\DB\Query\Where;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1925,9 +1924,13 @@ class Legacy_Contact_Query {
 			'role' => ''
 		] );
 
-		$role = sanitize_text_field( $filter_vars['role'] );
+		$role = $filter_vars['role'];
 
-		return "$query->table_name.user_id IN ( SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '{$wpdb->prefix}capabilities' AND meta_value RLIKE '\"$role\"' )";
+		if ( ! $role || ! wp_roles()->is_role( $role ) ) {
+			return '0=1';
+		}
+
+		return "$query->table_name.user_id IN ( SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '{$wpdb->prefix}capabilities' AND " . $wpdb->prepare( "meta_value RLIKE %s )", $filter_vars['role'] );
 	}
 
 	/**
@@ -2290,12 +2293,15 @@ class Legacy_Contact_Query {
 	 */
 	public static function filter_marketability( $filter_vars, $query ) {
 
+		global $wpdb;
+
 		switch ( $filter_vars['marketable'] ) {
 			default:
 			case 'yes':
 
 				if ( Plugin::instance()->preferences->is_confirmation_strict() ) {
-					$clause = sprintf( "( $query->table_name.optin_status = %s OR ( $query->table_name.optin_status = %s AND $query->table_name.date_created >= '%s') )", Preferences::CONFIRMED, Preferences::UNCONFIRMED, Ymd_His( time() - ( Plugin::instance()->preferences->get_grace_period() * DAY_IN_SECONDS ) ) );
+					$clause = $wpdb->prepare( "( $query->table_name.optin_status = %d OR ( $query->table_name.optin_status = %d AND $query->table_name.date_created >= %s) )", Preferences::CONFIRMED, Preferences::UNCONFIRMED,
+						Ymd_His( time() - ( Plugin::instance()->preferences->get_grace_period() * DAY_IN_SECONDS ) ) );
 				} else {
 					$clause = sprintf( "$query->table_name.optin_status IN (%s)", implode( ',', [
 						Preferences::CONFIRMED,
@@ -2678,6 +2684,8 @@ class Legacy_Contact_Query {
 		$before = $before_and_after['before'];
 		$after  = $before_and_after['after'];
 
+		global $wpdb;
+
 		switch ( $filter_vars['date_range'] ) {
 			default:
 			case '24_hours':
@@ -2687,16 +2695,20 @@ class Legacy_Contact_Query {
 			case '90_days':
 			case '365_days':
 			case 'after':
-				$clause = $as_int ? sprintf( "> %d", $after ) : sprintf( "> '%s'", Ymd_His( $after ) );
+				$clause = $as_int
+					? $wpdb->prepare( "> %d", $after )
+					: $wpdb->prepare( "> %s", Ymd_His( $after ) );
 				break;
 			case 'before':
-				$clause = $as_int ? sprintf( "< %d", $before ) : sprintf( "< '%s'", Ymd_His( $before ) );
+				$clause = $as_int
+					? $wpdb->prepare( "< %d", $before )
+					: $wpdb->prepare( "< %s", Ymd_His( $before ) );
 				break;
 			case 'between':
 			case 'today':
 				$clause = $as_int
-					? sprintf( "BETWEEN %d AND %d", $after, $before )
-					: sprintf( "BETWEEN '%s' AND '%s'", Ymd_His( $after ), Ymd_His( $before ) );
+					? $wpdb->prepare( "BETWEEN %d AND %d", $after, $before )
+					: $wpdb->prepare( "BETWEEN %s AND %s", Ymd_His( $after ), Ymd_His( $before ) );
 				break;
 		}
 
@@ -2713,6 +2725,8 @@ class Legacy_Contact_Query {
 	 */
 	public static function future_standard_activity_filter_clause( $filter_vars, $as_int = false, $future = false ) {
 
+		global $wpdb;
+
 		$filter_vars = wp_parse_args( $filter_vars, [
 			'date_range' => '24_hours',
 		] );
@@ -2724,10 +2738,14 @@ class Legacy_Contact_Query {
 
 		switch ( $filter_vars['date_range'] ) {
 			case 'after':
-				$clause = $as_int ? sprintf( "> %d", $after ) : sprintf( "> '%s'", Ymd_His( $after ) );
+				$clause = $as_int
+					? $wpdb->prepare( "> %d", $after )
+					: $wpdb->prepare( "> %s", Ymd_His( $after ) );
 				break;
 			case 'before':
-				$clause = $as_int ? sprintf( "< %d", $before ) : sprintf( "< '%s'", Ymd_His( $before ) );
+				$clause = $as_int
+					? $wpdb->prepare( "< %d", $before )
+					: $wpdb->prepare( "< %s", Ymd_His( $before ) );
 				break;
 			default:
 			case '24_hours':
@@ -2738,8 +2756,8 @@ class Legacy_Contact_Query {
 			case '365_days':
 			case 'between':
 				$clause = $as_int
-					? sprintf( "BETWEEN %d AND %d", $after, $before )
-					: sprintf( "BETWEEN '%s' AND '%s'", Ymd_His( $after ), Ymd_His( $before ) );
+					? $wpdb->prepare( "BETWEEN %d AND %d", $after, $before )
+					: $wpdb->prepare( "BETWEEN %s AND %s", Ymd_His( $after ), Ymd_His( $before ) );
 				break;
 		}
 

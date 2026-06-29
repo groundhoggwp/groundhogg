@@ -543,11 +543,15 @@ class Contact_Query extends Table_Query {
 			'role' => ''
 		] );
 
-		$role = sanitize_text_field( $filter['role'] );
+		$role = $filter['role'];
+
+		if ( ! $role || ! wp_roles()->is_role( $role ) ) {
+			return;
+		}
 
 		$capability_key = $where->query->db->prefix . 'capabilities';
 		$alias          = $where->query->joinMeta( $capability_key, $where->query->db->usermeta, 'user_id' );
-		$where->like( "$alias.meta_value", '%"' . $where->esc_like( $role ) . '"%' );
+		$where->contains( "$alias.meta_value", "'$role'" );
 	}
 
 	/**
