@@ -464,7 +464,7 @@ class Block_Registry {
 		$props['id']     = $props['queryId'] ?? '';
 		$props['layout'] = 'plain';
 
-		$posts = replacements()->posts( $props );
+		$posts = replacements()->posts_plain( $props );
 
 		remove_action( 'pre_get_posts', [ $this, 'post_query_filter' ] );
 
