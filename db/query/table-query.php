@@ -74,6 +74,8 @@ class Table_Query extends Query {
 
 				if ( is_array( $value ) ) {
 					$this->where->in( $param, $value );
+				} else if ( is_string( $value ) && str_contains( $value, '%' ) ) {
+					$this->where->like( $param, $value );
 				} else {
 					$this->where->equals( $param, $value );
 				}
