@@ -48,11 +48,12 @@ class Replacer {
 
 		foreach ( $this->replacements as $search => $replace ){
 
-			if ( is_callable( $replace ) ){
-				$replace = call_user_func( $replace, $this );
+			try {
+				$content = str_replace( $search, "$replace", $content );
+			} catch ( \Throwable $e ){
+				$content = str_replace( $search, $e->getMessage(), $content );
 			}
 
-			$content = str_replace( $search, $replace, $content );
 		}
 
 		return $content;
