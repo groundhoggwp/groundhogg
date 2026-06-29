@@ -58,8 +58,11 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 		wp_die( esc_html__( 'Could not load email...', 'groundhogg' ) );
 	}
 
-	$email->set_contact( $contact );
-	$email->set_event( $event );
+	try {
+		$email->set_contact( $contact );
+		$email->set_event( $event );
+	} catch ( InvalidContactException|InvalidEventException $e ) {
+	}
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Generated HTML
 	echo $email->build();

@@ -107,7 +107,9 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 				];
 			}
 
-			$email->set_contact( $contact );
+			try {
+				$email->set_contact( $contact );
+			} catch ( InvalidContactException $e ) {}
 
 			return [
 				$date->wpDateFormat(),
