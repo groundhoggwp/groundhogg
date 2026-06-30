@@ -219,15 +219,18 @@ class Utils {
 
 		if ( in_array( strtolower( self::$encrypt_method ), map_deep( openssl_get_cipher_methods(), 'strtolower' ) ) ) {
 
+			$key = self::$secret_key;
+			$iv  = self::$secret_iv;
+
 			//backwards compat
-			if ( function_exists( 'ctype_xdigit' ) && ctype_xdigit( self::$secret_key ) ) {
-				self::$secret_key = hex2bin( self::$secret_key );
-				self::$secret_iv  = hex2bin( self::$secret_iv );
+			if ( function_exists( 'ctype_xdigit' ) && ctype_xdigit( $key ) ) {
+				$key = hex2bin( $key );
+				$iv  = hex2bin( $iv );
 			}
 
 			$output = false;
-			$key    = substr( hash( 'sha256', self::$secret_key ), 0, 32 );
-			$iv     = substr( hash( 'sha256', self::$secret_iv ), 0, 16 );
+			$key = substr( hash( 'sha256', $key ), 0, 32 );
+			$iv  = substr( hash( 'sha256', $iv ), 0, 16 );
 
 			if ( $action == 'e' ) {
 				$output = base64_encode( openssl_encrypt( $string, self::$encrypt_method, $key, 0, $iv ) );

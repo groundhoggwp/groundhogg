@@ -349,7 +349,7 @@ class Tracking {
 				$event_id   = absint( hexdec( array_pop( $link_parts ) ) );
 				$contact_id = absint( hexdec( array_pop( $link_parts ) ) );
 				// in case the url contains `|` we re-implode and start from the back
-				$target_url = esc_url_raw( sanitize_text_field( implode( '|', $link_parts ) ) );
+				$target_url = implode( '|', $link_parts );
 
 				// signature check failed,
 				if ( ! check_signature( $id_payload, $signature, 16 ) ){

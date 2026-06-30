@@ -590,7 +590,7 @@ function get_referrer_url_param($key = '', $default = false ) {
  * @return array|string|string[]
  */
 function base64url_encode( $stuff ) {
-	return str_replace( [ '+', '/', '=' ], [ '-', '_', '' ], base64_encode( $stuff ) );
+	return rtrim( strtr( base64_encode( $stuff ), '+/', '-_' ), '=' );
 }
 
 /**
@@ -612,7 +612,10 @@ function base64_json_encode( $query ) {
  * @return false|string
  */
 function base64url_decode( $stuff ) {
-	return base64_decode( str_replace( [ '-', '_' ], [ '+', '/' ], $stuff ) );
+	$stuff = str_replace( [ '-', '_' ], [ '+', '/' ], $stuff );
+	$stuff .= str_repeat( '=', ( 4 - strlen( $stuff ) % 4 ) % 4 );
+
+	return base64_decode( $stuff, true );
 }
 
 /**
@@ -5237,7 +5240,7 @@ function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $exp
 function add_failsafe_tracking_params( string $url, Contact $contact ) {
 
 	$params = [
-		'gi' => base64url_encode( encrypt( $contact->get_email() ) )
+//		'gi' => base64url_encode( encrypt( $contact->get_email() ) )
 	];
 
 	if ( the_email() && is_sending() && the_email()->get_event() && the_email()->get_event()->exists() ) {
@@ -9671,7 +9674,7 @@ function is_staging_environment() {
 function compute_signature( string $data, int $length = 0, string $secret = '' ){
 
     if ( empty( $secret ) ){
-        $secret = utils::get_secret_key();
+        $secret = Utils::get_secret_key();
     }
 
 	$signature = hash_hmac( 'sha256', $data, $secret, true );
@@ -9689,22 +9692,24 @@ function compute_signature( string $data, int $length = 0, string $secret = '' )
  */
 function check_signature( string $data, string $signature, int $length = 0 ) {
 
-    if ( $length > 0 && strlen( $signature ) !== $length ){
-        return false;
-    }
+	$secrets = [
+		Utils::get_secret_key(),
+        hex2bin( Utils::get_secret_key() ), // whoops
+		wp_salt( 'auth' ),
+	];
 
-    $secrets = [
-        utils::get_secret_key(),
-	    wp_salt( 'auth' ) // back compat for using the auth salt
-    ];
+	foreach ( $secrets as $secret ) {
 
-    foreach ( $secrets as $secret ){
-	    $expected = compute_signature( $data, $length, $secret );
+		$expected = compute_signature( $data, $length, $secret );
 
-        if ( hash_equals( $signature, $expected ) ){
-            return true;
-        }
-    }
+		if ( strlen( $signature ) !== strlen( $expected ) ) {
+			continue;
+		}
+
+		if ( hash_equals( $expected, $signature ) ) {
+			return true;
+		}
+	}
 
 	return false;
 }

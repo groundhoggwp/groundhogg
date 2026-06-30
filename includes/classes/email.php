@@ -842,63 +842,79 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Replace the link with another link which has the ?ref UTM which will lead to the original link
+	 * Replace href URLs with Groundhogg tracking links.
 	 *
-	 * @param $matches
+	 * @param array  $matches
+	 * @param string $replacement
 	 *
 	 * @return string
 	 */
 	public function tracking_link_callback( $matches, $replacement = 'href="%s"' ) {
 
-		$clean_url = no_and_amp( html_entity_decode( $matches[1] ) );
+		$clean_url = $matches[1] ?? '';
 
-		// If the url is not to be tracked leave it alone.
+		// Only decode the common HTML attribute encoding we expect from hrefs.
+		// Avoid broad URL normalization before signing.
+		$clean_url = trim( str_replace( '&amp;', '&', $clean_url ) );
+
 		if ( is_url_excluded_from_tracking( $clean_url ) ) {
-			return sprintf( $replacement, $clean_url );
+			return sprintf( $replacement, esc_attr( $clean_url ) );
 		}
 
-		$local_hostname = wp_parse_url( home_url(), PHP_URL_HOST );
+		$local_hostname  = wp_parse_url( home_url(), PHP_URL_HOST );
+		$target_hostname = wp_parse_url( $clean_url, PHP_URL_HOST );
 
-		// target hostname and local hostname are the same
-		// in that case just use the path as the hostname is not needed.
-		if ( wp_parse_url( $clean_url, PHP_URL_HOST ) === $local_hostname ) {
-			$regex     = preg_quote( $local_hostname );
-			$clean_url = preg_replace( "@https?://$regex@", '', $clean_url );
+		// If linking to the same site, store only path/query/fragment.
+		// Do not preg_replace the host globally, because it may also appear inside redirect_to.
+		if ( $target_hostname && $target_hostname === $local_hostname ) {
+			$path     = wp_parse_url( $clean_url, PHP_URL_PATH ) ?: '/';
+			$query    = wp_parse_url( $clean_url, PHP_URL_QUERY );
+			$fragment = wp_parse_url( $clean_url, PHP_URL_FRAGMENT );
+
+			$clean_url = $path;
+
+			if ( $query !== null && $query !== '' ) {
+				$clean_url .= '?' . $query;
+			}
+
+			if ( $fragment !== null && $fragment !== '' ) {
+				$clean_url .= '#' . $fragment;
+			}
 		}
 
-		// Tracking link does not support empty
-		// "/" sends it to the homepage.
-		if ( empty( $clean_url ) ) {
+		if ( $clean_url === '' ) {
 			$clean_url = '/';
 		}
 
-		// if using legacy format without computing the signature
-		if ( $this->_use_legacy_tracking_links ) {
+		$contact_id_hex = dechex( $this->get_contact()->get_id() );
+		$event_id_hex   = dechex( $this->get_event()->get_id( true ) );
 
+		if ( $this->_use_legacy_tracking_links ) {
 			$tracking_url = managed_page_url( sprintf(
 				'c/%s/%s/%s',
-				dechex( $this->get_contact()->get_id() ),
-				dechex( $this->get_event()->get_id( true ) ),
+				$contact_id_hex,
+				$event_id_hex,
 				base64url_encode( $clean_url )
-			) );;
+			) );
 
-			return sprintf( $replacement, $tracking_url );
+			return sprintf( $replacement, esc_url( $tracking_url ) );
 		}
 
 		$payload = implode( '|', [
 			$clean_url,
-			dechex( $this->get_contact()->get_id() ),
-			dechex( $this->get_event()->get_id( true ) ),
+			$contact_id_hex,
+			$event_id_hex,
 		] );
 
-		// Example: https://groundhogg.dev/gh/c/L3ZlcnNpb24tMy03LTIvfDF8MTgyNzM.S9cLmojPjxsRxGKLsTYyvw/
+		$signature = compute_signature( $payload, 16 );
+
 		$tracking_url = managed_page_url( sprintf(
 			'c/%s.%s',
 			base64url_encode( $payload ),
-			base64url_encode( compute_signature( $payload, 16 ) )
+			base64url_encode( $signature )
 		) );
 
-		return sprintf( $replacement, $tracking_url );
+		return sprintf( $replacement, esc_url( $tracking_url ) );
 	}
 
 	/**
