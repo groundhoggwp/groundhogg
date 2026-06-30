@@ -167,6 +167,9 @@ class Contacts_Table extends WP_List_Table {
 
 		$query = apply_filters( 'groundhogg/admin/contacts/search_query', $query );
 
+        // select is not allowed here
+        unset( $query['select'] );
+
 		$this->query = $query;
 
 		$c_query     = new Contact_Query( $query );

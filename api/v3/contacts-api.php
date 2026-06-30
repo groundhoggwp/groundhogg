@@ -311,6 +311,9 @@ class Contacts_Api extends Base {
 			$query['order']   = 'ASC';
 		}
 
+		// select is unsupported here
+		unset( $query['select'] );
+
 		$contacts = $contact_query->query( $query );
 
 		if ( $is_for_select2 ) {

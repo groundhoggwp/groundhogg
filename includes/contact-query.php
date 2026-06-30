@@ -2584,6 +2584,11 @@ class Contact_Query extends Table_Query {
 			return $this->count( $query_vars );
 		}
 
+		// if the intent is to get contact objects, we should ignore any previously set select clauses
+		if ( $as_objects ) {
+			$this->setSelect( '*' );
+		}
+
 		try {
 			$items = $this->get_results();
 		} catch ( FilterException|\Exception $exception ) {
@@ -2620,6 +2625,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		if ( $this->groupby ) {
+			$this->setSelect( '*' );
 			$this->setLimit( 1 );
 			$this->setOffset( 0 );
 			$this->setFoundRows( true );

@@ -215,6 +215,9 @@ class Contacts_Api extends Base_Object_Api {
 			'found_rows' => true
 		] );
 
+		// select is not supported here
+		unset( $query['select'] );
+
 		if ( $request->get_param( 'count' ) ) {
 
 			$count = $contact_query->count( $query );
@@ -362,6 +365,8 @@ class Contacts_Api extends Base_Object_Api {
 		}
 
 		$contact_query = new Contact_Query();
+		// select is not allowed here
+		unset( $query['select'] );
 		$contacts      = $contact_query->query( $query, true );
 		$updated       = 0;
 
@@ -654,6 +659,9 @@ class Contacts_Api extends Base_Object_Api {
 
 			return self::SUCCESS_RESPONSE();
 		}
+
+		// select is not allowed here
+		unset( $query_vars['select'] );
 
 		$query = new Contact_Query( $query_vars );
 
