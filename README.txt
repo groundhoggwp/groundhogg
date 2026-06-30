@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.8
+Stable tag: 4.5.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,10 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.5.9 (2026-06-29) =
+* FIXED Tracking links not working because of silly signature generation bug.
+* FIXED Prevent naughty use of `select` parameter for queries. Credit to WordFence.
 
 = 4.5.8 (2026-06-29) =
 * FIXED Edge case bug where the first name of the logged-in user is the same name as a callable function causing a fatal error when trying to load remote notices. Fixed by no longer allowing callbacks as replacements for the replacer class.

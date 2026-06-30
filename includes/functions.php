@@ -5240,7 +5240,7 @@ function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $exp
 function add_failsafe_tracking_params( string $url, Contact $contact ) {
 
 	$params = [
-//		'gi' => base64url_encode( encrypt( $contact->get_email() ) )
+		'gi' => base64url_encode( encrypt( $contact->get_email() ) )
 	];
 
 	if ( the_email() && is_sending() && the_email()->get_event() && the_email()->get_event()->exists() ) {
