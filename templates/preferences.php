@@ -931,65 +931,64 @@ switch ( $action ):
 
 	case 'erase':
 
-		if ( ! wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ) {
+		if ( wp_verify_nonce( get_request_var( '_wpnonce' ), 'erase_profile' ) ) {
 
-			managed_page_head( esc_html__( 'Erase your profile', 'groundhogg' ), 'erase' );
+			/**
+			 * Before the request is made to erase the profile
+			 *
+			 * @param $contact Contact
+			 */
+			do_action( 'groundhogg/preferences/erase_profile', $contact );
+
+			$contact->delete();
+
+			managed_page_head( __( 'Erased', 'groundhogg' ), 'erase' );
 
 			?>
             <div class="box">
-                <h2 class="no-margin-top"><?php esc_html_e( 'Are you sure you want to erase your profile?', 'groundhogg' ); ?></h2>
-                <p><?php esc_html_e( "Erasing your profile will mean that you will no longer receive critical updates and communications from us.", 'groundhogg' ); ?></p>
-                <p><b><?php esc_html_e( "What will be erased?", 'groundhogg' ); ?></b></p>
-                <ul>
-                    <li><?php esc_html_e( "Your profile details.", 'groundhogg' ); ?></li>
-                    <li><?php esc_html_e( "Your profile marketing history.", 'groundhogg' ); ?></li>
-                    <li><?php esc_html_e( "Tracking data associated with your profile.", 'groundhogg' ); ?></li>
-                </ul>
-                <p><b><?php kses_e( __( "What will be <u>NOT</u> erased?", 'groundhogg' ) ); ?></b></p>
-                <ul>
-					<?php if ( $contact->get_user_id() ): ?>
-                        <li><?php kses_e( __( "Your user account. <i>To erase your user account contact us.</i>", 'groundhogg' ) ); ?></li>
-                        <li><?php esc_html_e( "Tracking data and historic details associated with your user account.", 'groundhogg' ); ?></li>
-					<?php endif; ?>
-                    <li><?php esc_html_e( "Associated purchase history and orders.", 'groundhogg' ); ?></li>
-                    <li><?php esc_html_e( "Legal documents associated with your profile.", 'groundhogg' ); ?></li>
-                </ul>
+                <p><b><?php esc_html_e( 'Your profile has been erased!', 'groundhogg' ); ?></b></p>
+                <p><?php esc_html_e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further communication.', 'groundhogg' ); ?></p>
                 <p>
-                    <a id="eraseprofile" class="button danger"
-                       href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php esc_html_e( 'Erase Profile', 'groundhogg' ); ?></a>
-                </p>
-                <p>
-                    <a id="gotoprofile"
-                       href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>">&larr; <?php esc_html_e( "Never mind! Don't erase my profile.", 'groundhogg' ); ?></a>
+                    <a id="gotosite" class="button"
+                       href="<?php echo esc_url( home_url() ); ?>"><?php
+						/* translators: 1: site title/name */
+						printf( esc_html__( 'Return to %s', 'groundhogg' ), esc_html( get_bloginfo( 'title', 'display' ) ) );
+						?></a>
                 </p>
             </div>
 			<?php
 			managed_page_footer();
-
 			die();
 		}
 
-		/**
-		 * Before the request is made to erase the profile
-		 *
-		 * @param $contact Contact
-		 */
-		do_action( 'groundhogg/preferences/erase_profile', $contact );
-
-		$contact->delete();
-
-		managed_page_head( __( 'Erased', 'groundhogg' ), 'erase' );
+		managed_page_head( esc_html__( 'Erase your profile', 'groundhogg' ), 'erase' );
 
 		?>
         <div class="box">
-            <p><b><?php esc_html_e( 'Your profile has been erased!', 'groundhogg' ); ?></b></p>
-            <p><?php esc_html_e( 'Further interactions with our site may be interpreted as re-subscribing to our list and will result in further communication.', 'groundhogg' ); ?></p>
+            <h2 class="no-margin-top"><?php esc_html_e( 'Are you sure you want to erase your profile?', 'groundhogg' ); ?></h2>
+            <p><?php esc_html_e( "Erasing your profile will mean that you will no longer receive critical updates and communications from us.", 'groundhogg' ); ?></p>
+            <p><b><?php esc_html_e( "What will be erased?", 'groundhogg' ); ?></b></p>
+            <ul>
+                <li><?php esc_html_e( "Your profile details.", 'groundhogg' ); ?></li>
+                <li><?php esc_html_e( "Your profile marketing history.", 'groundhogg' ); ?></li>
+                <li><?php esc_html_e( "Tracking data associated with your profile.", 'groundhogg' ); ?></li>
+            </ul>
+            <p><b><?php kses_e( __( "What will be <u>NOT</u> erased?", 'groundhogg' ) ); ?></b></p>
+            <ul>
+				<?php if ( $contact->get_user_id() ): ?>
+                    <li><?php kses_e( __( "Your user account. <i>To erase your user account contact us.</i>", 'groundhogg' ) ); ?></li>
+                    <li><?php esc_html_e( "Tracking data and historic details associated with your user account.", 'groundhogg' ); ?></li>
+				<?php endif; ?>
+                <li><?php esc_html_e( "Associated purchase history and orders.", 'groundhogg' ); ?></li>
+                <li><?php esc_html_e( "Legal documents associated with your profile.", 'groundhogg' ); ?></li>
+            </ul>
             <p>
-                <a id="gotosite" class="button"
-                   href="<?php echo esc_url( home_url() ); ?>"><?php
-                    /* translators: 1: site title/name */
-	                printf( esc_html__( 'Return to %s', 'groundhogg' ), esc_html( get_bloginfo( 'title', 'display' ) ) );
-                    ?></a>
+                <a id="eraseprofile" class="button danger"
+                   href="<?php echo esc_url( wp_nonce_url( managed_page_url( 'preferences/erase/' ), 'erase_profile' ) ); ?>"><?php esc_html_e( 'Erase Profile', 'groundhogg' ); ?></a>
+            </p>
+            <p>
+                <a id="gotoprofile"
+                   href="<?php echo esc_url( managed_page_url( 'preferences/profile/' ) ); ?>">&larr; <?php esc_html_e( "Never mind! Don't erase my profile.", 'groundhogg' ); ?></a>
             </p>
         </div>
 		<?php
