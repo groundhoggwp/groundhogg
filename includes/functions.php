@@ -9694,7 +9694,7 @@ function check_signature( string $data, string $signature, int $length = 0 ) {
 
 	$secrets = [
 		Utils::get_secret_key(),
-        hex2bin( Utils::get_secret_key() ), // whoops
+        @hex2bin( Utils::get_secret_key() ), // whoops
 		wp_salt( 'auth' ),
 	];
 
