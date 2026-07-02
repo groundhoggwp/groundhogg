@@ -558,7 +558,9 @@ class Location {
 			'address',
 			'time_zone',
 			'timezone',
-			'tz'
+			'tz',
+			'zip',
+			'postal_code'
 		];
 
 		if ( in_array( $purpose, $support ) ) {
@@ -592,6 +594,7 @@ class Location {
 							"country"      => @$ip_data->country,
 							"country_code" => @$ip_data->countryCode,
 							"time_zone"    => @$ip_data->timezone,
+							"zip"          => @$ip_data->zip,
 						);
 						break;
 					case 'address':
@@ -625,6 +628,9 @@ class Location {
 					case 'tz':
 					$output = @$ip_data->timezone;
 						break;
+					case 'zip':
+					case 'postal_code':
+						$output = @$ip_data->zip;
 				}
 			}
 		}

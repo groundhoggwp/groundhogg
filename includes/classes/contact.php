@@ -1109,10 +1109,11 @@ class Contact extends Base_Object_With_Meta {
 		}
 
 		$location_meta = [
-			'city'      => 'city',
-			'region'    => 'region',
-			'country'   => 'country_code',
-			'time_zone' => 'time_zone',
+			'city'       => 'city',
+			'region'     => 'region',
+			'country'    => 'country_code',
+			'time_zone'  => 'time_zone',
+			'postal_zip' => 'zip',
 		];
 
 		foreach ( $location_meta as $meta_key => $ip_info_key ) {
