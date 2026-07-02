@@ -152,11 +152,9 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		 * @param mixed[]     $data      just to make it compatible with the other crud actions
 		 * @param Base_Object $object    the object class
 		 */
-		do_action( "groundhogg/{$this->get_object_type()}/pre_delete", $this->get_id(), $this->data, $this );
+		do_action( "groundhogg/{$this->get_object_type()}/pre_delete", $id, $this->data, $this );
 
-		if ( $this->get_db()->delete( $this->get_id() ) ) {
-			unset( $this->data );
-			unset( $this->ID );
+		if ( $this->get_db()->delete( $id ) ) {
 
 			/**
 			 * Fires after the object deleted...
