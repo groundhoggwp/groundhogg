@@ -277,6 +277,7 @@
     items,
     buttonText = __('Finish Task', 'groundhogg'),
     moreText = __('Instructions', 'groundhogg'),
+    handleDismiss = id => {}
   }) => {
 
     const State = Groundhogg.createState({})
@@ -291,6 +292,7 @@
       completed = false,
       fix = '#',
       more = false,
+      id = ''
     }, i) => Div({
       className: `checklist-item checklist-row ${ completed ? 'complete' : '' }`,
       id       : `checklist-item-${ i + 1 }`,
@@ -332,12 +334,16 @@
           target   : '_blank',
         }, buttonText),
         ' ',
-        more && !Groundhogg.isWhiteLabeled ? An({
+        more && !Groundhogg.isWhiteLabeled ? Fragment([ An({
           href     : more,
           className: 'gh-button primary text small',
           target   : '_blank',
           id       : `more-info-${ i + 1 }`,
-        }, moreText) : null,
+        }, moreText), ' ' ]): null,
+        Button({
+          className: 'gh-button secondary small text',
+          onClick  : e => handleDismiss( id )
+        }, 'Mark complete'),
       ]) : null,
     ]))))
   }
@@ -466,11 +472,19 @@
         Checklist({
           id   : 'quickstart-items',
           items: State.items,
+          handleDismiss: id => {
+            ajax({
+              action: 'gh_dismiss_notice',
+              notice: id,
+            })
+            State.items.find( item => item.id === id ).completed = true
+            morph()
+          }
         }),
       ])
     })
-
   }
+
   const Recommendations = () => {
 
     const State = Groundhogg.useState({
@@ -531,6 +545,14 @@
           id        : 'recommendation-items',
           items     : State.items,
           buttonText: __('Implement'),
+          handleDismiss: id => {
+            ajax({
+              action: 'gh_dismiss_notice',
+              notice: id,
+            })
+            State.items.find( item => item.id === id ).completed = true
+            morph()
+          }
         }),
       ])
     })

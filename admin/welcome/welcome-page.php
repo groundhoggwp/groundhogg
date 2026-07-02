@@ -13,6 +13,7 @@ use function Groundhogg\has_premium_features;
 use function Groundhogg\is_event_queue_processing;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
+use function Groundhogg\notices;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\white_labeled_name;
@@ -57,6 +58,11 @@ class Welcome_Page extends Admin_Page {
 
 		wp_send_json( $json );
 	}
+
+    public static function fix_to_id( $fix, $prefix = 'fix-' ) {
+	    $fix = wp_parse_url( $fix );
+        return preg_replace( '/[^a-zA-Z0-9-]/', '-', $prefix . $fix['path'] . $fix['query'] . $fix['fragment'] );
+    }
 
 	public function ajax_get_checklist_items() {
 
@@ -110,6 +116,17 @@ class Welcome_Page extends Admin_Page {
 		];
 
 		apply_filters( 'groundhogg/admin/checklist_items', $checklist_items );
+
+		// set the ID as the query part of the fix
+		$checklist_items = array_map( function ( $item ) {
+			$item['id'] = self::fix_to_id( $item['fix'], 'fix-' );
+
+			if ( notices()->is_dismissed( $item['id'] ) ) {
+				$item['completed'] = true;
+			}
+
+			return $item;
+		}, $checklist_items );
 
 		$checklist_items = array_filter( $checklist_items, function ( $item ) {
 			return current_user_can( $item['cap'] );
@@ -231,6 +248,17 @@ class Welcome_Page extends Admin_Page {
 		}
 
 		apply_filters( 'groundhogg/admin/recommendation_items', $checklist_items );
+
+		// set the ID as the query part of the fix
+		$checklist_items = array_map( function ( $item ) {
+			$item['id'] = self::fix_to_id( $item['fix'], 'rec-' );
+
+			if ( notices()->is_dismissed( $item['id'] ) ) {
+				$item['completed'] = true;
+			}
+
+			return $item;
+		}, $checklist_items );
 
 		$checklist_items = array_filter( $checklist_items, function ( $item ) {
 			return current_user_can( $item['cap'] );
