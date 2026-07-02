@@ -2565,6 +2565,10 @@ class Contact_Query extends Table_Query {
 		return $this->get_sql();
 	}
 
+	public function setSelectToTableColumns() {
+		return $this->setSelect( ...array_keys( $this->db_table->get_columns() ) );
+	}
+
 	/**
 	 * Get the contacts
 	 *
@@ -2586,7 +2590,7 @@ class Contact_Query extends Table_Query {
 
 		// if the intent is to get contact objects, we should ignore any previously set select clauses
 		if ( $as_objects ) {
-			$this->setSelect( '*' );
+			$this->setSelectToTableColumns();
 		}
 
 		try {
