@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.10
+Stable tag: 4.5.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,13 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.5.11 (2026-07-06) =
+* ADDED Log summary reports in **Logs » Manage**
+* FIXED Purge failed events tool not working.
+* FIXED Dismissed notifications appearing as active in notifications sidebar.
+* FIXED Incorrect GDPR marketing consent value shown in form submission summary.
+* FIXED Usage of deprecated filters.
 
 = 4.5.10 (2026-07-02) =
 * ADDED Can mark recommendations or checklist items as complete in dashboard.
