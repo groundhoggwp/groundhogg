@@ -270,6 +270,28 @@ class Event extends Base_Object {
 	}
 
 	/**
+	 * Get the event type label
+	 *
+	 * @param  int  $type
+	 *
+	 * @return int|mixed
+	 */
+	public static function get_event_type_label( int $type ) {
+		$labels = [
+			Event::FUNNEL             => __( 'Funnel', 'groundhogg' ),
+			Event::BROADCAST          => __( 'Broadcast', 'groundhogg' ),
+			Event::EMAIL_NOTIFICATION => __( 'Email Notification', 'groundhogg' ),
+			Event::TEST_EMAIL         => __( 'Test Email', 'groundhogg' ),
+			Event::TEST_SUCCESS       => __( 'Test Success', 'groundhogg' ),
+			Event::TEST_FAILURE       => __( 'Test Failure', 'groundhogg' ),
+		];
+
+		$labels = apply_filters( 'groundhogg/event/get_event_type_label', $labels, $type );
+
+		return key_exists( $type, $labels ) ? $labels[ $type ] : $type;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function get_error_code() {

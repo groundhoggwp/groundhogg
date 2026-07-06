@@ -439,14 +439,21 @@ class Events_Page extends Tabbed_Admin_Page {
 		}
 
 		$status           = get_url_var( 'status' );
-		$purgeable_events = [ Event::FAILED, Event::CANCELLED, Event::SKIPPED ];
+		$purgeable_events = [ Event::FAILED, Event::CANCELLED, Event::SKIPPED, 'purgeable' ];
 
 		if ( empty( $status ) || ! in_array( $status, $purgeable_events ) ) {
 			return new WP_Error( 'invalid_status', esc_html__( 'Invalid status.', 'groundhogg' ) );
 		}
 
-		$query_params = get_request_query();
-		$items        = $this->get_items();
+        if ( $status === 'purgeable' ) {
+            $query_params = [
+                'status' => [ Event::FAILED, Event::CANCELLED, Event::SKIPPED ],
+            ];
+        } else {
+	        $query_params = get_request_query();
+        }
+
+		$items = $this->get_items();
 
 		if ( ! empty( $items ) ) {
 			$query_params['include'] = $items;

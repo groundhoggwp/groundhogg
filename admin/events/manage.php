@@ -11,6 +11,91 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
+$reports = [
+	'event-summary'  => [
+		'title'       => 'Event Summary',
+		'description' => 'A summary of all events in your database.',
+		'headers'     => [ 'Event Type', 'Total' ],
+		'rows'        => function () {
+			$query = new \Groundhogg\DB\Query\Table_Query( 'events' );
+			$query->setSelect( 'event_type', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'event_type' );
+			$results = $query->get_results();
+
+			return array_map( function ( $result ) {
+				return [
+					\Groundhogg\Event::get_event_type_label( $result->event_type ),
+					html()->a( admin_page_url( 'gh_events', [ 'status' => \Groundhogg\Event::COMPLETE, 'event_type' => $result->event_type ] ),
+						\Groundhogg\_nf( $result->total ) )
+				];
+			}, $results );
+		},
+	],
+	'flow-summary'   => [
+		'title'       => 'Flow Summary',
+		'description' => 'A summary of all flow events in your database.',
+		'headers'     => [ 'Flow', 'Total' ],
+		'rows'        => function () {
+			$query = new \Groundhogg\DB\Query\Table_Query( 'events' );
+			$query->setSelect( 'funnel_id', 'title', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'funnel_id' );
+			$query->addJoin( 'LEFT', 'funnels' )->onColumn( 'ID', 'funnel_id' );
+			$query->where( 'event_type', \Groundhogg\Event::FUNNEL );
+			$results = $query->get_results();
+
+			return array_map( function ( $result ) {
+				return [
+					html()->a( admin_page_url( 'gh_funnels', [ 'funnel' => $result->funnel_id, 'action' => 'edit' ] ), $result->title ),
+					html()->a( admin_page_url( 'gh_events', [ 'status' => \Groundhogg\Event::COMPLETE, 'include_filters' => \Groundhogg\base64_json_encode( [ [ [ 'type' => 'funnel', 'funnel_id' => $result->funnel_id ] ] ] ) ] ),
+						\Groundhogg\_nf( $result->total ) )
+				];
+			}, $results );
+		},
+	],
+	'errors-summary' => [
+		'title'       => 'Error Summary',
+		'description' => 'A summary of all errors in your database.',
+		'headers'     => [ 'Error Code', 'Total' ],
+		'rows'        => function () {
+			$query = new \Groundhogg\DB\Query\Table_Query( 'events' );
+			$query->setSelect( 'error_code', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'error_code' )->where( 'status', \Groundhogg\Event::FAILED );
+			$results = $query->get_results();
+
+			return array_map( function ( $result ) {
+				return [
+					$result->error_code,
+					html()->a( admin_page_url( 'gh_events', [ 'status' => \Groundhogg\Event::FAILED, 'include_filters' => \Groundhogg\base64_json_encode( [ [ [ 'type' => 'error_code', 'value' => $result->error_code ] ] ] ) ] ),
+						\Groundhogg\_nf( $result->total ) )
+				];
+			}, $results );
+		}
+	]
+];
+
+/**
+ * Allow registration of custom reports for the logs page
+ */
+$reports = apply_filters( 'groundhogg/logs/reports', $reports );
+
+$report_summary = \Groundhogg\get_url_var( 'report' );
+
+if ( $report_summary ):
+
+	if ( ! key_exists( $report_summary, $reports ) ) {
+		wp_die( 'Invalid report selected.' );
+	}
+
+	$headers = $reports[ $report_summary ]['headers'];
+	$rows    = call_user_func( $reports[ $report_summary ]['rows'] );
+
+	html( 'p', [], [
+		html()->a( admin_page_url( 'gh_events', [ 'tab' => 'manage' ] ), esc_html__( '← Back to log management', 'groundhogg' ), [], false )
+	] );
+    html( 'h2', [], esc_html( $reports[ $report_summary ]['title'] ) );
+    html( 'p', [], esc_html( $reports[ $report_summary ]['description'] ) );
+	html()->list_table( [], $headers, $rows );
+
+	return;
+endif;
+
 $count_unprocessed = event_queue_db()->count_unprocessed();
 
 ?>
@@ -18,86 +103,15 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 <div class="post-box-grid">
     <div class="gh-panel">
         <div class="gh-panel-header">
-            <h2><?php esc_html_e( 'Purge historical event logs', 'groundhogg' ); ?></h2>
+            <h2 class="hndle"><?php esc_html_e( 'Log Reports', 'groundhogg' ); ?></h2>
         </div>
         <div class="inside">
-            <p><b><?php esc_html_e( 'Cancelled/Skipped/Failed Events', 'groundhogg' ); ?></b></p>
-            <p><?php kses_e( __( 'You can safely purge <b>cancelled</b>, <b>skipped</b>, and <b>failed</b> event logs to free up some space as they do not affect reporting and are primarily used for debugging purposes.', 'groundhogg' ) ); ?></p>
-	        <?php html( 'a', [
-				'href'  => action_url( 'purge' ),
-				'class' => 'gh-button secondary small'
-			], 'Purge cancelled, skipped, and failed event logs' ); ?>
-            <p><b><?php esc_html_e( 'Completed Events', 'groundhogg' ); ?></b></p>
-            <p><?php kses_e( __( 'Purging completed event logs will free up space, but will adversely affect reporting and may impact flow automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>', 'groundhogg' ) ); ?></p>
-            <p><?php esc_html_e( 'Delete completed event logs older than...', 'groundhogg' ); ?></p>
-            <form class="display-flex column gap-10" method="post">
-				<?php
-
-				html()->hidden_GET_inputs();
-				action_input( 'purge_completed_tool', true, true );
-
-				?>
-                <div class="gh-input-group">
-					<?php
-
-					html()->frag( [
-						html()->input( [
-							'name'        => 'time_range',
-							'type'        => 'number',
-							'class'       => 'input',
-							'placeholder' => 3
-						] ),
-						html()->dropdown( [
-							'name'        => 'time_unit',
-							'options'     => [
-								'years'  => esc_html__( 'Years', 'groundhogg' ),
-								'months' => esc_html__( 'Months', 'groundhogg' ),
-								'weeks'  => esc_html__( 'Weeks', 'groundhogg' ),
-								'days'   => esc_html__( 'Days', 'groundhogg' ),
-							],
-							'option_none' => false,
-						] )
-					], true );
-					?>
-                </div>
-                <span><?php esc_html_e( 'What type of logs should be deleted?', 'groundhogg' ) ?></span>
-                <div class="gh-input-group">
-					<?php
-
-					html()->frag(
-						html()->dropdown( [
-							'name'        => 'what_to_delete',
-							'options'     => [
-								'all'       => _x( 'Everything', 'delete activity option', 'groundhogg' ),
-								'funnel'    => _x( 'Flow events', 'delete activity option', 'groundhogg' ),
-								'broadcast' => _x( 'Broadcast events', 'delete activity option', 'groundhogg' ),
-								'other'     => _x( 'Other events', 'delete activity option', 'groundhogg' ),
-							],
-							'option_none' => false,
-						] ), true );
-					?>
-                </div>
-                <div class="gh-input-group">
-					<?php
-
-					html()->frag( [
-						html()->input( [
-							'name'        => 'confirm',
-							'type'        => 'text',
-							'class'       => 'full-width',
-							'placeholder' => 'Type "confirm" to delete logs.',
-							'required'    => true,
-						] ),
-						html()->button( [
-							'type'  => 'submit',
-							'text'  => esc_html__( 'Delete', 'groundhogg' ),
-							'class' => 'gh-button danger small'
-						] )
-					], true );
-
-					?>
-                </div>
-            </form>
+            <p><?php esc_html_e( 'Reports to help you visualize the data in your logs.', 'groundhogg' ); ?></p>
+            <ul>
+                <?php foreach ( $reports as $report_id => $details ): ?>
+                    <li>📄 <?php html()->a( add_query_arg( 'report', $report_id, \Groundhogg\get_request_uri() ), esc_html( $details['title'] ), [], true ) ?></li>
+                <?php endforeach; ?>
+            </ul>
         </div>
     </div>
     <div class="gh-panel">
@@ -242,6 +256,93 @@ $count_unprocessed = event_queue_db()->count_unprocessed();
 			<?php endif; ?>
         </div>
     </div>
+    <div class="gh-panel">
+        <div class="gh-panel-header">
+            <h2><?php esc_html_e( 'Purge historical event logs', 'groundhogg' ); ?></h2>
+        </div>
+        <div class="inside">
+            <p><b><?php esc_html_e( 'Cancelled/Skipped/Failed Events', 'groundhogg' ); ?></b></p>
+            <p><?php kses_e( __( 'You can safely purge <b>cancelled</b>, <b>skipped</b>, and <b>failed</b> event logs to free up some space as they do not affect reporting and are primarily used for debugging purposes.',
+					'groundhogg' ) ); ?></p>
+			<?php html( 'a', [
+				'href'  => action_url( 'purge', [ 'status' => 'purgeable' ] ),
+				'class' => 'gh-button secondary small'
+			], 'Purge cancelled, skipped, and failed event logs' ); ?>
+            <p><b><?php esc_html_e( 'Completed Events', 'groundhogg' ); ?></b></p>
+            <p><?php kses_e( __( 'Purging completed event logs will free up space, but will adversely affect reporting and may impact flow automation for some contacts. You may want to download a backup of your database first. <b>Proceed with extreme caution.</b>',
+					'groundhogg' ) ); ?></p>
+            <p><?php esc_html_e( 'Delete completed event logs older than...', 'groundhogg' ); ?></p>
+            <form class="display-flex column gap-10" method="post">
+				<?php
+
+				html()->hidden_GET_inputs();
+				action_input( 'purge_completed_tool', true, true );
+
+				?>
+                <div class="gh-input-group">
+					<?php
+
+					html()->frag( [
+						html()->input( [
+							'name'        => 'time_range',
+							'type'        => 'number',
+							'class'       => 'input',
+							'placeholder' => 3
+						] ),
+						html()->dropdown( [
+							'name'        => 'time_unit',
+							'options'     => [
+								'years'  => esc_html__( 'Years', 'groundhogg' ),
+								'months' => esc_html__( 'Months', 'groundhogg' ),
+								'weeks'  => esc_html__( 'Weeks', 'groundhogg' ),
+								'days'   => esc_html__( 'Days', 'groundhogg' ),
+							],
+							'option_none' => false,
+						] )
+					], true );
+					?>
+                </div>
+                <span><?php esc_html_e( 'What type of logs should be deleted?', 'groundhogg' ) ?></span>
+                <div class="gh-input-group">
+					<?php
+
+					html()->frag(
+						html()->dropdown( [
+							'name'        => 'what_to_delete',
+							'options'     => [
+								'all'       => _x( 'Everything', 'delete activity option', 'groundhogg' ),
+								'funnel'    => _x( 'Flow events', 'delete activity option', 'groundhogg' ),
+								'broadcast' => _x( 'Broadcast events', 'delete activity option', 'groundhogg' ),
+								'other'     => _x( 'Other events', 'delete activity option', 'groundhogg' ),
+							],
+							'option_none' => false,
+						] ), true );
+					?>
+                </div>
+                <div class="gh-input-group">
+					<?php
+
+					html()->frag( [
+						html()->input( [
+							'name'        => 'confirm',
+							'type'        => 'text',
+							'class'       => 'full-width',
+							'placeholder' => 'Type "confirm" to delete logs.',
+							'required'    => true,
+						] ),
+						html()->button( [
+							'type'  => 'submit',
+							'text'  => esc_html__( 'Delete', 'groundhogg' ),
+							'class' => 'gh-button danger small'
+						] )
+					], true );
+
+					?>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="gh-panel">
         <div class="gh-panel-header">
             <h2><?php esc_html_e( 'Purge historical activity logs', 'groundhogg' ) ?></h2>
