@@ -628,7 +628,7 @@ class Form_v2 extends Step {
 					return implode( '', [
 						__( 'Data Processing Consent: Yes', 'groundhogg' ),
 						'<br/>',
-						$submission->marketing_consent === 'Yes' ? __( 'Marketing Consent: Yes', 'groundhogg' ) : __( 'Marketing Consent: No', 'groundhogg' )
+						$submission->marketing_consent === 'yes' ? __( 'Marketing Consent: Yes', 'groundhogg' ) : __( 'Marketing Consent: No', 'groundhogg' )
 					] );
 				}
 			],
