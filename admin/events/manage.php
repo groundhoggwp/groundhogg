@@ -18,7 +18,7 @@ $reports = [
 		'headers'     => [ 'Event Type', 'Total' ],
 		'rows'        => function () {
 			$query = new \Groundhogg\DB\Query\Table_Query( 'events' );
-			$query->setSelect( 'event_type', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'event_type' );
+			$query->setSelect( 'event_type', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'event_type' )->setOrderby( [ 'total', 'DESC' ]);
 			$results = $query->get_results();
 
 			return array_map( function ( $result ) {
@@ -36,7 +36,7 @@ $reports = [
 		'headers'     => [ 'Flow', 'Total' ],
 		'rows'        => function () {
 			$query = new \Groundhogg\DB\Query\Table_Query( 'events' );
-			$query->setSelect( 'funnel_id', 'title', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'funnel_id' );
+			$query->setSelect( 'funnel_id', 'title', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'funnel_id' )->setOrderby( [ 'total', 'DESC' ]);
 			$query->addJoin( 'LEFT', 'funnels' )->onColumn( 'ID', 'funnel_id' );
 			$query->where( 'event_type', \Groundhogg\Event::FUNNEL );
 			$results = $query->get_results();
@@ -51,19 +51,36 @@ $reports = [
 		},
 	],
 	'errors-summary' => [
-		'title'       => 'Error Summary',
+		'title'       => 'Event Error Summary',
 		'description' => 'A summary of all errors in your database.',
 		'headers'     => [ 'Error Code', 'Total' ],
 		'rows'        => function () {
 			$query = new \Groundhogg\DB\Query\Table_Query( 'events' );
-			$query->setSelect( 'error_code', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'error_code' )->where( 'status', \Groundhogg\Event::FAILED );
+			$query->setSelect( 'error_code', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'error_code' )->setOrderby( [ 'total', 'DESC' ])->where( 'status', \Groundhogg\Event::FAILED );
 			$results = $query->get_results();
 
 			return array_map( function ( $result ) {
 				return [
-					$result->error_code,
+					\Groundhogg\code_it( $result->error_code ),
 					html()->a( admin_page_url( 'gh_events', [ 'status' => \Groundhogg\Event::FAILED, 'include_filters' => \Groundhogg\base64_json_encode( [ [ [ 'type' => 'error_code', 'value' => $result->error_code ] ] ] ) ] ),
 						\Groundhogg\_nf( $result->total ) )
+				];
+			}, $results );
+		}
+	],
+	'activity-summary' => [
+		'title'       => 'Activity Summary',
+		'description' => 'A summary of all activities in your database.',
+		'headers'     => [ 'Activity Type', 'Total' ],
+		'rows'        => function () {
+			$query = new \Groundhogg\DB\Query\Table_Query( 'activity' );
+			$query->setSelect( 'activity_type', [ 'COUNT(ID)', 'total' ] )->setGroupby( 'activity_type' )->setOrderby( [ 'total', 'DESC' ]);
+			$results = $query->get_results();
+
+			return array_map( function ( $result ) {
+				return [
+					\Groundhogg\code_it( $result->activity_type ),
+                    \Groundhogg\_nf( $result->total )
 				];
 			}, $results );
 		}
