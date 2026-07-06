@@ -144,17 +144,17 @@ add_filter( 'render_block', __NAMESPACE__ . '\handle_conditional_content_block_f
 /**
  * Handle the skip if confirmed logic for the email confirmation step
  *
- * @param $enqueue bool
- * @param $contact Contact
  * @param $step    Step
  *
- * @return bool true if the step should be enqueued, otherwise false
+ * @param $contact Contact
+ *
+ * @return Step true if the step should be enqueued, otherwise false
  */
-function handle_skip_if_confirmed( $enqueue, $contact, $step ) {
+function handle_skip_if_confirmed( Step $step, Contact $contact ) {
 
 	// If the enqueue was already set to false ofr the step is not the send_email step
-	if ( ! $enqueue || ! $step->type_is( 'send_email' ) ) {
-		return $enqueue;
+	if ( ! $step->type_is( 'send_email' ) ) {
+		return $step;
 	}
 
 	$email = new Email( $step->get_meta( 'email_id' ) );
@@ -163,20 +163,26 @@ function handle_skip_if_confirmed( $enqueue, $contact, $step ) {
 		// Contact is confirmed and thus the step should be skipped
 		if ( $step->get_meta( 'skip_if_confirmed' ) && $contact->is_confirmed() ) {
 
-			$next = $step->get_next_of_type( 'email_confirmed' );
+			$confirmed_triggers = $step->get_funnel()->get_steps( [ 'step_type' => 'email_confirmed' ] );
 
-			if ( $next ) {
-				$next->enqueue( $contact );
+			if ( empty( $confirmed_triggers ) ){
+				return $step->get_next_action( $contact );
 			}
 
-			return false;
+			foreach ( $confirmed_triggers as $confirmed_trigger ) {
+				if ( $confirmed_trigger->can_travel( $step, $contact ) ){
+					return $confirmed_trigger;
+				}
+			}
+
+			return $step->get_next_action( $contact );
 		}
 	}
 
-	return true;
+	return $step;
 }
 
-add_filter( 'groundhogg/steps/enqueue', __NAMESPACE__ . '\handle_skip_if_confirmed', 9, 3 );
+add_filter( 'groundhogg/step/enqueue', __NAMESPACE__ . '\handle_skip_if_confirmed', 9, 2 );
 
 /**
  * Swap out the sanitization callback
