@@ -330,7 +330,7 @@ class Scripts {
 			'dismissed_notices' => array_values( parse_maybe_numeric_list( Notices::$dismissed_notices ) ),
 			'read_notices'      => array_values( parse_maybe_numeric_list( Notices::$read_notices ) ),
 			'unread'            => notices()->count_unread(),
-		] ) );
+		] ), 'before' );
 
 		wp_register_script( 'groundhogg-admin-toolbar', GROUNDHOGG_ASSETS_URL . 'js/admin/features/admin-bar' . $dot_min . '.js', [
 			'groundhogg-admin-components',
