@@ -551,7 +551,7 @@ class Contact_Query extends Table_Query {
 
 		$capability_key = $where->query->db->prefix . 'capabilities';
 		$alias          = $where->query->joinMeta( $capability_key, $where->query->db->usermeta, 'user_id' );
-		$where->contains( "$alias.meta_value", "'$role'" );
+		$where->contains( "$alias.meta_value", '"' . $role . '"' );
 	}
 
 	/**
