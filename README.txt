@@ -6,7 +6,7 @@ Donate link: https://www.groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.11
+Stable tag: 4.5.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -378,8 +378,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.5.12 (2026-07-09) =
+* FIXED Broken user role filter.
+
 = 4.5.11 (2026-07-06) =
-* ADDED Log summary reports in **Logs » Manage**
+* ADDED Log summary reports in **Logs » Manage**.
 * FIXED Purge failed events tool not working.
 * FIXED Dismissed notifications appearing as active in notifications sidebar.
 * FIXED Incorrect GDPR marketing consent value shown in form submission summary.
