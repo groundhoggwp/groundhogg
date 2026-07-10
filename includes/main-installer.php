@@ -18,7 +18,8 @@ class Main_Installer extends Installer {
 	 * Activate the Groundhogg plugin.
 	 */
 	protected function activate() {
-		set_transient( 'groundhogg_review_request_dismissed', WEEK_IN_SECONDS );
+		// prevent showing a review nag for at least 2 weeks
+		set_transient( 'groundhogg_review_request_dismissed', 1, 2 * WEEK_IN_SECONDS );
 
 		// Multisite compatibility, re-init as after_setup_theme DB $prefix is wrong.!
 		if ( is_multisite() ) {

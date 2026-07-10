@@ -2001,6 +2001,25 @@
     ]))
   }
 
+  const ShadowDom = ( props, children = [] ) => {
+
+    const { stylesheets = [], scripts = [] } = props
+
+    const shadowHost = Div({ className: 'shadow-host', ...props })
+    const shadow = shadowHost.attachShadow({ mode: 'open' })
+
+    stylesheets.forEach(sheet => {
+      shadow.appendChild( makeEl('link', { rel: 'stylesheet', href: sheet }) )
+    })
+
+    scripts.forEach(script => {
+      shadow.appendChild( makeEl('script', { src: script }) )
+    })
+
+    shadow.append( Fragment( children ) )
+    return shadowHost
+  }
+
   window.MakeEl = {
     Skeleton,
     TinyMCE,
@@ -2066,5 +2085,6 @@
     htmlToElements,
     domElementToReact,
     useState,
+    ShadowDom
   }
 } )(jQuery ?? function () { throw new Error('jQuery was not loaded.') })

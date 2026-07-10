@@ -2779,6 +2779,128 @@
     positionStep()
   }
 
+  const ReviewBeg = ({
+    onDismiss = () => {},
+    onReview = () => {},
+  }) => {
+
+    if (Groundhogg.isWhiteLabeled || !userHasCap('install_plugins')) {
+      return null
+    }
+
+    let State = Groundhogg.useState({
+      screen: 'nag',
+    }, ReviewBeg)
+
+    const handleDismiss = (morph) => {
+      onDismiss()
+      morph()
+    }
+
+    const handleReviewed = (morph) => {
+      onReview()
+      morph()
+    }
+
+    return Div({ id: 'review-beg-container' }, morph => {
+
+      if (State.hidden) {
+        return Fragment()
+      }
+
+      if (State.screen === 'reviewed') {
+        return Fragment([
+          Pg({}, 'Thanks for taking the time! We appreciate your support 😀'),
+        ])
+      }
+
+      if (State.screen === 'later') {
+        return Fragment([
+          Pg({}, 'No problem! We\'ll check back in a week or so.'),
+        ])
+      }
+
+      if (State.screen === 'ignore') {
+        return Fragment([
+          Pg({}, 'We understand, no worries! We wont bother you again.'),
+        ])
+      }
+
+      return Fragment([
+        Pg({ style: { fontWeight: 'bold' } }, 'Enjoying Groundhogg?'),
+        Pg({},
+          'Groundhogg grows almost entirely through word of mouth. If we\'ve saved you time, money, or helped your business, we\'d really appreciate a quick review.'),
+        Pg({},
+          'Leave a review on our <a href="https://wordpress.org/support/plugin/groundhogg/reviews/" target="_blank">WordPress.org plugin page</a> to help spread the word!'),
+        Div({ className: 'display-flex flex-wrap gap-5' }, [
+          Button({
+            className: 'gh-button small primary',
+            onClick  : e => {
+              window.open('https://wordpress.org/support/plugin/groundhogg/reviews/', '_blank')
+              State.set({ screen: 'reviewed' })
+              Groundhogg.notices.dismiss('review-please')
+              handleReviewed(morph)
+            },
+          }, 'Review Now!'),
+          Button({
+            className: 'gh-button small secondary',
+            onClick  : e => {
+              State.set({ screen: 'later' })
+              Groundhogg.notices.dismiss('review-please', 14)
+              handleDismiss(morph)
+            },
+          }, 'Maybe later...'),
+          Button({
+            className: 'gh-button small danger',
+            onClick  : e => {
+              State.set({ screen: 'ignore' })
+              Groundhogg.notices.dismiss('review-please')
+              handleDismiss(morph)
+            },
+          }, 'Don\'t ask again.'),
+        ].reverse()),
+        Pg({}, 'Your support is appreciated!'),
+        Pg({ className: 'display-flex flex-wrap gap-5 align-center' }, [
+          Img({
+            src   : 'https://secure.gravatar.com/avatar/5fbd75ff0eb49baa1d73c5684a6d501353d3278d3e6fe4c38044c9ce426526f8?s=128&d=mm&r=g',
+            height: 30,
+            width : 30,
+            style : {
+              borderRadius: 'var(--gh-border-radius)',
+            },
+          }),
+          makeEl('em', {}, 'Adrian Tobey, CEO'),
+        ]),
+
+      ])
+    })
+  }
+
+  const handleReviewNagHashChange = e => {
+
+    if (Groundhogg.isWhiteLabeled) {
+      return
+    }
+
+    let hash = window.location.hash.replace('#', '')
+    if (hash.startsWith('gh-review-please')) {
+      ModalWithHeader({
+        header : '⭐⭐⭐⭐⭐🙏',
+        width  : '455px',
+        onClose: () => {
+          history.pushState(
+            {},
+            document.title,
+            window.location.pathname + window.location.search,
+          )
+        },
+      }, ({ close }) => ReviewBeg({}))
+    }
+  }
+
+  window.addEventListener('hashchange', handleReviewNagHashChange)
+  window.addEventListener('load', handleReviewNagHashChange)
+
   Groundhogg.components = {
     QuickSearch,
     addContactModal,
@@ -2803,6 +2925,7 @@
     Relationships,
     OwnerPicker,
     Tour,
+    ReviewBeg,
   }
 
 } )(jQuery)

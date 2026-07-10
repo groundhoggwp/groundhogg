@@ -70,9 +70,10 @@
   /**
    * Dismiss a notification
    * @param id
+   * @param days
    * @returns {*}
    */
-  const dismissNotification = id => {
+  const dismissNotification = (id, days = 0) => {
 
     State.set({
       dismissed: [
@@ -84,6 +85,7 @@
     return ajax({
       action: 'gh_dismiss_notice',
       notice: id,
+      days,
     })
   }
 
@@ -216,6 +218,10 @@
 
   Groundhogg.Notifications = Notifications
   Groundhogg.NotificationsSidebar = NotificationsSidebar
+  Groundhogg.notices = {
+    isDismissed: id => State.dismissed.includes(id),
+    dismiss    : (id, days = 0) => dismissNotification(id, days),
+  }
 
   const handleHashChange = () => {
     let hash = window.location.hash.replace('#', '')

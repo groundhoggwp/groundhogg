@@ -28,7 +28,7 @@ use function Groundhogg\white_labeled_name;
 class Email_Reports extends Notification_Builder {
 
 	public function __construct() {
-//		add_action( 'init', [ $this, 'test_report' ] );
+		add_action( 'init', [ $this, 'test_report' ] );
 	}
 
 	public function test_report() {
@@ -37,7 +37,7 @@ class Email_Reports extends Notification_Builder {
 			return;
 		}
 
-		self::generate_user_status_report( wp_get_current_user() );
+		self::send_broadcast_report( new DateTimeHelper( '30 days ago' ), new DateTimeHelper( 'now' ) );
 	}
 
 	/**
@@ -320,16 +320,15 @@ class Email_Reports extends Notification_Builder {
 
 		$table_html = self::generate_performance_table_html( $performance, '__return_false' );
 
-		$replacer = new Replacer( [
+		$email_content = self::get_general_notification_template_html( 'broadcast-results', [
 			'broadcast_results_table' => $table_html,
 			'full_report_link'        => admin_page_url( 'gh_reporting', [
 				'tab'   => 'broadcasts',
 				'start' => $after->ymd(),
 				'end'   => $before->ymd(),
 			] ),
+			'review_nag' => notices()->is_dismissed( 'review-please' ) || ! current_user_can( 'install_plugins' ) || is_white_labeled() ? '' : self::get_template_part( 'review-nag' ),
 		] );
-
-		$email_content = $replacer->replace( self::get_general_notification_template_html( 'broadcast-results' ) );
 
 		return self::mail_report(
 			'broadcast-results',
@@ -407,7 +406,7 @@ class Email_Reports extends Notification_Builder {
 			}
 		}
 
-		$replacer = new Replacer( [
+		$email_content = self::get_general_notification_template_html( 'overview', [
 			'compare_text'             => $totalNewContacts['compare']['text'],
 			'broadcast_results_table'  => $broadcasts_table,
 			'funnel_results_table'     => $funnels_table,
@@ -446,10 +445,8 @@ class Email_Reports extends Notification_Builder {
 			'create_better_journey'    => '#',
 			'what_funnel_to_create'    => '#',
 			'get_pro'                  => has_premium_features() ? '' : self::get_template_part( 'funnels-upgrade-to-pro' ),
+			'review_nag' => notices()->is_dismissed( 'review-please' ) || ! current_user_can( 'install_plugins' ) || is_white_labeled() ? '' : self::get_template_part( 'review-nag' ),
 		] );
-
-		$email_content = self::get_general_notification_template_html( 'overview' );
-		$email_content = $replacer->replace( $email_content );
 
 		return self::mail_report(
 			'performance-overview',

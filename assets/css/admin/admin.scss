@@ -1537,6 +1537,16 @@ body.gh-full-screen {
 
   p {
     font-size: 16px;
+
+    &.big {
+      font-size: 20px !important;
+      margin: 1em 0 !important;
+      //font-weight: 500;
+    }
+  }
+
+  .center {
+    text-align: center;
   }
 
   a {
@@ -1549,6 +1559,7 @@ body.gh-full-screen {
   }
 
   .gh-primary-card {
+    position: relative;
     //padding: 1.25rem;
     border-radius: 0.75rem;
     background-color: var(--color-brown-200);
@@ -1560,6 +1571,7 @@ body.gh-full-screen {
   }
 
   .gh-site-button {
+    position: relative;
     border-radius: 0.75rem;
     border-style: solid;
     border-width: 1px;
@@ -1568,6 +1580,8 @@ body.gh-full-screen {
     border-color: var(--color-dark-800);
     text-transform: uppercase;
     padding: 0.625rem 1.25rem;
+    font-weight: bold;
+    font-size: 15px;
 
     &.primary {
       background-color: var(--color-yellow);
@@ -1576,6 +1590,7 @@ body.gh-full-screen {
 
   .gh-secondary-card {
     //padding: 1.25rem;
+    position: relative;
     border-radius: 0.75rem;
     background-color: var(--color-brown-50);
     border-style: solid;
@@ -1928,6 +1943,17 @@ ul.activity-timeline {
         width: 16px;
         height: 16px;
       }
+    }
+  }
+}
+
+#review-beg-container {
+  p {
+    margin: 1em 0;
+    font-size: 14px;
+
+    &:first-child {
+      margin-top: 0;
     }
   }
 }

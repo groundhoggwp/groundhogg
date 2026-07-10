@@ -1777,4 +1777,17 @@ class HTML {
         ], dashicon('bell'), '', true );
     }
 
+	public function review_nag_button() {
+
+		// don't show on white labeled installs
+		if ( is_white_labeled() || ! current_user_can( 'install_plugins' ) || notices()->is_dismissed( 'review-please' ) ){
+			return;
+		}
+
+		$this->e( 'a', [
+			'href' => '#gh-review-please',
+			'class' => 'gh-button secondary effect-balanced-reflection small'
+		], '⭐⭐⭐⭐⭐🙏', '', true );
+	}
+
 }

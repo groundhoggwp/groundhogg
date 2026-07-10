@@ -115,11 +115,47 @@ class Notices {
 	}
 
 	public function init() {
-		self::$dismissed_notices = get_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, true );
+		$dismissed = get_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, true );
 
-		if ( ! is_array( self::$dismissed_notices ) ) {
-			self::$dismissed_notices = [];
+		if ( ! is_array( $dismissed ) ) {
+			$dismissed = [];
 		}
+
+        // handle permanent or temp dismissal
+        self::$dismissed_notices = array_filter( $dismissed, function( $value, $notice_id ){
+            // if the key and the notice ID are the same, perma dismissed
+            // otherwise, if the key is > time(), temp dismissed
+            return $notice_id === $value || ( is_int($value) && $value > time() );
+        }, ARRAY_FILTER_USE_BOTH );
+
+        // let's handle some notices behaviorally, like the review nag
+		if ( ! key_exists( 'review-please', self::$dismissed_notices ) ){
+
+            $dismissable_reasons = [
+                // don't show if white labeled
+	            fn () => is_white_labeled(),
+	            // don't show to regular users obviously
+	            fn () => ! current_user_can( 'install_plugins' ),
+	            // don't show if just installed
+                fn () => get_transient( 'groundhogg_review_request_dismissed' ) === 1,
+	            // at least 2 broadcasts sent or one flow
+                fn () => db()->broadcasts->count( [ 'status' => 'sent' ] ) < 2 && db()->funnels->count( [ 'status' => 'active' ] ) < 1,
+                // at least 100 completed events
+                fn () => db()->events->count( [ 'status' => Event::COMPLETE ] ) < 100,
+            ];
+
+            // if any dismissable reason returns a truthy value, then don't show (count dismissed)
+            foreach ( $dismissable_reasons as $dismissable_reason ){
+                if ( call_user_func( $dismissable_reason ) ){
+                    // don't perma dismiss so that we can check again later if anything changes
+                    self::$dismissed_notices['review-please'] = time() + DAY_IN_SECONDS;
+                    break;
+                }
+            }
+		}
+
+        // todo remove after happy with design
+        unset( self::$dismissed_notices['review-please'] );
 
 		self::$read_notices = get_user_meta( get_current_user_id(), self::READ_NOTICES_OPTION, true );
 
@@ -127,6 +163,14 @@ class Notices {
 			self::$read_notices = [];
 		}
 	}
+
+    public static function get_dismissed_notice_ids() {
+        return array_keys( self::$dismissed_notices );
+    }
+
+    public static function get_read_notice_ids() {
+        return array_keys( self::$read_notices );
+    }
 
 	/**
 	 * Fetch remote notices for ajax
@@ -232,14 +276,19 @@ class Notices {
 
 	/**
 	 * Mark a notice as dismissed
+     * optionally supply $days for temporary dismissal
+     *
+     * if $days is supplied the value will be set to the timestamp of when the notice should appear again, otherwise the value will simply be the ID of the notice
 	 *
-	 * @param $ids
+	 * @param mixed $ids
+	 * @param  int  $days the number of days a notice should remain dismissed
 	 */
-	public function dismiss_notice( $ids ) {
+	public function dismiss_notice( $ids, $days = 0 ) {
 
 		$notices = parse_maybe_numeric_list( $ids );
 		foreach ( $notices as $notice ) {
-			self::$dismissed_notices[ $notice ] = $notice;
+            $value = $days > 0 ? strtotime( "+$days days" ) : $notice;
+			self::$dismissed_notices[ $notice ] = $value;
 		}
 
 		update_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, self::$dismissed_notices );
@@ -298,7 +347,10 @@ class Notices {
 			wp_send_json_error();
 		}
 
-		$this->dismiss_notice( get_post_var( 'notice' ) );
+		$days   = absint( get_post_var( 'days', 0 ) );
+		$notice = get_post_var( 'notice' );
+
+		$this->dismiss_notice( $notice, $days );
 
 		wp_send_json_success();
 	}

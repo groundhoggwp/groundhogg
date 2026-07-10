@@ -1288,6 +1288,13 @@ body.gh-full-screen #wpadminbar {
 .gh-site p {
   font-size: 16px;
 }
+.gh-site p.big {
+  font-size: 20px !important;
+  margin: 1em 0 !important;
+}
+.gh-site .center {
+  text-align: center;
+}
 .gh-site a {
   color: var(--color-orange-900);
   text-decoration: none;
@@ -1296,6 +1303,7 @@ body.gh-full-screen #wpadminbar {
   font-weight: bold;
 }
 .gh-site .gh-primary-card {
+  position: relative;
   border-radius: 0.75rem;
   background-color: var(--color-brown-200);
   border-style: solid;
@@ -1305,6 +1313,7 @@ body.gh-full-screen #wpadminbar {
   border-color: var(--color-dark-800);
 }
 .gh-site .gh-site-button {
+  position: relative;
   border-radius: 0.75rem;
   border-style: solid;
   border-width: 1px;
@@ -1313,11 +1322,14 @@ body.gh-full-screen #wpadminbar {
   border-color: var(--color-dark-800);
   text-transform: uppercase;
   padding: 0.625rem 1.25rem;
+  font-weight: bold;
+  font-size: 15px;
 }
 .gh-site .gh-site-button.primary {
   background-color: var(--color-yellow);
 }
 .gh-site .gh-secondary-card {
+  position: relative;
   border-radius: 0.75rem;
   background-color: var(--color-brown-50);
   border-style: solid;
@@ -1599,6 +1611,14 @@ ul.activity-timeline li.activity-item .activity-icon:not(.no-frame).broadcast {
 ul.activity-timeline li.activity-item .activity-icon:not(.no-frame) svg {
   width: 16px;
   height: 16px;
+}
+
+#review-beg-container p {
+  margin: 1em 0;
+  font-size: 14px;
+}
+#review-beg-container p:first-child {
+  margin-top: 0;
 }
 
 /*# sourceMappingURL=admin.css.map */

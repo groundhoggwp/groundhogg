@@ -73,16 +73,6 @@ class Scripts {
 
 		wp_enqueue_script( 'groundhogg-admin-toolbar' );
 		wp_enqueue_style( 'groundhogg-admin-toolbar' );
-
-		// Don't need these if white labelled
-		if ( ! is_white_labeled() ) {
-			wp_localize_script( 'groundhogg-admin-toolbar', 'GroundhoggToolbar', [
-				'dismissed_notices' => array_values( parse_maybe_numeric_list( Notices::$dismissed_notices ) ),
-				'read_notices'      => array_values( parse_maybe_numeric_list( Notices::$read_notices ) ),
-				'unread'            => notices()->count_unread(),
-			] );
-		}
-
 	}
 
 	public function is_script_debug_enabled() {
@@ -327,8 +317,8 @@ class Scripts {
 		], GROUNDHOGG_VERSION, true );
 
 		wp_add_inline_script( 'groundhogg-admin-remote-notifications', 'var GroundhoggNotifications = ' . wp_json_encode( [
-			'dismissed_notices' => array_values( parse_maybe_numeric_list( Notices::$dismissed_notices ) ),
-			'read_notices'      => array_values( parse_maybe_numeric_list( Notices::$read_notices ) ),
+			'dismissed_notices' => Notices::get_dismissed_notice_ids(),
+			'read_notices'      => Notices::get_read_notice_ids(),
 			'unread'            => notices()->count_unread(),
 		] ), 'before' );
 

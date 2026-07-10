@@ -111,10 +111,11 @@ class Notification_Builder {
 	 */
 	public static function get_general_notification_template_html( $content_template = '', $replacements = [] ) {
 
-		$replacer = new Replacer( wp_parse_args( $replacements, [
+		$replacer = new Replacer( array_merge( [
 			'the_header'         => self::get_template_part( ! is_white_labeled() ? 'branded-header' : 'generic-header' ),
 			'the_content'        => self::get_template_part( $content_template ),
 			'the_footer'         => self::get_template_part( ! is_white_labeled() ? 'branded-footer' : 'generic-footer' ),
+		], $replacements, [
 			'assets_url'         => GROUNDHOGG_ASSETS_URL,
 			'site_url'           => home_url(),
 			'site_name'          => get_bloginfo(),

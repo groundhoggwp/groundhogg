@@ -1358,6 +1358,9 @@
         return Fragment([
           `<p>${ __('🎉 Your broadcast is being scheduled in the background!', 'groundhogg') }</p>`,
           // `<p>${__('', 'groundhogg')}</p>`,
+          Groundhogg.notices.isDismissed( 'review-please' ) || ! Groundhogg.user.userHasCap( 'install_plugins' ) ? null : Div({ className: 'gh-panel outlined'}, Div({className: 'inside'}, [
+            Groundhogg.components.ReviewBeg({}),
+          ])),
           Button({
             id       : 're-schedule',
             className: 'gh-button primary',

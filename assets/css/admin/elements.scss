@@ -1613,9 +1613,58 @@ button {
       position: relative;
       animation: gh-rotation 1s linear infinite;
     }
+
+    &.effect-balanced-reflection {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background-color: var(--gh-primary-2);
+
+      &::after {
+        content: "";
+        position: absolute;
+
+        top: -60%;
+        bottom: -60%;
+        left: -45%;
+
+        width: 34%;
+
+        transform: skewX(-24deg);
+
+        pointer-events: none;
+
+        background: linear-gradient(
+                        90deg,
+                        transparent 0%,
+                        rgba(255,255,255,0.00) 20%,
+                        rgba(255,255,255,0.15) 40%,
+                        rgba(255,255,255,0.75) 50%,
+                        rgba(255,255,255,0.15) 60%,
+                        transparent 100%
+        );
+
+        mix-blend-mode: screen;
+
+        animation: balanced-reflection 5s ease-in-out infinite;
+      }
+    }
+
   }
 }
 
+@keyframes balanced-reflection {
+
+  0%,
+  78% {
+    left: -45%;
+  }
+
+  100% {
+    left: 130%;
+  }
+
+}
 
 .gh-button-group {
 

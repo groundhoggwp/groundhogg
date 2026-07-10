@@ -667,6 +667,7 @@ abstract class Admin_Page extends Supports_Errors {
         <div id="<?php echo esc_attr( $this->get_slug() . '-header' ); ?>" class="gh-header admin-page-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 20px">
 			<?php header_icon(); ?>
             <h1><?php echo esc_html( $this->get_title() ); ?></h1>
+	        <?php html()->review_nag_button(); ?>
             <?php html()->notifications_button(); ?>
 			<?php $this->do_title_actions(); ?>
         </div>

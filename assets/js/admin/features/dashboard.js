@@ -182,6 +182,10 @@
   }, [
     Groundhogg.isWhiteLabeled ? Span({ className: 'white-label-icon'}, Groundhogg.whiteLabelName ) : icons.groundhogg,
     H1({}, `👋 Hey ${ Groundhogg.currentUser.data.display_name }!`),
+    Groundhogg.notices.isDismissed( 'review-please' ) || ! userHasCap( 'install_plugins' ) ? null : An({
+      href: '#gh-review-please',
+      className: 'gh-button secondary effect-balanced-reflection small',
+    }, '⭐⭐⭐⭐⭐🙏'),
     An({
       href: '#gh-show-notifications',
       className: `gh-button secondary text icon ${ GroundhoggNotifications.unread > 0 ? 'gh-has-notifications unread-notices' : ''}`
@@ -890,9 +894,87 @@
 
   }
 
+  const ReviewPlease = () => {
+
+    const State = Groundhogg.useState({
+      screen: 'nag'
+    }, ReviewPlease)
+
+    return Div({ style: { padding: '0 1em' }, id: 'dash-review' }, morph => {
+
+      if ( State.screen === 'reviewed' ) {
+        return Fragment( [
+          Pg({}, 'Thanks for taking the time! We appreciate your support 😀'),
+        ] )
+      }
+
+      if ( State.screen === 'later' ) {
+        return Fragment( [
+          Pg({}, 'No problem! We\'ll check back in a week or so.'),
+        ] )
+      }
+
+      if ( State.screen === 'ignore' ) {
+        return Fragment( [
+          Pg({}, 'We understand, no worries! We wont bother you again.'),
+        ] )
+      }
+
+      return Fragment( [
+        Pg({}, 'Enjoying Groundhogg?'),
+        Pg({}, 'Groundhogg grows almost entirely through word of mouth. If we\'ve saved you time, money, or helped your business, we\'d really appreciate a quick review.'),
+        Pg({},
+          'Leave a review on our <a href="https://wordpress.org/support/plugin/groundhogg/reviews/" target="_blank">WordPress.org plugin page</a> to help spread the word!'),
+        Div({ className: 'display-flex flex-wrap gap-5' }, [
+          Button({
+            className: 'gh-button small primary',
+            onClick  : e => {
+              window.open('https://wordpress.org/support/plugin/groundhogg/reviews/', '_blank')
+              State.set({ screen: 'reviewed' })
+              Groundhogg.notices.dismiss( 'review-please' )
+              morph()
+            },
+          }, 'Review Now!'),
+          Button({ className: 'gh-button small secondary', onClick: e => {
+              State.set({ screen: 'later' })
+              Groundhogg.notices.dismiss( 'review-please', 7 )
+              morph()
+          } }, 'Maybe later...'),
+          Button({ className: 'gh-button small danger', onClick: e => {
+              State.set({ screen: 'ignore' })
+              Groundhogg.notices.dismiss( 'review-please' )
+              morph()
+            } }, 'Don\'t ask again.'),
+        ]),
+        Pg({}, 'Your support is appreciated!'),
+        Pg({ className: 'display-flex flex-wrap gap-5 align-center' }, [
+          Img({
+            src   : 'https://secure.gravatar.com/avatar/5fbd75ff0eb49baa1d73c5684a6d501353d3278d3e6fe4c38044c9ce426526f8?s=128&d=mm&r=g',
+            height: 30,
+            width : 30,
+            style : {
+              borderRadius: 'var(--gh-border-radius)',
+            },
+          }),
+          makeEl('em', {}, 'Adrian Tobey, CEO'),
+        ]),
+
+      ])
+    })
+  }
+
   const Widgets = Groundhogg.createRegistry()
 
   if (!Groundhogg.isWhiteLabeled) {
+
+    if ( ! Groundhogg.notices.isDismissed( 'review-please' ) || ! userHasCap( 'install_plugins' ) ) {
+      Widgets.add('review-please', {
+        name  : '⭐⭐⭐⭐⭐',
+        col   : 3,
+        render: ReviewPlease,
+      })
+    }
+
     Widgets.add('links', {
       name  : 'Helpful Links',
       cap   : '',
