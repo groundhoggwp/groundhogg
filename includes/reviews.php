@@ -7,8 +7,8 @@ class Reviews {
 
 	public function __construct() {
 
-		add_action( 'admin_notices', [ $this, 'show_review_request' ] );
-		add_action( 'wp_ajax_groundhogg_dismiss_review', [ $this, 'dismiss_review' ] );
+//		add_action( 'admin_notices', [ $this, 'show_review_request' ] );
+//		add_action( 'wp_ajax_groundhogg_dismiss_review', [ $this, 'dismiss_review' ] );
 
 	}
 
