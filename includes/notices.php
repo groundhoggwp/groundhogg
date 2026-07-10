@@ -154,9 +154,6 @@ class Notices {
             }
 		}
 
-        // todo remove after happy with design
-        unset( self::$dismissed_notices['review-please'] );
-
 		self::$read_notices = get_user_meta( get_current_user_id(), self::READ_NOTICES_OPTION, true );
 
 		if ( ! is_array( self::$read_notices ) ) {

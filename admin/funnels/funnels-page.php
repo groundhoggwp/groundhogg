@@ -289,9 +289,6 @@ class Funnels_Page extends Admin_Page {
 				$query->setSelect( 'DISTINCT author' );
 				$results = wp_parse_id_list( wp_list_pluck( $query->get_results(), 'author' ) );
 
-				// todo add script to preview funnels like in the email editor
-//				wp_enqueue_style( 'groundhogg-admin-funnel-editor' );
-//				wp_enqueue_script( 'groundhogg-admin-funnel-editor' );
 				wp_enqueue_script( 'groundhogg-admin-filter-funnels' );
 				wp_add_inline_script( 'groundhogg-admin-filter-funnels', "Groundhogg.authors = " . wp_json_encode( $results ) );
 
