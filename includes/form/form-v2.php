@@ -2267,20 +2267,17 @@ class Form_v2 extends Step {
 
 		foreach ( $fields as $field ) {
 
-			$isset = false;
+			$isset = self::check_field_isset( $field, $posted_data );
 
-			if ( isset_not_empty( $field, 'required' ) ) {
-
-				$isset = self::check_field_isset( $field, $posted_data );
-
-				if ( ! $isset ) {
-					$this->add_error( new WP_Error( 'field-required', __( 'This field is required', 'groundhogg' ), $field['label'] ) );
-					continue;
-				}
+			// if the field was not provided, but is required
+			if ( isset_not_empty( $field, 'required' ) && ! $isset ) {
+				$this->add_error( new WP_Error( 'field-required', __( 'This field is required', 'groundhogg' ), $field['label'] ) );
+				continue;
 			}
 
 			$result = null;
 
+			// if a value was provided, we must validate it
 			if ( $isset ) {
 				$result = self::validate_field( $field, $posted_data );
 			}
