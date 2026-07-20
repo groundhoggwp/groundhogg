@@ -94,7 +94,8 @@ class Library extends Supports_Errors {
 	public function get_email_templates() {
 		$response = $this->request( 'emails', [
 			'is_template' => 1,
-			'status'      => 'ready'
+			'status'      => 'ready',
+			'orderby'     => 'title',
 		] );
 
 		return get_array_var( $response, 'items', [] );
