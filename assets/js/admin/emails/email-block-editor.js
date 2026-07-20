@@ -7740,6 +7740,161 @@
     return parseFontStyle(styledEl.style)
   }
 
+  // Register new heading block
+  registerBlock('heading', 'Heading', {
+    displayAs: ({tag}) => tag.toUpperCase(),
+    attributes: {
+      tag: el => el.firstElementChild.tagName.toLowerCase(),
+      fontStyle: (el, block) => parseFontStyle( el.querySelector(block.tag).style ),
+      alignment: (el, block) => el.querySelector(block.tag).style.textAlign,
+      content: (el, block) => {
+        return el.querySelector(block.tag).innerHTML
+      },
+    },
+    //language=HTML
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v18m12-9H7m11-9v18M4 21h4M4 3h4m8 18h4M16 3h4"/></svg>`,
+
+    controls : ({
+      tag = 'h2',
+      fontStyle = {},
+      alignment = 'left',
+      updateBlock,
+      curBlock,
+    }) => {
+
+      return Fragment([
+        ControlGroup({
+          name: 'Heading'
+        }, [
+          Control({
+              label  : 'Type',
+            },
+            ButtonToggle({
+              id: `tag-name`,
+              selected: tag,
+              options : [
+                {
+                  id  : 'h1',
+                  text: 'H1',
+                },
+                {
+                  id  : 'h2',
+                  text: 'H2',
+                },
+                {
+                  id  : 'h3',
+                  text: 'H3',
+                },
+                {
+                  id  : 'h4',
+                  text: 'H4',
+                },
+                {
+                  id  : 'p',
+                  text: 'P',
+                },
+              ],
+              onChange: tag => {
+                updateBlock({
+                  tag,
+                  morphControls: true,
+                })
+              },
+            })),
+          Control({
+            label: 'Alignment'
+          }, AlignmentButtons( {
+            id: 'heading-alignment',
+            alignment,
+            onChange: alignment => {
+              updateBlock({
+                alignment,
+                morphControls: true,
+              })
+            },
+            direction: [
+              'left',
+              'center',
+              'right'
+            ],
+          }) ),
+          TagFontControlGroup('Font', 'fontStyle', fontStyle, updateBlock, { fragment: true } ),
+        ]),
+      ])
+    },
+    edit     : ({
+      id,
+      selector,
+      content,
+      updateBlock,
+      fontStyle,
+      alignment,
+      tag,
+      ...block
+    }) => {
+
+      return makeEl(tag, {
+          id             : `text-edit-link`,
+          contenteditable: true,
+          style          : {
+            ...fontStyle,
+            fontSize      : `${ fontStyle.fontSize }px`,
+            margin        : 0,
+            textAlign     : alignment,
+          },
+          eventHandlers  : {
+            'input': e => {
+              updateBlock({
+                content : e.currentTarget.innerHTML,
+              })
+            },
+          },
+        },
+        content)
+    },
+    html     : ({
+      id,
+      content,
+      updateBlock,
+      fontStyle,
+      tag,
+      alignment,
+      ...block
+    }) => makeEl( tag, {
+      style: {
+        ...fontStyle,
+        fontSize      : `${ fontStyle.fontSize }px`,
+        margin        : 0,
+        textAlign     : alignment,
+      },
+    }, content ),
+    plainText: ({ content, tag }) => extractPlainText( makeEl( tag, {}, content )),
+    gutenberg: ({ content, tag }) => {
+      content = convertToGutenbergBlocks(makeEl( tag, {}, content ))
+
+      return Div({}, [
+        `<!-- wp:group ${ JSON.stringify({
+          ghReplacements: true,
+        }) } -->`,
+        Div({
+          className: 'wp-block-group',
+        }, [
+          content,
+        ]),
+        `<!-- /wp:group -->`,
+      ]).innerHTML
+    },
+    defaults : {
+      content: `Lorem ipsum dolor sit amet`,
+      tag: 'h2',
+      fontStyle     : fontDefaults({
+        fontSize  : 24,
+        fontWeight: '500',
+      }),
+      alignment: 'left'
+    },
+  })
+
   // Register the text block
   registerBlock('text', 'Text', {
     attributes: {
@@ -7754,11 +7909,7 @@
       },
     },
     //language=HTML
-    svg: `
-        <svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
-             viewBox="0 0 977.7 977.7">
-        <path fill="currentColor"
-              d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4v16m9-8v8M6 20h4m5 0h4M13 7V4H3v3m18 7v-2h-8v2"/></svg>`,
 
     controls : ({
       p = {},
@@ -7973,165 +8124,6 @@
         fontSize  : 20,
         fontWeight: '500',
       }),
-    },
-  })
-
-  // Register new heading block
-  registerBlock('heading', 'Heading', {
-    displayAs: ({tag}) => tag.toUpperCase(),
-    attributes: {
-      tag: el => el.firstElementChild.tagName.toLowerCase(),
-      fontStyle: (el, block) => parseFontStyle( el.querySelector(block.tag).style ),
-      alignment: (el, block) => el.querySelector(block.tag).style.textAlign,
-      content: (el, block) => {
-        return el.querySelector(block.tag).innerHTML
-      },
-    },
-    //language=HTML
-    svg: `
-        <svg xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 977.7 977.7" xml:space="preserve"
-             viewBox="0 0 977.7 977.7">
-        <path fill="currentColor"
-              d="M770.7 930.6v-35.301c0-23.398-18-42.898-41.3-44.799-17.9-1.5-35.8-3.1-53.7-5-34.5-3.6-72.5-7.4-72.5-50.301L603 131.7c136-2 210.5 76.7 250 193.2 6.3 18.7 23.8 31.3 43.5 31.3h36.2c24.9 0 45-20.1 45-45V47.1c0-24.9-20.1-45-45-45H45c-24.9 0-45 20.1-45 45v264.1c0 24.9 20.1 45 45 45h36.2c19.7 0 37.2-12.6 43.5-31.3 39.4-116.5 114-195.2 250-193.2l-.3 663.5c0 42.9-38 46.701-72.5 50.301-17.9 1.9-35.8 3.5-53.7 5-23.3 1.9-41.3 21.4-41.3 44.799v35.3c0 24.9 20.1 45 45 45h473.8c24.8 0 45-20.199 45-45z"/></svg>`,
-
-    controls : ({
-      tag = 'h2',
-      fontStyle = {},
-      alignment = 'left',
-      updateBlock,
-      curBlock,
-    }) => {
-
-      return Fragment([
-        ControlGroup({
-          name: 'Heading'
-        }, [
-          Control({
-              label  : 'Type',
-            },
-            ButtonToggle({
-              id: `tag-name`,
-              selected: tag,
-              options : [
-                {
-                  id  : 'h1',
-                  text: 'H1',
-                },
-                {
-                  id  : 'h2',
-                  text: 'H2',
-                },
-                {
-                  id  : 'h3',
-                  text: 'H3',
-                },
-                {
-                  id  : 'h4',
-                  text: 'H4',
-                },
-                {
-                  id  : 'p',
-                  text: 'P',
-                },
-              ],
-              onChange: tag => {
-                updateBlock({
-                  tag,
-                  morphControls: true,
-                })
-              },
-            })),
-          Control({
-            label: 'Alignment'
-          }, AlignmentButtons( {
-            id: 'heading-alignment',
-            alignment,
-            onChange: alignment => {
-              updateBlock({
-                alignment,
-                morphControls: true,
-              })
-            },
-            direction: [
-              'left',
-              'center',
-              'right'
-            ],
-          }) ),
-          TagFontControlGroup('Font', 'fontStyle', fontStyle, updateBlock, { fragment: true } ),
-        ]),
-      ])
-    },
-    edit     : ({
-      id,
-      selector,
-      content,
-      updateBlock,
-      fontStyle,
-      alignment,
-      tag,
-      ...block
-    }) => {
-
-      return makeEl(tag, {
-          id             : `text-edit-link`,
-          contenteditable: true,
-          style          : {
-            ...fontStyle,
-            fontSize      : `${ fontStyle.fontSize }px`,
-            margin        : 0,
-            textAlign     : alignment,
-          },
-          eventHandlers  : {
-            'input': e => {
-              updateBlock({
-                content : e.currentTarget.innerHTML,
-              })
-            },
-          },
-        },
-        content)
-    },
-    html     : ({
-      id,
-      content,
-      updateBlock,
-      fontStyle,
-      tag,
-      alignment,
-      ...block
-    }) => makeEl( tag, {
-      style: {
-        ...fontStyle,
-        fontSize      : `${ fontStyle.fontSize }px`,
-        margin        : 0,
-        textAlign     : alignment,
-      },
-    }, content ),
-    plainText: ({ content, tag }) => extractPlainText( makeEl( tag, {}, content )),
-    gutenberg: ({ content, tag }) => {
-      content = convertToGutenbergBlocks(makeEl( tag, {}, content ))
-
-      return Div({}, [
-        `<!-- wp:group ${ JSON.stringify({
-          ghReplacements: true,
-        }) } -->`,
-        Div({
-          className: 'wp-block-group',
-        }, [
-          content,
-        ]),
-        `<!-- /wp:group -->`,
-      ]).innerHTML
-    },
-    defaults : {
-      content: `Lorem ipsum dolor sit amet`,
-      tag: 'h2',
-      fontStyle     : fontDefaults({
-        fontSize  : 24,
-        fontWeight: '500',
-      }),
-      alignment: 'left'
     },
   })
 
