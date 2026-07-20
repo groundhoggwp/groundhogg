@@ -1,11 +1,11 @@
 <?php
 /*
  * Plugin Name: Groundhogg - Safe Mode
- * Plugin URI:  https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
+ * Plugin URI:  https://groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Description: Safe mode functionality for Groundhogg debugging.
  * Version: 1.0
  * Author: Groundhogg Inc.
- * Author URI: https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
+ * Author URI: https://groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: groundhogg
  * Domain Path: /languages
  *

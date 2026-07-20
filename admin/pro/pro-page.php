@@ -31,7 +31,7 @@ class Pro_Page extends Admin_Page {
 			'utm_medium'   => 'wp-dash',
 			'utm_campaign' => 'go-pro',
 			'utm_content'  => 'go-pro-link',
-		], 'https://www.groundhogg.io/pricing/' );
+		], 'https://groundhogg.io/pricing/' );
 
 		$discount = get_user_meta( wp_get_current_user()->ID, 'gh_free_extension_discount', true );
 

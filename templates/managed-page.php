@@ -193,7 +193,7 @@ function managed_page_footer() {
 		            'utm_medium'   => 'footer-link',
 		            'utm_campaign' => 'email-affiliate',
 		            'aff'          => absint( get_option( 'gh_affiliate_id' ) ),
-	            ], 'https://www.groundhogg.io/pricing/' )
+	            ], 'https://groundhogg.io/pricing/' )
             ], html()->e( 'img', [ 'width' => 85, 'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png' ] ) );
 
 	        printf(

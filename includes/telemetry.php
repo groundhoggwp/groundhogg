@@ -71,7 +71,7 @@ class Telemetry {
 			]
 		];
 
-		return remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/1724-telemetry-optin?token=vNhKt6H', $request );
+		return remote_post_json( 'https://groundhogg.io/wp-json/gh/v4/webhooks/1724-telemetry-optin?token=vNhKt6H', $request );
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Telemetry {
 			'extensions'       => implode( ',', Extension::$extension_ids )
 		];
 
-		remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/1727-receive-telemetry?token=JVq8f3u', $request );
+		remote_post_json( 'https://groundhogg.io/wp-json/gh/v4/webhooks/1727-receive-telemetry?token=JVq8f3u', $request );
 	}
 
 }

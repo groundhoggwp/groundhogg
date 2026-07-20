@@ -67,7 +67,7 @@ class Contacts_Api extends Base {
 				'args'                => [
 					'contact' => [
 						'required'    => false,
-						'description' => _x( 'Contains list of contact arguments. Please visit www.groundhogg.io for full list of accepted arguments.', 'api', 'groundhogg' )
+						'description' => _x( 'Contains list of contact arguments. Please visit groundhogg.io for full list of accepted arguments.', 'api', 'groundhogg' )
 					]
 				]
 			],

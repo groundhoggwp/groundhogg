@@ -3157,7 +3157,7 @@ function get_store_products( $args = [] ) {
 		'number'   => '-1'
 	) );
 
-	$url = 'https://www.groundhogg.io/edd-api/v2/products/';
+	$url = 'https://groundhogg.io/edd-api/v2/products/';
 
 	$response = wp_remote_get( add_query_arg( $args, $url ) );
 
@@ -9154,7 +9154,7 @@ function ajax_send_plugin_feedback() {
 	}
 
 	$user   = wp_get_current_user();
-	$result = remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/2232-listen-for-product-feedback?token=j5qxFis', [
+	$result = remote_post_json( 'https://groundhogg.io/wp-json/gh/v4/webhooks/2232-listen-for-product-feedback?token=j5qxFis', [
 		'subject' => sanitize_text_field( get_post_var( 'subject' ) ),
 		'message' => sanitize_textarea_field( get_post_var( 'message' ) ),
 		'email'   => $user->user_email,

@@ -182,8 +182,8 @@ class Help_Page extends Tabbed_Admin_Page {
 
 	}
 
-	const SUPPORT_ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/v3/support-3/';
-	const ACCESS_ENDPOINT = 'https://www.groundhogg.io/wp-json/gh/v3/support-4/';
+	const SUPPORT_ENDPOINT = 'https://groundhogg.io/wp-json/gh/v3/support-3/';
+	const ACCESS_ENDPOINT = 'https://groundhogg.io/wp-json/gh/v3/support-4/';
 	const SUPPORT_EMAIL = 'support@groundhogg.io';
 	const HELP_EMAIL = 'help@groundhogg.io';
 	const SUPPORT_LOGIN = 'groundhogg';
@@ -511,25 +511,25 @@ class Help_Page extends Tabbed_Admin_Page {
 				'title'       => __( '🏗️ Building something?', 'groundhogg' ),
 				'description' => __( 'Are you building something custom with Groundhogg? Take a look at our developer oriented articles.', 'groundhogg' ),
 				'button_text' => __( 'I need help with development!', 'groundhogg' ),
-				'button_link' => 'https://www.groundhogg.io/documentation/#developers'
+				'button_link' => 'https://groundhogg.io/documentation/#developers'
 			],
 			[
 				'title'       =>__( '🙋‍♂️ Have a question?', 'groundhogg' ),
 				'description' =>__( 'Someone else may have already asked your question. Check out our FAQs to see if there is an answer for you.', 'groundhogg' ),
 				'button_text' =>__( 'I have a question!', 'groundhogg' ),
-				'button_link' => 'https://www.groundhogg.io/documentation/#getting-started'
+				'button_link' => 'https://groundhogg.io/documentation/#getting-started'
 			],
 			[
 				'title'       => __( '🔌 Installing an extension?', 'groundhogg' ),
 				'description' => __( 'We have detailed setup guides for all of our premium extensions. Find the one you need!', 'groundhogg' ),
 				'button_text' => __( 'I need help with an extension!', 'groundhogg' ),
-				'button_link' => 'https://www.groundhogg.io/doc/installation-guide/#installing-extensions-using-the-groundhogg-helper-plugin'
+				'button_link' => 'https://groundhogg.io/doc/installation-guide/#installing-extensions-using-the-groundhogg-helper-plugin'
 			],
 			[
 				'title'       => __( '💬 Didn\'t find what you need?', 'groundhogg' ),
 				'description' => __( 'If you didn\'t find what you were looking for then you can join our support group and ask the community!', 'groundhogg' ),
 				'button_text' => __( 'Join the community!', 'groundhogg' ),
-				'button_link' => 'https://www.groundhogg.io/fb/'
+				'button_link' => 'https://groundhogg.io/fb/'
 			],
 			[
 				'title'       => __( '🧑‍💻 Having a technical issue?', 'groundhogg' ),

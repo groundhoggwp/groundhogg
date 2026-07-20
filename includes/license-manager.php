@@ -611,7 +611,7 @@ class License_Manager {
 			'number'   => '-1'
 		) );
 
-		$url = 'https://www.groundhogg.io/edd-api/v2/products/';
+		$url = 'https://groundhogg.io/edd-api/v2/products/';
 
 		return remote_post_json( $url, $args, 'GET', [], false, DAY_IN_SECONDS );
 	}

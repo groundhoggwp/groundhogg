@@ -54,7 +54,7 @@ class Welcome_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
-		$json = remote_post_json( 'https://www.groundhogg.io/wp-json/wp/v2/posts', [], 'GET' );
+		$json = remote_post_json( 'https://groundhogg.io/wp-json/wp/v2/posts', [], 'GET' );
 
 		wp_send_json( $json );
 	}

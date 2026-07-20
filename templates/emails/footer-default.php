@@ -112,7 +112,7 @@ if ( $custom_text ): ?>
                                                             'utm_medium'    => 'footer-link',
                                                             'utm_campaign'  => 'email-affiliate',
                                                             'aff'           => absint( get_option( 'gh_affiliate_id' ) ),
-                                                        ], 'https://www.groundhogg.io/pricing/' ) ); ?>" target="_blank">
+                                                        ], 'https://groundhogg.io/pricing/' ) ); ?>" target="_blank">
                                                             <img style="vertical-align: middle" height="18.33" width="100" src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png' ); ?>"/>
                                                         </a>
                                                     </p>

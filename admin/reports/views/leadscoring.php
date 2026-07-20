@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <img id="leadscore-ad" src="<?php echo esc_url( GROUNDHOGG_ASSETS_URL . 'images/leadscoring-ad.png' ); ?>">
         <div class="notice-no-data">
             <p><?php kses_e( __( 'Please install the <b>Lead Scoring</b> extension to view this report.', 'groundhogg' ) ); ?></p>
-            <p><a href="https://www.groundhogg.io/downloads/lead-scoring/" target="_blank"
+            <p><a href="https://groundhogg.io/downloads/lead-scoring/" target="_blank"
                   class="gh-button primary"><?php esc_html_e( 'Get it now!', 'groundhogg' ); ?></a></p>
         </div>
 	<?php endif; ?>

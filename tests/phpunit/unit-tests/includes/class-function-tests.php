@@ -9,7 +9,7 @@ use function Groundhogg\preg_quote_except;
 class Function_Tests extends GH_UnitTestCase {
 
 	public function test_generate_referer_hash() {
-		$hash = \Groundhogg\generate_referer_hash( 'https://www.groundhogg.io/my/custom/path/' );
+		$hash = \Groundhogg\generate_referer_hash( 'https://groundhogg.io/my/custom/path/' );
 		$this->assertEquals( 20, strlen( $hash ) );
 	}
 

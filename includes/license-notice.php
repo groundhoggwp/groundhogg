@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class License_Notice {
 
-	const CHECKOUT_URL = 'https://www.groundhogg.io/secure/checkout/';
+	const CHECKOUT_URL = 'https://groundhogg.io/secure/checkout/';
 	const HELPER_PLUGIN_ID = 48143;
 
 	public function __construct() {

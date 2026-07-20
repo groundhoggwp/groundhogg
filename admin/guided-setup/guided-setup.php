@@ -141,7 +141,7 @@ class Guided_Setup extends Admin_Page {
 			'url'      => home_url(),
 		];
 
-		remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v4/webhooks/1998-review-your-funnel?token=l2d4PaK', $request );
+		remote_post_json( 'https://groundhogg.io/wp-json/gh/v4/webhooks/1998-review-your-funnel?token=l2d4PaK', $request );
 
 		wp_send_json_success();
 	}
@@ -177,7 +177,7 @@ class Guided_Setup extends Admin_Page {
 
 		$license = sanitize_text_field( get_post_var( 'license' ) );
 
-		$response = remote_post_json( 'https://www.groundhogg.io/wp-json/edd/all-access/', [
+		$response = remote_post_json( 'https://groundhogg.io/wp-json/edd/all-access/', [
 			'license_key' => $license
 		] );
 
@@ -222,7 +222,7 @@ class Guided_Setup extends Admin_Page {
 		$name  = wp_get_current_user()->display_name;
 
 		// Add to list
-		$response = remote_post_json( 'https://www.groundhogg.io/wp-json/gh/v3/webhook-listener?auth_token=NCM39k3&step_id=1641', [
+		$response = remote_post_json( 'https://groundhogg.io/wp-json/gh/v3/webhook-listener?auth_token=NCM39k3&step_id=1641', [
 			'email'     => $email,
 			'name'      => $name,
 			'time_zone' => get_user_timezone()->getName()
