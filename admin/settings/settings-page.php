@@ -2176,11 +2176,11 @@ class Settings_Page extends Admin_Page {
 			return;
 		}
 
-		$value = Plugin::$instance->settings->get_option( $field['id'] );
+		$default = get_array_var( $field['atts'], 'default' );
+		$value   = Plugin::$instance->settings->get_option( $field['id'], $default );
 
 		switch ( $field['type'] ) {
 			case 'editor':
-				$field['atts']['id']       = $field['id'];
 				$field['atts']['content']  = $value;
 				$field['atts']['settings'] = [ 'editor_height' => 200 ];
 				break;
