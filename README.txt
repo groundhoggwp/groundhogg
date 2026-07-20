@@ -2,7 +2,7 @@
 
 Contributors: trainingbusinesspros, Groundhogg
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
-Donate link: https://www.groundhogg.io/pricing/
+Donate link: https://groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
@@ -34,13 +34,13 @@ Businesses that switch to Groundhogg save on average **$240/m** on CRM fees.
 
 🚀 [**14-day demo!** Try before you buy.](https://groundhogg.io/try/)
 
-🏆 [2020 Gold Stevie Award Winner](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/)
+🏆 [2020 Gold Stevie Award Winner](https://groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/)
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
-Our award winning WordPress CRM is the very best alternative to [Keap](https://www.groundhogg.io/comparison/keap-infusionsoft/), [ActiveCampaign](https://www.groundhogg.io/comparison/activecampaign/), [HighLevel](https://www.groundhogg.io/comparison/gohighlevel/), [HubSpot](https://www.groundhogg.io/comparison/hubspot/), [MailChimp](https://www.groundhogg.io/comparison/mailchimp/) and [other SaaS platforms](https://www.groundhogg.io/crm-type/saas/).
+Our award winning WordPress CRM is the very best alternative to [Keap](https://groundhogg.io/comparison/keap-infusionsoft/), [ActiveCampaign](https://groundhogg.io/comparison/activecampaign/), [HighLevel](https://groundhogg.io/comparison/gohighlevel/), [HubSpot](https://groundhogg.io/comparison/hubspot/), [MailChimp](https://groundhogg.io/comparison/mailchimp/) and [other SaaS platforms](https://groundhogg.io/crm-type/saas/).
 
-You don’t have to sacrifice CRM features when you switch to our self-hosted solution. In fact you can **[save $1,000s per year](https://www.groundhogg.io/compare/)** and have the added benefit of owning all your information.
+You don’t have to sacrifice CRM features when you switch to our self-hosted solution. In fact you can **[save $1,000s per year](https://groundhogg.io/compare/)** and have the added benefit of owning all your information.
 
 If you are an agency, WaaS, WordPress developer, LMS/Course Creator, WordPress freelancer, or CRM implementation service provider then the Groundhogg CRM and Marketing Automation suite is for you.
 
@@ -58,7 +58,7 @@ When using the Groundhogg CRM & Marketing Automation suite free or with any of o
 * Number of flows (automations)
 * Number of emails sent
 
-When using Groundhogg CRM & Marketing Automation you will **never** be limited on the amount of **anything**! Unlike [other SaaS platforms](https://www.groundhogg.io/compare/).
+When using Groundhogg CRM & Marketing Automation you will **never** be limited on the amount of **anything**! Unlike [other SaaS platforms](https://groundhogg.io/compare/).
 
 Businesses [save $1,000s a year](https://groundhogg.io/pricing/) after switching to Groundhogg.
 
@@ -70,7 +70,7 @@ Putting your data in a SaaS CRM is like renting an apartment, but with less prot
 
 This leaves your business exposed. What would happen to your business if your CRM was turned off?
 
-With Groundhogg you actually [own your data](https://www.groundhogg.io/learn/email-and-self-hosting-is-now-more-critical-than-ever/)! No one expect you can make impactful changes.
+With Groundhogg you actually [own your data](https://groundhogg.io/learn/email-and-self-hosting-is-now-more-critical-than-ever/)! No one expect you can make impactful changes.
 
 ## 🔎 At A Glance
 
@@ -133,16 +133,16 @@ You can trust us to not only provide you with stellar software and support, but 
 
 Here's what a few of them had to say about our products and support!
 
-From 👨  **[Chris Badget](https://wordpress.org/support/topic/best-crm-and-marketing-automation-for-wordpress/)**, _CEO of [LifterLMS](https://www.groundhogg.io/best-lifterlms-crm/)_
+From 👨  **[Chris Badget](https://wordpress.org/support/topic/best-crm-and-marketing-automation-for-wordpress/)**, _CEO of [LifterLMS](https://groundhogg.io/best-lifterlms-crm/)_
 
 > Great team, great product, and works with all the key WordPress tools I’m using.
 > So nice to be able to do broadcast emails, tagging, and marketing automation all from inside my WordPress website.
 
-From 👨‍🦱 **[Francisco Opazo](https://www.groundhogg.io/best-buddyboss-crm/)**, _Marketing Manager at [BuddyBoss](https://www.groundhogg.io/best-buddyboss-crm/)_
+From 👨‍🦱 **[Francisco Opazo](https://groundhogg.io/best-buddyboss-crm/)**, _Marketing Manager at [BuddyBoss](https://groundhogg.io/best-buddyboss-crm/)_
 
 > Groundhogg CRM & Marketing Automation is essential for many community builders, course creators, and membership site owners to achieve higher rates of engagement and retention. It simplifies many complex processes including onboarding, email marketing, flows, and enables you to scale your marketing efforts more efficiently.
 
-From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-product/)**, _Podcaster & Owner of [WP-Tonic Agency](https://www.groundhogg.io/best-crm-for-agencies/)_
+From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-product/)**, _Podcaster & Owner of [WP-Tonic Agency](https://groundhogg.io/best-crm-for-agencies/)_
 
 > Adrian and his team have really built a great WordPress based CRM that’s really competitive with the big guys like ActiveCampagin. I would highly recommend it to anybody who is running WordPress.
 
@@ -173,7 +173,7 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 
 Groundhogg's search filters give you more control than any other CRM to segment your list to find exactly the leads you're looking for.
 
-Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocommerce/), [AffiliateWP](https://www.groundhogg.io/downloads/affiliatewp-integration/), [LearnDash](https://www.groundhogg.io/downloads/learndash-integration/), [and more](https://www.groundhogg.io/downloads/category/integrations/) add additional search filters you can use to create powerful segments so you can send hyper targeted messages.
+Our integrations with [WooCommerce](https://groundhogg.io/downloads/woocommerce/), [AffiliateWP](https://groundhogg.io/downloads/affiliatewp-integration/), [LearnDash](https://groundhogg.io/downloads/learndash-integration/), [and more](https://groundhogg.io/downloads/category/integrations/) add additional search filters you can use to create powerful segments so you can send hyper targeted messages.
 
 [youtube https://youtu.be/TI0WV62dSU0]
 
@@ -221,53 +221,53 @@ Our integrations with [WooCommerce](https://www.groundhogg.io/downloads/woocomme
 
 Groundhogg CRM & Marketing Automation has 45+ extensions to help you expand and integrate Groundhogg to help you build your all in one solution.
 
-👉 Bundle all of our incredible premium features into a [flat rate plan](https://www.groundhogg.io/pricing/). [Yearly](https://www.groundhogg.io/pricing/) & [monthly](https://www.groundhogg.io/pricing/monthly/) options available.
+👉 Bundle all of our incredible premium features into a [flat rate plan](https://groundhogg.io/pricing/). [Yearly](https://groundhogg.io/pricing/) & [monthly](https://groundhogg.io/pricing/monthly/) options available.
 
-You can also use our **[⏱️ 14 day $1 demo](https://www.groundhogg.io/try/)** to see a preview of these stellar features.
+You can also use our **[⏱️ 14 day $1 demo](https://groundhogg.io/try/)** to see a preview of these stellar features.
 
-Over **[24+ extensions](https://www.groundhogg.io/downloads/category/add-ons/)** to help you handle more...
+Over **[24+ extensions](https://groundhogg.io/downloads/category/add-ons/)** to help you handle more...
 
-* [Extend your CRM with Custom Fields](https://www.groundhogg.io/downloads/advanced-custom-meta-fields/)
-* [Extend your CRM with Custom SMTP](https://www.groundhogg.io/downloads/smtp/)
-* [Extend your CRM with Advanced Email Preferences](https://www.groundhogg.io/downloads/advanced-preferences/)
-* [Extend your CRM with Superlinks](https://www.groundhogg.io/downloads/advanced-features/)
-* [Extend your CRM with Lead Scoring](https://www.groundhogg.io/downloads/lead-scoring/)
-* [Extend your CRM with Booking Calendars](https://www.groundhogg.io/downloads/booking-calendar/)
-* [Extend your CRM with Social Proof Popups](https://www.groundhogg.io/downloads/proof/)
-* [Extend your CRM with Signed Contracts](https://www.groundhogg.io/downloads/contracts/)
-* [Extend your CRM with Company Management](https://www.groundhogg.io/downloads/companies/)
-* [Extend your CRM with a Sales Pipeline](https://www.groundhogg.io/downloads/pipeline/)
-* [Extend your CRM with Birthday Automation](https://www.groundhogg.io/downloads/birthdays/)
-* And [many more...](https://www.groundhogg.io/downloads/)
+* [Extend your CRM with Custom Fields](https://groundhogg.io/downloads/advanced-custom-meta-fields/)
+* [Extend your CRM with Custom SMTP](https://groundhogg.io/downloads/smtp/)
+* [Extend your CRM with Advanced Email Preferences](https://groundhogg.io/downloads/advanced-preferences/)
+* [Extend your CRM with Superlinks](https://groundhogg.io/downloads/advanced-features/)
+* [Extend your CRM with Lead Scoring](https://groundhogg.io/downloads/lead-scoring/)
+* [Extend your CRM with Booking Calendars](https://groundhogg.io/downloads/booking-calendar/)
+* [Extend your CRM with Social Proof Popups](https://groundhogg.io/downloads/proof/)
+* [Extend your CRM with Signed Contracts](https://groundhogg.io/downloads/contracts/)
+* [Extend your CRM with Company Management](https://groundhogg.io/downloads/companies/)
+* [Extend your CRM with a Sales Pipeline](https://groundhogg.io/downloads/pipeline/)
+* [Extend your CRM with Birthday Automation](https://groundhogg.io/downloads/birthdays/)
+* And [many more...](https://groundhogg.io/downloads/)
 
-Over **[30+ integrations](https://www.groundhogg.io/downloads/category/integrations/)** to connect to your favorite WordPress plugins. Integrate with...
+Over **[30+ integrations](https://groundhogg.io/downloads/category/integrations/)** to connect to your favorite WordPress plugins. Integrate with...
 
-* **[Connect LifterLMS to your CRM](https://www.groundhogg.io/best-lifterlms-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
-* **[Connect LearnDash to your CRM](https://www.groundhogg.io/best-learndash-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
-* **[Connect BuddyBoss to your CRM](https://www.groundhogg.io/best-buddyboss-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/essentials-funnels-for-buddyboss/)_
-* **[Connect GiveWP to your CRM](https://www.groundhogg.io/press/nonprofits-can-finally-leverage-their-data-to-collect-more-donations-with-groundhogg-and-givewp/)**
-* **[Connect Easy Digital Downloads to your CRM](https://www.groundhogg.io/best-crm-for-easy-digital-downloads/)**
-* [Connect WooCommerce to your CRM](https://www.groundhogg.io/downloads/woocommerce/)
-* [Connect HelpScout to your CRM](https://www.groundhogg.io/downloads/woocommerce/)
-* [Connect Elementor to your CRM](https://www.groundhogg.io/downloads/elementor/)
-* [Connect Amazon Web Services to your CRM](https://www.groundhogg.io/downloads/aws/)
-* [Connect SendGrid to your CRM](https://www.groundhogg.io/downloads/sendgrid-integration/)
-* [Connect AffiliateWP to your CRM](https://www.groundhogg.io/downloads/affiliatewp-integration/)
-* [Connect ThriveCart to your CRM](https://www.groundhogg.io/downloads/thrivecart/)
-* [Connect WPForms to your CRM](https://www.groundhogg.io/downloads/wpforms/)
-* And [many more...](https://www.groundhogg.io/downloads/category/integrations/)
+* **[Connect LifterLMS to your CRM](https://groundhogg.io/best-lifterlms-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
+* **[Connect LearnDash to your CRM](https://groundhogg.io/best-learndash-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
+* **[Connect BuddyBoss to your CRM](https://groundhogg.io/best-buddyboss-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/essentials-funnels-for-buddyboss/)_
+* **[Connect GiveWP to your CRM](https://groundhogg.io/press/nonprofits-can-finally-leverage-their-data-to-collect-more-donations-with-groundhogg-and-givewp/)**
+* **[Connect Easy Digital Downloads to your CRM](https://groundhogg.io/best-crm-for-easy-digital-downloads/)**
+* [Connect WooCommerce to your CRM](https://groundhogg.io/downloads/woocommerce/)
+* [Connect HelpScout to your CRM](https://groundhogg.io/downloads/woocommerce/)
+* [Connect Elementor to your CRM](https://groundhogg.io/downloads/elementor/)
+* [Connect Amazon Web Services to your CRM](https://groundhogg.io/downloads/aws/)
+* [Connect SendGrid to your CRM](https://groundhogg.io/downloads/sendgrid-integration/)
+* [Connect AffiliateWP to your CRM](https://groundhogg.io/downloads/affiliatewp-integration/)
+* [Connect ThriveCart to your CRM](https://groundhogg.io/downloads/thrivecart/)
+* [Connect WPForms to your CRM](https://groundhogg.io/downloads/wpforms/)
+* And [many more...](https://groundhogg.io/downloads/category/integrations/)
 
 ## ⏱️ Want to test out the premium Groundhogg CRM and Marketing Automation suite?
 
-If you'd like a trial of our premium plans, please check out our [$1 sandbox demo](https://www.groundhogg.io/try/).
+If you'd like a trial of our premium plans, please check out our [$1 sandbox demo](https://groundhogg.io/try/).
 
 ## Milestones
 
 * Serving 3,000+ businesses in 35+ countries.
 * ⭐⭐⭐⭐⭐ rated software and support!
 * 40+ Certified partners.
-* 🏆 [Gold Stevie Award 2020](https://www.groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/) for Tech Start up of the Year _(American Business Awards)_.
-* 🏆 [Gold Stevie Award 2021](https://www.groundhogg.io/wp-content/uploads/2021/02/gold-winner-01.jpg) for Best In Class Customer Service _(American Business Awards)_.
+* 🏆 [Gold Stevie Award 2020](https://groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/) for Tech Start up of the Year _(American Business Awards)_.
+* 🏆 [Gold Stevie Award 2021](https://groundhogg.io/wp-content/uploads/2021/02/gold-winner-01.jpg) for Best In Class Customer Service _(American Business Awards)_.
 * 🏅 Best Software Innovation 2020 finalist _(Canadian Search Awards)_.
 * 🏅 Canadian Small Business Awards 2021 finalist _(Canadian Search Awards)_.
 
@@ -336,20 +336,20 @@ No, but it is **highly** recommended. Without a proper transactional email servi
 Groundhogg provides a number of recommended solutions:
 
 * [MailHawk](https://mailhawk.io/)
-* [SendGrid](https://www.groundhogg.io/downloads/sendgrid-integration/)
-* [AWS SES](https://www.groundhogg.io/downloads/aws/)
-* [Elastic Email](https://www.groundhogg.io/downloads/elastic-email-integration/)
-* [Basic SMTP](https://www.groundhogg.io/downloads/smtp/) for other services.
+* [SendGrid](https://groundhogg.io/downloads/sendgrid-integration/)
+* [AWS SES](https://groundhogg.io/downloads/aws/)
+* [Elastic Email](https://groundhogg.io/downloads/elastic-email-integration/)
+* [Basic SMTP](https://groundhogg.io/downloads/smtp/) for other services.
 
 Groundhogg will automatically use the mail solution you have configured on your WordPress website.
 
 = Does Groundhogg have any required monthly fee or upgrades? =
 No, you can use Groundhogg CRM and Marketing Automation for free forever. Groundhogg is a Open Source project designed to democratize CRM and email marketing automation and provide simple easy to use tools to new and none tech savvy business owners.
 
-That being said, our [premium upgrades](https://www.groundhogg.io/pricing/) can seriously help your business! Use our proven tools and strategies to supercharge your marketing and WordPress site!
+That being said, our [premium upgrades](https://groundhogg.io/pricing/) can seriously help your business! Use our proven tools and strategies to supercharge your marketing and WordPress site!
 
 = Does Groundhogg connect to Woocommerce or other plugins? =
-Yes, Groundhogg can [integrate with over 30+](https://www.groundhogg.io/downloads/category/integrations/) of the most popular WordPress plugins around to crate an even more powerful CRM.
+Yes, Groundhogg can [integrate with over 30+](https://groundhogg.io/downloads/category/integrations/) of the most popular WordPress plugins around to crate an even more powerful CRM.
 
 = Does Groundhogg work with my theme? =
 Groundhogg is theme agnostic, meaning it will work with every and any theme. Groundhogg is mostly administrative and very little is seen by visitors.
@@ -370,7 +370,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 = Where can I upgrade to premium? =
-You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://www.groundhogg.io/pricing/).
+You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://groundhogg.io/pricing/).
 
 = How can I report security bugs? =
 
@@ -379,8 +379,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.5.13 (2026-07-10) =
-* TWEAKED Removed the sitewide review nag and replaced it with a dashboard specific, less intrusive request.
-* SECURITY Fixed non-required dropdown and radio fields not validating inputs correctly.
+* TWEAKED Removed the sitewide review nag and replaced it with a dashboard-specific, less intrusive request.
+* SECURITY Fixed non-required dropdown and radio fields not validating inputs correctly. Credit to Artus KG for practicing responsible disclosure.
 
 = 4.5.12 (2026-07-09) =
 * FIXED Broken user role filter.

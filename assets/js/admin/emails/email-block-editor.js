@@ -4273,7 +4273,7 @@
         },
         [
           `<p>${ __(
-            'Automatically add UTM parameters to links in your email. <a href="https://www.groundhogg.io/doc/utm-parameters/">About UTM</a>.',
+            'Automatically add UTM parameters to links in your email. <a href="https://groundhogg.io/doc/utm-parameters/">About UTM</a>.',
             'groundhogg') }</p>`,
           `<p>${ __('Replacements are currently <b>NOT</b> supported. Empty values are ignored.', 'groundhogg') }</p>`,
           Control({
@@ -4677,7 +4677,7 @@
             })),
           Control({
               label  : 'Message type',
-              tooltip: '<a href="https://www.groundhogg.io/doc/transactional-vs-marketing-emails/">Transactional</a> emails bypass contact marketability.<br><b>Marketing</b> emails respect contact marketability.',
+              tooltip: '<a href="https://groundhogg.io/doc/transactional-vs-marketing-emails/">Transactional</a> emails bypass contact marketability.<br><b>Marketing</b> emails respect contact marketability.',
             },
             Select({
               id      : 'message-type',
@@ -5574,7 +5574,7 @@
                         one will be created.</p>
                     <p>When testing links, we recommend opening them in an incognito window or different
                         browser. See our <a target="_blank"
-                                            href="https://www.groundhogg.io/doc/recommended-test-procedures/">recommended
+                                            href="https://groundhogg.io/doc/recommended-test-procedures/">recommended
                             testing procedures.</a></p>
                     <p>
                         ❌ <b>[TEST]</b> in subject line.<br/>
@@ -9476,7 +9476,7 @@
             value   : queryId,
             onChange: e => updateBlock({ queryId: e.target.value }),
           })),
-        `<p>This allows you to filter this specific query with additional parameters. <a href="https://www.groundhogg.io/doc/custom-queries-for-the-posts-and-query-loop-blocks/" target="_blank">More info.</a></p>`,
+        `<p>This allows you to filter this specific query with additional parameters. <a href="https://groundhogg.io/doc/custom-queries-for-the-posts-and-query-loop-blocks/" target="_blank">More info.</a></p>`,
       ])
   }
 

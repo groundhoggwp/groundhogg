@@ -224,7 +224,7 @@
             }, Dashicon( 'no-alt' ) ),
             H3({}, 'Do cron jobs give you <i>anxiety</i>?' ),
             Pg({}, 'Let our team help you set them up correctly! First time customers can have our team install Groundhogg, import contacts, connect SMTP, and set up cron jobs!'),
-            Pg({}, An( { href: 'https://www.groundhogg.io/downloads/initial-setup-installation', className: 'bold' }, 'MORE DETAILS &rarr;' ) ),
+            Pg({}, An( { href: 'https://groundhogg.io/downloads/initial-setup-installation', className: 'bold' }, 'MORE DETAILS &rarr;' ) ),
           ]),
           Img({ src: `${Groundhogg.assets.images}/phil-cutoff.png` })
         ])),

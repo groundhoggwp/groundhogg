@@ -509,7 +509,7 @@
             return `
                 <h1>${ __('Have a license key?', 'groundhogg') }</h1>
                 <p>
-                    ${ __('If you have previously purchased a license for Groundhogg you can enter it now! <i><a href="https://www.groundhogg.io/account/licenses/" target="_blank">Where do I find my license?</a></i>',
+                    ${ __('If you have previously purchased a license for Groundhogg you can enter it now! <i><a href="https://groundhogg.io/account/licenses/" target="_blank">Where do I find my license?</a></i>',
                             'groundhogg') }</p>
                 <div class="display-flex gap-10 inside stretch space-between">
                     ${ input({
@@ -1259,7 +1259,7 @@
 							${ __('Download the extension manager to install your premium features and integrations.',
                         'groundhogg') }</p>
 					</div>
-					<button data-target="_blank" data-link="https://www.groundhogg.io/account/all-access-downloads/?utm_source=plugin&utm_medium=button&utm_campaign=guided_setup&utm_content=next-steps" class="link gh-button space-between gap-10 secondary medium"><span class="dashicons dashicons-download"></span>${ __(
+					<button data-target="_blank" data-link="https://groundhogg.io/account/all-access-downloads/?utm_source=plugin&utm_medium=button&utm_campaign=guided_setup&utm_content=next-steps" class="link gh-button space-between gap-10 secondary medium"><span class="dashicons dashicons-download"></span>${ __(
                         'Install!') }</button>
 				</div>
 				<div class="display-flex center">

@@ -370,7 +370,7 @@
                               bold(_contact.data.full_name),
                               bold(getContact().data.full_name)) }</p>
                   <p>
-                      <a href="https://www.groundhogg.io/doc/merging-contacts/"
+                      <a href="https://groundhogg.io/doc/merging-contacts/"
                          target="_blank">${ __(
                               'What happens when contacts are merged?',
                               'groundhogg') }</a></p>`,

@@ -1008,7 +1008,7 @@
           [
             'welcome-learn-more',
             __('Learn'),
-            'https://www.groundhogg.io/events/',
+            'https://groundhogg.io/events/',
           ],
           [
             'media-document',

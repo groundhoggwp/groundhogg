@@ -1013,7 +1013,7 @@
 
                 if ( ! Groundhogg.stores.options.get( 'gh_is_send_time_optimization_enabled' ) && e.target.checked ){
                   Groundhogg.element.confirmationModal({
-                    alert: `<p>Using send time optimization will require additional storage for tracking.<br/>Would you like to enable this feature? <a target="_blank" href="https://www.groundhogg.io/doc/send-time-optimization/">More details.</a></p>`,
+                    alert: `<p>Using send time optimization will require additional storage for tracking.<br/>Would you like to enable this feature? <a target="_blank" href="https://groundhogg.io/doc/send-time-optimization/">More details.</a></p>`,
                     confirmText: __('Enable', 'groundhogg'),
                     onConfirm: () => {
 
@@ -1035,7 +1035,7 @@
               },
             }),
             Dashicon('editor-help',
-              ToolTip('Schedules each email based on contacts\' past <br>behaviour to maximize opens and clicks. <a target="_blank" href="https://www.groundhogg.io/doc/send-time-optimization/">Read more...</a>', 'bottom')),
+              ToolTip('Schedules each email based on contacts\' past <br>behaviour to maximize opens and clicks. <a target="_blank" href="https://groundhogg.io/doc/send-time-optimization/">Read more...</a>', 'bottom')),
           ]), {
             pillText: 'Advanced Feature',
             toolTipText: 'This feature requires the Advanced <br>Features add-on to be installed.',

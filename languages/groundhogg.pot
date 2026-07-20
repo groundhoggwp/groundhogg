@@ -4776,13 +4776,13 @@ msgstr ""
 #: admin/tools/tools-page.php:1151
 msgid ""
 "You can learn more about this change <i>(officially announced Oct 17th)</i> "
-"<a href=\"https://www.groundhogg.io/press/new-pricing-and-updates-planned-for-"
+"<a href=\"https://groundhogg.io/press/new-pricing-and-updates-planned-for-"
 "november-1st/\" target=\"_blank\">on our blog.</a>"
 msgstr ""
 
 #: admin/tools/tools-page.php:1152
 msgid ""
-"If you have an All Access Pass, <a href=\"https://www.groundhogg.io/pricing/"
+"If you have an All Access Pass, <a href=\"https://groundhogg.io/pricing/"
 "\" target=\"_blank\">Premium Plan</a> or a <a href=\"https://www.groundhogg."
 "io/grandfather-program/\" target=\"_blank\">Grandfather license</a> get you "
 "can enter it below to automatically install and activate the removed features."
@@ -5134,7 +5134,7 @@ msgstr ""
 #: api/v3/contacts-api.php:72
 msgctxt "api"
 msgid ""
-"Contains list of contact arguments. Please visit www.groundhogg.io for full "
+"Contains list of contact arguments. Please visit groundhogg.io for full "
 "list of accepted arguments."
 msgstr ""
 
@@ -8781,7 +8781,7 @@ msgstr ""
 #: assets/js/admin/features/setup.js:512
 msgid ""
 "If you have previously purchased a license for Groundhogg you can enter it "
-"now! <i><a href=\"https://www.groundhogg.io/account/licenses/\" "
+"now! <i><a href=\"https://groundhogg.io/account/licenses/\" "
 "target=\"_blank\">Where do I find my license?</a></i>"
 msgstr ""
 
@@ -10274,7 +10274,7 @@ msgstr ""
 
 #: assets/js/admin/features/troubleshooter.js:1951
 msgid ""
-"Keep track of your tickets from <a href=\"https://www.groundhogg.io/account/"
+"Keep track of your tickets from <a href=\"https://groundhogg.io/account/"
 "tickets/\">your account.</a>"
 msgstr ""
 
@@ -10295,7 +10295,7 @@ msgstr ""
 msgid ""
 "A license key is required to request support. If you have previously "
 "purchased a license for Groundhogg you can enter it now! <i><a href=\"https://"
-"www.groundhogg.io/account/licenses/\" target=\"_blank\">Where do I find my "
+"groundhogg.io/account/licenses/\" target=\"_blank\">Where do I find my "
 "license?</a></i>"
 msgstr ""
 
@@ -10380,13 +10380,13 @@ msgstr ""
 
 #: assets/js/admin/features/troubleshooter.js:2080
 msgid ""
-"If you are unsure you can go to <a href=\"https://www.groundhogg.io/account/"
+"If you are unsure you can go to <a href=\"https://groundhogg.io/account/"
 "licenses/\">Groundhogg.io</a> and message us via Live Chat!"
 msgstr ""
 
 #: assets/js/admin/features/troubleshooter.js:2082
 msgid ""
-"Have a different license key to try? <i><a href=\"https://www.groundhogg.io/"
+"Have a different license key to try? <i><a href=\"https://groundhogg.io/"
 "account/licenses/\" target=\"_blank\">Where do I find my license?</a></i>"
 msgstr ""
 
@@ -15801,7 +15801,7 @@ msgstr ""
 
 #. Plugin URI of the plugin/theme
 msgid ""
-"https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-"
+"https://groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-"
 "uri&utm_medium=wp-dash"
 msgstr ""
 
@@ -15815,6 +15815,6 @@ msgstr ""
 
 #. Author URI of the plugin/theme
 msgid ""
-"https://www.groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-"
+"https://groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-"
 "uri&utm_medium=wp-dash"
 msgstr ""
