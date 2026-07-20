@@ -2354,7 +2354,7 @@
         onChange: e => {
           updateFilter({
             compare: e.target.value
-          })
+          }, true )
         }
       }),
       compare === 'before' ? null : Input({
