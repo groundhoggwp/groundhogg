@@ -21,8 +21,6 @@ class GH_EDD_SL_Plugin_Updater {
 	private $wp_override = false;
 	private $cache_key = '';
 
-	private $health_check_timeout = 5;
-
 	private $beta = false;
 
 	/**
@@ -391,60 +389,33 @@ class GH_EDD_SL_Plugin_Updater {
 	 */
 	private function api_request( $_action, $_data ) {
 
-		global $wp_version, $edd_plugin_url_available;
-
-		// Do a quick status check on this domain if we haven't already checked it.
-		$store_hash = md5( $this->api_url );
-		if ( ! is_array( $edd_plugin_url_available ) || ! isset( $edd_plugin_url_available[ $store_hash ] ) ) {
-			$test_url_parts = wp_parse_url( $this->api_url );
-
-			$scheme = ! empty( $test_url_parts['scheme'] ) ? $test_url_parts['scheme'] : 'http';
-			$host   = ! empty( $test_url_parts['host'] ) ? $test_url_parts['host'] : '';
-			$port   = ! empty( $test_url_parts['port'] ) ? ':' . $test_url_parts['port'] : '';
-
-			if ( empty( $host ) ) {
-				$edd_plugin_url_available[ $store_hash ] = false;
-			} else {
-				$test_url                                = $scheme . '://' . $host . $port;
-				$response                                = wp_remote_get( $test_url, array(
-					'timeout'   => $this->health_check_timeout,
-					'sslverify' => true
-				) );
-				$edd_plugin_url_available[ $store_hash ] = is_wp_error( $response ) ? false : true;
-			}
-		}
-
-		if ( false === $edd_plugin_url_available[ $store_hash ] ) {
-			return;
-		}
-
 		$data = array_merge( $this->api_data, $_data );
 
 		if ( $data['slug'] != $this->slug ) {
 			return;
 		}
 
-		if ( $this->api_url == trailingslashit( home_url() ) ) {
+		if ( \Groundhogg\get_hostname( $this->api_url ) === \Groundhogg\get_hostname() ) {
 			return false; // Don't allow a plugin to ping itself
 		}
 
 		$api_params = array(
 			'edd_action' => 'get_version',
 			'license'    => ! empty( $data['license'] ) ? $data['license'] : '',
-			'item_name'  => isset( $data['item_name'] ) ? $data['item_name'] : false,
 			'item_id'    => isset( $data['item_id'] ) ? $data['item_id'] : false,
 			'version'    => isset( $data['version'] ) ? $data['version'] : false,
 			'slug'       => $data['slug'],
-			'author'     => $data['author'],
 			'url'        => home_url(),
 			'beta'       => ! empty( $data['beta'] ),
+//			'timestamp'  => time(), // cache busting maybe?
 		);
 
+		$url = add_query_arg( $api_params, $this->api_url );
+
 		$verify_ssl = $this->verify_ssl();
-		$request    = wp_remote_get( $this->api_url, array(
+		$request    = wp_remote_get( $url, array(
 			'timeout'   => 15,
 			'sslverify' => $verify_ssl,
-			'body'      => $api_params
 		) );
 
 		if ( ! is_wp_error( $request ) ) {
@@ -510,22 +481,22 @@ class GH_EDD_SL_Plugin_Updater {
 				'item_name'  => $data['item_name'] ?? false,
 				'item_id'    => $data['item_id'] ?? false,
 				'slug'       => $slug,
-				'author'     => $data['author'],
 				'url'        => home_url(),
-				'beta'       => ! empty( $data['beta'] )
+				'beta'       => ! empty( $data['beta'] ),
+				'timestamp'  => time(), // cache busting maybe?
 			);
 
+			$url = add_query_arg( $api_params, $this->api_url );
+
 			$verify_ssl = $this->verify_ssl();
-			$request    = wp_remote_get( $this->api_url, array(
+			$request    = wp_remote_get( $url, array(
 				'timeout'   => 15,
 				'sslverify' => $verify_ssl,
-				'body'      => $api_params
 			) );
 
 			if ( ! is_wp_error( $request ) ) {
 				$version_info = json_decode( wp_remote_retrieve_body( $request ) );
 			}
-
 
 			if ( ! empty( $version_info ) && isset( $version_info->sections ) ) {
 				$version_info->sections = maybe_unserialize( $version_info->sections );
@@ -581,7 +552,7 @@ class GH_EDD_SL_Plugin_Updater {
 		}
 
 		$data = array(
-			'timeout' => strtotime( '+3 hours', time() ),
+			'timeout' => strtotime( '+1 hour', time() ),
 			'value'   => wp_json_encode( $value )
 		);
 
