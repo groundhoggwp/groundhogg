@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.13
+Stable tag: 4.5.14
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,11 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.5.14 (2026-07-20) =
+* ADDED new Heading block in the email builder.
+* TWEAKED Removed www. from URLs to Groundhogg.io
+* FIXED UI bug in date search filters.
 
 = 4.5.13 (2026-07-10) =
 * TWEAKED Removed the sitewide review nag and replaced it with a dashboard-specific, less intrusive request.
