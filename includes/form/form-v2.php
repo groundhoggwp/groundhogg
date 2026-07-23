@@ -2188,6 +2188,19 @@ class Form_v2 extends Step {
 		return (bool) $this->get_meta( 'enable_ajax' );
 	}
 
+	public function get_after_submit() {
+
+		$after = $this->get_meta( 'after_submit' );
+
+		if ( ! $after ) {
+			$after = $this->get_meta( 'enable_ajax' ) === true ? 'success_message' : 'success_page';
+			$this->update_meta( 'after_submit', $after );
+			$this->delete_meta( 'enable_ajax' );
+		}
+
+		return $after;
+	}
+
 	/**
 	 * The page where contacts are sent after a successful submission
 	 *

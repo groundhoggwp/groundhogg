@@ -35,7 +35,9 @@
   const {
     Div,
     Button,
+    Textarea,
     ModalFrame,
+    Autocomplete,
     ItemPicker,
     Iframe,
     makeEl,
@@ -44,6 +46,8 @@
     Pg,
     Fragment,
     Input,
+    Select,
+    Label
   } = MakeEl
 
   const {
@@ -261,27 +265,11 @@
       //language=HTML
       return `
           <div class="edit-form"></div>
-          <div class="after-submit gh-panel ${ meta.enable_ajax ? 'ajax-enabled' : '' }">
+          <div class="after-submit gh-panel">
               <div class="gh-panel-header">
                   <h2>After submit...</h2>
               </div>
-              <div class="inside display-flex column gap-10">
-                  <div class="display-flex gap-10 align-center">
-                      <p>${ __('Stay on page after submitting?', 'groundhogg') }</p>
-                      ${ toggle({
-                          name    : 'enable_ajax',
-                          checked : Boolean(meta.enable_ajax),
-                          onLabel : _x('YES', 'toggle switch', 'groundhogg'),
-                          offLabel: _x('NO', 'toggle switch', 'groundhogg'),
-                      }) }
-                  </div>
-                  <div class="success-message">
-                      ${ stayOnPage }
-                  </div>
-                  <div class="success-redirect">
-                      ${ redirectToURL }
-                  </div>
-              </div>
+              <div class="inside"></div>
           </div>
           <div class="form-style gh-panel">
               <div class="gh-panel-header">
@@ -376,6 +364,82 @@
       })
 
       formBuilder.mount()
+
+      const AfterSubmit = () => Div({ className: 'inside', id: `after-submit-${ID}`}, morph => {
+
+        let {
+          after_submit = '',
+          success_message = '',
+          success_page = '',
+          enable_ajax = false,
+        } = Funnel.getActiveStep().meta
+
+        if ( ! after_submit ) {
+          after_submit = enable_ajax ? 'success_message' : 'success_page'
+        }
+
+        return Div({ className: 'display-flex column gap-10' }, [
+
+          Select({
+            name: 'after_submit',
+            options: {
+              success_message: __('Show a message', 'groundhogg'),
+              success_page: __('Redirect to a new page', 'groundhogg'),
+              reload_page: __('Reload the page', 'groundhogg'),
+            },
+            selected: after_submit,
+            onChange: e => {
+              updateStepMeta({
+                after_submit: e.target.value,
+              })
+
+              morph()
+            }
+          }),
+
+          after_submit === 'success_page' ? Autocomplete({
+            name: 'success_page',
+            value: success_page,
+            placeholder: __('Enter a page URL', 'groundhogg'),
+            className: 'full-width',
+            onInput: e => {
+              updateStepMeta({
+                success_page: e.target.value,
+              })
+            },
+            fetchResults: async search => {
+              let pages = await Groundhogg.api.ajax({
+                action             : 'wp-link-ajax',
+                _ajax_linking_nonce: groundhogg_nonces._ajax_linking_nonce,
+                term               : search,
+              })
+
+              return pages.map(({
+                title,
+                permalink,
+              }) => ( {
+                id  : permalink,
+                text: title,
+              } ))
+            },
+          }) : null,
+
+          after_submit === 'success_message' ? Textarea({
+            name: 'success_message',
+            value: success_message,
+            className: 'full-width',
+            placeholder: __('Enter a message', 'groundhogg'),
+            onChange: e => {
+              updateStepMeta({
+                success_message: e.target.value,
+              })
+            },
+          }) : null
+
+        ])
+      })
+
+      morphdom( document.querySelector( `${ parent } .after-submit .inside` ), AfterSubmit() )
 
     },
   }

@@ -104,15 +104,22 @@ class Forms_Api extends Base_Api {
 
 		after_form_submit_handler( $contact );
 
-		if ( $form->is_ajax_submit() ) {
-			return self::SUCCESS_RESPONSE( [
-				'message' => $form->get_success_message()
-			] );
+		switch ( $form->get_after_submit() ){
+			default:
+			case 'success_message':
+				return self::SUCCESS_RESPONSE( [
+					'message' => $form->get_success_message()
+				] );
+			case 'success_page':
+				return self::SUCCESS_RESPONSE( [
+					'url' => $form->get_success_url()
+				] );
+			case 'reload_page':
+				return self::SUCCESS_RESPONSE( [
+					'message' => __( 'Please wait a moment...', 'groundhogg' ),
+					'reload' => true
+				] );
 		}
-
-		return self::SUCCESS_RESPONSE( [
-			'url' => $form->get_success_url()
-		] );
 	}
 
 	/**
