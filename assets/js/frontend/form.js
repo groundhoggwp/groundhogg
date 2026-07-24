@@ -119,9 +119,17 @@
         }, 500)
       }
 
+      if (r.reload === true) {
+        window.location.reload()
+
+        let msg = document.createElement('div')
+        msg.innerHTML = r.message
+        msg.classList.add(...['gh-success'])
+        form.parentNode.appendChild(msg)
+      }
+
       if (r.message) {
         let msg = document.createElement('div')
-        //language=HTML
         msg.innerHTML = r.message
         msg.classList.add(...['gh-success'])
         form.parentNode.appendChild(msg)
