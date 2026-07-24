@@ -9858,3 +9858,85 @@ function list_broadcasts_archive( array $args ) {
         'total_pages' => $total_pages,
     ];
 }
+
+/**
+ * Get the current page context.
+ *
+ * @return array
+ */
+function get_page_context(): array {
+
+	$context = [
+		'type'      => 'unknown',
+		'id'        => 0,
+		'title'     => '',
+		'url'       => home_url(),
+		'post_type' => '',
+		'taxonomy'  => '',
+		'term_id'   => 0,
+		'term'      => '',
+		'author_id' => 0,
+		'search'    => '',
+		'paged'     => max( 1, get_query_var( 'paged' ) ),
+	];
+
+	if ( is_singular() ) {
+
+		$post = get_queried_object();
+
+		$context['type']      = 'singular';
+		$context['id']        = $post->ID;
+		$context['title']     = get_the_title( $post );
+		$context['url']       = get_permalink( $post );
+		$context['post_type'] = $post->post_type;
+
+	} elseif ( is_post_type_archive() ) {
+
+		$context['type']      = 'post_type_archive';
+		$context['post_type'] = get_query_var( 'post_type' );
+
+	} elseif ( is_tax() || is_category() || is_tag() ) {
+
+		$term = get_queried_object();
+
+		$context['type']     = 'taxonomy';
+		$context['taxonomy'] = $term->taxonomy;
+		$context['term_id']  = $term->term_id;
+		$context['term']     = $term->name;
+
+	} elseif ( is_author() ) {
+
+		$author = get_queried_object();
+
+		$context['type']      = 'author';
+		$context['author_id'] = $author->ID;
+		$context['title']     = $author->display_name;
+
+	} elseif ( is_search() ) {
+
+		$context['type']   = 'search';
+		$context['search'] = get_search_query();
+
+	} elseif ( is_home() ) {
+
+		$context['type'] = 'home';
+
+	} elseif ( is_front_page() ) {
+
+		$context['type'] = 'front_page';
+
+	} elseif ( is_date() ) {
+
+		$context['type'] = 'date';
+
+	} elseif ( is_404() ) {
+
+		$context['type'] = '404';
+
+	} elseif ( is_archive() ) {
+
+		$context['type'] = 'archive';
+	}
+
+	return $context;
+}

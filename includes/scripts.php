@@ -166,6 +166,7 @@ class Scripts {
 			'ajaxurl'                      => admin_url( 'admin-ajax.php' ),
 			'_wpnonce'                     => wp_create_nonce( 'wp_rest' ),
 			'_ghnonce'                     => wp_create_nonce( 'groundhogg_frontend' ),
+			'pageContext'                  => get_page_context()
 		) );
 
 		wp_enqueue_script( 'groundhogg-frontend' );

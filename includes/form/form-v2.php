@@ -1922,12 +1922,23 @@ class Form_v2 extends Step {
 	/**
 	 * Get a cleaned assoc array of the form config
 	 *
+	 * @param  string  $context either 'view' or 'submit'
+	 *
 	 * @return array
 	 */
-	private function get_cleaned_json_config() {
+	private function get_cleaned_json_config( $context = 'view' ) {
 		$config = $this->get_meta( 'form' );
 		// encode and decode to fix potential mutation errors when importing/exporting
-		return json_decode( wp_json_encode( $config ), true );
+		$config = json_decode( wp_json_encode( $config ), true );
+
+		/**
+		 * Allow modifying the form config
+		 *
+		 * @param $config array the form config
+		 * @param $form Form_v2 the form object
+		 * @param $context string either 'view' or 'submit'
+		 */
+		return apply_filters( 'groundhogg/form/config', $config, $this, $context );
 	}
 
 	/**
@@ -1936,7 +1947,7 @@ class Form_v2 extends Step {
 	 * @return string
 	 */
 	function get_field_html() {
-		$config = $this->get_cleaned_json_config();
+		$config = $this->get_cleaned_json_config( 'view' );
 		$fields = get_array_var( $config, 'fields', [] );
 
 		// Filter out hidden fields
@@ -2182,12 +2193,18 @@ class Form_v2 extends Step {
 	/**
 	 * Whether to submit this form via ajax
 	 *
+	 * @deprecated use Form_V2::get_after_submit() instead
 	 * @return bool
 	 */
 	public function is_ajax_submit() {
-		return (bool) $this->get_meta( 'enable_ajax' );
+		return $this->get_after_submit() === 'success_message';
 	}
 
+	/**
+	 * What happens after the form is submitted
+	 *
+	 * @return array|mixed|string
+	 */
 	public function get_after_submit() {
 
 		$after = $this->get_meta( 'after_submit' );
@@ -2236,10 +2253,12 @@ class Form_v2 extends Step {
 	/**
 	 * Return all fields
 	 *
+	 * @param  string  $context either 'view' or 'submit'
+	 *
 	 * @return mixed
 	 */
-	public function get_fields() {
-		$config = $this->get_cleaned_json_config();
+	public function get_fields( $context = 'view' ) {
+		$config = $this->get_cleaned_json_config( $context );
 
 		if ( ! is_array( $config ) || ! isset( $config['fields'] ) ) {
 			return [];
@@ -2265,7 +2284,7 @@ class Form_v2 extends Step {
 		$posted_data = new Posted_Data();
 
 		// Ensure array and not stdClass
-		$config    = $this->get_cleaned_json_config();
+		$config    = $this->get_cleaned_json_config( 'submit' );
 		$fields    = $config['fields'];
 
 		// add the recaptcha to fields array for validation
@@ -2477,7 +2496,7 @@ class Form_v2 extends Step {
 	 */
 	public function get_submission_answers( Submission $submission, bool $include_hidden = false ) {
 
-		$fields = $this->get_fields();
+		$fields = $this->get_fields( 'view' );
 
 		$answers = [];
 

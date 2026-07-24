@@ -78,6 +78,9 @@
 
     let uuid = form.dataset.id
 
+    Groundhogg.pageContext.location = window.location.href
+    fd.append( '__page_context', JSON.stringify( Groundhogg.pageContext ) )
+
     apiPostFormData(`${ routes.forms }/${ uuid }/`, fd).then(r => {
 
       stop()
