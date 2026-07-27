@@ -52,7 +52,6 @@ function sanitize_custom_field( $value, $field_id ) {
 		default:
 		case 'text':
 		case 'url':
-		case 'radio':
 		case 'tel':
 			return sanitize_text_field( $value );
 		case 'email':
@@ -82,14 +81,33 @@ function sanitize_custom_field( $value, $field_id ) {
 				return '';
 			}
 		case 'dropdown':
-			// Multiple options can be selected
-			if ( isset_not_empty( $field, 'multiple' ) ) {
-				return array_intersect( array_trim( maybe_explode( $value ) ), $field['options'] );
+
+			$options = $field['options'];
+
+			if ( ! is_array( $options ) ) {
+				return '';
 			}
 
-			array_unshift( $field['options'], '' );
+			// Multiple options can be selected
+			if ( isset_not_empty( $field, 'multiple' ) ) {
+				return array_intersect( array_trim( maybe_explode( $value ) ), $options );
+			}
 
-			return one_of( $value, $field['options'] );
+			// add empty string to options
+			array_unshift( $options, '' );
+
+			return one_of( $value, $options );
+		case 'radio':
+			$options = $field['options'];
+
+			if ( ! is_array( $options ) ) {
+				return '';
+			}
+
+			// add empty string to options
+			array_unshift( $options, '' );
+
+			return one_of( $value, $options );
 		case 'checkboxes':
 			return array_intersect( array_trim( maybe_explode( $value ) ), $field['options'] );
 		case 'html':
