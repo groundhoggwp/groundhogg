@@ -117,25 +117,25 @@
         setTimeout(() => {
           window.open(r.url, inIframe() ? '_parent' : '_self')
         }, 500)
+        return
+      }
+
+      const setMessage = content => {
+        let msg = document.createElement('div')
+        msg.innerHTML = content
+        msg.classList.add(...['gh-success'])
+        form.parentNode.appendChild(msg)
       }
 
       if (r.reload === true) {
+        setMessage(r.message)
         window.location.reload()
-
-        let msg = document.createElement('div')
-        msg.innerHTML = r.message
-        msg.classList.add(...['gh-success'])
-        form.parentNode.appendChild(msg)
+        return
       }
 
       if (r.message) {
-        let msg = document.createElement('div')
-        msg.innerHTML = r.message
-        msg.classList.add(...['gh-success'])
-        form.parentNode.appendChild(msg)
-
+        setMessage(r.message)
         form.reset()
-
       }
 
     }).then(() => {
