@@ -7897,7 +7897,9 @@
         textAlign     : alignment,
       },
     }, content ),
-    plainText: ({ content, tag }) => extractPlainText( makeEl( tag, {}, content )),
+    plainText: ({ content, tag }) => {
+      return extractPlainText(makeEl( tag, {}, content ).outerHTML)
+    },
     gutenberg: ({ content, tag }) => {
       content = convertToGutenbergBlocks(makeEl( tag, {}, content ))
 

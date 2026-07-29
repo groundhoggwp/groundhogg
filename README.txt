@@ -378,6 +378,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.5.15 (2026-07-27) =
+* ADDED "Reload page" after form submit setting.
+* FIXED Email editor crashes after dragging a block from a global block namespace to the main namespace.
+
 = 4.5.14 (2026-07-20) =
 * ADDED new Heading block in the email builder.
 * TWEAKED Removed www. from URLs to Groundhogg.io
