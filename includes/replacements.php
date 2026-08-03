@@ -1260,7 +1260,7 @@ class Replacements implements \JsonSerializable {
 
 		while ( ! empty( $nested_keys ) && is_iterable( $value ) ) {
 			$key   = array_shift( $nested_keys );
-			$value = $value[ $key ];
+			$value = $value[ $key ] ?? '';
 		}
 
 		switch ( $format ) {
