@@ -948,7 +948,7 @@
               TaskCTA(task, {
                 onComplete: morph,
               }),
-              task.is_complete ? null : Button({
+              task.is_complete || ! belongsToMe() ? null : Button({
                 id       : `task-mark-complete-${ task.ID }`,
                 className: 'gh-button text icon primary mark-complete',
                 onClick  : e => {
