@@ -109,8 +109,8 @@
     search: (plural, columns = []) => ( {
       param: 'search',
       description: () => Pg({},
-        /* translators: %s: plural of an asset-type like "contacts" */
-        sprintf(__('Search for %s using a search phrase. Will match %s.', 'groundhogg'), plural,
+        /* translators: 1: plural of an asset-type like "contacts", 2: list of searchable fields */
+        sprintf(__('Search for %1$s using a search phrase. Will match %2$s.', 'groundhogg'), plural,
           andList(columns.map(col => el('code', {}, col))))),
       type: 'string',
     } ),
@@ -842,38 +842,60 @@
       }
     }
 
+    let _strings = {
+
+      // translators: %s: singular of an asset-type like "contact"
+      _createSingleA: sprintf( __('Create a %s', 'groundhogg'), singular ),
+      // translators: %s: singular of an asset-type like "contact"
+      _createSingleAn: sprintf( __('Create an %s', 'groundhogg'), singular ),
+
+      // translators: %s: singular of an asset-type like "contact"
+      _readSingleA: sprintf( __('Retrieve a %s', 'groundhogg'), singular ),
+      // translators: %s: singular of an asset-type like "contact"
+      _readSingleAn: sprintf( __('Retrieve an %s', 'groundhogg'), singular ),
+
+      // translators: %s: singular of an asset-type like "contact"
+      _updateSingleA: sprintf( __('Update a %s', 'groundhogg'), singular ),
+      // translators: %s: singular of an asset-type like "contact"
+      _updateSingleAn: sprintf( __('Update an %s', 'groundhogg'), singular ),
+
+      // translators: %s: singular of an asset-type like "contact"
+      _deleteSingleA: sprintf( __('Delete a %s', 'groundhogg'), singular ),
+      // translators: %s: singular of an asset-type like "contact"
+      _deleteSingleAn: sprintf( __('Delete an %s', 'groundhogg'), singular ),
+    }
+
     strings = {
-      /* translators: %s: plural of an asset-type like "contacts" */
+      // translators: %s: plural of an asset-type like "contacts"
       read: sprintf(__('List %s', 'groundhogg'), plural),
-      /* translators: %s: plural of an asset-type like "contacts" */
+      // translators: %s: plural of an asset-type like "contacts"
       readDesc: sprintf(__('Retrieve multiple %s using a query.', 'groundhogg'), plural),
-      /* translators: %s: plural of an asset-type like "contacts" */
+      // translators: %s: plural of an asset-type like "contacts"
       create: sprintf(__('Create %s', 'groundhogg'), plural),
-      /* translators: %s: plural of an asset-type like "contacts" */
+      // translators: %s: plural of an asset-type like "contacts"
       createDesc: sprintf(__('Create multiple %s at once.', 'groundhogg'), plural),
-      /* translators: %s: plural of an asset-type like "contacts" */
+      // translators: %s: plural of an asset-type like "contacts"
       update: sprintf(__('Update %s', 'groundhogg'), plural),
-      /* translators: %s: plural of an asset-type like "contacts" */
+      // translators: %s: plural of an asset-type like "contacts"
       updateDesc: sprintf(__('Update multiple %s at once.', 'groundhogg'), plural),
-      /* translators: %s: plural of an asset-type like "contacts" */
-      delete: sprintf(__('Delete %s', 'groundhogg'), plural),
-      /* translators: %s: plural of an asset-type like "contacts" */
-      deleteDesc: sprintf(__('Delete multiple %s at once.', 'groundhogg'), plural),
-      /* translators: %s: singular of an asset-type like "contact" */
-      readSingle: sprintf(swv(singular) ? __('Retrieve an %s', 'groundhogg') : __('Retrieve a %s', 'groundhogg'), singular),
+      // translators: %s: plural of an asset-type like "contacts"
+      delete: sprintf(_x('Delete %s', 'pluralized, deleting multiple items', 'groundhogg'), plural),
+      // translators: %s: plural of an asset-type like "contacts"
+      deleteDesc  : sprintf(__('Delete multiple %s at once.', 'groundhogg'), plural),
+      // translators: %s: singular of an asset-type like "contact"
       readSingleDesc: sprintf(__('Retrieves a single %s.', 'groundhogg'), singular),
-      /* translators: %s: singular of an asset-type like "contact" */
-      createSingle: sprintf(swv(singular) ? __('Create an %s', 'groundhogg') : __('Create a %s', 'groundhogg'), singular),
-      /* translators: %s: singular of an asset-type like "contact" */
+      // translators: %s: singular of an asset-type like "contact"
       createSingleDesc: sprintf(__('Create a single %s.', 'groundhogg'), singular),
-      /* translators: %s: singular of an asset-type like "contact" */
-      updateSingle: sprintf(swv(singular) ? __('Update an %s', 'groundhogg') : __('Update a %s', 'groundhogg'), singular),
-      /* translators: %s: singular of an asset-type like "contact" */
+      // translators: %s: singular of an asset-type like "contact"
       updateSingleDesc: sprintf(__('Update a single %s.', 'groundhogg'), singular),
-      /* translators: %s: singular of an asset-type like "contact" */
-      deleteSingle: sprintf(swv(singular) ? __('Delete an %s', 'groundhogg') : __('Delete a %s', 'groundhogg'), singular),
-      /* translators: %s: singular of an asset-type like "contact" */
+      // translators: %s: singular of an asset-type like "contact"
       deleteSingleDesc: sprintf(__('Delete a single %s.', 'groundhogg'), singular),
+
+      deleteSingle: swv(singular) ? _strings._deleteSingleAn : _strings._deleteSingleA,
+      updateSingle: swv(singular) ? _strings._updateSingleAn : _strings._updateSingleA,
+      readSingle  : swv(singular) ? _strings._readSingleAn : _strings._readSingleA,
+      createSingle: swv(singular) ? _strings._createSingleAn : _strings._createSingleA,
+
       ...strings,
     }
 

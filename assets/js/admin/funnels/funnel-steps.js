@@ -78,44 +78,44 @@
 
   const delay_timer_i18n = {
     delay_duration_types   : {
-      minutes: __('Minutes'),
-      hours  : __('Hours'),
-      days   : __('Days'),
-      weeks  : __('Weeks'),
-      months : __('Months'),
-      years  : __('Years'),
-      none   : __('No delay', 'groundhogg'),
+      minutes: __('Minutes', 'groundhogg'),
+      hours  : __('Hours', 'groundhogg'),
+      days   : __('Days', 'groundhogg'),
+      weeks  : __('Weeks', 'groundhogg'),
+      months : __('Months', 'groundhogg'),
+      years  : __('Years', 'groundhogg'),
+      none   : __('No delay', 'groundhogg', 'groundhogg'),
     },
     day_of_week_determiners: {
-      any   : __('Any'),
-      first : __('First'),
-      second: __('Second'),
-      third : __('Third'),
-      fourth: __('Fourth'),
-      last  : __('Last'),
+      any   : __('Any', 'groundhogg'),
+      first : __('First', 'groundhogg'),
+      second: __('Second', 'groundhogg'),
+      third : __('Third', 'groundhogg'),
+      fourth: __('Fourth', 'groundhogg'),
+      last  : __('Last', 'groundhogg'),
     },
     days_of_week           : {
-      monday   : __('Monday'),
-      tuesday  : __('Tuesday'),
-      wednesday: __('Wednesday'),
-      thursday : __('Thursday'),
-      friday   : __('Friday'),
-      saturday : __('Saturday'),
-      sunday   : __('Sunday'),
+      monday   : __('Monday', 'groundhogg'),
+      tuesday  : __('Tuesday', 'groundhogg'),
+      wednesday: __('Wednesday', 'groundhogg'),
+      thursday : __('Thursday', 'groundhogg'),
+      friday   : __('Friday', 'groundhogg'),
+      saturday : __('Saturday', 'groundhogg'),
+      sunday   : __('Sunday', 'groundhogg'),
     },
     months                 : {
-      january  : __('January'),
-      february : __('February'),
-      march    : __('March'),
-      april    : __('April'),
-      may      : __('May'),
-      june     : __('June'),
-      july     : __('July'),
-      august   : __('August'),
-      september: __('September'),
-      october  : __('October'),
-      november : __('November'),
-      december : __('December'),
+      january  : __('January', 'groundhogg'),
+      february : __('February', 'groundhogg'),
+      march    : __('March', 'groundhogg'),
+      april    : __('April', 'groundhogg'),
+      may      : __('May', 'groundhogg'),
+      june     : __('June', 'groundhogg'),
+      july     : __('July', 'groundhogg'),
+      august   : __('August', 'groundhogg'),
+      september: __('September', 'groundhogg'),
+      october  : __('October', 'groundhogg'),
+      november : __('November', 'groundhogg'),
+      december : __('December', 'groundhogg'),
     },
   }
 
@@ -124,11 +124,11 @@
   }
 
   const runOnTypes = {
-    any         : 'Any day',
-    weekday     : 'Weekday',
-    weekend     : 'Weekend',
-    day_of_week : 'Day of week',
-    day_of_month: 'Day of month',
+    any         : __( 'Any day', 'groundhogg' ),
+    weekday     : __( 'Weekday', 'groundhogg' ),
+    weekend     : __( 'Weekend', 'groundhogg' ),
+    day_of_week : __( 'Day of week', 'groundhogg' ),
+    day_of_month: __( 'Day of month', 'groundhogg' ),
   }
 
   const runOnDaysOfMonth = {}
@@ -140,8 +140,8 @@
   runOnDaysOfMonth.last = 'last'
 
   const runOnMonthTypes = {
-    any     : 'Of any month',
-    specific: 'Of specific month(s)',
+    any     : __( 'Of any month', 'groundhogg' ),
+    specific: __( 'Of specific month(s)', 'groundhogg' ),
   }
 
   const delayTimerName = ({
@@ -159,6 +159,16 @@
     run_on_dom = [], // Run on days of month
   }) => {
     const preview = []
+
+    const strings = {
+      /* translators: %s: a day of the week */
+      any_dow: _x('any %s', 'any - day of the week', 'groundhogg'),
+      /* translators: 1: the occurrence within the month, like "first", 2: a day of the week */
+      the_det_dow: _x('the %1$s %2$s', 'the - determiner - day of week', 'groundhogg'),
+      // translators: %s: and ordinal day of the month (1st, 2nd, 3rd, etc...)
+      the_dom: _x('the %s', 'the - ordinal day of month', 'groundhogg')
+
+    }
 
     const formatTime = (time) => {
       return Intl.DateTimeFormat(Groundhogg.locale, {
@@ -198,11 +208,8 @@
       case 'day_of_week':
         let dowList = orList(run_on_dow.map((i) => `<b>${ delay_timer_i18n.days_of_week[i] }</b>`))
         days = run_on_dow_type === 'any'
-          /* translators: %s: a day of the week */
-               ? sprintf(_x('any %s', 'any - day of the week', 'groundhogg'), dowList)
-          /* translators: 1: the occurrence within the month, like "first", 2: a day of the week */
-               : sprintf(_x('the %1$s %2$s', 'the - determiner - day of week', 'groundhogg'),
-            delay_timer_i18n.day_of_week_determiners[run_on_dow_type].toLowerCase(), dowList)
+               ? sprintf( strings.any_dow, dowList)
+               : sprintf(strings.the_det_dow, delay_timer_i18n.day_of_week_determiners[run_on_dow_type].toLowerCase(), dowList)
         months = run_on_month_type === 'specific' ? orList(
           run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month', 'groundhogg') }</b>`
         preview.unshift(sprintf(
@@ -211,8 +218,7 @@
         break
       case 'day_of_month':
         days = run_on_dom.length > 0
-               // translators: %s: and ordinal day of the month (1st, 2nd, 3rd, etc...)
-               ? sprintf(_x('the %s', 'the - ordinal day of month', 'groundhogg'), orList(
+               ? sprintf( strings.the_dom, orList(
             run_on_dom.map((i) => `<b>${ i === 'last' ? __('last day', 'groundhogg') : ordinal_suffix_of(i) }</b>`)))
                : `<b>${ __('any day', 'groundhogg') }</b>`
         months = run_on_month_type === 'specific' ? orList(
@@ -272,7 +278,7 @@
           <div class="edit-form"></div>
           <div class="after-submit gh-panel">
               <div class="gh-panel-header">
-                  <h2>After submit...</h2>
+                  <h2>${__('After submit...','groundhogg')}</h2>
               </div>
               <div class="inside"></div>
           </div>
@@ -282,21 +288,21 @@
               </div>
               <div class="inside display-flex gap-10">
                   <div class="display-flex column gap-10">
-                      <label for="form-theme">${ __('Theme') }</label>
+                      <label for="form-theme">${ _x('Theme', 'as in form theme', 'groundhogg') }</label>
                       ${ select({
                           id      : 'form-theme',
                           name    : 'form_theme',
                           options : {
-                              default: _x('Theme Default', 'form theme', 'groundhogg'),
-                              simple : _x('Simple', 'form theme', 'groundhogg'),
-                              modern : _x('Modern', 'form theme', 'groundhogg'),
-                              classic: _x('Classic', 'form theme', 'groundhogg'),
+                              default: _x('Theme Default', 'as in form theme', 'groundhogg'),
+                              simple : _x('Simple', 'as in form theme', 'groundhogg'),
+                              modern : _x('Modern', 'as in form theme', 'groundhogg'),
+                              classic: _x('Classic', 'as in form theme', 'groundhogg'),
                           },
                           selected: theme ?? 'default',
                       }) }
                   </div>
                   <div class="form-theme-wrap display-flex column gap-10 ${ theme === 'default' ? 'hidden' : '' }">
-                      <label for="form-accent-color">${ __('Accent Color') }</label>
+                      <label for="form-accent-color">${ __('Accent Color', 'groundhogg') }</label>
                       ${ input({
                           id       : 'form-accent',
                           name     : 'form_accent_color',
@@ -494,8 +500,7 @@
       $btn.on('click', e => {
 
         confirmationModal({
-          alert      : `<p>${ __('Once you upgrade to this form to the new form builder there is no going back.',
-            'groundhogg') }</p>`,
+          alert      : `<p>${ __('Once you upgrade to this form to the new form builder there is no going back.', 'groundhogg') }</p>`,
           confirmText: __('Upgrade Form', 'groundhogg'),
           onConfirm  : () => {
 
@@ -1008,7 +1013,7 @@
 
       const EmailPicker = () => ItemPicker({
         id          : `step-${ ID }-email-picker`,
-        noneSelected: 'Search for an email...',
+        noneSelected: __( 'Search for an email...', 'groundhogg' ),
         selected    : email_id ? {
           id  : email_id,
           text: getEmail().data.title,
@@ -1082,7 +1087,7 @@
                   },
                 }, [
                   Dashicon('plus-alt2'),
-                  __('Create new email'),
+                  __('Create new email', 'groundhogg'),
                 ]),
                 !hasEmail() ? null : Button({
                   id       : `step_${ ID }_email_more`,
@@ -1091,12 +1096,12 @@
                     moreMenu(`#step_${ ID }_email_more`, [
                       {
                         key     : 'edit',
-                        text    : __('Edit'),
+                        text    : __('Edit', 'groundhogg'),
                         onSelect: () => openEmailEditor(getEmail()),
                       },
                       {
                         key     : 'add',
-                        text    : __('Create New Email'),
+                        text    : __('Create new email', 'groundhogg'),
                         onSelect: () => {
                           openEmailEditor({})
                         },

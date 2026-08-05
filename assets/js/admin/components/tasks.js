@@ -55,7 +55,7 @@
     }
 
     if (isComplete(task)) {
-      /* translators: %s: amount of time like "3 days" */
+      /* translators: %s: amount of time, like "10 days" */
       return `<span class="pill green" title="${ task.i18n.completed_date }">${ sprintf(__('%s ago', 'groundhogg'),
         task.i18n.completed) }</span>`
     }

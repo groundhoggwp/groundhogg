@@ -1222,8 +1222,8 @@
                 <h1>${ __('Next Steps...', 'groundhogg') }</h1>
                 <p>
                     ${ sprintf(
-                            __('Congrats %s, you\'re all set to use Groundhogg. Here are some next steps for you so you can start leveraging Groundhogg.',
-                                    'groundhogg'),
+                      // translators: %s: the current user's display name
+                            __('Congrats %s, you\'re all set to use Groundhogg. Here are some next steps for you so you can start leveraging Groundhogg.', 'groundhogg'),
                             currentUser.data.display_name) }</p>
                 ${ installedMailhawk ? `<div class="display-flex gap-20 space-between align-center">
 					<div>

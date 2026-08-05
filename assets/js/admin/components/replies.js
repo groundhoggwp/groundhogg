@@ -39,6 +39,26 @@
     note_type = 'saved_reply', // saved replies are stored in the notes table
   } = {}) => {
 
+    let strings = {
+      /* translators: %s: the plural label of saved replies, like "Saved Replies" */
+      manage: sprintf(__('Manage %s', 'groundhogg'), plural),
+      /* translators: singular label of saved reply, such as "Reply" */
+      name: sprintf( __('%s Name', 'groundhogg'), single),
+      /* translators: singular label of saved reply, such as "Reply" */
+      create: sprintf(_x( 'Create %s', 'as in create a saved reply', 'groundhogg' ), single ),
+      /* translators: %s: the singular label of a saved reply, like "Reply" */
+      new: sprintf(__('New %s', 'groundhogg'), single),
+      /* translators: singular label of saved reply, such as "Reply" */
+      update: sprintf( _x( 'Update %s', 'as in update a saved reply', 'groundhogg' ), single),
+      /* translators: singular label of an asset type */
+      delete: sprintf( _x('Delete %s', 'deleting a single item', 'groundhogg'), single),
+      /* translators: %s: the singular label of a saved reply, like "Reply" */
+      deleteConfirmation: sprintf(__('Are you sure you want to delete this %s?', 'groundhogg'), single),
+      /* translators: %s: the plural label of saved replies, like "Saved Replies" */
+      noReplies: sprintf(__('No %s yet.', 'groundhogg'), plural)
+
+    }
+
     const State = Groundhogg.createState({
       adding      : false,
       editing     : false,
@@ -147,8 +167,7 @@
             }, [
               Label({
                 for: 'reply-summary',
-                /* translators: singular label of saved reply, such as "Reply" */
-              }, sprintf( __('%s Name', 'groundhogg'), single)),
+              }, strings.name ),
               Input({
                 className: 'full-width',
                 id       : 'reply-summary',
@@ -214,8 +233,7 @@
               className: 'gh-button primary',
               id       : 'update-reply',
               type     : 'submit',
-              /* translators: singular label of saved reply, such as "Reply" */
-            }, sprintf(State.adding ? _x( 'Create %s', 'as in create a saved reply', 'groundhogg' ) : _x( 'Update %s', 'as in update a saved reply', 'groundhogg' ), single)),
+            }, State.adding ? strings.create : strings.update ),
           ]),
         ])
       }
@@ -269,8 +287,7 @@
               className: 'gh-button danger icon text',
               onClick: e => {
                 dangerConfirmationModal({
-                  /* translators: %s: the singular label of a saved reply, like "Reply" */
-                  alert: `<p>${sprintf(__('Are you sure you want to delete this %s?', 'groundhogg'), single)}</p>`,
+                  alert: `<p>${strings.deleteConfirmation}</p>`,
                   confirmText: __( 'Delete', 'groundhogg' ),
                   onConfirm: () => {
                     RepliesStore.delete(note.ID).then(() => {
@@ -297,8 +314,7 @@
         Div({
           className: 'space-between',
         }, [
-          /* translators: %s: the plural label of saved replies, like "Saved Replies" */
-          H2({}, sprintf(__('Manage %s', 'groundhogg'), plural)),
+          H2({}, strings.manage ),
           Button({
             className: 'gh-button primary',
             onClick  : e => {
@@ -308,7 +324,7 @@
               morph()
             },
             /* translators: %s: the singular label of a saved reply, like "Reply" */
-          }, sprintf(__('New %s', 'groundhogg'), single)),
+          }, strings.new ),
         ]),
 
         // Add Note Form
@@ -319,7 +335,7 @@
             textAlign: 'center',
           },
           /* translators: %s: the plural label of saved replies, like "Saved Replies" */
-        }, sprintf(__('No %s yet.', 'groundhogg'), plural)),
+        }, strings.noReplies ),
       ])
     })
 

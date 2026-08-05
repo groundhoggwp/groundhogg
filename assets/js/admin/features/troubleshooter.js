@@ -215,9 +215,10 @@
                 ${ faq({
                     show: !GroundhoggTroubleshooter.php.is_recommended,
                     title: `⚠️ ${ __('Recommended PHP Version', 'groundhogg') }`, content: `<p>
-                            ${ sprintf(__(
-                            'The minimum recommended PHP version for Groundhogg is %1$s. Update your PHP to %1$s for the best results.',
-                            'groundhogg'), GroundhoggTroubleshooter.php.recommended) }</p>`,
+                            ${ sprintf(
+                              // translators: 1: the recommended PHP version, 
+                              __('The minimum recommended PHP version for Groundhogg is %1$s. Update your PHP to %1$s for the best results.', 'groundhogg'), 
+                            GroundhoggTroubleshooter.php.recommended) }</p>`,
                 }) }
                 <div class="space-between align-center"
                      style="margin-top: 40px">

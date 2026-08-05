@@ -126,6 +126,23 @@
     Groundhogg.components.emailModal(email)
   }
 
+  const strings = {
+
+    /* translators: %s: a step name */
+    pending: __( 'Pending %s', 'groundhogg'),
+    /* translators: %s: a step name */
+    completed: __( 'Completed %s', 'groundhogg'),
+    /* translators: %s: the broadcast title */
+    will_receive_broadcast: __( 'Will receive broadcast: %s', 'groundhogg'),
+    /* translators: %s: the broadcast title */
+    received_broadcast: __( 'Received broadcast: %s', 'groundhogg'),
+    /* translators: %s: the email title */
+    will_receive_email: __( 'Will receive email: %s', 'groundhogg'),
+    /* translators: %s: the email title */
+    received_email: __( 'Received email: %s', 'groundhogg')
+
+  }
+
   const ContactActions = [
     {
       id     : 'send-email',
@@ -273,8 +290,9 @@
               }).then(() => {
 
                 dialog({
-                  /* translators: %s: the name of a contact */
-                  message: sprintf(__('%s added to flow!', 'groundhogg'),
+                  message: sprintf(
+                    /* translators: %s: the name of a contact */
+                    __('%s added to flow!', 'groundhogg'),
                     getContact().data.full_name),
                 })
 
@@ -291,8 +309,10 @@
               })
 
             },
+          }, sprintf(
             /* translators: %s: the name of a flow */
-          }, sprintf(__('Add to %s now!', 'groundhogg'), bold(FunnelsStore.get(State.funnel_id).data.title))) : null,
+            __('Add to %s now!', 'groundhogg'),
+            bold(FunnelsStore.get(State.funnel_id).data.title))) : null,
         ]))
       },
     },
@@ -869,12 +889,7 @@
                     <div class="activity-rendered gh-panel space-between">
                         <div>
                             <div class="activity-info">
-                                <span>${ sprintf(pending
-                                                 /* translators: %s: a step name */
-                                                 ? __( 'Pending %s', 'groundhogg')
-                                                 /* translators: %s: a step name */
-                                                 : __( 'Completed %s', 'groundhogg'),
-                                        stepTitleDisplay) }</span>
+                                <span>${ sprintf(pending ? strings.pending : strings.completed, stepTitleDisplay) }</span>
                             </div>
                             <div class="event-extra">
                                 ${ sprintf(
@@ -915,6 +930,10 @@
               }, objectTitleDisplay)
             }
 
+            let strings = {
+
+            }
+
             // language=HTML
             return `
                 <li class="activity-item">
@@ -923,21 +942,14 @@
                     <div class="activity-rendered gh-panel space-between">
                         <div>
                             <div class="activity-info">
-                                <span>${ sprintf(pending
-                                           /* translators: %s: the broadcast title */
-                                           ? __( 'Will receive broadcast: %s', 'groundhogg')
-                                           /* translators: %s: the broadcast title */ 
-                                           : __( 'Received broadcast: %s', 'groundhogg'),
-                                        objectTitleDisplay) }</span>
+                                <span>${ sprintf(pending ? strings.will_receive_broadcast : strings.received_broadcast, objectTitleDisplay) }</span>
                             </div>
                             <div class="diff-time">
                                 ${ activity.i18n.diff_time }
                             </div>
                         </div>
                         <button
-                                class="gh-button secondary icon text event-${ pending
-                                                                              ? 'queue-'
-                                                                              : '' }more"
+                                class="gh-button secondary icon text event-${ pending ? 'queue-' : '' }more"
                                 data-event="${ activity.ID }">
                             ${ icons.verticalDots }
                         </button>
@@ -963,12 +975,7 @@
                     <div class="activity-rendered gh-panel space-between">
                         <div>
                             <div class="activity-info">
-                                <span>${ sprintf(pending
-                                                 /* translators: %s: the email title */                 
-                                                 ? __( 'Will receive email: %s', 'groundhogg')
-                                                 /* translators: %s: the email title */
-                                                 : __('Received email: %s', 'groundhogg'),
-                                        emailTitleDisplay) }</span>
+                                <span>${ sprintf(pending ? strings.will_receive_email : strings.received_email, emailTitleDisplay) }</span>
                             </div>
                             <div class="diff-time">
                                 ${ activity.i18n.diff_time }

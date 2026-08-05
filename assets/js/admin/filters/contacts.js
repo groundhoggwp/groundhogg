@@ -1132,6 +1132,14 @@
         ...rest
       }) {
 
+
+        const strings = {
+          /* translators: 1: the link clicked, 2: the title of an email */
+          clicked_link: __('Clicked %1$s in %2$s', 'groundhogg'),
+          /* translators: 2: the title of an email */
+          clicked_any_link: __('Clicked any link in %2$s', 'groundhogg'),
+        }
+
         const emailName = email_id
                           ? EmailsStore.get(email_id).data.title
                           : 'any email'
@@ -1141,8 +1149,7 @@
         }
 
         let prepend = sprintf(
-          /* translators: 1: the link clicked, 2: the title of an email */
-          link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'),
+          link ? strings.clicked_link : strings.clicked_any_link,
           `<b class="link" title="${ link }">${ maybeTruncateLink(link) }</b>`,
           `<b>${ emailName }</b>`)
 
@@ -1475,18 +1482,27 @@
 
       let text = __('Completed any step in any flow', 'groundhogg')
 
+      const strings = {
+        /* translators: 1: the flow name, 2: the step name */
+        completed_step: __('Completed %2$s in %1$s', 'groundhogg'),
+        /* translators: 1: the flow name */
+        completed_any_step: __('Completed any step in %1$s', 'groundhogg'),
+
+        /* translators: 1: the flow name, 2: the step name */
+        will_complete_step: __('Will complete %2$s in %1$s', 'groundhogg'),
+        /* translators: 1: the flow name */
+        will_complete_any_step: __('Will complete any step in %1$s', 'groundhogg'),
+      }
+
       if (funnel_id) {
 
         const funnel = FunnelsStore.get(funnel_id)
         const step = funnel.steps.find(s => s.ID === step_id)
 
-        text = status === 'complete' ? sprintf(
-          step ? __('Completed %2$s in %1$s', 'groundhogg') : __(
-            'Completed any step in %1$s', 'groundhogg'),
+        text = status === 'complete' ? sprintf( step ? strings.completed_step : strings.completed_any_step,
           `<b>${ funnel.data.title }</b>`,
           step ? `<b>${ step.data.step_title }</b>` : '') : sprintf(
-          step ? __('Will complete %2$s in %1$s', 'groundhogg') : __(
-            'Will complete any step in %1$s', 'groundhogg'),
+          step ? strings.will_complete_step : strings.will_complete_any_step,
           `<b>${ funnel.data.title }</b>`,
           step ? `<b>${ step.data.step_title }</b>` : '')
 
@@ -1710,22 +1726,20 @@
         status = 'complete',
       }) {
 
-        if (!broadcast_id) {
-          return __('Received any broadcast', 'groundhogg')
+        const strings = {
+          // translators: 1: broadcast title, 2: date and time
+          received: __('Received %1$s on %2$s', 'groundhogg'),
+          // translators: 1: broadcast title, 2: date and time
+          will_receive: __('Will receive %1$s on %2$s', 'groundhogg'),
         }
 
         const broadcast = BroadcastsStore.get(broadcast_id)
 
-        return status === 'complete'
-               ? sprintf(broadcast ? __('Received %1$s on %2$s', 'groundhogg') : __(
-              'Will receive a broadcast', 'groundhogg'),
-            `<b>${ broadcast.object.data.title }</b>`,
-            `<b>${ formatDateTime(broadcast.data.send_time * 1000) }</b>`)
-               : sprintf(
-            broadcast ? __('Will receive %1$s on %2$s', 'groundhogg') : __(
-              'Received a broadcast', 'groundhogg'),
-            `<b>${ broadcast.object.data.title }</b>`,
-            `<b>${ formatDateTime(broadcast.data.send_time * 1000) }</b>`)
+        if ( ! broadcast ) {
+          return status === 'complete' ? __('Received any broadcast', 'groundhogg') : __('Will receive any broadcast', 'groundhogg')
+        }
+
+        return sprintf( status === 'complete' ? strings.received: strings.will_receive, `<b>${ broadcast.data.title }</b>`, `<b>${ formatDateTime(broadcast.data.send_time * 1000) }</b>` )
       },
       edit ({ broadcast_id }) {
 
@@ -1770,9 +1784,13 @@
 
         const broadcast = BroadcastsStore.get(broadcast_id)
 
+        if ( ! broadcast ){
+          throw new Error('Selected broadcast not found')
+        }
+
         return sprintf(
-          broadcast ? __('Opened %1$s after %2$s', 'groundhogg') : __(
-            'Will receive a broadcast', 'groundhogg'),
+          // translators: 1: broadcast title, 2: date and time
+           __('Opened %1$s after %2$s', 'groundhogg'),
           `<b>${ broadcast.object.data.title }</b>`,
           `<b>${ formatDateTime(broadcast.data.send_time * 1000) }</b>`)
 

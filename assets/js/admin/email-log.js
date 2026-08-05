@@ -27,6 +27,13 @@
 
   var $doc = $(document);
 
+  const strings = {
+    /* translators: 1: message type, 2: email service, 3: recipients, 4: date */
+    failed: __('%1$s email via %2$s failed to send to %3$s on %4$s', 'groundhogg' ),
+    /* translators: 1: message type, 2: email service, 3: recipients, 4: date */
+    sent: __( '%1$s email sent via %2$s to %3$s on %4$s', 'groundhogg' ),
+  }
+
   const EmailLogModal = ( logItem ) => {
 
     const {
@@ -53,11 +60,7 @@
 
       makeEl( 'p', {
         className: status === 'failed' ? 'gh-text danger' : ''
-      }, sprintf( status === 'failed'
-                  /* translators: 1: message type, 2: email service, 3: recipients, 4: date */
-                  ? __('%1$s email via %2$s failed to send to %3$s on %4$s', 'groundhogg' )
-                  /* translators: 1: message type, 2: email service, 3: recipients, 4: date */
-                  : __( '%1$s email sent via %2$s to %3$s on %4$s', 'groundhogg' ),
+      }, sprintf( status === 'failed' ? strings.failed : strings.sent,
         bold(i18n.type),
         bold(i18n.service),
         andList( recipients.map( bold ) ),

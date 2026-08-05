@@ -190,6 +190,13 @@
     }
   }), 15 * 1000)
 
+  const strings = {
+    /* translators: %1$s: plugin or brand name. %2$s: human-readable time since the cron last ran. */
+    cron_not_running: __('⚠️ The %1$s cron is not running on time and was last run %2$s', 'groundhogg'),
+    /* translators: %1$s: plugin or brand name. %2$s: human-readable time since the cron last ran. */
+    cron_running: __('The %1$s cron is running on time and was last run %2$s.', 'groundhogg'),
+  }
+
   const CronJobSetup = () => {
     return Div({
       id   : 'cron-setup',
@@ -339,10 +346,14 @@
               'groundhogg'),
             Groundhogg.whiteLabelName)),
           !wpCronOnTime()
+          ? Div({ className: 'pill attention loading-dots'}, sprintf(
             /* translators: %s: human-readable time since the cron last ran. */
-          ? Div({ className: 'pill attention loading-dots'}, sprintf(__('⚠️ The core WordPress cron is not running on time and was last run %s', 'groundhogg'), State.wp_last_ping_i18n ))
+            __('⚠️ The core WordPress cron is not running on time and was last run %s', 'groundhogg'),
+              State.wp_last_ping_i18n ))
+          : Div({ className: 'pill success'}, sprintf(
             /* translators: %s: human-readable time since the cron last ran. */
-          : Div({ className: 'pill success'}, sprintf(__('The core WordPress cron is running on time and was last run %s.', 'groundhogg'), State.wp_last_ping_i18n )),
+            __('The core WordPress cron is running on time and was last run %s.', 'groundhogg'),
+              State.wp_last_ping_i18n )),
           Pg({}, __(
             'We recommend that the core WordPress cron be run <b>once every minute</b> for the best performance. The <i>minimum</i> recommendation is every 15 minutes.',
             'groundhogg')),
@@ -357,10 +368,8 @@
           /* translators: %s: plugin or brand name. */
           Pg({}, sprintf(__('The %s cron is responsible for sending scheduled emails and doing flow automation.', 'groundhogg'), Groundhogg.whiteLabelName)),
           !ghCronOnTime()
-            /* translators: %1$s: plugin or brand name. %2$s: human-readable time since the cron last ran. */
-          ? Div({ className: 'pill attention loading-dots'}, [ sprintf(__('⚠️ The %1$s cron is not running on time and was last run %2$s', 'groundhogg'), Groundhogg.whiteLabelName, State.gh_last_ping_i18n ) ] )
-            /* translators: %1$s: plugin or brand name. %2$s: human-readable time since the cron last ran. */
-          : Div({ className: 'pill success'}, sprintf(__('The %1$s cron is running on time and was last run %2$s.', 'groundhogg'), Groundhogg.whiteLabelName, State.gh_last_ping_i18n )),
+          ? Div({ className: 'pill attention loading-dots'}, [ sprintf( strings.cron_not_running, Groundhogg.whiteLabelName, State.gh_last_ping_i18n ) ] )
+          : Div({ className: 'pill success'}, sprintf( strings.cron_running, Groundhogg.whiteLabelName, State.gh_last_ping_i18n )),
           Pg({}, __('We recommend it be set to run <b>once every minute</b> for the best performance. The <i>minimum</i> recommendation is every 5 minutes.', 'groundhogg')),
           SetupInstructions('gh-cron.php'),
         ])) : null,
