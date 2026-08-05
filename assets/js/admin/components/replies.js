@@ -13,6 +13,7 @@
   const {
     sprintf,
     __,
+    _x,
   } = wp.i18n
 
   const {
@@ -146,7 +147,8 @@
             }, [
               Label({
                 for: 'reply-summary',
-              }, sprintf(__('%s Name'), single)),
+                /* translators: singular label of saved reply, such as "Reply" */
+              }, sprintf( __('%s Name', 'groundhogg'), single)),
               Input({
                 className: 'full-width',
                 id       : 'reply-summary',
@@ -164,7 +166,7 @@
           }, [
             Label({
               for: 'edit-reply-content',
-            }, __('Content')),
+            }, __('Content', 'groundhogg')),
             Textarea({
               id       : 'edit-reply-content',
               className: 'full-width',
@@ -212,7 +214,8 @@
               className: 'gh-button primary',
               id       : 'update-reply',
               type     : 'submit',
-            }, sprintf(State.adding ? 'Create %s' : 'Update %s', single)),
+              /* translators: singular label of saved reply, such as "Reply" */
+            }, sprintf(State.adding ? _x( 'Create %s', 'as in create a saved reply', 'groundhogg' ) : _x( 'Update %s', 'as in update a saved reply', 'groundhogg' ), single)),
           ]),
         ])
       }
@@ -260,14 +263,15 @@
               },
             }, [
               Dashicon('edit'),
-              ToolTip('Edit'),
+              ToolTip(__( 'Edit', 'groundhogg' ) ),
             ]),
             userHasCap( 'delete_others_notes' ) ? Button({
               className: 'gh-button danger icon text',
               onClick: e => {
                 dangerConfirmationModal({
-                  alert: `<p>${sprintf(__('Are you sure you want to delete this %s?'), single)}</p>`,
-                  confirmText: __( 'Delete' ),
+                  /* translators: %s: the singular label of a saved reply, like "Reply" */
+                  alert: `<p>${sprintf(__('Are you sure you want to delete this %s?', 'groundhogg'), single)}</p>`,
+                  confirmText: __( 'Delete', 'groundhogg' ),
                   onConfirm: () => {
                     RepliesStore.delete(note.ID).then(() => {
                       State.set({
@@ -280,7 +284,7 @@
               }
             }, [
               Dashicon('trash'),
-              ToolTip('Delete'),
+              ToolTip(__( 'Delete', 'groundhogg' ) ),
             ]) : null,
           ]),
         ]))
@@ -293,7 +297,8 @@
         Div({
           className: 'space-between',
         }, [
-          H2({}, sprintf(__('Manage %s'), plural)),
+          /* translators: %s: the plural label of saved replies, like "Saved Replies" */
+          H2({}, sprintf(__('Manage %s', 'groundhogg'), plural)),
           Button({
             className: 'gh-button primary',
             onClick  : e => {
@@ -302,7 +307,8 @@
               })
               morph()
             },
-          }, sprintf(__('New %s'), single)),
+            /* translators: %s: the singular label of a saved reply, like "Reply" */
+          }, sprintf(__('New %s', 'groundhogg'), single)),
         ]),
 
         // Add Note Form
@@ -312,6 +318,7 @@
           style: {
             textAlign: 'center',
           },
+          /* translators: %s: the plural label of saved replies, like "Saved Replies" */
         }, sprintf(__('No %s yet.', 'groundhogg'), plural)),
       ])
     })
@@ -326,8 +333,8 @@
       // dialogClasses: 'overflow-visible',
     }, Fragment([
       SavedReplies({
-        single: __('Saved Reply'),
-        plural: __('Saved Replies'),
+        single: __('Saved Reply', 'groundhogg'),
+        plural: __('Saved Replies', 'groundhogg'),
         ...props,
       }),
     ]))

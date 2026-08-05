@@ -4269,11 +4269,11 @@
             cells   : [
               props => Input({
                 ...props,
-                placeholder: 'Key',
+                placeholder: _x( 'Key', 'as in a metadata field key', 'groundhogg' ),
               }),
               props => Input({
                 ...props,
-                placeholder: 'Value',
+                placeholder: _x( 'Value', 'as in a field value', 'groundhogg' ),
               }),
 
             ],
@@ -4387,11 +4387,11 @@
             cells   : [
               props => Input({
                 ...props,
-                placeholder: 'Key',
+                placeholder: _x( 'Key', 'as in a metadata field key', 'groundhogg' ),
               }),
               props => Input({
                 ...props,
-                placeholder: 'Value',
+                placeholder: _x( 'Value', 'as in a field value', 'groundhogg' ),
               }),
 
             ],

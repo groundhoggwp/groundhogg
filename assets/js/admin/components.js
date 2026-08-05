@@ -211,7 +211,8 @@
               opts.unshift({
                 ID  : search,
                 data: {
-                  tag_name: sprintf(__('Add "%s"', 'groundhogg'), search),
+                  /* translators: %s: the name of a new tag */
+                  tag_name: sprintf(_x('Add "%s"', 'creating a new tag', 'groundhogg'), search),
                 },
               })
             }
@@ -1392,16 +1393,19 @@
     // array of contacts provided
     if (Array.isArray(contactId)) {
       contactIds = contactId
+      /* translators: %s: the number of contacts */
       title = sprintf(__('Select an email to send to %s contacts', 'groundhogg'), contactIds.length)
     }
     else if (typeof contactId === 'object') { // contact object provide
       let contact = contactId
       contactIds = [contact.ID]
+      /* translators: %s: the name of a contact */
       title = sprintf(__('Select an email to send to %s', 'groundhogg'), contact.data.full_name.trim() || contact.data.email)
     }
     else { // contact ID provided
       let contact = await Groundhogg.stores.contacts.maybeFetchItem(contactId)
       contactIds = [contact.ID]
+      /* translators: %s: the name of a contact */
       title = sprintf(__('Select an email to send to %s', 'groundhogg'), contact.data.full_name.trim() || contact.data.email)
     }
 
@@ -1910,7 +1914,7 @@
 
     ModalWithHeader({
       width: '400px',
-      header: 'Send Feedback'
+      header: __( 'Send Feedback', 'groundhogg' )
     }, ({
       close,
       morph,
@@ -1932,7 +1936,7 @@
         }).then(r => {
           onSubmit(r)
           dialog({
-            message: 'Thanks for your feedback!',
+            message: __( 'Thanks for your feedback!', 'groundhogg' ),
           })
           close()
         })
@@ -1943,7 +1947,7 @@
 
       Label({
         for: 'feedback-subject',
-      }, ['What feature are you submitting feedback for?']),
+      }, [__('What feature are you submitting feedback for?', 'groundhogg')]),
       Input({
         id      : 'feedback-subject',
         value   : State.subject,
@@ -1955,7 +1959,7 @@
       Div(),
       Label({
         for: 'feedback-message',
-      }, ['What is your feedback? Be as descriptive as possible.']),
+      }, [__('What is your feedback? Be as descriptive as possible.', 'groundhogg')]),
       Textarea({
         id      : 'feedback-message',
         value   : State.message,
@@ -1970,7 +1974,7 @@
         type     : 'submit',
         disabled : State.submitting,
       }, 'Send feedback'),
-      Pg({}, 'Your email address will be collected to validate your feedback, but will not be used beyond that.'),
+      Pg({}, __('Your email address will be collected to validate your feedback, but will not be used beyond that.', 'groundhogg')),
     ]))
 
   }
@@ -2058,8 +2062,10 @@
             Span({
               className: 'subscribed',
             }, `&nbsp;— ${ sprintf(
-              __('Subscribed %s'),
-              `<abbr title="${ formatDateTime(date_created) }">${ sprintf(__('%s ago '),
+              /* translators: %s: amount of time passed, like "10 days ago" */
+              __('Subscribed %s', 'groundhogg'),
+              /* translators: %s: amount of time, like "10 days" */
+              `<abbr title="${ formatDateTime(date_created) }">${ sprintf( __('%s ago', 'groundhogg'),
                 item.i18n.created) }</abbr>`) }`),
           ]),
           Div({}, [
@@ -2089,7 +2095,8 @@
         // Tags
         Div({ className: 'gh-tags' }, [
           ...showTags.map(tag => Span({ className: 'gh-tag' }, tag.data.tag_name)),
-          allTags.length ? Span({}, sprintf('and %d more...', allTags.length)) : null,
+          /* translators: %s: additional number of tags */
+          allTags.length ? Span({}, sprintf( __( 'and %d more...', 'groundhogg' ), allTags.length)) : null,
         ]),
         maybeCall(extra, item),
       ]),
@@ -2097,7 +2104,7 @@
   }
 
   const ContactList = (contacts = [], {
-    noContacts = () => Pg({ style: { textAlign:'center' } }, __('No contacts found.')),
+    noContacts = () => Pg({ style: { textAlign:'center' } }, __('No contacts found.', 'groundhogg')),
     itemProps = {},
   } = {}) => {
 
@@ -2763,12 +2770,12 @@
             id       : 'tour-prev',
             className: 'gh-button small secondary text prev-step',
             onClick  : () => prev(),
-          }, 'Prev') : null,
+          }, __( 'Prev', 'groundhogg' ) ) : null,
           currentStep().showNext === false ? null : MakeEl.Button({
             id       : 'tour-next',
             className: `gh-button small ${State.current < steps.length - 1 ? 'secondary' : 'primary'} next-step`,
             onClick  : () => next(),
-          }, State.current < steps.length - 1 ? 'Next' : 'Finish'),
+          }, State.current < steps.length - 1 ? __( 'Next', 'groundhogg' ) : __( 'Finish', 'groundhogg' ) ),
         ]),
       ]),
     ])
@@ -2810,13 +2817,13 @@
 
       if (State.screen === 'reviewed') {
         return Fragment([
-          Pg({}, 'Thanks for taking the time! We appreciate your support 😀'),
+          Pg({}, __( 'Thanks for taking the time! We appreciate your support 😀', 'groundhogg' ) ),
         ])
       }
 
       if (State.screen === 'later') {
         return Fragment([
-          Pg({}, 'No problem! We\'ll check back in a week or so.'),
+          Pg({}, __( 'No problem! We\'ll check back in a week or so.', 'groundhogg' ) ),
         ])
       }
 
@@ -2829,9 +2836,9 @@
       return Fragment([
         Pg({ style: { fontWeight: 'bold' } }, 'Enjoying Groundhogg?'),
         Pg({},
-          'Groundhogg grows almost entirely through word of mouth. If we\'ve saved you time, money, or helped your business, we\'d really appreciate a quick review.'),
+          __( 'Groundhogg grows almost entirely through word of mouth. If we\'ve saved you time, money, or helped your business, we\'d really appreciate a quick review.', 'groundhogg' ) ),
         Pg({},
-          'Leave a review on our <a href="https://wordpress.org/support/plugin/groundhogg/reviews/" target="_blank">WordPress.org plugin page</a> to help spread the word!'),
+          __( 'Leave a review on our <a href="https://wordpress.org/support/plugin/groundhogg/reviews/" target="_blank">WordPress.org plugin page</a> to help spread the word!', 'groundhogg' ) ),
         Div({ className: 'display-flex flex-wrap gap-5' }, [
           Button({
             className: 'gh-button small primary',
@@ -2841,7 +2848,7 @@
               Groundhogg.notices.dismiss('review-please')
               handleReviewed(morph)
             },
-          }, 'Review Now!'),
+          }, __( 'Review Now!', 'groundhogg' ) ),
           Button({
             className: 'gh-button small secondary',
             onClick  : e => {
@@ -2849,7 +2856,7 @@
               Groundhogg.notices.dismiss('review-please', 14)
               handleDismiss(morph)
             },
-          }, 'Maybe later...'),
+          }, __( 'Maybe later...', 'groundhogg' ) ),
           Button({
             className: 'gh-button small danger',
             onClick  : e => {
@@ -2857,9 +2864,9 @@
               Groundhogg.notices.dismiss('review-please')
               handleDismiss(morph)
             },
-          }, 'Don\'t ask again.'),
+          }, __( 'Don\'t ask again.', 'groundhogg' ) ),
         ].reverse()),
-        Pg({}, 'Your support is appreciated!'),
+        Pg({}, __( 'Your support is appreciated!', 'groundhogg' ) ),
         Pg({ className: 'display-flex flex-wrap gap-5 align-center' }, [
           Img({
             src   : 'https://secure.gravatar.com/avatar/5fbd75ff0eb49baa1d73c5684a6d501353d3278d3e6fe4c38044c9ce426526f8?s=128&d=mm&r=g',

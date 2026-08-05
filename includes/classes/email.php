@@ -1665,7 +1665,7 @@ class Email extends Base_Object_With_Meta {
 	public function duplicate( $overrides = [], $meta_overrides = [] ) {
 
 		$overrides = array_merge( [
-			/* translators: %s: the name of the email being duplicated */
+			/* translators: %s: the asset title being copied */
 			'title'  => sprintf( __( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
 			'status' => 'draft'
 		], $overrides );

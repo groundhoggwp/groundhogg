@@ -56,8 +56,7 @@
           <div class="gh-rows-and-columns">
               <div class="gh-row">
                   <div class="gh-col">
-                      <label for="email">${ __('Opt-in Status',
-                              'groundhogg') }</label>
+                      <label for="email">${ __('Opt-in Status', 'groundhogg') }</label>
                       ${ select({
                           id: `optin-status`,
                           name: 'optin_status',
@@ -67,8 +66,7 @@
                       }) }
                   </div>
                   <div class="gh-col">
-                      <label for="owner">${ __('Owner',
-                              'noun the contact owner', 'groundhogg') }</label>
+                      <label for="owner">${ __('Owner', 'noun the contact owner', 'groundhogg') }</label>
                       ${ select({
                           id: `owner`,
                           name: 'owner_id',
@@ -127,8 +125,7 @@
                       }) }
                   </div>
                   <div class="gh-col">
-                      <label for="postal_zip">${ __('Postal/Zip Code',
-                              'groundhogg') }</label>
+                      <label for="postal_zip">${ __('Postal/Zip Code', 'groundhogg') }</label>
                       ${ input({
                           id: 'postal_zip',
                           name: 'postal_zip',
@@ -146,8 +143,7 @@
                       }) }
                   </div>
                   <div class="gh-col">
-                      <label for="country">${ __('Country',
-                              'groundhogg') }</label>
+                      <label for="country">${ __('Country', 'groundhogg') }</label>
                       ${ select({
                           id: 'country',
                           name: 'country',
@@ -331,7 +327,7 @@
                         join('') }
             </div>
             <p>
-                <button id="commit" class="gh-button primary">${ __('Commit') }
+                <button id="commit" class="gh-button primary">${ _x('Commit', 'as in commit changes', 'groundhogg') }
                 </button>
             </p>
         </div>`
@@ -398,8 +394,8 @@
 
   const setCommitText = () => {
     $('#commit').text(sprintf(
-      _n('Edit %s contact', 'Edit %s contacts', totalContacts,
-        'groundhogg'), formatNumber(totalContacts)))
+      /* translators: %s: the number of contacts */
+      _n('Edit %s contact', 'Edit %s contacts', totalContacts, 'groundhogg'), formatNumber(totalContacts)))
   }
 
   const mount = () => {
@@ -432,7 +428,7 @@
 
       if ( ! State.hasChanges ){
         dialog({
-          message: __( 'Make some changes first!' ),
+          message: __( 'Make some changes first!', 'groundhogg' ),
           type: 'error'
         })
         return
@@ -440,9 +436,8 @@
 
       confirmationModal({
         width: 600,
-        alert: `<p>${ sprintf(__(
-          'Are you sure you want to edit %s contacts? This action cannot be undone.',
-          'groundhogg'), bold(formatNumber(totalContacts))) }</p>`,
+        /* translators: %s: the number of contacts */
+        alert: `<p>${ sprintf(__('Are you sure you want to edit %s contacts? This action cannot be undone.', 'groundhogg'), bold(formatNumber(totalContacts))) }</p>`,
         onConfirm: () => {
 
           const { close } = loadingModal()

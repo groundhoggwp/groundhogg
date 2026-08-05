@@ -151,9 +151,9 @@ class Email_Log_Table extends Table {
 					'name'        => 'date_filter',
 					'option_none' => esc_html__( 'Filter by date', 'groundhogg' ),
 					'options'     => [
-						'before'  => esc_html__( 'Before', 'groundhogg' ),
-						'after'   => esc_html__( 'After', 'groundhogg' ),
-						'between' => esc_html__( 'Between', 'groundhogg' ),
+						'before'  => esc_html_x( 'Before', 'as in a date-range', 'groundhogg' ),
+						'after'   => esc_html_x( 'After', 'as in a date-range','groundhogg' ),
+						'between' => esc_html_x( 'Between', 'as in a date-range','groundhogg' ),
 					],
 					'selected'    => get_url_var( 'date_filter' )
 				] ),

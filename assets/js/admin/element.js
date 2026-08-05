@@ -370,8 +370,8 @@
     if (array.length === 1) {
       return array[0]
     }
-    // translators: 1: all items in a list except the last, 2: the last item; used when joining with "and"
     return sprintf(
+      /* translators: 1: all items in a list except the last, 2: the last item; used when joining with "and" */
       _x('%1$s and %2$s', 'and preceding the last item in a list', 'groundhogg'),
       array.slice(0, -1).join(', '), array[array.length - 1])
   }
@@ -384,6 +384,7 @@
       return array[0]
     }
     return sprintf(
+      /* translators: 1: all items in a list except the last, 2: the last item; used when joining with "or" */
       _x('%1$s or %2$s', 'or preceding the last item in a list', 'groundhogg'),
       array.slice(0, -1).join(', '),
       array[array.length - 1])
@@ -1086,7 +1087,7 @@ ${ afterProgress() }`,
    * @param props
    * @return {{setContent: setContent, $modal: (*|jQuery|HTMLElement), close: close}}
    */
-  const loadingModal = (text = 'Loading', props = {}) => {
+  const loadingModal = (text = '', props = {}) => {
 
     return modal({
       content      : spinner(),
@@ -1147,6 +1148,7 @@ ${ afterProgress() }`,
     name,
     ...props
   }) => dangerConfirmationModal({
+    /* translators: %s: the name of an asset (contacts, flows, emails, etc...) */
     alert      : `<p>${ sprintf(__('Are you sure you want to delete %s? This action cannot be undone.', 'groundhogg'), name) }</p>`,
     confirmText: __('Delete'),
     ...props,
@@ -1184,6 +1186,7 @@ ${ afterProgress() }`,
     let msg = __('Are you sure? This action cannot be undone.', 'groundhogg')
 
     if (e.currentTarget.dataset.name) {
+      /* translators: %s: the name of an asset (contacts, flows, emails, etc...) */
       msg = sprintf(__('Are you sure you want to delete %s? This action cannot be undone.', 'groundhogg'), bold(e.currentTarget.dataset.name))
     }
 

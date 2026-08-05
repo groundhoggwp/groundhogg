@@ -89,7 +89,7 @@ usort( $downloads, function ( $a, $b ) {
 								?>
                                 <a class="gh-button secondary" target="_blank"
                                    href="<?php echo esc_url( $extension->info->link ); ?>"> <?php
-                                   /* translators: %s: the price of the extension */
+                                   /* translators: %s: the price */
                                     echo esc_html( sprintf( _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ) ); ?></a>
 								<?php
 							} else {

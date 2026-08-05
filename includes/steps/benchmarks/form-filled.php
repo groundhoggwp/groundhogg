@@ -893,7 +893,7 @@ class Form_Filled extends Benchmark {
                     <!-- END NUMBER OPTIONS -->
 
                     <tr id="gh-field-value">
-                        <th><?php esc_html_e( 'Value', 'groundhogg' ); ?></th>
+                        <th><?php echo esc_html_x( 'Value', 'as in a field value', 'groundhogg' ); ?></th>
                         <td><?php
 							html( html()->input( array(
 								'id'   => 'field-value',

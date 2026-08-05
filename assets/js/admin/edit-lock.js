@@ -40,6 +40,7 @@
     }, [
       Avatar( avatar_src ),
       Div({}, [
+        /* translators: %s: the name of a user */
         `<p style="margin-top: 0">${ sprintf( __( '%s is currently working on this asset, which means you cannot make any changes, unless you take over.', 'groundhogg' ), `<b>${name}</b>` ) }</p>`,
         `<p>${ __( 'If you take over, the other user will lose editing control of this asset.', 'groundhogg' ) }</p>`,
       ])
@@ -50,7 +51,7 @@
       take_over ? makeEl('a', {
         className: 'gh-button primary text',
         href: take_over
-      }, __( 'Take over' ) ) : null,
+      }, __( 'Take over', 'groundhogg' ) ) : null,
       ExitButton(),
     ])
   ]))
@@ -71,6 +72,7 @@
     }, [
       Avatar( avatar_src ),
       Div({}, [
+        /* translators: %s: the name of a user */
         `<p style="margin-top: 0">${ sprintf( __( '%s now has editing control of this asset.', 'groundhogg' ), `<b>${name}</b>` ) }</p>`,
       ])
     ]),

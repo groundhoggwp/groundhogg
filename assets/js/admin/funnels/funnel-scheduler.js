@@ -101,6 +101,7 @@
           name,
         }) => ( {
           id,
+          /* translators: %s: name of a saved search */
           text : sprintf(__('Saved search %s', 'groundhogg'), bold(name)),
           query: () => ( {
             saved_search: id,
@@ -345,6 +346,7 @@
               })
             },
           }) : null,
+          /* translators: %s: the number of contacts */
           `<p>${ sprintf(__('%s contacts will be added to the flow.', 'groundhogg'),
             formatNumber(getState().totalContacts)) }</p>`,
           Button({
@@ -496,7 +498,8 @@
             getState().duration_estimate
             ? Span({
               className: 'pill yellow',
-            }, sprintf(__('It will take at least %s to add %s contacts.', 'groundhogg'), bold(getState().duration_estimate),
+              /* translators: 1: an amount of time like "3 minutes", 2: the number of contacts */
+            }, sprintf(__('It will take at least %1$s to add %2$s contacts.', 'groundhogg'), bold(getState().duration_estimate),
               formatNumber(getState().totalContacts)))
             : Span({ className: 'loading-dots' }, __('Estimating', 'groundhogg')),
           ]) : null,
@@ -527,12 +530,14 @@
         let preview
 
         if (getState().when === 'now') {
+          /* translators: 1: a number of contacts, 2: the name of a flow, 3: the name of a step in the flow */
           preview = sprintf(__('Add %1$s contacts to %2$s at step %3$s <b>now</b>!', 'groundhogg'),
             bold(formatNumber(getState().totalContacts)),
             bold(getFunnel().data.title),
             bold(getStep().data.step_title))
         }
         else {
+          /* translators: 1: a number of contacts, 2: the name of a flow, 3: the name of a step in the flow, 4: the date to add the contacts to the flow */
           preview = sprintf(__('Add %1$s contacts to %2$s at step %3$s on %4$s.', 'groundhogg'),
             bold(formatNumber(getState().totalContacts)),
             bold(getFunnel().data.title),

@@ -70,7 +70,7 @@ $show_custom_footer_text = apply_filters( 'groundhogg/templates/email/parts/foot
 	$_p( implode( ' | ', $links ) );
 
 	if ( ! $email->is_transactional() ) {
-		/* translators: 1: unsubscribe link HTML */
+		/* translators: %s: the unsubscribe link */
 		$_p( sprintf( esc_html__( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
 			'href' => $email->get_unsubscribe_link()
 		], esc_html__( 'Unsubscribe', 'groundhogg' ) ) ) );

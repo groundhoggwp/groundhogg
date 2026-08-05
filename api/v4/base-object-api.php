@@ -171,6 +171,39 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
+	 * Read singular based on a specific object
+	 *
+	 * @param  Base_Object_With_Meta|Base_Object  $object
+	 *
+	 * @return bool
+	 */
+	protected function current_user_can_read( Base_Object_With_Meta|Base_Object $object ) {
+		return current_user_can( sprintf( 'view_%s', $this->get_object_type() ), $object );
+	}
+
+	/**
+	 * Update singular based on a specific object
+	 *
+	 * @param  Base_Object_With_Meta|Base_Object  $object
+	 *
+	 * @return bool
+	 */
+	protected function current_user_can_update( Base_Object_With_Meta|Base_Object $object ) {
+		return current_user_can( sprintf( 'edit_%s', $this->get_object_type() ), $object );
+	}
+
+	/**
+	 * Delete singular based on a specific object
+	 *
+	 * @param  Base_Object_With_Meta|Base_Object  $object
+	 *
+	 * @return bool
+	 */
+	protected function current_user_can_delete( Base_Object_With_Meta|Base_Object $object ) {
+		return current_user_can( sprintf( 'delete_%s', $this->get_object_type() ), $object );
+	}
+
+	/**
 	 * Returns the resource data table
 	 *
 	 * @return \Groundhogg\DB\DB|\Groundhogg\DB\Meta_DB|\Groundhogg\DB\Tags
@@ -203,7 +236,7 @@ abstract class Base_Object_Api extends Base_Api {
 	 * @return WP_Error
 	 */
 	protected function ERROR_RESOURCE_NOT_FOUND() {
-		return self::ERROR_404( 'error', sprintf( '%s not found.', $this->get_object_type() ) );
+		return self::ERROR_404( 'error', sprintf( '%s not found.', $this->get_db_table()->singular ) );
 	}
 
 	/**
@@ -543,7 +576,7 @@ abstract class Base_Object_Api extends Base_Api {
 				$id     = get_array_var( $item, $this->get_primary_key() );
 				$object = $this->create_new_object( $id );
 
-				if ( ! $object->exists() ) {
+				if ( ! $object->exists() || ! $this->current_user_can_update( $object ) ) {
 					continue;
 				}
 
@@ -575,6 +608,10 @@ abstract class Base_Object_Api extends Base_Api {
 		 * @var $object Base_Object|Base_Object_With_Meta
 		 */
 		foreach ( $items as $object ) {
+
+			if ( ! $this->current_user_can_update( $object ) ){
+				continue;
+			}
 
 			$object->update( $data );
 
@@ -637,7 +674,13 @@ abstract class Base_Object_Api extends Base_Api {
 		 * @var $object Base_Object
 		 */
 		foreach ( $items as $object ) {
+
+			if ( ! $this->current_user_can_delete( $object ) ){
+				continue;
+			}
+
 			$deleted_item_ids[] = $object->get_id();
+
 			$object->delete();
 
 			$this->do_object_deleted_action( $object );
@@ -731,6 +774,10 @@ abstract class Base_Object_Api extends Base_Api {
 
 		if ( ! $object->exists() ) {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		if ( ! $this->current_user_can_update( $object ) ){
+			return $this->ERROR_403( 'error', 'You do not have permission to update this ' . $this->get_object_type() . '.' );
 		}
 
 		$data = $request->get_param( 'data' );

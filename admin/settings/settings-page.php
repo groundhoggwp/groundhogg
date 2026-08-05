@@ -880,7 +880,7 @@ class Settings_Page extends Admin_Page {
 			'gh_uninstall_on_delete'                 => [
 				'id'      => 'gh_uninstall_on_delete',
 				'section' => 'danger_zone',
-				/* translators: the plugin/brand name */
+				/* translators: %s: the plugin/brand name */
 				'label'   => sprintf( _x( 'Delete %s data', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'desc'    => _x( 'Delete all information when uninstalling. This cannot be undone.', 'settings', 'groundhogg' ),
 				'type'    => 'checkbox',
@@ -896,7 +896,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_opted_in_stats_collection',
 				'section' => 'danger_zone',
 				'label'   => _x( 'Opt-in to anonymous usage tracking.', 'settings', 'groundhogg' ),
-				/* translators: the plugin/brand name */
+				/* translators: %s: the plugin/brand name */
 				'desc'    => sprintf( _x( 'Help us make %s better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
@@ -923,7 +923,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_enable_experimental_features',
 				'section' => 'developer',
 				'label'   => _x( 'Enable experimental features.', 'settings', 'groundhogg' ),
-				/* translators: the plugin/brand name */
+				/* translators: %s: the plugin/brand name */
 				'desc'    => sprintf( _x( 'This will enabled experimental features in %s and various extensions.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
@@ -1033,7 +1033,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_disable_geolocation_services',
 				'section' => 'features',
 				'label'   => _x( 'Disable geolocation services', 'settings', 'groundhogg' ),
-				/* translators: the plugin/brand name */
+				/* translators: %s: the plugin/brand name */
 				'desc'    => sprintf( _x( 'By default, %s will attempt to determine the contact\'s country of origin and timezone based on their IP address.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
@@ -1047,7 +1047,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_ignore_user_precedence',
 				'section' => 'page_tracking',
 				'label'   => _x( 'Disable logged in user tracking precedence', 'settings', 'groundhogg' ),
-				/* translators: the plugin/brand name */
+				/* translators: %s: the plugin/brand name */
 				'desc'    => sprintf( _x( 'By default, %s will always show info of a logged in user before referencing information from tracking links or forms. You can disable this behaviour with this option.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [

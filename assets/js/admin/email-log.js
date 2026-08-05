@@ -53,10 +53,11 @@
 
       makeEl( 'p', {
         className: status === 'failed' ? 'gh-text danger' : ''
-        /* translators: %s: message type, %s: email service, %s: recipients, %s: date*/
       }, sprintf( status === 'failed'
-                  ? __('%s email via %s failed to send to %s on %s', 'groundhogg' )
-                  : __( '%s email sent via %s to %s on %s', 'groundhogg' ),
+                  /* translators: 1: message type, 2: email service, 3: recipients, 4: date */
+                  ? __('%1$s email via %2$s failed to send to %3$s on %4$s', 'groundhogg' )
+                  /* translators: 1: message type, 2: email service, 3: recipients, 4: date */
+                  : __( '%1$s email sent via %2$s to %3$s on %4$s', 'groundhogg' ),
         bold(i18n.type),
         bold(i18n.service),
         andList( recipients.map( bold ) ),

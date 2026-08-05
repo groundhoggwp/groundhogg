@@ -88,7 +88,7 @@ class Tag_Removed extends Tag_Applied {
 		if ( empty( $tags ) ) {
 			$name = __( 'A tag is removed', 'groundhogg' );
 		} else if ( count( $tags ) === 1 ) {
-			/* translators: %s: tag name */
+			/* translators: %s: list of tags */
 			$name = sprintf( esc_html__( '%s is removed', 'groundhogg' ), orList( $tags ) );
 		} else if ( count( $tags ) >= 4 ) {
 			switch ( $condition ) {

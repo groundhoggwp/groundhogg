@@ -82,6 +82,7 @@
       },
       description: () => Fragment([
         Pg({},
+          /* translators: %s: plural of an asset-type like "contacts" */
           sprintf(__('Filters are the most comprehensive way to search for %s that match your criteria.', 'groundhogg'),
             plural)),
         currEndpoint().method === 'GET' ? Pg({},
@@ -95,53 +96,62 @@
       param: 'include',
       type: 'int[]',
       control: IdRepeater,
+      /* translators: %s: plural of an asset-type like "contacts" */
       description: () => Pg({}, sprintf(__('IDs of %s to include.', 'groundhogg'), plural)),
     } ),
     exclude: (plural) => ( {
       param: 'exclude',
       type: 'int[]',
       control: IdRepeater,
+      /* translators: %s: plural of an asset-type like "contacts" */
       description: () => Pg({}, sprintf(__('IDs of %s to exclude.', 'groundhogg'), plural)),
     } ),
     search: (plural, columns = []) => ( {
       param: 'search',
       description: () => Pg({},
+        /* translators: %s: plural of an asset-type like "contacts" */
         sprintf(__('Search for %s using a search phrase. Will match %s.', 'groundhogg'), plural,
           andList(columns.map(col => el('code', {}, col))))),
       type: 'string',
     } ),
     limit: (plural) => ( {
       param: 'limit',
+      /* translators: %s: plural of an asset-type like "contacts" */
       description: () => Pg({}, sprintf(__('The number of %s to return.', 'groundhogg'), plural)),
       type: 'int',
       default: 20,
     } ),
     per_page: (plural) => ( {
       param: 'per_page',
+      /* translators: %s: plural of an asset-type like "contacts" */
       description: () => Pg({}, sprintf(__('The number of %s per page.', 'groundhogg'), plural)),
       type: 'int',
       default: 10,
     } ),
     page: (plural) => ( {
       param: 'page',
+      /* translators: %s: plural of an asset-type like "contacts" */
       description: () => Pg({}, sprintf(__('The page of %s to return', 'groundhogg'), plural)),
       type: 'int',
       default: 1,
     } ),
     id: (singular) => ( {
       param: 'id',
-      description: () => Pg({}, sprintf(__('The ID of the %s to return.', 'groundhogg'), singular)),
+      /* translators: %s: plural of an asset-type like "contacts" */
+      description: () => Pg({}, sprintf(__('The ID(s) of the %s to return.', 'groundhogg'), singular)),
       type: 'int',
       required: true,
     } ),
     offset: (plural) => ( {
       param: 'offset',
+      /* translators: %s: plural of an asset-type like "contacts" */
       description: () => Pg({}, sprintf(__('Paginate through %s.', 'groundhogg'), plural)),
       type: 'int',
       default: 0,
     } ),
     order: (plural) => ( {
       param: 'order',
+      /* translators: %s: plural of an asset-type like "contacts" */
       description: () => Pg({}, sprintf(__('How to order %s.', 'groundhogg'), plural)),
       type: 'string',
       default: 'DESC',
@@ -150,6 +160,7 @@
     orderby: (plural, columns = []) => ( {
       param: 'orderby',
       description: () => Pg({},
+        /* translators: %s: plural of an asset-type like "contacts" */
         sprintf(__('Order %s by a specific column.', 'groundhogg'), plural)),
       type: 'string',
       options: columns,
@@ -158,6 +169,7 @@
     found_rows: (plural) => ( {
       param: 'found_rows',
       description: () => Pg({},
+        /* translators: %s: plural of an asset-type like "contacts" */
         sprintf(__('Whether to return the total number of %s matching the query.', 'groundhogg'), plural)),
       type: 'bool',
       default: 'true',
@@ -347,6 +359,7 @@
           isParamRequired(param) || required ? `<span class="required">${ __('Required', 'groundhogg') }</span>` : null,
         ]),
         description,
+        /* translators: %s: an arbitrary default value */
         typeof props.default !== 'undefined' && props.default !== null ? `<p>${ sprintf(__('Defaults to %s.'),
           `<code>${ props.default }</code>`) }</p>` : null,
         props.subParams ? null : ControlFromParam({ param, type, ...props }),
@@ -386,7 +399,7 @@
           State.request.push({})
           morph()
         },
-      }, 'Add another item'),
+      }, __( 'Add another item', 'groundhogg' ) ),
     ])
   }
 
@@ -830,22 +843,36 @@
     }
 
     strings = {
+      /* translators: %s: plural of an asset-type like "contacts" */
       read: sprintf(__('List %s', 'groundhogg'), plural),
+      /* translators: %s: plural of an asset-type like "contacts" */
       readDesc: sprintf(__('Retrieve multiple %s using a query.', 'groundhogg'), plural),
+      /* translators: %s: plural of an asset-type like "contacts" */
       create: sprintf(__('Create %s', 'groundhogg'), plural),
+      /* translators: %s: plural of an asset-type like "contacts" */
       createDesc: sprintf(__('Create multiple %s at once.', 'groundhogg'), plural),
+      /* translators: %s: plural of an asset-type like "contacts" */
       update: sprintf(__('Update %s', 'groundhogg'), plural),
+      /* translators: %s: plural of an asset-type like "contacts" */
       updateDesc: sprintf(__('Update multiple %s at once.', 'groundhogg'), plural),
+      /* translators: %s: plural of an asset-type like "contacts" */
       delete: sprintf(__('Delete %s', 'groundhogg'), plural),
+      /* translators: %s: plural of an asset-type like "contacts" */
       deleteDesc: sprintf(__('Delete multiple %s at once.', 'groundhogg'), plural),
-      readSingle: sprintf(swv(singular) ? __('Retrieve an %s', 'groundhogg') : __('Retrieve a %s', 'groundhogg'),
-        singular),
+      /* translators: %s: singular of an asset-type like "contact" */
+      readSingle: sprintf(swv(singular) ? __('Retrieve an %s', 'groundhogg') : __('Retrieve a %s', 'groundhogg'), singular),
       readSingleDesc: sprintf(__('Retrieves a single %s.', 'groundhogg'), singular),
+      /* translators: %s: singular of an asset-type like "contact" */
       createSingle: sprintf(swv(singular) ? __('Create an %s', 'groundhogg') : __('Create a %s', 'groundhogg'), singular),
+      /* translators: %s: singular of an asset-type like "contact" */
       createSingleDesc: sprintf(__('Create a single %s.', 'groundhogg'), singular),
+      /* translators: %s: singular of an asset-type like "contact" */
       updateSingle: sprintf(swv(singular) ? __('Update an %s', 'groundhogg') : __('Update a %s', 'groundhogg'), singular),
+      /* translators: %s: singular of an asset-type like "contact" */
       updateSingleDesc: sprintf(__('Update a single %s.', 'groundhogg'), singular),
+      /* translators: %s: singular of an asset-type like "contact" */
       deleteSingle: sprintf(swv(singular) ? __('Delete an %s', 'groundhogg') : __('Delete a %s', 'groundhogg'), singular),
+      /* translators: %s: singular of an asset-type like "contact" */
       deleteSingleDesc: sprintf(__('Delete a single %s.', 'groundhogg'), singular),
       ...strings,
     }
@@ -897,6 +924,7 @@
             ...dataParams,
           ],
           description: () => Fragment([
+            /* translators: %s: singular of an asset-type like "contact" */
             Pg({}, sprintf(__('The data object contains all the necessary information for a new %s.', 'groundhogg'), singular)),
           ]),
         },
@@ -935,6 +963,7 @@
           type: 'int',
           required: true,
           description: () => Fragment([
+            /* translators: %s: singular of an asset-type like "contact" */
             Pg({}, sprintf(__('The ID of the %s to update.', 'groundhogg'), singular)),
           ]),
         },

@@ -84,6 +84,7 @@
       }).then(total => {
         $('#search-contacts').
           html(sprintf(
+            /* translators: %s: the number of contacts */
             _n('Show %s contact', 'Show %s contacts', total, 'groundhogg'),
             formatNumber(total)))
       })
@@ -185,18 +186,15 @@
             </div>
             <div class="search-filters-wrap">
                 ${ this.excludeEnabled
-                        ? `<div class="include-filters-wrap"><div class="include-block">${ __(
-                                'Include') }</div>`
+                        ? `<div class="include-filters-wrap"><div class="include-block">${ __('Include', 'groundhogg') }</div>`
                         : '' }
                 <div id="search-filters"></div>
                 ${ this.excludeEnabled
-                        ? `</div><div class="exclude-filters-wrap"><div class="exclude-block">${ __(
-                                'Exclude') }</div><div id="exclude-filters"></div></div>`
+                        ? `</div><div class="exclude-filters-wrap"><div class="exclude-block">${ __('Exclude', 'groundhogg') }</div><div id="exclude-filters"></div></div>`
                         : '' }
                 <div id="below-filters" class="space-between">
                     <div class="align-left-space-between">
-                        <span>${ __('Show exclude filters',
-                                'groundhogg') }</span>
+                        <span>${ __('Show exclude filters', 'groundhogg') }</span>
                         ${ toggle({
                             id: 'enable-exclude',
                             name: 'enable_exclude',
@@ -209,9 +207,7 @@
                             ${ __('Search', 'groundhogg') }
                         </button>
                         ${ !this.currentSearch
-                                ? `<button id="save-search" class="gh-button secondary">${ __(
-                                        'Save this search',
-                                        'groundhogg') }</button>`
+                                ? `<button id="save-search" class="gh-button secondary">${ __('Save this search', 'groundhogg') }</button>`
                                 : `<button id="update-search" class="gh-button secondary" ${ objectEquals(
                                         this.query.filters,
                                         this.currentSearch.query.filters) &&
@@ -220,9 +216,9 @@
                                                 this.currentSearch.query.exclude_filters) )
                                         ? 'disabled'
                                         : '' }>${ sprintf(
+                                        /* translators: %s: the name of a saved search */
                                         __('Update "%s"', 'groundhogg'),
-                                        this.currentSearch.name) }</button><a class="gh-text danger delete-search">${ __(
-                                        'Delete') }</a>` }
+                                        this.currentSearch.name) }</button><a class="gh-text danger delete-search">${ __('Delete', 'groundhogg') }</a>` }
                     </div>
 
                 </div>
@@ -234,16 +230,14 @@
       return `
           <button class="gh-button purple enable-filters small"><span
                   class="dashicons dashicons-filter"></span>
-              ${ this.currentSearch ? __('Edit Filters', 'groundhogg') : __(
-                      'Filter Contacts', 'groundhogg') }
+              ${ this.currentSearch ? __('Edit Filters', 'groundhogg') : __('Filter Contacts', 'groundhogg') }
           </button>
           ${ this.savedSearchEnabled
                   ? `<div id="searches-picker"></div>`
                   : ( ContactSearch.searches.length
                                   ? `<button id="load-saved-search" class="gh-button secondary small"><span class="dashicons dashicons-search" style="line-height: 1"></span> <span class="text">${ this.loadingSearch
                                           ? __('Loading search', 'groundhogg')
-                                          : __('Load saved search',
-                                                  'groundhogg') }</span></button>`
+                                          : __('Load saved search', 'groundhogg') }</span></button>`
                                   : ''
                   ) }`
     },
@@ -341,7 +335,7 @@
 
         dangerConfirmationModal({
           alert: `<p>${ __(
-            'Are you sure you want to delete this search') }</p>`,
+            'Are you sure you want to delete this search', 'groundhogg') }</p>`,
           onConfirm: () => {
             SearchesStore.delete(this.currentSearch.id).then(() => {
               this.currentSearch = null
@@ -482,8 +476,7 @@
 
     $('.gh-actions').
       append(
-        `<button type="button" class="more-actions button button-secondary">${ __(
-          'More Actions', 'groundhogg') }</button>`)
+        `<button type="button" class="more-actions button button-secondary">${ __('More Actions', 'groundhogg') }</button>`)
     $('.more-actions').on('click', (e) => {
 
       const {
@@ -498,24 +491,28 @@
         {
           key: 'edit',
           cap: 'edit_contacts',
+          /* translators: %s: the number of contacts */
           text: sprintf(__('Edit %s contacts', 'groundhogg'),
             totalContactsFormatted),
         },
         {
           key: 'export',
           cap: 'export_contacts',
+          /* translators: %s: the number of contacts */
           text: sprintf(__('Export %s contacts', 'groundhogg'),
             totalContactsFormatted),
         },
         {
           key: 'broadcast',
           cap: 'schedule_broadcasts',
+          /* translators: %s: the number of contacts */
           text: sprintf(__('Send a broadcast to %s contacts', 'groundhogg'),
             totalContactsFormatted),
         },
         {
           key: 'funnel',
           cap: 'view_funnels',
+          /* translators: %s: the number of contacts */
           text: sprintf(__('Add %s contacts to a flow', 'groundhogg'),
             totalContactsFormatted),
         },
@@ -523,6 +520,7 @@
           key: 'delete',
           cap: 'delete_contacts',
           text: `<span class="gh-text danger">${ sprintf(
+            /* translators: %s: the number of contacts */
             __('Delete %s contacts', 'groundhogg'),
             totalContactsFormatted) }</span>`,
         },
@@ -567,6 +565,7 @@
                     searchMethods: [
                       {
                         id: 'selection',
+                        /* translators: %s: the number of contacts */
                         text: sprintf(__('Selected %s contacts', 'groundhogg'), formatNumber(totalContacts)),
                         query: () => ( {
                           ...query,
@@ -591,6 +590,7 @@
                     searchMethods: [
                       {
                         id: 'selection',
+                        /* translators: %s: the number of contacts */
                         text: sprintf(__('Selected %s contacts', 'groundhogg'), formatNumber(totalContacts)),
                         query: () => ( {
                           ...query,
@@ -606,9 +606,11 @@
 
               dangerConfirmationModal({
                 width: 600,
-                alert: `<p>${ sprintf(__(
-                  'Are you sure you want to delete %s contacts? This cannot be undone. Consider <i>exporting</i> first!',
-                  'groundhogg'), `<b>${ totalContactsFormatted }</b>`) }</p>`,
+                alert: `<p>${ sprintf(
+                  /* translators: %s: the number of contacts */
+                  __('Are you sure you want to delete %s contacts? This cannot be undone. Consider <i>exporting</i> first!', 'groundhogg'), 
+                  `<b>${ totalContactsFormatted }</b>`
+                ) }</p>`,
                 onConfirm: () => {
 
                   ContactsStore.deleteMany({
@@ -618,8 +620,9 @@
 
                     confirmationModal({
                       width: 600,
-                      alert: `<p>${ sprintf(__(
-                          '🗑️ %s contacts are being deleted in the background. <i>It may take a while.</i> We\'ll let you know when it\'s done!', 'groundhogg'),
+                      alert: `<p>${ sprintf(
+                        /* translators: %s: the number of contacts */
+                        __('🗑️ %s contacts are being deleted in the background. <i>It may take a while.</i> We\'ll let you know when it\'s done!', 'groundhogg'),
                         `<b>${ totalContactsFormatted }</b>`) }</p>`,
                       cancelButtonType: 'hidden',
                       confirmText: __('Sounds good!', 'groundhogg'),
@@ -654,14 +657,15 @@
       const contact = ContactsStore.get(ID)
 
       dangerConfirmationModal({
-        confirmText: __('Delete'),
+        confirmText: __('Delete', 'groundhogg'),
         alert: `<p>${ sprintf(
-          __('Are you sure you want to delete %s?', 'groundhogg'), bold(
-            contact.i18n.displayAs )) }</p>`,
+          /* translators: %s: the name of an asset (contacts, flows, emails, etc...) */
+          __('Are you sure you want to delete %s?', 'groundhogg'), bold( contact.i18n.displayAs )) }</p>`,
         onConfirm: () => {
           ContactsStore.delete(contact.ID).then(() => {
             $(`#contact-${ contact.ID }`).remove()
             dialog({
+              /* translators: %s: the name of an asset (contacts, flows, emails, etc...) */
               message: sprintf(__('%s was deleted!', 'groundhogg'),
                 contact.i18n.displayAs ),
             })
@@ -783,7 +787,7 @@
             }
           })
         }
-      }, __('Show All')),
+      }, __('Show All', 'groundhogg')),
       Button({
         id: 'unselect-all-columns',
         className: 'gh-button grey small',
@@ -795,7 +799,7 @@
             }
           })
         }
-      }, __('Hide All')),
+      }, __('Hide All', 'groundhogg')),
     ...ContactSearch.presets.map(preset => Button({
         id: `toggle-${ preset.id }`,
         type: 'button',

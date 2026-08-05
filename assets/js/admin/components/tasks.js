@@ -23,6 +23,7 @@
   const {
     sprintf,
     __,
+    _x,
   } = wp.i18n
 
   const typeToIcon = {
@@ -33,10 +34,10 @@
   }
 
   const taskTypes = {
-    task   : __('Task', 'groundhogg'),
-    call   : __('Call', 'groundhogg'),
-    email  : __('Email', 'groundhogg'),
-    meeting: __('Meeting', 'groundhogg'),
+    task   : _x('Task', 'as in task type', 'groundhogg'),
+    call   : _x('Call', 'as in task type', 'groundhogg'),
+    email  : _x('Email', 'as in task type', 'groundhogg'),
+    meeting: _x('Meeting', 'as in task type', 'groundhogg'),
   }
 
   const isOverdue = t => t.is_overdue && !t.is_complete
@@ -48,11 +49,13 @@
   const dueBy = (task) => {
 
     if (isOverdue(task)) {
+      /* translators: %s: amount of time like "3 days" */
       return `<span class="pill red" title="${ task.i18n.due_date }">${ sprintf(__('%s overdue', 'groundhogg'),
         task.i18n.due_in) }</span>`
     }
 
     if (isComplete(task)) {
+      /* translators: %s: amount of time like "3 days" */
       return `<span class="pill green" title="${ task.i18n.completed_date }">${ sprintf(__('%s ago', 'groundhogg'),
         task.i18n.completed) }</span>`
     }
@@ -66,11 +69,12 @@
       color = 'yellow'
     }
 
+    /* translators: %s: amount of time like "3 days" */
     return `<span class="pill ${ color }" title="${ task.i18n.due_date }">${ sprintf(__('In %s', 'groundhogg'),
       task.i18n.due_in) }</span>`
   }
 
-  const userDisplayName = user => user.ID === getCurrentUser().ID ? __('Me') : user.data.display_name
+  const userDisplayName = user => user.ID === getCurrentUser().ID ? __('Me', 'groundhogg') : user.data.display_name
 
   const addedBy = (task) => {
 
@@ -79,7 +83,7 @@
       user_id,
     } = task.data
 
-    let date_created = `<abbr title="${ formatDateTime(task.data.date_created) }">${ task.i18n.time_diff }</abbr>`
+    let time = `<abbr title="${ formatDateTime(task.data.date_created) }">${ task.i18n.time_diff }</abbr>`
 
     let name = ''
 
@@ -88,23 +92,24 @@
         let user = Groundhogg.filters.owners.find(o => o.ID == user_id)
 
         if (!user) {
-          name = __('Unknown')
+          name = __('Unknown', 'groundhogg')
         }
         else {
-          name = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
+          name = user.ID == Groundhogg.currentUser.ID ? __('me', 'groundhogg') : user.data.display_name
         }
 
         break
       default:
       case 'system':
-        name = __('System')
+        name = __('System', 'groundhogg')
         break
       case 'funnel':
-        name = __('Flow')
+        name = __('Flow', 'groundhogg')
         break
     }
 
-    return sprintf(__('Added by %s %s ago', 'groundhogg'), name, date_created)
+    /* translators: %(name)s: a username, %(time)s: a time difference like "3 days" */
+    return sprintf(__('Added by %(name)s %(time)s ago', 'groundhogg'), { name, time })
   }
 
   const openActivityForm = (type, taskId, onComplete = () => {}) => setTimeout(() => {
@@ -170,7 +175,7 @@
           moreMenu(e.target, [
             {
               key     : 'compose',
-              text    : 'Compose an email',
+              text    : __( 'Compose an email', 'groundhogg' ),
               onSelect: k => {
                 if (to.length) {
                   Groundhogg.components.emailModal({
@@ -198,7 +203,7 @@
             },
             {
               key     : 'template',
-              text    : 'Send an email template',
+              text    : __( 'Send an email template', 'groundhogg' ),
               onSelect: k => {
                 if (contactIds.length) {
                   Groundhogg.components.EmailTemplateModal(contactIds.length > 1 ? contactIds : contactIds[0], r => {
@@ -215,14 +220,14 @@
             },
             {
               key     : 'activity',
-              text    : 'Record email activity',
+              text    : __( 'Record email activity', 'groundhogg' ),
               onSelect: key => openActivityForm('email', task.ID, onComplete),
             },
           ])
         },
       }, [
         icons.email,
-        ToolTip('Send a email!', 'left'),
+        ToolTip(__( 'Send a email!', 'groundhogg' ), 'left'),
       ]),
     ])
 
@@ -256,21 +261,24 @@
 
             if (primary_phone) {
               phones.push([
-                sprintf(__('%s\'s Primary Phone'), full_name),
+                /* translators: %s: a contact's name */
+                sprintf(__('%s\'s Primary Phone', 'groundhogg'), full_name),
                 primary_phone,
               ])
             }
 
             if (mobile_phone) {
               phones.push([
-                sprintf(__('%s\'s Mobile Phone'), full_name),
+                /* translators: %s: a contact's name */
+                sprintf(__('%s\'s Mobile Phone', 'groundhogg'), full_name),
                 mobile_phone,
               ])
             }
 
             if (company_phone) {
               phones.push([
-                sprintf(__('%s\'s Business Phone'), full_name),
+                /* translators: %s: a contact's name */
+                sprintf(__('%s\'s Business Phone', 'groundhogg'), full_name),
                 company_phone,
               ])
             }
@@ -307,14 +315,14 @@
             } )),
             {
               key     : 'activity',
-              text    : 'Record call activity',
+              text    : __( 'Record call activity', 'groundhogg' ),
               onSelect: key => openActivityForm('call', task.ID, onComplete),
             },
           ])
         },
       }, [
         icons.phone,
-        ToolTip('Call now!', 'left'),
+        ToolTip(__( 'Call now!', 'groundhogg' ), 'left'),
       ]),
     ])
   }
@@ -404,7 +412,7 @@
   let taskOutcomes = null
 
   const AddTaskActivity = async ({
-    addButtonText = 'Add Activity',
+    addButtonText = __( 'Add Activity', 'groundhogg' ),
     onSubmit = () => {},
   }) => {
 
@@ -433,7 +441,7 @@
       Div({}, [
         Label({
           for: 'activity-outcome',
-        }, __('What happened?')),
+        }, __('What happened?', 'groundhogg')),
         `<br>`,
         Div({
           className: 'display-flex gap-5 align-center',
@@ -444,7 +452,7 @@
             options : [
               {
                 value: '',
-                text : 'Select an outcome',
+                text : __( 'Select an outcome', 'groundhogg' ),
               },
               ...taskOutcomes.map(item => ( {
                 value: item,
@@ -497,13 +505,13 @@
                       morph()
                     })
                   },
-                }, 'Save Changes'),
+                }, __( 'Save Changes', 'groundhogg' ) ),
               ]))
             },
-          }, __('Manage outcomes')) : null,
+          }, __('Manage outcomes', 'groundhogg')) : null,
         ]),
       ]),
-      Pg({}, __('Want to add any additional context?')),
+      Pg({}, __('Want to add any additional context?', 'groundhogg')),
       Textarea({
         id       : 'activity-note',
         name     : 'activity_note',
@@ -535,7 +543,7 @@
           className: 'gh-button danger text',
           disabled : State.submitting,
           onClick  : e => close(),
-        }, __('Cancel')),
+        }, __('Cancel', 'groundhogg')),
         Button({
           className: 'gh-button primary',
           id       : 'add-activity',
@@ -721,7 +729,7 @@
             }, [
               Label({
                 for: 'task-summary',
-              }, __('Task summary')),
+              }, __('Task summary', 'groundhogg')),
               Input({
                 className: 'full-width',
                 id       : 'task-summary',
@@ -739,7 +747,7 @@
             }, [
               Label({
                 for: 'task-type',
-              }, __('Type')),
+              }, _x('Type', 'as in task type', 'groundhogg' )),
               `<br>`,
               Select({
                 id      : 'task-type',
@@ -756,7 +764,7 @@
           }, [
             Label({
               for: 'task-date',
-            }, __('Due Date')),
+            }, __('Due Date', 'groundhogg')),
             InputGroup([
               Input({
                 type     : 'date',
@@ -784,7 +792,7 @@
           }, [
             Label({
               for: 'task-assigned-to',
-            }, __('Assigned To')),
+            }, __('Assigned To', 'groundhogg')),
             `<br>`,
             ItemPicker({
               id          : `task-assigned-to`,
@@ -817,7 +825,7 @@
           }, [
             Label({
               for: 'edit-task-content',
-            }, __('Details')),
+            }, _x('Details', 'as in task details', 'groundhogg' ) ),
             Textarea({
               id       : 'edit-task-content',
               className: 'full-width',
@@ -866,7 +874,7 @@
               className: 'gh-button primary',
               id       : 'update-task',
               type     : 'submit',
-            }, State.adding ? 'Create Task' : 'Update Task'),
+            }, State.adding ? __( 'Create Task', 'groundhogg' ) : __( 'Update Task', 'groundhogg' ) ),
           ]),
         ])
       }
@@ -899,6 +907,7 @@
          * @returns {boolean}
          */
         const belongsToMe = () => user_id == Groundhogg.currentUser.ID
+        const canEditTask = () => userHasCap(belongsToMe() ? 'edit_tasks' : 'edit_others_tasks' )
 
         let assocIcon = null
 
@@ -948,7 +957,7 @@
               TaskCTA(task, {
                 onComplete: morph,
               }),
-              task.is_complete || ! belongsToMe() ? null : Button({
+              task.is_complete || ! canEditTask() ? null : Button({
                 id       : `task-mark-complete-${ task.ID }`,
                 className: 'gh-button text icon primary mark-complete',
                 onClick  : e => {
@@ -967,7 +976,7 @@
                         },
                       }).then(task => {
                         dialog({
-                          message: __('Task completed!'),
+                          message: __('Task completed!', 'groundhogg'),
                         })
 
                         morph()
@@ -1005,7 +1014,7 @@
                     {
                       key     : 'record-activity',
                       cap     : 'edit_tasks',
-                      text    : __('Record activity'),
+                      text    : __('Record activity', 'groundhogg'),
                       onSelect: () => {
                         AddTaskActivity({
                           onSubmit: ({
@@ -1021,7 +1030,7 @@
                               },
                             }).then(task => {
                               dialog({
-                                message: __('Activity recorded!'),
+                                message: __('Activity recorded!', 'groundhogg'),
                               })
 
                               morph()
@@ -1033,7 +1042,7 @@
                     {
                       key     : 'delete',
                       cap     : belongsToMe() ? 'delete_tasks' : 'delete_others_tasks',
-                      text    : `<span class="gh-text danger">${ __('Delete') }</span>`,
+                      text    : `<span class="gh-text danger">${ __('Delete', 'groundhogg') }</span>`,
                       onSelect: () => {
                         dangerConfirmationModal({
                           alert    : `<p>${ __('Are you sure you want to delete this task?', 'groundhogg') }</p>`,
@@ -1053,7 +1062,7 @@
                     items.unshift({
                       key     : 'incomplete',
                       cap     : belongsToMe() ? 'edit_tasks' : 'edit_others_tasks',
-                      text    : __('Snooze'),
+                      text    : _x('Snooze', 'as in delay a task', 'groundhogg'),
                       onSelect: () => {
                         TasksStore.patch(task.ID, {
                           data: { snooze: 1 },
@@ -1068,7 +1077,7 @@
                     items.unshift({
                       key     : 'incomplete',
                       cap     : belongsToMe() ? 'edit_tasks' : 'edit_others_tasks',
-                      text    : __('Mark incomplete'),
+                      text    : __('Mark incomplete', 'groundhogg'),
                       onSelect: () => {
                         TasksStore.incomplete(task.ID).then(() => {
                           morph()
@@ -1113,7 +1122,7 @@
               })
               taskMorph()
             },
-          }, TaskState.showTimeline ? 'Hide timeline &uarr;' : 'Show timeline &darr;') : null,
+          }, TaskState.showTimeline ? __( 'Hide timeline &uarr;', 'groundhogg' ) : __( 'Show timeline &darr;', 'groundhogg' ) ) : null,
           TaskState.showTimeline ? TimeLine(task.activity) : null,
         ]))
       }
@@ -1166,6 +1175,7 @@
         }, [
           FilterPill({
             id    : 'overdue',
+            /* translators: %s: number of tasks */
             text  : __('%d overdue', 'groundhogg'),
             color : 'red',
             filter: isOverdue,
@@ -1173,6 +1183,7 @@
 
           FilterPill({
             id    : 'due-today',
+            /* translators: %s: number of tasks */
             text  : __('%d due today', 'groundhogg'),
             color : 'orange',
             filter: isDueToday,
@@ -1180,6 +1191,7 @@
 
           FilterPill({
             id    : 'due-soon',
+            /* translators: %s: number of tasks */
             text  : __('%d due soon', 'groundhogg'),
             color : 'yellow',
             filter: isDueSoon,
@@ -1187,12 +1199,14 @@
 
           FilterPill({
             id    : 'pending',
+            /* translators: %s: number of tasks */
             text  : __('%d pending', 'groundhogg'),
             filter: isPending,
           }),
 
           FilterPill({
             id    : 'complete',
+            /* translators: %s: number of tasks */
             text  : __('%d complete', 'groundhogg'),
             color : 'green',
             filter: isComplete,
@@ -1216,7 +1230,7 @@
             },
           }, [
             Dashicon('plus-alt2'),
-            ToolTip('Add Task', 'left'),
+            ToolTip(__( 'Add Task', 'groundhogg' ), 'left'),
           ]) : null,
         ]) : null,
         State.selected.length ? Div({
@@ -1241,7 +1255,7 @@
               }
               morph()
             },
-          }, __('Edit')),
+          }, __('Edit', 'groundhogg')),
           // Snooze
           !userHasCap('edit_tasks') ? null : Button({
             className: 'gh-button secondary small',
@@ -1255,25 +1269,28 @@
                 data : { snooze: 1 },
               }).then(() => {
                 dialog({
-                  message: sprintf('%d tasks snoozed!', State.selected.length),
+                  /* translators: %s: number of tasks */
+                  message: sprintf(__('%d tasks snoozed!', 'groundhogg'), State.selected.length),
                 })
                 morph()
               })
 
             },
-          }, __('Snooze')),
+          }, _x('Snooze', 'as in delay a task', 'groundhogg')),
           // Delete
           !userHasCap('delete_tasks') ? null : Button({
             className: 'gh-button danger small',
             disabled : State.bulk_edit,
             onClick  : e => {
               dangerConfirmationModal({
+                /* translators: %s: number of tasks */
                 alert    : `<p>${ sprintf(__('Are you sure you want to delete these %d tasks?', 'groundhogg'), State.selected.length) }</p>`,
                 onConfirm: () => {
                   TasksStore.deleteMany({
                     include: State.selected,
                   }).then(() => {
                     dialog({
+                      /* translators: %s: number of tasks */
                       message: sprintf('%d tasks deleted!', State.selected.length),
                     })
                     // also remove from state
@@ -1286,7 +1303,7 @@
                 },
               })
             },
-          }, __('Delete')),
+          }, __('Delete', 'groundhogg')),
           // Mark complete
           !userHasCap('edit_tasks') ? null : Button({
             className: 'gh-button primary small',
@@ -1315,14 +1332,15 @@
                     },
                   }).then(() => {
                     dialog({
-                      message: sprintf('%d tasks completed!', State.selected.length),
+                      /* translators: %s: number of tasks */
+                      message: sprintf(__( '%d tasks completed!', 'groundhogg' ), State.selected.length),
                     })
                     morph()
                   })
                 },
               })
             },
-          }, __('Mark Complete')),
+          }, __('Mark Complete', 'groundhogg')),
           // Deselect all
           Button({
             className: 'gh-button secondary text small',
@@ -1333,7 +1351,7 @@
               })
               morph()
             },
-          }, __('Clear Selection')),
+          }, __('Clear Selection', 'groundhogg')),
         ]) : null,
         // Bulk Edit
         State.bulk_edit ? Div({
@@ -1346,12 +1364,12 @@
           Div({}, [
             Label({
               for: 'task-type',
-            }, __('Type')),
+            }, _x('Type', 'as in task type', 'groundhogg')),
             `<br>`,
             Select({
               id      : 'task-type',
               options : {
-                '': 'No change',
+                '': __( 'No change', 'groundhogg' ),
                 ...taskTypes,
               },
               selected: State.edit_type,
@@ -1364,7 +1382,7 @@
           Div({}, [
             Label({
               for: 'task-date',
-            }, __('Due Date')),
+            }, __('Due Date', 'groundhogg')),
             InputGroup([
               Input({
                 type     : 'date',
@@ -1391,7 +1409,7 @@
           Div({}, [
             Label({
               for: 'task-assigned-to',
-            }, __('Assigned To')),
+            }, __('Assigned To', 'groundhogg')),
             `<br>`,
             ItemPicker({
               id          : `task-assigned-to`,
@@ -1448,12 +1466,13 @@
                   bulk_edit: false,
                 })
                 dialog({
-                  message: sprintf('%d tasks updated!', State.selected.length),
+                  /* translators: %s: number of tasks */
+                  message: sprintf(__('%d tasks updated!', 'groundhogg' ), State.selected.length),
                 })
                 morph()
               })
             },
-          }, __('Update')),
+          }, __('Update', 'groundhogg')),
         ]) : null,
         // Add Task Form
         State.adding ? TaskDetails() : null,

@@ -200,6 +200,7 @@
           name,
         }) => ( {
           id,
+          /* translators: %s: name of a saved search */
           text : sprintf(__('Saved search %s', 'groundhogg'), bold(name)),
           query: () => ( {
             saved_search: id,
@@ -215,14 +216,22 @@
         let parts = []
 
         if (filters.length) {
-          parts.push(`Includes (${ ContactFilterDisplay(filters).outerHTML })`)
+          parts.push(sprintf(
+            /* translators: %s: human-readable contact filters. */
+            __('Includes (%s)', 'groundhogg'),
+            ContactFilterDisplay(filters).outerHTML,
+          ))
         }
 
         if (exclude_filters.length) {
-          parts.push(`Excludes (${ ContactFilterDisplay(exclude_filters).outerHTML })`)
+          parts.push(sprintf(
+            /* translators: %s: human-readable excluded contact filters. */
+            __('Excludes (%s)', 'groundhogg'),
+            ContactFilterDisplay(exclude_filters).outerHTML,
+          ))
         }
 
-        let text = parts.join(' AND ')
+        let text = parts.join(` ${ __('AND', 'groundhogg') } `)
 
         return {
           id   : base64_json_encode(query),
@@ -406,12 +415,14 @@
 
     switch (repeats_every_interval) {
       case 'days':
+        /* translators: %s: number of days */
         recurring_preview = sprintf(_n('repeat every %s day', 'repeat every %s days', repeats_every_amount, 'groundhogg'),
           bold(repeats_every_amount))
         break
       case 'weeks':
         recurring_preview = sprintf(
-          _n('repeat every %s week on %s', 'repeat every %s weeks on %s', repeats_every_amount, 'groundhogg'),
+          /* translators: 1: number of weeks, 2: list of weekdays, such as "Monday, Tuesday, and Friday". */
+          _n('repeat every %1$s week on %2$s', 'repeat every %1$s weeks on %2$s', repeats_every_amount, 'groundhogg'),
           bold(repeats_every_amount),
           andList(repeats_dow.map(dow => bold(labels[dow]))),
         )
@@ -420,7 +431,8 @@
 
         if (repeats_month_occurrence_type === 'm') {
           recurring_preview = sprintf(
-            _n('repeat every %s month on the %s day of the month', 'repeat every %s months on %s day of the month',
+            /* translators: 1: number of months, 2: list of ordinal dates, such as "1st, 2nd, and 3rd". */
+            _n('repeat every %1$s month on the %2$s day of the month', 'repeat every %1$s months on %2$s day of the month',
               repeats_every_amount, 'groundhogg'),
             bold(repeats_every_amount),
             andList(repeats_dom.map(dom => bold(ordinal_suffix_of(dom)))),
@@ -428,7 +440,8 @@
         }
         else if (repeats_month_occurrence_type === 'w') {
           recurring_preview = sprintf(
-            _n('repeat every %s month on the %s %s', 'repeat every %s months on the %s %s',
+            /* translators: 1: number of months, 2: ordered occurrences such as "first, second, and last", 3: weekdays such as "Monday, Tuesday, and Friday". */
+            _n('repeat every %1$s month on the %2$s %3$s', 'repeat every %1$s months on the %2$s %3$s',
               repeats_every_amount, 'groundhogg'),
             bold(repeats_every_amount),
             andList(repeats_dow_occurrence.map(occurrence => bold(labels[occurrence]))),
@@ -438,6 +451,7 @@
 
         break
       case 'years':
+        /* translators: %s: number of years */
         recurring_preview = sprintf(_n('repeat every %s year', 'repeat every %s years', repeats_every_amount, 'groundhogg'),
           bold(repeats_every_amount))
         break
@@ -448,9 +462,11 @@
         recurring_preview += __(', indefinitely.', 'groundhogg')
         break
       case 'date':
+        /* translators: %s: a future date */
         recurring_preview += sprintf(__(', until %s.', 'groundhogg'), wp.date.dateI18n(wp.date.getSettings().formats.date, repeats_until_date))
         break
       case 'occurrences':
+        /* translators: %s: a number of occurrences */
         recurring_preview += sprintf(_n(', %s time.', ', %s times.', repeats_until_occurrences, 'groundhogg'),
           bold(repeats_until_occurrences))
         break
@@ -492,11 +508,13 @@
     let preview
 
     if (getState().when === 'now') {
+      /* translators: 1: email title, 2: number of contacts. */
       preview = sprintf(__('Send %1$s to %2$s contacts <b>now</b>!', 'groundhogg'), bold(getObject().data.title),
         bold(formatNumber(
           getState().totalContacts)))
     }
     else {
+      /* translators: 1: email title, 2: number of contacts, 3: scheduled send date(s). */
       preview = sprintf(__('Send %1$s to %2$s contacts on %3$s.', 'groundhogg'), bold(getObject().data.title),
         bold(formatNumber(
           getState().totalContacts)), sendDatesPreview() )
@@ -504,7 +522,13 @@
 
     return Fragment([
       `<p>${ preview }</p>`,
-      getState().is_recurring ? `<p>Then ${ RecurringSchedulePreview(getState()) }</p>` : null,
+      getState().is_recurring
+      ? `<p>${ sprintf(
+        /* translators: %s: description of the recurring schedule. */
+        __('Then %s', 'groundhogg'),
+        RecurringSchedulePreview(getState()),
+      ) }</p>`
+      : null,
       getObject() ? objectPreview : null,
       Button({
         id       : 'confirm-and-schedule',
@@ -662,7 +686,11 @@
                     step: 'campaigns',
                   })
                 },
-              }, sprintf('%s &rarr;', __('Campaigns', 'groundhogg'))) : null,
+              }, sprintf(
+                /* translators: %s: navigation step name. */
+                __('%s →', 'groundhogg'),
+                __('Campaigns', 'groundhogg'),
+              )) : null,
             ]),
           ]),
           getObject() ? EmailPreview() : null,
@@ -730,7 +758,11 @@
                 step: 'contacts',
               })
             },
-          }, sprintf('%s &rarr;', __('Contacts', 'groundhogg'))),
+          }, sprintf(
+            /* translators: %s: navigation step name. */
+            __('%s →', 'groundhogg'),
+            __('Contacts', 'groundhogg'),
+          )),
         ])
       },
     },
@@ -796,13 +828,15 @@
               })
             },
           }) : null,
-          `<div style="font-size: 14px">${ sprintf(__('%s contacts will receive this broadcast.', 'groundhogg'),
+          `<div style="font-size: 14px">${ sprintf(
+            /* translators: %s: number of contacts. */
+            __('%s contacts will receive this broadcast.', 'groundhogg'),
             bold(formatNumber(getState().totalContacts))) }</div>`,
           State.when === 'later' ? Fragment([
             Div({
               className: 'display-flex column gap-5',
             }, [
-              `<p>Which contacts should be included at the time of sending?</p>`,
+              `<p>${ __('Which contacts should be included at the time of sending?', 'groundhogg') }</p>`,
               Label({
                 style: {
                   fontsize: '14px',
@@ -821,7 +855,7 @@
                   },
 
                 }),
-                '<b>Static Segment:</b> <i>Contacts</i> currently <i>within the segment</i>.',
+                __( '<b>Static Segment:</b> <i>Contacts</i> currently <i>within the segment</i>.', 'groundhogg' ),
               ]),
               Label({
                 style: {
@@ -840,7 +874,7 @@
                     }
                   },
                 }),
-                '<b>Dynamic Segment:</b> <i>Contacts within the segment</i> at the time of sending.',
+                __( '<b>Dynamic Segment:</b> <i>Contacts within the segment</i> at the time of sending.', 'groundhogg' ),
               ]),
             ]),
           ]) : null,
@@ -859,7 +893,11 @@
                 step: 'schedule',
               })
             },
-          }, sprintf('%s &rarr;', __('Schedule', 'groundhogg'))),
+          }, sprintf(
+            /* translators: %s: navigation step name. */
+            __('%s →', 'groundhogg'),
+            __('Schedule', 'groundhogg'),
+          )),
         ])
       },
     },
@@ -879,11 +917,11 @@
               options : [
                 {
                   id  : 'later',
-                  text: 'Later',
+                  text: __('Later', 'groundhogg'),
                 },
                 {
                   id  : 'now',
-                  text: 'Now',
+                  text: __('Now', 'groundhogg'),
                 },
               ],
               selected: getState().when,
@@ -982,7 +1020,7 @@
                     ],
                   })
                 },
-              }, '+ Add additional dates'),
+              }, __('+ Add additional dates', 'groundhogg')),
             ]),
           ]) : null,
           getState().when === 'later' ? Div({
@@ -992,8 +1030,8 @@
             Toggle({
               id      : 'send-in-local',
               checked : getState().send_in_local_time,
-              onLabel : __('Yes'),
-              offLabel: __('No'),
+              onLabel : __('Yes', 'groundhogg'),
+              offLabel: __('No', 'groundhogg'),
               onChange: e => setState({
                 send_in_local_time: e.target.checked,
               }),
@@ -1006,14 +1044,14 @@
             Toggle({
               id      : 'use-optimized-send-time',
               checked : getState().use_optimized_send_time && Groundhogg.stores.options.get( 'gh_is_send_time_optimization_enabled' ),
-              onLabel : __('Yes'),
-              offLabel: __('No'),
+              onLabel : __('Yes', 'groundhogg'),
+              offLabel: __('No', 'groundhogg'),
               disabled: ! Groundhogg.isProFeaturesActive,
               onChange: e => {
 
                 if ( ! Groundhogg.stores.options.get( 'gh_is_send_time_optimization_enabled' ) && e.target.checked ){
                   Groundhogg.element.confirmationModal({
-                    alert: `<p>Using send time optimization will require additional storage for tracking.<br/>Would you like to enable this feature? <a target="_blank" href="https://groundhogg.io/doc/send-time-optimization/">More details.</a></p>`,
+                    alert: `<p>${ __( 'Using send time optimization will require additional storage for tracking.<br/>Would you like to enable this feature? <a target="_blank" href="https://groundhogg.io/doc/send-time-optimization/">More details.</a>', 'groundhogg' ) }</p>`,
                     confirmText: __('Enable', 'groundhogg'),
                     onConfirm: () => {
 
@@ -1035,10 +1073,10 @@
               },
             }),
             Dashicon('editor-help',
-              ToolTip('Schedules each email based on contacts\' past <br>behaviour to maximize opens and clicks. <a target="_blank" href="https://groundhogg.io/doc/send-time-optimization/">Read more...</a>', 'bottom')),
+              ToolTip(__( 'Schedules each email based on contacts\' past <br>behaviour to maximize opens and clicks. <a target="_blank" href="https://groundhogg.io/doc/send-time-optimization/">Read more...</a>', 'groundhogg' ), 'bottom')),
           ]), {
-            pillText: 'Advanced Feature',
-            toolTipText: 'This feature requires the Advanced <br>Features add-on to be installed.',
+            pillText: __('Advanced Feature', 'groundhogg'),
+            toolTipText: __('This feature requires the Advanced <br>Features add-on to be installed.', 'groundhogg'),
           } ) : null,
           '<div><hr></div>',
           Div({
@@ -1048,8 +1086,8 @@
             Toggle({
               id      : 'send-in-batches',
               checked : getState().batching,
-              onLabel : __('Yes'),
-              offLabel: __('No'),
+              onLabel : __('Yes', 'groundhogg'),
+              offLabel: __('No', 'groundhogg'),
               onChange: e => {
                 setState({
                   batching: e.target.checked,
@@ -1064,7 +1102,7 @@
             Pg({
               className: 'display-flex gap-5 align-center',
             }, [
-              'Send',
+              __('Send', 'groundhogg'),
               Input({
                 id       : 'batch-amount',
                 name     : 'batch_amount',
@@ -1083,7 +1121,7 @@
                   paddingRight: 0,
                 },
               }),
-              'emails every',
+              __('emails every', 'groundhogg'),
               Input({
                 id       : 'batch-interval-length',
                 name     : 'batch_interval_length',
@@ -1113,16 +1151,18 @@
                   updateDurationEstimate()
                 },
                 options : {
-                  minutes: __('Minutes'),
-                  hours  : __('Hours'),
-                  days   : __('Days'),
+                  minutes: __('Minutes', 'groundhogg'),
+                  hours  : __('Hours', 'groundhogg'),
+                  days   : __('Days', 'groundhogg'),
                 },
               }),
             ]),
             getState().duration_estimate
             ? Span({
               className: 'pill yellow',
-            }, sprintf(__('It will take at least %s to send to %s contacts.', 'groundhogg'), bold(getState().duration_estimate),
+            }, sprintf(
+              /* translators: 1: estimated duration, 2: number of contacts. */
+              __('It will take at least %1$s to send to %2$s contacts.', 'groundhogg'), bold(getState().duration_estimate),
               formatNumber(getState().totalContacts)))
             : Span({ className: 'loading-dots' }, __('Estimating', 'groundhogg')),
           ]) : null,
@@ -1135,8 +1175,8 @@
               Toggle({
                 id      : 'is-recurring',
                 checked : getState().is_recurring,
-                onLabel : __('Yes'),
-                offLabel: __('No'),
+                onLabel : __('Yes', 'groundhogg'),
+                offLabel: __('No', 'groundhogg'),
                 onChange: e => {
                   setState({
                     is_recurring: e.target.checked,
@@ -1148,7 +1188,7 @@
           getState().is_recurring && getState().when === 'later' ? Fragment([
             // repeats every
             Pg({ className: 'display-flex gap-5 align-center' }, [
-              __('Repeats every'),
+              __('Repeats every', 'groundhogg'),
               Input({
                 name     : 'repeats_every_amount',
                 type     : 'number',
@@ -1181,13 +1221,13 @@
                 id      : 'repeats-dow',
                 selected: getState().repeats_dow,
                 options : Groundhogg.functions.assoc2array({
-                  monday   : __('Monday'),
-                  tuesday  : __('Tuesday'),
-                  wednesday: __('Wednesday'),
-                  thursday : __('Thursday'),
-                  friday   : __('Friday'),
-                  saturday : __('Saturday'),
-                  sunday   : __('Sunday'),
+                  monday   : __('Monday', 'groundhogg'),
+                  tuesday  : __('Tuesday', 'groundhogg'),
+                  wednesday: __('Wednesday', 'groundhogg'),
+                  thursday : __('Thursday', 'groundhogg'),
+                  friday   : __('Friday', 'groundhogg'),
+                  saturday : __('Saturday', 'groundhogg'),
+                  sunday   : __('Sunday', 'groundhogg'),
                 }),
                 onChange: days => setState({
                   repeats_dow: days,
@@ -1198,8 +1238,8 @@
               ButtonToggle({
                 id      : 'repeats_month_occurrence_type',
                 options : Groundhogg.functions.assoc2array({
-                  m: __('Day of Month'),
-                  w: __('Day of Week'),
+                  m: __('Day of Month', 'groundhogg'),
+                  w: __('Day of Week', 'groundhogg'),
                 }),
                 selected: getState().repeats_month_occurrence_type,
                 onChange: repeats_month_occurrence_type => setState({
@@ -1218,11 +1258,11 @@
                   id      : 'repeats-dow-occurrence',
                   selected: getState().repeats_dow_occurrence,
                   options : Groundhogg.functions.assoc2array({
-                    first : __('First'),
-                    second: __('Second'),
-                    third : __('Third'),
-                    fourth: __('Fourth'),
-                    last  : __('Last'),
+                    first : __('First', 'groundhogg'),
+                    second: __('Second', 'groundhogg'),
+                    third : __('Third', 'groundhogg'),
+                    fourth: __('Fourth', 'groundhogg'),
+                    last  : __('Last', 'groundhogg'),
                   }),
                   onChange: which => setState({
                     repeats_dow_occurrence: which,
@@ -1232,13 +1272,13 @@
                   id      : 'repeats-month-dow',
                   selected: getState().repeats_dow,
                   options : Groundhogg.functions.assoc2array({
-                    monday   : __('Monday'),
-                    tuesday  : __('Tuesday'),
-                    wednesday: __('Wednesday'),
-                    thursday : __('Thursday'),
-                    friday   : __('Friday'),
-                    saturday : __('Saturday'),
-                    sunday   : __('Sunday'),
+                    monday   : __('Monday', 'groundhogg'),
+                    tuesday  : __('Tuesday', 'groundhogg'),
+                    wednesday: __('Wednesday', 'groundhogg'),
+                    thursday : __('Thursday', 'groundhogg'),
+                    friday   : __('Friday', 'groundhogg'),
+                    saturday : __('Saturday', 'groundhogg'),
+                    sunday   : __('Sunday', 'groundhogg'),
                   }),
                   onChange: days => setState({
                     repeats_dow: days,
@@ -1246,7 +1286,7 @@
                 }),
               ]) : null,
             ]) : null,
-            Pg({}, __('Ends')),
+            Pg({}, __('Ends', 'groundhogg')),
             Div({ className: 'display-flex gap-5 column' }, [
               Div({ className: 'display-flex gap-5 align-center' }, [
                 Input({
@@ -1262,7 +1302,7 @@
                     }
                   },
                 }),
-                Label({ for: 'repeats-never' }, __('Never')),
+                Label({ for: 'repeats-never' }, __('Never', 'groundhogg')),
               ]),
               Div({ className: 'display-flex gap-5 align-center' }, [
                 Input({
@@ -1278,7 +1318,7 @@
                     }
                   },
                 }),
-                Label({ for: 'repeats-until-date' }, __('On')),
+                Label({ for: 'repeats-until-date' }, __('On', 'groundhogg')),
                 Input({
                   type    : 'date',
                   id      : 'repeats-until-date-value',
@@ -1305,7 +1345,7 @@
                     }
                   },
                 }),
-                Label({ for: 'repeats-until-occurrences' }, __('After')),
+                Label({ for: 'repeats-until-occurrences' }, __('After', 'groundhogg')),
                 Input({
                   type     : 'number',
                   className: 'number',
@@ -1321,7 +1361,7 @@
                   },
                   disabled : getState().repeats_until !== 'occurrences',
                 }),
-                Label({ for: 'repeats-until-occurrences-amount' }, __('occurrences')),
+                Label({ for: 'repeats-until-occurrences-amount' }, __('occurrences', 'groundhogg')),
               ]),
             ]),
           ]) : null,
@@ -1338,12 +1378,16 @@
                 step: 'review',
               })
             },
-          }, sprintf('%s &rarr;', __('Review', 'groundhogg'))),
+          }, sprintf(
+            /* translators: %s: navigation step name. */
+            __('%s →', 'groundhogg'),
+            __('Review', 'groundhogg'),
+          )),
         ])
       },
     },
     'review'   : {
-      name        : 'Review',
+      name        : __('Review', 'groundhogg'),
       icon        : Dashicon('thumbs-up'),
       requirements: () => getObject() && hasValidDates() && getState().totalContacts,
       render      : () => ReviewScreen({
@@ -1351,7 +1395,7 @@
       }),
     },
     'scheduled': {
-      name        : __('Scheduled'),
+      name        : __('Scheduled', 'groundhogg'),
       icon        : Dashicon('megaphone'),
       requirements: () => getState().broadcast,
       render      : () => {
@@ -1372,7 +1416,11 @@
                 ...initialState,
               })
             },
-          }, sprintf('&larr; %s', __('Schedule another broadcast', 'groundhogg'))),
+          }, sprintf(
+            /* translators: %s: navigation action label. */
+            __('← %s', 'groundhogg'),
+            __('Schedule another broadcast', 'groundhogg'),
+          )),
         ])
       },
     },

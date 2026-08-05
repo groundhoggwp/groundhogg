@@ -106,7 +106,7 @@ function managed_page_head( $title = '', $action = '' ) {
 		$header_title = get_network()->site_name;
 	} else {
 		$header_url   = home_url();
-		/* translators: 1: plugin/brand name */
+		/* translators: %s: plugin/brand name */
 		$header_title = sprintf( __( 'Powered by %s', 'groundhogg' ), white_labeled_name() );
 	}
 
@@ -197,7 +197,7 @@ function managed_page_footer() {
             ], html()->e( 'img', [ 'width' => 85, 'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-logo-email-footer.png' ] ) );
 
 	        printf(
-	            /* translators: %s: plugin/brand name as a link */
+	            /* translators: %s: plugin/brand name */
 		        esc_html__( "Powered by %s", 'groundhogg' ),
                 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
 		        $powered_by_link

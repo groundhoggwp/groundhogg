@@ -1,0 +1,1138 @@
+/**
+ * Automatic SVG node connector.
+ *
+ * Usage:
+ *
+ * drawNodeLine({
+ *     from: document.getElementById('node-a'),
+ *     to: document.getElementById('node-b'),
+ *     id: 'node-a-to-node-b',
+ * })
+ *
+ * Call drawNodeLine() again after the nodes move to update the line.
+ */
+
+const LOGIC_LINE_SVG_NS = 'http://www.w3.org/2000/svg'
+
+/**
+ * Draw or update a line between two nodes.
+ *
+ * @param {Object} options
+ *
+ * @return {Object|null}
+ */
+function drawNodeLine({
+  from,
+  to,
+  id,
+  container = document.getElementById('step-flow'),
+
+  // Optional fixed ports.
+  fromSide = null,
+  toSide = null,
+
+  clearance = 30,
+  radius = 12,
+  verticalBias = 1,
+  className = '',
+  arrow = true,
+} = {}) {
+
+  from = resolveNodeLineElement(from)
+  to = resolveNodeLineElement(to)
+  container = resolveNodeLineElement(container)
+
+  if (!from || !to || !container) {
+    return null
+  }
+
+  if (!id) {
+    id = getNodeLineId(from, to)
+  }
+
+  const svg = getLogicLineSvg(container)
+
+  updateLogicLineSvgSize(
+    svg,
+    container
+  )
+
+  const fromRect = getNodeLineLocalRect(
+    from,
+    container
+  )
+
+  const toRect = getNodeLineLocalRect(
+    to,
+    container
+  )
+
+  /*
+   * Automatically determine any ports that were not supplied.
+   */
+  const automaticPorts = determineNodeLinePorts(
+    fromRect,
+    toRect,
+    verticalBias
+  )
+
+  fromSide =
+    fromSide ||
+    automaticPorts.fromSide
+
+  toSide =
+    toSide ||
+    automaticPorts.toSide
+
+  const start = getNodeLinePort(
+    fromRect,
+    fromSide
+  )
+
+  const end = getNodeLinePort(
+    toRect,
+    toSide
+  )
+
+  const points = routeNodeLine({
+    fromRect,
+    toRect,
+    start,
+    end,
+    fromSide,
+    toSide,
+    clearance,
+  })
+
+  let path = svg.querySelector(
+    `path[data-logic-line="${CSS.escape(String(id))}"]`
+  )
+
+  if (!path) {
+    path = document.createElementNS(
+      LOGIC_LINE_SVG_NS,
+      'path'
+    )
+
+    path.dataset.logicLine = id
+    svg.append(path)
+  }
+
+  path.setAttribute(
+    'class',
+    [
+      'automatic-node-line',
+      className,
+    ].filter(Boolean).join(' ')
+  )
+
+  path.setAttribute(
+    'd',
+    nodeLinePointsToRoundedPath(
+      points,
+      radius
+    )
+  )
+
+  if (arrow) {
+    path.setAttribute(
+      'marker-end',
+      'url(#automatic-node-line-arrow)'
+    )
+  }
+  else {
+    path.removeAttribute(
+      'marker-end'
+    )
+  }
+
+  return {
+    id,
+    path,
+    svg,
+    from,
+    to,
+    fromSide,
+    toSide,
+    start,
+    end,
+    points,
+  }
+}
+
+/**
+ * Determine the best ports according to the relative positions
+ * of the two nodes.
+ *
+ * verticalBias:
+ *
+ * 1.0 = vertical and horizontal positioning are weighted equally.
+ * 1.25 = prefer horizontal ports slightly more often.
+ * 0.75 = prefer vertical ports slightly more often.
+ */
+function determineNodeLinePorts(
+  fromRect,
+  toRect,
+  verticalBias = 1
+) {
+  const fromCenter = getNodeLineRectCenter(
+    fromRect
+  )
+
+  const toCenter = getNodeLineRectCenter(
+    toRect
+  )
+
+  const deltaX =
+    toCenter.x -
+    fromCenter.x
+
+  const deltaY =
+    toCenter.y -
+    fromCenter.y
+
+  const horizontalDistance =
+    Math.abs(deltaX)
+
+  const verticalDistance =
+    Math.abs(deltaY)
+
+  const primarilyVertical =
+    verticalDistance >=
+    horizontalDistance * verticalBias
+
+  /*
+   * Node B is primarily below node A.
+   */
+  if (
+    primarilyVertical &&
+    deltaY > 0
+  ) {
+    return {
+      fromSide: 'bottom',
+      toSide: 'top',
+    }
+  }
+
+  /*
+   * Node B is primarily above node A.
+   */
+  if (
+    primarilyVertical &&
+    deltaY < 0
+  ) {
+    return {
+      fromSide: 'top',
+      toSide: 'bottom',
+    }
+  }
+
+  /*
+   * Node B is primarily to the right.
+   */
+  if (deltaX >= 0) {
+    return {
+      fromSide: 'right',
+      toSide: 'left',
+    }
+  }
+
+  /*
+   * Node B is primarily to the left.
+   */
+  return {
+    fromSide: 'left',
+    toSide: 'right',
+  }
+}
+
+/**
+ * Route an orthogonal line between the selected ports.
+ */
+function routeNodeLine({
+  fromRect,
+  toRect,
+  start,
+  end,
+  fromSide,
+  toSide,
+  clearance = 30,
+}) {
+  const startOutside = moveNodeLinePointOutward(
+    start,
+    fromSide,
+    clearance
+  )
+
+  const endOutside = moveNodeLinePointOutward(
+    end,
+    toSide,
+    clearance
+  )
+
+  const points = [
+    start,
+    startOutside,
+  ]
+
+  const fromVertical =
+    isVerticalNodeLineSide(
+      fromSide
+    )
+
+  const toVertical =
+    isVerticalNodeLineSide(
+      toSide
+    )
+
+  /*
+   * Vertical to vertical.
+   *
+   * Examples:
+   *
+   * bottom -> top
+   * top -> bottom
+   */
+  if (
+    fromVertical &&
+    toVertical
+  ) {
+    const portsFaceEachOther =
+      (
+        fromSide === 'bottom' &&
+        toSide === 'top' &&
+        startOutside.y <= endOutside.y
+      ) ||
+      (
+        fromSide === 'top' &&
+        toSide === 'bottom' &&
+        startOutside.y >= endOutside.y
+      )
+
+    if (portsFaceEachOther) {
+      const middleY = (
+        startOutside.y +
+        endOutside.y
+      ) / 2
+
+      points.push(
+        {
+          x: startOutside.x,
+          y: middleY,
+        },
+        {
+          x: endOutside.x,
+          y: middleY,
+        }
+      )
+    }
+    else {
+      const routeY =
+        fromSide === 'bottom'
+        ? Math.max(
+          fromRect.bottom,
+          toRect.bottom,
+          startOutside.y,
+          endOutside.y
+        ) + clearance
+        : Math.min(
+          fromRect.top,
+          toRect.top,
+          startOutside.y,
+          endOutside.y
+        ) - clearance
+
+      points.push(
+        {
+          x: startOutside.x,
+          y: routeY,
+        },
+        {
+          x: endOutside.x,
+          y: routeY,
+        }
+      )
+    }
+  }
+
+  /*
+   * Horizontal to horizontal.
+   *
+   * Examples:
+   *
+   * right -> left
+   * left -> right
+   */
+  else if (
+    !fromVertical &&
+    !toVertical
+  ) {
+    const portsFaceEachOther =
+      (
+        fromSide === 'right' &&
+        toSide === 'left' &&
+        startOutside.x <= endOutside.x
+      ) ||
+      (
+        fromSide === 'left' &&
+        toSide === 'right' &&
+        startOutside.x >= endOutside.x
+      )
+
+    if (portsFaceEachOther) {
+      const middleX = (
+        startOutside.x +
+        endOutside.x
+      ) / 2
+
+      points.push(
+        {
+          x: middleX,
+          y: startOutside.y,
+        },
+        {
+          x: middleX,
+          y: endOutside.y,
+        }
+      )
+    }
+    else {
+      const routeX =
+        fromSide === 'right'
+        ? Math.max(
+          fromRect.right,
+          toRect.right,
+          startOutside.x,
+          endOutside.x
+        ) + clearance
+        : Math.min(
+          fromRect.left,
+          toRect.left,
+          startOutside.x,
+          endOutside.x
+        ) - clearance
+
+      points.push(
+        {
+          x: routeX,
+          y: startOutside.y,
+        },
+        {
+          x: routeX,
+          y: endOutside.y,
+        }
+      )
+    }
+  }
+
+  /*
+   * Vertical exit to horizontal entry.
+   */
+  else if (fromVertical) {
+    points.push({
+      x: startOutside.x,
+      y: endOutside.y,
+    })
+  }
+
+  /*
+   * Horizontal exit to vertical entry.
+   */
+  else {
+    points.push({
+      x: endOutside.x,
+      y: startOutside.y,
+    })
+  }
+
+  points.push(
+    endOutside,
+    end
+  )
+
+  return removeDuplicateNodeLinePoints(
+    points
+  )
+}
+
+/**
+ * Return the position of a node port.
+ */
+function getNodeLinePort(
+  rect,
+  side
+) {
+  switch (side) {
+    case 'top':
+      return {
+        x:
+          rect.left +
+          rect.width / 2,
+
+        y: rect.top,
+      }
+
+    case 'right':
+      return {
+        x: rect.right,
+
+        y:
+          rect.top +
+          rect.height / 2,
+      }
+
+    case 'bottom':
+      return {
+        x:
+          rect.left +
+          rect.width / 2,
+
+        y: rect.bottom,
+      }
+
+    case 'left':
+      return {
+        x: rect.left,
+
+        y:
+          rect.top +
+          rect.height / 2,
+      }
+
+    default:
+      throw new Error(
+        `Unsupported node line port: ${side}`
+      )
+  }
+}
+
+/**
+ * Move a port point away from its node.
+ */
+function moveNodeLinePointOutward(
+  point,
+  side,
+  distance
+) {
+  switch (side) {
+    case 'top':
+      return {
+        x: point.x,
+        y: point.y - distance,
+      }
+
+    case 'right':
+      return {
+        x: point.x + distance,
+        y: point.y,
+      }
+
+    case 'bottom':
+      return {
+        x: point.x,
+        y: point.y + distance,
+      }
+
+    case 'left':
+      return {
+        x: point.x - distance,
+        y: point.y,
+      }
+
+    default:
+      throw new Error(
+        `Unsupported node line direction: ${side}`
+      )
+  }
+}
+
+/**
+ * Convert an array of orthogonal points into an SVG path with
+ * rounded corners.
+ */
+function nodeLinePointsToRoundedPath(
+  points,
+  radius = 12
+) {
+  if (
+    !Array.isArray(points) ||
+    points.length < 2
+  ) {
+    return ''
+  }
+
+  let path =
+    `M ${points[0].x} ${points[0].y}`
+
+  for (
+    let index = 1;
+    index < points.length;
+    index++
+  ) {
+    const current =
+      points[index]
+
+    /*
+     * The final point does not need a rounded corner.
+     */
+    if (
+      index ===
+      points.length - 1
+    ) {
+      path +=
+        ` L ${current.x} ${current.y}`
+
+      continue
+    }
+
+    const previous =
+      points[index - 1]
+
+    const next =
+      points[index + 1]
+
+    const incomingDistance =
+      Math.hypot(
+        current.x -
+        previous.x,
+
+        current.y -
+        previous.y
+      )
+
+    const outgoingDistance =
+      Math.hypot(
+        next.x -
+        current.x,
+
+        next.y -
+        current.y
+      )
+
+    const cornerRadius =
+      Math.min(
+        radius,
+        incomingDistance / 2,
+        outgoingDistance / 2
+      )
+
+    /*
+     * Do not attempt to round zero-length segments.
+     */
+    if (cornerRadius <= 0) {
+      path +=
+        ` L ${current.x} ${current.y}`
+
+      continue
+    }
+
+    const beforeCorner =
+      moveNodeLinePointToward(
+        current,
+        previous,
+        cornerRadius
+      )
+
+    const afterCorner =
+      moveNodeLinePointToward(
+        current,
+        next,
+        cornerRadius
+      )
+
+    path +=
+      ` L ${beforeCorner.x} ${beforeCorner.y}`
+
+    path +=
+      ` Q ${current.x} ${current.y} ${afterCorner.x} ${afterCorner.y}`
+  }
+
+  return path
+}
+
+/**
+ * Move one point toward another by a given distance.
+ */
+function moveNodeLinePointToward(
+  from,
+  to,
+  distance
+) {
+  const deltaX =
+    to.x -
+    from.x
+
+  const deltaY =
+    to.y -
+    from.y
+
+  const length =
+    Math.hypot(
+      deltaX,
+      deltaY
+    )
+
+  if (!length) {
+    return {
+      ...from,
+    }
+  }
+
+  return {
+    x:
+      from.x +
+      (
+        deltaX /
+        length
+      ) * distance,
+
+    y:
+      from.y +
+      (
+        deltaY /
+        length
+      ) * distance,
+  }
+}
+
+/**
+ * Get an element's coordinates relative to the line container.
+ */
+function getNodeLineLocalRect(
+  element,
+  container
+) {
+  const elementRect =
+    element.getBoundingClientRect()
+
+  const containerRect =
+    container.getBoundingClientRect()
+
+  const left =
+    elementRect.left -
+    containerRect.left +
+    container.scrollLeft
+
+  const top =
+    elementRect.top -
+    containerRect.top +
+    container.scrollTop
+
+  return {
+    left,
+    top,
+
+    right:
+      left +
+      elementRect.width,
+
+    bottom:
+      top +
+      elementRect.height,
+
+    width:
+    elementRect.width,
+
+    height:
+    elementRect.height,
+  }
+}
+
+/**
+ * Get the center of a rectangle.
+ */
+function getNodeLineRectCenter(
+  rect
+) {
+  return {
+    x:
+      rect.left +
+      rect.width / 2,
+
+    y:
+      rect.top +
+      rect.height / 2,
+  }
+}
+
+/**
+ * Return whether a port is vertical.
+ */
+function isVerticalNodeLineSide(
+  side
+) {
+  return (
+    side === 'top' ||
+    side === 'bottom'
+  )
+}
+
+/**
+ * Remove consecutive duplicate points.
+ */
+function removeDuplicateNodeLinePoints(
+  points
+) {
+  return points.filter(
+    (point, index) => {
+      const previous =
+        points[index - 1]
+
+      return (
+        !previous ||
+        previous.x !== point.x ||
+        previous.y !== point.y
+      )
+    }
+  )
+}
+
+/**
+ * Create or retrieve the SVG overlay.
+ */
+function getLogicLineSvg(
+  container
+) {
+  let svg =
+    container.querySelector(
+      ':scope > svg.automatic-node-line-overlay'
+    )
+
+  if (svg) {
+    return svg
+  }
+
+  injectNodeLineStyles()
+
+  const computedStyle =
+    window.getComputedStyle(
+      container
+    )
+
+  if (
+    computedStyle.position ===
+    'static'
+  ) {
+    container.style.position =
+      'relative'
+  }
+
+  svg = document.createElementNS(
+    LOGIC_LINE_SVG_NS,
+    'svg'
+  )
+
+  svg.setAttribute(
+    'class',
+    'automatic-node-line-overlay'
+  )
+
+  svg.setAttribute(
+    'aria-hidden',
+    'true'
+  )
+
+  const defs =
+    document.createElementNS(
+      LOGIC_LINE_SVG_NS,
+      'defs'
+    )
+
+  const marker =
+    document.createElementNS(
+      LOGIC_LINE_SVG_NS,
+      'marker'
+    )
+
+  marker.setAttribute(
+    'id',
+    'automatic-node-line-arrow'
+  )
+
+  marker.setAttribute(
+    'viewBox',
+    '0 0 10 10'
+  )
+
+  marker.setAttribute(
+    'refX',
+    '9'
+  )
+
+  marker.setAttribute(
+    'refY',
+    '5'
+  )
+
+  marker.setAttribute(
+    'markerWidth',
+    '7'
+  )
+
+  marker.setAttribute(
+    'markerHeight',
+    '7'
+  )
+
+  marker.setAttribute(
+    'orient',
+    'auto-start-reverse'
+  )
+
+  const arrow =
+    document.createElementNS(
+      LOGIC_LINE_SVG_NS,
+      'path'
+    )
+
+  arrow.setAttribute(
+    'd',
+    'M 0 0 L 10 5 L 0 10 z'
+  )
+
+  arrow.setAttribute(
+    'class',
+    'automatic-node-line-arrow'
+  )
+
+  marker.append(arrow)
+  defs.append(marker)
+  svg.append(defs)
+
+  /*
+   * Prepend the SVG so the node elements appear above it.
+   */
+  container.prepend(svg)
+
+  return svg
+}
+
+/**
+ * Ensure the SVG covers the full container, including overflow.
+ */
+function updateLogicLineSvgSize(
+  svg,
+  container
+) {
+  const width =
+    Math.max(
+      container.clientWidth,
+      container.scrollWidth
+    )
+
+  const height =
+    Math.max(
+      container.clientHeight,
+      container.scrollHeight
+    )
+
+  svg.setAttribute(
+    'width',
+    width
+  )
+
+  svg.setAttribute(
+    'height',
+    height
+  )
+
+  svg.setAttribute(
+    'viewBox',
+    `0 0 ${width} ${height}`
+  )
+}
+
+/**
+ * Remove one line.
+ */
+function removeNodeLine(
+  id,
+  container = document.getElementById('step-flow')
+) {
+  container =
+    resolveNodeLineElement(
+      container
+    )
+
+  if (!container) {
+    return false
+  }
+
+  const path =
+    container.querySelector(
+      `path[data-logic-line="${CSS.escape(String(id))}"]`
+    )
+
+  if (!path) {
+    return false
+  }
+
+  path.remove()
+
+  return true
+}
+
+/**
+ * Remove all automatically drawn lines.
+ */
+function clearNodeLines(
+  container = document.getElementById('step-flow')
+) {
+  container =
+    resolveNodeLineElement(
+      container
+    )
+
+  if (!container) {
+    return
+  }
+
+  container
+  .querySelectorAll(
+    'path[data-logic-line]'
+  )
+  .forEach(
+    path => path.remove()
+  )
+}
+
+/**
+ * Resolve a selector or element.
+ */
+function resolveNodeLineElement(
+  value
+) {
+  if (!value) {
+    return null
+  }
+
+  if (
+    typeof value ===
+    'string'
+  ) {
+    return document.querySelector(
+      value
+    )
+  }
+
+  return value
+}
+
+/**
+ * Generate a default ID when none is supplied.
+ */
+function getNodeLineId(
+  from,
+  to
+) {
+  const fromId =
+    from.id ||
+    from.dataset.id ||
+    from.dataset.stepId ||
+    'from'
+
+  const toId =
+    to.id ||
+    to.dataset.id ||
+    to.dataset.stepId ||
+    'to'
+
+  return `${fromId}-to-${toId}`
+}
+
+/**
+ * Inject the required CSS once.
+ */
+function injectNodeLineStyles() {
+  if (
+    document.getElementById(
+      'automatic-node-line-styles'
+    )
+  ) {
+    return
+  }
+
+  const style =
+    document.createElement(
+      'style'
+    )
+
+  style.id =
+    'automatic-node-line-styles'
+
+  style.textContent = `
+        .automatic-node-line-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: visible;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .automatic-node-line {
+            fill: none;
+            stroke: #5f6368;
+            stroke-width: 2px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vector-effect: non-scaling-stroke;
+            pointer-events: none;
+        }
+
+        .automatic-node-line-arrow {
+            fill: #5f6368;
+        }
+    `
+
+  document.head.append(
+    style
+  )
+}
+
+function determineBorderLinePorts(
+  fromRect,
+  toRect,
+  verticalBias = 1
+) {
+  const fromCenter = {
+    x: fromRect.left + fromRect.width / 2,
+    y: fromRect.top + fromRect.height / 2,
+  }
+
+  const toCenter = {
+    x: toRect.left + toRect.width / 2,
+    y: toRect.top + toRect.height / 2,
+  }
+
+  const dx =
+    toCenter.x - fromCenter.x
+
+  const dy =
+    toCenter.y - fromCenter.y
+
+  if (
+    Math.abs(dy) * verticalBias >
+    Math.abs(dx)
+  ) {
+    return dy >= 0
+           ? {
+        fromSide: 'bottom',
+        toSide: 'top',
+      }
+           : {
+        fromSide: 'top',
+        toSide: 'bottom',
+      }
+  }
+
+  return dx >= 0
+         ? {
+      fromSide: 'right',
+      toSide: 'left',
+    }
+         : {
+      fromSide: 'left',
+      toSide: 'right',
+    }
+}

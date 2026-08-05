@@ -22,6 +22,7 @@
   const {
     sprintf,
     __,
+    _x,
   } = wp.i18n
 
   const typeToIcon = {
@@ -33,10 +34,10 @@
   }
 
   const noteTypes = {
-    note   : __('Note', 'groundhogg'),
-    call   : __('Call', 'groundhogg'),
-    email  : __('Email', 'groundhogg'),
-    meeting: __('Meeting', 'groundhogg'),
+    note   : _x('Note', 'as in note type', 'groundhogg'),
+    call   : _x('Call', 'as in note type', 'groundhogg'),
+    email  : _x('Email', 'as in note type', 'groundhogg'),
+    meeting: _x('Meeting', 'as in note type', 'groundhogg'),
   }
 
   const addedBy = (note) => {
@@ -46,7 +47,7 @@
       user_id,
     } = note.data
 
-    let date_created = `<abbr title="${ formatDateTime(note.data.date_created) }">${ note.i18n.time_diff }</abbr>`
+    let time = `<abbr title="${ formatDateTime(note.data.date_created) }">${ note.i18n.time_diff }</abbr>`
 
     let name
 
@@ -55,23 +56,24 @@
         let user = Groundhogg.filters.owners.find(o => o.ID == user_id)
 
         if (!user) {
-          name = __('Unknown')
+          name = __('Unknown', 'groundhogg')
         }
         else {
-          name = user.ID == Groundhogg.currentUser.ID ? __('me') : user.data.display_name
+          name = user.ID == Groundhogg.currentUser.ID ? __('me', 'groundhogg') : user.data.display_name
         }
 
         break
       default:
       case 'system':
-        name = __('System')
+        name = __('System', 'groundhogg')
         break
       case 'funnel':
-        name = __('Flow')
+        name = __('Flow', 'groundhogg')
         break
     }
 
-    return sprintf(__('Added by %s %s ago', 'groundhogg'), name, date_created)
+    /* translators: %(name)s: a username, %(time)s: a time difference like "3 days" */
+    return sprintf(__('Added by %(name)s %(time)s ago', 'groundhogg'), { name, time })
   }
 
   const {
@@ -240,7 +242,7 @@
           }, [
             Label({
               for: 'edit-note-content',
-            }, __('Details')),
+            }, _x('Details', 'as in note content', 'groundhogg')),
             Textarea({
               id       : 'edit-note-content',
               className: 'full-width',
@@ -276,7 +278,7 @@
             }, [
               Label({
                 for: 'note-type',
-              }, __('Type')),
+              }, _x('Type', 'as in note type', 'groundhogg')),
               `<br>`,
               Select({
                 id      : 'note-type',
@@ -308,7 +310,7 @@
               className: 'gh-button primary',
               id       : 'update-note',
               type     : 'submit',
-            }, State.adding ? 'Create Note' : 'Update Note'),
+            }, State.adding ? __( 'Create Note', 'groundhogg' ) : __( 'Update Note', 'groundhogg' ) ),
           ]),
         ])
       }
@@ -378,7 +380,7 @@
                     {
                       key     : 'edit',
                       cap     : belongsToMe() ? 'edit_notes' : 'edit_others_notes',
-                      text    : __('Edit'),
+                      text    : __('Edit', 'groundhogg'),
                       onSelect: () => {
                         clearEditState()
                         State.set({
@@ -392,7 +394,7 @@
                     {
                       key     : 'delete',
                       cap     : belongsToMe() ? 'delete_notes' : 'delete_others_notes',
-                      text    : `<span class="gh-text danger">${ __('Delete') }</span>`,
+                      text    : `<span class="gh-text danger">${ __('Delete', 'groundhogg') }</span>`,
                       onSelect: () => {
                         dangerConfirmationModal({
                           alert    : `<p>${ __('Are you sure you want to delete this note?', 'groundhogg') }</p>`,
@@ -445,7 +447,7 @@
             },
           }, [
             Dashicon('plus-alt2'),
-            ToolTip('Add Note', 'left'),
+            ToolTip(__( 'Add Note', 'groundhogg' ), 'left'),
           ]) : null,
         ]) : null,
         State.selected.length ? Div({
@@ -470,19 +472,21 @@
               }
               morph()
             },
-          }, __('Edit')),
+          }, __('Edit', 'groundhogg')),
           // Delete
           !userHasCap('delete_notes') ? null : Button({
             className: 'gh-button danger small',
             disabled : State.bulk_edit,
             onClick  : e => {
               dangerConfirmationModal({
+                /* translators: %d: number of notes */
                 alert    : `<p>${ sprintf(__('Are you sure you want to delete these %d notes?', 'groundhogg'), State.selected.length) }</p>`,
                 onConfirm: () => {
                   NotesStore.deleteMany({
                     include: State.selected,
                   }).then(() => {
                     dialog({
+                      /* translators: %d: number of notes */
                       message: sprintf('%d notes deleted!', State.selected.length),
                     })
                     // also remove from state
@@ -495,7 +499,7 @@
                 },
               })
             },
-          }, __('Delete')),
+          }, __('Delete', 'groundhogg')),
           // Deselect all
           Button({
             className: 'gh-button secondary text small',
@@ -506,7 +510,7 @@
               })
               morph()
             },
-          }, __('Clear Selection')),
+          }, __('Clear Selection', 'groundhogg')),
         ]) : null,
         // Bulk Edit
         State.bulk_edit ? Div({
@@ -519,12 +523,12 @@
           Div({}, [
             Label({
               for: 'note-type',
-            }, __('Type')),
+            }, __('Type', 'groundhogg')),
             `<br>`,
             Select({
               id      : 'note-type',
               options : {
-                '': 'No change',
+                '': __( 'No change', 'groundhogg' ),
                 ...noteTypes,
               },
               selected: State.edit_type,
@@ -554,12 +558,13 @@
                   bulk_edit: false,
                 })
                 dialog({
+                  /* translators: %d: number of notes */
                   message: sprintf('%d notes updated!', State.selected.length),
                 })
                 morph()
               })
             },
-          }, __('Update')),
+          }, __('Update', 'groundhogg')),
         ]) : null,
         // Add Note Form
         State.adding ? NoteDetails() : null,

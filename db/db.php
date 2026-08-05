@@ -126,7 +126,7 @@ abstract class DB {
 	 *
 	 * @param $name
 	 *
-	 * @return void
+	 * @return mixed
 	 */
 	public function __get( $name ) {
 		switch ( $name ) {
@@ -136,6 +136,20 @@ abstract class DB {
 			case 'charset':
 			case 'primary_key':
 				return $this->$name;
+			case 'singular':
+
+				if ( isset( $this->labels ) && isset( $this->labels[ 'singular' ] ) ){
+					return $this->labels[ 'singular' ];
+				}
+
+				return $this->get_object_type();
+			case 'plural':
+
+				if ( isset( $this->labels ) && isset( $this->labels[ 'plural' ] ) ){
+					return $this->labels[ 'plural' ];
+				}
+
+				return $this->get_object_type() . 's';
 		}
 	}
 

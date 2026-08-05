@@ -68,8 +68,8 @@ class Sync_Users extends Task {
 		$users = $user_query->get_results();
 
 		if ( empty( $users ) ) {
-			/* translators: %s: number of users that have been synced */
-			$message = sprintf( __( '%s users have been synced!', 'groundhogg' ), bold_it( _nf( $this->users ) ) );
+			/* translators: %s: the number of users that have been synced */
+			$message = sprintf( esc_html__( '%s users have been synced!', 'groundhogg' ), bold_it( _nf( $this->users ) ) );
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 
 			return true;

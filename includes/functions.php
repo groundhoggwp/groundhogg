@@ -8020,7 +8020,6 @@ function andList( $array ) {
 	}
 
 	/* translators: 1: all items in a list except the last, 2: the last item; used when joining with "and" */
-
 	return sprintf( esc_html_x( '%1$s and %2$s', 'and preceding the last item in a list', 'groundhogg' ),
 		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
 }
@@ -8034,7 +8033,6 @@ function orList( $array ) {
 	}
 
 	/* translators: 1: all items in a list except the last, 2: the last item; used when joining with "or" */
-
 	return sprintf( esc_html_x( '%1$s or %2$s', 'or preceding the last item in a list', 'groundhogg' ),
 		implode( ', ', array_slice( $array, 0, - 1 ) ), $array[ count( $array ) - 1 ] );
 }

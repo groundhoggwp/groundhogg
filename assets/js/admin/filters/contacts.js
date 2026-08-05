@@ -80,6 +80,7 @@
     pastDateRanges,
     futureDateRanges,
     allDateRanges,
+    filterCountComparisons
   } = Groundhogg.filters.comparisons
 
   const ContactFilterRegistry = FilterRegistry({})
@@ -246,22 +247,13 @@
                                 ? ranges[date_range].replace('X', days).toLowerCase()
                                 : '' }`
       case 'between':
-        return `${ prepend } ${ sprintf(
-          _x('between %1$s and %2$s', 'where %1 and %2 are dates',
-            'groundhogg'), `<b>${ formatDate(after) }</b>`,
-          `<b>${ formatDate(before) }</b>`) }`
+        return ComparisonsTitleGenerators.between( prepend, bold(formatDate(after)), bold(formatDate(before)))
       case 'before':
-        return `${ prepend } ${ sprintf(
-          _x('before %s', '%s is a date', 'groundhogg'),
-          `<b>${ formatDate(before) }</b>`) }`
+        return ComparisonsTitleGenerators.before( prepend, bold(formatDate(before)))
       case 'after':
-        return `${ prepend } ${ sprintf(
-          _x('after %s', '%s is a date', 'groundhogg'),
-          `<b>${ formatDate(after) }</b>`) }`
+        return ComparisonsTitleGenerators.after( prepend, bold(formatDate(after)))
       case 'day_of':
-        return `${ prepend } ${ sprintf(
-          _x('on %s', '%s is a date', 'groundhogg'),
-          `<b>${ formatDate(after) }</b>`) }`
+        return ComparisonsTitleGenerators.day_of( prepend, bold(formatDate(after)))
     }
   }
 
@@ -366,7 +358,7 @@
                 }) }
             </div>
             <span class="gh-text">
-			  ${ __('Times') }
+			  ${ _x('Times', 'as in number of occurrences', 'groundhogg') }
           </span>
         </div>`
   }
@@ -377,22 +369,6 @@
         [e.target.name]: e.target.value,
       })
     })
-  }
-
-  const filterCountComparisons = {
-    equals                  : (v) => sprintf(_n('%s time', '%s times', parseInt(v), 'groundhogg'),
-      v),
-    less_than               : (v) => sprintf(
-      _n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'),
-      v),
-    less_than_or_equal_to   : (v) => sprintf(
-      _n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
-    greater_than            : (v) => sprintf(
-      _n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'),
-      v),
-    greater_than_or_equal_to: (v) => sprintf(
-      _n('at least %s time', 'at least %s times', parseInt(v), 'groundhogg'),
-      v),
   }
 
   const filterCountTitle = (
@@ -821,6 +797,7 @@
 
   registerFilter('user_role_is', 'user', __('User Role', 'groundhogg'), {
     view ({ role = 'subscriber' }) {
+      /* translators: %s: the user role name like "administrator" */
       return sprintf(__('User role is %s', 'groundhogg'),
         bold(role ? roles[role].name : ''))
     },
@@ -882,6 +859,7 @@
 
   registerFilter('country', 'location', __('Country', 'groundhogg'), {
     view ({ country }) {
+      /* translators: %s: the country name like "Canada" */
       return sprintf(__('Country is %s', 'groundhogg'),
         bold(countries[country]))
     },
@@ -909,6 +887,7 @@
 
   registerFilter('region', 'location', __('State/Province', 'groundhogg'), {
     view ({ region }) {
+      /* translators: %s: the state name like "Ontario" */
       return sprintf(__('State/Province is %s', 'groundhogg'), bold(region))
     },
     edit ({ region }) {
@@ -938,6 +917,7 @@
 
   registerFilter('city', 'location', __('City', 'groundhogg'), {
     view ({ city }) {
+      /* translators: %s: the city name like "Toronto" */
       return sprintf(__('City is %s', 'groundhogg'), bold(city))
     },
     edit ({ city }) {
@@ -981,7 +961,7 @@
 
       locales = locales.map( locale => bold( dropdown.querySelector( `option[value="${locale}"]` ).innerHTML ) )
 
-      return sprintf( '%s is %s', bold( __( 'Locale' ) ), orList( locales ) )
+      return ComparisonsTitleGenerators.is( bold( __( 'Locale' ) ), orList( locales ) )
     },
     edit ({
       locales = [],
@@ -1024,7 +1004,8 @@
                           ? EmailsStore.get(email_id).data.title
                           : 'any email'
 
-        let prefix = sprintf(_x('Received %s', '%s is an email', 'groundhogg'),
+        /* translators: %s: the title of an email */
+        let prefix = sprintf(__('Received %s', 'groundhogg'),
           `<b>${ emailName }</b>`)
         prefix = filterCountTitle(prefix, rest)
 
@@ -1087,7 +1068,8 @@
                         ? EmailsStore.get(email_id).data.title
                         : 'any email'
 
-      let prefix = sprintf(_x('Opened %s', '%s is an email', 'groundhogg'),
+      /* translators: %s: the title of an email */
+      let prefix = sprintf(__('Opened %s', 'groundhogg'),
         `<b>${ emailName }</b>`)
 
       prefix = filterCountTitle(prefix, rest)
@@ -1159,8 +1141,8 @@
         }
 
         let prepend = sprintf(
-          link ? __('Clicked %1$s in %2$s', 'groundhogg') : __(
-            'Clicked any link in %2$s', 'groundhogg'),
+          /* translators: 1: the link clicked, 2: the title of an email */
+          link ? __('Clicked %1$s in %2$s', 'groundhogg') : __('Clicked any link in %2$s', 'groundhogg'),
           `<b class="link" title="${ link }">${ maybeTruncateLink(link) }</b>`,
           `<b>${ emailName }</b>`)
 
@@ -1266,28 +1248,15 @@
         } )),
         onChange    : items => {
           let reasons = items.map(({ id }) => id)
-          console.log(reasons)
           updateFilter({
             reasons,
           })
         },
       }),
     ]),
-    display: ({ reasons = [] }) => sprintf('Unsubscribed %s', orList(reasons.map(r => bold(unsubReasons[r] ?? r)))),
+    /* translators: %s: list of unsubscribed reasons */
+    display: ({ reasons = [] }) => sprintf(__('Unsubscribed %s', 'groundhogg'), orList(reasons.map(r => bold(unsubReasons[r] ?? r)))),
   }))
-
-  // registerFilter('unsubscribed', 'activity', __('Unsubscribed', 'groundhogg'), {
-  //   view (filter) {
-  //     return standardActivityDateTitle(
-  //       `<b>${ __('Unsubscribed', 'groundhogg') }</b>`, filter)
-  //   }, edit (filter) {
-  //     return standardActivityDateOptions(filter)
-  //   }, onMount (filter, updateFilter) {
-  //     standardActivityDateFilterOnMount(filter, updateFilter)
-  //   }, defaults: {
-  //     ...standardActivityDateDefaults,
-  //   },
-  // })
 
   registerFilter('optin_status_changed', 'activity',
     __('Opt-in Status Changed', 'groundhogg'), {
@@ -1296,7 +1265,8 @@
         ...filter
       }) {
         return standardActivityDateTitle(
-          sprintf('<b>Opt-in status</b> changed to %s',
+          // translators: %s: a list of opt-in statuses
+          sprintf( __('<b>Opt-in status</b> changed to %s', 'groundhogg' ),
             orList(value.map(v => `<b>${ optin_status[v] }</b>`))), filter)
       },
       edit ({
@@ -1345,6 +1315,7 @@
       if (link) {
         const url = new URL(link)
 
+        /* translators: %s: a url/path */
         prefix = sprintf(__('Visited %s', 'groundhogg'), bold(url.pathname))
       }
       else {
@@ -1850,6 +1821,7 @@
         }
 
         if (!broadcast_id && link) {
+          // translators: %s: a url or path
           return sprintf(__('Clicked %s in any broadcast', 'groundhogg'),
             bold(link))
         }
@@ -1858,11 +1830,13 @@
 
         if (broadcast_id && !link) {
           return sprintf(
+            // translators: 1: the title of an email, 2: a date
             __('Clicked any link in %1$s after %2$s', 'groundhogg'),
             bold(broadcast.object.data.title),
             bold(formatDateTime(broadcast.data.send_time * 1000)))
         }
 
+        // translators: 1: a url or path, 2: the title of an email, 3: a date
         return sprintf(__('Clicked %1$s in %2$s after %3$s', 'groundhogg'),
           bold(link), bold(broadcast.object.data.title),
           bold(formatDateTime(broadcast.data.send_time * 1000)))
@@ -2075,7 +2049,7 @@
           rows    : meta_filters,
           cells   : [
             props => input({
-              placeholder: 'Key',
+              placeholder: _x( 'Key', 'as in a metadata field key', 'groundhogg' ),
               className  : 'input',
               ...props,
             }),
@@ -2088,7 +2062,7 @@
               ...props,
             }),
             props => input({
-              placeholder: 'Value',
+              placeholder: _x( 'Value', 'as in a field value', 'groundhogg' ),
               className  : 'input',
               ...props,
             }),
@@ -2107,14 +2081,21 @@
       },
     })
 
-  registerFilterGroup('query', 'Query')
+  registerFilterGroup('query', _x( 'Query', 'filter group title; collection of query related filters', 'groundhogg' ) )
 
-  registerFilter('saved_search', 'query', __('Saved Search'), {
+  registerFilter('saved_search', 'query', __('Saved Search', 'groundhogg'), {
     view    : ({
       compare = 'in',
       search,
     }) => {
-      return sprintf(__('Is %s search %s'), compare === 'in' ? 'in' : 'not in', bold(SearchesStore.get(search)?.name))
+
+      if ( compare === 'in' ) {
+        // translators: %s: the name of a saved search
+        return sprintf( __( 'Is in saved search %s', 'groundhogg' ), bold(SearchesStore.get(search)?.name) )
+      }
+
+      // translators: %s: the name of a saved search
+      return sprintf( __( 'Is not in saved search %s', 'groundhogg' ), bold(SearchesStore.get(search)?.name) )
     },
     edit    : ({ compare }) => {
       return [
@@ -2122,8 +2103,8 @@
           name    : 'filter_compare',
           id      : 'filter-compare',
           options : {
-            in    : __('In'),
-            not_in: __('Not in'),
+            in    : __('In', 'comparison', 'groundhogg'),
+            not_in: __('Not in', 'comparison', 'groundhogg'),
           },
           selected: compare,
         }),
@@ -2152,7 +2133,7 @@
               selected: id === search,
             } )),
           ],
-          placeholder: __('Type to search...'),
+          placeholder: __('Type to search...', 'groundhogg'),
         }).on('change', e => {
           updateFilter({
             search: e.target.value,
@@ -2179,7 +2160,7 @@
     },
   })
 
-  ContactFilterRegistry.registerFilter(createFilter('sub_query', 'Sub Query', 'query', {
+  ContactFilterRegistry.registerFilter(createFilter('sub_query', __( 'Sub Query', 'groundhogg' ), 'query', {
     display: ({
       include_filters = [],
       exclude_filters = [],
@@ -2191,11 +2172,11 @@
       ]
 
       if (include_filters.length && exclude_filters.length) {
-        return texts.join(' <abbr title="exclude">and exclude</abbr> ')
+        return texts.join(` <abbr title="exclude">${__('and exclude', 'groundhogg')}</abbr> `)
       }
 
       if (exclude_filters.length) {
-        return sprintf('<abbr title="exclude">Exclude</abbr> %s', texts[1])
+        return sprintf(`<abbr title="exclude">${__('Exclude', 'groundhogg')}</abbr> %s`, texts[1])
       }
 
       if (include_filters.length) {
@@ -2347,9 +2328,9 @@
         id: 'select-compare',
         selected:  compare,
         options: {
-          after: 'After',
-          before: 'Before',
-          between: 'Between'
+          after: _x( 'After', 'as in a date-range', 'groundhogg' ),
+          before: _x( 'Before', 'as in a date-range', 'groundhogg' ),
+          between: _x( 'Between', 'as in a date-range', 'groundhogg' ),
         },
         onChange: e => {
           updateFilter({
@@ -2362,7 +2343,7 @@
         id: 'after-date',
         name: 'after_date',
         value: after,
-        placeholder: 'After...',
+        placeholder: __( 'After...', 'groundhogg' ),
         onChange: e => {
           updateFilter({
             after: e.target.value
@@ -2374,7 +2355,7 @@
         id: 'before-date',
         name: 'before_date',
         value: before,
-        placeholder: 'Before...',
+        placeholder: __( 'Before...', 'groundhogg' ),
         min: 0,
         onInput: e => {
           updateFilter({
@@ -2411,21 +2392,21 @@
     after: '',
   })
 
-  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_datetime', 'Current Date & Time', 'datetime-local', formatDateTime ))
-  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_date', 'Current Date', 'date', formatDate ))
-  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_time', 'Current Time', 'time', ( time ) => formatTime(`2000-01-01T${time}`) ))
+  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_datetime', __( 'Current Date & Time', 'groundhogg' ), 'datetime-local', formatDateTime ))
+  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_date', __('Current Date', 'groundhogg' ), 'date', formatDate ))
+  ContactFilterRegistry.registerFilter(CurrentDateCompareFilterFactory('current_time', __('Current Time', 'groundhogg' ), 'time', ( time ) => formatTime(`2000-01-01T${time}`) ))
 
   const dayList = {
-    0: __('Sunday'),
-    1: __('Monday'),
-    2: __('Tuesday'),
-    3: __('Wednesday'),
-    4: __('Thursday'),
-    5: __('Friday'),
-    6: __('Saturday'),
+    0: __('Sunday', 'groundhogg'),
+    1: __('Monday', 'groundhogg'),
+    2: __('Tuesday', 'groundhogg'),
+    3: __('Wednesday', 'groundhogg'),
+    4: __('Thursday', 'groundhogg'),
+    5: __('Friday', 'groundhogg'),
+    6: __('Saturday', 'groundhogg'),
   }
 
-  ContactFilterRegistry.registerFilter(createFilter('day_of_week', 'Day of Week', 'date', {
+  ContactFilterRegistry.registerFilter(createFilter('day_of_week', __( 'Day of Week', 'groundhogg' ), 'date', {
     edit   : ({
       days = [],
       updateFilter,
@@ -2433,7 +2414,7 @@
 
       return ItemPicker({
         id          : 'days-of-week-picker',
-        noneSelected: 'Select a day',
+        noneSelected: __( 'Select a day', 'groundhogg' ),
         fetchOptions: async (search) => assoc2array(dayList).filter(option => option.text.match(new RegExp(search, 'i'))),
         selected    : days.map(day => ( {
           id  : day,
@@ -2447,45 +2428,46 @@
       })
 
     },
-    display: ({ days = [] }) => sprintf(__('Today is a %s'), orList(days.map(day => bold(dayList[day])))),
+    // translators: %s: list of days of the week
+    display: ({ days = [] }) => sprintf(__('Today is a %s', 'groundhogg'), orList(days.map(day => bold(dayList[day])))),
   }))
 
   const dateList = {
-    1 : __('1st'),
-    2 : __('2nd'),
-    3 : __('3rd'),
-    4 : __('4th'),
-    5 : __('5th'),
-    6 : __('6th'),
-    7 : __('7th'),
-    8 : __('8th'),
-    9 : __('9th'),
-    10: __('10th'),
-    11: __('11th'),
-    12: __('12th'),
-    13: __('13th'),
-    14: __('14th'),
-    15: __('15th'),
-    16: __('16th'),
-    17: __('17th'),
-    18: __('18th'),
-    19: __('19th'),
-    20: __('20th'),
-    21: __('21st'),
-    22: __('22nd'),
-    23: __('23rd'),
-    24: __('24th'),
-    25: __('25th'),
-    26: __('26th'),
-    27: __('27th'),
-    28: __('28th'),
-    29: __('29th'),
-    30: __('30th'),
-    31: __('31st'),
-    0 : __('Last'),
+    1 : __('1st', 'groundhogg'),
+    2 : __('2nd', 'groundhogg'),
+    3 : __('3rd', 'groundhogg'),
+    4 : __('4th', 'groundhogg'),
+    5 : __('5th', 'groundhogg'),
+    6 : __('6th', 'groundhogg'),
+    7 : __('7th', 'groundhogg'),
+    8 : __('8th', 'groundhogg'),
+    9 : __('9th', 'groundhogg'),
+    10: __('10th', 'groundhogg'),
+    11: __('11th', 'groundhogg'),
+    12: __('12th', 'groundhogg'),
+    13: __('13th', 'groundhogg'),
+    14: __('14th', 'groundhogg'),
+    15: __('15th', 'groundhogg'),
+    16: __('16th', 'groundhogg'),
+    17: __('17th', 'groundhogg'),
+    18: __('18th', 'groundhogg'),
+    19: __('19th', 'groundhogg'),
+    20: __('20th', 'groundhogg'),
+    21: __('21st', 'groundhogg'),
+    22: __('22nd', 'groundhogg'),
+    23: __('23rd', 'groundhogg'),
+    24: __('24th', 'groundhogg'),
+    25: __('25th', 'groundhogg'),
+    26: __('26th', 'groundhogg'),
+    27: __('27th', 'groundhogg'),
+    28: __('28th', 'groundhogg'),
+    29: __('29th', 'groundhogg'),
+    30: __('30th', 'groundhogg'),
+    31: __('31st', 'groundhogg'),
+    0 : __('Last', 'groundhogg'),
   }
 
-  ContactFilterRegistry.registerFilter(createFilter('day_of_month', 'Day of Month', 'date', {
+  ContactFilterRegistry.registerFilter(createFilter('day_of_month', __( 'Day of Month', 'groundhogg' ), 'date', {
     edit   : ({
       dates = [],
       updateFilter,
@@ -2493,7 +2475,7 @@
 
       return ItemPicker({
         id          : 'days-of-week-picker',
-        noneSelected: 'Select a day',
+        noneSelected: __( 'Select a day', 'groundhogg' ),
         fetchOptions: async (search) => assoc2array(dateList).filter(option => option.text.match(new RegExp(search, 'i'))),
         selected    : dates.map(date => ( {
           id  : date,
@@ -2507,10 +2489,11 @@
       })
 
     },
-    display: ({ dates = [] }) => sprintf(__('Today is the %s of the month'), orList(dates.map(date => bold(dateList[date])))),
+    // translators: %s: ordinal day of the month
+    display: ({ dates = [] }) => sprintf(__('Today is the %s of the month', 'groundhogg'), orList(dates.map(date => bold(dateList[date])))),
   }))
 
-  registerFilterGroup( 'submissions', 'Submissions' )
+  registerFilterGroup( 'submissions', __( 'Submissions', 'groundhogg' ) )
 
   const SubmissionMetaFilters = (meta_filters, updateFilter) => InputRepeater({
     id      : 'submission-meta-filters',
@@ -2518,7 +2501,7 @@
     cells   : [
       props => Input({
         ...props,
-        placeholder: 'Field Name',
+        placeholder: __( 'Field Name', 'groundhogg' ),
       }),
       ({
         value,
@@ -2530,7 +2513,7 @@
       }),
       props => Input({
         ...props,
-        placeholder: 'Value',
+        placeholder: _x( 'Value', 'as in a field value', 'groundhogg' ),
       }),
     ],
     fillRow : () => [
@@ -2545,14 +2528,15 @@
     },
   })
 
-  ContactFilterRegistry.registerFilter(createPastDateFilter('form_submissions', 'Form Submissions', 'submissions', {
+  ContactFilterRegistry.registerFilter(createPastDateFilter('form_submissions', __( 'Form Submissions', 'groundhogg' ), 'submissions', {
     display: ({ form_id = [] }) => {
 
       if (!form_id.length) {
-        return 'Submitted any form'
+        return __( 'Submitted any form', 'groundhogg' )
       }
 
-      return `Submitted ${ orList(form_id.map(id => bold(Groundhogg.stores.forms.get(id).name))) }`
+      // translators: %s: list of forms
+      return sprintf( __( 'Submitted form %s', 'groundhogg' ), orList(form_id.map(id => bold(Groundhogg.stores.forms.get(id).name))) )
     },
     preload: ({
       form_id = [],
@@ -2572,7 +2556,7 @@
         ItemPicker({
           id: 'select-form',
           // label: '',
-          noneSelected: 'Any form',
+          noneSelected: __( 'Any form', 'groundhogg' ),
           fetchOptions: async search => {
             let forms = await Groundhogg.stores.forms.fetchItems({
               search,
@@ -2606,7 +2590,7 @@
   const StepPicker = (type, step_id, updateFilter) => ItemPicker({
     id: 'select-webhook',
     // label: '',
-    noneSelected: 'Any webhook',
+    noneSelected: __( 'Any webhook', 'groundhogg' ),
     fetchOptions: async search => {
       let steps = await Groundhogg.stores.steps.fetchItems({
         search,
@@ -2631,14 +2615,15 @@
   })
 
   if (typeof Groundhogg.rawStepTypes.http_post !== 'undefined') {
-    ContactFilterRegistry.registerFilter(createPastDateFilter('webhook_response', 'Webhook Response', 'submissions', {
+    ContactFilterRegistry.registerFilter(createPastDateFilter('webhook_response', __( 'Webhook Response', 'groundhogg' ), 'submissions', {
       display: ({ step_id = [] }) => {
 
         if (!step_id.length) {
-          return 'Any webhook response'
+          return __( 'Any webhook response', 'groundhogg' )
         }
 
-        return `Webhook response from ${ orList(step_id.map(id => bold(Groundhogg.stores.steps.get(id).data.step_title))) }`
+        // translators: %s: list of flow step names
+        return sprintf(__('Webhook response from %s', 'groundhogg'), orList(step_id.map(id => bold(Groundhogg.stores.steps.get(id).data.step_title))))
       },
       preload: ({
         step_id = [],
@@ -2676,15 +2661,15 @@
     }) => {
 
       if (!event_name) {
-        return 'Any WP Fusion activity'
+        return __( 'Any WP Fusion activity', 'groundhogg' )
       }
 
       let text = sprintf(`WP Fusion Event: %s`,
-        ComparisonsTitleGenerators[event_name_compare](bold('Name'), `<code>${ event_name }</code>`),
+        ComparisonsTitleGenerators[event_name_compare](bold( _x( 'Name', 'as in name of a wp-fusion event', 'groundhogg' ) ), `<code>${ event_name }</code>`),
       )
 
       if (event_value) {
-        text += ', ' + ComparisonsTitleGenerators[event_value_compare](bold('Value'), `<code>${ event_value }</code>`)
+        text += ', ' + ComparisonsTitleGenerators[event_value_compare](bold( _x( 'Value', 'as in a field value', 'groundhogg' ) ), `<code>${ event_value }</code>`)
       }
 
       return text
@@ -2698,7 +2683,7 @@
     }) => {
 
       return Fragment([
-        MakeEl.Label({ for: 'event-name' }, 'Event Name'),
+        MakeEl.Label({ for: 'event-name' }, _x( 'Event Name', 'as in name of a wp-fusion event', 'groundhogg' ) ),
         MakeEl.InputGroup([
           Select({
             id      : 'event-name-compare',
@@ -2715,7 +2700,7 @@
             id         : 'event-name',
             name       : 'event_name',
             value      : event_name,
-            placeholder: 'Event Name',
+            placeholder: _x( 'Event Name', 'as in name of a wp-fusion event', 'groundhogg' ),
             onChange   : e => {
               updateFilter({
                 event_name: e.target.value,
@@ -2723,7 +2708,7 @@
             },
           }),
         ]),
-        MakeEl.Label({ for: 'event-value' }, 'Event Value'),
+        MakeEl.Label({ for: 'event-value' }, _x( 'Value', 'as in a field value', 'groundhogg' ) ),
         MakeEl.InputGroup([
           Select({
             id      : 'event-value-compare',
@@ -2738,7 +2723,7 @@
           Input({
             id         : 'event-value',
             value      : event_value,
-            placeholder: 'Event value',
+            placeholder: _x( 'Value', 'as in a field value', 'groundhogg' ),
             onChange   : e => {
               updateFilter({
                 event_value: e.target.value,
@@ -2756,14 +2741,15 @@
   }))
 
   if (typeof Groundhogg.rawStepTypes.webhook_listener !== 'undefined') {
-    ContactFilterRegistry.registerFilter(createPastDateFilter('webhook_request', 'Webhook Request', 'submissions', {
+    ContactFilterRegistry.registerFilter(createPastDateFilter('webhook_request', __( 'Webhook Request', 'groundhogg' ), 'submissions', {
       display: ({ step_id = [] }) => {
 
         if (!step_id.length) {
-          return 'Any webhook request'
+          return __( 'Any webhook request', 'groundhogg' )
         }
 
-        return `Webhook request to ${ orList(step_id.map(id => bold(Groundhogg.stores.steps.get(id).data.step_title))) }`
+        // translators: %s: list of flow step names
+        return sprintf(__('Webhook request to %s', 'groundhogg'), orList(step_id.map(id => bold(Groundhogg.stores.steps.get(id).data.step_title))) )
       },
       preload: ({
         step_id = [],
@@ -2790,17 +2776,17 @@
     }))
   }
 
-  ContactFilterRegistry.registerFilter(createFilter('is_free_email_provider', 'Free inbox?', 'contact', {
-    display: ({is_free}) => is_free ? 'Is a free inbox' : 'Is NOT a free inbox',
+  ContactFilterRegistry.registerFilter(createFilter('is_free_email_provider', __( 'Free inbox?', 'groundhogg' ), 'contact', {
+    display: ({is_free}) => is_free ? __( 'Is a free inbox', 'groundhogg' ) : __( 'Is NOT a free inbox', 'groundhogg' ),
     edit: ({ is_free, updateFilter }) => {
       return Fragment([
         Div({
           className: 'display-flex gap-10'
         },[
-          'Email provider is free',
+          __( 'Email provider is free', 'groundhogg' ),
           Toggle({
-            onLabel: 'Yes',
-            offLabel: 'No',
+            onLabel: __( 'Yes', 'groundhogg' ),
+            offLabel: __( 'No', 'groundhogg' ),
             id: 'is-free',
             checked: is_free,
             onChange: e => {

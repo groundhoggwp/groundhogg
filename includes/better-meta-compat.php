@@ -51,6 +51,11 @@ function sanitize_custom_field( $value, $field_id ) {
 	switch ( $field['type'] ):
 		default:
 		case 'text':
+			if ( is_array( $value ) ){
+				$value = implode( ',', array_flatten( $value ) );
+			}
+
+			return sanitize_text_field( $value );
 		case 'url':
 		case 'tel':
 			return sanitize_text_field( $value );
@@ -58,6 +63,11 @@ function sanitize_custom_field( $value, $field_id ) {
 		case 'custom_email':
 			return sanitize_email( $value );
 		case 'textarea':
+
+			if ( is_array( $value ) ){
+				$value = implode( PHP_EOL, array_flatten( $value ) );
+			}
+
 			return sanitize_textarea_field( $value );
 		case 'number':
 //			return number_format( (float) $value, $field['decimals'] ?? 0, '.', '' );

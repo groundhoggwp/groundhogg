@@ -171,10 +171,12 @@
         preview.unshift(_x('at any time', 'groundhogg'))
         break
       case 'later':
+        /* translators: %s: a specific time like "09:00:00" */
         preview.unshift(sprintf(_x('at %s', 'at a specific time', 'groundhogg'), `<b>${ formatTime(run_time) }</b>`))
         break
       case 'between':
         preview.unshift(
+          /* translators: 1: a specific time like "09:00:00", 2: another specific time like "17:00:00" */
           sprintf(_x('between %1$s and %2$s', 'within a time from', 'groundhogg'), `<b>${ formatTime(run_time) }</b>`,
             `<b>${ formatTime(run_time_to) }</b>`))
         break
@@ -196,18 +198,20 @@
       case 'day_of_week':
         let dowList = orList(run_on_dow.map((i) => `<b>${ delay_timer_i18n.days_of_week[i] }</b>`))
         days = run_on_dow_type === 'any'
+          /* translators: %s: a day of the week */
                ? sprintf(_x('any %s', 'any - day of the week', 'groundhogg'), dowList)
+          /* translators: 1: the occurrence within the month, like "first", 2: a day of the week */
                : sprintf(_x('the %1$s %2$s', 'the - determiner - day of week', 'groundhogg'),
             delay_timer_i18n.day_of_week_determiners[run_on_dow_type].toLowerCase(), dowList)
         months = run_on_month_type === 'specific' ? orList(
-          run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month',
-          'groundhogg') }</b>`
+          run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month', 'groundhogg') }</b>`
         preview.unshift(sprintf(
-          _x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month',
-            'groundhogg'), days, months))
+          /* translators: 1: a list of ordinal days of the month (1st, 2nd, 3rd, etc...), 2: a list of months (February, March, April) */
+          _x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month', 'groundhogg'), days, months))
         break
       case 'day_of_month':
         days = run_on_dom.length > 0
+               // translators: %s: and ordinal day of the month (1st, 2nd, 3rd, etc...)
                ? sprintf(_x('the %s', 'the - ordinal day of month', 'groundhogg'), orList(
             run_on_dom.map((i) => `<b>${ i === 'last' ? __('last day', 'groundhogg') : ordinal_suffix_of(i) }</b>`)))
                : `<b>${ __('any day', 'groundhogg') }</b>`
@@ -215,8 +219,8 @@
           run_on_months.map((i) => `<b>${ delay_timer_i18n.months[i] }</b>`)) : `<b>${ __('any month',
           'groundhogg') }</b>`
         preview.unshift(sprintf(
-          _x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month',
-            'groundhogg'), days, months))
+          /* translators: 1: a list of ordinal days of the month (1st, 2nd, 3rd, etc...), 2: a list of months (February, March, April) */
+          _x('run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month', 'groundhogg'), days, months))
         break
     }
 
@@ -234,6 +238,7 @@
       }
 
       preview.unshift(
+        // translators: %s: a duration of time like "3 days"
         sprintf(_x('Wait at least %s and then', 'wait for a duration', 'groundhogg'),
           `<b>${ delay_amount } ${ delayTypes[delay_type] }</b>`),
       )

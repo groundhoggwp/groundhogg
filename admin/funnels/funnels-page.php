@@ -486,7 +486,7 @@ class Funnels_Page extends Admin_Page {
 			$id         = $new_funnel->import( $json );
 
 			$new_funnel->update( [
-				/* translators: %s: the previous flow title */
+				/* translators: %s: the asset title being copied */
 				'title' => sprintf( __( 'Copy of %s', 'groundhogg' ), $funnel->get_title() ),
 			] );
 

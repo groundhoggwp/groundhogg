@@ -89,130 +89,147 @@
 
   const ComparisonsTitleGenerators = {
     equals                  : (k, v) => sprintf(
-      _x('%1$s equals %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value*/
+      _x('%1$s equals %2$s', 'comparison', 'groundhogg'), k, v),
     not_equals              : (k, v) => sprintf(
-      _x('%1$s does not equal %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s does not equal %2$s', 'comparison', 'groundhogg'), k, v),
     contains                : (k, v) => sprintf(
-      _x('%1$s contains %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s contains %2$s', 'comparison', 'groundhogg'), k, v),
     not_contains            : (k, v) => sprintf(
-      _x('%1$s does not contain %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s does not contain %2$s', 'comparison', 'groundhogg'), k, v),
     starts_with             : (k, v) => sprintf(
-      _x('%1$s starts with %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s starts with %2$s', 'comparison', 'groundhogg'), k, v),
     ends_with               : (k, v) => sprintf(
-      _x('%1$s ends with %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s ends with %2$s', 'comparison', 'groundhogg'), k, v),
     does_not_start_with     : (k, v) => sprintf(
-      _x('%1$s does not start with %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s does not start with %2$s', 'comparison', 'groundhogg'), k, v),
     does_not_end_with       : (k, v) => sprintf(
-      _x('%1$s does not end with %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s does not end with %2$s', 'comparison', 'groundhogg'), k, v),
     less_than               : (k, v) => sprintf(
-      _x('%1$s is less than %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is less than %2$s', 'comparison', 'groundhogg'), k, v),
     less_than_or_equal_to   : (k, v) => sprintf(
-      _x('%1$s is less than or equal to %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is less than or equal to %2$s', 'comparison', 'groundhogg'), k, v),
     greater_than            : (k, v) => sprintf(
-      _x('%1$s is greater than %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is greater than %2$s', 'comparison', 'groundhogg'), k, v),
     greater_than_or_equal_to: (k, v) => sprintf(
-      _x('%1$s is greater than or equal to %2$s',
-        '%1 is a key and %2 is user defined value', 'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is greater than or equal to %2$s', 'comparison', 'groundhogg'), k, v),
     in                      : (k, v) => sprintf(
-      _x('%1$s is %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is %2$s', 'comparison', 'groundhogg'), k, v),
     not_in                  : (k, v) => sprintf(
-      _x('%1$s is not %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is not %2$s', 'comparison', 'groundhogg'), k, v),
     any_of                      : (k, v) => sprintf(
-      _x('%1$s is any of %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is any of %2$s', 'comparison', 'groundhogg'), k, v),
     none_of                  : (k, v) => sprintf(
-      _x('%1$s is none of %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is none of %2$s', 'comparison', 'groundhogg'), k, v),
     empty                   : (k, v) => sprintf(
-      _x('%1$s is empty', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is empty', 'comparison', 'groundhogg'), k, v),
     not_empty               : (k, v) => sprintf(
-      _x('%1$s is not empty', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is not empty', 'comparison', 'groundhogg'), k, v),
     includes                : (k, v) => sprintf(
-      _x('%1$s includes %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s includes %2$s', 'comparison', 'groundhogg'), k, v),
     excludes                : (k, v) => sprintf(
-      _x('%1$s excludes %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s excludes %2$s', 'comparison', 'groundhogg'), k, v),
     before                  : (k, v) => sprintf(
-      _x('%1$s is before %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is before %2$s', 'comparison', 'groundhogg'), k, v),
+    not_before                  : (k, v) => sprintf(
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is not before %2$s', 'comparison', 'groundhogg'), k, v),
     day_of                  : (k, v) => sprintf(
-      _x('%1$s on %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s on %2$s', 'comparison', 'groundhogg'), k, v),
+    not_day_of                  : (k, v) => sprintf(
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is not on %2$s', 'comparison', 'groundhogg'), k, v),
     after                   : (k, v) => sprintf(
-      _x('%1$s is after %2$s', '%1 is a key and %2 is user defined value',
-        'groundhogg'), k, v),
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is after %2$s', 'comparison', 'groundhogg'), k, v),
+    not_after                   : (k, v) => sprintf(
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is not after %2$s', 'comparison', 'groundhogg'), k, v),
     between                 : (k, v, v2) => sprintf(
-      _x('%1$s is between %2$s and %3$s',
-        '%1 is a key and %2 and %3 are user defined values', 'groundhogg'), k,
-      v, v2),
+      /* translators: 1: a field key, 2: a user-defined value, 3: another user-defined value */
+      _x('%1$s is between %2$s and %3$s', 'comparison', 'groundhogg'), k, v, v2),
+    not_between                 : (k, v, v2) => sprintf(
+      /* translators: 1: a field key, 2: a user-defined value, 3: another user-defined value */
+      _x('%1$s is not between %2$s and %3$s', 'comparison', 'groundhogg'), k, v, v2),
+    is                      : (k, v) => sprintf(
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is %2$s', 'comparison', 'groundhogg'), k, v),
+    is_not                      : (k, v) => sprintf(
+      /* translators: 1: a field key, 2: a user-defined value */
+      _x('%1$s is %2$s', 'comparison', 'groundhogg'), k, v),
   }
 
   const pastDateRanges = {
-    'any'         : __('At any time', 'groundhogg'),
-    'today'       : __('Today', 'groundhogg'),
-    'yesterday'   : __('Yesterday', 'groundhogg'),
-    'this_week'   : __('This week', 'groundhogg'),
-    'last_week'   : __('Last week', 'groundhogg'),
-    'this_month'  : __('This month', 'groundhogg'),
-    'last_month'  : __('Last month', 'groundhogg'),
-    'this_quarter': __('This quarter', 'groundhogg'),
-    'last_quarter': __('Last quarter', 'groundhogg'),
-    'this_year'   : __('This year', 'groundhogg'),
-    'last_year'   : __('Last year', 'groundhogg'),
-    '24_hours'    : __('In the last 24 hours', 'groundhogg'),
-    '7_days'      : __('In the last 7 days', 'groundhogg'),
-    '14_days'     : __('In the last 14 days', 'groundhogg'),
-    '30_days'     : __('In the last 30 days', 'groundhogg'),
-    '60_days'     : __('In the last 60 days', 'groundhogg'),
-    '90_days'     : __('In the last 90 days', 'groundhogg'),
-    '365_days'    : __('In the last 365 days', 'groundhogg'),
-    'x_days'      : __('In the last X days', 'groundhogg'),
-    'before'      : __('Before', 'groundhogg'),
-    'after'       : __('After', 'groundhogg'),
-    'between'     : __('Between', 'groundhogg'),
-    'day_of'      : __('Day of', 'groundhogg'),
+    'any'         : _x('At any time', 'as in a date-range', 'groundhogg'),
+    'today'       : _x('Today', 'as in a date-range', 'groundhogg'),
+    'yesterday'   : _x('Yesterday', 'as in a date-range', 'groundhogg'),
+    'this_week'   : _x('This week', 'as in a date-range', 'groundhogg'),
+    'last_week'   : _x('Last week', 'as in a date-range', 'groundhogg'),
+    'this_month'  : _x('This month', 'as in a date-range', 'groundhogg'),
+    'last_month'  : _x('Last month', 'as in a date-range', 'groundhogg'),
+    'this_quarter': _x('This quarter', 'as in a date-range', 'groundhogg'),
+    'last_quarter': _x('Last quarter', 'as in a date-range', 'groundhogg'),
+    'this_year'   : _x('This year', 'as in a date-range', 'groundhogg'),
+    'last_year'   : _x('Last year', 'as in a date-range', 'groundhogg'),
+    '24_hours'    : _x('In the last 24 hours', 'as in a date-range', 'groundhogg'),
+    '7_days'      : _x('In the last 7 days', 'as in a date-range', 'groundhogg'),
+    '14_days'     : _x('In the last 14 days', 'as in a date-range', 'groundhogg'),
+    '30_days'     : _x('In the last 30 days', 'as in a date-range', 'groundhogg'),
+    '60_days'     : _x('In the last 60 days', 'as in a date-range', 'groundhogg'),
+    '90_days'     : _x('In the last 90 days', 'as in a date-range', 'groundhogg'),
+    '365_days'    : _x('In the last 365 days', 'as in a date-range', 'groundhogg'),
+    'x_days'      : _x('In the last X days', 'as in a date-range', 'groundhogg'),
+    'before'      : _x('Before', 'as in a date-range', 'groundhogg'),
+    'after'       : _x('After', 'as in a date-range', 'groundhogg'),
+    'between'     : _x('Between', 'as in a date-range', 'groundhogg'),
+    'day_of'      : _x('Day of', 'as in a date-range', 'groundhogg'),
   }
 
   const futureDateRanges = {
-    'any'          : __('At any time', 'groundhogg'),
-    'today'        : __('Today', 'groundhogg'),
-    'tomorrow'     : __('Tomorrow', 'groundhogg'),
-    'this_week'    : __('This week', 'groundhogg'),
-    'next_week'    : __('Next week', 'groundhogg'),
-    'this_month'   : __('This month', 'groundhogg'),
-    'next_month'   : __('Next month', 'groundhogg'),
-    'this_quarter' : __('This quarter', 'groundhogg'),
-    'next_quarter' : __('Next quarter', 'groundhogg'),
-    'this_year'    : __('This year', 'groundhogg'),
-    'next_year'    : __('Next year', 'groundhogg'),
-    'next_24_hours': __('In the next 24 hours', 'groundhogg'),
-    'next_7_days'  : __('In the next 7 days', 'groundhogg'),
-    'next_14_days' : __('In the next 14 days', 'groundhogg'),
-    'next_30_days' : __('In the next 30 days', 'groundhogg'),
-    'next_60_days' : __('In the next 60 days', 'groundhogg'),
-    'next_90_days' : __('In the next 90 days', 'groundhogg'),
-    'next_365_days': __('In the next 365 days', 'groundhogg'),
-    'next_x_days'  : __('In the next X days', 'groundhogg'),
-    'before'       : __('Before', 'groundhogg'),
-    'after'        : __('After', 'groundhogg'),
-    'between'      : __('Between', 'groundhogg'),
-    'day_of'       : __('Day of', 'groundhogg'),
+    'any'          : _x('At any time', 'as in a date-range', 'groundhogg'),
+    'today'        : _x('Today', 'as in a date-range', 'groundhogg'),
+    'tomorrow'     : _x('Tomorrow', 'as in a date-range', 'groundhogg'),
+    'this_week'    : _x('This week', 'as in a date-range', 'groundhogg'),
+    'next_week'    : _x('Next week', 'as in a date-range', 'groundhogg'),
+    'this_month'   : _x('This month', 'as in a date-range', 'groundhogg'),
+    'next_month'   : _x('Next month', 'as in a date-range', 'groundhogg'),
+    'this_quarter' : _x('This quarter', 'as in a date-range', 'groundhogg'),
+    'next_quarter' : _x('Next quarter', 'as in a date-range', 'groundhogg'),
+    'this_year'    : _x('This year', 'as in a date-range', 'groundhogg'),
+    'next_year'    : _x('Next year', 'as in a date-range', 'groundhogg'),
+    'next_24_hours': _x('In the next 24 hours', 'as in a date-range', 'groundhogg'),
+    'next_7_days'  : _x('In the next 7 days', 'as in a date-range', 'groundhogg'),
+    'next_14_days' : _x('In the next 14 days', 'as in a date-range', 'groundhogg'),
+    'next_30_days' : _x('In the next 30 days', 'as in a date-range', 'groundhogg'),
+    'next_60_days' : _x('In the next 60 days', 'as in a date-range', 'groundhogg'),
+    'next_90_days' : _x('In the next 90 days', 'as in a date-range', 'groundhogg'),
+    'next_365_days': _x('In the next 365 days', 'as in a date-range', 'groundhogg'),
+    'next_x_days'  : _x('In the next X days', 'as in a date-range', 'groundhogg'),
+    'before'       : _x('Before', 'as in a date-range', 'groundhogg'),
+    'after'        : _x('After', 'as in a date-range', 'groundhogg'),
+    'between'      : _x('Between', 'as in a date-range', 'groundhogg'),
+    'day_of'       : _x('Day of', 'as in a date-range', 'groundhogg'),
   }
 
   const allDateRanges = {
@@ -229,25 +246,34 @@
   }
 
   const filterCountComparisons = {
+    /* translators: %s: number of occurrences */
     equals                  : (v) => sprintf(_n('%s time', '%s times', parseInt(v), 'groundhogg'), v),
+    /* translators: %s: number of occurrences */
     less_than               : (v) => sprintf(_n('less than %s time', 'less than %s times', parseInt(v), 'groundhogg'), v),
+    /* translators: %s: number of occurrences */
     less_than_or_equal_to   : (v) => sprintf(_n('at most %s time', 'at most %s times', parseInt(v), 'groundhogg'), v),
+    /* translators: %s: number of occurrences */
     greater_than            : (v) => sprintf(_n('more than %s time', 'more than %s times', parseInt(v), 'groundhogg'), v),
+    /* translators: %s: number of occurrences */
     greater_than_or_equal_to: (v) => sprintf(_n('at least %s time', 'at least %s times', parseInt(v), 'groundhogg'), v),
   }
 
   const moreComparisonTitleGenerators = {
     all_checked: (prefix, options) => sprintf(
-      __('%2$s is checked for %1$s', 'groundhogg-better-meta'), prefix,
+      /* translators: 2: list of checked options, 1: a field key */
+      __('%2$s is checked for %1$s', 'groundhogg'), prefix,
       andList(options.map(b => bold(b)))),
     not_checked: (prefix, options) => sprintf(
-      __('%2$s is not checked for %1$s', 'groundhogg-better-meta'), prefix,
+      /* translators: 2: list of checked options, 1: a field key */
+      __('%2$s is not checked for %1$s', 'groundhogg'), prefix,
       andList(options.map(b => bold(b)))),
     all_in     : (prefix, options) => sprintf(
-      __('%2$s is selected for %1$s', 'groundhogg-better-meta'), prefix,
+      /* translators: 2: list of checked options, 1: a field key */
+      __('%2$s is selected for %1$s', 'groundhogg'), prefix,
       andList(options.map(b => bold(b)))),
     all_not_in : (prefix, options) => sprintf(
-      __('%2$s is not selected for %1$s', 'groundhogg-better-meta'), prefix,
+      /* translators: 2: list of checked options, 1: a field key */
+      __('%2$s is not selected for %1$s', 'groundhogg'), prefix,
       andList(options.map(b => bold(b)))),
   }
 
@@ -684,8 +710,8 @@
             id      : 'filter-compare',
             name    : 'compare',
             options : {
-              is    : 'Is',
-              is_not: 'Is not',
+              is    : _x( 'Is', 'comparison', 'groundhogg' ),
+              is_not: _x( 'Is not', 'comparison', 'groundhogg' ),
             },
             selected: compare,
             onChange: e => updateFilter({
@@ -742,25 +768,35 @@
       }) => {
 
         let prefix = display(rest)
+
         if (!prefix || prefix.length === 0) {
           prefix = bold(name)
         }
 
         if (compare === 'is_not') {
-          prefix += ' is not'
+          switch (date_range) {
+            case 'between':
+              return ComparisonsTitleGenerators.not_between(prefix, formatDate(after), formatDate(before))
+            case 'after':
+              return ComparisonsTitleGenerators.not_after(prefix, formatDate(after))
+            case 'day_of':
+              return ComparisonsTitleGenerators.not_day_of(prefix, formatDate(after))
+            case 'before':
+              return ComparisonsTitleGenerators.not_before(prefix, formatDate(before))
+            default:
+              return ComparisonsTitleGenerators.is_not( prefix, dateRanges[date_range ?? 'any']?.replace('X', days).toLowerCase())
+          }
         }
 
         switch (date_range) {
           case 'between':
-            return ComparisonsTitleGenerators.between(prefix,
-              formatDate(after), formatDate(before))
+            return ComparisonsTitleGenerators.between(prefix, formatDate(after), formatDate(before))
           case 'after':
+            return ComparisonsTitleGenerators.after(prefix, formatDate(after))
           case 'day_of':
-            return ComparisonsTitleGenerators[date_range](prefix,
-              formatDate(after))
+            return ComparisonsTitleGenerators.day_of(prefix, formatDate(after))
           case 'before':
-            return ComparisonsTitleGenerators.before(prefix,
-              formatDate(before))
+            return ComparisonsTitleGenerators.before(prefix, formatDate(before))
           default:
             return sprintf('%s %s', prefix, dateRanges[date_range ?? 'any']?.replace('X', days).toLowerCase())
         }
@@ -844,8 +880,8 @@
     name,
     group,
     {
-      display: ({ value }) => sprintf('%s is %s', bold(name),
-        bold(options[value])),
+      /* translators: 1: a field key, 2: a user-defined value */
+      display: ({ value }) => ComparisonsTitleGenerators.is( bold(name), bold(options[value])),
       edit   : ({
         value,
         updateFilter,
@@ -876,7 +912,7 @@
     updateFilter,
   }) => ItemPicker({
     id          : 'filter-options',
-    noneSelected: 'Type to search...',
+    noneSelected: __( 'Type to search...', 'groundhogg' ),
     selected    : options.map(opt => ( {
       id  : opt,
       text: opt,
@@ -1010,8 +1046,8 @@
           id      : 'filter-compare',
           selected: compare,
           options : field.multiple ? {
-            all_in    : __('Has all selected'),
-            all_not_in: __('Does not have all selected'),
+            all_in    : __('Has all selected', 'groundhogg'),
+            all_not_in: __('Does not have all selected', 'groundhogg'),
           } : {
             in    : _x('Is one of', 'comparison, groundhogg'),
             not_in: _x('Is not one of', 'comparison', 'groundhogg'),
@@ -1055,8 +1091,8 @@
           id      : 'filter-compare',
           selected: compare,
           options : {
-            all_checked: __('Is Checked', 'groundhogg-better-meta'),
-            not_checked: __('Is Not Checked', 'groundhogg-better-meta'),
+            all_checked: _x('Is Checked', 'comparison', 'groundhogg'),
+            not_checked: _x('Is Not Checked', 'comparison', 'groundhogg'),
           },
           onChange: e => updateFilter({
             compare: e.target.value,
@@ -1341,10 +1377,12 @@
 
       if (filterRegistry.hasFilter(filter)) {
         message = err instanceof Error ? err.message : sprintf(
+          /* translators: %s: a filter type like "optin_status" */
           __('This %s filter is corrupted', 'groundhogg'),
           bold(filterRegistry.filterName(filter)))
       }
       else {
+        /* translators: %s: a filter type like "optin_status" */
         message = sprintf(__('This %s filter is not available.', 'groundhogg'),
           bold(filter.type))
       }
@@ -1667,7 +1705,7 @@
     }, Span({
       id       : `${ id }-loading`,
       className: 'filters-loading',
-    }, Ellipses(__('Loading'))))
+    }, Ellipses(_x('Loading', 'as in waiting for something to load', 'groundhogg'))))
 
     /**
      * The wrapper for all the filters
@@ -1725,9 +1763,9 @@
 
         return Span({}, result).innerHTML
 
-      }).join(' <i>AND</i> ')
+      }).join(` <i>${_x('AND', 'as in a query', 'groundhogg')}</i> `)
 
-    }).join(' <br/><i>OR</i> '))
+    }).join(` <br/><i>${_x('OR', 'as in a query', 'groundhogg')}</i> `))
 
     try {
       return renderFilters()
@@ -1736,7 +1774,7 @@
       // need to preload
     }
 
-    let el = Span({className:'loading-dots'}, ['Loading'])
+    let el = Span({className:'loading-dots'}, [_x('Loading', 'as in waiting to for something to load', 'groundhogg')])
 
     filterRegistry.preloadFilters(filters).finally(r => {
       morphdom(el, renderFilters())
@@ -1771,6 +1809,7 @@
     futureDateRanges,
     allDateRanges,
     moreComparisonTitleGenerators,
+    filterCountComparisons
   }
 
   if (window.GroundhoggTableFilters) {

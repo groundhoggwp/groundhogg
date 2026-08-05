@@ -714,7 +714,7 @@ class License_Manager {
 							?>
 							<a class="button-secondary" target="_blank"
 							   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf(
-                                       /* translators: 1: the min price, 2: the max price */
+                                       /* translators: 1: min price, 2: max price */
                                        _x( 'Buy Now ($%1$s - $%2$s)', 'action', 'groundhogg' ), $price1, $price2 ) ); ?></a>
 							<?php
 						} else {

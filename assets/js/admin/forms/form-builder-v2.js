@@ -771,7 +771,9 @@
               return `
                   <div class="inline-tag-picker" style="position: relative">
                       ${ icons.tag }
-                      ${ value.length ? `<span class="number-of">${tagCount}</span><div class="gh-tooltip top">${sprintf( _n( 'Apply %d tag', 'Apply %d tags', tagCount, 'groundhogg' ), tagCount ) }</div>` : '' }
+                      ${ value.length ? `<span class="number-of">${tagCount}</span><div class="gh-tooltip top">${sprintf(
+                        // translators: %d: a number of tags
+                        _n( 'Apply %d tag', 'Apply %d tags', tagCount, 'groundhogg' ), tagCount ) }</div>` : '' }
                       ${ input({
                           className: 'input hidden tags-input',
                           value: isString(value) ? value : '',
@@ -1150,8 +1152,8 @@
           checked,
         })
 
-        let dataLabel = sprintf(__('I agree to %s\'s storage and processing of my personal data.', 'groundhogg'),
-          Groundhogg.name)
+        /* translators: %s: site/brand name */
+        let dataLabel = sprintf(__('I agree to %s\'s storage and processing of my personal data.', 'groundhogg'), Groundhogg.name)
 
         const marketingField = input({
           id: 'marketing-consent',
@@ -1163,6 +1165,7 @@
           checked,
         })
 
+        /* translators: %s: site/brand name */
         let marketingLabel = sprintf(__('I agree to receive marketing offers and updates from %s.', 'groundhogg'),
           Groundhogg.name)
 

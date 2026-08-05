@@ -275,7 +275,7 @@ abstract class Base_Api extends Supports_Errors {
 				/* translators: %s: the contact's ID */
 				return self::ERROR_400( 'invalid_id', sprintf( _x( 'Contact with ID %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
 			} else {
-				/* translators: %s: the contact's email */
+				/* translators: %s: the contact's email address */
 				return self::ERROR_400( 'invalid_email', sprintf( _x( 'Contact with email %s does not exist.', 'api', 'groundhogg' ), $id_or_email ) );
 			}
 		}

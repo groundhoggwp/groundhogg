@@ -311,7 +311,7 @@ class Tracking {
 	public function invalid_link_screen() {
 		wp_die( 'This link is currently unavailable.', 'Invalid Link', [
 			'response' => 404,
-			// translators: %s is the blog name
+			// translators: %s: the blog name
 			'link_text' => sprintf( esc_html__( 'Return to %s', 'groundhogg' ), esc_html( get_bloginfo( 'name', 'display' ) ) ),
 			'link_url'  => esc_url( home_url() )
 		] );
