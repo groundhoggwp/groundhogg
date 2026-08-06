@@ -17,7 +17,7 @@ class Split_Test extends Split_Path {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Split (A/B) Test';
+		return esc_html_x( 'Split (A/B) Test', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -25,7 +25,7 @@ class Split_Test extends Split_Path {
 	}
 
 	public function get_description() {
-		return 'Test how different steps affect conversions and other funnel metrics.';
+		return esc_html__( 'Test how different steps affect conversions and other funnel metrics.', 'groundhogg' );
 	}
 
 	public function get_icon() {
@@ -234,7 +234,7 @@ class Split_Test extends Split_Path {
 		$winner = $this->get_setting( 'winner' );
 
 		if ( $winner ){
-			return $branch === $winner ? 'Winner (100%)' : 'Loser (0%)';
+			return $branch === $winner ? esc_html__( 'Winner (100%)', 'groundhogg' ) : esc_html__( 'Loser (0%)', 'groundhogg' );
 		}
 
 		$branch = strtoupper( explode( '-', $branch )[1] );

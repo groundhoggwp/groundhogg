@@ -40,7 +40,7 @@ class Sleep extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Sleep', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Sleep', 'step_name', 'groundhogg' );
 	}
 
 	/**

@@ -11,7 +11,7 @@ class Timer_Skip extends Logic {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Timer Skip';
+		return esc_html_x( 'Timer Skip', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -19,7 +19,7 @@ class Timer_Skip extends Logic {
 	}
 
 	public function get_description() {
-		return 'Skips to the timer with the next closest date.';
+		return esc_html__( 'Skips to the timer with the next closest date.', 'groundhogg' );
 	}
 
 	public function get_icon() {

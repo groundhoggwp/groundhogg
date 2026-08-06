@@ -14,7 +14,7 @@ class Date_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Date Timer', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Date Timer', 'step_name', 'groundhogg' );
 	}
 
 	/**

@@ -44,7 +44,7 @@ class Web_Form extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Web Form', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Web Form', 'step_name', 'groundhogg' );
 	}
 
 	/**

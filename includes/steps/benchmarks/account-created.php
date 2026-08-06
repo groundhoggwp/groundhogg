@@ -45,7 +45,7 @@ class Account_Created extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'User Created', 'step_name', 'groundhogg' );
+		return esc_html_x( 'User Created', 'step_name', 'groundhogg' );
 	}
 
 	public function get_sub_group() {

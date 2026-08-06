@@ -10,7 +10,7 @@ class Field_Changed extends Benchmark {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return _x( 'Field Changed', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Field Changed', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {

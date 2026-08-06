@@ -53,7 +53,7 @@ class Email_Opened extends Benchmark {
 	}
 
 	public function get_name() {
-		return __( 'Email Opened', 'groundhogg' );
+		return esc_html_x( 'Email Opened', 'step name', 'groundhogg' );
 	}
 
 	public function get_type() {

@@ -26,7 +26,7 @@ class Link_Clicked extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Link Click', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Link Click', 'step_name', 'groundhogg' );
 	}
 
 	/**

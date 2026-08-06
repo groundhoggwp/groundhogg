@@ -39,7 +39,7 @@ class Tag_Removed extends Tag_Applied {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Tag Removed', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Tag Removed', 'step_name', 'groundhogg' );
 	}
 
 	/**

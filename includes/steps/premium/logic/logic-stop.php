@@ -11,7 +11,7 @@ class Logic_Stop extends Logic {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Stop';
+		return esc_html_x( 'Stop', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -19,7 +19,7 @@ class Logic_Stop extends Logic {
 	}
 
 	public function get_description() {
-		return 'Prevent a contact from continuing in a flow based on filters.';
+		return esc_html__( 'Prevent a contact from continuing in a flow based on filters.', 'groundhogg' );
 	}
 
 	public function get_icon() {

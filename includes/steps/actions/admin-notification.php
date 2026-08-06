@@ -57,7 +57,7 @@ class Admin_Notification extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Admin Notification', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Admin Notification', 'step_name', 'groundhogg' );
 	}
 
 	public function get_sub_group() {

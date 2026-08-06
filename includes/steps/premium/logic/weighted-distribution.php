@@ -13,7 +13,7 @@ class Weighted_Distribution extends Split_Path {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Random Distribution';
+		return esc_html_x( 'Random Distribution', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -21,7 +21,7 @@ class Weighted_Distribution extends Split_Path {
 	}
 
 	public function get_description() {
-		return 'Randomly send contacts down different branches with some bias.';
+		return esc_html__( 'Randomly send contacts down different branches with some bias.', 'groundhogg' );
 	}
 
 	public function get_icon() {

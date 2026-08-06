@@ -15,7 +15,7 @@ class Plugin_Api extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Plugin API Trigger', 'groundhogg' );
+		return esc_html_x( 'Plugin API Trigger', 'step_name', 'groundhogg' );
 	}
 
 	/**

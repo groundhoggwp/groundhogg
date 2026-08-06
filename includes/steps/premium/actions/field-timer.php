@@ -34,7 +34,7 @@ class Field_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Field Timer', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Field Timer', 'step_name', 'groundhogg' );
 	}
 
 	/**

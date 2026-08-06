@@ -19,7 +19,7 @@ class Role_Changed extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Role Changed', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Role Changed', 'step_name', 'groundhogg' );
 	}
 
 	/**

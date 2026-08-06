@@ -19,7 +19,7 @@ class Post_Published extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Post Published', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Post Published', 'step_name', 'groundhogg' );
 	}
 
 	/**

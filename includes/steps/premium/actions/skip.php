@@ -5,7 +5,7 @@ namespace Groundhogg\Steps\Premium\Actions;
 class Skip extends Loop {
 
 	public function get_name() {
-		return 'Skip';
+		return esc_html_x( 'Skip', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {

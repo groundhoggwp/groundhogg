@@ -14,7 +14,7 @@ class Advanced_Timer extends Timer {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Advanced Timer', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Advanced Timer', 'step_name', 'groundhogg' );
 	}
 
 	/**

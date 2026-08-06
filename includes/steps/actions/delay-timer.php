@@ -91,7 +91,7 @@ class Delay_Timer extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Delay Timer', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Delay Timer', 'step_name', 'groundhogg' );
 	}
 
 	/**

@@ -16,7 +16,7 @@ class Split_Path extends Branch_Logic {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Multi Branch';
+		return esc_html_x( 'Multi Branch', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -24,7 +24,7 @@ class Split_Path extends Branch_Logic {
 	}
 
 	public function get_description() {
-		return 'Similar to Yes/No logic, but each branch has its own conditions.';
+		return esc_html__( 'Similar to Yes/No logic, but each branch has its own conditions.', 'groundhogg' );
 	}
 
 	public function get_icon() {

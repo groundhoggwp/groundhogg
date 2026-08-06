@@ -11,7 +11,7 @@ class Logic_Skip extends Logic {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Skip';
+		return esc_html_x( 'Skip', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -19,7 +19,7 @@ class Logic_Skip extends Logic {
 	}
 
 	public function get_description() {
-		return 'Skip to a proceeding step within the flow.';
+		return esc_html__( 'Skip to a proceeding step within the flow.', 'groundhogg' );
 	}
 
 	public function get_icon() {

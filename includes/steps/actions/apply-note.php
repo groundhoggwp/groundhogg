@@ -40,7 +40,7 @@ class Apply_Note extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Add Note', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Add Note', 'step_name', 'groundhogg' );
 	}
 
 	/**

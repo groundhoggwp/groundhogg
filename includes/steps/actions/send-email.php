@@ -51,7 +51,7 @@ class Send_Email extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Send Email', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Send Email', 'step_name', 'groundhogg' );
 	}
 
 	public function get_sub_group() {

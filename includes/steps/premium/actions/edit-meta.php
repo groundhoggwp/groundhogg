@@ -26,7 +26,7 @@ class Edit_Meta extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Edit Custom Fields', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Edit Custom Fields', 'step_name', 'groundhogg' );
 	}
 
 	/**

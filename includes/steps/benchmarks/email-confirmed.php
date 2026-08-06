@@ -36,7 +36,7 @@ class Email_Confirmed extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Opt-in Status Confirmed', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Opt-in Status Confirmed', 'step_name', 'groundhogg' );
 	}
 
 	/**

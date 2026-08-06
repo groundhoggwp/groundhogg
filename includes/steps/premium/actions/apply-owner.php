@@ -26,7 +26,7 @@ class Apply_Owner extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Assign Owner', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Assign Owner', 'step_name', 'groundhogg' );
 	}
 
 	/**

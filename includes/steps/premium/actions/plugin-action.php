@@ -15,7 +15,7 @@ class Plugin_Action extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Plugin API Action', 'groundhogg' );
+		return esc_html_x( 'Plugin API Action', 'step_name','groundhogg' );
 	}
 
 	/**

@@ -26,7 +26,7 @@ class Create_User extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Create User', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Create User', 'step_name', 'groundhogg' );
 	}
 
 	/**

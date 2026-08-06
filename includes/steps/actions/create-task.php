@@ -44,7 +44,7 @@ class Create_Task extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Create Task', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Create Task', 'step_name', 'groundhogg' );
 	}
 
 	/**

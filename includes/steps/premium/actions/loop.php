@@ -10,7 +10,7 @@ class Loop extends Action {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Loop';
+		return esc_html_x( 'Loop','step_name', 'groundhogg' );
 	}
 
 	public function get_type() {

@@ -19,7 +19,7 @@ class Login_Status extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Logs In', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Logs In', 'step_name', 'groundhogg' );
 	}
 
 	/**

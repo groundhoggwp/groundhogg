@@ -39,7 +39,7 @@ class Optin_Status_Changed extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Opt-in status changed', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Opt-in status changed', 'step_name', 'groundhogg' );
 	}
 
 	/**

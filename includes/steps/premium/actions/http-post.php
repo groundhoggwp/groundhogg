@@ -26,7 +26,7 @@ class HTTP_Post extends Action {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Webhook', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Webhook', 'step_name', 'groundhogg' );
 	}
 
 	/**

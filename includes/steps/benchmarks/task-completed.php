@@ -89,7 +89,7 @@ class Task_Completed extends Benchmark {
 	}
 
 	public function get_name() {
-		return __( 'Task Completed', 'groundhogg' );
+		return esc_html_x( 'Task Completed', 'step name','groundhogg' );
 	}
 
 	public function get_type() {

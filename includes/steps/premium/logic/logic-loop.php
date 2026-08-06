@@ -11,7 +11,7 @@ class Logic_Loop extends Logic {
 	use Trait_Premium_Step;
 
 	public function get_name() {
-		return 'Loop';
+		return esc_html_x( 'Loop', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -19,7 +19,7 @@ class Logic_Loop extends Logic {
 	}
 
 	public function get_description() {
-		return 'Loop back to previous step within the funnel.';
+		return esc_html__( 'Loop back to previous step within the funnel.', 'groundhogg' );
 	}
 
 	public function get_icon() {

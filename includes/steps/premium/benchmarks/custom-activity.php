@@ -20,7 +20,7 @@ class Custom_Activity extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Custom Activity', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Custom Activity', 'step_name', 'groundhogg' );
 	}
 
 	/**

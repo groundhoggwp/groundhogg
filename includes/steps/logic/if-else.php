@@ -11,7 +11,7 @@ use function Groundhogg\html;
 class If_Else extends Branch_Logic {
 
 	public function get_name() {
-		return 'Yes/No';
+		return esc_html_x( 'Yes/No', 'step name', 'groundhogg' );
 	}
 
 	public function get_type() {

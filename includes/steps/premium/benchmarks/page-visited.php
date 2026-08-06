@@ -23,7 +23,7 @@ class Page_Visited extends Benchmark {
 	 * @return string
 	 */
 	public function get_name() {
-		return _x( 'Page Visited', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Page Visited', 'step_name', 'groundhogg' );
 	}
 
 	/**
