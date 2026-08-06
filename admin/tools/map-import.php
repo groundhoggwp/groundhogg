@@ -36,7 +36,7 @@ $file_name = urldecode( sanitize_text_field( wp_unslash( $_GET['import'] ?? '' )
 $file_path = files()->get_csv_imports_dir( $file_name );
 
 if ( ! file_exists( $file_path ) ) {
-	wp_die( 'The given file does not exist.' );
+	wp_die( esc_html__( 'The given file does not exist.', 'groundhogg' ) );
 }
 
 $selected = absint( get_url_var( 'preview_item' ) );

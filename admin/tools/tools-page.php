@@ -632,7 +632,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		$map = map_deep( get_post_var( 'map' ), 'sanitize_text_field' );
 
 		if ( ! is_array( $map ) ) {
-			wp_die( 'Invalid map provided.' );
+			wp_die( esc_html__( 'Invalid map provided.', 'groundhogg' ) );
 		}
 
 		$file_name = sanitize_file_name( get_post_var( 'import' ) );
@@ -1224,20 +1224,20 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		// guard against ../../ traversal attack
 		if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) || ! Files::is_file_within_directory( $file_path, $groundhogg_path ) ) {
-			wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
+			wp_die( esc_html__( 'The requested file was not found.', 'groundhogg' ), esc_html__( 'File not found.', 'groundhogg' ), [ 'status' => 404 ] );
 		}
 
 		$request = get_request_query();
 
 		if ( ! current_user_can( 'download_file', $short_path, $request, $file_path ) ) {
-			wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
+			wp_die( esc_html__( 'You do not have permission to view this file.', 'groundhogg' ), esc_html__( 'Access denied.', 'groundhogg' ), [ 'status' => 403 ] );
 		}
 
 		$mime = wp_check_filetype( $file_path );
 		$mime = $mime['type'];
 
 		if ( ! $mime ) {
-			wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
+			wp_die( esc_html__( 'The request file type is unrecognized and has been blocked for your protection.', 'groundhogg' ), esc_html__( 'Access denied.', 'groundhogg' ), [ 'status' => 403 ] );
 		}
 
 		$content_type = sprintf( "Content-Type: %s", $mime );

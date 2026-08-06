@@ -18,7 +18,7 @@ $form_id = get_query_var( 'slug' );
 $step = new Step( $form_id );
 
 if ( ! $step ) {
-	wp_die( 'No form found...' );
+  wp_die( esc_html__( 'No form found...', 'groundhogg' ) );
 }
 
 $title = $step->get_title();

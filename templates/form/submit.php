@@ -16,7 +16,7 @@ $slug = get_query_var( 'slug' );
 $step = new Step( $slug );
 
 if ( ! $step->exists() || ! ( $step->type_is( 'form_fill' ) || $step->type_is( 'web_form' ) ) ) {
-	wp_die( 'Form does not exist.' );
+	wp_die( esc_html__( 'Form does not exist.', 'groundhogg' ) );
 }
 
 if ( $step->type_is( 'form_fill' ) ) {
@@ -24,7 +24,7 @@ if ( $step->type_is( 'form_fill' ) ) {
 } else if ( $step->type_is( 'web_form' ) ) {
 	$form = new Form_v2( [ 'id' => $step->get_id() ] );
 } else {
-	wp_die( 'Invalid form type.' );
+	wp_die( esc_html__( 'Invalid form type.', 'groundhogg' ) );
 }
 
 

@@ -261,7 +261,7 @@ class Tracking {
 				break;
 		}
 
-		wp_die( 'This link is currently unavailable.' );
+		wp_die( esc_html__( 'This link is currently unavailable.', 'groundhogg' ) );
 	}
 
 	/**
@@ -309,7 +309,7 @@ class Tracking {
 	 * @return void
 	 */
 	public function invalid_link_screen() {
-		wp_die( 'This link is currently unavailable.', 'Invalid Link', [
+		wp_die( esc_html__( 'This link is currently unavailable.', 'groundhogg' ), esc_html__( 'Invalid Link', 'groundhogg' ), [
 			'response' => 404,
 			// translators: %s: the blog name
 			'link_text' => sprintf( esc_html__( 'Return to %s', 'groundhogg' ), esc_html( get_bloginfo( 'name', 'display' ) ) ),
