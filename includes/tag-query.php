@@ -381,7 +381,7 @@ class Tag_Query {
             return self::$no_results;
         }
 
-        $tags    = $clause['tags'];
+        $tags    =  parse_tag_list( $clause['tags'], 'ID', false );
         $operator = strtoupper( $clause['operator'] );
 
         if ( 'IN' == $operator ) {
