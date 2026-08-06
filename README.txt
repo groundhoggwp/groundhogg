@@ -381,6 +381,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 4.5.15 (2026-07-27) =
 * ADDED "Reload page" after form submit setting.
 * FIXED Email editor crashes after dragging a block from a global block namespace to the main namespace.
+* FIXED i18n not working in JS files.
+* FIXED Missing translator comments, incorrect gettext usage, and other localization oversights in JS files.
 
 = 4.5.14 (2026-07-20) =
 * ADDED new Heading block in the email builder.
