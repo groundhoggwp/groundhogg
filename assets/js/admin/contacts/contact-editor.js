@@ -842,8 +842,8 @@
                         ${ sprintf(
                           /* translators: %s: a url/path */
                           __('Visited %s', 'groundhogg'),
-                                `<a href="${ activity.data.path }" target="_blank">${ bold(
-                                        activity.data.path) }</a>`) }
+                                `<a href="${ escHTML( activity.data.path ) }" target="_blank">${ bold(
+                                        escHTML( activity.data.path) ) }</a>`) }
                     </div>
                     <div class="diff-time">
                         ${ activity.i18n.diff_time }
