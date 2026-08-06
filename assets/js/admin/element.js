@@ -1150,7 +1150,7 @@ ${ afterProgress() }`,
   }) => dangerConfirmationModal({
     /* translators: %s: the name of an asset (contacts, flows, emails, etc...) */
     alert      : `<p>${ sprintf(__('Are you sure you want to delete %s? This action cannot be undone.', 'groundhogg'), name) }</p>`,
-    confirmText: __('Delete'),
+    confirmText: __('Delete', 'groundhogg'),
     ...props,
   })
 
@@ -1191,7 +1191,7 @@ ${ afterProgress() }`,
     }
 
     dangerModalLink(e, msg, {
-      confirmText: __('Delete'),
+      confirmText: __('Delete','groundhogg'),
     })
   })
 

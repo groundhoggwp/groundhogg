@@ -697,6 +697,45 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
+		foreach ( [
+			'groundhogg-admin-element',
+			'groundhogg-admin-components',
+			'groundhogg-admin-replies',
+			'groundhogg-admin-properties',
+			'groundhogg-admin-contact-search',
+			'groundhogg-admin-filter-contacts',
+			'groundhogg-admin-send-broadcast',
+			'groundhogg-admin-funnel-scheduler',
+			'groundhogg-admin-bulk-edit-contacts',
+			'groundhogg-admin-contact-editor',
+			'groundhogg-admin-tasks',
+			'groundhogg-admin-notes',
+			'groundhogg-admin-remote-notifications',
+			'groundhogg-admin-form-builder-v2',
+			'groundhogg-admin-flow-simulator',
+			'groundhogg-admin-funnel-editor',
+			'groundhogg-email-block-editor',
+			'groundhogg-admin-funnel-steps',
+			'groundhogg-admin-email-log',
+			'groundhogg-admin-guided-setup',
+			'groundhogg-troubleshooter',
+			'groundhogg-admin-reporting',
+			'groundhogg-admin-custom-reports',
+			'groundhogg-admin-big-file-upload',
+			'groundhogg-admin-filters',
+			'groundhogg-admin-form-fields-editor',
+			'groundhogg-admin-edit-lock',
+			'groundhogg-admin-api-docs',
+			'groundhogg-admin-dashboard',
+			'groundhogg-admin-cron-jobs'
+		] as $handle ) {
+			wp_set_script_translations(
+				$handle,
+				'groundhogg',
+				GROUNDHOGG_PATH . 'languages'
+			);
+		}
+
 		do_action( 'groundhogg/scripts/after_register_admin_scripts', $this->is_script_debug_enabled(), $dot_min );
 	}
 

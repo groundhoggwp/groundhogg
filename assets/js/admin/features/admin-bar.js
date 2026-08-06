@@ -3,25 +3,15 @@
   const classPrefix = 'groundhogg-toolbar-quick-search'
 
   const {
-    input,
     tooltip,
-    clickedIn,
     icons,
-    adminPageURL,
-    spinner,
   } = Groundhogg.element
 
   const { quickAddForm } = Groundhogg.components
 
   const { userHasCap } = Groundhogg.user
-  const { sprintf, __, _x, _n } = wp.i18n
-  const { formatNumber, formatTime, formatDate, formatDateTime } = Groundhogg.formatting
 
   const { isWhiteLabeled } = Groundhogg
-
-  const {
-    contacts: ContactsStore,
-  } = Groundhogg.stores
 
   const Tabs = {
     search_contacts: {
