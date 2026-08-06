@@ -2197,6 +2197,8 @@ msgstr "Verzögerungsvorschau"
 #: assets/js/admin/contacts/contact-editor.js:1948
 #: assets/js/admin/contacts/contact-search.js:221
 #: assets/js/admin/contacts/contact-search.js:660
+#: assets/js/admin/element.js:1153
+#: assets/js/admin/element.js:1194
 msgid "Delete"
 msgstr "Löschen"
 
@@ -2432,7 +2434,6 @@ msgstr "Auf E-Mail-Link geklickt"
 msgid "Email Notification"
 msgstr "E-Mail Nachricht"
 
-#: includes/steps/benchmarks/email-opened.php:56
 #: assets/js/admin/filters/contacts.js:1062
 msgid "Email Opened"
 msgstr "E-Mail geöffnet"
@@ -11541,10 +11542,6 @@ msgstr ""
 msgid "All of..."
 msgstr ""
 
-#: includes/steps/benchmarks/task-completed.php:92
-msgid "Task Completed"
-msgstr ""
-
 #: includes/steps/benchmarks/task-completed.php:104
 msgid "Runs when a task is completed."
 msgstr ""
@@ -11673,10 +11670,6 @@ msgctxt "step_description"
 msgid "Track a new custom activity."
 msgstr ""
 
-#: includes/steps/premium/actions/plugin-action.php:18
-msgid "Plugin API Action"
-msgstr ""
-
 #: includes/steps/premium/actions/plugin-action.php:40
 msgid "Call a custom PHP script from within a funnel."
 msgstr ""
@@ -11721,10 +11714,6 @@ msgctxt "step_description"
 msgid "Runs whenever the specified page is visited."
 msgstr ""
 
-#: includes/steps/premium/benchmarks/plugin-api.php:18
-msgid "Plugin API Trigger"
-msgstr ""
-
 #: includes/steps/premium/benchmarks/plugin-api.php:36
 msgid "Use a custom PHP script to add/move the contact within the funnel."
 msgstr ""
@@ -11747,10 +11736,6 @@ msgstr ""
 #: includes/steps/premium/benchmarks/role-changed.php:44
 msgctxt "step_description"
 msgid "Runs whenever a user's role is changed."
-msgstr ""
-
-#: includes/steps/premium/benchmarks/webhook-listener.php:15
-msgid "Webhook Listener"
 msgstr ""
 
 #: includes/steps/premium/benchmarks/webhook-listener.php:27
@@ -15776,4 +15761,121 @@ msgstr ""
 #: blocks/gutenberg/build/block.json
 msgctxt "block description"
 msgid "Embed and render a Groundhogg form shortcode with customizable attributes"
+msgstr ""
+
+#: includes/steps/benchmarks/email-opened.php:56
+msgctxt "step name"
+msgid "Email Opened"
+msgstr ""
+
+#: includes/steps/benchmarks/task-completed.php:92
+msgctxt "step name"
+msgid "Task Completed"
+msgstr ""
+
+#: includes/steps/logic/if-else.php:14
+msgctxt "step name"
+msgid "Yes/No"
+msgstr ""
+
+#: includes/steps/premium/actions/loop.php:13
+#: includes/steps/premium/logic/logic-loop.php:14
+msgctxt "step_name"
+msgid "Loop"
+msgstr ""
+
+#: includes/steps/premium/actions/plugin-action.php:18
+msgctxt "step_name"
+msgid "Plugin API Action"
+msgstr ""
+
+#: includes/steps/premium/actions/skip.php:8
+#: includes/steps/premium/logic/logic-skip.php:14
+msgctxt "step_name"
+msgid "Skip"
+msgstr ""
+
+#: includes/steps/premium/benchmarks/plugin-api.php:18
+msgctxt "step_name"
+msgid "Plugin API Trigger"
+msgstr ""
+
+#: includes/steps/premium/benchmarks/webhook-listener.php:15
+msgctxt "step_name"
+msgid "Webhook Listener"
+msgstr ""
+
+#: includes/steps/premium/logic/evergreen-sequence.php:29
+msgctxt "evergreen sequence branch name"
+msgid "Sequence"
+msgstr ""
+
+#: includes/steps/premium/logic/evergreen-sequence.php:37
+msgctxt "step_name"
+msgid "Smart Date Sequence"
+msgstr ""
+
+#: includes/steps/premium/logic/evergreen-sequence.php:49
+msgid "Contacts will jump to the timer closest to the current date."
+msgstr ""
+
+#: includes/steps/premium/logic/logic-loop.php:22
+msgid "Loop back to previous step within the funnel."
+msgstr ""
+
+#: includes/steps/premium/logic/logic-skip.php:22
+msgid "Skip to a proceeding step within the flow."
+msgstr ""
+
+#: includes/steps/premium/logic/logic-stop.php:14
+msgctxt "step_name"
+msgid "Stop"
+msgstr ""
+
+#: includes/steps/premium/logic/logic-stop.php:22
+msgid "Prevent a contact from continuing in a flow based on filters."
+msgstr ""
+
+#: includes/steps/premium/logic/split-path.php:19
+msgctxt "step_name"
+msgid "Multi Branch"
+msgstr ""
+
+#: includes/steps/premium/logic/split-path.php:27
+msgid "Similar to Yes/No logic, but each branch has its own conditions."
+msgstr ""
+
+#: includes/steps/premium/logic/split-test.php:20
+msgctxt "step_name"
+msgid "Split (A/B) Test"
+msgstr ""
+
+#: includes/steps/premium/logic/split-test.php:28
+msgid "Test how different steps affect conversions and other funnel metrics."
+msgstr ""
+
+#: includes/steps/premium/logic/split-test.php:237
+msgid "Winner (100%)"
+msgstr ""
+
+#: includes/steps/premium/logic/split-test.php:237
+msgid "Loser (0%)"
+msgstr ""
+
+#: includes/steps/premium/logic/timer-skip.php:14
+msgctxt "step_name"
+msgid "Timer Skip"
+msgstr ""
+
+#: includes/steps/premium/logic/timer-skip.php:22
+msgid "Skips to the timer with the next closest date."
+msgstr ""
+
+#: includes/steps/premium/logic/weighted-distribution.php:16
+msgctxt "step_name"
+msgid "Random Distribution"
+msgstr ""
+
+#: includes/steps/premium/logic/weighted-distribution.php:24
+msgid "Randomly send contacts down different branches with some bias."
 msgstr ""
