@@ -380,7 +380,7 @@ class Rewrites {
 
 				// guard against ../../ traversal attack
 				if ( ! $file_path || ! file_exists( $file_path ) || ! is_file( $file_path ) || ! Files::is_file_within_directory( $file_path, $groundhogg_path ) ) {
-					wp_die( 'The requested file was not found.', 'File not found.', [ 'status' => 404 ] );
+					wp_die( esc_html__( 'The requested file was not found.', 'groundhogg' ), esc_html__( 'File not found.', 'groundhogg' ), [ 'status' => 404 ] );
 				}
 
 				$unrestricted = is_option_enabled( 'gh_allow_unrestricted_file_access' );
@@ -398,7 +398,7 @@ class Rewrites {
 					$contact_read_access = $contact && $contact->get_upload_folder_basename() === $basename && check_permissions_key( get_permissions_key( 'download_files' ), $contact, 'download_files' );
 
 					if ( ! $admin_read_access && ! $contact_read_access ) {
-						wp_die( 'You do not have permission to view this file.', 'Access denied.', [ 'status' => 403 ] );
+						wp_die( esc_html__( 'You do not have permission to view this file.', 'groundhogg' ), esc_html__( 'Access denied.', 'groundhogg' ), [ 'status' => 403 ] );
 					}
 				}
 
@@ -406,7 +406,7 @@ class Rewrites {
 				$mime = $mime['type'];
 
 				if ( ! $mime ) {
-					wp_die( 'The request file type is unrecognized and has been blocked for your protection.', 'Access denied.', [ 'status' => 403 ] );
+					wp_die( esc_html__( 'The request file type is unrecognized and has been blocked for your protection.', 'groundhogg' ), esc_html__( 'Access denied.', 'groundhogg' ), [ 'status' => 403 ] );
 				}
 
 				$content_type = sprintf( "Content-Type: %s", $mime );

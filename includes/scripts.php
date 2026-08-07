@@ -254,7 +254,7 @@ class Scripts {
 			'groundhogg-make-el'
 		], GROUNDHOGG_VERSION, true );
 
-		wp_set_script_translations( 'groundhogg-admin', 'groundhogg',  );
+		wp_set_script_translations( 'groundhogg-admin', 'groundhogg', GROUNDHOGG_PATH . 'languages' );
 
 		wp_register_script( 'groundhogg-admin-data', GROUNDHOGG_ASSETS_URL . 'js/admin/data' . $dot_min . '.js', [
 			'jquery',

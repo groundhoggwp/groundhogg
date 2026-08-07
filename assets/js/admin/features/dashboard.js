@@ -976,7 +976,7 @@
     }
 
     Widgets.add('links', {
-      name  : 'Helpful Links',
+      name  : __('Helpful Links', 'groundhogg'),
       cap   : '',
       col   : 3,
       render: () => {
@@ -1106,21 +1106,21 @@
     })
 
     Widgets.add('news', {
-      name  : 'News',
+      name  : __('News', 'groundhogg'),
       col   : 3,
       render: News,
     })
   }
 
   Widgets.add('checklist', {
-    name    : 'Quickstart Checklist',
+    name    : __('Quickstart Checklist', 'groundhogg'),
     col     : 1,
     feedback: true,
     render  : QuickStart,
   })
 
   Widgets.add('recommendations', {
-    name    : 'Recommendations',
+    name    : __('Recommendations', 'groundhogg'),
     col     : 1,
     feedback: true,
     render  : Recommendations,
@@ -1128,13 +1128,13 @@
 
   if ( userHasCap('view_reports') ) {
     Widgets.add('summary', {
-      name  : 'Summary',
+      name  : __('Summary', 'groundhogg'),
       col   : 2,
       render: Summary,
     })
   } else {
     Widgets.add('subscribers', {
-      name  : 'Recent Subscribers',
+      name  : __('Recent Subscribers', 'groundhogg'),
       col   : 2,
       render: Subscribers,
     })
@@ -1142,21 +1142,21 @@
 
   if ( userHasCap('schedule_broadcasts') ) {
     Widgets.add('broadcasts', {
-      name  : 'Recent Broadcasts',
+      name  : __('Recent Broadcasts', 'groundhogg'),
       col   : 2,
       render: Broadcasts,
     })
   }
 
   Widgets.add('searches', {
-    name  : 'Searches',
+    name  : __('Searches', 'groundhogg'),
     col   : 1,
     render: Searches,
   })
 
   if (userHasCap('view_tasks')) {
     Widgets.add('tasks', {
-      name    : 'My Tasks',
+      name    : __('My Tasks', 'groundhogg'),
       col     : 2,
       feedback: true,
       render  : () => Groundhogg.ObjectTasks({

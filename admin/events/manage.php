@@ -97,7 +97,7 @@ $report_summary = \Groundhogg\get_url_var( 'report' );
 if ( $report_summary ):
 
 	if ( ! key_exists( $report_summary, $reports ) ) {
-		wp_die( 'Invalid report selected.' );
+		wp_die( esc_html__( 'Invalid report selected.', 'groundhogg' ) );
 	}
 
 	$headers = $reports[ $report_summary ]['headers'];

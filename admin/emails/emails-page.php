@@ -64,7 +64,7 @@ class Emails_Page extends Admin_Page {
 				$email_id = Groundhogg\get_request_var( 'email' );
 
 				if ( ! $email_id ) {
-					wp_die( 'Invalid Email Id.' );
+					wp_die( esc_html__( 'Invalid Email Id.', 'groundhogg' ) );
 				}
 
 				$email       = new Email( absint( $email_id ) );

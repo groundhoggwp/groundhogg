@@ -14,7 +14,7 @@ if ( ! $email_id ){
 $email = new Email( $email_id );
 
 if ( ! $email->exists() ){
-    wp_die( 'Invalid email.' );
+	wp_die( esc_html__( 'Invalid email.', 'groundhogg' ) );
 }
 
 try {

@@ -22,7 +22,7 @@ if ( ! $contact ) {
 
 	// if still no contact, die
 	if ( ! $contact ) {
-		wp_die( 'No contact record available for preview...' );
+		wp_die( esc_html__( 'No contact record available for preview...', 'groundhogg' ) );
 	}
 }
 
@@ -42,10 +42,9 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
 	if ( ! $event->exists() || $event->get_contact_id() !== $contact->get_id() ) {
 
         if ( current_user_can( 'view_emails' ) ){
-	        wp_die( 'The view in browser feature does not work for tests and previews because it is not associated with an event. It only works when the email is sent to a recipient from a broadcast or funnel.' );
+			wp_die( esc_html__( 'The view in browser feature does not work for tests and previews because it is not associated with an event. It only works when the email is sent to a recipient from a broadcast or funnel.', 'groundhogg' ) );
         }
-
-		wp_die( 'Unable to view archive...' );
+		wp_die( esc_html__( 'Unable to view archive...', 'groundhogg' )
 	}
 
 	$email_id = $event->email_id;
