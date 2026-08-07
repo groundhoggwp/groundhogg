@@ -120,7 +120,7 @@
           style      : {
             padding: '8px',
           },
-        }, __('Feedback')) : null,
+        }, __('Feedback', 'groundhogg')) : null,
         Button({
           className: 'toggle-indicator',
           onClick  : e => {
@@ -197,21 +197,21 @@
         moreMenu(e.currentTarget, [
           {
             key     : 'broadcast',
-            text    : __('Schedule a broadcast'),
+            text    : __('Schedule a broadcast', 'groundhogg'),
             onSelect: () => {
               window.open(adminPageURL('gh_broadcasts', { action: 'add' }), '_self')
             },
           },
           {
             key     : 'funnel',
-            text    : __('Create a flow'),
+            text    : __('Create a flow', 'groundhogg'),
             onSelect: () => {
               window.open(adminPageURL('gh_funnels', { action: 'add' }), '_self')
             },
           },
           {
             key     : 'reports',
-            text    : __('View reports'),
+            text    : __('View reports', 'groundhogg'),
             onSelect: () => {
               window.open(adminPageURL('gh_reporting'), '_self')
             },
@@ -219,7 +219,7 @@
         ])
 
       },
-    }, __('Quick Actions')),
+    }, __('Quick Actions', 'groundhogg')),
     Button({
       className: 'gh-button secondary icon text',
       id       : 'dashboard-more',
@@ -230,7 +230,7 @@
         moreMenu(e.currentTarget, [
           {
             key     : 'preferences',
-            text    : __('Preferences'),
+            text    : __('Preferences', 'groundhogg'),
             onSelect: () => {
               Modal({}, morph => Div({}, [
                 H2({}, 'Widgets'),
@@ -464,7 +464,7 @@
           style: {
             textAlign: 'center',
           },
-        }, __('You\'re all set!'))
+        }, __('You\'re all set!', 'groundhogg'))
       }
 
       return Fragment([
@@ -472,7 +472,7 @@
           style: {
             padding: '0 20px',
           },
-        }, __('Click on a task to view additional details.')),
+        }, __('Click on a task to view additional details.', 'groundhogg')),
         Checklist({
           id   : 'quickstart-items',
           items: State.items,
@@ -536,7 +536,7 @@
           style: {
             textAlign: 'center',
           },
-        }, __('No recommendations!'))
+        }, __('No recommendations!', 'groundhogg'))
       }
 
       return Fragment([
@@ -544,11 +544,11 @@
           style: {
             padding: '0 20px',
           },
-        }, __('Click on a recommendation to view additional details.')),
+        }, __('Click on a recommendation to view additional details.', 'groundhogg')),
         Checklist({
           id        : 'recommendation-items',
           items     : State.items,
-          buttonText: __('Implement'),
+          buttonText: __('Implement', 'groundhogg'),
           handleDismiss: id => {
             ajax({
               action: 'gh_dismiss_notice',
@@ -685,7 +685,7 @@
         Div({
           className: 'half inside display-flex column',
         }, [
-          ReportHead(__('This month')),
+          ReportHead(__('This month', 'groundhogg')),
           Stat('New contacts', State.month.total_new_contacts),
           Stat('Confirmed', State.month.total_confirmed_contacts),
           Stat('Engaged', State.month.total_engaged_contacts),
@@ -694,7 +694,7 @@
         Div({
           className: 'half inside display-flex column',
         }, [
-          ReportHead(__('Today')),
+          ReportHead(__('Today', 'groundhogg')),
           Stat('New contacts', State.today.total_new_contacts),
           Stat('Confirmed', State.today.total_confirmed_contacts),
           Stat('Engaged', State.today.total_engaged_contacts),
@@ -707,7 +707,7 @@
             style: {
               padding: '0 0 10px 20px',
             },
-          }, Bold({}, __('Recent subscribers'))),
+          }, Bold({}, __('Recent subscribers', 'groundhogg'))),
           ContactList(State.contacts, {
             itemProps: item => ( {
               className: 'contact-list-item clickable',
@@ -823,7 +823,7 @@
             href     : adminPageURL('gh_broadcasts', {
               action: 'add',
             }),
-          }, __('Send a broadcast!')),
+          }, __('Send a broadcast!', 'groundhogg')),
         ])
 
       }
@@ -983,19 +983,19 @@
 
         let links1 = [
           [
-            __('Groundhogg'),
+            __('Groundhogg', 'groundhogg'),
             'https://groundhogg.io',
           ],
           [
-            __('HollerBox'),
+            __('HollerBox', 'groundhogg'),
             'https://hollerwp.com',
           ],
           [
-            __('MailHawk'),
+            __('MailHawk', 'groundhogg'),
             'https://mailhawk.io',
           ],
           [
-            __('Adrian Tobey'),
+            __('Adrian Tobey', 'groundhogg'),
             'https://adriantobey.com',
           ],
         ].map(([text, href]) => ( [
@@ -1007,27 +1007,27 @@
         let links2 = [
           [
             'welcome-learn-more',
-            __('Learn'),
+            __('Learn', 'groundhogg'),
             'https://groundhogg.io/events/',
           ],
           [
             'media-document',
-            __('Documentation'),
+            __('Documentation', 'groundhogg'),
             'https://groundhogg.io/documentation/',
           ],
           [
             'sos',
-            __('Get Help'),
+            __('Get Help', 'groundhogg'),
             adminPageURL('gh_help'),
           ],
           [
             'admin-site',
-            __('Support Group'),
+            __('Support Group', 'groundhogg'),
             'https://facebook.com/groups/groundhoggwp/',
           ],
           [
             'admin-users',
-            __('My Account'),
+            __('My Account', 'groundhogg'),
             'https://groundhogg.io/account/',
           ],
         ].map(([icon, text, href]) => ( [
@@ -1039,32 +1039,32 @@
         let socials = [
           [
             'youtube',
-            __('YouTube'),
+            __('YouTube', 'groundhogg'),
             'https://www.youtube.com/Groundhogg',
           ],
           [
             'twitter',
-            __('X (Twitter)'),
+            __('X (Twitter)', 'groundhogg'),
             'https://twitter.com/groundhoggwp',
           ],
           [
             'facebook',
-            __('Facebook'),
+            __('Facebook', 'groundhogg'),
             'https://www.facebook.com/groups/groundhoggwp/',
           ],
           [
             'instagram',
-            __('Instagram'),
+            __('Instagram', 'groundhogg'),
             'https://www.instagram.com/groundhoggwp/',
           ],
           [
             'wordpress',
-            __('WordPress.org'),
+            __('WordPress.org', 'groundhogg'),
             'https://wordpress.org/plugins/groundhogg/',
           ],
           [
             'linkedin',
-            __('LinkedIn'),
+            __('LinkedIn', 'groundhogg'),
             'https://www.linkedin.com/company/groundhogg/',
           ],
         ].map(([icon, text, href]) => ( [
@@ -1090,15 +1090,15 @@
           className: 'inside display-flex gap-20',
         }, [
           Nav({ className: 'display-flex column gap-10' }, [
-            `<b>${ __('Resources') }</b>`,
+            `<b>${ __('Resources', 'groundhogg') }</b>`,
             ...makeLinks(links2),
           ]),
           Nav({ className: 'display-flex column gap-10' }, [
-            `<b>${ __('Our Sites') }</b>`,
+            `<b>${ __('Our Sites', 'groundhogg') }</b>`,
             ...makeLinks(links1),
           ]),
           Nav({ className: 'display-flex column gap-10' }, [
-            `<b>${ __('Follow Us') }</b>`,
+            `<b>${ __('Follow Us', 'groundhogg') }</b>`,
             ...makeLinks(socials),
           ]),
         ])
