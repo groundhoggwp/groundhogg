@@ -294,7 +294,7 @@ class License_Manager {
 		if ( isset( $_POST['gh_activate_license'] ) ) {
 
 			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( "Cannot access this functionality" );
+				wp_die( esc_html__( 'Cannot access this functionality', 'groundhogg' ) );
 			}
 
 			$licenses = map_deep( get_request_var( 'licenses' ), 'sanitize_text_field' );

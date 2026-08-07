@@ -61,7 +61,7 @@ include_once __DIR__ . '/../managed-page.php';
 $contact = get_contactdata();
 
 if ( ! $contact ) {
-	wp_die( 'Archive is currently unavailable.' );
+	wp_die( esc_html__( 'Archive is currently unavailable.', 'groundhogg' ) );
 }
 
 $permissions_key = get_permissions_key( 'view_archive', true );
