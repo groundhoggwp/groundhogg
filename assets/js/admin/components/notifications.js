@@ -89,6 +89,19 @@
     })
   }
 
+  const undismissNotification = (id) => {
+
+    State.set({
+      dismissed: State.dismissed.filter(d => d !== id),
+    })
+
+    return ajax({
+      action: 'gh_undismiss_notice',
+      notice: id,
+    })
+
+  }
+
   const Notification = ({
     id,
     title,
@@ -221,6 +234,7 @@
   Groundhogg.notices = {
     isDismissed: id => State.dismissed.includes(id),
     dismiss    : (id, days = 0) => dismissNotification(id, days),
+    undismiss  : id => undismissNotification(id),
   }
 
   const handleHashChange = () => {

@@ -20,12 +20,6 @@
     Skeleton,
     Modal,
     makeEl,
-    Table,
-    THead,
-    TBody,
-    Tr,
-    Td,
-    Th,
   } = MakeEl
 
   const {
@@ -120,7 +114,7 @@
           style      : {
             padding: '8px',
           },
-        }, __('Feedback')) : null,
+        }, __('Feedback', 'groundhogg')) : null,
         Button({
           className: 'toggle-indicator',
           onClick  : e => {
@@ -158,7 +152,7 @@
           className: 'inside'
         }, Pg({
           className: 'gh-text danger red error'
-        }, 'Something went wrong with this widget.'))
+        }, __('Something went wrong with this widget.', 'groundhogg')))
       })
     }
   }))
@@ -181,7 +175,7 @@
     className: 'gh-header sticky no-padding display-flex flex-start',
   }, [
     Groundhogg.isWhiteLabeled ? Span({ className: 'white-label-icon'}, Groundhogg.whiteLabelName ) : icons.groundhogg,
-    H1({}, `👋 Hey ${ Groundhogg.currentUser.data.display_name }!`),
+    H1({}, sprintf(__(`👋 Hey %s!`, 'groundhogg'), Groundhogg.currentUser.data.display_name)),
     Groundhogg.notices.isDismissed( 'review-please' ) || ! userHasCap( 'install_plugins' ) ? null : An({
       href: '#gh-review-please',
       className: 'gh-button secondary effect-balanced-reflection small',
@@ -197,21 +191,21 @@
         moreMenu(e.currentTarget, [
           {
             key     : 'broadcast',
-            text    : __('Schedule a broadcast'),
+            text: __('Schedule a broadcast', 'groundhogg'),
             onSelect: () => {
               window.open(adminPageURL('gh_broadcasts', { action: 'add' }), '_self')
             },
           },
           {
             key     : 'funnel',
-            text    : __('Create a flow'),
+            text: __('Create a flow', 'groundhogg'),
             onSelect: () => {
               window.open(adminPageURL('gh_funnels', { action: 'add' }), '_self')
             },
           },
           {
             key     : 'reports',
-            text    : __('View reports'),
+            text: __('View reports', 'groundhogg'),
             onSelect: () => {
               window.open(adminPageURL('gh_reporting'), '_self')
             },
@@ -219,7 +213,7 @@
         ])
 
       },
-    }, __('Quick Actions')),
+    }, __('Quick Actions', 'groundhogg')),
     Button({
       className: 'gh-button secondary icon text',
       id       : 'dashboard-more',
@@ -230,7 +224,7 @@
         moreMenu(e.currentTarget, [
           {
             key     : 'preferences',
-            text    : __('Preferences'),
+            text: _x('Preferences', 'as in dashboard widget preferences', 'groundhogg'),
             onSelect: () => {
               Modal({}, morph => Div({}, [
                 H2({}, 'Widgets'),
@@ -347,7 +341,7 @@
         Button({
           className: 'gh-button secondary small text',
           onClick  : e => handleDismiss( id )
-        }, 'Mark complete'),
+        }, __('Mark complete', 'groundhogg')),
       ]) : null,
     ]))))
   }
@@ -464,7 +458,7 @@
           style: {
             textAlign: 'center',
           },
-        }, __('You\'re all set!'))
+        }, __('You\'re all set!', 'groundhogg'))
       }
 
       return Fragment([
@@ -472,7 +466,7 @@
           style: {
             padding: '0 20px',
           },
-        }, __('Click on a task to view additional details.')),
+        }, __('Click on a task to view additional details.', 'groundhogg')),
         Checklist({
           id   : 'quickstart-items',
           items: State.items,
@@ -536,7 +530,7 @@
           style: {
             textAlign: 'center',
           },
-        }, __('No recommendations!'))
+        }, __('No recommendations!', 'groundhogg'))
       }
 
       return Fragment([
@@ -544,11 +538,11 @@
           style: {
             padding: '0 20px',
           },
-        }, __('Click on a recommendation to view additional details.')),
+        }, __('Click on a recommendation to view additional details.', 'groundhogg')),
         Checklist({
           id        : 'recommendation-items',
           items     : State.items,
-          buttonText: __('Implement'),
+          buttonText: _x('Implement', 'verb: as in to accept and perform a recommendation', 'groundhogg'),
           handleDismiss: id => {
             ajax({
               action: 'gh_dismiss_notice',
@@ -685,20 +679,20 @@
         Div({
           className: 'half inside display-flex column',
         }, [
-          ReportHead(__('This month')),
-          Stat('New contacts', State.month.total_new_contacts),
-          Stat('Confirmed', State.month.total_confirmed_contacts),
-          Stat('Engaged', State.month.total_engaged_contacts),
-          Stat('Unsubscribed', State.month.total_unsubscribed_contacts),
+          ReportHead(_x('This month', 'as in a date-range', 'groundhogg')),
+          Stat( __( 'New contacts', 'groundhogg' ), State.month.total_new_contacts),
+          Stat( __( 'Confirmed', 'groundhogg' ), State.month.total_confirmed_contacts),
+          Stat( __( 'Engaged', 'groundhogg' ), State.month.total_engaged_contacts),
+          Stat( __( 'Unsubscribed', 'groundhogg' ), State.month.total_unsubscribed_contacts),
         ]),
         Div({
           className: 'half inside display-flex column',
         }, [
-          ReportHead(__('Today')),
-          Stat('New contacts', State.today.total_new_contacts),
-          Stat('Confirmed', State.today.total_confirmed_contacts),
-          Stat('Engaged', State.today.total_engaged_contacts),
-          Stat('Unsubscribed', State.today.total_unsubscribed_contacts),
+          ReportHead(_x('Today', 'as in a date-range', 'groundhogg')),
+          Stat( __( 'New contacts', 'groundhogg' ), State.today.total_new_contacts),
+          Stat( __( 'Confirmed', 'groundhogg' ), State.today.total_confirmed_contacts),
+          Stat( __( 'Engaged', 'groundhogg' ), State.today.total_engaged_contacts),
+          Stat( __( 'Unsubscribed', 'groundhogg' ), State.today.total_unsubscribed_contacts),
         ]),
         Div({
           className: 'full',
@@ -707,13 +701,13 @@
             style: {
               padding: '0 0 10px 20px',
             },
-          }, Bold({}, __('Recent subscribers'))),
+          }, Bold({}, __('Recent subscribers', 'groundhogg'))),
           ContactList(State.contacts, {
             itemProps: item => ( {
               className: 'contact-list-item clickable',
               onClick  : e => {
                 window.open(item.admin, '_self')
-              },
+              },zxdfrf
             } ),
           }),
         ]),
@@ -816,14 +810,14 @@
         return Div({
           className: 'inside',
         }, [
-          Pg({}, 'You haven\'t sent any broadcasts this week! 😱'),
-          Pg({}, 'Send one to your subscribers before they forget about you.'),
+          Pg({}, __('You haven\'t sent any broadcasts this week! 😱', 'groundhogg')),
+          Pg({}, __('Send one to your subscribers before they forget about you.', 'groundhogg')),
           An({
             className: 'gh-button primary small',
             href     : adminPageURL('gh_broadcasts', {
               action: 'add',
             }),
-          }, __('Send a broadcast!')),
+          }, __('Send a broadcast!', 'groundhogg')),
         ])
 
       }
@@ -900,66 +894,8 @@
       screen: 'nag'
     }, ReviewPlease)
 
-    return Div({ style: { padding: '0 1em' }, id: 'dash-review' }, morph => {
-
-      if ( State.screen === 'reviewed' ) {
-        return Fragment( [
-          Pg({}, 'Thanks for taking the time! We appreciate your support 😀'),
-        ] )
-      }
-
-      if ( State.screen === 'later' ) {
-        return Fragment( [
-          Pg({}, 'No problem! We\'ll check back in a week or so.'),
-        ] )
-      }
-
-      if ( State.screen === 'ignore' ) {
-        return Fragment( [
-          Pg({}, 'We understand, no worries! We wont bother you again.'),
-        ] )
-      }
-
-      return Fragment( [
-        Pg({}, 'Enjoying Groundhogg?'),
-        Pg({}, 'Groundhogg grows almost entirely through word of mouth. If we\'ve saved you time, money, or helped your business, we\'d really appreciate a quick review.'),
-        Pg({},
-          'Leave a review on our <a href="https://wordpress.org/support/plugin/groundhogg/reviews/" target="_blank">WordPress.org plugin page</a> to help spread the word!'),
-        Div({ className: 'display-flex flex-wrap gap-5' }, [
-          Button({
-            className: 'gh-button small primary',
-            onClick  : e => {
-              window.open('https://wordpress.org/support/plugin/groundhogg/reviews/', '_blank')
-              State.set({ screen: 'reviewed' })
-              Groundhogg.notices.dismiss( 'review-please' )
-              morph()
-            },
-          }, 'Review Now!'),
-          Button({ className: 'gh-button small secondary', onClick: e => {
-              State.set({ screen: 'later' })
-              Groundhogg.notices.dismiss( 'review-please', 7 )
-              morph()
-          } }, 'Maybe later...'),
-          Button({ className: 'gh-button small danger', onClick: e => {
-              State.set({ screen: 'ignore' })
-              Groundhogg.notices.dismiss( 'review-please' )
-              morph()
-            } }, 'Don\'t ask again.'),
-        ]),
-        Pg({}, 'Your support is appreciated!'),
-        Pg({ className: 'display-flex flex-wrap gap-5 align-center' }, [
-          Img({
-            src   : 'https://secure.gravatar.com/avatar/5fbd75ff0eb49baa1d73c5684a6d501353d3278d3e6fe4c38044c9ce426526f8?s=128&d=mm&r=g',
-            height: 30,
-            width : 30,
-            style : {
-              borderRadius: 'var(--gh-border-radius)',
-            },
-          }),
-          makeEl('em', {}, 'Adrian Tobey, CEO'),
-        ]),
-
-      ])
+    return Div({ style: { padding: '1em' }, id: 'dash-review' }, morph => {
+      return Groundhogg.components.ReviewBeg({})
     })
   }
 
@@ -983,19 +919,19 @@
 
         let links1 = [
           [
-            __('Groundhogg'),
+            'Groundhogg',
             'https://groundhogg.io',
           ],
           [
-            __('HollerBox'),
+            'HollerBox',
             'https://hollerwp.com',
           ],
           [
-            __('MailHawk'),
+            'MailHawk',
             'https://mailhawk.io',
           ],
           [
-            __('Adrian Tobey'),
+            'Adrian Tobey',
             'https://adriantobey.com',
           ],
         ].map(([text, href]) => ( [
@@ -1007,27 +943,27 @@
         let links2 = [
           [
             'welcome-learn-more',
-            __('Learn'),
+            __('Learn', 'groundhogg'),
             'https://groundhogg.io/events/',
           ],
           [
             'media-document',
-            __('Documentation'),
+            __('Documentation', 'groundhogg'),
             'https://groundhogg.io/documentation/',
           ],
           [
             'sos',
-            __('Get Help'),
+            __('Get Help', 'groundhogg'),
             adminPageURL('gh_help'),
           ],
           [
             'admin-site',
-            __('Support Group'),
+            __('Support Group', 'groundhogg'),
             'https://facebook.com/groups/groundhoggwp/',
           ],
           [
             'admin-users',
-            __('My Account'),
+            __('My Account', 'groundhogg'),
             'https://groundhogg.io/account/',
           ],
         ].map(([icon, text, href]) => ( [
@@ -1044,7 +980,7 @@
           ],
           [
             'twitter',
-            __('X (Twitter)'),
+            __('𝕏 (Twitter)'),
             'https://twitter.com/groundhoggwp',
           ],
           [
@@ -1090,15 +1026,15 @@
           className: 'inside display-flex gap-20',
         }, [
           Nav({ className: 'display-flex column gap-10' }, [
-            `<b>${ __('Resources') }</b>`,
+            `<b>${ __('Resources', 'groundhogg') }</b>`,
             ...makeLinks(links2),
           ]),
           Nav({ className: 'display-flex column gap-10' }, [
-            `<b>${ __('Our Sites') }</b>`,
+            `<b>${ __('Our Sites', 'groundhogg') }</b>`,
             ...makeLinks(links1),
           ]),
           Nav({ className: 'display-flex column gap-10' }, [
-            `<b>${ __('Follow Us') }</b>`,
+            `<b>${ __('Follow Us', 'groundhogg') }</b>`,
             ...makeLinks(socials),
           ]),
         ])

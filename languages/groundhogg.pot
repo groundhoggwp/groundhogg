@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-06T20:01:52+00:00\n"
+"POT-Creation-Date: 2026-08-07T16:01:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: groundhogg\n"
@@ -1328,6 +1328,8 @@ msgstr ""
 #: templates/preferences.php:801
 #: templates/preferences.php:859
 #: assets/js/admin/contacts/contact-editor.js:526
+#: assets/js/admin/features/dashboard.js:686
+#: assets/js/admin/features/dashboard.js:695
 #: assets/js/admin/filters/contacts.js:1242
 msgid "Unsubscribed"
 msgstr ""
@@ -1430,6 +1432,10 @@ msgstr ""
 
 #: admin/contacts/tables/contacts-table.php:453
 msgid "Unblock"
+msgstr ""
+
+#: admin/emails/emails-page.php:67
+msgid "Invalid Email Id."
 msgstr ""
 
 #: admin/emails/emails-page.php:83
@@ -2170,6 +2176,10 @@ msgstr ""
 #, php-format
 msgctxt "action"
 msgid "Purge %s events"
+msgstr ""
+
+#: admin/events/manage.php:100
+msgid "Invalid report selected."
 msgstr ""
 
 #: admin/events/manage.php:107
@@ -2973,6 +2983,10 @@ msgstr ""
 
 #: admin/reports/views/functions.php:101
 msgid "vs. Previous 30 Days"
+msgstr ""
+
+#: admin/reports/views/funnel-single.php:17
+msgid "Flow does not exist!"
 msgstr ""
 
 #: admin/reports/views/funnel-single.php:29
@@ -4467,6 +4481,10 @@ msgstr ""
 msgid "Delete Import"
 msgstr ""
 
+#: admin/tools/map-import.php:39
+msgid "The given file does not exist."
+msgstr ""
+
 #: admin/tools/map-import.php:81
 msgid "Map Contact Fields"
 msgstr ""
@@ -4716,6 +4734,10 @@ msgstr ""
 msgid "Safe mode has been disabled."
 msgstr ""
 
+#: admin/tools/tools-page.php:635
+msgid "Invalid map provided."
+msgstr ""
+
 #. translators: 1: estimated time until import completes
 #: admin/tools/tools-page.php:670
 #, php-format
@@ -4820,6 +4842,33 @@ msgstr ""
 msgid "WP Cron has been disabled!"
 msgstr ""
 
+#: admin/tools/tools-page.php:1227
+#: includes/rewrites.php:383
+msgid "The requested file was not found."
+msgstr ""
+
+#: admin/tools/tools-page.php:1227
+#: includes/rewrites.php:383
+msgid "File not found."
+msgstr ""
+
+#: admin/tools/tools-page.php:1233
+#: includes/rewrites.php:401
+msgid "You do not have permission to view this file."
+msgstr ""
+
+#: admin/tools/tools-page.php:1233
+#: admin/tools/tools-page.php:1240
+#: includes/rewrites.php:401
+#: includes/rewrites.php:409
+msgid "Access denied."
+msgstr ""
+
+#: admin/tools/tools-page.php:1240
+#: includes/rewrites.php:409
+msgid "The request file type is unrecognized and has been blocked for your protection."
+msgstr ""
+
 #: admin/user/admin-user.php:55
 msgid "Email performance reports"
 msgstr ""
@@ -4895,6 +4944,7 @@ msgid "Let's make sure your subscribers can hear you. Send them a broadcast emai
 msgstr ""
 
 #: admin/welcome/welcome-page.php:110
+#: assets/js/admin/features/dashboard.js:201
 msgid "Create a flow"
 msgstr ""
 
@@ -5254,10 +5304,6 @@ msgstr ""
 
 #: api/v4/forms-api.php:119
 msgid "Please wait a moment..."
-msgstr ""
-
-#: api/v4/settings-api.php:39
-msgid "Settings group ID."
 msgstr ""
 
 #: blocks/beaver-builder/form-widget.php:13
@@ -6368,6 +6414,10 @@ msgstr ""
 #: includes/functions.php:9115
 msgctxt "admin unsubscribe reason"
 msgid "Other"
+msgstr ""
+
+#: includes/license-manager.php:297
+msgid "Cannot access this functionality"
 msgstr ""
 
 #: includes/license-manager.php:303
@@ -7496,11 +7546,15 @@ msgid "Hard Bounces"
 msgstr ""
 
 #: includes/reporting/new-reports/chart-new-contacts.php:67
+#: assets/js/admin/features/dashboard.js:683
+#: assets/js/admin/features/dashboard.js:692
 msgid "New contacts"
 msgstr ""
 
 #: includes/reporting/new-reports/chart-new-contacts.php:75
 #: templates/preferences.php:908
+#: assets/js/admin/features/dashboard.js:684
+#: assets/js/admin/features/dashboard.js:693
 msgid "Confirmed"
 msgstr ""
 
@@ -7611,6 +7665,8 @@ msgid "Completed"
 msgstr ""
 
 #: includes/reporting/new-reports/table-list-engagement.php:44
+#: assets/js/admin/features/dashboard.js:685
+#: assets/js/admin/features/dashboard.js:694
 msgid "Engaged"
 msgstr ""
 
@@ -8912,6 +8968,15 @@ msgstr ""
 msgid "Inexistent tags."
 msgstr ""
 
+#: includes/tracking.php:264
+#: includes/tracking.php:312
+msgid "This link is currently unavailable."
+msgstr ""
+
+#: includes/tracking.php:312
+msgid "Invalid Link"
+msgstr ""
+
 #. translators: %s: the blog name
 #: includes/tracking.php:315
 #: templates/preferences.php:923
@@ -9129,8 +9194,24 @@ msgid_plural "There are %s campaign archives available."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/archive/event.php:58
+#: templates/archive/event.php:25
+msgid "No contact record available for preview..."
+msgstr ""
+
+#: templates/archive/event.php:45
+msgid "The view in browser feature does not work for tests and previews because it is not associated with an event. It only works when the email is sent to a recipient from a broadcast or funnel."
+msgstr ""
+
+#: templates/archive/event.php:47
+msgid "Unable to view archive..."
+msgstr ""
+
+#: templates/archive/event.php:57
 msgid "Could not load email..."
+msgstr ""
+
+#: templates/archive/events.php:64
+msgid "Archive is currently unavailable."
 msgstr ""
 
 #: templates/archive/events.php:75
@@ -9191,6 +9272,10 @@ msgstr ""
 msgid "Error loading email."
 msgstr ""
 
+#: templates/emails/email.php:17
+msgid "Invalid email."
+msgstr ""
+
 #: templates/emails/footer-default.php:61
 msgid "Don't want these emails?"
 msgstr ""
@@ -9201,6 +9286,18 @@ msgstr ""
 
 #: templates/emails/header-default.php:194
 msgid "View In Browser..."
+msgstr ""
+
+#: templates/form/form.php:21
+msgid "No form found..."
+msgstr ""
+
+#: templates/form/submit.php:19
+msgid "Form does not exist."
+msgstr ""
+
+#: templates/form/submit.php:27
+msgid "Invalid form type."
 msgstr ""
 
 #. translators: %s: plugin/brand name
@@ -10069,6 +10166,7 @@ msgid "Retrieve the report of a single broadcast."
 msgstr ""
 
 #: assets/js/admin/api-docs/broadcasts.js:267
+#: assets/js/admin/features/dashboard.js:194
 msgid "Schedule a broadcast"
 msgstr ""
 
@@ -11367,6 +11465,7 @@ msgstr ""
 #: assets/js/admin/components/tasks.js:965
 #: assets/js/admin/components/tasks.js:989
 #: assets/js/admin/components/tasks.js:1314
+#: assets/js/admin/features/dashboard.js:344
 msgid "Mark complete"
 msgstr ""
 
@@ -12619,16 +12718,161 @@ msgstr ""
 msgid "We recommend it be set to run <b>once every minute</b> for the best performance. The <i>minimum</i> recommendation is every 5 minutes."
 msgstr ""
 
-#: assets/js/admin/features/dashboard.js:282
+#: assets/js/admin/features/dashboard.js:117
+msgid "Feedback"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:155
+msgid "Something went wrong with this widget."
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:178
+#, js-format
+msgid "👋 Hey %s!"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:208
+msgid "View reports"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:216
+msgid "Quick Actions"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:227
+msgctxt "as in dashboard widget preferences"
+msgid "Preferences"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:276
 msgid "Finish Task"
 msgstr ""
 
-#: assets/js/admin/features/dashboard.js:283
+#: assets/js/admin/features/dashboard.js:277
 msgid "Instructions"
 msgstr ""
 
-#: assets/js/admin/features/dashboard.js:874
+#: assets/js/admin/features/dashboard.js:461
+msgid "You're all set!"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:469
+msgid "Click on a task to view additional details."
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:533
+msgid "No recommendations!"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:541
+msgid "Click on a recommendation to view additional details."
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:545
+msgctxt "verb: as in to accept and perform a recommendation"
+msgid "Implement"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:682
+#: assets/js/admin/filters/filters.js:189
+#: assets/js/admin/filters/filters.js:215
+msgctxt "as in a date-range"
+msgid "This month"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:691
+#: assets/js/admin/filters/filters.js:185
+#: assets/js/admin/filters/filters.js:211
+msgctxt "as in a date-range"
+msgid "Today"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:704
+msgid "Recent subscribers"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:813
+msgid "You haven't sent any broadcasts this week! 😱"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:814
+msgid "Send one to your subscribers before they forget about you."
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:820
+msgid "Send a broadcast!"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:868
 msgid "You don't have any saved searches."
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:915
+msgid "Helpful Links"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:946
+msgid "Learn"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:951
+msgid "Documentation"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:956
+msgid "Get Help"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:961
+msgid "Support Group"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:966
+msgid "My Account"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1029
+msgid "Resources"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1033
+msgid "Our Sites"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1037
+msgid "Follow Us"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1045
+msgid "News"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1052
+msgid "Quickstart Checklist"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1059
+msgid "Recommendations"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1067
+msgid "Summary"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1073
+msgid "Recent Subscribers"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1081
+msgid "Recent Broadcasts"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1088
+msgid "Searches"
+msgstr ""
+
+#: assets/js/admin/features/dashboard.js:1095
+msgid "My Tasks"
 msgstr ""
 
 #: assets/js/admin/features/send-broadcast.js:118
@@ -14962,12 +15206,6 @@ msgctxt "as in a date-range"
 msgid "At any time"
 msgstr ""
 
-#: assets/js/admin/filters/filters.js:185
-#: assets/js/admin/filters/filters.js:211
-msgctxt "as in a date-range"
-msgid "Today"
-msgstr ""
-
 #: assets/js/admin/filters/filters.js:186
 msgctxt "as in a date-range"
 msgid "Yesterday"
@@ -14982,12 +15220,6 @@ msgstr ""
 #: assets/js/admin/filters/filters.js:188
 msgctxt "as in a date-range"
 msgid "Last week"
-msgstr ""
-
-#: assets/js/admin/filters/filters.js:189
-#: assets/js/admin/filters/filters.js:215
-msgctxt "as in a date-range"
-msgid "This month"
 msgstr ""
 
 #: assets/js/admin/filters/filters.js:190
