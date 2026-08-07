@@ -686,19 +686,19 @@
           className: 'half inside display-flex column',
         }, [
           ReportHead(__('This month', 'groundhogg')),
-          Stat('New contacts', State.month.total_new_contacts),
-          Stat('Confirmed', State.month.total_confirmed_contacts),
-          Stat('Engaged', State.month.total_engaged_contacts),
-          Stat('Unsubscribed', State.month.total_unsubscribed_contacts),
+          Stat(__('New contacts', 'groundhogg'), State.month.total_new_contacts),
+          Stat(__('Confirmed', 'groundhogg'), State.month.total_confirmed_contacts),
+          Stat(__('Engaged', 'groundhogg'), State.month.total_engaged_contacts),
+          Stat(__('Unsubscribed', 'groundhogg'), State.month.total_unsubscribed_contacts),
         ]),
         Div({
           className: 'half inside display-flex column',
         }, [
           ReportHead(__('Today', 'groundhogg')),
-          Stat('New contacts', State.today.total_new_contacts),
-          Stat('Confirmed', State.today.total_confirmed_contacts),
-          Stat('Engaged', State.today.total_engaged_contacts),
-          Stat('Unsubscribed', State.today.total_unsubscribed_contacts),
+          Stat(__('New contacts', 'groundhogg'), State.today.total_new_contacts),
+          Stat(__('Confirmed', 'groundhogg'), State.today.total_confirmed_contacts),
+          Stat(__('Engaged', 'groundhogg'), State.today.total_engaged_contacts),
+          Stat(__('Unsubscribed', 'groundhogg'), State.today.total_unsubscribed_contacts),
         ]),
         Div({
           className: 'full',

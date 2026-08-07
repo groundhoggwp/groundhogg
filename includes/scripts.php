@@ -726,6 +726,7 @@ class Scripts {
 			'groundhogg-admin-form-fields-editor',
 			'groundhogg-admin-edit-lock',
 			'groundhogg-admin-api-docs',
+			'groundhogg-admin-components',
 			'groundhogg-admin-dashboard',
 			'groundhogg-admin-cron-jobs'
 		] as $handle ) {
