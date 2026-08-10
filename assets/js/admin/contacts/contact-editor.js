@@ -1034,7 +1034,6 @@
                       return this.renderActivity(a)
                   }
                   catch (e) {
-                    console.warn(e)
                       return ''
                   }
               }).join('') }
@@ -1286,8 +1285,6 @@
             return get(`${ ContactsStore.route }/${contact.ID}/timeline`, {
               order
             }).then(response => {
-
-              console.log('response', response)
 
               SubmissionsStore.itemsFetched( response.submissions )
               ActivityStore.itemsFetched(response.activity)
