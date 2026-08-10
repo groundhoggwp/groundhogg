@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 4.5.14
+Stable tag: 4.5.15
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -380,9 +380,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.5.15 (2026-07-27) =
 * ADDED "Reload page" after form submit setting.
+* ADDED Contact timeline now shows activity and events from flows for sales reps and managers.
+* FIXED Various API permissions issues.
 * FIXED Email editor crashes after dragging a block from a global block namespace to the main namespace.
 * FIXED i18n not working in JS files.
 * FIXED Missing translator comments, incorrect gettext usage, and other localization oversights in JS files.
+* SECURITY Fixed Cross-Site Scripting vulnerability responsibly reported by @thevietronin
+* SECURITY Fixed SQL Injection vulnerability responsibly reported by @JonathanDersch
 
 = 4.5.14 (2026-07-20) =
 * ADDED new Heading block in the email builder.
