@@ -290,14 +290,21 @@ class Simulator {
 					$time = $current->get_run_time( $time );
 					self::log( "⌛ Wait until " . ( new DateTimeHelper( $time ) )->wpDateTimeFormat() );
 				} else if ( ! self::is_dry_run() ) {
+
 					$event = new Event();
 					$event->create( [
+						'time'           => $time,
+						'time_scheduled' => time(),
 						'step_id'    => $current->ID,
 						'funnel_id'  => $funnel->ID,
 						'contact_id' => $contact->ID,
 						'event_type' => Event::FUNNEL,
 						'status'     => Event::WAITING,
 					] );
+
+					if ( ! $event->exists() ) {
+						self::log( '🚨 Unable to create event record' );
+					}
 
 					// add the event args here also
 					$event->set_args( self::$event_args );
