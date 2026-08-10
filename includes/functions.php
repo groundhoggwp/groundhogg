@@ -6682,7 +6682,7 @@ function array_map_to_contacts( array &$array ) {
 /**
  * @param $array
  *
- * @return Step[]
+ * @return Contact[]
  */
 function as_contacts( array $array ) {
 	return map_to_class( $array, Contact::class );
