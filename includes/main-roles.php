@@ -163,32 +163,34 @@ class Main_Roles extends Roles {
 	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 		$primitive_cap_map = [
-			'view_funnel'             => 'view_funnels',
-			'edit_funnel'             => 'edit_funnels',
-			'delete_funnel'           => 'delete_funnels',
-			'view_campaign'           => 'manage_campaigns',
-			'edit_campaign'           => 'manage_campaigns',
-			'delete_campaign'         => 'manage_campaigns',
-			'view_email'              => 'view_emails',
-			'edit_email'              => 'edit_emails',
-			'delete_email'            => 'delete_emails',
-			'view_broadcast'          => 'view_broadcasts',
-			'edit_broadcast'          => 'cancel_broadcasts',
-			'delete_broadcast'        => 'cancel_broadcasts',
-			'edit_event'              => 'execute_events',
-			'delete_event'            => 'delete_logs',
-			'delete_events'           => 'delete_logs',
-			'edit_event_queue_item'   => 'execute_events',
-			'delete_event_queue_item' => 'cancel_events',
-			'edit_tag'                => 'edit_tags',
-			'view_tag'                => 'manage_tags',
-			'delete_tag'              => 'delete_tags',
-			'edit_log'                => 'do_not_allow',
-			'delete_log'              => 'delete_logs',
+			'view_funnel'             => [ 'view_funnels' ],
+			'edit_funnel'             => [ 'edit_funnels' ],
+			'delete_funnel'           => [ 'delete_funnels' ],
+			'view_campaign'           => [ 'manage_campaigns' ],
+			'edit_campaign'           => [ 'manage_campaigns' ],
+			'delete_campaign'         => [ 'manage_campaigns' ],
+			'view_email'              => [ 'view_emails' ],
+			'edit_email'              => [ 'edit_emails' ],
+			'delete_email'            => [ 'delete_emails' ],
+			'view_broadcast'          => [ 'view_broadcasts' ],
+			'edit_broadcast'          => [ 'cancel_broadcasts' ],
+			'delete_broadcast'        => [ 'cancel_broadcasts' ],
+			'edit_event'              => [ 'execute_events' ],
+			'delete_event'            => [ 'delete_logs' ],
+			'delete_events'           => [ 'delete_logs' ],
+			'edit_event_queue_item'   => [ 'execute_events' ],
+			'delete_event_queue_item' => [ 'cancel_events' ],
+			'edit_tag'                => [ 'edit_tags' ],
+			'view_tag'                => [ 'manage_tags' ],
+			'delete_tag'              => [ 'delete_tags' ],
+			'edit_log'                => [ 'do_not_allow' ],
+			'delete_log'              => [ 'delete_logs' ],
+			'start_flows'             => [ 'view_funnels', 'send_emails' ],
+			'schedule_flows'          => [ 'view_funnels', 'schedule_broadcasts' ],
 		];
 
 		if ( key_exists( $cap, $primitive_cap_map ) ) {
-			return [ $primitive_cap_map[ $cap ] ];
+			return $primitive_cap_map[ $cap ];
 		}
 
 		switch ( $cap ) {

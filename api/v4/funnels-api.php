@@ -55,7 +55,9 @@ class Funnels_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'add_contacts' ],
-				'permission_callback' => [ $this, 'update_permissions_callback' ]
+				'permission_callback' => function () {
+					return current_user_can( 'start_flows' );
+				},
 			],
 		] );
 
@@ -158,13 +160,25 @@ class Funnels_Api extends Base_Object_Api {
 				] );
 			}
 
+			// make sure the current user can add the contact to the flow
+			if ( ! current_user_can( 'edit_contact', $contact ) ){
+				return self::ERROR_INVALID_PERMISSIONS();
+			}
+
 			$step->enqueue( $contact );
 
 			return self::SUCCESS_RESPONSE();
 		}
 
+		// need scheduling permissions for this
+		if ( ! current_user_can( 'schedule_flows' ) ){
+			return self::ERROR_INVALID_PERMISSIONS();
+		}
+
 		// Doing it with batches and limit
 		if ( isset( $query_vars['limit'] ) || isset( $query_vars['number'] ) ) {
+
+			// in this situation contact owner permissions are handled within Contact_Query
 			$query    = new Contact_Query();
 			$contacts = $query->query( $query_vars, true );
 

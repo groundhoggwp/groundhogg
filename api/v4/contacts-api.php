@@ -1011,16 +1011,16 @@ class Contacts_Api extends Base_Object_Api {
 			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
 		}
 
-		$order = $request->get_param( 'order' ) ?: 'DESC';
+		$order = strtoupper( $request->get_param( 'order' ) ?: 'DESC' );
 
 		// submissions
 		$submissions = as_class( db()->submissions->query( [ 'contact_id' => $ID, 'orderby' => 'date_created', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Submission::class );
 		// activity
 		$activity = as_class( db()->activity->query( [ 'contact_id' => $ID, 'orderby' => 'timestamp', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Activity::class );
 		// events
-		$events = as_class( db()->events->query( [ 'contact_id' => $ID, 'status' => [ Event::COMPLETE, Event::FAILED ], 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event::class );
+		$events = as_class( db()->events->query( [ 'contact_id' => $ID, 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event::class );
 		// event queue
-		$event_queue = as_class( db()->events->query( [ 'contact_id' => $ID, 'status' => Event::WAITING, 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event_Queue_Item::class );
+		$event_queue = as_class( db()->event_queue->query( [ 'contact_id' => $ID, 'status' => Event::WAITING, 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event_Queue_Item::class );
 		// page visits
 		$page_visits = as_class( db()->page_visits->query( [ 'contact_id' => $ID, 'orderby' => 'timestamp', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Page_Visit::class );
 

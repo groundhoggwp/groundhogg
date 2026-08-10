@@ -33,7 +33,9 @@ class Task extends Note {
 	}
 
 	protected function post_setup() {
-		// TODO: Implement post_setup() method.
+		if ( ! $this->timestamp ){
+			$this->timestamp = ( new DateTimeHelper( $this->date_created) )->getTimestamp();
+		}
 	}
 
 	/**

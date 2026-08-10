@@ -3,6 +3,7 @@
 namespace Groundhogg\Classes;
 
 use Groundhogg\Base_Object;
+use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\create_object_from_type;
 use function Groundhogg\do_replacements;
 use function Groundhogg\get_db;
@@ -10,7 +11,10 @@ use function Groundhogg\get_db;
 class Note extends Base_Object {
 
 	protected function post_setup() {
-		// TODO: Implement post_setup() method.
+
+		if ( ! $this->timestamp ){
+			$this->timestamp = ( new DateTimeHelper( $this->date_created) )->getTimestamp();
+		}
 	}
 
 	protected function get_db() {
@@ -97,7 +101,7 @@ class Note extends Base_Object {
 	public function get_as_array() {
 		return array_merge( parent::get_as_array(), [
 			'i18n' => [
-				'time_diff' => human_time_diff( $this->timestamp, time() )
+				'time_diff' => human_time_diff( (int) $this->timestamp, time() )
 			]
 		] );
 	}

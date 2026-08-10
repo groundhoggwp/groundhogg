@@ -2,9 +2,11 @@
 
 namespace Groundhogg\Api\V4;
 
+use Groundhogg\Api\Api_Loader;
 use Groundhogg\Email_Log_Item;
 use Groundhogg\Email_Logger;
 use WP_REST_Request;
+use function Groundhogg\get_event_by_queued_id;
 
 class Email_Log_Api extends Base_Object_Api {
 
@@ -55,7 +57,20 @@ class Email_Log_Api extends Base_Object_Api {
 	}
 
 	public function read_permissions_callback() {
-		return current_user_can( 'view_logs' );
+
+		if ( current_user_can( 'view_logs' ) ){
+			return true;
+		}
+
+		$request = API_Loader::get_request();
+
+		// special case, searching by queued ID
+		if ( $request->has_param( 'queued_event_id' ) ){
+			$event = get_event_by_queued_id( $request->get_param( 'queued_event_id' ) );
+			return current_user_can( 'view_contact', $event->get_contact_id() );
+		}
+
+		return false;
 	}
 
 	public function update_permissions_callback() {

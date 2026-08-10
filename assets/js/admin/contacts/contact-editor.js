@@ -97,6 +97,7 @@
 
   const activityUpdated = () => {
     window.dispatchEvent(new Event('activityupdated'))
+    $('#refresh-timeline').click()
   }
 
   const getContact = () => {
@@ -123,7 +124,7 @@
       ]
     }
 
-    Groundhogg.components.emailModal(email)
+    Groundhogg.components.emailModal(email, activityUpdated )
   }
 
   const strings = {
@@ -168,7 +169,7 @@
                 sendEmail()
                 break
               case 'template':
-                Groundhogg.components.EmailTemplateModal(getContact().ID)
+                Groundhogg.components.EmailTemplateModal(getContact().ID, activityUpdated)
                 break
 
             }
@@ -295,6 +296,8 @@
                     __('%s added to flow!', 'groundhogg'),
                     getContact().data.full_name),
                 })
+
+                activityUpdated()
 
                 close()
 
@@ -930,10 +933,6 @@
               }, objectTitleDisplay)
             }
 
-            let strings = {
-
-            }
-
             // language=HTML
             return `
                 <li class="activity-item">
@@ -1035,6 +1034,7 @@
                       return this.renderActivity(a)
                   }
                   catch (e) {
+                    console.warn(e)
                       return ''
                   }
               }).join('') }
@@ -1191,8 +1191,6 @@
 
   const otherContactStuff = () => {
 
-    let activeTab = editor.default_tab ?? 'activity'
-
     const tabs = [
       {
         id     : 'activity',
@@ -1284,42 +1282,19 @@
           })
 
           const fetchActivity = () => {
-            return Promise.all([
-              SubmissionsStore.fetchItems({
-                contact_id: contact.ID,
-                limit     : 50,
-                order,
-                orderby   : 'date_created',
-              }),
-              ActivityStore.fetchItems({
-                contact_id: contact.ID,
-                limit     : 50,
-                order,
-                orderby   : 'timestamp',
-              }),
-              EventsStore.fetchItems({
-                contact_id: contact.ID,
-                status    : 'complete',
-                limit     : 50,
-                orderby   : 'time',
-                order,
-              }),
-              EventQueue.fetchItems({
-                contact_id: contact.ID,
-                status    : 'waiting',
-                limit     : 50,
-                orderby   : 'time',
-                order,
-              }),
-              PageVisitsStore.fetchItems({
-                contact_id: contact.ID,
-                limit     : 50,
-                orderby   : 'timestamp',
-                order,
-              }),
-            ]).then(() => {
-              loadTimeline()
-            }).catch(e => {
+
+            return get(`${ ContactsStore.route }/${contact.ID}/timeline`, {
+              order
+            }).then(response => {
+
+              console.log('response', response)
+
+              SubmissionsStore.itemsFetched( response.submissions )
+              ActivityStore.itemsFetched(response.activity)
+              EventsStore.itemsFetched(response.events)
+              EventQueue.itemsFetched(response.event_queue)
+              PageVisitsStore.itemsFetched(response.page_visits)
+
               loadTimeline()
             })
           }
@@ -1687,7 +1662,7 @@
               ${ tabs.map(({
                   id,
                   name,
-              }) => `<a href="#" data-tab="${ id }" class="nav-tab ${ activeTab ===
+              }) => `<a href="#${ id }" data-tab="${ id }" class="nav-tab ${ activeTab ===
                                                                       id ? 'nav-tab-active' : '' }">${ name }</a>`).join('') }
           </h2>
               ${ tabs.find(t => t.id === activeTab).render() }
@@ -1698,6 +1673,15 @@
 
       $('#other-contact-stuff').html(template())
       onMount()
+    }
+
+    let hash = window.location.hash.replace('#', '')
+    let activeTab
+
+    if ( tabs.find(t => t.id === hash) ) {
+      activeTab = hash
+    } else {
+      activeTab = editor.default_tab ?? 'activity'
     }
 
     const onMount = () => {
