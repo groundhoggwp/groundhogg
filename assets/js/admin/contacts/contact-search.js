@@ -218,7 +218,7 @@
                                         : '' }>${ sprintf(
                                         /* translators: %s: the name of a saved search */
                                         __('Update "%s"', 'groundhogg'),
-                                        this.currentSearch.name) }</button><a class="gh-text danger delete-search">${ __('Delete', 'groundhogg') }</a>` }
+                                        this.currentSearch.name) }</button><a id="delete-search" class="gh-text danger delete-search">${ __('Delete', 'groundhogg') }</a>` }
                     </div>
 
                 </div>
@@ -329,7 +329,7 @@
         }
       })
 
-      $('.delete-search').on('click', (e) => {
+      $('#delete-search').on('click', (e) => {
 
         e.preventDefault()
 
@@ -351,7 +351,7 @@
         const $button = $(e.target)
         $button.prop('disabled', true)
         $button.html(__('Updating', 'groundhogg'))
-        const { stop } = loadingDots('#update-search')
+        $button.addClass('loading-dots')
 
         SearchesStore.patch(this.currentSearch.id, {
           query: {
@@ -362,7 +362,7 @@
           },
         }).then(search => {
 
-          stop()
+          $button.removeClass('loading-dots')
           this.currentSearch = search
           $button.html(__('Updated!', 'groundhogg'))
           dialog({
@@ -375,7 +375,16 @@
         })
       })
 
+      if ( ! userHasCap( 'manage_options' ) ){
+        $('#update-search').remove()
+        $('#delete-search').remove()
+      }
+
       $('span#search-name').on('click', (e) => {
+
+        if ( ! userHasCap( 'manage_options' ) ){
+          return
+        }
 
         const $span = $(e.target)
 
@@ -511,7 +520,7 @@
         },
         {
           key: 'funnel',
-          cap: 'view_funnels',
+          cap: 'schedule_broadcasts',
           /* translators: %s: the number of contacts */
           text: sprintf(__('Add %s contacts to a flow', 'groundhogg'),
             totalContactsFormatted),
