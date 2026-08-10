@@ -889,11 +889,6 @@
   }
 
   const ReviewPlease = () => {
-
-    const State = Groundhogg.useState({
-      screen: 'nag'
-    }, ReviewPlease)
-
     return Div({ style: { padding: '1em' }, id: 'dash-review' }, morph => {
       return Groundhogg.components.ReviewBeg({})
     })
@@ -901,9 +896,9 @@
 
   const Widgets = Groundhogg.createRegistry()
 
-  if (!Groundhogg.isWhiteLabeled) {
+  if ( ! Groundhogg.isWhiteLabeled ) {
 
-    if ( ! Groundhogg.notices.isDismissed( 'review-please' ) || ! userHasCap( 'install_plugins' ) ) {
+    if ( ! Groundhogg.notices.isDismissed( 'review-please' ) && userHasCap( 'install_plugins' ) ) {
       Widgets.add('review-please', {
         name  : '⭐⭐⭐⭐⭐',
         col   : 3,
