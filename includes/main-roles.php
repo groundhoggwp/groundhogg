@@ -162,6 +162,35 @@ class Main_Roles extends Roles {
 	 */
 	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
 
+		$primitive_cap_map = [
+			'view_funnel'             => 'view_funnels',
+			'edit_funnel'             => 'edit_funnels',
+			'delete_funnel'           => 'delete_funnels',
+			'view_campaign'           => 'manage_campaigns',
+			'edit_campaign'           => 'manage_campaigns',
+			'delete_campaign'         => 'manage_campaigns',
+			'view_email'              => 'view_emails',
+			'edit_email'              => 'edit_emails',
+			'delete_email'            => 'delete_emails',
+			'view_broadcast'          => 'view_broadcasts',
+			'edit_broadcast'          => 'cancel_broadcasts',
+			'delete_broadcast'        => 'cancel_broadcasts',
+			'edit_event'              => 'execute_events',
+			'delete_event'            => 'delete_logs',
+			'delete_events'           => 'delete_logs',
+			'edit_event_queue_item'   => 'execute_events',
+			'delete_event_queue_item' => 'cancel_events',
+			'edit_tag'                => 'edit_tags',
+			'view_tag'                => 'manage_tags',
+			'delete_tag'              => 'delete_tags',
+			'edit_log'                => 'do_not_allow',
+			'delete_log'              => 'delete_logs',
+		];
+
+		if ( key_exists( $cap, $primitive_cap_map ) ) {
+			return [ $primitive_cap_map[ $cap ] ];
+		}
+
 		switch ( $cap ) {
 			case 'download_imports':
 			case 'download_exports':
@@ -185,18 +214,16 @@ class Main_Roles extends Roles {
 			case 'edit_task':
 			case 'view_task':
 			case 'delete_task':
-			case 'edit_funnel':
-			case 'edit_email':
 
 				$caps = [];
 
-				$parts       = explode( '_', $cap );
+				$parts = explode( '_', $cap );
 				$action      = $parts[0];
 				$object_type = $parts[1];
 
 				$caps[] = $action . '_' . $object_type . 's';
 
-				$object = $args[0];
+				$object = $args[0] ?? null;
 
 				// didn't pass the full object
 				if ( ! is_object( $object ) || ! method_exists( $object, 'get_id' ) ) {
@@ -295,7 +322,69 @@ class Main_Roles extends Roles {
 				}
 
 				break;
+			case 'view_event':
+			case 'view_event_queue_item':
 
+				$caps = [];
+
+				$parts       = explode( '_', $cap, 2 );
+				$object_type = $parts[1];
+
+				$event = $args[0] ?? null;
+
+				// didn't pass the full object
+				if ( ! is_object( $event ) || ! method_exists( $event, 'get_id' ) ) {
+					$event = $object_type === 'event' ? new Event( $event ) : new Event_Queue_Item( $event );
+				}
+
+				// Not a real object
+				if ( ! $event->exists() ) {
+					$caps[] = 'do_not_allow';
+					break;
+				}
+
+				// so if the current user does not have access to the contact, fallback to view_events
+				$contact = $event->get_contact();
+
+				if ( ! user_can( $user_id, 'view_contact', $contact ) ) {
+					$caps[] = 'view_events';
+				}
+
+				break;
+			case 'view_log':
+
+				$caps = [];
+
+				$log = $args[0] ?? null;
+
+				// didn't pass the full object
+				if ( ! is_object( $log ) || ! method_exists( $log, 'get_id' ) ) {
+					$log = new Email_Log_Item( $log );
+				}
+
+				// Not a real object
+				if ( ! $log->exists() ) {
+					$caps[] = 'do_not_allow';
+					break;
+				}
+
+				// array of email addresses
+				$recipients = $log->recipients;
+
+				if ( empty( $recipients ) ) {
+					$caps[] = 'view_logs';
+					break;
+				}
+
+				// if the user can't view the contact record of the recipients, fall back on view_logs
+				foreach ( $recipients as $recipient ) {
+					if ( ! user_can( $user_id, 'view_contact', $recipient ) ) {
+						$caps[] = 'view_logs';
+						break;
+					}
+				}
+
+				break;
 		}
 
 		return $caps;

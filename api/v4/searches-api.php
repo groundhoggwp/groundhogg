@@ -182,7 +182,7 @@ class Searches_Api extends Base_Api {
 	 * @return mixed
 	 */
 	public function update_permissions_callback() {
-		return current_user_can( 'edit_contacts' );
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -200,6 +200,6 @@ class Searches_Api extends Base_Api {
 	 * @return mixed
 	 */
 	public function delete_permissions_callback() {
-		return current_user_can( 'delete_contacts' );
+		return current_user_can( 'manage_options' );
 	}
 }

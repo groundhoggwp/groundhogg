@@ -59,11 +59,11 @@ class Email_Log_Api extends Base_Object_Api {
 	}
 
 	public function update_permissions_callback() {
-		return current_user_can( 'administrator' );
+		return false;
 	}
 
 	public function create_permissions_callback() {
-		return current_user_can( 'administrator' );
+		return false;
 	}
 
 	public function delete_permissions_callback() {

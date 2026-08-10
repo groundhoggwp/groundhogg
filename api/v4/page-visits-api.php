@@ -28,20 +28,20 @@ class Page_Visits_Api extends Base_Object_Api{
 	 * @inheritDoc
 	 */
 	public function update_permissions_callback() {
-		return current_user_can( 'view_contacts' );
+		return current_user_can( 'administrator' );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function create_permissions_callback() {
-		return current_user_can( 'view_contacts' );
+		return current_user_can( 'administrator' );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function delete_permissions_callback() {
-		return current_user_can( 'view_contacts' );
+		return current_user_can( 'administrator' );
 	}
 }

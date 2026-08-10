@@ -9,13 +9,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Background_Tasks;
+use Groundhogg\Classes\Activity;
+use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\Event;
+use Groundhogg\Event_Queue_Item;
 use Groundhogg\Plugin;
+use Groundhogg\Submission;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function Groundhogg\as_class;
+use function Groundhogg\db;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -79,6 +86,14 @@ class Contacts_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_inbox' ],
+				'permission_callback' => [ $this, 'read_single_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, '/contacts/(?P<ID>\d+)/timeline', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_timeline' ],
 				'permission_callback' => [ $this, 'read_single_permissions_callback' ]
 			],
 		] );
@@ -949,6 +964,110 @@ class Contacts_Api extends Base_Object_Api {
 	}
 
 	/**
+	 * Get the admin table row
+	 *
+	 * @param  WP_REST_Request  $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function admin_table_row( WP_REST_Request $request ) {
+		$contact = get_contactdata( $request->get_param( 'contact' ) );
+
+		if ( ! current_user_can( 'view_contact', $contact ) ) {
+			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
+		}
+
+		$contactTable = new Contacts_Table;
+
+		ob_start();
+
+		$contactTable->single_row( $contact );
+
+		$row = ob_get_clean();
+
+		return self::SUCCESS_RESPONSE( [
+			'row' => $row
+		] );
+	}
+
+	/**
+	 * Single request to read a contact's timeline
+	 *
+	 * @param  WP_REST_Request  $request
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function read_timeline( WP_REST_Request $request ) {
+
+		$ID = absint( $request->get_param( 'ID' ) );
+
+		$contact = get_contactdata( $ID );
+
+		if ( ! is_a_contact( $contact ) ) {
+			return self::ERROR_CONTACT_NOT_FOUND();
+		}
+
+		if ( ! $this->current_user_can_read( $contact ) ) {
+			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
+		}
+
+		$order = $request->get_param( 'order' ) ?: 'DESC';
+
+		// submissions
+		$submissions = as_class( db()->submissions->query( [ 'contact_id' => $ID, 'orderby' => 'date_created', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Submission::class );
+		// activity
+		$activity = as_class( db()->activity->query( [ 'contact_id' => $ID, 'orderby' => 'timestamp', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Activity::class );
+		// events
+		$events = as_class( db()->events->query( [ 'contact_id' => $ID, 'status' => [ Event::COMPLETE, Event::FAILED ], 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event::class );
+		// event queue
+		$event_queue = as_class( db()->events->query( [ 'contact_id' => $ID, 'status' => Event::WAITING, 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event_Queue_Item::class );
+		// page visits
+		$page_visits = as_class( db()->page_visits->query( [ 'contact_id' => $ID, 'orderby' => 'timestamp', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Page_Visit::class );
+
+		return self::SUCCESS_RESPONSE( [
+			'submissions' => $submissions,
+			'activity'    => $activity,
+			'events'      => $events,
+			'event_queue' => $event_queue,
+			'page_visits' => $page_visits,
+		] );
+	}
+
+	/**
+	 * Read permissions callback for single contact
+	 *
+	 * @param  WP_REST_Request  $request
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function read_single_permissions_callback( WP_REST_Request $request ) {
+		$contact = $this->get_object_from_request( $request );
+
+		if ( ! $contact->exists() ) {
+			return self::ERROR_404();
+		}
+
+		return current_user_can( 'view_contact', $contact );
+	}
+
+	/**
+	 * Udpate permissions callback for a single contact
+	 *
+	 * @param  WP_REST_Request  $request
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function update_single_permissions_callback( WP_REST_Request $request ) {
+		$contact = $this->get_object_from_request( $request );
+
+		if ( ! $contact->exists() ) {
+			return self::ERROR_404();
+		}
+
+		return current_user_can( 'edit_contact', $contact );
+	}
+
+	/**
 	 * protect delete endpoint
 	 *
 	 * @param WP_REST_Request $request
@@ -1012,6 +1131,7 @@ class Contacts_Api extends Base_Object_Api {
 		return current_user_can( 'delete_contacts' );
 	}
 
+
 	/**
 	 * Permissions callback for files
 	 *
@@ -1020,7 +1140,6 @@ class Contacts_Api extends Base_Object_Api {
 	public function create_files_permissions_callback() {
 		return current_user_can( 'download_contact_files' );
 	}
-
 
 	/**
 	 * Permissions callback for files
@@ -1047,32 +1166,5 @@ class Contacts_Api extends Base_Object_Api {
 	 */
 	public function delete_files_permissions_callback() {
 		return current_user_can( 'delete_files' );
-	}
-
-	/**
-	 * Get the admin table row
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return WP_Error|WP_REST_Response
-	 */
-	public function admin_table_row( WP_REST_Request $request ) {
-		$contact = get_contactdata( $request->get_param( 'contact' ) );
-
-		if ( ! current_user_can( 'view_contact', $contact ) ) {
-			return self::ERROR_INVALID_PERMISSIONS_CANT_VIEW();
-		}
-
-		$contactTable = new Contacts_Table;
-
-		ob_start();
-
-		$contactTable->single_row( $contact );
-
-		$row = ob_get_clean();
-
-		return self::SUCCESS_RESPONSE( [
-			'row' => $row
-		] );
 	}
 }

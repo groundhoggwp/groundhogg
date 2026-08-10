@@ -217,6 +217,22 @@ abstract class Base_Api extends Supports_Errors {
 	}
 
 	/**
+	 * 401 Error for invalid permissions.
+	 *
+	 * @return WP_Error
+	 */
+	protected static function ERROR_NO_ACCESS( $resource = null ) {
+
+		if ( ! $resource ){
+			return self::ERROR_401( 'no_access', _x( 'You do not have access to this resource.', 'api', 'groundhogg' ) );
+		}
+
+		// translators: %s: singular label of resource-type like contacts
+		return self::ERROR_401( 'no_access', sprintf( _x( 'You do not have access to this %s.', 'api', 'groundhogg' ), $resource ) );
+
+	}
+
+	/**
 	 * 500 Error for unknown error.
 	 *
 	 * @return WP_Error

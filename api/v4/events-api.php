@@ -2,9 +2,7 @@
 
 namespace Groundhogg\Api\V4;
 
-use Groundhogg\Api\Api_Loader;
 use Groundhogg\Event;
-use Groundhogg\Event_Queue_Item;
 use function Groundhogg\get_db;
 
 class Events_Api extends Base_Object_Api {
@@ -70,16 +68,6 @@ class Events_Api extends Base_Object_Api {
 	 * @return bool
 	 */
 	public function read_permissions_callback() {
-
-		$request = Api_Loader::get_request();
-
-		// from contact screen
-		$contact_id = $request->get_param( 'contact_id' );
-
-		if ( $contact_id && current_user_can( 'view_contact', $contact_id ) ) {
-			return true;
-		}
-
 		return current_user_can( 'view_events' );
 	}
 
@@ -98,7 +86,7 @@ class Events_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function create_permissions_callback() {
-		return current_user_can( 'add_events' );
+		return current_user_can( 'schedule_events' );
 	}
 
 	/**

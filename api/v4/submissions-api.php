@@ -4,6 +4,7 @@ namespace Groundhogg\Api\V4;
 
 // Exit if accessed directly
 use Groundhogg\Submission;
+use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -39,7 +40,7 @@ class Submissions_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function update_permissions_callback() {
-		return current_user_can( 'edit_contacts' );
+		return false;
 	}
 
 	/**
@@ -48,7 +49,7 @@ class Submissions_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function create_permissions_callback() {
-		return current_user_can( 'add_contacts' );
+		return false;
 	}
 
 	/**
@@ -57,6 +58,6 @@ class Submissions_Api extends Base_Object_Api {
 	 * @return mixed
 	 */
 	public function delete_permissions_callback() {
-		return current_user_can( 'delete_contacts' );
+		return current_user_can( 'delete_logs' );
 	}
 }
