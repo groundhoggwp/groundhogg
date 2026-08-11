@@ -1593,7 +1593,7 @@ abstract class DB {
 						$alias = $query->joinMeta( $key );
 
 						$query->where( "$alias.meta_key", $key );
-						$query->where( "$alias.meta_value", $value, $compare );
+						$query->where( Query::coalesceEmptyString( "$alias.meta_value" ), $value, $compare );
 					}
 
 					break;

@@ -5,6 +5,7 @@ namespace Groundhogg;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Query\FilterException;
 use Groundhogg\DB\Query\Filters;
+use Groundhogg\DB\Query\Query;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Query\Where;
 use Groundhogg\Utils\DateTimeHelper;
@@ -2104,7 +2105,7 @@ class Contact_Query extends Table_Query {
 					$alias = $where->query->joinMeta( $meta_key );
 
 					if ( $meta_value && $meta_compare ) {
-						$where->compare( "$alias.meta_value", $meta_value, $meta_compare );
+						$where->compare( Query::coalesceEmptyString( "$alias.meta_value" ), $meta_value, $meta_compare );
 					}
 
 					break;
@@ -2124,7 +2125,7 @@ class Contact_Query extends Table_Query {
 					$alias = $where->query->joinMeta( $meta_key, $where->query->db->usermeta, 'user_id' );
 
 					if ( $meta_value && $meta_compare ) {
-						$where->compare( "$alias.meta_value", $meta_value, $meta_compare );
+						$where->compare( Query::coalesceEmptyString( "$alias.meta_value" ), $meta_value, $meta_compare );
 					}
 
 					break;
@@ -2152,7 +2153,7 @@ class Contact_Query extends Table_Query {
 
 						$alias = $metaWhere->query->joinMeta( $key );
 
-						$metaWhere->compare( "$alias.meta_value", $value, $compare );
+						$metaWhere->compare( Query::coalesceEmptyString( "$alias.meta_value" ), $value, $compare );
 					}
 					break;
 				case 'date_query':

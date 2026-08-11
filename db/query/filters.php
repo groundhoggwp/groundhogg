@@ -555,7 +555,7 @@ class Filters {
 		}
 
 		$alias = $where->query->joinMeta( sanitize_key( $filter['meta'] ) );
-		Filters::string( "$alias.meta_value", $filter, $where );
+		Filters::string( Query::coalesceEmptyString( "$alias.meta_value" ), $filter, $where );
 	}
 
 	/**
@@ -744,7 +744,7 @@ class Filters {
 			case 'tel':
 			case 'custom_email':
 			case 'html':
-				self::string( $meta_value_column, $filter, $where );
+				self::string( Query::coalesceEmptyString( $meta_value_column ), $filter, $where );
 				break;
 			case 'number':
 				self::number( Query::cast2decimal( $meta_value_column, 10, 2 ), $filter, $where );

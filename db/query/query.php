@@ -779,6 +779,10 @@ class Query {
 
 	}
 
+	public static function coalesceEmptyString( string $col ) {
+		return "COALESCE($col, '')";
+	}
+
 	public static function coalesceZero( string $col ) {
 		return "COALESCE($col, 0)";
 	}
