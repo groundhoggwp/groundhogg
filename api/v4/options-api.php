@@ -42,6 +42,10 @@ class Options_Api extends Base_Api{
 		return current_user_can( 'manage_options' );
 	}
 
+	public static function ERROR_UPDATING_GLOBAL_OPTIONS_UNSUPPORTED() {
+		return self::ERROR_400( 'global_options_unsupported', 'Updating non-Groundhogg options is not supported' );
+	}
+
 	/**
 	 * Update options
 	 *
@@ -49,13 +53,18 @@ class Options_Api extends Base_Api{
 	 *
 	 * @param \WP_REST_Request $request
 	 *
-	 * @return \WP_REST_Response
+	 * @return \WP_Error|\WP_REST_Response
 	 */
 	public function update( \WP_REST_Request $request ){
 
 		$options = $request->get_params();
 
 		foreach ( $options as $option => $value ){
+
+			// not a groundhogg option, so we're going to ignore
+			if ( ! str_starts_with( $option, 'gh_' ) ) {
+				return self::ERROR_UPDATING_GLOBAL_OPTIONS_UNSUPPORTED();
+			}
 
 			/**
 			 * Filter the callback to sanitize the option
@@ -85,13 +94,19 @@ class Options_Api extends Base_Api{
 	 *
 	 * @param \WP_REST_Request $request
 	 *
-	 * @return \WP_REST_Response
+	 * @return \WP_Error|\WP_REST_Response
 	 */
 	public function delete( \WP_REST_Request $request ){
 
 		$options = $request->get_params();
 
 		foreach ( $options as $option ){
+
+			// not a groundhogg option, so we're going to ignore
+			if ( ! str_starts_with( $option, 'gh_' ) ) {
+				return self::ERROR_400( 'global_options_unsupported', 'Updating non-Groundhogg options is not supported' );
+			}
+
 			delete_option( $option );
 		}
 
@@ -105,15 +120,20 @@ class Options_Api extends Base_Api{
 	 *
 	 * @param \WP_REST_Request $request
 	 *
-	 * @return \WP_REST_Response
+	 * @return \WP_Error|\WP_REST_Response
 	 */
 	public function read( \WP_REST_Request $request ){
 
 		$options = array_keys( $request->get_params() );
-		$options = array_combine( $options, $options );
+
+		if ( \Groundhogg\array_any( $options, fn( $option ) => ! str_starts_with( $option, 'gh_' ) ) ) {
+			return self::ERROR_400( 'global_options_unsupported', 'Reading non-Groundhogg options is not supported' );
+		}
+
+		$values = array_map( fn( $option ) => get_option( $option ), $options );
 
 		return self::SUCCESS_RESPONSE([
-			'items' => array_map_with_keys( $options,  function ( $v, $opt ) { return get_option( $opt ); } )
+			'items' => array_combine( $options, $values )
 		]);
 	}
 }
