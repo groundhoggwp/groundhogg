@@ -142,7 +142,7 @@ class Tasks_Api extends Notes_Api {
 
 				$task = new Task( $item );
 
-				if ( ! $task->exists() ) {
+				if ( ! $task->exists() || ! current_user_can( 'edit_task', $task ) ) {
 					continue;
 				}
 
@@ -164,6 +164,11 @@ class Tasks_Api extends Notes_Api {
 		 * @var $object Task
 		 */
 		foreach ( $items as $task ) {
+
+			if ( ! current_user_can( 'edit_task', $task ) ){
+				continue;
+			}
+
 			$task->complete();
 		}
 
