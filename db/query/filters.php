@@ -580,7 +580,7 @@ class Filters {
 		if ( $filter['compare'] === 'in' ) {
 			$where->in( $column, $filter['options'] );
 		} else {
-			$where->notIn( "COALESCE($column,'')", $filter['options'] );
+			$where->notIn( Query::coalesceEmptyString( $column ), $filter['options'] );
 		}
 	}
 
@@ -615,7 +615,7 @@ class Filters {
 			case 'not_checked':
 			case 'all_not_in':
 				foreach ( $filter['options'] as $option ) {
-					$where->notContains( "COALESCE($column,'')", '"' . $option . '"' );
+					$where->notContains( Query::coalesceEmptyString( $column ), '"' . $option . '"' );
 				}
 				break;
 		}
@@ -760,12 +760,24 @@ class Filters {
 				self::mysqlDateTime( Query::cast2time( $meta_value_column ), $filter, $where );
 				break;
 			case 'radio':
+
+				// options can only be what's available in the field
+				$filter['options'] = array_intersect( $filter['options'] ?? [], $field['options'] ?? [] );
+
 				self::is_one_of_filter( $meta_value_column, $filter, $where );
 				break;
 			case 'checkboxes':
+
+				// options can only be what's available in the field
+				$filter['options'] = array_intersect( $filter['options'] ?? [], $field['options'] ?? [] );
+
 				self::custom_field_has_all_selected( $meta_value_column, $filter, $where );
 				break;
 			case 'dropdown':
+
+				// options can only be what's available in the field
+				$filter['options'] = array_intersect( $filter['options'] ?? [], $field['options'] ?? [] );
+
 				if ( isset_not_empty( $field, 'multiple' ) ) {
 					self::custom_field_has_all_selected( $meta_value_column, $filter, $where );
 				} else {
