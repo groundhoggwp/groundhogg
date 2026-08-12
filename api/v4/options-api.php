@@ -104,7 +104,7 @@ class Options_Api extends Base_Api{
 
 			// not a groundhogg option, so we're going to ignore
 			if ( ! str_starts_with( $option, 'gh_' ) ) {
-				return self::ERROR_400( 'global_options_unsupported', 'Updating non-Groundhogg options is not supported' );
+				return self::ERROR_UPDATING_GLOBAL_OPTIONS_UNSUPPORTED();
 			}
 
 			delete_option( $option );
