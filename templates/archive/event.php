@@ -44,7 +44,8 @@ if ( current_user_can( 'view_emails' ) || current_contact_and_logged_in_user_mat
         if ( current_user_can( 'view_emails' ) ){
 			wp_die( esc_html__( 'The view in browser feature does not work for tests and previews because it is not associated with an event. It only works when the email is sent to a recipient from a broadcast or funnel.', 'groundhogg' ) );
         }
-		wp_die( esc_html__( 'Unable to view archive...', 'groundhogg' )
+
+		wp_die( esc_html__( 'Unable to view archive...', 'groundhogg' ) );
 	}
 
 	$email_id = $event->email_id;
