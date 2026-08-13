@@ -5,10 +5,12 @@ namespace Groundhogg\Steps\Premium\Logic;
 use Groundhogg\Contact;
 use Groundhogg\Steps\Logic\Logic;
 use Groundhogg\Steps\Premium\Trait_Premium_Step;
+use Groundhogg\Steps\Trait_Legacy;
 
 class Logic_Loop extends Logic {
 
 	use Trait_Premium_Step;
+	use Trait_Legacy;
 
 	public function get_name() {
 		return esc_html_x( 'Loop', 'step_name', 'groundhogg' );

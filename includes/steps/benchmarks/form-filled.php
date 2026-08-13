@@ -7,6 +7,7 @@ use Groundhogg\Form;
 use Groundhogg\Plugin;
 use Groundhogg\Properties;
 use Groundhogg\Step;
+use Groundhogg\Steps\Trait_Legacy;
 use Groundhogg\Submission;
 use function Groundhogg\encrypt;
 use function Groundhogg\get_array_var;
@@ -37,6 +38,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Form_Filled extends Benchmark {
 
+    use Trait_Legacy;
+
 	public function get_sub_group() {
 		return 'forms';
 	}
@@ -47,10 +50,6 @@ class Form_Filled extends Benchmark {
 
 	protected function add_additional_actions() {
 		add_action( 'admin_footer', [ $this, 'modal_form' ] );
-	}
-
-	public function is_legacy() {
-		return true;
 	}
 
 	/**
