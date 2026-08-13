@@ -80,7 +80,7 @@ class Manager {
 		$this->register_sub_group( 'other', __( 'Other', 'groundhogg' ) );
 		$this->register_sub_group( 'developer', __( 'Developer', 'groundhogg' ) );
 		$this->register_sub_group( 'branching', __( 'Branching', 'groundhogg' ) );
-		$this->register_sub_group( 'logic', __( 'Logic', 'groundhogg' ) );
+		$this->register_sub_group( 'logic', __( 'Routing', 'groundhogg' ) );
 		$this->register_sub_group( 'special', __( 'Special', 'groundhogg' ) );
 
 		/* actions */

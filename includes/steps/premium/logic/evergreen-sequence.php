@@ -34,7 +34,7 @@ class Evergreen_Sequence extends Branch_Logic {
 	}
 
 	public function get_name() {
-		return esc_html_x( 'Smart Date Sequence', 'step_name', 'groundhogg' );
+		return esc_html_x( 'Date Sync', 'step_name', 'groundhogg' );
 	}
 
 	public function get_type() {
@@ -46,7 +46,7 @@ class Evergreen_Sequence extends Branch_Logic {
 	}
 
 	public function get_description() {
-		return esc_html__( 'Contacts will jump to the timer closest to the current date.', 'groundhogg' );
+		return esc_html__( 'Contacts will jump to the timer closest to the current date within the sequence.', 'groundhogg' );
 	}
 
 	public function get_sub_timer_steps() {
