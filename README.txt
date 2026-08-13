@@ -378,6 +378,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.6 (2026-07-27) =
+* ADDED New "Reroute" logic step, allowing contacts to be routed to any other action node in a flow, from anywhere in a flow.
+* TWEAKED The "Logic" flow step subgroup has be renamed "Routing"
+* TWEAKED The "Smart Date Sequence" logic step has been renamed "Date Sync"
+* TWEAKED The "Skip" and "Loop" logic steps have been deprecated (available as legacy steps) since the Reroute step does the same thing but better.
+
 = 4.5.15 (2026-07-27) =
 * ADDED "Reload page" after form submit setting.
 * ADDED Contact timeline now shows activity and events from flows for sales reps and managers.

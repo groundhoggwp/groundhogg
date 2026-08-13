@@ -18,7 +18,7 @@ class Logic_Jump extends Logic {
 	}
 
 	public function get_description() {
-		return esc_html__( 'Go to any other step in the flow', 'groundhogg' );
+		return esc_html__( 'Go to any other action node in the flow', 'groundhogg' );
 	}
 
 	public function get_icon() {
