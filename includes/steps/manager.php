@@ -144,6 +144,7 @@ class Manager {
 			$this->add_step( new Premium\Logic\Logic_Loop() );
 			$this->add_step( new Premium\Logic\Logic_Skip() );
 			$this->add_step( new Premium\Logic\Logic_Stop() );
+			$this->add_step( new Premium\Logic\Logic_Jump() );
 //			$this->add_step( new Premium\Logic\Timer_Skip() );
 
 		}

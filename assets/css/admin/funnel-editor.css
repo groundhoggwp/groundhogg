@@ -59,6 +59,28 @@ body:has(#funnel-form):not(.gh-full-screen) #close {
     box-shadow: 0 0 0 0 var(--gh-dark-50);
   }
 }
+@keyframes pulseLogicLine {
+  0% {
+    border-color: rgba(108, 25, 173, 0.25);
+  }
+  70% {
+    border-color: rgb(108, 25, 173);
+  }
+  100% {
+    border-color: rgba(108, 25, 173, 0.25);
+  }
+}
+@keyframes pulseLogicArrow {
+  0% {
+    color: rgba(108, 25, 173, 0.25);
+  }
+  70% {
+    color: rgb(108, 25, 173);
+  }
+  100% {
+    color: rgba(108, 25, 173, 0.25);
+  }
+}
 body.gh-moving-step #step-flow button.add-step {
   box-shadow: 0 0 0 var(--gh-dark-50);
   animation: pulseBoxShadow 2s infinite;
@@ -73,32 +95,7 @@ body.gh-moving-step #step-flow .step .actions {
 body.gh-screenshot-mode #step-settings-container {
   display: none;
 }
-body.gh-screenshot-mode #funnel-form #step-flow {
-  --logic-line-width: 3px;
-}
-body.gh-screenshot-mode #funnel-form #step-flow .fixed-inside {
-  background-image: none;
-  background-color: #fff;
-}
 body.gh-screenshot-mode #funnel-form #step-flow button.add-step {
-  display: none;
-}
-body.gh-screenshot-mode #funnel-form #step-flow .sortable-item:first-child button.add-step + .flow-line {
-  display: none;
-}
-body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step {
-  border-width: var(--logic-line-width);
-  background-image: linear-gradient(var(--color-10), var(--color-10));
-  background-color: #fff;
-  box-shadow: none;
-}
-body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step .hndle-icon {
-  background-color: var(--color);
-}
-body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step .hndle-icon svg {
-  fill: #FFF;
-}
-body.gh-screenshot-mode #funnel-form #step-flow .step-branch .step + .flow-line {
   display: none;
 }
 
@@ -825,6 +822,16 @@ button.button.save-button {
   background-position: center center;
   background-size: 20px 20px;
 }
+#step-flow .fixed-inside .logic:hover .loop-line,
+#step-flow .fixed-inside .logic:hover .skip-line,
+#step-flow .fixed-inside .logic:hover .jump-line {
+  animation: pulseLogicLine 2s infinite;
+}
+#step-flow .fixed-inside .logic:hover .loop-line > .jump-arrow,
+#step-flow .fixed-inside .logic:hover .skip-line > .jump-arrow,
+#step-flow .fixed-inside .logic:hover .jump-line > .jump-arrow {
+  animation: pulseLogicArrow 2s infinite;
+}
 #step-flow .fixed-inside .logic-line {
   border-style: var(--logic-line-style);
   position: absolute;
@@ -851,42 +858,24 @@ button.button.save-button {
   bottom: 0;
   left: 100%;
 }
-#step-flow .fixed-inside .logic-line.skip-line, #step-flow .fixed-inside .logic-line.loop-line {
+#step-flow .fixed-inside .logic-line.jump-line, #step-flow .fixed-inside .logic-line.skip-line, #step-flow .fixed-inside .logic-line.loop-line {
   border-color: rgb(108, 25, 173);
 }
-#step-flow .fixed-inside .logic-line.loop-line > .line-arrow.top {
-  left: 60%;
-}
-#step-flow .fixed-inside .logic-line.loop-line > .line-arrow.bottom {
-  left: 60%;
-}
-#step-flow .fixed-inside .logic-line > .line-arrow {
+#step-flow .fixed-inside .logic-line .jump-arrow {
+  color: rgb(108, 25, 173);
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border-color: rgb(108, 25, 173);
-  border-style: solid;
-  border-width: var(--logic-line-width) var(--logic-line-width) 0 0;
+  display: block;
+  line-height: 1;
 }
-#step-flow .fixed-inside .logic-line > .line-arrow.top {
-  transform: translate(-50%, -50%) rotate(45deg);
-  left: 40%;
-  top: 0;
+#step-flow .fixed-inside .logic-line.loop-line > .jump-arrow {
+  top: -1px;
+  transform: translateY(-50%);
+  right: -2px;
 }
-#step-flow .fixed-inside .logic-line > .line-arrow.bottom {
-  transform: translate(-50%, 50%) rotate(-135deg);
-  left: 40%;
-  bottom: 0;
-}
-#step-flow .fixed-inside .logic-line > .line-arrow.left {
-  transform: translate(-50%, -50%) rotate(-45deg);
-  left: 0;
-  top: 50%;
-}
-#step-flow .fixed-inside .logic-line > .line-arrow.right {
-  transform: translate(50%, -50%) rotate(135deg);
-  right: 0;
-  top: 50%;
+#step-flow .fixed-inside .logic-line.skip-line > .jump-arrow {
+  bottom: -1px;
+  transform: translateY(50%);
+  left: -2px;
 }
 #step-flow .fixed-inside .step-branches {
   gap: 40px;

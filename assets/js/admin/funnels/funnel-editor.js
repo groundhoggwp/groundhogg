@@ -2309,678 +2309,6 @@
 
   let lineWidth
 
-  function drawLogicLinesSVG() {
-
-    const flow = document.getElementById('step-flow').querySelector('.fixed-inside')
-
-    if (!flow) {
-      return
-    }
-
-    /*
-     * Store all connections before removing the old line elements,
-     * because some relationships are identified by those elements.
-     */
-    const connections = []
-
-    const addConnection = ({
-      id,
-      from,
-      to,
-      fromSide = null,
-      toSide = null,
-      fromIsBranch = false,
-      toIsBranch = false,
-      className = '',
-      arrow = false,
-      clearance = 30,
-      radius = 12,
-    }) => {
-      from = resolveNodeLineElement(from)
-      to = resolveNodeLineElement(to)
-
-      if (!from || !to || from === to) {
-        return
-      }
-
-      /*
-       * Branches and non-node containers always use their top port.
-       */
-      if (
-        fromIsBranch ||
-        !from.matches('.step, .sortable-item')
-      ) {
-        fromSide = 'top'
-      }
-
-      if (
-        toIsBranch ||
-        !to.matches('.step, .sortable-item')
-      ) {
-        toSide = 'top'
-      }
-
-      connections.push({
-        id,
-        from,
-        to,
-        fromSide,
-        toSide,
-        className,
-        arrow,
-        clearance,
-        radius,
-      })
-    }
-
-    const getStepData = step => {
-      return Funnel.steps.find(
-        funnelStep =>
-          funnelStep.ID == step.dataset.id
-      )
-    }
-
-    const getStepTarget = step => {
-      const stepData =
-        getStepData(step)
-
-      const targetId =
-        stepData?.meta?.next
-
-      if (
-        !targetId ||
-        targetId == 0
-      ) {
-        return null
-      }
-
-      return document.getElementById(
-        `step-${targetId}`
-      )
-    }
-
-    /*
-     * Ensure the funnel end exists.
-     */
-    const main =
-      document.querySelector(
-        `.step-branch[data-branch="main"]`
-      )
-
-    if (main) {
-      let end =
-        main.querySelector(
-          '.funnel-end'
-        )
-
-      if (!end) {
-        end = MakeEl.Fragment([
-          document.body.classList.contains('gh_funnels')
-          ? Button({
-            className:
-              `add-step ${
-                Funnel.steps.length
-                ? 'add-action'
-                : 'add-benchmark'
-              }`,
-
-            id: 'end-funnel',
-          }, MakeEl.Dashicon('plus-alt2'))
-          : null,
-
-          Div({
-            className: 'flow-line',
-          }),
-
-          Div({
-            className: 'funnel-end',
-          }, Span({
-            className: 'the-end',
-          }, 'End')),
-        ])
-      }
-
-      main.append(end)
-    }
-
-    /*
-     * Create benchmark group labels.
-     */
-    try {
-      document
-      .querySelectorAll(
-        '.step-branch.benchmarks'
-      )
-      .forEach(branch => {
-        if (
-          branch.previousElementSibling?.matches(
-            '.benchmark-pill'
-          )
-        ) {
-          return
-        }
-
-        let pill
-
-        if (
-          branch.parentElement.matches(
-            '.starting'
-          )
-        ) {
-          pill = Div({
-            className: 'benchmark-pill',
-          }, [
-            'Start the flow when...',
-          ])
-        }
-        else {
-          pill = Div({
-            className: 'benchmark-pill',
-          }, [
-            'Until...',
-
-            ToolTip(
-              'Contacts will be <i>pulled</i> here, skipping all actions, when any <span class="gh-text orange">trigger</span> is completed.',
-              'right'
-            ),
-          ])
-
-          branch.insertAdjacentElement(
-            'beforebegin',
-            Div({
-              className: 'flow-stop',
-            })
-          )
-        }
-
-        branch.insertAdjacentElement(
-          'beforebegin',
-          pill
-        )
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to create benchmark labels.',
-        error
-      )
-    }
-
-    /*
-     * Benchmark connections.
-     *
-     * Each benchmark connects to its benchmark branch.
-     * The branch endpoint always uses its top port.
-     */
-    try {
-      document
-      .querySelectorAll(
-        '.step-branch.benchmarks > .sortable-item'
-      )
-      .forEach(sortable => {
-        const step =
-          sortable.matches('.step')
-          ? sortable
-          : sortable.querySelector('.step') ||
-            sortable
-
-        const branch =
-          sortable.parentElement
-
-        if (
-          !step ||
-          !branch ||
-          step.style.display === 'none'
-        ) {
-          return
-        }
-
-        addConnection({
-          id:
-            `benchmark-${step.id || step.dataset.id}-below`,
-
-          from: step,
-          to: branch,
-
-          toIsBranch: true,
-
-          className:
-            'benchmark-line benchmark-line-below',
-        })
-
-        /*
-         * Starting benchmarks have no incoming pass-through line.
-         */
-        if (
-          sortable
-          .closest('.sortable-item.benchmarks')
-          ?.matches('.starting')
-        ) {
-          return
-        }
-
-        addConnection({
-          id:
-            `benchmark-${step.id || step.dataset.id}-above`,
-
-          from: branch,
-          to: step,
-
-          fromIsBranch: true,
-
-          className: [
-            'benchmark-line',
-            'benchmark-line-above',
-            step.classList.contains('passthru')
-            ? 'passthru'
-            : '',
-          ].filter(Boolean).join(' '),
-        })
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect benchmark connections.',
-        error
-      )
-    }
-
-    /*
-     * Connections above branch groups.
-     *
-     * Existing structure:
-     *
-     * step
-     * step-branches
-     *   step-branch
-     *     line-above
-     *
-     * The branch receives the connection through its top port.
-     */
-    try {
-      document
-      .querySelectorAll(
-        '.logic-line.line-above'
-      )
-      .forEach((line, index) => {
-        const branch =
-          line.parentElement
-
-        const branches =
-          line.closest('.step-branches')
-
-        const step =
-          branches?.previousElementSibling
-
-        if (!branch || !step) {
-          return
-        }
-
-        addConnection({
-          id:
-            `branch-above-${
-              step.dataset.id ||
-              step.id ||
-              index
-            }-${
-              branch.dataset.branch ||
-              index
-            }`,
-
-          from: step,
-          to: branch,
-
-          toIsBranch: true,
-
-          className:
-            'branch-line line-above',
-        })
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect branch-above connections.',
-        error
-      )
-    }
-
-    /*
-     * Connections below branches.
-     *
-     * The branch is connected to the containing sortable item.
-     * Both are treated as structural endpoints and therefore use
-     * their top ports.
-     */
-    try {
-      document
-      .querySelectorAll(
-        '.logic-line.line-below'
-      )
-      .forEach((line, index) => {
-        const branch =
-          line.parentElement
-
-        const sortable =
-          line.closest('.sortable-item')
-
-        if (!branch || !sortable) {
-          return
-        }
-
-        addConnection({
-          id:
-            `branch-below-${
-              branch.dataset.branch ||
-              index
-            }-${
-              sortable.dataset.id ||
-              sortable.id ||
-              index
-            }`,
-
-          from: branch,
-          to: sortable,
-
-          fromIsBranch: true,
-          toIsBranch: true,
-
-          className:
-            'branch-line line-below',
-        })
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect branch-below connections.',
-        error
-      )
-    }
-
-    /*
-     * Loop connections travel around the left.
-     */
-    try {
-      document
-      .querySelectorAll(`
-                .step-branch .step.loop,
-                .step-branch .step.logic_loop:not(.loop_broken)
-            `)
-      .forEach(step => {
-        const target =
-          getStepTarget(step)
-
-        if (!target) {
-          return
-        }
-
-        addConnection({
-          id:
-            `loop-${step.dataset.id}-to-${target.dataset.id}`,
-
-          from: step,
-          to: target,
-
-          fromSide: 'left',
-          toSide: 'left',
-
-          className:
-            'loop-line',
-
-          arrow: true,
-          clearance: 40,
-        })
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect loop connections.',
-        error
-      )
-    }
-
-    /*
-     * Skip connections travel around the right.
-     */
-    try {
-      document
-      .querySelectorAll(`
-                .step-branch .step.skip,
-                .step-branch .step.logic_skip:not(.loop_broken)
-            `)
-      .forEach(step => {
-        const target =
-          getStepTarget(step)
-
-        if (!target) {
-          return
-        }
-
-        addConnection({
-          id:
-            `skip-${step.dataset.id}-to-${target.dataset.id}`,
-
-          from: step,
-          to: target,
-
-          fromSide: 'right',
-          toSide: 'right',
-
-          className:
-            'skip-line',
-
-          arrow: true,
-          clearance: 40,
-        })
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect skip connections.',
-        error
-      )
-    }
-
-    /*
-     * Timer skips.
-     *
-     * Each additional timer gets more clearance so the paths do not
-     * completely overlap.
-     */
-    try {
-      document
-      .querySelectorAll(
-        '.step-branch .step.timer_skip'
-      )
-      .forEach(step => {
-        const stepData =
-          getStepData(step)
-
-        const timers =
-          stepData?.meta?.timers
-
-        if (
-          !Array.isArray(timers) ||
-          !timers.length
-        ) {
-          return
-        }
-
-        timers.forEach(
-          (targetId, index) => {
-            if (!targetId) {
-              return
-            }
-
-            const target =
-              document.getElementById(
-                `step-${targetId}`
-              )
-
-            if (!target) {
-              return
-            }
-
-            addConnection({
-              id:
-                `timer-${step.dataset.id}-to-${targetId}-${index}`,
-
-              from: step,
-              to: target,
-
-              fromSide: 'right',
-              toSide: 'right',
-
-              className:
-                'timer-skip-line',
-
-              arrow: true,
-
-              clearance:
-                40 + index * 20,
-            })
-          }
-        )
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect timer connections.',
-        error
-      )
-    }
-
-    /*
-     * Stop connections.
-     *
-     * Connect each stop step to its local funnel-end element.
-     * funnel-end is not a step, so it always receives the line
-     * through its top port.
-     */
-    try {
-      document
-      .querySelectorAll(
-        '.step-branch .step.logic_stop'
-      )
-      .forEach((step, index) => {
-        const branch =
-          step.closest('.step-branch')
-
-        const end =
-          branch?.querySelector('.funnel-end') ||
-          main?.querySelector('.funnel-end')
-
-        if (!end) {
-          return
-        }
-
-        addConnection({
-          id:
-            `stop-${step.dataset.id || index}-to-end`,
-
-          from: step,
-          to: end,
-
-          toIsBranch: true,
-
-          className:
-            'stop-line',
-
-          fromSide: 'bottom',
-          arrow: false,
-        })
-      })
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect stop connections.',
-        error
-      )
-    }
-
-    /*
-     * Connect the final regular step in the main branch to the
-     * funnel-end element.
-     */
-    try {
-      const end =
-        main?.querySelector(
-          '.funnel-end'
-        )
-
-      const mainSteps =
-        main
-        ? [
-          ...main.querySelectorAll(
-            ':scope > .sortable-item .step'
-          ),
-        ].filter(
-          step =>
-            step.style.display !== 'none'
-        )
-        : []
-
-      const finalStep =
-        mainSteps.at(-1)
-
-      if (finalStep && end) {
-        addConnection({
-          id:
-            `main-${finalStep.dataset.id || finalStep.id}-to-end`,
-
-          from: finalStep,
-          to: end,
-
-          fromSide: 'bottom',
-          toIsBranch: true,
-
-          className:
-            'main-end-line',
-        })
-      }
-    }
-    catch (error) {
-      console.error(
-        'Unable to collect main end connection.',
-        error
-      )
-    }
-
-    /*
-     * Remove every previous SVG connection.
-     */
-    clearNodeLines(flow)
-
-    /*
-     * Remove the old border-based line elements.
-     *
-     * The relationship information has already been collected above.
-     */
-    flow
-    .querySelectorAll(`
-            .logic-line.benchmark-line,
-            .logic-line.line-above,
-            .logic-line.line-below,
-            .logic-line.loop-line,
-            .logic-line.skip-line,
-            .logic-line.line-end
-        `)
-    .forEach(line => line.remove())
-
-    /*
-     * Draw all collected connections.
-     */
-    connections.forEach(connection => {
-      drawNodeLine({
-        container: flow,
-        ...connection,
-      })
-    })
-
-    $(document).trigger(
-      'draw-logic-lines'
-    )
-  }
-
   function drawLogicLines () {
 
     // const borderRadius = '50px'
@@ -3351,57 +2679,63 @@
     }
     catch (e) {}
 
-    // loops
-    try {
-      document.querySelectorAll('.step-branch .step.loop, .step-branch .step.logic_loop:not(.loop_broken)').forEach(el => {
+    /**
+     * -->--②
+     * |
+     * ^
+     * |
+     * --<--①
+     *
+     * @param from
+     * @param to
+     */
+    const loopLine = ( from, to ) => {
 
-        // the step-branch.benchmarks container
-        let stepPos = el.getBoundingClientRect()
-        let stepId = el.dataset.id
-        let targetStepId = Funnel.steps.find(s => s.ID == stepId).meta.next
+      let widestEl = findWidestElementBetween(to, from)
+      let toPos = to.getBoundingClientRect()
+      let fromPos = from.getBoundingClientRect()
 
-        if (!targetStepId || typeof targetStepId == 'undefined' || targetStepId == 0) {
-          return
-        }
+      let lineHeight = Math.abs(( fromPos.bottom - ( fromPos.height / 2 ) ) - ( toPos.bottom - ( toPos.height / 2 ) ))
+      let minWidth = Math.min(fromPos.width, toPos.width)
 
-        let targetStep = document.getElementById(`step-${ targetStepId }`)
-        let widestEl = findWidestElementBetween(targetStep, el)
-        let targetPos = targetStep.getBoundingClientRect()
+      let branchPos = from.closest('.step-branch').getBoundingClientRect()
+      let sortable = from.closest('.sortable-item')
+      let sortablePos = sortable.getBoundingClientRect()
 
-        let lineHeight = Math.abs(( stepPos.bottom - ( stepPos.height / 2 ) ) - ( targetPos.bottom - ( targetPos.height / 2 ) ))
-        let minWidth = Math.min(stepPos.width, targetPos.width)
+      let line = sortable.querySelector(`div.logic-line.loop-${ from.dataset.id }-to-${ to.dataset.id }`)
 
-        let branchPos = el.closest('.step-branch').getBoundingClientRect()
-        let sortable = el.closest('.sortable-item')
-        let sortablePos = sortable.getBoundingClientRect()
+      if (!line) {
+        line = Div({ className: `logic-line loop-line loop-${ from.dataset.id  }-to-${ to.dataset.id }` }, [
+          Span({className: 'jump-arrow'}, '▶' )
+        ])
+        sortable.append(line)
+      }
 
-        let line = sortable.querySelector(`div.logic-line.loop-${ stepId }-to-${ targetStepId }`)
+      clearLineStyle(line)
 
-        if (!line) {
-          line = Div({ className: `logic-line loop-line loop-${ stepId }-to-${ targetStepId }` }, [
-            Div({ className: 'line-arrow top' }),
-            Div({ className: 'line-arrow left' }),
-            Div({ className: 'line-arrow bottom' }),
-          ])
-          sortable.append(line)
-        }
+      let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
 
-        clearLineStyle(line)
+      line.style.bottom = `${ Math.abs(sortablePos.bottom - fromPos.bottom) + ( fromPos.height / 2 ) }px`
+      line.style.width = `${ width }px`
+      line.style.right = `calc(50% + ${ minWidth / 2 }px)`
+      line.style.height = `${ lineHeight }px`
+      line.style.borderWidth = `${ borderWidth } 0 ${ borderWidth } ${ borderWidth }`
+      line.style.borderBottomLeftRadius = borderRadius
+      line.style.borderTopLeftRadius = borderRadius
 
-        let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
-
-        line.style.bottom = `${ Math.abs(sortablePos.bottom - stepPos.bottom) + ( stepPos.height / 2 ) }px`
-        line.style.width = `${ width }px`
-        line.style.right = `calc(50% + ${ minWidth / 2 }px)`
-        line.style.height = `${ lineHeight }px`
-        line.style.borderWidth = `${ borderWidth } 0 ${ borderWidth } ${ borderWidth }`
-        line.style.borderBottomLeftRadius = borderRadius
-        line.style.borderTopLeftRadius = borderRadius
-
-      })
     }
-    catch (e) {}
 
+    /**
+     * ①-->--
+     *       |
+     *       ↓
+     *       |
+     * ②--<--
+     *
+     * @param from
+     * @param to
+     * @param offset
+     */
     const skipLine = (from, to, offset = 0) => {
 
       // the step-branch.benchmarks container
@@ -3423,9 +2757,7 @@
 
       if (!line) {
         line = Div({ className: `logic-line skip-line skip-${ from.dataset.id }-to-${ to.dataset.id }` }, [
-          Div({ className: 'line-arrow top' }),
-          Div({ className: 'line-arrow right' }),
-          Div({ className: 'line-arrow bottom' }),
+          Span({className: 'jump-arrow'}, '◀' )
         ])
         sortable.append(line)
       }
@@ -3443,6 +2775,418 @@
       line.style.borderBottomRightRadius = borderRadius
 
     }
+
+
+    // loops
+    try {
+      document.querySelectorAll('.step-branch .step.loop, .step-branch .step.logic_loop:not(.loop_broken)').forEach(el => {
+
+        // the step-branch.benchmarks container
+        let stepId = el.dataset.id
+        let targetStepId = Funnel.steps.find(s => s.ID == stepId).meta.next
+
+        if (!targetStepId || typeof targetStepId == 'undefined' || targetStepId == 0) {
+          return
+        }
+
+        let targetStep = document.getElementById(`step-${ targetStepId }`)
+
+        loopLine( el, targetStep )
+
+      })
+    }
+    catch (e) {}
+
+    /**
+     * Finds the centerpoint coordinate of a node
+     *
+     * @param node
+     */
+    const centerPointPos = ( node ) => {
+      const { left, width } = node.getBoundingClientRect()
+      return left + ( width / 2 )
+    }
+
+    /**
+     * Determines if two nodes overlap vertically
+     *
+     * @param a
+     * @param b
+     * @returns {boolean}
+     */
+    function horizontallyOverlaps(a, b) {
+      const aRect = a.getBoundingClientRect()
+      const bRect = b.getBoundingClientRect()
+
+      return (
+        aRect.left < bRect.right &&
+        aRect.right > bRect.left
+      )
+    }
+
+    /**
+     * ①
+     * |
+     * -->--
+     *     |
+     *     ②
+     *
+     * @param from
+     * @param to
+     */
+    const bottomToTopLine = (from, to) => {
+
+      // todo
+
+      let line2 = Div({ className: `logic-line jump-line bottom-to-top-line bottom-to-top-line-${ from.dataset.id }-to-${ to.dataset.id }--2` })
+      let line1 = Div({ className: `logic-line jump-line bottom-to-top-line bottom-to-top-line-${ from.dataset.id }-to-${ to.dataset.id }--1` }, line2 )
+
+      from.parentNode.querySelector( `:scope > .bottom-to-top-line-${ from.dataset.id }-to-${ to.dataset.id }--1` )?.remove()
+      from.parentNode.append(line1)
+
+      let fromPos = from.getBoundingClientRect()
+      let fromContainerPos = from.parentNode.getBoundingClientRect()
+      let toPos = to.getBoundingClientRect()
+
+      let fromCenter = fromPos.left + fromPos.width / 2
+      let toCenter = toPos.left + toPos.width / 2
+
+      let abovePos, belowPos, going
+
+      if ( fromPos.top > toPos.top ) {
+        abovePos = toPos
+        belowPos = fromPos
+        going = 'up'
+      } else {
+        abovePos = fromPos
+        belowPos = toPos
+        going = 'down'
+      }
+
+      let lineHeight = Math.abs(abovePos.bottom - belowPos.top) / 2
+      let lineWidth = Math.abs(fromCenter - toCenter) / 2
+
+      clearLineStyle(line1)
+      clearLineStyle(line2)
+
+      let positionOffset = `calc(50% - 1px)`
+
+      line1.style.width = `${ lineWidth }px`
+      line1.style.height = `${ lineHeight }px`
+
+      line2.style.width = `${ lineWidth }px`
+      line2.style.height = `${ going === 'down' ? lineHeight - 24 : lineHeight }px`
+
+      // ↑
+      if ( going === 'up' ) {
+
+        line1.style.bottom = `${ fromContainerPos.bottom - fromPos.top }px`
+        line2.style.bottom = '100%'
+
+        let arrow = Span({ className: 'jump-arrow' }, '▲' )
+        line2.append( arrow )
+
+        arrow.style.top = `-3px`
+
+        //    ②
+        //    ↑ :: line 2
+        // ----
+        // ↑ :: line1
+        // ①
+        if (fromCenter < toCenter) {
+
+          arrow.style.right = `-1px`
+          arrow.style.transform = `translateX(50%)`
+
+          line1.style.left = positionOffset
+
+          line1.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+          line1.style.borderTopLeftRadius = borderRadius
+
+          line2.style.left = '100%'
+          line2.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+          line2.style.borderBottomRightRadius = borderRadius
+
+        }
+        // ②
+        // ↑ :: line 2
+        // ----
+        //    ↑ :: line 1
+        //    ①
+        else {
+
+          arrow.style.left = `-1px`
+          arrow.style.transform = `translateX(-50%)`
+
+          line1.style.right = positionOffset
+
+          line1.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+          line1.style.borderTopRightRadius = borderRadius
+
+          line2.style.right = '100%'
+          line2.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+          line2.style.borderBottomLeftRadius = borderRadius
+
+        }
+
+      }
+      // ↓
+      else {
+
+        line1.style.top = `${ fromPos.bottom - fromContainerPos.top }px`
+        line2.style.top = '100%'
+
+        let arrow = Span({ className: 'jump-arrow' }, '▼' )
+        line2.append( arrow )
+
+        arrow.style.bottom = `-3px`
+
+        //    ①
+        //    ↓ :: line1
+        // ----
+        // ↓ :: line2
+        // ②
+        if (fromCenter > toCenter) {
+
+          arrow.style.left = `-1px`
+          arrow.style.transform = `translateX(-50%)`
+
+          line1.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+          line1.style.borderBottomRightRadius = borderRadius
+          line1.style.right = positionOffset
+
+          line2.style.right = '100%'
+          line2.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+          line2.style.borderTopLeftRadius = borderRadius
+
+        }
+        // ①
+        // ↓ :: line1
+        // ----
+        //    ↓ :: line2
+        //    ②
+        else {
+
+          arrow.style.right = `-1px`
+          arrow.style.transform = `translateX(50%)`
+
+          line1.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+          line1.style.borderBottomLeftRadius = borderRadius
+          line1.style.left = positionOffset
+
+          line2.style.left = '100%'
+          line2.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+          line2.style.borderTopRightRadius = borderRadius
+
+        }
+      }
+    }
+
+    /**
+     * ① ->-
+     *     |
+     *     ->-②
+     *
+     * @param from
+     * @param to
+     */
+    const leftToRightLine = (from, to) => {
+
+      let line2 = Div({ className: `logic-line jump-line left-to-right-line left-to-right-line-${ from.dataset.id }-to-${ to.dataset.id }--2` })
+      let line1 = Div({ className: `logic-line jump-line left-to-right-line left-to-right-line-${ from.dataset.id }-to-${ to.dataset.id }--1` }, line2 )
+
+      from.parentNode.querySelector( `:scope > .left-to-right-line-${ from.dataset.id }-to-${ to.dataset.id }--1` )?.remove()
+      from.parentNode.append(line1)
+
+      let fromPos = from.getBoundingClientRect()
+      let fromContainerPos = from.parentNode.getBoundingClientRect()
+      let toPos = to.getBoundingClientRect()
+
+      let fromCenter = fromPos.top + fromPos.height / 2
+      let toCenter = toPos.top + toPos.height / 2
+
+      let leftPos, rightPos, going
+
+      if ( fromPos.left > toPos.left ) {
+        leftPos = toPos
+        rightPos = fromPos
+        going = 'left'
+      } else {
+        leftPos = fromPos
+        rightPos = toPos
+        going = 'right'
+      }
+
+      let lineHeight = Math.abs(fromCenter - toCenter ) / 2
+      let lineWidth = Math.abs(rightPos.left - leftPos.right ) / 2
+
+      clearLineStyle(line1)
+      clearLineStyle(line2)
+
+      line1.style.width = `${ lineWidth }px`
+      line1.style.height = `${ lineHeight }px`
+
+      line2.style.width = `${ lineWidth - 10 }px`
+      line2.style.height = `${ lineHeight }px`
+
+      // ←---
+      if ( going === 'left' ) {
+
+        let arrow = Span({ className: 'jump-arrow' }, '◀' )
+        line2.append( arrow )
+
+        line1.style.left = `-${ lineWidth + 1 }px`
+        line2.style.right = '100%'
+
+        // ②-←-
+        //     |
+        //     -←-①
+        if (fromCenter > toCenter) {
+
+          arrow.style.transform = 'translateY(-50%)'
+          arrow.style.top = '-1px'
+          arrow.style.right = '98%'
+
+          line1.style.bottom = `${fromContainerPos.bottom - fromCenter}px`
+
+          line1.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+          line1.style.borderBottomLeftRadius = borderRadius
+
+          line2.style.bottom = '100%'
+          line2.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+          line2.style.borderTopRightRadius = borderRadius
+
+        }
+        //     -←-①
+        //     |
+        // ②-←-
+        else {
+
+          arrow.style.transform = 'translateY(50%)'
+          arrow.style.bottom = '-1px'
+          arrow.style.right = '98%'
+
+          arrow.style.transform = 'translateY(50%)'
+          arrow.style.bottom = '0'
+
+          line1.style.top = `${fromCenter - fromContainerPos.top}px`
+
+          line1.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+          line1.style.borderTopLeftRadius = borderRadius
+
+          line2.style.top = '100%'
+          line2.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+          line2.style.borderBottomRightRadius = borderRadius
+
+        }
+
+      }
+      // ---→
+      else {
+
+        let arrow = Span({ className: 'jump-arrow' }, '▶' )
+        line2.append( arrow )
+
+        line1.style.right = `-${ lineWidth + 1 }px`
+        line2.style.left = '100%'
+
+        //     -→-②
+        //     |
+        // ①-→-
+        if (fromCenter > toCenter) {
+
+          arrow.style.transform = 'translateY(-50%)'
+          arrow.style.top = '-1px'
+          arrow.style.left = '98%'
+
+          line1.style.bottom = `${fromContainerPos.bottom - fromCenter}px`
+
+          line1.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+          line1.style.borderBottomRightRadius = borderRadius
+
+          line2.style.bottom = '100%'
+          line2.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+          line2.style.borderTopLeftRadius = borderRadius
+
+        }
+        // ①-→-
+        //     |
+        //     -→-②
+        else {
+
+          arrow.style.transform = 'translateY(50%)'
+          arrow.style.bottom = '-1px'
+          arrow.style.left = '98%'
+
+          line1.style.top = `${fromCenter - fromContainerPos.top}px`
+
+          line1.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+          line1.style.borderTopRightRadius = borderRadius
+
+          line2.style.top = '100%'
+          line2.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+          line2.style.borderBottomLeftRadius = borderRadius
+
+        }
+      }
+
+    }
+
+    /**
+     * Draws a line between two nodes anywhere in the flow
+     *
+     * IF both nodes are inline, use a `loopLine()` or `skipLine()` depending if $from is before or after $to
+     *
+     * ①-->--
+     *       |
+     *       ↓
+     *       |
+     * ②--<--
+     *
+     * ELSE IF the nodes rects overlap, use top/bottom ports
+     *
+     * ①
+     * |
+     * -->--
+     *     |
+     *     ②
+     *
+     * ELSE IF no overlap, use left/right port
+     *
+     * ① ->-
+     *     |
+     *     ->-②
+     *
+     * @param from
+     * @param to
+     */
+    const goToLine = ( from, to ) => {
+
+      let fromPos = from.getBoundingClientRect()
+      let toPos = to.getBoundingClientRect()
+
+      // check if inline
+      if ( areNumbersClose( centerPointPos( from ), centerPointPos( to ), 1 ) ) {
+
+        if ( fromPos.top < toPos.top ) {
+          skipLine( from, to )
+          return
+        }
+
+        loopLine( from, to)
+        return
+      }
+
+      // check if overlapping, use top/bottom ports
+      if ( horizontallyOverlaps( from, to ) ) {
+        bottomToTopLine( from, to)
+        return
+      }
+
+      // otherwise use left/right ports
+      leftToRightLine(from, to)
+    }
+
 
     // skips
     try {
@@ -3465,7 +3209,7 @@
 
     // Jump
     try {
-      document.querySelectorAll('.step.logic_jump:not(.broken)').forEach(step => {
+      document.querySelectorAll('.step-branch .step.logic_jump:not(.broken)').forEach(step => {
 
         // the step-branch.benchmarks container
         let stepId = step.dataset.id
@@ -3477,11 +3221,10 @@
 
         let targetStep = document.getElementById(`step-${ targetStepId }`)
 
-        let ports = determineBorderLinePorts( step.getBoundingClientRect(), targetStep.getBoundingClientRect(), 1 )
-
+        goToLine(step, targetStep)
       })
     } catch (e) {
-
+      console.warn(e)
     }
 
     // stops
