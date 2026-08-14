@@ -707,7 +707,7 @@
               className: 'contact-list-item clickable',
               onClick  : e => {
                 window.open(item.admin, '_self')
-              },zxdfrf
+              },
             } ),
           }),
         ]),
