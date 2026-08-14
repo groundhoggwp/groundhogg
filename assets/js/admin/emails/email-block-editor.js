@@ -503,6 +503,8 @@
     // Add a state to the history
     addChange (state) {
 
+      state = JSON.stringify(state)
+
       // use a timeout to avoid creating too many states from onInput events
       if (this.timeout) {
         clearTimeout(this.timeout)
@@ -550,6 +552,8 @@
 
     restoreState () {
       let state = this.getState(this.pointer)
+      state = JSON.parse(state)
+
       setState(state)
       morphEmailEditor()
       updateStyles()
@@ -639,7 +643,7 @@
   }
 
   const getState = () => State
-  const getStateCopy = () => jsonCopy(getState())
+  const getStateCopy = () => jsonCopy(State.copy())
 
   let onSave = () => {
   }

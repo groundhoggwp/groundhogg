@@ -984,6 +984,17 @@
     },
 
     /**
+     * Returns a weak copy of the state
+     *
+     * @returns {*}
+     */
+    copy() {
+      return {
+        ...this.state
+      }
+    },
+
+    /**
      * Get a specific key from the state
      *
      * @param key
