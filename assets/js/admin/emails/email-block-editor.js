@@ -501,9 +501,9 @@
     timeout: null,
 
     // Add a state to the history
-    addChange (state) {
+    addChange () {
 
-      state = JSON.stringify(state)
+      let state = JSON.stringify(State.getState())
 
       // use a timeout to avoid creating too many states from onInput events
       if (this.timeout) {
@@ -628,8 +628,7 @@
     } = State
 
     State.set({
-      ...State, ...newState,
-      id: uuid(),
+      ...newState,
     })
 
     if (wasSavingEditorSettings !== State.savingEditorSettings) {
@@ -643,7 +642,6 @@
   }
 
   const getState = () => State
-  const getStateCopy = () => jsonCopy(State.copy())
 
   let onSave = () => {
   }
@@ -1097,7 +1095,7 @@
 
     updatePreview()
 
-    History.addChange(getStateCopy()) // updateSettings, email meta basically
+    History.addChange() // updateSettings, email meta basically
   }
 
   function getSubstringUpToSecondHyphen (inputString) {
@@ -1146,7 +1144,7 @@
       updatePreview()
     }
 
-    History.addChange(getStateCopy())
+    History.addChange()
   }
 
   const setBlocks = (blocks = [], hasChanges = true) => {
@@ -1186,7 +1184,7 @@
     }
 
     // Log a new state in history whenever we set the blocks
-    History.addChange(getStateCopy())
+    History.addChange()
   }
 
   function extractPlainText (content) {
@@ -4674,7 +4672,7 @@
                   })
                 }
 
-                History.addChange(getStateCopy()) // after change from
+                History.addChange() // after change from
 
                 updatePreview()
               },
@@ -4702,7 +4700,7 @@
               } : [],
               onChange: item => {
                 setEmailMeta({ reply_to_override: item ? item.id : '' })
-                History.addChange(getStateCopy()) // after change reply-to
+                History.addChange() // after change reply-to
               },
             })),
           Control({

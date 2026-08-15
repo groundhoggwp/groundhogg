@@ -947,104 +947,84 @@
    */
   const createState = (initialState = {}) => new Proxy({
 
-    initial: {
-      ...initialState
-    },
+    initial: structuredClone(initialState),
 
-    state: {
-      ...initialState,
-    },
+    state: structuredClone(initialState),
 
-    /**
-     * Add props to the state
-     *
-     * @param newState
-     */
-    set (newState) {
+    set(newState) {
       this.state = {
         ...this.state,
         ...newState,
       }
     },
 
-    /**
-     * Clear the state
-     */
-    clear () {
+    clear() {
       this.state = {}
     },
 
-    /**
-     * Reset the State to it's initial
-     */
     reset() {
-      this.set({
-        ...this.initial
-      })
+      this.state = structuredClone(this.initial)
     },
 
-    /**
-     * Returns a weak copy of the state
-     *
-     * @returns {*}
-     */
     copy() {
       return {
         ...this.state
       }
     },
 
-    /**
-     * Get a specific key from the state
-     *
-     * @param key
-     * @returns {*|boolean|{}}
-     */
-    get (key = '') {
-
-      if (key) {
-        return this.state[key]
-      }
-
+    getState() {
       return this.state
     },
 
-    /**
-     * If the state has a specific key
-     *
-     * @param key
-     * @returns {boolean}
-     */
-    has (key = '') {
-      if (key) {
-        return key in this.state
-      }
-
-      return Object.keys(this.state).length > 0
+    get(key = '') {
+      return key
+             ? this.state[key]
+             : this.state
     },
+
+    has(key = '') {
+      return key
+             ? key in this.state
+             : Object.keys(this.state).length > 0
+    },
+
   }, {
-    set (manager, key, val) { // to intercept property writing
 
-      if (key === 'state') {
-        return Reflect.set(manager, key, val)
-      }
-
-      return Reflect.set(Reflect.get(manager, 'state'), key, val)
+    ownKeys(manager) {
+      return Reflect.ownKeys(manager.state)
     },
-    get (manager, key, receiver) {
 
-      if (key === 'state') {
-        return Reflect.get(manager, key)
+    getOwnPropertyDescriptor(manager, key) {
+      if (Reflect.has(manager.state, key)) {
+        return {
+          value: manager.state[key],
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        }
       }
 
-      let state = Reflect.get(manager, 'state')
-
-      if (Reflect.has(state, key)) {
-        return Reflect.get(state, key)
-      }
-
-      return Reflect.get(manager, key)
+      return undefined
     },
+
+    set(manager, key, val, receiver) {
+
+      if (Reflect.has(manager, key)) {
+        return Reflect.set(manager, key, val, receiver)
+      }
+
+      return Reflect.set(manager.state, key, val)
+    },
+
+    get(manager, key, receiver) {
+
+      if (Reflect.has(manager, key)) {
+        return Reflect.get(manager, key, receiver)
+      }
+
+      return Reflect.get(manager.state, key)
+    }
+
   })
 
   const stateMap = new WeakMap();
