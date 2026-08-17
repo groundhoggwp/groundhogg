@@ -491,15 +491,14 @@ class Email extends Base_Object_With_Meta {
 
 		$css = implode( PHP_EOL, $parts );
 		// quickly handle global block css inserts
-		$css = preg_replace_callback(
-			'@\.global-block\.t-(\d+)\{[^}]*\}@',
-			function ($matches) {
-				$block_id = (int) $matches[1];
 
-				return db()->emailmeta->get_meta( $block_id, 'css', true );
-			},
-			$css
-		);
+		preg_match_all( '/\.global-block\.t-(\d+)/', $css, $matches );
+
+		$ids = array_map( 'intval', $matches[1] );
+
+		foreach ( $ids as $id ) {
+			$css .= (new Email($id))->get_css();
+		}
 
 		return apply_filters( 'groundhogg/email/css', $css, $this );
 	}
