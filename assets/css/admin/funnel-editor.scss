@@ -1223,20 +1223,46 @@ button.button.save-button {
       .jump-arrow {
         color: $secondary-purple;
         position: absolute;
-        display: block;
+        //display: flex;
+        //align-items: center;
+        //justify-content: center;
         line-height: 1;
+        height: 10px;
+        width: 10px;
+
+        > svg {
+          width: 10px;
+          height: 10px;
+          fill: currentColor;
+        }
+
+        &.left {
+          > svg {
+            transform: rotate(-90deg);
+          }
+        }
+        &.right {
+          > svg {
+            transform: rotate(90deg);
+          }
+        }
+        &.down {
+          > svg {
+            transform: rotate(180deg);
+          }
+        }
       }
 
       &.loop-line > .jump-arrow {
-        top: -1px;
+        top: -2px;
         transform: translateY(-50%);
-        right: -2px;
+        left: calc(100% - 2px);
       }
 
       &.skip-line > .jump-arrow {
-        bottom: -1px;
+        bottom: 0;
         transform: translateY(50%);
-        left: -2px;
+        right: calc(100% - 2px);
       }
     }
 

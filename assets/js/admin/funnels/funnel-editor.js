@@ -2235,6 +2235,54 @@
     return el.closest('.sortable-item')
   }
 
+  const JumpArrow = dir => Div({ className: `jump-arrow ${dir}` }, [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15"><path color='currentColor' d="M7.539 2c-.295 0-.489.177-.616.385l-5.846 9.538C1 12 1 12.153 1 12.308c0 .538.385.692.692.692h11.616c.384 0 .692-.154.692-.692 0-.154 0-.231-.077-.385l-5.77-9.538C8.029 2.177 7.789 2 7.539 2"/></svg>`
+  ])
+
+  /**
+   * Get the distance between two anchor points on DOM elements.
+   *
+   * Examples:
+   *   elementDistance(a, b, 'bottom', 'middle') // vertical: bottom of A → middle of B
+   *   elementDistance(a, b, 'left', 'left')     // horizontal: left of A → left of B
+   *   elementDistance(a, b, 'right', 'left')    // horizontal: right of A → left of B
+   *
+   * @param {HTMLElement} a
+   * @param {HTMLElement} b
+   * @param {'top'|'bottom'|'left'|'right'|'middle'|'center'} from
+   * @param {'top'|'bottom'|'left'|'right'|'middle'|'center'} to
+   * @return {number}
+   */
+  const elementDistance = (a, b, from, to) => {
+
+    const aRect = a.getBoundingClientRect()
+    const bRect = b.getBoundingClientRect()
+
+    const point = (rect, position) => {
+      switch (position) {
+        case 'top':
+          return rect.top
+
+        case 'bottom':
+          return rect.bottom
+
+        case 'left':
+          return rect.left
+
+        case 'right':
+          return rect.right
+
+        case 'middle':
+          return rect.top + rect.height / 2
+
+        case 'center':
+          return rect.left + rect.width / 2
+      }
+    }
+
+    return point(bRect, to) - point(aRect, from)
+  }
+
   function findWidestElementBetween (startElement, endElement) {
 
     startElement = getSortableEl(startElement)
@@ -2691,37 +2739,41 @@
      */
     const loopLine = ( from, to ) => {
 
+      let line2 = Div({ className: `logic-line loop-line loop-line-2 loop-line-${ from.dataset.id }-to-${ to.dataset.id }--2` }, [
+       JumpArrow('right')
+      ])
+      let line1 = Div({ className: `logic-line loop-line loop-line-1 loop-line-${ from.dataset.id }-to-${ to.dataset.id }--1` }, line2 )
+
+      from.parentNode.querySelector( `:scope > .loop-line-${ from.dataset.id }-to-${ to.dataset.id }--1` )?.remove()
+      from.parentNode.append(line1)
+
       let widestEl = findWidestElementBetween(to, from)
       let toPos = to.getBoundingClientRect()
       let fromPos = from.getBoundingClientRect()
 
-      let lineHeight = Math.abs(( fromPos.bottom - ( fromPos.height / 2 ) ) - ( toPos.bottom - ( toPos.height / 2 ) ))
-      let minWidth = Math.min(fromPos.width, toPos.width)
+      let lineHeight = Math.abs(( fromPos.bottom - ( fromPos.height / 2 ) ) - ( toPos.bottom - ( toPos.height / 2 ) )) / 2
 
       let branchPos = from.closest('.step-branch').getBoundingClientRect()
       let sortable = from.closest('.sortable-item')
-      let sortablePos = sortable.getBoundingClientRect()
-
-      let line = sortable.querySelector(`div.logic-line.loop-${ from.dataset.id }-to-${ to.dataset.id }`)
-
-      if (!line) {
-        line = Div({ className: `logic-line loop-line loop-${ from.dataset.id  }-to-${ to.dataset.id }` }, [
-          Span({className: 'jump-arrow'}, '▶' )
-        ])
-        sortable.append(line)
-      }
-
-      clearLineStyle(line)
 
       let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
 
-      line.style.bottom = `${ Math.abs(sortablePos.bottom - fromPos.bottom) + ( fromPos.height / 2 ) }px`
-      line.style.width = `${ width }px`
-      line.style.right = `calc(50% + ${ minWidth / 2 }px)`
-      line.style.height = `${ lineHeight }px`
-      line.style.borderWidth = `${ borderWidth } 0 ${ borderWidth } ${ borderWidth }`
-      line.style.borderBottomLeftRadius = borderRadius
-      line.style.borderTopLeftRadius = borderRadius
+      line1.style.right = '100%'
+      line1.style.bottom = `${elementDistance(from, sortable, 'middle', 'bottom')}px`
+      line1.style.height = `${ lineHeight }px`
+      line1.style.width = `${ width }px`
+      line1.style.borderWidth = `0 0 ${ borderWidth } ${ borderWidth }`
+      line1.style.borderBottomLeftRadius = borderRadius
+
+      line2.style.left = `-2px`
+      line2.style.bottom = `100%`
+      line2.style.height = `${ lineHeight }px`
+      line2.style.width = `${ elementDistance(line1, to, 'left', 'left' ) - 8 }px`
+      line2.style.borderWidth = `${ borderWidth } 0 0 ${ borderWidth }`
+      line2.style.borderTopLeftRadius = borderRadius
+
+      // line2.firstElementChild.style.left = '100%'
+
 
     }
 
@@ -2738,41 +2790,38 @@
      */
     const skipLine = (from, to, offset = 0) => {
 
-      // the step-branch.benchmarks container
-      let widestEl = findWidestElementBetween(from, to)
+      let line2 = Div({ className: `logic-line skip-line skip-line-2 skip-line-${ from.dataset.id }-to-${ to.dataset.id }--2` }, [
+        JumpArrow('left'),
+      ])
+      let line1 = Div({ className: `logic-line skip-line skip-line-1 skip-line-${ from.dataset.id }-to-${ to.dataset.id }--1` }, line2 )
 
-      let fromPos = from.getBoundingClientRect()
-      let toPos = to.getBoundingClientRect()
+      from.parentNode.querySelector( `:scope > .skip-line-${ from.dataset.id }-to-${ to.dataset.id }--1` )?.remove()
+      from.parentNode.append(line1)
 
-      let lineHeight = Math.abs(( ( fromPos.bottom - ( fromPos.height / 2 ) ) ) - ( toPos.bottom - ( toPos.height / 2 ) ) + offset)
-      let minWidth = Math.min(fromPos.width, toPos.width)
+      let widestEl = findWidestElementBetween(to, from)
 
-      let branch = from.closest('.step-branch')
-      let branchPos = branch.getBoundingClientRect()
+      let lineHeight = elementDistance(from, to, 'middle', 'middle') / 2
 
+      let branchPos = from.closest('.step-branch').getBoundingClientRect()
       let sortable = from.closest('.sortable-item')
-      let sortablePos = sortable.getBoundingClientRect()
-
-      let line = sortable.querySelector(`div.logic-line.skip-${ from.dataset.id }-to-${ to.dataset.id }`)
-
-      if (!line) {
-        line = Div({ className: `logic-line skip-line skip-${ from.dataset.id }-to-${ to.dataset.id }` }, [
-          Span({className: 'jump-arrow'}, '◀' )
-        ])
-        sortable.append(line)
-      }
-
-      clearLineStyle(line)
 
       let width = ( ( widestEl ? widestEl.getBoundingClientRect().width : branchPos.width ) ) / 2
 
-      line.style.top = `${ fromPos.top - sortablePos.top + ( fromPos.height / 2 ) }px`
-      line.style.width = `${ width + offset }px`
-      line.style.left = `calc(50% + ${ minWidth / 2 }px)`
-      line.style.height = `${ lineHeight }px`
-      line.style.borderWidth = `${ borderWidth } ${ borderWidth } ${ borderWidth } 0`
-      line.style.borderTopRightRadius = borderRadius
-      line.style.borderBottomRightRadius = borderRadius
+      line1.style.left = '100%'
+      line1.style.top = `${elementDistance(sortable, from, 'top', 'middle')}px`
+      line1.style.height = `${ lineHeight }px`
+      line1.style.width = `${ width }px`
+      line1.style.borderWidth = `${ borderWidth } ${ borderWidth } 0 0`
+      line1.style.borderTopRightRadius = borderRadius
+
+      line2.style.right = `-2px`
+      line2.style.top = `100%`
+      line2.style.height = `${ lineHeight }px`
+      line2.style.width = `${ elementDistance(to, line1, 'right', 'right' ) - 8 }px`
+      line2.style.borderWidth = `0 ${ borderWidth } ${ borderWidth } 0`
+      line2.style.borderBottomRightRadius = borderRadius
+
+      // line2.firstElementChild.style.right = '100%'
 
     }
 
@@ -2875,7 +2924,7 @@
       line1.style.height = `${ lineHeight }px`
 
       line2.style.width = `${ lineWidth }px`
-      line2.style.height = `${ going === 'down' ? lineHeight - 24 : lineHeight }px`
+      line2.style.height = `${ going === 'down' ? lineHeight - elementDistance( to.querySelector('.hndle-icon'), to, 'top', 'top' ) - 10: lineHeight - 10 }px`
 
       // ↑
       if ( going === 'up' ) {
@@ -2883,10 +2932,10 @@
         line1.style.bottom = `${ fromContainerPos.bottom - fromPos.top }px`
         line2.style.bottom = '100%'
 
-        let arrow = Span({ className: 'jump-arrow' }, '▲' )
+        let arrow = JumpArrow('up')
         line2.append( arrow )
 
-        arrow.style.top = `-3px`
+        arrow.style.bottom = `100%`
 
         //    ②
         //    ↑ :: line 2
@@ -2936,10 +2985,10 @@
         line1.style.top = `${ fromPos.bottom - fromContainerPos.top }px`
         line2.style.top = '100%'
 
-        let arrow = Span({ className: 'jump-arrow' }, '▼' )
+        let arrow = JumpArrow('down')
         line2.append( arrow )
 
-        arrow.style.bottom = `-3px`
+        arrow.style.top = `calc(100% - 3px)`
 
         //    ①
         //    ↓ :: line1
@@ -3026,13 +3075,13 @@
       line1.style.width = `${ lineWidth }px`
       line1.style.height = `${ lineHeight }px`
 
-      line2.style.width = `${ lineWidth - 10 }px`
+      line2.style.width = `${ lineWidth - 7 }px`
       line2.style.height = `${ lineHeight }px`
 
       // ←---
       if ( going === 'left' ) {
 
-        let arrow = Span({ className: 'jump-arrow' }, '◀' )
+        let arrow = JumpArrow('left')
         line2.append( arrow )
 
         line1.style.left = `-${ lineWidth + 1 }px`
@@ -3045,7 +3094,7 @@
 
           arrow.style.transform = 'translateY(-50%)'
           arrow.style.top = '-1px'
-          arrow.style.right = '98%'
+          arrow.style.right = 'calc(100% - 2px)'
 
           line1.style.bottom = `${fromContainerPos.bottom - fromCenter}px`
 
@@ -3064,10 +3113,10 @@
 
           arrow.style.transform = 'translateY(50%)'
           arrow.style.bottom = '-1px'
-          arrow.style.right = '98%'
+          arrow.style.right = `calc(100% - 2px)`
 
-          arrow.style.transform = 'translateY(50%)'
-          arrow.style.bottom = '0'
+          // arrow.style.transform = 'translateY(50%)'
+          // arrow.style.bottom = '0'
 
           line1.style.top = `${fromCenter - fromContainerPos.top}px`
 
@@ -3084,7 +3133,7 @@
       // ---→
       else {
 
-        let arrow = Span({ className: 'jump-arrow' }, '▶' )
+        let arrow = JumpArrow('right')
         line2.append( arrow )
 
         line1.style.right = `-${ lineWidth + 1 }px`
@@ -3097,7 +3146,7 @@
 
           arrow.style.transform = 'translateY(-50%)'
           arrow.style.top = '-1px'
-          arrow.style.left = '98%'
+          arrow.style.left = `calc(100% - 2px)`
 
           line1.style.bottom = `${fromContainerPos.bottom - fromCenter}px`
 
@@ -3116,7 +3165,7 @@
 
           arrow.style.transform = 'translateY(50%)'
           arrow.style.bottom = '-1px'
-          arrow.style.left = '98%'
+          arrow.style.left = `calc(100% - 2px)`
 
           line1.style.top = `${fromCenter - fromContainerPos.top}px`
 
