@@ -3093,7 +3093,7 @@
         if (fromCenter > toCenter) {
 
           arrow.style.transform = 'translateY(-50%)'
-          arrow.style.top = '-1px'
+          arrow.style.top = '-2px'
           arrow.style.right = 'calc(100% - 2px)'
 
           line1.style.bottom = `${fromContainerPos.bottom - fromCenter}px`
@@ -3112,7 +3112,7 @@
         else {
 
           arrow.style.transform = 'translateY(50%)'
-          arrow.style.bottom = '-1px'
+          arrow.style.bottom = '0'
           arrow.style.right = `calc(100% - 2px)`
 
           // arrow.style.transform = 'translateY(50%)'
@@ -3145,7 +3145,7 @@
         if (fromCenter > toCenter) {
 
           arrow.style.transform = 'translateY(-50%)'
-          arrow.style.top = '-1px'
+          arrow.style.top = '-2px'
           arrow.style.left = `calc(100% - 2px)`
 
           line1.style.bottom = `${fromContainerPos.bottom - fromCenter}px`
@@ -3164,7 +3164,7 @@
         else {
 
           arrow.style.transform = 'translateY(50%)'
-          arrow.style.bottom = '-1px'
+          arrow.style.bottom = '0'
           arrow.style.left = `calc(100% - 2px)`
 
           line1.style.top = `${fromCenter - fromContainerPos.top}px`
