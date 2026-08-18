@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $email = the_email();
 
-if ( $email->has_footer_block() ) {
+if ( $email->has_footer_block() || $email->is_global_block() ) {
 	return;
 }
 
