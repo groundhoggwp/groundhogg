@@ -42,30 +42,7 @@
 
   const HOSTNAME = ( new URL(Groundhogg.url.home) ).hostname
 
-  const copyText = url => {
-    navigator.clipboard.writeText(url)
-    dialog({
-      message: __('Copied to clipboard!', 'groundhogg'),
-    })
-  }
-
-  const CopyInput = text => Div({ className: 'gh-input-group' }, [
-    Input({
-      value    : text,
-      readonly : true,
-      className: 'code full-width',
-      onClick  : e => {
-        e.target.select()
-        copyText(text)
-      },
-    }),
-    Button({
-      className: 'gh-button icon secondary',
-      onClick  : e => {
-        copyText(text)
-      },
-    }, icons.duplicate),
-  ])
+  const { CopyInput } = Groundhogg.components
 
   const SetupInstructions = (file) => Accordion({
     id      : `${ file.replaceAll('.', '-') }-instructions`,
