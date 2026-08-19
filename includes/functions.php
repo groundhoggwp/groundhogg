@@ -3726,25 +3726,29 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
 	// if there is no valid cache, then we'll clear any cached file, and proceed with the request
 	if ( $cache_ttl !== 0 && $cache_key ) {
 
-		// path to cache file
 		$cached_file = files()->get_uploads_dir( 'requests', $cache_key . '.json' );
 
-		// exists!
-		if ( @file_exists( $cached_file ) ) {
+		if ( file_exists( $cached_file ) ) {
 
-			// positive integers will be treated as the cache time to live
+			// Positive TTL means use the cache if it hasn't expired.
 			if ( $cache_ttl > 0 ) {
-				$time = filectime( $cached_file );
-				// check the time the file was created, if within our ttl, return the contents
+
+				$time = filemtime( $cached_file );
+
 				if ( $time && $time > time() - $cache_ttl ) {
-					$json = json_decode( files()->get_contents( $cached_file ), $as_array );
-					if ( ! empty( $json ) ) {
+
+					$json = json_decode(
+						files()->get_contents( $cached_file ),
+						$as_array
+					);
+
+					if ( json_last_error() === JSON_ERROR_NONE ) {
 						return $json;
 					}
 				}
 			}
 
-			// delete the file, either invalid contents or expired ttl, or force expiration with negative ttl
+			// Invalid, expired, or explicitly invalidated with a negative TTL.
 			wp_delete_file( $cached_file );
 		}
 	}
@@ -7036,7 +7040,8 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		'assets'        => [
 			'logo' => has_custom_logo() ? wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' ) : false,
 		],
-		'post_types'    => $post_types
+		'post_types'     => $post_types,
+		'senderProfiles' => get_sender_profiles(),
 	], $extra );
 
 	wp_add_inline_script( 'groundhogg-email-block-editor', 'const _BlockEditor = ' . wp_json_encode( $localized ), 'before' );
@@ -9937,4 +9942,78 @@ function get_page_context(): array {
 	}
 
 	return $context;
+}
+
+/**
+ * Returns a list of sender profiles...
+ * - Includes the "Contact Owner"
+ * - Includes profiles generated from user's with the view_contacts capability
+ * - Includes custom profiles
+ * - includes the default sender profile
+ *
+ * @return array[]
+ */
+function get_sender_profiles() {
+
+	static $profiles = [];
+
+    if ( ! empty( $profiles ) ){
+        return $profiles;
+    }
+
+	$profiles['default'] = [
+		'from_avatar' => get_avatar_url( wp_get_current_user()->ID, [ 'size' => 40 ] ),
+		'from_name'   => get_default_from_name(),
+		'from_email'  => get_default_from_email(),
+		'from_header' => get_default_from_name() . ' <' . get_default_from_email() . '>',
+		'display'     => get_default_from_name() . ' <' . get_default_from_email() . '>',
+	];
+
+	$profiles['owner'] = [
+		'from_avatar' => get_avatar_url( 'foo@bar.com', [ 'size' => 40 ] ),
+		'from_name'   => "{owner_name}",
+		'from_email'  => "{owner_email}",
+		'from_header' => "{owner_name} <{owner_email}>",
+		'display'     => __( 'The Contact Owner', 'groundhogg' ),
+	];
+
+	$owners = get_owners();
+
+	foreach ( $owners as $user ) {
+
+		$user_from_name  = get_user_meta( $user->ID, 'gh_from_name', true ) ?: $user->display_name;
+		$user_from_email = get_user_meta( $user->ID, 'gh_from_email', true ) ?: $user->user_email;
+
+		$profiles[ "user-$user->ID" ] = [
+			'from_avatar' => get_avatar_url( $user->ID, [ 'size' => 40 ] ),
+			'from_name'   => $user_from_name,
+			'from_email'  => $user_from_email,
+			'from_header' => $user_from_name . ' <' . $user_from_email . '>',
+			'display'     => $user_from_name . ' <' . $user_from_email . '>',
+		];
+	}
+
+    $custom_profiles = get_option( 'gh_customer_sender_profiles' );
+
+    if ( is_array( $custom_profiles ) ){
+
+        foreach ( $custom_profiles as $profile ){
+            [ $profile_id, $profile_name, $profile_email ] = $profile;
+
+            $profiles[ "custom-$profile_id" ] = [
+                'from_avatar' => get_avatar_url( $profile_email, [ 'size' => 40 ] ),
+                'from_name'   => $profile_name,
+                'from_email'  => $profile_email,
+                'from_header' => $profile_name . ' <' .$profile_email . '>',
+                'display'     => $profile_name . ' <' .$profile_email . '>',
+            ];
+        }
+    }
+
+	/**
+	 * Allow filtering of the sender profiles
+	 *
+	 * @param  array  $profiles
+	 */
+	return apply_filters( 'groundhogg/sender_profiles', $profiles );
 }

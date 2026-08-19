@@ -8,6 +8,7 @@ use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DB\Query\Where;
 use Groundhogg\Email;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\get_sender_profiles;
 use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -117,6 +118,19 @@ class Emails extends DB {
 			$where->in( 'from_user', wp_parse_id_list( $filter['users'] ) );
 		} );
 
+		$this->query_filters->register( 'from_profile', function ( $filter, Where $where ) {
+			$filter = wp_parse_args( $filter, [
+				'profiles' => [],
+			] );
+
+			$allowed_profiles = array_keys( get_sender_profiles() );
+			$profiles = array_intersect( $filter['profiles'], $allowed_profiles );
+
+
+			$where->in( 'from_profile', $profiles );
+		} );
+
+
 		// Author
 		$this->query_filters->register( 'author', function ( $filter, Where $where ) {
 			$filter = wp_parse_args( $filter, [
@@ -200,6 +214,12 @@ class Emails extends DB {
 		], [
 			'from_user' => $new,
 		] );
+
+		$this->update( [
+			'from_profile' => 'user-' . $prev,
+		], [
+			'from_profile' => 'user-' . $new,
+		] );
 	}
 
 
@@ -220,6 +240,7 @@ class Emails extends DB {
 			'message_type' => '%s',
 			'author'       => '%d',
 			'from_user'    => '%d',
+			'from_profile' => '%s',
 			'status'       => '%s',
 			'is_template'  => '%d',
 			'last_updated' => '%s',
@@ -244,6 +265,7 @@ class Emails extends DB {
 			'message_type' => 'marketing',
 			'author'       => get_current_user_id(),
 			'from_user'    => 0,
+			'from_profile' => 'default',
 			'is_template'  => 0,
 			'status'       => 'draft',
 			'last_updated' => current_time( 'mysql' ),
@@ -269,8 +291,6 @@ class Emails extends DB {
 	 */
 	public function create_table() {
 
-		global $wpdb;
-
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 		$sql = "CREATE TABLE " . $this->table_name . " (
@@ -281,6 +301,7 @@ class Emails extends DB {
         title text NOT NULL,
         pre_header text NOT NULL,
         from_user bigint(20) unsigned NOT NULL,
+        from_profile varchar(191) NOT NULL,
         author bigint(20) unsigned NOT NULL,   
         is_template tinyint unsigned NOT NULL,   
         status VARCHAR(20) NOT NULL,

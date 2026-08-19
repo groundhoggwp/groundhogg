@@ -76,16 +76,6 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
-	 * Set the from_select and from_type properties
-	 *
-	 * @return void
-	 */
-	protected function set_from_select() {
-		$this->from_select = $this->from_user > 0 ? $this->from_user : ( $this->get_meta( 'use_default_from' ) ? 'default' : 0 );
-		$this->from_type   = $this->from_user > 0 ? 'user' : ( $this->get_meta( 'use_default_from' ) ? 'default' : 'owner' );
-	}
-
-	/**
 	 * Do any post setup actions.
 	 *
 	 * @return void
@@ -108,8 +98,6 @@ class Email extends Base_Object_With_Meta {
 		}
 
 		$this->is_template = boolval( $this->is_template );
-
-		$this->set_from_select();
 
 		// Maybe update from the meta message type
 		if ( ! isset_not_empty( $this->data, 'message_type' ) ) {
@@ -1107,29 +1095,25 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Return the from profile
+	 *
+	 * @return array
+	 */
+	public function get_from_profile() {
+
+		$profiles = get_sender_profiles();
+
+		return $profiles[$this->from_profile] ?? $profiles['default'];
+	}
+
+	/**
 	 * Return the from name for the email
 	 *
 	 *
 	 * @return string
 	 */
 	public function get_from_name() {
-
-		switch ( $this->from_type ) {
-
-			case 'owner':
-				if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
-					return $this->get_contact()->get_ownerdata()->display_name;
-				}
-				break;
-			case 'user':
-				if ( $this->get_from_user() ) {
-					return $this->get_from_user()->display_name;
-				}
-				break;
-		}
-
-		return get_default_from_name();
-
+		return do_replacements( $this->get_from_profile()['from_name'], $this->contact );
 	}
 
 	/**
@@ -1138,26 +1122,7 @@ class Email extends Base_Object_With_Meta {
 	 * @return string
 	 */
 	public function get_from_email() {
-
-		switch ( $this->from_type ) {
-
-			case 'owner':
-
-				if ( $this->get_contact() && $this->get_contact()->get_ownerdata() ) {
-					return $this->get_contact()->get_ownerdata()->user_email;
-				}
-
-				break;
-			case 'user':
-
-				if ( $this->get_from_user() ) {
-					return $this->get_from_user()->user_email;
-				}
-
-				break;
-		}
-
-		return get_default_from_email();
+		return do_replacements( $this->get_from_profile()['from_email'], $this->contact );
 	}
 
 	/**
@@ -1567,6 +1532,15 @@ class Email extends Base_Object_With_Meta {
 				case 'author':
 					$value = absint( $value );
 					break;
+				case 'from_profile':
+
+					// filter by allowed profiles
+					$allowed_profiles = get_sender_profiles();
+					if ( ! key_exists( $value, $allowed_profiles ) ){
+						$value = 'default';
+					}
+
+					break;
 				case 'plain_text':
 					$value = email_kses( $value );
 					break;
@@ -1581,15 +1555,6 @@ class Email extends Base_Object_With_Meta {
 					break;
 				case 'message_type':
 					$value = one_of( $value, [ 'transactional', 'marketing', 'global_block' ] );
-					break;
-				case 'from_select':
-
-					if ( $value === 'default' ) {
-						$data['from_user'] = 0;
-					} else {
-						$data['from_user'] = $value;
-					}
-
 					break;
 			}
 		}
@@ -1750,20 +1715,14 @@ class Email extends Base_Object_With_Meta {
 			$this->content = wpautop( $this->content );
 		}
 
-		// Do this again just in case 🤷
-		$this->set_from_select();
-
 		return array_merge( parent::get_as_array(), [
 			'campaigns' => $this->get_related_objects( 'campaign' ),
 			'context'   => [
 				'editor_type' => $this->get_editor_type(),
-				'from_avatar' => get_avatar_url( $this->get_from_user_id(), [
-					'size' => 40
-				] ),
+				'from_avatar' => $this->get_from_profile()['from_avatar'],
 				'from_name'   => $this->get_from_name(),
 				'from_email'  => $this->get_from_email(),
 				'subject'     => $this->get_merged_subject_line(),
-//				'from_user'   => $this->get_from_user(),
 				'built'       => $live_preview,
 				'plain'       => $this->get_merged_alt_body(),
 			]

@@ -290,6 +290,40 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					install_custom_rewrites();
 				},
+			],
+			'4.7'  => [
+				'automatic'   => true,
+				'description' => __( 'Upgrade emails table to use sender profiles instead of exclusively user accounts.', 'groundhogg' ),
+				'callback'    => function () {
+					// add from_profile column
+					db()->emails->create_table();
+
+					// collect all emails that have the from user set to 0
+					// upgrade to use default or owner
+					$emailQuery = new Table_Query( 'emails' );
+					$emailQuery->where()->equals( 'from_user', 0 );
+					$emails = $emailQuery->get_objects( Email::class );
+
+					foreach ( $emails as $email ) {
+
+						$use_default_from = $email->get_meta( 'use_default_from' );
+
+						$email->update([
+							'from_profile' => $use_default_from ? 'default' : 'owner',
+						]);
+
+						$email->delete_meta( 'use_default_from' );
+
+					}
+
+					// the rest get from_user set to from_profile with a user- prefix
+					$emailQuery = new Table_Query('emails');
+					$emailQuery->where()->greaterThanEqualTo( 'from_user', 1 );
+					$emailQuery->add_safe_column( "CONCAT( 'user-', from_user )" );
+					$emailQuery->update([
+						'from_profile' => "CONCAT( 'user-', from_user )"
+					]);
+				},
 			]
 		];
 	}

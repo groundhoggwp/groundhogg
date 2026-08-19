@@ -59,6 +59,7 @@
     dangerConfirmationModal,
     adminPageURL,
     isValidEmail,
+    escHTML,
   } = Groundhogg.element
 
   const {
@@ -91,6 +92,7 @@
   const {
     ImageInput,
     ImagePicker,
+    CopyInput
   } = Groundhogg.components
 
   let {
@@ -99,6 +101,7 @@
     globalSocials = [],
     blockDefaults = {},
     imageSizes = [],
+    senderProfiles = {},
   } = _BlockEditor
 
   const { TokenList } = Groundhogg
@@ -4586,36 +4589,17 @@
     } = getEmailMeta()
 
     let {
-      from_select = 0,
+      from_profile = 'default',
       message_type = 'marketing',
       is_template = 0,
     } = getEmailData()
 
-    let fromOptions = [
-      {
-        id  : 0,
-        text: __('Contact Owner'),
-      },
-      {
-        id  : 'default',
-        text: `${ Groundhogg.defaults.from_name } &lt;${ Groundhogg.defaults.from_email }&gt;`,
+    let fromOptions = Object.keys(senderProfiles).map(key => ( {
+      id  : key,
+      text: escHTML(senderProfiles[key].display),
+    } ))
 
-      },
-      ...Groundhogg.filters.owners.map(({
-        data,
-        ID,
-      }) => ( {
-        id  : ID,
-        text: `${ data.display_name } &lt;${ data.user_email }&gt;`,
-
-      } )),
-
-    ]
-
-    let replyToOptions = [
-      Groundhogg.defaults.from_email,
-      ...Groundhogg.filters.owners.map(({ data }) => data.user_email),
-    ].filter(onlyUnique)
+    let replyToOptions = Object.keys(senderProfiles).map(key => senderProfiles[key].from_email).filter(onlyUnique)
 
     return Fragment([
       isGlobalBlockEditor() ? null : ControlGroup({
@@ -4647,30 +4631,13 @@
               isValidSelection: id => true,
               fetchOptions    : search => Promise.resolve(fromOptions.filter(item => item.text.includes(search))),
 
-              selected: fromOptions.find(opt => from_select === opt.id),
+              selected: fromOptions.find(opt => from_profile === opt.id),
 
               onChange: item => {
 
-                if (item.id === 'default') {
-                  setEmailData({
-                    from_user  : 0,
-                    from_select: item.id,
-                  })
-
-                  setEmailMeta({
-                    use_default_from: true,
-                  })
-                }
-                else {
-                  setEmailData({
-                    from_user  : item.id,
-                    from_select: item.id,
-                  })
-
-                  setEmailMeta({
-                    use_default_from: false,
-                  })
-                }
+                setEmailData({
+                  from_profile: item.id,
+                })
 
                 History.addChange() // after change from
 
@@ -10997,7 +10964,7 @@
         title       : 'My new email',
         subject     : '',
         pre_header  : '',
-        from_select : 0,
+        from_profile: 'default',
         status      : 'draft',
         message_type: 'marketing',
       }

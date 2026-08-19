@@ -179,19 +179,9 @@ class Emails_Table extends Table {
 	 */
 	protected function column_from_user( $email ) {
 
-		if ( $email->get_from_user_id() == 0 && ! $email->get_meta( 'use_default_from' ) ) {
-			return esc_html__( 'The contact\'s owner', 'groundhogg' );
-		}
+        $profile = $email->get_from_profile();
 
-		if ( $email->get_from_user() ) {
-			return html()->e( 'a', [
-				'href' => admin_page_url( 'gh_emails', [
-					'from_user' => $email->get_from_user_id()
-				] )
-			], esc_html( sprintf( '%s <%s>', $email->get_from_name(), $email->get_from_email() ) ) );
-		}
-
-		return esc_html( sprintf( '%s <%s>', get_default_from_name(), get_default_from_email() ) );
+		return esc_html( $profile['display'] );
 	}
 
 	/**
@@ -471,6 +461,7 @@ class Emails_Table extends Table {
 				'pre_header',
 				'message_type',
 				'author',
+				'from_profile',
 				'from_user',
 				'status',
 				'is_template',

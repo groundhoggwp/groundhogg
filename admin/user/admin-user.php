@@ -142,6 +142,21 @@ class Admin_User {
                     <p class="description"><?php echo esc_html_x( 'Which tab should be selected by default when opening a contact record.', 'settings', 'groundhogg' ); ?></p>
                 </td>
             </tr>
+            <?php if ( user_can( $profile_user, 'send_emails' ) ): ?>
+            <tr>
+                <th><?php esc_html_e( 'Sender From Name', 'groundhogg' ); ?></th>
+                <td>
+	                <?php html( 'input', [ 'type' => 'text', 'name' => 'gh_from_name', 'value' => get_user_meta( $profile_user->ID, 'gh_from_name', true ), 'placeholder' => $profile_user->display_name ] ); ?>
+                    <p class="description"><?php echo esc_html_x( 'Your name as shown in the inbox of a recipient whenever you send an email. Leave empty to use your display name.', 'settings', 'groundhogg' ); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th><?php esc_html_e( 'Sender From Email', 'groundhogg' ); ?></th>
+                <td>
+                    <?php html( 'input', [ 'type' => 'email', 'name' => 'gh_from_email', 'value' => get_user_meta( $profile_user->ID, 'gh_from_email', true ), 'placeholder' => $profile_user->user_email ] ); ?>
+                    <p class="description"><?php echo esc_html_x( 'The email address used when you send an email. Leave empty to use your account email.', 'settings', 'groundhogg' ); ?></p>
+                </td>
+            </tr>
             <tr>
                 <th><?php esc_html_e( 'Email Signature', 'groundhogg' ); ?></th>
                 <td>
@@ -158,6 +173,7 @@ class Admin_User {
                     <p class="description"><?php kses_e( __( 'Accepts HTML. The signature can be merged using the <code>{owner_signature}</code> in any email.', 'groundhogg' ) ); ?></p>
                 </td>
             </tr>
+            <?php endif; ?>
         </table>
 		<?php
 
@@ -173,6 +189,8 @@ class Admin_User {
 
 		update_user_meta( $user_id, 'signature', wp_kses_post( get_post_var( 'signature' ) ) );
 		update_user_meta( $user_id, 'gh_default_contact_tab', sanitize_text_field( get_post_var( 'gh_default_contact_tab' ) ) );
+		update_user_meta( $user_id, 'gh_from_name', sanitize_text_field( get_post_var( 'gh_from_name' ) ) );
+		update_user_meta( $user_id, 'gh_from_email', sanitize_email( get_post_var( 'gh_from_email' ) ) );
 
 		if ( user_can( $user_id, 'view_reports' ) ) {
 			update_user_meta( $user_id, 'gh_broadcast_results', boolval( get_post_var( 'gh_broadcast_results' ) ) );
