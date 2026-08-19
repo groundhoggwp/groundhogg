@@ -947,9 +947,11 @@
    */
   const createState = (initialState = {}) => new Proxy({
 
-    initial: structuredClone(initialState),
+    initial: initialState,
 
-    state: structuredClone(initialState),
+    state: {
+      ...initialState,
+    },
 
     set(newState) {
       this.state = {
@@ -963,7 +965,9 @@
     },
 
     reset() {
-      this.state = structuredClone(this.initial)
+      this.state = {
+        ...this.initial
+      }
     },
 
     copy() {
