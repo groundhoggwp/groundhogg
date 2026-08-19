@@ -41,7 +41,7 @@ global $event;
 	<?php do_action( "groundhogg/templates/email/head" ); ?>
 	<?php
 
-	if ( is_browser_view() && ( ( isset( $campaign ) && isset( $broadcast ) ) || isset( $event ) ) ) {
+	if ( is_browser_view() ) {
 		?>
         <style id="archive">
             <?php load_css( 'archive' ); ?>

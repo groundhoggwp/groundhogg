@@ -5562,7 +5562,7 @@
                     break
                   case 'functional':
                     // language=HTML
-                    content = `<p>Functional tests simulate sending the email to a contact record from a
+                    content = `<p>Simulated tests simulate sending the email to a contact record from a
                         broadcast or a funnel.</p>
                     <p>The email will be sent to your selected email addresses, using information from the
                         associated contact records. If no contact exists, a new
@@ -5581,6 +5581,11 @@
                         ✅ Open tracking.
                     </p>`
                     break
+                  case 'link':
+                    // language=HTML
+                    content = `<p>Send this link to anyone you want to be able to see a preview of the email.</p>`
+                    break
+
                 }
 
                 return Div({ id: 'test-type-explanation' },
@@ -5607,7 +5612,11 @@
                       },
                       {
                         id  : 'functional',
-                        text: 'Functional',
+                        text: 'Simulated',
+                      },
+                      {
+                        id  : 'link',
+                        text: 'Preview Link',
                       },
                     ],
                     selected: getState().testType ?? 'design',
@@ -5620,7 +5629,7 @@
                     },
                   }),
                   TestTypeExplanation(),
-                  Div({
+                  [ 'design', 'functional' ].includes( getState().testType ) ? Div({
                       className: 'display-flex gap-10 align-bottom',
                     },
                     [
@@ -5688,8 +5697,10 @@
                         },
                         'Send'),
 
-                    ]),
-
+                    ]) : null,
+                  'link' === getState().testType ? Div({}, [
+                    CopyInput( getEmail().preview_url )
+                  ]) : null
                 ]))
             },
           },

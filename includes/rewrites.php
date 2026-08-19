@@ -196,12 +196,18 @@ class Rewrites {
 	 * @return string
 	 */
 	public function template_include( $template ) {
+
+		$template_loader = $this->get_template_loader();
+
 		if ( ! is_managed_page() ) {
 			return $template;
 		}
 
+		if ( get_url_var('preview_email' ) ){
+			return $template_loader->get_template_part( 'email/preview', '', false );
+		}
+
 		$subpage         = get_query_var( 'subpage' );
-		$template_loader = $this->get_template_loader();
 
 		switch ( $subpage ) {
 			case 'benchmark_link':

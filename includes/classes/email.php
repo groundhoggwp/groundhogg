@@ -394,7 +394,7 @@ class Email extends Base_Object_With_Meta {
 			return permissions_key_url( managed_page_url( sprintf( "archive/%s", dechex( $this->get_event()->get_id() ) ) ), $this->get_contact(), 'view_archive' );
 		}
 
-		return managed_page_url( 'archive' );
+		return $this->get_preview_url();
 
 	}
 
@@ -1654,7 +1654,12 @@ class Email extends Base_Object_With_Meta {
 	 * @return array
 	 */
 	public function export() {
-		return parent::get_as_array();
+		$data = parent::get_as_array();
+
+		unset( $data['context'] );
+		unset( $data['preview_url'] );
+
+		return $data;
 	}
 
 	/**
@@ -1725,7 +1730,27 @@ class Email extends Base_Object_With_Meta {
 				'subject'     => $this->get_merged_subject_line(),
 				'built'       => $live_preview,
 				'plain'       => $this->get_merged_alt_body(),
-			]
+			],
+			'preview_url' => $this->get_preview_url()
 		] );
+	}
+
+	/**
+	 * Get the email preview URL
+	 *
+	 * @return string
+	 */
+	public function get_preview_url() {
+
+		$payload = [ $this->get_id(), time() + WEEK_IN_SECONDS ];
+		$encoded = wp_json_encode( $payload );
+		$signature = compute_signature( $encoded, 16 );
+
+		$param = implode( '.', [
+			base64url_encode( $encoded ),
+			base64url_encode( $signature )
+		] );
+
+		return add_query_arg( 'preview_email', $param, managed_page_url() );
 	}
 }
