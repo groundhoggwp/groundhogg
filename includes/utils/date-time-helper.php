@@ -12,7 +12,7 @@ class DateTimeHelper extends \DateTime {
 	const ZEROTIME = "00:00:00";
 	const ZERODATETIME = "0000-00-00 00:00:00";
 
-	public function __construct( $datetime = 'now', \DateTimeZone|string $timezone = null ) {
+	public function __construct( $datetime = 'now', $timezone = null ) {
 
 		if ( ! $timezone ) {
 			$timezone = wp_timezone();
@@ -27,8 +27,7 @@ class DateTimeHelper extends \DateTime {
 		if ( is_int( $datetime ) ) {
 			$timestamp = $datetime;
 			$datetime  = 'now';
-		}
-		else if ( is_a( $datetime, 'DateTime' ) ){
+		} elseif ( is_a( $datetime, 'DateTime' ) ) {
 			$timestamp = $datetime->getTimestamp();
 			$datetime  = 'now';
 		}
@@ -39,7 +38,6 @@ class DateTimeHelper extends \DateTime {
 			$this->setTimestamp( $timestamp );
 		}
 	}
-
 	public function whenIs() {
 
 		$compare   = new DateTimeHelper( 'today' );
