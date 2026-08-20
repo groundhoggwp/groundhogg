@@ -158,7 +158,6 @@
           gh_city = '',
           gh_region = '',
           gh_country = '',
-          blogname = '',
         } = Options.items
 
         return stepTemplate({
@@ -181,7 +180,7 @@
                                 placeholder: __('My Business', 'groundhogg'),
                                 value: gh_business_name
                                         ? gh_business_name
-                                        : blogname,
+                                        : Groundhogg.name,
                             }) }
                         </div>
                         <div class="gh-col">
@@ -1411,7 +1410,6 @@
       'gh_terms',
       'gh_override_from_name',
       'gh_override_from_email',
-      'blogname',
     ]).then(() => {
       isLicensed = Options.get('gh_master_license') != false
 
