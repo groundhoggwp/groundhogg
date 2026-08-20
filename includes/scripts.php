@@ -563,8 +563,7 @@ class Scripts {
 		}
 
 		wp_register_script( 'groundhogg-admin-cron-jobs', GROUNDHOGG_ASSETS_URL . 'js/admin/features/cron-jobs' . $dot_min . '.js', [
-			'groundhogg-make-el',
-			'groundhogg-admin-element',
+			'groundhogg-admin-components',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );

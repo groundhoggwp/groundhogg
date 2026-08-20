@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.1
-Stable tag: 4.7
+Stable tag: 4.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -378,7 +378,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.7 (2026-08-18) =
+= 4.7.1 (2026-08-20) =
+* FIXED Cron setup page issue with WP 7.1
+* FIXED PHP 7.4 incompatibility.
+* TWEAKED bumped the minimum supported PHP version to 7.4.
+* TWEAKED bumped the minimum supported WP version to 6.9.
+
+= 4.7 (2026-08-20) =
 * ADDED Custom sender profiles in Groundhogg » Settings » Email » Sender Profiles.
 * ADDED If an email is being sent from a user, that user can set a "from name" and "from email" override in their user profile.
 * ADDED When sending a test email there is now an option to copy a preview link to share with a team.
