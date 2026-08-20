@@ -247,27 +247,17 @@ class Contacts_Table extends WP_List_Table {
 	/**
 	 * @param $contact Contact
 	 *
-	 * @return string
+	 * @return void
 	 */
 	protected function column_email( $contact ) {
-
-		$editUrl = admin_url( 'admin.php?page=gh_contacts&action=edit&contact=' . $contact->get_id() );
-
-		$html = "<strong>";
-
-		$html .= "<a class='row-title' href='$editUrl'>" . html()->e( 'img', [
-				'src'   => $contact->get_profile_picture(),
-				'style' => [
-					'float'        => 'left',
-					'margin-right' => '10px'
-				],
-				'width' => 40
-			] ) . esc_html( $contact->get_email() ) . "</a>";
-
-		$html .= "</strong>";
-
-		return $html;
-
+        ?>
+        <strong>
+            <a class="row-title" href="<?php echo esc_url( $contact->admin_link() ); ?>">
+                <?php html()->covered_square_image( $contact->get_profile_picture(), 40 ); ?>
+                <?php echo esc_html( $contact->get_email() ); ?>
+            </a>
+        </strong>
+        <?php
 	}
 
 	/**

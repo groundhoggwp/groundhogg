@@ -24,8 +24,9 @@ $action-green-50: rgba(158, 206, 56, 0.5);
 $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
 
 .row-title {
-  img {
-    border-radius: var(--gh-border-radius);
+  .gh-square-image {
+    float: left;
+    margin-right: 10px;
   }
 }
 

@@ -1,5 +1,6 @@
-.row-title img {
-  border-radius: var(--gh-border-radius);
+.row-title .gh-square-image {
+  float: left;
+  margin-right: 10px;
 }
 
 #wpbody-content .inline-edit-row-contact .inline-edit-col-left {

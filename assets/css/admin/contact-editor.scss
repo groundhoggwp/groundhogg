@@ -108,11 +108,9 @@ a.change-status.complained:hover {
   color: #dc3232;
 }
 
-.contact-picture img {
-  border-radius: 3px;
+.contact-picture > .gh-square-image {
   float: left;
   margin: 0 20px 16px 20px;
-
 }
 
 .two-columns {

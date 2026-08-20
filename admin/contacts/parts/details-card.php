@@ -21,14 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="contact-details">
     <!-- Photo -->
     <div class="contact-picture">
-	    <?php
-	    html()->e( 'img', [
-			'class'  => 'profile-picture has-box-shadow',
-			'title' => esc_html__( 'Profile Picture', 'groundhogg' ),
-			'width'  => 100,
-			'height' => 100,
-			'src'    => $contact->get_profile_picture()
-	    ], null, true, true ); ?>
+	    <?php html()->covered_square_image( $contact->get_profile_picture(), 100 ); ?>
     </div>
     <!-- FIRST -->
     <h1 id="contact-full-name">

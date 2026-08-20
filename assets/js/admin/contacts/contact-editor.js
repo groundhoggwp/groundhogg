@@ -2596,5 +2596,37 @@
     }
   })
 
+  $(document).on('click', '.contact-picture', e => {
+
+    let file_frame = wp.media.frames.file_frame = wp.media({
+      title: __('Select a profile picture', 'groundhogg'),
+      button: {
+        text: __('Select', 'groundhogg'),
+      },
+      library: {
+        type: 'image',
+      },
+      multiple: false,
+      frame: 'select',
+    })
+    // When an image is selected, run a callback.
+    file_frame.on('select', function () {
+      // We set multiple to false so only get one image from the uploader
+      let attachment = file_frame.state().get('selection').first().toJSON()
+
+      $('.profile-picture')[0].style.backgroundImage = `url(${ attachment.url })`
+
+      ContactsStore.patch(getContact().ID, {
+        meta: {
+          profile_picture: attachment.url,
+        }
+      })
+
+    })
+    // Finally, open the modal
+    file_frame.open()
+
+  })
+
 } )(jQuery, ContactEditor)
 

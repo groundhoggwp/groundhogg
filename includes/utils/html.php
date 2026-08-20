@@ -1790,4 +1790,19 @@ class HTML {
 		], '⭐⭐⭐⭐⭐🙏', '', true );
 	}
 
+    public function covered_square_image( $src = '', $size = 100, $atts = [] ) {
+
+	    html()->e( 'div', [
+		    'class'  => 'gh-square-image has-box-shadow',
+		    'style' => [
+			    'width'               => $size,
+                'aspect-ratio'        => '1 / 1',
+			    'background-image'    => "url({$src})",
+			    'background-size'     => 'cover',
+			    'background-position' => 'center center',
+		    ],
+            ...$atts,
+	    ], null, true, true );
+
+    }
 }

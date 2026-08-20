@@ -1621,4 +1621,8 @@ ul.activity-timeline li.activity-item .activity-icon:not(.no-frame) svg {
   margin-top: 0;
 }
 
+.gh-square-image {
+  border-radius: var(--gh-border-radius);
+}
+
 /*# sourceMappingURL=admin.css.map */
