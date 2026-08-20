@@ -61,7 +61,13 @@ class Welcome_Page extends Admin_Page {
 
     public static function fix_to_id( $fix, $prefix = 'fix-' ) {
 	    $fix = wp_parse_url( $fix );
-        return preg_replace( '/[^a-zA-Z0-9-]/', '-', $prefix . $fix['path'] . $fix['query'] . $fix['fragment'] );
+        return preg_replace( '/[^a-zA-Z0-9-]/',
+            '-',
+            $prefix
+            . ( $fix['path'] ?? '' )
+            . ( $fix['query'] ?? '' )
+            . ( $fix['fragment'] ?? '' )
+        );
     }
 
 	public function ajax_get_checklist_items() {
