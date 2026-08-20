@@ -180,8 +180,8 @@
                 if (to.length) {
                   Groundhogg.components.emailModal({
                     to,
-                    from_email: getCurrentUser().data.user_email,
-                    from_name : getCurrentUser().data.display_name,
+                    from_email: getCurrentUser().from_email,
+                    from_name : getCurrentUser().from_name,
                   }, r => {
 
                     const {

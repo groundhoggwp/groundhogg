@@ -114,8 +114,8 @@
 
     let email = {
       to        : [contact.data.email],
-      from_email: currentUser.data.user_email,
-      from_name : currentUser.data.display_name,
+      from_email: currentUser.from_email,
+      from_name : currentUser.from_name,
     }
 
     if (contact.data.owner_id && currentUser.ID != contact.data.owner_id) {
@@ -124,7 +124,7 @@
       ]
     }
 
-    Groundhogg.components.emailModal(email, activityUpdated )
+    Groundhogg.components.emailModal( email, activityUpdated )
   }
 
   const strings = {
