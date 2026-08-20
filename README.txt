@@ -4,9 +4,9 @@ Contributors: trainingbusinesspros, Groundhogg
 Tags: wordpress crm, marketing automation, crm, email marketing, email automation
 Donate link: https://groundhogg.io/pricing/
 Requires at least: 5.9
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.1
-Stable tag: 4.6.1
+Stable tag: 4.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,14 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.7 (2026-08-18) =
+* ADDED Custom sender profiles in Groundhogg » Settings » Email » Sender Profiles.
+* ADDED If an email is being sent from a user, that user can set a "from name" and "from email" override in their user profile.
+* ADDED When sending a test email there is now an option to copy a preview link to share with a team.
+* TWEAKED Emails now use a "sender profile" rather than a "from user" to enable adding custom sender profiles.
+* FIXED Deals info card broken after last update.
+* FIXED Guided setup not loading.
 
 = 4.6.1 (2026-08-18) =
 * FIXED Nested global blocks not loading CSS.
