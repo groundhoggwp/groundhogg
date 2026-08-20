@@ -9997,18 +9997,22 @@ function get_sender_profiles() {
 
     if ( ! empty( $custom_profiles ) ){
 
-        $custom_profiles = json_decode( $custom_profiles, true );
+        try {
+	        $custom_profiles = json_decode( $custom_profiles, true );
 
-        foreach ( $custom_profiles as $profile ){
-            [ $profile_name, $profile_email, $profile_id ] = $profile;
+	        foreach ( $custom_profiles as $profile ){
+		        [ $profile_name, $profile_email, $profile_id ] = $profile;
 
-            $profiles[ "custom-$profile_id" ] = [
-                'from_avatar' => get_avatar_url( $profile_email, [ 'size' => 40 ] ),
-                'from_name'   => $profile_name,
-                'from_email'  => $profile_email,
-                'from_header' => $profile_name . ' <' .$profile_email . '>',
-                'display'     => $profile_name . ' <' .$profile_email . '>*',
-            ];
+		        $profiles[ "custom-$profile_id" ] = [
+			        'from_avatar' => get_avatar_url( $profile_email, [ 'size' => 40 ] ),
+			        'from_name'   => $profile_name,
+			        'from_email'  => $profile_email,
+			        'from_header' => $profile_name . ' <' .$profile_email . '>',
+			        'display'     => $profile_name . ' <' .$profile_email . '>*',
+		        ];
+	        }
+        } catch ( \Throwable $e ) {
+            // ignore if malformed or something...
         }
     }
 
