@@ -634,8 +634,38 @@ class Settings_Page extends Admin_Page {
 //			],
 			'overrides'             => [
 				'id'    => 'overrides',
-				'title' => _x( 'Defaults', 'settings_sections', 'groundhogg' ),
-				'tab'   => 'email'
+				'title' => _x( 'Sender Profiles', 'settings_sections', 'groundhogg' ),
+				'tab'   => 'email',
+                'callback' => function () {
+
+                    $localized = [
+                        'from_name' => __( 'From Name', 'groundhogg' ),
+                        'from_email' => __( 'From Email', 'groundhogg' ),
+                    ];
+
+                    ?><script>
+                    ((localized) => {
+                      window.addEventListener('load', () => {
+                        const hiddenInput = document.querySelector( '#gh_custom_sender_profiles' )
+
+                        hiddenInput.insertAdjacentElement( 'beforebegin', MakeEl.InputRepeater({
+                          id: 'gh_custom_sender_profiles_repeater',
+                          rows: hiddenInput.value ? JSON.parse( hiddenInput.value ) : [],
+                          cells: [
+                            props => MakeEl.Input({ placeholder: localized.from_name, ...props}),
+                            props => MakeEl.Input({ placeholder: localized.from_email, ...props}),
+                            props => MakeEl.Input({ type: 'hidden', ...props}),
+                          ],
+                          fillRow: () => [ '', '', crypto.randomUUID().replaceAll('-', '').slice(0, 8) ],
+                          onChange: ( rows ) => {
+                            hiddenInput.value = JSON.stringify( rows )
+                          }
+                        }))
+
+                      })
+                    })( <?php echo wp_json_encode( $localized ); ?> )
+                    </script><?php
+                }
 			],
 			'footer'                => [
 				'id'    => 'footer',
@@ -1464,6 +1494,15 @@ class Settings_Page extends Admin_Page {
 					'id'          => 'gh_override_from_email',
 					'placeholder' => Plugin::$instance->settings->get_option( 'admin_email' ),
 				],
+			],
+			'gh_custom_sender_profiles' => [
+				'section' => 'overrides',
+				'label'   => _x( 'Custom Sender Profiles', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Create additional "from name" and "from email address" combinations that can be used to send email templates. Usage of custom profiles will be indicated with a <code>*</code>.', 'settings', 'groundhogg' ),
+				'type'    => 'input',
+				'atts'    => [
+					'type' => 'hidden'
+				]
 			],
 			'gh_email_footer_alignment'              => [
 				'id'      => 'gh_email_footer_alignment',
