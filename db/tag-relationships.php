@@ -42,7 +42,7 @@ class Tag_Relationships extends DB {
 	 * @return string
 	 */
 	public function get_primary_key() {
-		return 'tag_id';
+		return '';
 	}
 
 	/**
@@ -202,7 +202,7 @@ class Tag_Relationships extends DB {
 		$results = $this->query( [
 			'select'  => $return,
 			$column   => $value,
-			'orderby' => $this->primary_key,
+			'orderby' => 'tag_id',
 			'order'   => 'DESC'
 		] );
 
