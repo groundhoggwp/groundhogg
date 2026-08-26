@@ -149,6 +149,16 @@ function managed_page_head( $title = '', $action = '' ) {
 	<?php
 }
 
+function managed_page_footer_simple() {
+	?>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </body>
+</html>
+<?php
+}
+
 /**
  * Outputs the footer for the login page.
  */

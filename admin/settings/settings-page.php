@@ -1710,6 +1710,16 @@ class Settings_Page extends Admin_Page {
 					'value' => 'on',
 				],
 			],
+			'gh_use_js_cookie_method'              => [
+				'section' => 'tracking',
+				'label'   => _x( 'Use Tracking Redirect Page', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'Sets the tracking cookie using a temporary redirect page during tracking link clicks. Enable this if your host or CDN prevents tracking cookies from being set during redirects.', 'settings', 'groundhogg' ),
+				'type'    => 'checkbox',
+				'atts'    => [
+					'label' => __( 'Enable' , 'groundhogg' ),
+					'value' => 'on',
+				],
+			],
 			'gh_url_tracking_exclusions'             => [
 				'id'      => 'gh_url_tracking_exclusions',
 				'section' => 'tracking',

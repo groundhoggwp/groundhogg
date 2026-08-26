@@ -113,6 +113,16 @@
 
       }
 
+      if (r.cookie){
+        document.cookie = [
+          `${r.cookie.name}=${encodeURIComponent( r.cookie.value )}`,
+          `Max-Age=${r.cookie.expiry}`,
+          'path=/',
+          'SameSite=Lax',
+          ...( location.protocol === 'https:' ? [ 'Secure' ] : [] ),
+        ].join( '; ' );
+      }
+
       if (r.url) {
         setTimeout(() => {
           window.open(r.url, inIframe() ? '_parent' : '_self')

@@ -728,16 +728,33 @@ class Tracking {
 	}
 
 	/**
-	 * Build a tracking cookie based on the available information.
+	 * Get the cookie value
+	 *
+	 * @return bool|string
 	 */
-	protected function build_tracking_cookie() {
-
+	public function get_tracking_cookie_value() {
 		$cookie_vars = apply_filters( 'groundhogg/tracking/set_cookie_vars', $this->cookie );
 		$cookie      = wp_json_encode( $cookie_vars );
 		$cookie      = encrypt( $cookie );
-		$expiry      = apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY * DAY_IN_SECONDS );
 
-		return set_cookie( self::TRACKING_COOKIE, $cookie, $expiry );
+		return $cookie;
+	}
+
+	/**
+	 * Get the cookie expiry
+	 *
+	 * @return mixed|null
+	 */
+	public function get_tracking_cookie_expiry() {
+		return apply_filters( 'groundhogg/tracking/cookie_expiry', self::COOKIE_EXPIRY * DAY_IN_SECONDS );
+
+	}
+
+	/**
+	 * Build a tracking cookie based on the available information.
+	 */
+	public function build_tracking_cookie() {
+		return set_cookie( self::TRACKING_COOKIE, $this->get_tracking_cookie_value(), $this->get_tracking_cookie_expiry() );
 	}
 
 	/**
@@ -886,6 +903,48 @@ class Tracking {
 	 * Redirects to the target URL
 	 */
 	protected function redirect_to_target() {
+
+		if ( is_option_enabled( 'gh_use_js_cookie_method' ) ) {
+
+			include_once __DIR__ . '/../templates/managed-page.php';
+
+            managed_page_head( esc_html__( 'Processing your request...', 'groundhogg' ), 'tracking_redirect' );
+
+			?>
+            <script>
+              ( () => {
+
+                const state = <?php echo wp_json_encode( [
+					'target'       => $this->get_target_url(),
+					'cookie-value' => $this->get_tracking_cookie_value(),
+					'expiry'       => $this->get_tracking_cookie_expiry(),
+				] ); ?>;
+
+                document.cookie = [
+                  `<?php echo esc_attr( self::TRACKING_COOKIE ) ?>=${encodeURIComponent( state['cookie-value'] )}`,
+                  `Max-Age=${state.expiry}`,
+                  'path=/',
+                  'SameSite=Lax',
+                  ...( location.protocol === 'https:' ? [ 'Secure' ] : [] ),
+                ].join( '; ' );
+
+                requestAnimationFrame( () => {
+                  window.location.replace( state.target );
+                } );
+
+              } )();
+            </script>
+            <div class="box">
+                <h2 class="loading-dots"><?php esc_html_e( 'Just a moment', 'groundhogg' ); ?></h2>
+                <p><?php esc_html_e( 'We’re securely processing your request and will redirect you automatically.', 'groundhogg' ); ?></p>
+                <p><?php esc_html_e( 'Not redirected?', 'groundhogg' ); ?> <?php html()->a( $this->get_target_url(), esc_html__( 'Click here!', 'groundhogg' ), [], true ); ?></p>
+            </div>
+			<?php
+
+			managed_page_footer_simple();
+
+			exit;
+		}
 
 		// safe redirects only
 		if ( self::$use_safe_redirect ){

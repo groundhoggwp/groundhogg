@@ -233,15 +233,15 @@ class Utils {
 			$iv  = substr( hash( 'sha256', $iv ), 0, 16 );
 
 			if ( $action == 'e' ) {
-				$output = base64_encode( openssl_encrypt( $string, self::$encrypt_method, $key, 0, $iv ) );
+				$output = base64url_encode( openssl_encrypt( $string, self::$encrypt_method, $key, 0, $iv ) );
 			} else if ( $action == 'd' ) {
-				$output = openssl_decrypt( base64_decode( $string ), self::$encrypt_method, $key, 0, $iv );
+				$output = openssl_decrypt( base64url_decode( $string ), self::$encrypt_method, $key, 0, $iv );
 			}
 		} else {
 			if ( $action == 'e' ) {
-				$output = base64_encode( $string );
+				$output = base64url_encode( $string );
 			} else if ( $action == 'd' ) {
-				$output = base64_decode( $string );
+				$output = base64url_decode( $string );
 			}
 		}
 

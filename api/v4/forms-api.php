@@ -5,6 +5,7 @@ namespace Groundhogg\Api\V4;
 use Groundhogg\Form\Form;
 use Groundhogg\Form\Form_v2;
 use Groundhogg\Plugin;
+use Groundhogg\Tracking;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -14,6 +15,7 @@ use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\isset_not_empty;
+use function Groundhogg\tracking;
 
 class Forms_Api extends Base_Api {
 
@@ -104,19 +106,28 @@ class Forms_Api extends Base_Api {
 
 		after_form_submit_handler( $contact );
 
+		$cookie = [
+			'value'  => tracking()->get_tracking_cookie_value(),
+			'expiry' => tracking()->get_tracking_cookie_expiry(),
+			'name'   => Tracking::TRACKING_COOKIE,
+		];
+
 		switch ( $form->get_after_submit() ){
 			default:
 			case 'success_message':
 				return self::SUCCESS_RESPONSE( [
-					'message' => $form->get_success_message()
+					'message' => $form->get_success_message(),
+					'cookie'  => $cookie,
 				] );
 			case 'success_page':
 				return self::SUCCESS_RESPONSE( [
-					'url' => $form->get_success_url()
+					'url'    => $form->get_success_url(),
+					'cookie' => $cookie,
 				] );
 			case 'reload_page':
 				return self::SUCCESS_RESPONSE( [
 					'message' => __( 'Please wait a moment...', 'groundhogg' ),
+					'cookie' => $cookie,
 					'reload' => true
 				] );
 		}
