@@ -901,7 +901,7 @@ switch ( $action ):
 
 		if ( $redirect_to ) {
             // phpcs:ignore WordPress.Security.SafeRedirect -- user defined redirect
-			wp_redirect( $redirect_to );
+			wp_safe_redirect( $redirect_to );
             exit;
 		}
 
