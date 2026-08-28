@@ -900,7 +900,6 @@ switch ( $action ):
 		$redirect_to = apply_filters( 'groundhogg/confirmed/redirect_to', $redirect_to, $contact );
 
 		if ( $redirect_to ) {
-            // phpcs:ignore WordPress.Security.SafeRedirect -- user defined redirect
 			wp_safe_redirect( $redirect_to );
             exit;
 		}
