@@ -138,7 +138,7 @@ class Extension_Upgrader {
 
 			$plugin_id = absint( $plugin_id );
 
-			// Plugin is updated, leave alone.
+			// Plugin is registered, leave alone.
 			if ( in_array( $plugin_id, Extension::$extension_ids ) ) {
 				continue;
 			}
