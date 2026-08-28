@@ -1790,14 +1790,23 @@ class HTML {
 		], '⭐⭐⭐⭐⭐🙏', '', true );
 	}
 
-    public function covered_square_image( $src = '', $size = 100, $atts = [] ) {
+	/**
+     * Output a square box with an image centered as the background
+     *
+	 * @param  string  $src
+	 * @param  int  $size
+	 * @param  array  $atts
+	 *
+	 * @return void
+	 */
+    public function covered_square_image( string $src, int $size = 100, array $atts = [] ) {
 
 	    html()->e( 'div', [
 		    'class'  => 'gh-square-image has-box-shadow',
 		    'style' => [
 			    'width'               => $size,
                 'aspect-ratio'        => '1 / 1',
-			    'background-image'    => "url({$src})",
+			    'background-image'    => sprintf( 'url(%s)', esc_url( $src ) ),
 			    'background-size'     => 'cover',
 			    'background-position' => 'center center',
 		    ],
