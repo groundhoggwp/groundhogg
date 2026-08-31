@@ -848,7 +848,7 @@
                                 `<a href="${ escHTML( activity.data.path ) }" target="_blank">${ bold(
                                         escHTML( activity.data.path) ) }</a>`) }
                     </div>
-                    <div class="diff-time">
+                    <div class="diff-time" title="${ activity.i18n.ymdhis }">
                         ${ activity.i18n.diff_time }
                     </div>
                 </div>
@@ -907,7 +907,7 @@
                                             href: funnel.admin + '#' + activity.data.step_id,
                                         }, funnel.data.title)) }
                             </div>
-                            <div class="diff-time">
+                            <div class="diff-time" title="${ activity.i18n.ymdhis }">
                                 ${ activity.i18n.diff_time }
                             </div>
                         </div>
@@ -943,7 +943,7 @@
                             <div class="activity-info">
                                 <span>${ sprintf(pending ? strings.will_receive_broadcast : strings.received_broadcast, objectTitleDisplay) }</span>
                             </div>
-                            <div class="diff-time">
+                            <div class="diff-time" title="${ activity.i18n.ymdhis }">
                                 ${ activity.i18n.diff_time }
                             </div>
                         </div>
@@ -976,7 +976,7 @@
                             <div class="activity-info">
                                 <span>${ sprintf(pending ? strings.will_receive_email : strings.received_email, emailTitleDisplay) }</span>
                             </div>
-                            <div class="diff-time">
+                            <div class="diff-time" title="${ activity.i18n.ymdhis }">
                                 ${ activity.i18n.diff_time }
                             </div>
                         </div>
@@ -1017,7 +1017,7 @@
                   <div class="activity-info">
                       ${ type.render(activity) }
                   </div>
-                  <div class="diff-time">
+                  <div class="diff-time" title="${ activity.i18n.ymdhis }">
                       ${ activity.i18n.diff_time }
                   </div>
               </div>

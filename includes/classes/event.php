@@ -681,7 +681,8 @@ class Event extends Base_Object {
 		}
 
 		$array['i18n'] = [
-			'diff_time' => $diff_time
+			'diff_time' => $diff_time,
+			'ymdhis'    => $date->ymdhis(),
 		];
 
 		switch ( $this->get_event_type() ) {
