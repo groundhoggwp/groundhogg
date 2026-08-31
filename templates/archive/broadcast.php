@@ -10,13 +10,8 @@ define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
 
 include_once __DIR__ . '/../managed-page.php';
 
-$broadcast = new Broadcast( get_query_var( 'broadcast' ) );
-
-if ( ! $broadcast->exists() ){
-    return;
-}
-
-$email = $broadcast->get_object();
+$broadcast = the_thing( 'broadcast' );
+$email     = $broadcast->get_object();
 
 if ( ! $email->exists() ) {
     return;

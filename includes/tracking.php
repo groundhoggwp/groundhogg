@@ -1057,9 +1057,8 @@ class Tracking {
 		$click_delay = absint( get_option( 'gh_click_tracking_delay' ) );
 
 		// if diff between current time and sent time is suspicious we should assume bot?
-		if ( $click_delay && $event->is_broadcast_event() && time() - $event->get_time() < $click_delay ) {
+		if ( $click_delay && time() - $event->get_time() < $click_delay ) {
 			$this->bail();
-
 			return;
 		}
 

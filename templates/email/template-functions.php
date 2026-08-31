@@ -1,15 +1,16 @@
 <?php
 
 use function Groundhogg\files;
+use function Groundhogg\the_thing;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-function the_campaign(){
-	return new \Groundhogg\Campaign( get_query_var( 'campaign' ), 'slug' );
+function the_campaign( $campaign = null ){
+	return the_thing( 'campaign', $campaign );
 }
 
-function the_broadcast(){
-	return new \Groundhogg\Broadcast( get_query_var( 'broadcast' ) );
+function the_broadcast( $broadcast = null ){
+	return the_thing( 'broadcast', $broadcast );
 }
 
 /**

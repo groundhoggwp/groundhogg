@@ -245,6 +245,8 @@ class Rewrites {
 				$campaign = new Campaign( $campaign_slug, 'slug' );
 				$GLOBALS['campaign'] = $campaign;
 
+				the_thing( 'campaign', $campaign );
+
 				if ( ! $campaign->exists() || ( ! $campaign->is_public() && ! current_user_can( 'manage_campaigns' ) ) ) {
 
 					status_header( 404 );
@@ -259,6 +261,8 @@ class Rewrites {
 				if ( $broadcast_id ) {
 					$broadcast = new Broadcast( $broadcast_id );
 					$GLOBALS['broadcast'] = $broadcast;
+
+					the_thing( 'broadcast', $broadcast );
 
 					if ( $broadcast->exists() ) {
 						$template = $template_loader->get_template_part( 'archive/broadcast', '', false );

@@ -54,13 +54,7 @@ add_action( 'wp_head', function () {
 
 } );
 
-$campaign_slug = get_query_var( 'campaign' );
-
-$campaign = new Campaign( $campaign_slug, 'slug' );
-
-if ( ! $campaign->exists() || ! $campaign->is_public() ) {
-	return;
-}
+$campaign = the_thing( 'campaign' );
 
 include_once __DIR__ . '/../managed-page.php';
 
