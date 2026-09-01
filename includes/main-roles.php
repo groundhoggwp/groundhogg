@@ -163,13 +163,11 @@ class Main_Roles extends Roles {
 	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 		$primitive_cap_map = [
-			'view_funnel'             => [ 'view_funnels' ],
 			'edit_funnel'             => [ 'edit_funnels' ],
 			'delete_funnel'           => [ 'delete_funnels' ],
 			'view_campaign'           => [ 'manage_campaigns' ],
 			'edit_campaign'           => [ 'manage_campaigns' ],
 			'delete_campaign'         => [ 'manage_campaigns' ],
-			'view_email'              => [ 'view_emails' ],
 			'edit_email'              => [ 'edit_emails' ],
 			'delete_email'            => [ 'delete_emails' ],
 			'view_broadcast'          => [ 'view_broadcasts' ],
@@ -194,6 +192,23 @@ class Main_Roles extends Roles {
 		}
 
 		switch ( $cap ) {
+			case 'view_funnel':
+				$caps = [ 'view_funnels' ];
+
+				if ( is_template_site() && doing_rest() ){
+					$caps = [];
+				}
+
+				break;
+			case 'view_email';
+				$caps = [ 'view_emails' ];
+
+				if ( is_template_site() && doing_rest() ){
+					$caps = [];
+				}
+
+				break;
+
 			case 'download_imports':
 			case 'download_exports':
 			case 'delete_imports':
