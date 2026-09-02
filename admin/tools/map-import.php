@@ -31,8 +31,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- not needed
-$file_name = urldecode( sanitize_text_field( wp_unslash( $_GET['import'] ?? '' ) ) );
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- handled upstream
+$file_name = basename( sanitize_file_name( wp_unslash( $_GET['import'] ?? '' ) ) );
+
+if (
+	! $file_name ||
+	strtolower( pathinfo( $file_name, PATHINFO_EXTENSION ) ) !== 'csv'
+) {
+	wp_die( esc_html__( 'Invalid import file.', 'groundhogg' ) );
+}
+
 $file_path = files()->get_csv_imports_dir( $file_name );
 
 if ( ! file_exists( $file_path ) ) {

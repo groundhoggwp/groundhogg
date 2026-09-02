@@ -154,6 +154,41 @@ class Files {
 	}
 
 	/**
+	 * Protect against path traversal
+	 *
+	 * @param  string  $base
+	 * @param  string  $subdir
+	 * @param  string  $file_path
+	 *
+	 * @return false|string
+	 */
+	public function get_path( string $base, string $subdir = 'uploads', string $file_path = '' ) {
+
+		$base      = rtrim( wp_normalize_path( $base ), '/' );
+		$subdir    = trim( wp_normalize_path( $subdir ), '/' );
+		$file_path = trim( wp_normalize_path( $file_path ), '/' );
+
+		// Reject path traversal.
+		$segments = array_merge( explode( '/', $file_path ), explode( '/', $subdir ) );
+
+		if ( in_array( '..', $segments, true ) ) {
+			return false;
+		}
+
+		$path = $base;
+
+		if ( $subdir ) {
+			$path .= '/' . $subdir;
+		}
+
+		if ( $file_path ) {
+			$path .= '/' . $file_path;
+		}
+
+		return untrailingslashit( $path );
+	}
+
+	/**
 	 * Generic function for mapping to uploads folder.
 	 *
 	 * @param string $subdir
@@ -163,9 +198,9 @@ class Files {
 	 * @return string
 	 */
 	public function get_uploads_dir( $subdir = 'uploads', $file_path = '', $create_folders = false ) {
-		$path = untrailingslashit( wp_normalize_path( sprintf( "%s/%s/%s", $this->get_base_uploads_dir(), $subdir, $file_path ) ) );
+		$path = $this->get_path( $this->get_base_uploads_dir(), $subdir, $file_path );
 
-		if ( $create_folders ) {
+		if ( $create_folders && $path ) {
 			wp_mkdir_p( dirname( $path ) );
 		}
 
@@ -181,7 +216,7 @@ class Files {
 	 * @return string
 	 */
 	public function get_uploads_url( $subdir = 'uploads', $file_path = '' ) {
-		return untrailingslashit( sprintf( "%s/%s/%s", $this->get_base_uploads_url(), $subdir, $file_path ) );
+		return $this->get_path( $this->get_base_uploads_url(), $subdir, $file_path );
 	}
 
 	/**
