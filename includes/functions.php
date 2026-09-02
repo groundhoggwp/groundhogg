@@ -4392,7 +4392,7 @@ function is_helper_plugin_installed() {
  * @return bool
  */
 function has_premium_features() {
-	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' ) || get_option( 'gh_master_license' ) !== false || is_white_labeled();
+	return defined( 'GROUNDHOGG_HELPER_VERSION' ) || defined( 'GROUNDHOGG_PRO_VERSION' ) || get_master_license() !== false || is_white_labeled();
 }
 
 add_action( 'admin_menu', function () {
