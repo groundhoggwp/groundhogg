@@ -3690,9 +3690,11 @@ function is_main_blog() {
  * @return array|bool|WP_Error|object
  */
 function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [], bool $as_array = false, int $cache_ttl = 0 ) {
+
 	$method = strtoupper( $method );
 
-	if ( $method !== 'GET' && ! isset_not_empty( $headers, 'Content-type' ) ) {
+	// if using FORM, maps to POST but no json encoding
+	if ( ! in_array( $method, [ 'GET', 'FORM' ] ) && ! isset_not_empty( $headers, 'Content-type' ) ) {
 		$headers['Content-type'] = sprintf( 'application/json; charset=%s', get_bloginfo( 'charset' ) );
 	}
 
@@ -3701,24 +3703,29 @@ function remote_post_json( $url = '', $body = [], $method = 'POST', $headers = [
         $body = [];
     }
 
+	$args = [
+		'method'     => $method,
+		'headers'    => $headers,
+		'body'       => $body,
+		'sslverify'  => true,
+		'user-agent' => 'Groundhogg/' . GROUNDHOGG_VERSION . '; ' . home_url()
+	];
+
 	switch ( $method ) {
 		case 'POST':
 		case 'PUT':
 		case 'PATCH':
 		case 'DELETE':
-			$body = is_array( $body ) ? wp_json_encode( $body ) : $body;
+		    $args['body']        = wp_json_encode( $body );
+		    $args['data_format'] = 'body';
 			break;
 	}
 
-	$args = [
-		'method'      => $method,
-		'headers'     => $headers,
-		'body'        => $body,
-		'data_format' => 'body',
-		'sslverify'   => true,
-		'user-agent'  => 'Groundhogg/' . GROUNDHOGG_VERSION . '; ' . home_url()
-
-	];
+	// map FORM to POST
+	if ( $method === 'FORM' ) {
+		$method         = 'POST';
+		$args['method'] = $method;
+	}
 
 	$cache_key = md5serialize( $url, $args );
 
@@ -4371,7 +4378,7 @@ function is_pro_features_active() {
  * @return string
  */
 function get_master_license() {
-	return get_option( 'gh_master_license' );
+	return License_Manager::get_master_license();
 }
 
 /**
@@ -8349,6 +8356,24 @@ function create_task( $args, $object ) {
  */
 function is_browser_view() {
 	return defined( 'GROUNDHOGG_IS_BROWSER_VIEW' ) && GROUNDHOGG_IS_BROWSER_VIEW;
+}
+
+/**
+ * Flagger
+ *
+ * @param  string  $flag
+ * @param $set
+ *
+ * @return false|mixed
+ */
+function flagged( string $flag, $set = null ) {
+	static $flags = [];
+
+	if ( $set !== null ) {
+		$flags[ $flag ] = (bool) $set;
+	}
+
+	return $flags[ $flag ] ?? false;
 }
 
 /**

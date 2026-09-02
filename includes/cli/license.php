@@ -4,6 +4,7 @@ namespace Groundhogg\cli;
 
 use Groundhogg\Extension_Upgrader;
 use Groundhogg\License_Manager;
+use function Groundhogg\get_master_license;
 use function WP_CLI\Utils\make_progress_bar;
 
 /**
@@ -35,10 +36,10 @@ class License {
 	function install_activate( $args ) {
 
 		$plugin  = $args[0];
-		$license = $args[1];
+		$license = $args[1] ?? '';
 
 		$item_id = absint( $plugin );
-		$license = trim( $license ?: get_option( 'gh_master_license' ) );
+		$license = trim( $license );
 
 		if ( ! $license ) {
 			return \WP_CLI::error( 'No valid license supplied.' );

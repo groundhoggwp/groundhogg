@@ -2,6 +2,8 @@
 
 namespace Groundhogg;
 
+use WP_Error;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
@@ -100,7 +102,26 @@ class Extension_Upgrader {
 	 * @return int
 	 */
 	public static function get_extension_id_by_path( $path ) {
-		return array_search( $path, static::$file_map );
+		return array_search( $path, static::$file_map, true );
+	}
+
+	/**
+	 * Return the item_id of an extension given the slug
+	 *
+	 * @param $slug
+	 *
+	 * @return false|int
+	 */
+	public static function get_extension_id_by_slug( $slug = '' ) {
+
+		foreach ( static::$file_map as $id => $path ) {
+			if ( basename( $path, '.php' ) === $slug ) {
+				return $id;
+			}
+		}
+
+		return false;
+
 	}
 
 	/**
@@ -115,62 +136,10 @@ class Extension_Upgrader {
 	 * Extension_Updater constructor.
 	 */
 	public function __construct() {
-		add_action( 'admin_init', [ $this, 'check_for_updates' ] );
-	}
 
-	/**
-	 * Get the existing licenses from the licenses page
-	 *
-	 * @return array
-	 */
-	protected function get_licensed_extensions() {
-		return get_option( "gh_extensions", array() );
-	}
-
-	/**
-	 * Check for updates.
-	 */
-	public function check_for_updates() {
-
-		$extensions = $this->get_licensed_extensions();
-
-		foreach ( $extensions as $plugin_id => $extension ) {
-
-			$plugin_id = absint( $plugin_id );
-
-			// Plugin is registered, leave alone.
-			if ( in_array( $plugin_id, Extension::$extension_ids ) ) {
-				continue;
-			}
-
-			$license = get_array_var( $extension, 'license' );
-
-			if ( ! isset_not_empty( self::$file_map, $plugin_id ) ) {
-				continue;
-			}
-
-			$subpath   = self::$file_map[ $plugin_id ];
-			$file_path = WP_PLUGIN_DIR . '/' . $subpath;
-
-			if ( ! file_exists( $file_path ) ) {
-				continue;
-			}
-
-			$data = get_plugin_data( $file_path );
-
-			if ( ! class_exists( '\GH_EDD_SL_Plugin_Updater' ) ) {
-				require_once __DIR__ . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
-			}
-
-			$updater = new \GH_EDD_SL_Plugin_Updater( License_Manager::$storeUrl, $file_path, [
-				'version' => $data['Version'],
-				'license' => $license,
-				'item_id' => $plugin_id,
-				'author'  => $data['Author'],
-				'url'     => home_url()
-			] );
-
-		}
+		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'legacy_update_check' ] );
+		add_filter( 'update_plugins_groundhogg.io', [ $this, 'check_for_updates_w_update_uri' ], 10, 4 );
+		add_filter( 'plugins_api', [ $this, 'plugins_api_filter' ], 10, 3 );
 
 	}
 
@@ -184,12 +153,9 @@ class Extension_Upgrader {
 	 */
 	public static function remote_install( $item_id, $license = '' ) {
 
-		// We set the license here, so ignore the fallback action...
-		remove_action( 'activated_plugin', [ License_Manager::class, 'maybe_activate_using_master_license' ], 99 );
-
-		if ( empty( $license ) ) {
-			// Get the first available license
-			$license = License_Manager::get_license();
+		// already installed :)
+		if ( Extension::installed( $item_id ) ) {
+			return true;
 		}
 
 		$plugin = get_array_var( self::$file_map, $item_id );
@@ -205,7 +171,7 @@ class Extension_Upgrader {
 		}
 
 		foreach ( get_plugins() as $path => $details ) {
-			if ( false === strpos( $path, $plugin ) ) {
+			if ( ! str_contains( $path, $plugin ) ) {
 				continue;
 			}
 
@@ -224,11 +190,18 @@ class Extension_Upgrader {
 
 		if ( ! $is_installed ) {
 
-			// Activate the download
-			$activated = License_Manager::activate_license_quietly( $license, $item_id );
+			// if a license was supplied and it's not already registered
+			if ( $license && ! License_Manager::license_is_registered( $license ) ) {
 
-			if ( ! $activated || is_wp_error( $activated ) ) {
-				return $activated;
+				// attempt to activate with the supplied license
+				$result = License_Manager::activate_license( $license );
+
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
+
+			} elseif ( ! License_Manager::is_licensed( $item_id ) ) {
+				return new \WP_Error( 'error', 'No valid license found.' );
 			}
 
 			if ( ! class_exists( '\Plugin_Upgrader' ) ) {
@@ -238,20 +211,26 @@ class Extension_Upgrader {
 			}
 
 			// Get the package info from the Store API
-			$api = License_Manager::get_version( $item_id, $license );
+			$response = self::get_package_info_from_store( $item_id );
 
-			if ( is_wp_error( $api ) ) {
-				return $api;
+			if ( is_wp_error( $response ) ) {
+				return $response;
 			}
 
-			if ( ! get_array_var( $api, 'download_link' ) ) {
-				return new \WP_Error( 'error', 'Could not retrieve download package', $api );
+			if ( ! $response ) {
+				return new \WP_Error( 'error', 'Could not retrieve download package', $response );
+			}
+
+			$download_link = $response->download_link ?? null;
+
+			if ( ! $download_link ) {
+				return new \WP_Error( 'error', 'Could not retrieve download package' );
 			}
 
 			// Use the AJAX upgrader skin to quietly install the plugin.
 			$upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin() );
 
-			$install = $upgrader->install( get_array_var( $api, 'download_link' ) );
+			$install = $upgrader->install( $download_link );
 
 			if ( is_wp_error( $install ) ) {
 				return $install;
@@ -282,7 +261,7 @@ class Extension_Upgrader {
 
 		foreach ( get_plugins() as $path => $details ) {
 
-			if ( false === strpos( $path, sprintf( '/%s.php', $slug ) ) ) {
+			if ( ! str_contains( $path, sprintf( '/%s.php', $slug ) ) ) {
 				continue;
 			}
 
@@ -328,5 +307,239 @@ class Extension_Upgrader {
 		return true;
 	}
 
+	static array $batch_package_response = [];
+
+	/**
+	 * Send a batch request for all Groundhogg extensions in a single request instead of DDOSing ourselves
+	 *
+	 * @return array|bool|object|WP_Error
+	 */
+	public static function maybe_batch_get_package_info_from_store() {
+
+		if ( flagged( __METHOD__ ) ) {
+			return false;
+		}
+
+		flagged( __METHOD__, true );
+
+		$plugins = get_plugins();
+
+		$products = [];
+
+		foreach ( $plugins as $path => $details ) {
+
+			if ( ! in_array( $path, self::$file_map ) ) {
+				continue;
+			}
+
+			$item_id = self::get_extension_id_by_path( $path );
+			$license = License_Manager::get_license( $item_id );
+			$slug    = basename( $path, '.php' );
+			$version = $details['Version'];
+
+			$products[ $slug ] = [
+				'license' => $license,
+				'item_id' => $item_id,
+				'version' => $version,
+				'slug'    => $slug,
+				'url'     => home_url(),
+				'beta'    => is_option_enabled( 'gh_get_beta_versions' ),
+			];
+
+		}
+
+		if ( empty( $products ) ) {
+			return false;
+		}
+
+		$api_params = [
+			'edd_action' => 'get_version',
+			'products'   => $products,
+		];
+
+		$response = remote_post_json( License_Manager::$storeUrl, $api_params, 'FORM', [], false, DAY_IN_SECONDS );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		foreach ( (array) $response as $slug => $response_data ) {
+			$item_id                                  = self::get_extension_id_by_slug( $slug );
+			self::$batch_package_response[ $item_id ] = $response_data;
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Get the version info for this plugin
+	 *
+	 * @return object|false
+	 */
+	public static function get_package_info_from_store( $item_id, $version = '' ) {
+
+		$slug    = basename( self::$file_map[ $item_id ], '.php' );
+		$license = License_Manager::get_license( $item_id );
+
+		if ( isset( self::$batch_package_response[ $item_id ] ) ) {
+			$response = self::$batch_package_response[ $item_id ];
+		} else {
+
+			$api_params = array(
+				'edd_action' => 'get_version',
+				'license'    => $license,
+				'item_id'    => $item_id,
+				'version'    => $version,
+				'slug'       => $slug,
+				'url'        => home_url(),
+				'beta'       => is_option_enabled( 'gh_get_beta_versions' ),
+			);
+
+			// built-in caching from the remote api
+			$response = remote_post_json( License_Manager::$storeUrl, $api_params, 'GET', [], false, DAY_IN_SECONDS );
+
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+		}
+
+		foreach ( [ 'sections', 'banners', 'icons' ] as $attribute ) {
+			$response->$attribute = (array) maybe_unserialize( $response->$attribute ?? [] );
+		}
+
+		// no new version was supplied, possibly because of a licensing issue, automatically check the license
+		// or if we did get a response but the local license is not valid, check it again to sync
+		if ( ( empty( $response->package ) && License_Manager::is_valid( $license ) ) || ( ! empty( $response->package ) && ! License_Manager::is_valid( $license ) ) ) {
+			License_Manager::check_license( $license );
+		}
+
+		$response->slug    = $slug;
+		$response->version = $response->new_version; // this is so "view details" shows in the plugins list oddly enough
+		$response->tested  = get_bloginfo( 'version' ); // Are we sure? No. Will we say it anyway? Yes.
+
+		return $response;
+	}
+
+	/**
+	 * Updates information on the "View version x.x details" page with custom data.
+	 *
+	 * @param  mixed  $data
+	 * @param  string  $action
+	 * @param  object  $args
+	 *
+	 * @return object $_data
+	 *
+	 */
+	public function plugins_api_filter( $data, $action = '', $args = null ) {
+
+		if ( $action !== 'plugin_information' ) {
+			return $data;
+		}
+
+		$slug = $args->slug;
+
+		$item_id = self::get_extension_id_by_slug( $slug );
+
+		if ( ! $item_id ) {
+			return $data;
+		}
+
+		$version_info = self::get_package_info_from_store( $item_id );
+
+		if ( is_wp_error( $version_info ) ) {
+			wp_die( esc_html( $version_info->get_error_message() ) );
+		}
+
+		if ( ! $version_info ) {
+			return $data;
+		}
+
+		return $version_info;
+	}
+
+
+	/**
+	 * Use WordPress' Update URI to do plugin updates
+	 *
+	 * @param $update
+	 * @param $plugin_data
+	 * @param $plugin_file
+	 * @param $locales
+	 *
+	 * @return object|false
+	 */
+	public function check_for_updates_w_update_uri(
+		$update,
+		$plugin_data,
+		$plugin_file,
+		$locales
+	) {
+		$item_id = self::get_extension_id_by_path( $plugin_file );
+
+		if ( ! $item_id ) {
+			return $update;
+		}
+
+		self::maybe_batch_get_package_info_from_store();
+
+		$response = self::get_package_info_from_store( $item_id, $plugin_data['Version'] );
+
+		if ( ! $response || is_wp_error( $response ) ) {
+			return $update;
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Legacy update support if Update URI is unavailable
+	 *
+	 * @param $transient
+	 *
+	 * @return mixed
+	 */
+	public function legacy_update_check( $transient ) {
+
+		if ( empty( $transient->checked ) ) {
+			return $transient;
+		}
+
+		self::maybe_batch_get_package_info_from_store();
+
+		$plugins = get_plugins();
+
+		foreach ( self::$file_map as $item_id => $plugin_file ) {
+
+			if ( ! isset( $transient->checked[ $plugin_file ] ) ) {
+				continue;
+			}
+
+			// New versions use WordPress' native Update URI mechanism.
+			if ( ! empty( $plugins[ $plugin_file ]['UpdateURI'] ) ) {
+				continue;
+			}
+
+			$installed_version = $transient->checked[ $plugin_file ];
+
+			$update = self::get_package_info_from_store(
+				$item_id,
+				$installed_version
+			);
+
+			if ( ! $update || is_wp_error( $update ) ) {
+				continue;
+			}
+
+			$update->plugin = $plugin_file;
+
+			if ( version_compare( $update->new_version, $installed_version, '>' ) ) {
+				$transient->response[ $plugin_file ] = $update;
+			} else {
+				$transient->no_update[ $plugin_file ] = $update;
+			}
+		}
+
+		return $transient;
+	}
 
 }

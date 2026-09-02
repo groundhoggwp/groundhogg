@@ -329,12 +329,6 @@ class Plugin {
 		$this->library = new Library();
 
 		new Blocks\Blocks();
-
-		if ( ! is_white_labeled() ) {
-//			new Reviews();
-			new License_Notice();
-		}
-
 		new Extension_Upgrader();
 		new Email_Logger();
 

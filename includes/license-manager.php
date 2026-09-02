@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 
+use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 
 /**
@@ -20,87 +21,398 @@ use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+class License {
+
+	public int $item_id = 0;
+	public string $item_name = '';
+	public string $description = '';
+	public string $license = '';
+	public string $expires = '';
+
+	public int $payment_id = 0;
+	public string $customer_name = '';
+	public string $customer_email = '';
+
+	public string $price_id = '';
+	public int $license_limit = 0;
+	public int $site_count = 0;
+
+	public int $activations_left = 0;
+
+	public bool $is_local = false;
+
+	/**
+	 * Download IDs this license grants access to.
+	 *
+	 * @var int[]
+	 */
+	public array $items = [];
+
+	/**
+	 * @param  array  $data  API response.
+	 */
+	public function __construct( array $data = [] ) {
+		$this->hydrate( $data );
+	}
+
+	/**
+	 * Create from an API response.
+	 */
+	public static function from_array( array $data ): self {
+		return new self( $data );
+	}
+
+	/**
+	 * Populate the license from API data.
+	 */
+	protected function hydrate( array $data ): void {
+
+		if ( array_key_exists( 'item_id', $data ) ) {
+			$this->item_id = (int) $data['item_id'];
+		}
+
+		if ( array_key_exists( 'item_name', $data ) ) {
+			$this->item_name = (string) $data['item_name'];
+		}
+
+		if ( array_key_exists( 'description', $data ) ) {
+			$this->description = (string) $data['description'];
+		}
+
+		if ( array_key_exists( 'success', $data ) ) {
+			$this->success = (bool) $data['success'];
+		}
+
+		if ( array_key_exists( 'license', $data ) ) {
+			$this->license = (string) $data['license'];
+		}
+
+		if ( array_key_exists( 'checksum', $data ) ) {
+			$this->checksum = (string) $data['checksum'];
+		}
+
+		if ( array_key_exists( 'expires', $data ) ) {
+			$this->expires = (string) $data['expires'];
+		}
+
+		if ( array_key_exists( 'payment_id', $data ) ) {
+			$this->payment_id = (int) $data['payment_id'];
+		}
+
+		if ( array_key_exists( 'customer_name', $data ) ) {
+			$this->customer_name = (string) $data['customer_name'];
+		}
+
+		if ( array_key_exists( 'customer_email', $data ) ) {
+			$this->customer_email = (string) $data['customer_email'];
+		}
+
+		if ( array_key_exists( 'price_id', $data ) ) {
+			$this->price_id = (string) $data['price_id'];
+		}
+
+		if ( array_key_exists( 'license_limit', $data ) ) {
+			$this->license_limit = (int) $data['license_limit'];
+		}
+
+		if ( array_key_exists( 'site_count', $data ) ) {
+			$this->site_count = (int) $data['site_count'];
+		}
+
+		if ( array_key_exists( 'activations_left', $data ) ) {
+			$this->activations_left = (int) $data['activations_left'];
+		}
+
+		if ( array_key_exists( 'is_local', $data ) ) {
+			$this->is_local = (bool) $data['is_local'];
+		}
+
+		if ( array_key_exists( 'items', $data ) ) {
+			$this->items = array_values(
+				array_unique(
+					wp_parse_id_list( $data['items'] )
+				)
+			);
+		}
+	}
+
+	/**
+	 * Whether this license never expires.
+	 */
+	public function is_lifetime(): bool {
+		return strtolower( $this->expires ) === 'lifetime';
+	}
+
+	/**
+	 * Whether the license is expired.
+	 */
+	public function is_expired(): bool {
+
+		if ( $this->is_lifetime() ) {
+			return false;
+		}
+
+		if ( ! $this->expires ) {
+			return true;
+		}
+
+		$expires = strtotime( $this->expires );
+
+		if ( ! $expires ) {
+			return true;
+		}
+
+		return $expires < time();
+	}
+
+	/**
+	 * Whether the license is currently valid.
+	 */
+	public function is_valid(): bool {
+		return (
+			$this->license === 'valid'
+			&& ! $this->is_expired()
+		);
+	}
+
+	/**
+	 * Whether this license grants access to a particular download.
+	 */
+	public function can_access( int $download_id ): bool {
+		return in_array( $download_id, $this->items, true );
+	}
+
+	/**
+	 * Whether another site activation is available.
+	 */
+	public function has_activations_left(): bool {
+
+		// 0 is commonly used for unlimited licenses.
+		if ( $this->license_limit === 0 ) {
+			return true;
+		}
+
+		return $this->activations_left > 0;
+	}
+
+	/**
+	 * Number of downloads granted by this license.
+	 */
+	public function get_item_count(): int {
+		return count( $this->items );
+	}
+
+	/**
+	 * Convert back into an array.
+	 */
+	public function to_array(): array {
+		return [
+			'item_id'          => $this->item_id,
+			'item_name'        => $this->item_name,
+			'license'          => $this->license,
+			'expires'          => $this->expires,
+			'payment_id'       => $this->payment_id,
+			'customer_name'    => $this->customer_name,
+			'customer_email'   => $this->customer_email,
+			'price_id'         => $this->price_id,
+			'license_limit'    => $this->license_limit,
+			'site_count'       => $this->site_count,
+			'activations_left' => $this->activations_left,
+			'is_local'         => $this->is_local,
+			'items'            => $this->items,
+			'description'      => $this->description,
+		];
+	}
+
+	/**
+	 * PHP serialization.
+	 */
+	public function __serialize(): array {
+		return $this->to_array();
+	}
+
+	/**
+	 * PHP unserialization.
+	 */
+	public function __unserialize( array $data ): void {
+		$this->hydrate( $data );
+	}
+
+	public function expiry() {
+		return $this->is_lifetime() ? 'never' : ( new DateTimeHelper( $this->expires ) )->date_i18n();
+	}
+
+	/**
+	 * Package responses will include some information about the license, whether it's expired or whatever
+	 *
+	 * @param  array  $package_response
+	 *
+	 * @return License
+	 */
+	public function update( array $package_response ) {
+
+        // remove these keys if they are empty so that they don't get overridden if unsupplied
+        foreach ( [ 'item_id', 'item_name' ] as $key ) {
+            if ( array_key_exists( $key, $package_response ) && empty( $package_response[$key] ) ) {
+                unset( $package_response[$key] );
+            }
+        }
+
+		$this->hydrate( $package_response );
+
+		return $this;
+	}
+}
+
 class License_Manager {
 
-	static $extensions = array(); // array( item_id => array( license, status ) )
+	/**
+     * Array of licenses
+     *
+	 * @var License[]
+	 */
+	static array $licenses;
 	static $storeUrl = "https://groundhogg.io/license-api/";
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' license-manager';
 
 	public function __construct() {
-		add_action( 'activated_plugin', [ self::class, 'maybe_activate_using_master_license' ], 99, 2 );
+        add_action( 'admin_post_groundhogg_add_license', [ __CLASS__, 'handle_add_license_form' ] );
+		add_action( 'admin_post_groundhogg_manage_license', [ __CLASS__, 'handle_manage_license_form' ] );
 	}
 
 	/**
-	 * Activate the a
+	 * Sanitize a license api response from the check/activate endpoints...
 	 *
-	 * @param $plugin       string
-	 * @param $network_wide bool
-	 *
-	 * @return void
-	 */
-	public static function maybe_activate_using_master_license( $plugin, $network_wide ) {
-
-		if ( $network_wide ) {
-			return;
-		}
-
-		$item_id = Extension_Upgrader::get_extension_id_by_path( $plugin );
-
-		// The plugin that's being activated is a registered extension
-		if ( ! $item_id ) {
-			return;
-		}
-
-		$master_license = get_option( 'gh_master_license' );
-
-		if ( empty( $master_license ) ) {
-			return;
-		}
-
-		$license = self::get_license( $item_id );
-
-		if ( $license ) {
-			return;
-		}
-
-		self::activate_license_quietly( $master_license, $item_id );
-	}
-
-	/**
-	 * Maybe setup the licenses unless they haven't been already
-	 */
-	public static function init_licenses() {
-
-		if ( empty( static::$extensions ) ) {
-			$extensions = get_option( "gh_extensions", [] );
-
-			// Ignore inactive addons
-			static::$extensions = array_filter( $extensions, function ( $item_id ) {
-				return array_key_exists( $item_id, Extension::$extension_ids );
-			}, ARRAY_FILTER_USE_KEY );
-		}
-	}
-
-	/**
-	 * Get all the stored licenses
+	 * @param $api_response
 	 *
 	 * @return array
 	 */
-	public static function get_extension_licenses() {
-		self::init_licenses();
+	public static function sanitize_license_respones( $api_response ) {
+		return array_apply_callbacks( (array) $api_response, [
+			'item_id'          => 'absint',
+			'item_name'        => 'sanitize_text_field',
+			'description'      => 'sanitize_text_field',
+			'license'          => fn( $status ) => one_of( $status, [ 'valid', 'invalid', 'expired', 'disabled', 'site_inactive' ] ),
+			'license_limit'    => 'absint',
+			'site_count'       => 'absint',
+			'activations_left' => 'absint',
+			'items'            => 'wp_parse_id_list',
+			'payment_id'       => 'absint',
+			'expires'          => function ( $expires ) {
+				if ( $expires === 'lifetime' ) {
+					return $expires;
+				}
 
-		return static::$extensions;
+				try {
+					return ( new DateTimeHelper( $expires ) )->ymdhis();
+				} catch ( \Exception $e ) {
+					return '?';
+				}
+			}
+		], true );
 	}
 
 	/**
-	 * Get a unique array of the licenses
+	 * Save a license to the site's options. We'll save the whole license object as opposed to whatever we were doing before
 	 *
-	 * @return array
+	 * @param  string  $license
+	 * @param  object  $api_response
+	 *
+	 * @return License
+	 */
+	public static function add_license( string $license, object $api_response ) {
+
+		$licenses = self::get_licenses();
+
+		if ( empty( $licenses ) ) {
+			$licenses = [];
+		}
+
+		$sanitized = self::sanitize_license_respones( $api_response );
+
+		self::$licenses[ $license ] = License::from_array( $sanitized );
+
+		self::save_licenses();
+
+		return $licenses[ $license ];
+	}
+
+	/**
+	 * Update a license
+	 *
+	 * @param $license
+	 * @param  object  $api_response
+	 *
+	 * @return License
+	 */
+	public static function update_license( $license, object $api_response ) {
+
+		self::get_licenses();
+
+		$sanitized = self::sanitize_license_respones( $api_response );
+		$existing  = self::$licenses[ $license ] ?? null;
+
+        if ( ! $existing ) {
+            $existing = License::from_array( $sanitized );
+        } else {
+            $existing->update( $sanitized );
+        }
+
+		self::$licenses[ $license ] = $existing;
+
+		self::save_licenses();
+
+		return $existing;
+
+	}
+
+	/**
+	 * Retrieve the site's master license, which is any valid license that can access more than one item
+	 *
+	 * @return string|false the master license key or false if unavailable
+	 */
+	public static function get_master_license() {
+
+		$licenses = self::get_licenses();
+
+		foreach ( $licenses as $key => $license ) {
+			if ( $license->is_valid() && $license->get_item_count() > 1 ) {
+				return $key;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Return the licenses
+	 *
+	 * @return License[]
 	 */
 	public static function get_licenses() {
-		self::init_licenses();
 
-		return array_unique( wp_list_pluck( static::$extensions, 'license' ) );
+        if ( empty( self::$licenses ) ){
+            self::$licenses = get_option( 'gh_licenses', [] );
+        }
+
+        return self::$licenses;
+	}
+
+    public static function save_licenses() {
+	    update_option( 'gh_licenses', self::$licenses );
+    }
+
+	/**
+	 * Whether an item has a valid license
+	 *
+	 * @throws \Exception
+	 *
+	 * @param  int  $item_id
+	 *
+	 * @return bool
+	 */
+	public static function has_valid_license( int $item_id ) {
+		return self::is_licensed( $item_id );
 	}
 
 	/**
@@ -127,191 +439,68 @@ class License_Manager {
 	 * @return array
 	 */
 	public static function get_expired_licenses() {
-		self::init_licenses();
-
-		return array_unique( wp_list_pluck( self::get_expired_items(), 'license' ) );
-	}
-
-	/**
-	 * Get the expired items
-	 *
-	 * @return array
-	 */
-	public static function get_expired_items() {
-		self::init_licenses();
-
-		return array_filter( self::$extensions, function ( $license ) {
-			return $license['status'] === 'invalid' || ( $license['expiry'] !== 'lifetime' && strtotime( $license['expiry'] ) < time() );
+		return array_filter( self::get_licenses(), function ( License $license ) {
+			return ! $license->is_valid();
 		} );
 	}
 
 	/**
-	 * Add an extension to the extensions options.
-	 *
-	 * @param $item_id int
-	 * @param $license string
-	 * @param $status  string
-	 * @param $expiry  string
-	 *
-	 * @return bool
-	 */
-	public static function add_extension( $item_id, $license, $status, $expiry ) {
-		self::init_licenses();
-
-		static::$extensions[ $item_id ] = array(
-			'license' => $license,
-			'status'  => $status,
-			'expiry'  => $expiry
-		);
-
-		return update_option( "gh_extensions", static::$extensions );
-	}
-
-	/**
-	 * Remove an extension
-	 *
-	 * @param $item_id int
-	 *
-	 * @return bool
-	 */
-	public static function delete_extension( $item_id ) {
-		self::init_licenses();
-
-		unset( static::$extensions[ $item_id ] );
-
-		return update_option( "gh_extensions", static::$extensions );
-	}
-
-	/**
-	 * Whether the current install has extensions installed.
-	 *
-	 * @return bool
-	 */
-	public static function has_extensions() {
-		self::init_licenses();
-
-		return ! empty( static::$extensions );
-	}
-
-	/**
 	 * Will get a specific license for a given item
-	 * If no item is specified, will return the first license
-	 * If item is specific but no license exists, return false
+	 * Checks all registered licenses to see if they have access to the download
+	 * If more than one license can handle it, prefer one that is active
 	 *
-	 * @param bool $item_id
+	 * @param  int|bool  $item_id the item to check
+	 * @param  bool  $must_be_valid whether only a valid license should be returned
 	 *
-	 * @return bool|mixed
+	 * @return string|false the license key for a specific item ID
 	 */
-	public static function get_license( $item_id = false ) {
-		self::init_licenses();
+	public static function get_license( $item_id = false, $must_be_valid = false ) {
 
-		if ( empty( static::$extensions ) ) {
-			return false;
+		if ( $item_id === false ) {
+			return self::get_master_license();
 		}
 
-		if ( $item_id && isset_not_empty( static::$extensions, $item_id ) ) {
-			return static::$extensions[ $item_id ]['license'];
-		}
+		$licenses = self::get_licenses();
+        $found    = false;
 
-		if ( ! $item_id ) {
+		foreach ( $licenses as $key => $license ) {
+			if ( $license->can_access( $item_id ) ) {
 
-			$licenses = array_filter( wp_list_pluck( static::$extensions, 'license' ) );
+                if ( $license->is_valid() ){
+	                return $key;
+                }
 
-			if ( ! empty( $licenses ) ) {
-				return $licenses[0];
+                $found = $key;
 			}
-
 		}
 
-		return false;
+        // no valid key was available, otherwise we would have returned it earlier
+        if ( $must_be_valid ){
+            return false;
+        }
+
+        // return any found key
+		return $found;
 	}
 
 	/**
-	 * Get the extension Ids which are being used with a specific license.
+	 * Whether a given item is licensed
 	 *
-	 * @param $license
+	 * @param  int  $item_id
 	 *
-	 * @return array
+	 * @return bool whether there is a valid license for a given item
 	 */
-	public static function get_extensions_by_license( $license ) {
-		self::init_licenses();
-
-		return array_keys( array_filter( self::$extensions, function ( $extension ) use ( $license ) {
-			return $extension['license'] === $license;
-		} ) );
+	public static function is_licensed( int $item_id, $must_be_valid = false ) {
+		$license = self::get_license( $item_id, $must_be_valid );
+        return $license !== false;
 	}
 
-	/**
-	 * Get the status of a specific license
-	 *
-	 * @param $item_id
-	 *
-	 * @return false|mixed
-	 */
-	public static function get_license_status( $item_id ) {
-		self::init_licenses();
-
-		if ( isset( static::$extensions[ $item_id ] ) ) {
-			return static::$extensions[ $item_id ]['status'];
-		}
-
-		return false;
-
+	public static function license_is_registered( string $license ) {
+		return key_exists( $license, self::get_licenses() );
 	}
 
-	/**
-	 * Update the status of a license
-	 *
-	 * @param int         $item_id
-	 * @param string      $status
-	 *
-	 * @param string|bool $expiry Maybe update the expiry
-	 *
-	 * @return bool
-	 */
-	public static function update_license_status( $item_id, $status, $expiry = false ) {
-		self::init_licenses();
-
-		// If the item does not exist, hence it was never activated, then ignore.
-		if ( ! isset_not_empty( static::$extensions, $item_id ) ) {
-			return false;
-		}
-
-		static::$extensions[ $item_id ]['status'] = $status;
-
-		if ( $expiry ) {
-			static::$extensions[ $item_id ]['expiry'] = $expiry;
-		}
-
-		return update_option( "gh_extensions", static::$extensions );
-	}
-
-	/**
-	 * Activate a license
-	 */
-	public static function perform_activation() {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- handled upstream
-		if ( isset( $_POST['gh_activate_license'] ) ) {
-
-			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( esc_html__( 'Cannot access this functionality', 'groundhogg' ) );
-			}
-
-			$licenses = map_deep( get_request_var( 'licenses' ), 'sanitize_text_field' );
-
-			if ( ! is_array( $licenses ) ) {
-				wp_die( esc_html_x( 'Invalid license format', 'notice', 'groundhogg' ) );
-			}
-
-			foreach ( $licenses as $item_id => $license ) {
-				$license = trim( $license );
-				$item_id = intval( trim( $item_id ) );
-
-				if ( ! empty( $license ) && ! self::get_license_status( $license ) ) {
-					self::activate_license( $license, $item_id );
-				}
-			}
-		}
+	public static function is_valid( string $license ) {
+        return self::license_is_registered( $license ) && self::get_licenses()[ $license ]->is_valid();
 	}
 
 	/**
@@ -326,10 +515,10 @@ class License_Manager {
 
 		switch ( $error ) {
 			case 'expired' :
+				$date    = new DateTimeHelper( $expiry );
 				$message = sprintf(
                     /* translators: %s: license expiry date */
-					esc_html_x( 'Your license key expired on %s.', 'notice', 'groundhogg' ),
-					date_i18n( get_option( 'date_format' ), strtotime( $expiry, current_time( 'timestamp' ) ) )
+					esc_html_x( 'Your license key expired on %s.', 'notice', 'groundhogg' ), $date->i18n()
 				);
 				break;
 			case 'invalid' :
@@ -356,243 +545,41 @@ class License_Manager {
 				break;
 		}
 
-		return esc_html( $message . ' (' . esc_html( $error ) . ')' );
+		return esc_html( $message );
 	}
 
 	/**
-	 * Activate a license quietly
+	 * Call Groundhogg's licensing API
 	 *
-	 * @param $license
-	 * @param $item_id
+	 * @param  string  $action
+	 * @param  string  $license
 	 *
-	 * @return bool|WP_Error
+	 * @return mixed|WP_Error
 	 */
-	public static function activate_license_quietly( $license, $item_id ) {
-
-		$existing_license = self::get_license( $item_id );
-
-		// If there is no change in the license...
-		if ( $existing_license === $license ) {
-			return true;
-		}
+	public static function licence_api_request( string $action, string $license = '' ) {
 
 		$api_params = array(
-			'edd_action' => 'activate_license',
+			'edd_action' => $action,
 			'license'    => $license,
-			'item_id'    => $item_id,// The ID of the item in EDD,
-			// 'item_name'  => $item_name,
-			'url'        => home_url(),
-			'beta'       => false
-		);
-
-		$request = [
-			'timeout'    => 15,
-			'sslverify'  => true,
-			'body'       => $api_params,
-			'user-agent' => self::$user_agent,
-		];
-
-		$license_data = null;
-
-		// Call the custom api.
-		$response = wp_remote_post( static::$storeUrl, $request );
-		// make sure the response came back okay
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			$message = ( is_wp_error( $response ) && $response->get_error_message() ) ? $response->get_error_message() : esc_html__( 'An error occurred, please try again.', 'groundhogg' );
-		} else {
-			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( false === $license_data->success ) {
-				$message = self::get_license_error_message( $license_data->error, $license_data->expires );
-			}
-		}
-
-		// Check if anything passed on a message constituting a failure
-		if ( ! empty( $message ) ) {
-			return new WP_Error( 'license_failed', esc_html( $message ), $license_data );
-		}
-
-		$status = 'valid';
-		$expiry = $license_data->expires;
-
-		self::add_extension( $item_id, $license, $status, $expiry );
-
-		return true;
-	}
-
-	/**
-	 * Activate a license key
-	 *
-	 * @param $license
-	 * @param $item_id
-	 *
-	 * @return bool
-	 */
-	public static function activate_license( $license, $item_id ) {
-
-		$result = self::activate_license_quietly( $license, $item_id );
-
-		if ( is_wp_error( $result ) ) {
-			notices()->add( $result );
-
-			return false;
-		}
-
-		notices()->add( 'license_activated', __( 'License activated!', 'groundhogg' ) );
-
-		return true;
-	}
-
-	/**
-	 * Deactivate a license
-	 *
-	 * @param int|string $item_id_or_license
-	 *
-	 * @return bool
-	 */
-	public static function deactivate_license( $item_id_or_license = 0 ) {
-
-		if ( is_int( $item_id_or_license ) ) {
-			$item_id = $item_id_or_license;
-			$license = self::get_license( $item_id );
-		} else {
-			$license = $item_id_or_license;
-			$items   = self::get_extensions_by_license( $license );
-			$item_id = array_pop( $items );
-		}
-
-		$api_params = array(
-			'edd_action' => 'deactivate_license',
-			'item_id'    => $item_id,
-			'license'    => $license,
-			'url'        => home_url(),
-		);
-
-		$response = wp_remote_post( self::$storeUrl, array(
-			'body'       => $api_params,
-			'timeout'    => 15,
-			'sslverify'  => false,
-			'user-agent' => self::$user_agent,
-		) );
-
-		if ( is_wp_error( $response ) ) {
-			$success = false;
-			$message = esc_html_x( 'Something went wrong.', 'notice', 'groundhogg' );
-		} else {
-			$response = json_decode( wp_remote_retrieve_body( $response ) );
-
-			if ( $response->success === false ) {
-				$success = false;
-				$message = esc_html_x( 'Something went wrong.', 'notice', 'groundhogg' );
-			} else {
-				$success = true;
-				$message = esc_html_x( 'License deactivated.', 'notice', 'groundhogg' );
-			}
-		}
-
-		self::delete_extension( $item_id );
-
-		$type = $success ? 'success' : 'error';
-		Plugin::$instance->notices->add( 'license_outcome', $message, $type );
-
-		return $success;
-	}
-
-	/**
-	 * Verify that a license is in good standing.
-	 *
-	 * @param $item_id
-	 * @param $license
-	 *
-	 * @return bool true if valid, false otherwise
-	 */
-	public static function verify_license( $item_id, $license = '' ) {
-
-		if ( ! $item_id ) {
-			return false;
-		}
-
-		if ( ! $license ) {
-			$license = self::get_license( $item_id );
-		}
-
-		$api_params = array(
-			'edd_action' => 'check_license',
-			'license'    => $license,
-			'item_id'    => $item_id,
 			'url'        => home_url()
 		);
 
 		$response = wp_remote_post( static::$storeUrl, array(
-			'body'       => $api_params,
+			'body' => $api_params,
 			'timeout'    => 15,
 			'sslverify'  => true,
 			'user-agent' => self::$user_agent,
 		) );
 
 		if ( is_wp_error( $response ) ) {
-			// return true in the event of an error. Check again later...
-			return true;
+			return $response;
 		}
 
-		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-
-		if ( $license_data->success === true && $license_data->license === 'valid' ) {
-
-			self::update_license_status( $item_id, 'valid', $license_data->expires );
-		} else {
-
-			$code    = $license_data->license;
-			$message = self::get_license_error_message( $code, $license_data->expires );
-
-			notices()->add( new WP_Error( $code, $message, [
-				'response' => $license_data
-			] ) );
-
-			self::update_license_status( $item_id, 'invalid', $license_data->expires );
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Get download package details of a plugin
-	 *
-	 * @param $item_id
-	 * @param $license
-	 *
-	 * @return bool
-	 */
-	public static function get_version( $item_id, $license ) {
-
-        $api_params = array(
-			'edd_action' => 'get_version',
-			'license'    => $license,
-			'item_id'    => $item_id,
-			'url'        => home_url()
-		);
-
-		$response = wp_remote_post( static::$storeUrl, array(
-			'body'       => $api_params,
-			'timeout'    => 15,
-			'sslverify'  => true,
-			'user-agent' => self::$user_agent,
-		) );
-
-		if ( is_wp_error( $response ) ) {
-			// return true in the event of an error. Check again later...
-			return true;
-		}
+        if ( 200 !== wp_remote_retrieve_response_code( $response ) ){
+            return new WP_Error( 'request_error', esc_html__( 'An error occurred, please try again.', 'groundhogg' ) );
+        }
 
 		return json_decode( wp_remote_retrieve_body( $response ) );
-	}
-
-	/**
-	 * @return Extension[]
-	 */
-	public static function get_installed() {
-		return Extension::get_extensions();
 	}
 
 	/**
@@ -617,131 +604,288 @@ class License_Manager {
 	}
 
 	/**
-	 * Get a list of extensions to promote on the welcome page
+	 * Shows a form to manage the master license
 	 *
-	 * @return array
+	 * if no license, show an activation form to add the license
+	 * if there is a license, show the field and check/deactivate buttons
+	 *  --> if the license is expired, show a notice that it's expired or otherwise invalid
+	 *
+	 * @return void
 	 */
-	public static function get_extensions( $num = 4 ) {
-		$products = self::get_store_products( array(
-			'category' => [ 16, 9 ],
-		) );
+	public static function add_license_form() {
 
-		if ( is_wp_error( $products ) ) {
-			notices()->add( $products );
+		?>
+        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+            <input type="hidden" name="action" value="groundhogg_add_license">
+			<?php
 
-			return [];
-		}
+			wp_nonce_field( 'groundhogg_add_license' );
 
-		$products = $products->products;
+			html( 'div', [ 'id' => 'master-license-form' ], [
+				html()->e( 'h3', [], __( 'Activate License', 'groundhogg' ) ),
+				html()->e( 'p', [], esc_html__( 'If you have a plan or add-on license enter it here!', 'groundhogg' ) ),
+				html()->div( [ 'class' => 'display-flex gap-5' ], [
+					html()->input( [
+						'type'        => 'password',
+						'placeholder' => __( 'License Key', 'groundhogg' ),
+						'name'        => 'new_license'
+					] ),
+					html()->input( [
+						'type'  => 'submit',
+						'name'  => 'activate_new_license',
+						'class' => 'gh-button primary',
+						'value' => esc_html__( 'Activate', 'groundhogg' ),
+					] )
+				] ),
 
-		$installed = self::get_installed();
+			] );
 
-		if ( ! empty( $installed ) ) {
-			$keep = [];
-
-			foreach ( $products as $i => $product ) {
-				foreach ( $installed as $extension ) {
-					if ( absint( $product->info->id ) !== $extension->get_download_id() ) {
-						$keep[] = $product;
-					}
-				}
-			}
-
-			// Switch out.
-			$products = $keep;
-		}
-
-		shuffle( $products );
-
-		if ( $num > count( $products ) ) {
-			$num = count( $products );
-		}
-
-		$rands      = array_rand( $products, $num );
-		$extensions = [];
-
-		foreach ( $rands as $rand ) {
-			$extensions[] = $products[ $rand ];
-		}
-
-		return apply_filters( 'groundhogg/license_manager/get_extensions', $extensions );
+			?>
+        </form>
+		<?php
 	}
 
 	/**
-	 * Convert array to html article
+	 * Activate a license with the remote api
 	 *
-	 * @param $args array
+	 * @param  string  $license
+	 *
+	 * @return License|WP_Error
 	 */
-	public static function extension_to_html( $args = array() ) {
-		/* I'm lazy so just covert it to an object*/
-		$extension = (object) $args;
+	public static function activate_license( $license ) {
 
-		$extension->info->link = add_query_arg( [
-			'utm_source'   => get_bloginfo(),
-			'utm_medium'   => 'extension-ad',
-			'utm_campaign' => 'admin-links',
-			'utm_content'  => sanitize_key( $extension->info->title ),
-		], $extension->info->link );
+		$response = self::licence_api_request( 'activate_license', $license );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+        // don't add license with error
+        if ( isset( $response->error ) ){
+            $message = self::get_license_error_message( $response->error, $response->expires );
+            return new WP_Error( 'license_error', $message );
+        }
+
+        // don't add invalid licenses
+        if ( $response->license !== 'valid' ){
+	        return new WP_Error( 'license_error', esc_html__( 'Invalid license key.', 'groundhogg' ) );
+        }
+
+		return self::add_license( $license, $response );
+	}
+
+	/**
+     * Run a license through the check API
+     *
+	 * @param $license
+	 *
+	 * @return License|mixed|WP_Error|null
+	 */
+	public static function check_license( $license ) {
+
+        // don't check the license more than once during the same request
+        if ( flagged( __METHOD__ . ':' . $license ) ){
+            return self::$licenses[ $license ] ?? null;
+        }
+
+        flagged( __METHOD__ . ':' . $license, true );
+
+		$response = self::licence_api_request( 'check_license', $license );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+        // update the license regardless of the license status
+		$current = self::update_license( $license, $response );
+
+        // if the license is not valid, return an error
+        if ( ! $current->is_valid() ){
+            return new WP_Error( 'license_error', self::get_license_error_message( $response->license, $current->expires ) );
+        }
+
+        return $current;
+	}
+
+	/**
+	 * Deactivate a license with the remote api
+	 *
+	 * @param $license
+	 *
+	 * @return mixed|true|WP_Error|null
+	 */
+	public static function deactivate_license( $license ) {
+
+		$response = self::licence_api_request( 'deactivate_license', $license );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+        if ( $response->license !== 'deactivated' ){
+            return new WP_Error( 'license_error', esc_html__( 'An error occurred, please try again.', 'groundhogg' ) );
+        }
+
+        // this will instantiate the license object if empty
+        self::get_licenses();
+
+		unset( self::$licenses[ $license ] );
+
+		self::save_licenses();
+
+		return true;
+	}
+
+	public static function go_back() {
+
+	    wp_safe_redirect(
+		    wp_get_referer()
+	    );
+
+	    exit;
+    }
+
+	/**
+	 * handle registering and activating a new license key
+	 *
+	 * @return void
+	 */
+	public static function handle_add_license_form() {
+
+		check_admin_referer( 'groundhogg_add_license' );
+
+		if ( ! current_user_can( 'manage_gh_licenses' ) ) {
+			wp_die( esc_html__( 'Invalid permissions.', 'groundhogg' ), 'No Access!' );
+		}
+
+		$license = sanitize_text_field( get_request_var( 'new_license' ) );
+
+		$result = self::activate_license( $license );
+
+		if ( is_wp_error( $result ) ) {
+			notices()->add_user_notice( $result->get_error_message(), 'error' );
+			self::go_back();
+		}
+
+		notices()->add_user_notice( __( 'License activated!', 'groundhogg' ) );
+
+		self::go_back();
+	}
+
+	/**
+	 * Show a grid of license forms for managing licenses
+	 *
+	 * @return void
+	 */
+	public static function manage_licenses() {
+
+		$licenses = self::get_licenses();
+
+		if ( empty( $licenses ) ) {
+			return;
+		}
+
+		html( 'h3', [], esc_html__( 'Your Licenses', 'groundhogg' ) );
+		html( 'p', [], esc_html__( 'Manage your licenses below.', 'groundhogg' ) );
 
 		?>
-		<div class="postbox">
-			<?php if ( $extension->info->title ): ?>
-				<h2 class="hndle"><b><?php echo esc_html( $extension->info->title ); ?></b></h2>
-			<?php endif; ?>
-			<div class="inside" style="padding: 0;margin: 0">
-				<?php if ( $extension->info->thumbnail ): ?>
-					<div class="img-container">
-						<a href="<?php echo esc_url( $extension->info->link ); ?>" target="_blank">
-							<img src="<?php echo esc_url( $extension->info->thumbnail ); ?>"
-							     style="width: 100%;max-width: 100%;border-bottom: 1px solid #ddd" alt="<?php echo esc_attr( $extension->info->title ); ?>">
-						</a>
-					</div>
-				<?php endif; ?>
-				<?php if ( $extension->info->excerpt ): ?>
-					<div class="article-description" style="padding: 10px;">
-						<?php kses_e( $extension->info->excerpt, 'simple' ); ?>
-					</div>
-					<hr/>
-				<?php endif; ?>
-				<?php if ( $extension->info->link ): ?>
-					<div class="buy" style="padding: 10px">
-						<?php $pricing = (array) $extension->pricing;
-						if ( count( $pricing ) > 1 ) {
+        <div class="display-grid gap-20"><?php
 
-							$price1 = min( $pricing );
-							$price2 = max( $pricing );
+		foreach ( $licenses as $key => $license ):
+			?>
+        <form class="span-6" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+            <input type="hidden" name="action" value="groundhogg_manage_license">
+			<?php
 
-							?>
-							<a class="button-secondary" target="_blank"
-							   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf(
-                                       /* translators: 1: min price, 2: max price */
-                                       _x( 'Buy Now ($%1$s - $%2$s)', 'action', 'groundhogg' ), $price1, $price2 ) ); ?></a>
-							<?php
-						} else {
 
-							$price = array_pop( $pricing );
+			if ( $license->is_valid() ) {
+				$prefix = '';
+                $class  = '';
+				// translators: the expiry date
+				$message = sprintf( esc_html__( 'This license is valid and expires %s.', 'groundhogg' ), $license->expiry() );
+			} elseif ( $license->is_expired() ) {
+				$prefix  = '⚠️';
+				$message = esc_html__( 'This license is expired. Please renew it now.', 'groundhogg' );
+				$class   = 'gh-text red';
+			} else {
+				$prefix  = '⚠️';
+				$message = esc_html__( 'This license is no longer valid. Contact customer support for assistance.', 'groundhogg' );
+                $class   = 'gh-text red';
+			}
 
-							if ( $price > 0.00 ) {
-								?>
-								<a class="button-secondary" target="_blank"
-								   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html( sprintf(
-                                           /* translators: %s: the price */
-                                           _x( 'Buy Now ($%s)', 'action', 'groundhogg' ), $price ) ); ?></a>
-								<?php
-							} else {
-								?>
-								<a class="button-secondary" target="_blank"
-								   href="<?php echo esc_url( $extension->info->link ); ?>"> <?php echo esc_html_x( 'Download', 'action', 'groundhogg' ); ?></a>
-								<?php
-							}
-						}
+			wp_nonce_field( 'groundhogg_manage_license' );
 
-						?>
-					</div>
-				<?php endif; ?>
-			</div>
-		</div>
-		<?php
+			html( 'div', [ 'class' => 'gh-panel' ], [
+				html()->e( 'div', [ 'class' => 'gh-panel-header' ], html()->e( 'h2', [], esc_html( $prefix . ' ' . $license->item_name ) ) ),
+				html()->e( 'div', [ 'class' => 'inside' ], [
+					html()->e( 'p', [], esc_html( $license->description ) ),
+					html()->div( [ 'class' => 'display-flex gap-5' ], [
+						html()->input( [
+							'type'     => 'password',
+							'name'     => 'license',
+							'value'    => $key,
+							'readonly' => true,
+						] ),
+						html()->input( [
+							'type'  => 'submit',
+							'name'  => 'check_license',
+							'class' => 'gh-button secondary',
+							'value' => esc_html__( 'Sync', 'groundhogg' ),
+						] ),
+						html()->input( [
+							'type'  => 'submit',
+							'name'  => 'deactivate_license',
+							'class' => 'gh-button danger text',
+							'value' => esc_html__( 'Remove', 'groundhogg' ),
+						] )
+					] ),
+					html()->e( 'p', [ 'class' => $class ], $message ),
+				] ),
+			] );
+
+			?></form><?php
+
+		endforeach;
+
+		?></div><?php
+	}
+
+	public static function handle_manage_license_form() {
+
+		check_admin_referer( 'groundhogg_manage_license' );
+
+		$license = sanitize_text_field( get_request_var( 'license' ) );
+
+		$exit = fn() => wp_safe_redirect(
+			wp_get_referer()
+		);
+
+		if ( get_post_var( 'check_license' ) ) {
+
+            $result = self::check_license( $license );
+
+            if ( is_wp_error( $result ) ) {
+                notices()->add_user_notice( $result->get_error_message(), 'error' );
+            } else {
+                notices()->add_user_notice( __( 'License synced!', 'groundhogg' ) );
+            }
+
+			self::go_back();
+		}
+
+        if ( get_post_var( 'deactivate_license' ) ) {
+            $result = self::deactivate_license( $license );
+
+            if ( is_wp_error( $result ) ) {
+                notices()->add_user_notice( $result->get_error_message(), 'error' );
+            } else {
+                notices()->add_user_notice( __( 'License removed!', 'groundhogg' ) );
+            }
+
+	        self::go_back();
+        }
+
+        wp_die( esc_html__( 'Unhandled request.', 'groundhogg' ), 'Whoops!' );
 
 	}
 }

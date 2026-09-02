@@ -94,7 +94,6 @@ class Settings_Page extends Admin_Page {
 		add_action( 'admin_init', array( $this, 'register_sections' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( "groundhogg/admin/settings/api_tab/after_form", [ $this, 'api_keys_table' ] );
-		add_action( "groundhogg/admin/settings/extensions/after_submit", [ $this, 'show_extensions' ] );
 	}
 
 	public function get_slug() {
@@ -225,55 +224,11 @@ class Settings_Page extends Admin_Page {
 		html()->end_form_table();
 	}
 
-	public function show_extensions() {
+	public function view_extensions() {
 
-		$extensions = Extension::get_extensions();
+		License_Manager::add_license_form();
 
-		?>
-        <div>
-			<?php wp_nonce_field(); ?>
-			<?php
-
-			if ( ! empty( $extensions ) ) :
-
-				if ( ! is_white_labeled() && License_Manager::has_expired_licenses() ):
-
-					$verify_license_url = Plugin::instance()->bulk_jobs->check_licenses->get_start_url();
-
-					html( 'p', [], sprintf(
-					/* translators: 1: open <a> tag, 2: closing </a> tag, 3: open <a> tag */
-						esc_html__( 'If your license key has expired, %1$splease renew your license%2$s. If you have recently renewed your license %3$sclick here to re-verify it%2$s.', 'groundhogg' ),
-						'<a href="https://groundhogg.io/account/licenses/">',
-						'</a>',
-						'<a href="' . esc_url( $verify_license_url ) . '">',
-					) );
-
-				else:
-
-					html( 'p' );
-
-				endif;
-
-				?>
-                <div class="post-box-grid"><?php
-
-				foreach ( $extensions as $extension ):
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-					echo $extension;
-				endforeach;
-
-				?></div><?php
-			else:
-				?>
-                <p><?php esc_html_e( 'You have no extensions installed. Want some?', 'groundhogg' ); ?> <a
-                            href="https://groundhogg.io/pricing/"><?php esc_html_e( 'Get your first extension!', 'groundhogg' ) ?></a>
-                </p>
-                <div class="extensions">
-					<?php include __DIR__ . '/extensions.php'; ?>
-                </div>
-			<?php endif; ?>
-        </div>
-		<?php
+        License_Manager::manage_licenses();
 	}
 
 	/**
@@ -284,48 +239,6 @@ class Settings_Page extends Admin_Page {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			$this->wp_die_no_access();
 		}
-
-		if ( get_request_var( 'activate_license' ) ) {
-
-			$licenses = get_request_var( 'license', [] );
-
-			foreach ( $licenses as $item_id => $license ) {
-
-				License_Manager::activate_license( $license, absint( $item_id ) );
-
-			}
-		}
-	}
-
-	/**
-	 * When the license notices is being annoying try an activate using the master license instead of requiring the user to add them manually.
-	 *
-	 * @return bool|WP_Error
-	 */
-	public function process_activate_using_master_license() {
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			$this->wp_die_no_access();
-		}
-
-		$master_license = get_master_license();
-		$licensed       = array_intersect( array_keys( License_Manager::get_extension_licenses() ), Extension_Upgrader::get_extension_ids() );
-		$installed      = array_intersect( array_values( Extension::$extension_ids ), Extension_Upgrader::get_extension_ids() );
-		$unlicensed     = array_unique( array_diff( $installed, $licensed ) );
-
-		$error = null;
-
-		foreach ( $unlicensed as $item_id ) {
-
-			$result = License_Manager::activate_license_quietly( $master_license, $item_id );
-
-			if ( is_wp_error( $result ) ) {
-				$error = $result;
-				notices()->add_user_notice( $result->get_error_message() );
-			}
-		}
-
-		return $error ?? true;
 	}
 
 	/**
@@ -393,29 +306,6 @@ class Settings_Page extends Admin_Page {
 		$this->add_notice( 'success', 'API key revoked!' );
 
 		return true;
-	}
-
-	/**
-	 * Deactivate a license key
-	 */
-	public function process_deactivate_license() {
-
-		$item_id = absint( get_request_var( 'extension' ) );
-		$license = sanitize_text_field( get_request_var( 'license' ) );
-
-		License_Manager::deactivate_license( $item_id ?: $license );
-	}
-
-	/**
-	 * Check a license key
-	 */
-	public function process_check_license() {
-
-		$item_id = absint( get_request_var( 'extension' ) );
-
-		if ( $item_id ) {
-			License_Manager::verify_license( $item_id );
-		}
 	}
 
 	/**
@@ -2156,6 +2046,16 @@ class Settings_Page extends Admin_Page {
 	 */
 //    public function settings_content()
 	public function view() {
+
+        if ( ! $this->user_can_access_tab() ){
+            $this->wp_die_no_access();
+        }
+
+        if ( method_exists( $this, 'view_' . $this->active_tab() ) ){
+            call_user_func( [ $this, 'view_' . $this->active_tab() ] );
+            return;
+        }
+
 		?>
         <style>
             td .select2 {
@@ -2164,6 +2064,7 @@ class Settings_Page extends Admin_Page {
         </style>
         <div class="wrap">
 			<?php
+
 			settings_errors();
 			$action = $this->tab_has_settings( $this->active_tab() ) ? 'options.php' : ''; ?>
             <form method="POST" enctype="multipart/form-data" action="<?php echo esc_attr( $action ); ?>">
@@ -2190,7 +2091,8 @@ class Settings_Page extends Admin_Page {
                 <!-- END SETTINGS -->
             </form>
 			<?php do_action( "groundhogg/admin/settings/{$this->active_tab()}/after_form" ); ?>
-        </div> <?php
+        </div>
+        <?php
 	}
 
 	public function settings_callback( $field ) {

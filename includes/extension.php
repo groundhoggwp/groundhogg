@@ -79,6 +79,10 @@ abstract class Extension {
 		Extension::$extension_ids[ $this->get_download_id() ] = $this->get_download_id();
 	}
 
+    public static function installed_official_extension_ids() {
+	    return array_intersect( array_values( Extension::$extension_ids ), Extension_Upgrader::get_extension_ids() );
+    }
+
 	/**
 	 * Instance.
 	 *
@@ -226,9 +230,6 @@ abstract class Extension {
 	 * @return void
 	 */
 	public function init() {
-
-		// Include updater before checking dependencies otherwise it won't check for updates.
-		$this->get_edd_updater();
 
 		if ( ! $this->dependent_plugins_are_installed() ) {
 
@@ -544,7 +545,7 @@ abstract class Extension {
 	 * @return string|false
 	 */
 	public function get_license_key() {
-		return get_array_var( $this->get_extension_details(), 'license' );
+		return License_Manager::get_license( $this->get_download_id() );
 	}
 
 	/**
@@ -557,26 +558,6 @@ abstract class Extension {
 		}
 
 		return date_i18n( get_option( 'date_format' ), strtotime( get_array_var( $this->get_extension_details(), 'expiry' ) ) );
-	}
-
-	/**
-	 * Get the EDD updater.
-	 *
-	 * @return \GH_EDD_SL_Plugin_Updater
-	 */
-	public function get_edd_updater() {
-		if ( ! class_exists( '\GH_EDD_SL_Plugin_Updater' ) ) {
-			require_once __DIR__ . '/lib/edd/GH_EDD_SL_Plugin_Updater.php';
-		}
-
-		return new \GH_EDD_SL_Plugin_Updater( License_Manager::$storeUrl, $this->get_plugin_file(), [
-			'version' => $this->get_version(),
-			'license' => $this->get_license_key(),
-			'item_id' => $this->get_download_id(),
-			'author'  => $this->get_author(),
-			'url'     => home_url(),
-			'beta'    => is_option_enabled( 'gh_get_beta_versions' ),
-		] );
 	}
 
 	/**
@@ -639,7 +620,6 @@ abstract class Extension {
 		$content .= "<div class=\"inside\">";
 		$content .= "<p>" . kses( $description, 'simple' ) . "</p>";
 
-
 		$content .= html()->input( [
 			'placeholder' => __( 'License', 'groundhogg' ),
 			'name'        => "license[{$this->get_download_id()}]",
@@ -647,7 +627,7 @@ abstract class Extension {
 			'type'        => $this->get_license_key() ? 'password' : 'text'
 		] );
 
-		if ( $this->get_license_key() ) {
+        if ( $this->get_license_key() ) {
 			$content .= "<p>";
 			$content .= $this->license_status();
 			$content .= "</p>";

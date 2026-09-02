@@ -31,7 +31,6 @@ class Manager {
 		$this->create_users             = new Create_Users();
 		$this->process_events           = new Process_Events();
 		$this->update_subsites          = new Update_subsites();
-		$this->check_licenses           = new Check_Licenses();
 		$this->update_marketing_consent = new Update_Marketing_Consent();
 		$this->bulk_edit_contacts       = new Edit_Contacts();
 		$this->fix_birthdays            = new Fix_Birthdays();

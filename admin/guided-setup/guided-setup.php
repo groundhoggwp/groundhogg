@@ -10,6 +10,7 @@ use Groundhogg\Plugin;
 use Groundhogg\Telemetry;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\get_array_var;
+use function Groundhogg\get_master_license;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\get_user_timezone;
@@ -137,7 +138,7 @@ class Guided_Setup extends Admin_Page {
 			'name'     => $name,
 			'business' => $business,
 			'more'     => $more_info,
-			'license'  => get_option( 'gh_master_license' ),
+			'license'  => get_master_license(),
 			'url'      => home_url(),
 		];
 
@@ -177,15 +178,11 @@ class Guided_Setup extends Admin_Page {
 
 		$license = sanitize_text_field( get_post_var( 'license' ) );
 
-		$response = remote_post_json( 'https://groundhogg.io/wp-json/edd/all-access/', [
-			'license_key' => $license
-		] );
+		$result = License_Manager::set_master_license( $license );
 
-		if ( is_wp_error( $response ) ) {
-			wp_send_json_error( $response );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result );
 		}
-
-		update_option( 'gh_master_license', $license );
 
 		wp_send_json_success();
 	}
