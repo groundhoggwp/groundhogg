@@ -150,7 +150,7 @@ class Extension_Upgrader {
 	 * @return int[]
 	 */
 	public static function get_installable_items() {
-		return array_intersect( License_Manager::get_accessible_items(), Extension_Upgrader::get_extension_ids() );
+		return array_values( array_intersect( License_Manager::get_accessible_items(), Extension_Upgrader::get_extension_ids() ) );
 	}
 
 	/**
@@ -388,8 +388,8 @@ class Extension_Upgrader {
 	 */
 	public static function get_package_info_from_store( $item_id, $version = '' ) {
 
-		$slug    = basename( self::$file_map[ $item_id ], '.php' );
-		$license = License_Manager::get_license( $item_id );
+		$slug        = basename( self::$file_map[ $item_id ], '.php' );
+		$license_key = License_Manager::get_license( $item_id );
 
 		if ( isset( self::$batch_package_response[ $item_id ] ) ) {
 			$response = self::$batch_package_response[ $item_id ];
@@ -397,7 +397,7 @@ class Extension_Upgrader {
 
 			$api_params = array(
 				'edd_action' => 'get_version',
-				'license'    => $license ?: 'none',
+				'license'    => $license_key ?: 'none',
 				'item_id'    => $item_id,
 				'version'    => $version,
 				'slug'       => $slug,
@@ -417,10 +417,12 @@ class Extension_Upgrader {
 			$response->$attribute = (array) maybe_unserialize( $response->$attribute ?? [] );
 		}
 
-		// no new version was supplied, possibly because of a licensing issue, automatically check the license
-		// or if we did get a response but the local license is not valid, check it again to sync
-		if ( ( empty( $response->package ) && License_Manager::is_valid( $license ) ) || ( ! empty( $response->package ) && ! License_Manager::is_valid( $license ) ) ) {
-			License_Manager::check_license( $license );
+		if ( $license_key ) {
+			// no new version was supplied, possibly because of a licensing issue, automatically check the license
+			// or if we did get a response but the local license is not valid, check it again to sync
+			if ( ( empty( $response->package ) && License_Manager::is_valid( $license_key ) ) || ( ! empty( $response->package ) && ! License_Manager::is_valid( $license_key ) ) ) {
+				License_Manager::check_license( $license_key );
+			}
 		}
 
 		$response->slug    = $slug;
