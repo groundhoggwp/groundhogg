@@ -99,7 +99,7 @@ class Telemetry {
 			'email'            => get_option( 'gh_telemetry_email' ) ?: get_bloginfo( 'admin_email' ),
 			'date'             => Ymd_His(),
 			'is_licensed'      => has_premium_features(),
-			'master_license'   => get_option( 'gh_master_license' ),
+			'master_license'   => get_master_license(),
 			'is_white_labeled' => is_white_labeled(),
 			'system_info'      => [
 				'php_version' => PHP_VERSION,

@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use WP_Error;
+use function Avifinfo\read;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -141,6 +142,15 @@ class Extension_Upgrader {
 		add_filter( 'update_plugins_groundhogg.io', [ $this, 'check_for_updates_w_update_uri' ], 10, 4 );
 		add_filter( 'plugins_api', [ $this, 'plugins_api_filter' ], 10, 3 );
 
+	}
+
+	/**
+	 * Items that can be installed based on the user's license key
+	 *
+	 * @return int[]
+	 */
+	public static function get_installable_items() {
+		return array_intersect( License_Manager::get_accessible_items(), Extension_Upgrader::get_extension_ids() );
 	}
 
 	/**
@@ -338,7 +348,7 @@ class Extension_Upgrader {
 			$version = $details['Version'];
 
 			$products[ $slug ] = [
-				'license' => $license,
+				'license' => $license ?: 'none',
 				'item_id' => $item_id,
 				'version' => $version,
 				'slug'    => $slug,
@@ -387,7 +397,7 @@ class Extension_Upgrader {
 
 			$api_params = array(
 				'edd_action' => 'get_version',
-				'license'    => $license,
+				'license'    => $license ?: 'none',
 				'item_id'    => $item_id,
 				'version'    => $version,
 				'slug'       => $slug,

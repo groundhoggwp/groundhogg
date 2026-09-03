@@ -278,7 +278,19 @@ class License_Manager {
 	public function __construct() {
         add_action( 'admin_post_groundhogg_add_license', [ __CLASS__, 'handle_add_license_form' ] );
 		add_action( 'admin_post_groundhogg_manage_license', [ __CLASS__, 'handle_manage_license_form' ] );
+        add_filter( 'pre_option_gh_master_license', [ $this, 'pre_get_option_gh_master_license' ] );
 	}
+
+	/**
+     * If anywhere still uses get_option( 'gh_master_license' ) inject the master license found here.
+     *
+	 * @return string|null return null if no license so that get_option doesn't run the query
+	 */
+    public function pre_get_option_gh_master_license() {
+	    $license = self::get_master_license();
+
+	    return empty( $license ) ? null : $license;
+    }
 
 	/**
 	 * Sanitize a license api response from the check/activate endpoints...
@@ -352,7 +364,7 @@ class License_Manager {
 		$sanitized = self::sanitize_license_respones( $api_response );
 		$existing  = self::$licenses[ $license ] ?? null;
 
-        if ( ! $existing ) {
+        if ( ! is_a( $existing, License::class ) ) {
             $existing = License::from_array( $sanitized );
         } else {
             $existing->update( $sanitized );
@@ -368,20 +380,30 @@ class License_Manager {
 
 	/**
 	 * Retrieve the site's master license, which is any valid license that can access more than one item
+     * If no valid license is found, it returns a potentially invalid license with access to multiple items
 	 *
 	 * @return string|false the master license key or false if unavailable
 	 */
 	public static function get_master_license() {
 
+		if ( defined( 'GH_MASTER_LICENSE' ) ) {
+			return GH_MASTER_LICENSE;
+		}
+
 		$licenses = self::get_licenses();
 
+        $found = false;
+
 		foreach ( $licenses as $key => $license ) {
-			if ( $license->is_valid() && $license->get_item_count() > 1 ) {
-				return $key;
+			if ( $license->get_item_count() > 1 ) {
+				$found = $key;
+                if ( $license->is_valid() ){
+                    return $key;
+                }
 			}
 		}
 
-		return false;
+		return $found;
 	}
 
 	/**
@@ -393,6 +415,11 @@ class License_Manager {
 
         if ( empty( self::$licenses ) ){
             self::$licenses = get_option( 'gh_licenses', [] );
+
+            // filter out funky stuff
+	        self::$licenses = array_filter( self::$licenses, function ( License $license, $key ) {
+		        return ! empty( $key ) && is_a( $license, License::class );
+	        }, ARRAY_FILTER_USE_BOTH );
         }
 
         return self::$licenses;
@@ -455,6 +482,11 @@ class License_Manager {
 	 * @return string|false the license key for a specific item ID
 	 */
 	public static function get_license( $item_id = false, $must_be_valid = false ) {
+
+        // return the master license if set in WP_CONFIG
+        if ( defined( 'GH_MASTER_LICENSE' ) ) {
+            return GH_MASTER_LICNESE;
+        }
 
 		if ( $item_id === false ) {
 			return self::get_master_license();
@@ -583,6 +615,22 @@ class License_Manager {
 	}
 
 	/**
+     * Return a list of accessible items based on the installed licenses
+     *
+	 * @return int[]
+	 */
+    public static function get_accessible_items() {
+
+        $items = [];
+
+        foreach ( self::get_licenses() as $license ){
+            $items = array_merge( $items, $license->items );
+        }
+
+        return array_unique( $items );
+    }
+
+	/**
 	 * @param array $args
 	 *
 	 * @return array|mixed|object
@@ -590,7 +638,6 @@ class License_Manager {
 	public static function get_store_products( $args = array() ) {
 
 		$args = wp_parse_args( $args, array(
-			//'category' => 'templates',
 			'category' => '',
 			'tag'      => '',
 			's'        => '',
@@ -648,11 +695,16 @@ class License_Manager {
 	/**
 	 * Activate a license with the remote api
 	 *
-	 * @param  string  $license
+	 * @param  string $license the license key
+	 * @param  bool   $save_anyway whether to add the license reponse as a License even if it's invalid
 	 *
 	 * @return License|WP_Error
 	 */
-	public static function activate_license( $license ) {
+	public static function activate_license( $license, $save_anyway = false ) {
+
+		if ( defined( 'GH_MASTER_LICENSE' ) && $license === GH_MASTER_LICENSE ){
+			return new WP_Error( 'license_error', esc_html__( 'License is configured in `wp-config.php`.', 'groundhogg' ) );
+		}
 
 		$response = self::licence_api_request( 'activate_license', $license );
 
@@ -661,14 +713,9 @@ class License_Manager {
 		}
 
         // don't add license with error
-        if ( isset( $response->error ) ){
+        if ( isset( $response->error ) && $response->error && ! $save_anyway ){
             $message = self::get_license_error_message( $response->error, $response->expires );
             return new WP_Error( 'license_error', $message );
-        }
-
-        // don't add invalid licenses
-        if ( $response->license !== 'valid' ){
-	        return new WP_Error( 'license_error', esc_html__( 'Invalid license key.', 'groundhogg' ) );
         }
 
 		return self::add_license( $license, $response );
@@ -679,9 +726,13 @@ class License_Manager {
      *
 	 * @param $license
 	 *
-	 * @return License|mixed|WP_Error|null
+	 * @return License|WP_Error
 	 */
 	public static function check_license( $license ) {
+
+        if ( defined( 'GH_MASTER_LICENSE' ) && $license === GH_MASTER_LICENSE ){
+            return new WP_Error( 'license_error', esc_html__( 'License is configured in `wp-config.php`.', 'groundhogg' ) );
+        }
 
         // don't check the license more than once during the same request
         if ( flagged( __METHOD__ . ':' . $license ) ){
@@ -708,6 +759,26 @@ class License_Manager {
 	}
 
 	/**
+     * Checks all the registered licenses
+     *
+	 * @return \WP_Error[]|true array of errors if there were any, or true of all licenses validated successfully
+	 */
+	public static function check_all() {
+
+        $errors = [];
+
+        foreach ( self::get_licenses() as $license ){
+            $result = self::check_license( $license );
+
+            if ( is_wp_error( $result ) ){
+                $errors[] = $result;
+            }
+        }
+
+        return empty( $errors ) ? true : $errors;
+    }
+
+	/**
 	 * Deactivate a license with the remote api
 	 *
 	 * @param $license
@@ -716,15 +787,15 @@ class License_Manager {
 	 */
 	public static function deactivate_license( $license ) {
 
+		if ( defined( 'GH_MASTER_LICENSE' ) && $license === GH_MASTER_LICENSE ){
+			return new WP_Error( 'license_error', esc_html__( 'License is configured in `wp-config.php`.', 'groundhogg' ) );
+		}
+
 		$response = self::licence_api_request( 'deactivate_license', $license );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
-
-        if ( $response->license !== 'deactivated' ){
-            return new WP_Error( 'license_error', esc_html__( 'An error occurred, please try again.', 'groundhogg' ) );
-        }
 
         // this will instantiate the license object if empty
         self::get_licenses();
@@ -775,14 +846,14 @@ class License_Manager {
 	/**
 	 * Show a grid of license forms for managing licenses
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public static function manage_licenses() {
 
 		$licenses = self::get_licenses();
 
 		if ( empty( $licenses ) ) {
-			return;
+			return false;
 		}
 
 		html( 'h3', [], esc_html__( 'Your Licenses', 'groundhogg' ) );
@@ -848,6 +919,8 @@ class License_Manager {
 		endforeach;
 
 		?></div><?php
+
+		return true;
 	}
 
 	public static function handle_manage_license_form() {

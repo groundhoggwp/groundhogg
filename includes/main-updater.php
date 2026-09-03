@@ -324,7 +324,35 @@ class Main_Updater extends Old_Updater {
 						'from_profile' => "CONCAT( 'user-', from_user )"
 					]);
 				},
-			]
+			],
+			'4.7.2' => [
+				'automatic'   => true,
+				'description' => __( 'Upgrade the license system', 'groundhogg' ),
+				'callback'    => function () {
+
+					// then we get the old individual extension licenses
+					// old license markup [ item_id => [ license: string, status: invalid, valid, expiry: ymd his ], ... ]
+					$old_licenses   = get_option( 'gh_extensions' ) ?: [];
+					$old_licenses   = wp_list_pluck( $old_licenses, 'license' ) ;
+					$master_license = get_option( 'gh_master_license' );
+
+					// then we should migrate it to the new license system
+					if ( $master_license ) {
+						$old_licenses[] = $master_license;
+					}
+
+					$old_licenses = array_filter( array_unique( $old_licenses ) );
+
+					// activate the license to instantiate the new License object, should be only a few licenses, in most cases one
+					foreach ( $old_licenses as $license ) {
+						License_Manager::activate_license( $license, true );
+					}
+
+					// cleanup unused options
+					delete_option( 'gh_extensions' );
+					delete_option( 'gh_master_license' );
+				},
+			],
 		];
 	}
 

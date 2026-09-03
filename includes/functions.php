@@ -73,7 +73,6 @@ function maybe_get_option_from_constant( $value, $option_name ) {
 
 add_constant_support( 'gh_secret_key' );
 add_constant_support( 'gh_secret_iv' );
-add_constant_support( 'gh_master_license' );
 add_constant_support( 'gh_recaptcha_secret_key' );
 add_constant_support( 'gh_recaptcha_site_key' );
 add_constant_support( 'gh_click_tracking_delay' );
