@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.1
-Stable tag: 4.7.1
+Stable tag: 4.7.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,12 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.7.2 (2026-09-03) =
+* ADDED Click on a contact's profile picture to update it with an image from the Library.
+* TWEAKED Modernized the licensing and updates system.
+* FIXED Authenticated (Sales Rep+) Path Traversal vulnerability. Thanks to @Sergei Pro for reporting responsibly via PatchStack.
+* FIXED Possible Redirection Attack (Phishing). Thanks to @Yaswanth Reddy Sunkara for reporting responsibly via WPScan.
 
 = 4.7.1 (2026-08-20) =
 * FIXED Cron setup page issue with WP 7.1
