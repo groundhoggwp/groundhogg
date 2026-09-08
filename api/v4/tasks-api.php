@@ -235,12 +235,10 @@ class Tasks_Api extends Notes_Api {
 		return current_user_can( 'edit_tasks' );
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function create_permissions_callback() {
-		return current_user_can( 'add_tasks' );
-	}
+	// create_permissions_callback() is inherited from Notes_Api: it already
+	// resolves the cap from get_object_type() ('add_tasks' here) and adds the
+	// per-associated-object view check. Overriding it with a bare
+	// current_user_can( 'add_tasks' ) would drop that check for tasks.
 
 	/**
 	 * @inheritDoc

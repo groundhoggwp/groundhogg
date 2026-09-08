@@ -273,6 +273,58 @@ class Main_Roles extends Roles {
 						break;
 				}
 
+				// Notes and tasks are polymorphic: each is attached to another object
+				// (a contact, deal, company, ...) via object_type/object_id. Everything
+				// above only scopes on the note/task's *author* - it never asks whether
+				// the caller can see what the note/task is actually *about*. Without this
+				// check, anyone holding the blanket view_notes / view_others_notes cap can
+				// read every note in the system, including notes on contacts they can't
+				// otherwise access (Notes_Api::read() gates on view_notes only, and
+				// Notes::query() scopes by author, not by associated object). Cascade into
+				// a "can you view the associated object" check, the same way view_event /
+				// view_log below fall back to the associated contact, and the same check
+				// the notes/tasks abilities already make per-request (see
+				// Groundhogg\Abilities\Contacts).
+				if ( in_array( $object_type, [ 'note', 'task' ], true ) && method_exists( $object, 'get_associated_object' ) ) {
+
+					$associated = $object->get_associated_object();
+
+					// Only enforce when the association resolves to a real object. A
+					// deactivated add-on (create_object_from_type() returns null) or a
+					// type with no registered view_ meta cap falls through to the blanket
+					// {action}_{type}s cap added above: never more permissive than before,
+					// just not more restrictive for a type we can't reason about.
+					if ( is_object( $associated ) && method_exists( $associated, 'exists' ) && $associated->exists() ) {
+
+						$associated_type = $associated->_get_object_type();
+
+						/**
+						 * Object types whose note/task permission checks cascade into a
+						 * "can the user view the associated object" check. A type left out
+						 * of this list keeps the prior behaviour (blanket view_notes /
+						 * view_tasks + author scoping only).
+						 *
+						 * @param string[]    $types
+						 * @param Base_Object $associated the resolved associated object
+						 * @param string      $action     view|edit|delete
+						 */
+						$cascade_types = apply_filters(
+							'groundhogg/roles/note_association_cap_check_types',
+							[ 'contact', 'deal', 'company' ],
+							$associated,
+							$action
+						);
+
+						// view access to the associated object is the floor for reading,
+						// editing or deleting its notes/tasks - matching add-contact-note,
+						// which also gates its write path on view_contact, not edit_contact.
+						if ( in_array( $associated_type, $cascade_types, true )
+						     && ! user_can( $user_id, 'view_' . $associated_type, $associated ) ) {
+							$caps[] = 'do_not_allow';
+						}
+					}
+				}
+
 				break;
 			case 'download_file':
 
