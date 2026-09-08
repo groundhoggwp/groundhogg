@@ -353,6 +353,14 @@ class Main_Updater extends Old_Updater {
 					delete_option( 'gh_master_license' );
 				},
 			],
+			'4.8' => [
+				'automatic'   => true,
+				'description' => __( 'Add tables for custom objects.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'custom_objects' )->create_table();
+					get_db( 'custom_object_meta' )->create_table();
+				},
+			],
 		];
 	}
 

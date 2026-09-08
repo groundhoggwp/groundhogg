@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Abilities\Abilities;
 use Groundhogg\Api\Api_Loader;
 use Groundhogg\DB\Manager as DB_Manager;
 use Groundhogg\Admin\Admin_Menu;
@@ -345,6 +346,7 @@ class Plugin {
 		new Cleanup_Actions();
 		new Daily_Actions();
 		new Email_Reports();
+		new Abilities();
 	}
 
 	/**
@@ -404,6 +406,7 @@ class Plugin {
 		require __DIR__ . '/filters.php';
 		require __DIR__ . '/tools.php';
 		require __DIR__ . '/better-meta-compat.php';
+		require __DIR__ . '/custom-object-type.php';
 		require __DIR__ . '/cli/bootstrap.php';
 		require __DIR__ . '/ai/actions.php';
 	}

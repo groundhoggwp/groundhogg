@@ -65,6 +65,8 @@ class Autoloader {
 		'Base_Object_With_Meta'             => 'includes/classes/base-object-with-meta.php',
 		'DB_Object_With_Meta'               => 'includes/classes/db-object-with-meta.php',
 		'Contact'                           => 'includes/classes/contact.php',
+		'Custom_Object'                     => 'includes/classes/custom-object.php',
+		'Custom_Object_Type'                => 'includes/custom-object-type.php',
 		'Campaign'                          => 'includes/classes/campaign.php',
 		'Email_Log_Item'                    => 'includes/classes/email-log-item.php',
 		'Submission'                        => 'includes/classes/submission.php',

@@ -85,6 +85,8 @@ class Manager {
 		$this->event_queue          = new Event_Queue();
 		$this->campaigns            = new Campaigns();
 		$this->object_relationships = new Object_Relationships();
+		$this->custom_objects       = new Custom_Objects();
+		$this->custom_object_meta   = new Custom_Object_Meta();
 		$this->page_visits          = new Page_Visits();
 		$this->logs                 = new Logs();
 		$this->background_tasks     = new Background_Tasks();
