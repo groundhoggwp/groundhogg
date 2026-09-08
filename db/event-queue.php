@@ -71,6 +71,15 @@ class Event_Queue extends DB {
 		return 'event_queue_item';
 	}
 
+	/**
+	 * The date key for before/after queries
+	 *
+	 * @return string
+	 */
+	public function get_date_key() {
+		return 'time';
+	}
+
 	public function create_object( $object ) {
 		return new Event_Queue_Item( $object );
 	}

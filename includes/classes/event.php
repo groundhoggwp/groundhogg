@@ -677,7 +677,7 @@ class Event extends Base_Object {
 			$diff_time = __( 'Running now...', 'groundhogg' );
 		} else {
 			/* translators: %s: when the event will/was run */
-			$diff_time = sprintf( $this->is_waiting() ? __( 'Runs %s', 'groundhogg' ) : __( 'Ran %s', 'groundhogg' ), $date->wi18n() );
+			$diff_time = $date->wi18n();
 		}
 
 		$array['i18n'] = [

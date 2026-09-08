@@ -212,11 +212,13 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function is_conversion() {
-		return (bool) $this->is_conversion && $this->is_benchmark();
+		// read the column directly - $this->is_conversion would resolve to this method via __get and recurse
+		return (bool) ( $this->data['is_conversion'] ?? false ) && $this->is_benchmark();
 	}
 
 	public function is_entry() {
-		return (bool) $this->is_entry && $this->is_benchmark();
+		// read the column directly - $this->is_entry would resolve to this method via __get and recurse
+		return (bool) ( $this->data['is_entry'] ?? false ) && $this->is_benchmark();
 	}
 
 	public function is_last() {
@@ -2273,6 +2275,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			'meta'   => $this->meta,
 			'export' => $this->export(),
 			'is_starting' => $this->is_starting(),
+			'is_entry'    => $this->is_entry(),
 
 		] );
 	}

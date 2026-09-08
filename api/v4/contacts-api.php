@@ -13,9 +13,12 @@ use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
+use Groundhogg\Email;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
+use Groundhogg\Funnel;
 use Groundhogg\Plugin;
+use Groundhogg\Step;
 use Groundhogg\Submission;
 use WP_Error;
 use WP_REST_Request;
@@ -1013,16 +1016,80 @@ class Contacts_Api extends Base_Object_Api {
 
 		$order = strtoupper( $request->get_param( 'order' ) ?: 'DESC' );
 
+		// Time range. Accepts a unix timestamp or any parseable date string; the query layer
+		// (DateTimeHelper) converts it to the right format for each table's date column.
+		$normalize_date = function ( $value ) {
+			if ( $value === null || $value === '' ) {
+				return null;
+			}
+
+			return is_numeric( $value ) ? (int) $value : ( strtotime( $value ) ?: null );
+		};
+
+		$time_range = array_filter( [
+			'before' => $normalize_date( $request->get_param( 'before' ) ),
+			'after'  => $normalize_date( $request->get_param( 'after' ) ),
+		], function ( $v ) {
+			return $v !== null;
+		} );
+
+		$common = array_merge( [
+			'contact_id' => $ID,
+			'order'      => $order,
+			'found_rows' => false,
+		], $time_range );
+
 		// submissions
-		$submissions = as_class( db()->submissions->query( [ 'contact_id' => $ID, 'orderby' => 'date_created', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Submission::class );
+		$submissions = as_class( db()->submissions->query( array_merge( $common, [ 'orderby' => 'date_created' ] ) ), Submission::class );
 		// activity
-		$activity = as_class( db()->activity->query( [ 'contact_id' => $ID, 'orderby' => 'timestamp', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Activity::class );
-		// events
-		$events = as_class( db()->events->query( [ 'contact_id' => $ID, 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event::class );
+		$activity = as_class( db()->activity->query( array_merge( $common, [ 'orderby' => 'timestamp' ] ) ), Activity::class );
+		// events - only those that actually ran; skipped/cancelled events are noise on the timeline
+		$events = as_class( db()->events->query( array_merge( $common, [ 'orderby' => 'time', 'status' => [ Event::COMPLETE, Event::FAILED ] ] ) ), Event::class );
 		// event queue
-		$event_queue = as_class( db()->event_queue->query( [ 'contact_id' => $ID, 'status' => Event::WAITING, 'orderby' => 'time', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Event_Queue_Item::class );
+		$event_queue = as_class( db()->event_queue->query( array_merge( $common, [ 'status' => Event::WAITING, 'orderby' => 'time' ] ) ), Event_Queue_Item::class );
 		// page visits
-		$page_visits = as_class( db()->page_visits->query( [ 'contact_id' => $ID, 'orderby' => 'timestamp', 'order' => $order, 'limit' => 100, 'found_rows' => false ] ), Page_Visit::class );
+		$page_visits = as_class( db()->page_visits->query( array_merge( $common, [ 'orderby' => 'timestamp' ] ) ), Page_Visit::class );
+
+		// Collect related funnel/email IDs so the timeline can be hydrated in a single request
+		$funnel_ids = [];
+		$email_ids  = [];
+
+		foreach ( array_merge( $events, $event_queue ) as $event ) {
+			if ( $event->funnel_id > 1 ) {
+				$funnel_ids[] = $event->funnel_id;
+			}
+			if ( $event->email_id ) {
+				$email_ids[] = $event->email_id;
+			}
+		}
+
+		foreach ( $activity as $_activity ) {
+			if ( $_activity->funnel_id > 1 ) {
+				$funnel_ids[] = $_activity->funnel_id;
+			}
+			if ( $_activity->email_id ) {
+				$email_ids[] = $_activity->email_id;
+			}
+		}
+
+		foreach ( $submissions as $submission ) {
+			if ( $submission->get_form_id() ) {
+				$form_funnel_id = ( new Step( $submission->get_form_id() ) )->get_funnel_id();
+				if ( $form_funnel_id > 1 ) {
+					$funnel_ids[] = $form_funnel_id;
+				}
+			}
+		}
+
+		$funnel_ids = array_values( array_unique( array_filter( $funnel_ids ) ) );
+		$email_ids  = array_values( array_unique( array_filter( $email_ids ) ) );
+
+		$funnels = $funnel_ids
+			? as_class( db()->funnels->query( [ 'include' => $funnel_ids, 'limit' => count( $funnel_ids ), 'found_rows' => false ] ), Funnel::class )
+			: [];
+		$emails = $email_ids
+			? as_class( db()->emails->query( [ 'include' => $email_ids, 'limit' => count( $email_ids ), 'found_rows' => false ] ), Email::class )
+			: [];
 
 		return self::SUCCESS_RESPONSE( [
 			'submissions' => $submissions,
@@ -1030,6 +1097,8 @@ class Contacts_Api extends Base_Object_Api {
 			'events'      => $events,
 			'event_queue' => $event_queue,
 			'page_visits' => $page_visits,
+			'funnels'     => $funnels,
+			'emails'      => $emails,
 		] );
 	}
 

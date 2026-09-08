@@ -267,6 +267,7 @@ code.meta-replacement-code {
 
 .note-actions .dashicons {
   font-size: 12px;
+
 }
 
 .gh-note p {
@@ -323,6 +324,20 @@ code.meta-replacement-code {
   //max-height: 800px;
 }
 
+#timeline-load-earlier {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+
+  &:empty {
+    display: none;
+  }
+}
+
+#timeline-filter {
+  min-width: 240px;
+}
+
 .property-field {
 
   > .property-label{
@@ -337,7 +352,14 @@ code.meta-replacement-code {
 #activity-timeline {
 
   margin-left: 15px;
-  border-left: 2px solid var(--gh-dark-10);
+  border-left: 1px solid var(--gh-dark-10);
+  font-size: 14px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
   code {
     border-radius: var(--gh-border-radius);
@@ -345,43 +367,80 @@ code.meta-replacement-code {
 
   li.activity-item {
 
-    table{
-      td:first-child {
-        word-break:normal;
-      }
-    }
-
-    &:not(:hover,:active,:focus){
-      .event-more,.event-queue-more{
-        display: none;
-      }
-    }
-
     position: relative;
-    margin-left: 20px;
+    margin-left: 24px;
+    padding: 1px 0;
 
     &:not(:last-child) {
-      margin-bottom: 25px;
+      margin-bottom: 18px;
+    }
+
+    .activity-details table td:first-child {
+      word-break: normal;
+    }
+
+    &:not(:hover, :active, :focus, :focus-within) {
+      .activity-actions {
+        display: none; // hidden entirely so it doesn't reserve layout space / force a wrap
+      }
     }
 
     .activity-info {
-      font-size: 15px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       word-break: break-word;
     }
 
+    // inline actions (run again, cancel, open in editor…), revealed on hover after the timestamp
+    .activity-actions {
+      margin-left: 8px;
+      white-space: nowrap;
+
+      a {
+        color: var(--gh-dark-50);
+        text-decoration: none;
+        font-size: 12px;
+
+        &:hover {
+          color: var(--gh-primary);
+        }
+      }
+
+      .activity-action {
+        &.danger:hover {
+          color: $error-red;
+        }
+
+        & + .activity-action {
+          margin-left: 6px;
+        }
+      }
+
+      .open-in-editor {
+        margin-left: 6px;
+        vertical-align: middle;
+
+        .dashicons {
+          font-size: 15px;
+          width: 15px;
+          height: 15px;
+          line-height: 1;
+        }
+      }
+    }
+
+    // quoted feedback (unsub reason, etc.)
     .contact-input {
-      padding: 5px 10px;
-      background-color: var(--gh-dark-5);
-      font-size: 14px;
-      border-radius: var(--gh-border-radius);
-      margin-top: 5px;
+      margin-top: 4px;
+      padding-left: 10px;
+      border-left: 2px solid var(--gh-dark-15);
+      font-size: 13px;
       width: fit-content;
     }
 
     .event-extra,
     .diff-time {
       color: var(--gh-dark-50);
+      font-size: 12px;
 
       .step-type {
         &.action {
@@ -393,20 +452,31 @@ code.meta-replacement-code {
       }
     }
 
+    // shown inline, trailing the main content, separated by a dot (like the group meta)
+    .activity-info .diff-time {
+      margin-left: 4px;
+      white-space: nowrap;
+      text-decoration: none; // abbr[title] gets a dotted underline by default
+      cursor: default;
+
+      &::before {
+        content: "·";
+        margin-right: 4px;
+        color: var(--gh-dark-30);
+      }
+    }
+
     .diff-time:first-letter {
       text-transform: capitalize;
     }
 
-    .activity-rendered.gh-panel {
-      padding: 5px 10px;
-    }
-
+    // icons: small, flat, sitting on the rail
     .activity-icon.no-frame {
       position: absolute;
       left: -22px;
       transform: translateX(-50%);
-      height: 30px;
-      width: 30px;
+      height: 24px;
+      width: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -415,89 +485,149 @@ code.meta-replacement-code {
     .activity-icon:not(.no-frame) {
 
       position: absolute;
-      left: -34px;
+      left: -33px;
+      top: 0;
       box-sizing: border-box;
 
-      height: 25px;
-      width: 25px;
+      height: 20px;
+      width: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: var(--gh-border-radius);
-      background: var(--gh-primary);
-      color: #FFFFFF;
+      border-radius: 50%;
+      background: white;
+      color: var(--gh-dark-50);
 
       img {
         max-width: 100%;
       }
 
-      &.unsubscribed,
-      &.bounce,
-      &.complaint{
-        background-color: $error-red;
-      }
+      svg {
+        width: 13px;
+        height: 13px;
+        fill: currentColor;
 
-      &.page-visit{
-        background: $primary-dark;
-      }
-
-      &.soft_bounce{
-        background-color: $alert-yellow;
-        color: $primary-dark;
-      }
-
-      &.benchmark {
-        --color: #{$benchmark-orange};
-        --color-5: #{$benchmark-orange-5};
-        --color-10: #{$benchmark-orange-10};
-
-        border: 2px solid var(--color);
-        background-color: #fff;
-        background-image: linear-gradient(var(--color-5),var(--color-10));
-        border-radius: 50px;
-
-        &.pending{
-          border: none;
-          background-color: var(--color);
-        }
-
-        &:not(.pending){
-          svg {
-            fill: var(--color) !important;
-          }
+        path {
+          fill: currentColor;
         }
       }
 
       &.action {
-        --color: #{$action-green};
-        --color-5: #{$action-green-5};
-        --color-10: #{$action-green-10};
+        color: $action-green;
+      }
 
-        border: 2px solid var(--color);
-        background-color: #fff;
-        background-image: linear-gradient(var(--color-5),var(--color-10));
+      &.benchmark {
+        color: $benchmark-orange;
+      }
 
-        &.pending{
-          border: none;
-          background-color: var(--color);
+      &.broadcast {
+        color: $action-green;
+      }
+
+      &.page-visit {
+        color: $primary-dark;
+      }
+
+      &.funnel {
+        color: var(--gh-primary);
+      }
+
+      &.pending {
+        opacity: 0.6;
+      }
+
+      &.unsubscribed,
+      &.bounce,
+      &.complaint {
+        color: $error-red;
+      }
+
+      &.soft_bounce {
+        color: $alert-yellow;
+      }
+
+      // a failed event - wins over the step-group colour
+      &.failed {
+        color: $error-red;
+      }
+    }
+
+    // engagement (opens / clicks) nested under a send event
+    .activity-children {
+      margin: 8px 0 0;
+      padding: 0;
+
+      .engagement-summary {
+        color: var(--gh-dark-50);
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      li.activity-item {
+        margin-left: 24px;
+        font-size: 13px;
+
+        &:not(:last-child) {
+          margin-bottom: 10px;
         }
 
-        &:not(.pending){
+        .activity-icon:not(.no-frame) {
+          height: 16px;
+          width: 16px;
+          left: -21px;
+
           svg {
-            width: 100%;
-            height: 100%;
-            fill: var(--color) !important;
+            width: 11px;
+            height: 11px;
           }
         }
       }
+    }
+  }
 
-      &.broadcast{
-        background-color: $action-green;
-      }
+  // collapsible groups: flow runs & browsing sessions
+  li.activity-item.group {
 
-      svg {
-        width: 16px;
-        height: 16px;
+    .group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .group-title b {
+      font-weight: 600;
+    }
+
+    .group-meta {
+      color: var(--gh-dark-50);
+      margin-left: 8px;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .group-header .dashicons {
+      color: var(--gh-dark-50);
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+
+    &:not(.closed) .group-header .dashicons {
+      transform: rotate(180deg);
+    }
+
+    &.closed .group-items {
+      display: none;
+    }
+
+    .group-items {
+      margin: 12px 0 2px;
+      padding: 0;
+      border-left: 1px solid var(--gh-dark-10);
+
+      li.activity-item {
+        margin-left: 25px;
       }
     }
   }
