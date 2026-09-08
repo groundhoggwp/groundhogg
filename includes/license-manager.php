@@ -485,7 +485,7 @@ class License_Manager {
 
         // return the master license if set in WP_CONFIG
         if ( defined( 'GH_MASTER_LICENSE' ) ) {
-            return GH_MASTER_LICNESE;
+            return GH_MASTER_LICENSE;
         }
 
 		if ( $item_id === false ) {
