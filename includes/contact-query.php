@@ -55,6 +55,20 @@ class Contact_Query extends Table_Query {
 	protected $legacy_query;
 
 	/**
+	 * Whether the most recent query(), count() or get_sql() call fell back to the
+	 * Legacy_Contact_Query because the modern query engine threw.
+	 *
+	 * When true, anything applied to the modern query object via method calls
+	 * (setLimit(), setOrderby(), where()->..., setGroupby(), etc.) was NOT honoured,
+	 * because the legacy engine only sees the raw query vars. Callers that depend on
+	 * that behaviour — most notably the broadcast scheduler's `ID > last_id` keyset
+	 * pagination — must check this and refuse to proceed.
+	 *
+	 * @var bool
+	 */
+	protected bool $used_legacy_fallback = false;
+
+	/**
 	 * @var int flags for later
 	 */
 	protected int $flags;
@@ -2542,6 +2556,70 @@ class Contact_Query extends Table_Query {
 	}
 
 	/**
+	 * Whether the most recent query(), count() or get_sql() call fell back to the
+	 * Legacy_Contact_Query because the modern query engine threw.
+	 *
+	 * @return bool
+	 */
+	public function used_legacy_fallback(): bool {
+		return $this->used_legacy_fallback;
+	}
+
+	/**
+	 * Handle an exception thrown by the modern query engine before falling back to
+	 * the Legacy_Contact_Query.
+	 *
+	 * The modern engine throws when a saved segment references a filter that is not
+	 * registered with Contact_Query — typically a legacy filter registered by an
+	 * outdated add-on. We still fall back so the query returns something, but this
+	 * must never be silent: callers that rely on modern-only behaviour need to be
+	 * able to detect it (see used_legacy_fallback()), and site owners need a
+	 * breadcrumb to find the offending add-on.
+	 *
+	 * @throws \Throwable
+	 *
+	 * @param  \Throwable  $e
+	 *
+	 * @return void
+	 */
+	protected function handle_legacy_fallback( \Throwable $e ) {
+
+		$this->used_legacy_fallback = true;
+
+		$message = sprintf(
+			'Contact_Query fell back to Legacy_Contact_Query: %s | query_vars: %s',
+			$e->getMessage(),
+			wp_json_encode( $this->query_vars )
+		);
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( '[Groundhogg] ' . $message );
+		}
+
+		/**
+		 * Fires whenever the modern contact query engine throws and the query falls
+		 * back to the legacy engine. Hook for telemetry or an admin notice.
+		 *
+		 * @param \Throwable    $e          the exception thrown by the modern engine
+		 * @param array         $query_vars the query vars being processed
+		 * @param Contact_Query $query      the query instance
+		 */
+		do_action( 'groundhogg/contact_query/legacy_fallback', $e, $this->query_vars, $this );
+
+		/**
+		 * Allow forcing the exception to propagate instead of silently falling back
+		 * to the legacy engine. Defaults to false for backwards compatibility.
+		 *
+		 * @param bool          $throw
+		 * @param \Throwable     $e
+		 * @param Contact_Query  $query
+		 */
+		if ( apply_filters( 'groundhogg/contact_query/throw_on_legacy_fallback', false, $e, $this ) ) {
+			throw $e;
+		}
+	}
+
+	/**
 	 * Retrieve the SQL statement instead of the actual items
 	 *
 	 * @param $query
@@ -2556,6 +2634,8 @@ class Contact_Query extends Table_Query {
 		try {
 			$this->maybe_setup_query();
 		} catch ( \Exception|FilterException $exception ) {
+			$this->handle_legacy_fallback( $exception );
+
 			return $this->legacy_query->get_sql( $query );
 		}
 
@@ -2597,6 +2677,7 @@ class Contact_Query extends Table_Query {
 		try {
 			$items = $this->get_results();
 		} catch ( FilterException|\Exception $exception ) {
+			$this->handle_legacy_fallback( $exception );
 			$items             = $this->legacy_query->query( $query_vars );
 			$this->found_items = $this->legacy_query->found_items;
 		}
@@ -2626,6 +2707,8 @@ class Contact_Query extends Table_Query {
 		try {
 			$this->maybe_setup_query();
 		} catch ( FilterException|\Exception $exception ) {
+			$this->handle_legacy_fallback( $exception );
+
 			return $this->legacy_query->count( $query_vars );
 		}
 

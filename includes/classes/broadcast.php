@@ -449,6 +449,23 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		$contacts = $c_query->query( null, true );
 
+		// The modern query engine threw and Contact_Query fell back to the legacy
+		// engine, which does not honour the `ID > last_id` keyset boundary or the
+		// batch limit set above. Continuing would re-schedule the entire audience on
+		// every batch (duplicate sends, count far exceeding the segment total).
+		// Usually caused by a saved segment that relies on filters registered by an
+		// outdated add-on. Cancel the broadcast: whatever was scheduled in earlier
+		// batches is unreliable, so scrap the run rather than send a
+		// partial/duplicated broadcast. cancel() also cancels any WAITING events and
+		// the background task.
+		if ( $c_query->used_legacy_fallback() ) {
+			$this->update_meta( 'schedule_error', 'legacy_query_fallback' );
+			$this->delete_meta( 'schedule_lock' );
+			$this->cancel();
+
+			return false;
+		}
+
 		// no more contacts to schedule
 		if ( empty( $contacts ) ) {
 			$this->update_meta( 'is_scheduled', true );
