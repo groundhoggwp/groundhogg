@@ -379,23 +379,25 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.8 (2026-09-09) =
+* ADDED The Licenses settings tab now shows a notice when installed extensions have no active license or when a license has expired, each with a link to groundhogg.io to purchase or renew.
 * ADDED Redesigned contact activity timeline: flow runs and browsing sessions are grouped into collapsible sections, and email opens and clicks are nested under the email they belong to.
 * ADDED Failed flow events now show in the timeline along with the error that caused them.
 * ADDED Filter the timeline by a specific flow, email, or broadcast, or by activity type, using the new filter picker.
 * ADDED "Load earlier activity" button to page further back through a contact's history.
 * ADDED Relative date headers and a date/time gutter in the timeline for easier scanning.
+* ADDED Groundhogg now registers abilities with the WordPress Abilities API so AI agents and other tools can act on the CRM through a supported interface. This first set covers contacts: get a contact, create or update one, search contacts, add and read contact notes, and list tags, contact owners, custom fields, and saved searches. Every ability runs through the same capability and per-contact permission checks as the rest of Groundhogg. This is an active work in progress — more abilities, including tags, flows, and emails, will be exposed in future updates.
 * TWEAKED The contact timeline now loads in a single request and is fetched by date range instead of a fixed number of items.
 * TWEAKED Completed flow steps in the timeline link through to that step in the flow editor.
 * TWEAKED Skipped and cancelled flow events are no longer shown in the timeline.
-* ADDED The Licenses settings tab now shows a notice when installed extensions have no active license or when a license has expired, each with a link to groundhogg.io to purchase or renew.
-* FIXED Step is_entry()/is_conversion() could trigger "Undefined property" warnings.
+* TWEAKED Dropdowns in the admin now use Groundhogg's native item picker instead of the bundled select2 library, for a consistent look and lighter page load.
 * SECURITY Viewing, editing, deleting, or creating a note or task now also requires access to the contact (or other object) it is attached to. Previously `view_notes` / `view_tasks` alone could expose notes and tasks on contacts a user was not otherwise permitted to see, both through the REST API and anywhere the `view_note` / `view_task` capabilities are checked.
+* FIXED Step is_entry()/is_conversion() could trigger "Undefined property" warnings.
 * FIXED Broadcasts using a segment with filters from an outdated add-on could schedule duplicate emails and far more than the segment's contact count. The contact query no longer silently falls back to the legacy engine, and such broadcasts are now cancelled with an error instead of scheduling.
 * DEV Contact_Query::used_legacy_fallback() exposes when a query dropped to the legacy engine; new `groundhogg/contact_query/legacy_fallback` action and `groundhogg/contact_query/throw_on_legacy_fallback` filter.
 * DEV `view_note` / `view_task` (and their edit/delete counterparts) now cascade into a view check on the associated object. New `groundhogg/roles/note_association_cap_check_types` filter controls which associated types participate (contact, deal, company by default); a type left out keeps the prior behaviour of the blanket `view_notes` / `view_tasks` capability plus author scoping.
 * DEV Custom objects: register lightweight object types with `register_custom_object( $type, $args )` instead of creating a dedicated table. Each type is backed by the shared `gh_objects` / `gh_object_meta` tables, gets a REST controller at `gh/v4/objects/{type}` (CRUD, meta, relationships), and resolves through `get_db()`, `create_object_from_type()`, and the query builder like any first-party object. Extend `\Groundhogg\Custom_Object` for a typed runtime class.
-* ADDED Groundhogg now registers abilities with the WordPress Abilities API so AI agents and other tools can act on the CRM through a supported interface. This first set covers contacts: get a contact, create or update one, search contacts, add and read contact notes, and list tags, contact owners, custom fields, and saved searches. Every ability runs through the same capability and per-contact permission checks as the rest of Groundhogg. This is an active work in progress — more abilities, including tags, flows, and emails, will be exposed in future updates.
 * DEV Abilities live in `includes/abilities/`; each extends `\Groundhogg\Abilities\Ability` and is registered on `wp_abilities_api_init`. Reusable output shapes are defined as `\Groundhogg\Abilities\Schemas\Schema` subclasses.
+* DEV admin.js no longer depends on select2. When `$.fn.select2` is undefined a polyfill backed by `MakeEl.ItemPicker` is registered that maps the select2 options still in use (`data`, `ajax`, `multiple`, `tags`, `placeholder`, `allowClear`) and keeps the underlying `<select>` in sync, so `.select2().on('change', ...)` / `.val()` and form submission keep working.
 
 = 4.7.2 (2026-09-03) =
 * ADDED Click on a contact's profile picture to update it with an image from the Library.
