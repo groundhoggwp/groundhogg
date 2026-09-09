@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.1
-Stable tag: 4.7.2
+Stable tag: 4.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -377,6 +377,18 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.8 (2026-09-09) =
+* ADDED Redesigned contact activity timeline: flow runs and browsing sessions are grouped into collapsible sections, and email opens and clicks are nested under the email they belong to.
+* ADDED Failed flow events now show in the timeline along with the error that caused them.
+* ADDED Filter the timeline by a specific flow, email, or broadcast, or by activity type, using the new filter picker.
+* ADDED "Load earlier activity" button to page further back through a contact's history.
+* ADDED Relative date headers and a date/time gutter in the timeline for easier scanning.
+* TWEAKED The contact timeline now loads in a single request and is fetched by date range instead of a fixed number of items.
+* TWEAKED Completed flow steps in the timeline link through to that step in the flow editor.
+* TWEAKED Skipped and cancelled flow events are no longer shown in the timeline.
+* ADDED The Licenses settings tab now shows a notice when installed extensions have no active license or when a license has expired, each with a link to groundhogg.io to purchase or renew.
+* FIXED Step is_entry()/is_conversion() could trigger "Undefined property" warnings.
 
 = 4.7.2 (2026-09-03) =
 * ADDED Click on a contact's profile picture to update it with an image from the Library.
