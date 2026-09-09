@@ -351,7 +351,8 @@ code.meta-replacement-code {
 
 #activity-timeline {
 
-  margin-left: 15px;
+  // left margin leaves room for the date + time gutter that sits left of the icons
+  margin-left: 110px;
   border-left: 1px solid var(--gh-dark-10);
   font-size: 14px;
 
@@ -381,7 +382,44 @@ code.meta-replacement-code {
 
     &:not(:hover, :active, :focus, :focus-within) {
       .activity-actions {
-        display: none; // hidden entirely so it doesn't reserve layout space / force a wrap
+        display: none;
+      }
+    }
+
+    // the date/time is shown in the left gutter, not inline
+    .activity-info .diff-time {
+      display: none;
+    }
+
+    // left gutter: time of day on every row, with the date to its left on the boundary row of each day
+    .activity-gutter {
+      position: absolute;
+      left: -129px;
+      top: 0;
+      width: 88px; // right edge lands ~8px left of the icon
+      display: flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 6px;
+      line-height: 20px; // aligns with the icon / first line of content
+      white-space: nowrap;
+
+      // never compress - if it doesn't fit, overflow left rather than clip the date
+      > * {
+        flex-shrink: 0;
+      }
+
+      .activity-date {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--gh-dark-50);
+      }
+
+      .activity-time {
+        font-size: 11px;
+        color: var(--gh-dark-30);
       }
     }
 
@@ -512,12 +550,27 @@ code.meta-replacement-code {
         }
       }
 
+      // flow steps - matched to how they look in the funnel editor:
+      // actions are green rounded squares, benchmarks/triggers are orange circles
+      &.action,
+      &.benchmark {
+        background-color: #fff;
+        background-image: linear-gradient(var(--icon-tint-5), var(--icon-tint-10));
+        border: 1.5px solid currentColor;
+      }
+
       &.action {
         color: $action-green;
+        border-radius: var(--gh-border-radius);
+        --icon-tint-5: #{$action-green-5};
+        --icon-tint-10: #{$action-green-10};
       }
 
       &.benchmark {
         color: $benchmark-orange;
+        border-radius: 50%;
+        --icon-tint-5: #{$benchmark-orange-5};
+        --icon-tint-10: #{$benchmark-orange-10};
       }
 
       &.broadcast {
@@ -585,6 +638,22 @@ code.meta-replacement-code {
     }
   }
 
+  // relative-time section headers ("Today", "Previous 7 days", "March"…)
+  li.timeline-date-header {
+    margin: 0 0 14px -105px; // pull left so it spans the date gutter too
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gh-dark-30);
+
+    &:not(:first-child) {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid var(--gh-dark-10);
+    }
+  }
+
   // collapsible groups: flow runs & browsing sessions
   li.activity-item.group {
 
@@ -622,12 +691,22 @@ code.meta-replacement-code {
     }
 
     .group-items {
-      margin: 12px 0 2px;
+      margin: 12px 0 2px 44px;
       padding: 0;
       border-left: 1px solid var(--gh-dark-10);
 
+      &:has(.activity-date){
+        margin-left: 88px;
+      }
+
       li.activity-item {
         margin-left: 25px;
+      }
+
+      // per-row time (+ date on multi-day boundaries), hugging the left of each row's icon
+      .activity-gutter {
+        left: -115px;
+        width: 74px;
       }
     }
   }

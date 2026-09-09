@@ -80,6 +80,11 @@
     _n,
   } = wp.i18n
 
+  const { dateI18n, isInTheFuture } = wp.date
+  const wpDateFormats = ( wp.date.getSettings ?? wp.date.__experimentalGetSettings )().formats
+  // site time format, but tighten "10:58 am" -> "10:58am" to save gutter space (24h formats unaffected)
+  const compactTimeFormat = wpDateFormats.time.replace(/\s+(\\?[aA])/g, '$1')
+
   ContactsStore.itemsFetched([contact])
 
   let files = []
@@ -886,7 +891,7 @@
           body     : sprintf(
             /* translators: %s: a url/path */
             __('Visited %s', 'groundhogg'),
-            `<a href="${ escHTML(activity.data.path) }" target="_blank">${ bold(escHTML(activity.data.path)) }</a>`),
+            `<a href="${ escHTML(activity.data.path) }" target="_blank">${ escHTML(activity.data.path) }</a>`),
           diffTime : activity.i18n.diff_time,
           ymdhis   : activity.i18n.ymdhis,
         })
@@ -1225,7 +1230,7 @@
             body     : sprintf(__('Clicked %s', 'groundhogg'), el('a', {
               target: '_blank',
               href  : link,
-            }, bold(escHTML(short)))),
+            }, escHTML(short))),
             diffTime : activity.i18n.diff_time,
             ymdhis   : activity.i18n.ymdhis,
           })
@@ -1267,7 +1272,12 @@
             ]),
             Dashicon('arrow-down-alt2'),
           ]),
-          Ul({ className: 'group-items' }, items.map(i => this.renderNode(i))),
+          Ul({ className: 'group-items' }, ( () => {
+            // each row gets its own time gutter, with a date on multi-day boundaries
+            let entries = items.map(i => ( { el: this.renderNode(i), time: i.time } ))
+            this.gutterizeRun(entries)
+            return entries.map(e => e.el)
+          } )()),
         ]),
       ])
     },
@@ -1276,16 +1286,14 @@
 
       let funnel = FunnelsStore.get(group.funnel_id)
       let title = funnel ? funnel.data.title : __('Flow', 'groundhogg')
-      let entryItem = group.items.reduce((a, b) => a.time <= b.time ? a : b, group.items[0])
 
       return this.CollapsibleGroup({
         className: 'flow-group',
         iconClass: 'funnel',
         icon     : icons.funnel,
         title,
-        /* translators: 1: a number of events, 2: a time difference like "3 days ago" */
-        meta     : sprintf(_n('%1$d event · entered %2$s', '%1$d events · entered %2$s', group.items.length, 'groundhogg'),
-          group.items.length, entryItem.i18n.diff_time),
+        /* translators: %d: a number of events */
+        meta     : sprintf(_n('%d event', '%d events', group.items.length, 'groundhogg'), group.items.length),
         items    : group.items,
         dataAttrs: { dataFunnel: group.funnel_id },
       })
@@ -1298,15 +1306,12 @@
         return this.renderActivity(session.items[0])
       }
 
-      let entryItem = session.items.reduce((a, b) => a.time <= b.time ? a : b, session.items[0])
-
       return this.CollapsibleGroup({
         className: 'visit-session',
         iconClass: 'page-visit',
         icon     : icons.link_click,
         /* translators: %d: a number of pages */
         title    : sprintf(_n('%d page visited', '%d pages visited', session.items.length, 'groundhogg'), session.items.length),
-        meta     : entryItem.i18n.diff_time,
         items    : session.items,
       })
     },
@@ -1440,10 +1445,15 @@
       })
 
       // order group items + compute a sort key for each root
+      let nowSeconds = Math.floor(Date.now() / 1000)
+
       roots.forEach(node => {
         if (node.type === 'flow_group' || node.type === 'visit_session') {
           node.items.sort((a, b) => order === 'desc' ? b.time - a.time : a.time - b.time)
-          node.sortTime = order === 'desc' ? node.maxTime : node.minTime
+          // a group's "when" is its last *actual* activity, not a pending future step
+          let happened = node.items.filter(i => i.time <= nowSeconds).map(i => i.time)
+          let latest = happened.length ? Math.max(...happened) : node.minTime
+          node.sortTime = order === 'desc' ? latest : node.minTime
         }
         else {
           node.sortTime = node.time
@@ -1455,8 +1465,135 @@
       return roots
     },
 
+    // the calendar day a unix timestamp falls on, in the site timezone (e.g. "2024-03-14")
+    dayKey (time) {
+      return dateI18n('Y-m-d', new Date(time * 1000))
+    },
+
+    /**
+     * The relative-time bucket a timestamp falls into, used for the section headers.
+     */
+    dateBucket (time) {
+
+      if (isInTheFuture(new Date(time * 1000))) {
+        return { key: 'upcoming', label: __('Upcoming', 'groundhogg') }
+      }
+
+      const dayKey = this.dayKey(time)
+      const todayKey = this.dayKey(Date.now() / 1000)
+
+      if (dayKey === todayKey) {
+        return { key: 'today', label: __('Today', 'groundhogg') }
+      }
+
+      // whole calendar days between the two dates (parsed as UTC midnight so DST/TZ don't skew it)
+      const days = Math.round(( Date.parse(todayKey) - Date.parse(dayKey) ) / 86400000)
+
+      if (days === 1) {
+        return { key: 'yesterday', label: __('Yesterday', 'groundhogg') }
+      }
+      if (days <= 7) {
+        return { key: 'last-7', label: __('Previous 7 days', 'groundhogg') }
+      }
+      if (days <= 30) {
+        return { key: 'last-30', label: __('Previous 30 days', 'groundhogg') }
+      }
+
+      const d = new Date(time * 1000)
+      const sameYear = dateI18n('Y', d) === dateI18n('Y', new Date())
+
+      return {
+        key  : dateI18n('Y-m', d),
+        label: dateI18n(sameYear ? 'F' : 'F Y', d),
+      }
+    },
+
+    // the left-gutter cell: time of day, optionally prefixed with the date
+    gutterEl (ms, withDate = false) {
+      const d = new Date(ms)
+      return makeEl('span', {
+        className: 'activity-gutter',
+        title    : dateI18n(wpDateFormats.datetimeAbbreviated || wpDateFormats.datetime, d),
+      }, [
+        withDate ? makeEl('span', { className: 'activity-date' }, dateI18n('M j', d)) : null,
+        makeEl('span', { className: 'activity-time' }, dateI18n(compactTimeFormat, d)),
+      ])
+    },
+
+    /**
+     * Prepend a time gutter to a contiguous run of rendered rows. The date is shown on the
+     * oldest row of each day - the last row when reading desc (bottom-up), the first when asc.
+     *
+     * @param entries [{ el, time }] - rendered <li> + its unix timestamp (el may be null)
+     */
+    gutterizeRun (entries) {
+
+      const labelLast = this.order !== 'asc'
+
+      const addGutter = (el, time, withDate) => {
+        el.insertBefore(this.gutterEl(time * 1000, withDate), el.firstChild)
+      }
+
+      let prev = null // { el, time, day }
+
+      entries.forEach(({ el, time }) => {
+
+        if (!el || !time) {
+          return
+        }
+
+        let day = this.dayKey(time)
+
+        if (labelLast) {
+          if (prev) {
+            addGutter(prev.el, prev.time, prev.day !== day)
+          }
+          prev = { el, time, day }
+        }
+        else {
+          addGutter(el, time, !prev || prev.day !== day)
+          prev = { el, time, day }
+        }
+      })
+
+      if (prev && labelLast) {
+        addGutter(prev.el, prev.time, true)
+      }
+    },
+
     render (nodes) {
-      return Ul({ id: 'activity-timeline' }, nodes.map(n => this.renderNode(n)))
+
+      let items = []
+      let currentBucket = null
+      let run = [] // { el, time } for the current section
+
+      const flushRun = () => {
+        this.gutterizeRun(run)
+        run = []
+      }
+
+      nodes.forEach(node => {
+
+        let bucket = this.dateBucket(node.sortTime)
+
+        if (bucket.key !== currentBucket) {
+          flushRun()
+          currentBucket = bucket.key
+          items.push(Li({ className: 'timeline-date-header' }, bucket.label))
+        }
+
+        let el = this.renderNode(node)
+        if (!el) {
+          return
+        }
+
+        run.push({ el, time: node.sortTime })
+        items.push(el)
+      })
+
+      flushRun()
+
+      return Ul({ id: 'activity-timeline' }, items)
     },
 
     onMount () {},
@@ -1467,6 +1604,7 @@
     } = {}) {
 
       this.needsRefresh = needsRefresh
+      this.order = order
 
       const el = document.querySelector(selector)
 
@@ -1737,7 +1875,7 @@
 
             return get(`${ ContactsStore.route }/${contact.ID}/timeline`, {
               order,
-              after: moment().subtract(lookbackDays, 'days').unix(),
+              after: Math.floor(Date.now() / 1000) - ( lookbackDays * 86400 ),
             }).then(response => {
 
               // Hydration data embedded in the single timeline request

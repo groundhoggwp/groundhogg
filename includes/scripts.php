@@ -299,6 +299,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/contacts/contact-editor' . $dot_min . '.js', [
 			'jquery',
 			'moment',
+			'wp-date',
 			'jquery-ui-sortable',
 			'groundhogg-admin-tasks',
 			'groundhogg-admin-notes',
