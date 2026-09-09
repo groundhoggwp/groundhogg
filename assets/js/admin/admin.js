@@ -39,6 +39,175 @@
     return o
   }
 
+  /**
+   * Polyfill for $.fn.select2 backed by MakeEl.ItemPicker.
+   *
+   * Groundhogg no longer bundles the select2 library. When select2 is not
+   * present we register a drop-in replacement that renders a MakeEl.ItemPicker
+   * in front of the original <select> and keeps that <select> in sync, so that
+   * existing `.on('change')` / `.val()` / form submission code keeps working.
+   *
+   * Supported select2 options: data, ajax (url, data, dataType, beforeSend,
+   * processResults), multiple, tags, placeholder, allowClear. Presentational
+   * options (width, tokenSeparators, delay, ...) are ignored.
+   */
+  if (typeof $.fn.select2 === 'undefined') {
+
+    const s2_normalizeOption = opt => {
+
+      if (opt === null || typeof opt !== 'object') {
+        return {
+          id  : String(opt),
+          text: String(opt),
+        }
+      }
+
+      let id = opt.id ?? opt.value ?? ''
+
+      return {
+        ...opt,
+        id  : String(id),
+        text: String(opt.text ?? opt.name ?? opt.label ?? id),
+      }
+    }
+
+    const s2_optionsFromSelect = selectEl => [...selectEl.querySelectorAll('option')].map(opt => ( {
+      id  : opt.value,
+      text: opt.textContent,
+    } ))
+
+    const s2_matchesSearch = (opt, search) => {
+
+      if (!search) {
+        return true
+      }
+
+      search = search.toLowerCase()
+
+      return opt.id.toLowerCase().includes(search) || opt.text.toLowerCase().includes(search)
+    }
+
+    const s2_init = (selectEl, opts = {}) => {
+
+      // don't double init
+      if (selectEl.select2Polyfilled) {
+        return
+      }
+      selectEl.select2Polyfilled = true
+
+      const pickerId = `${ selectEl.id || `select2-${ Math.random().toString(36).slice(2) }` }-picker`
+      const multiple = opts.multiple !== undefined ? Boolean(opts.multiple) : selectEl.multiple
+      const tags = Boolean(opts.tags) || Boolean(selectEl.dataset.tags)
+      const staticData = Array.isArray(opts.data) ? opts.data.map(s2_normalizeOption) : null
+      const ajax = opts.ajax || null
+      const placeholder = opts.placeholder && typeof opts.placeholder === 'object'
+                          ? opts.placeholder.text
+                          : opts.placeholder
+
+      // a <select multiple> is required for $().val() to return an array
+      if (multiple) {
+        selectEl.multiple = true
+      }
+
+      const fetchOptions = async search => {
+
+        if (ajax) {
+
+          const params = typeof ajax.data === 'function'
+                         ? ajax.data({ term: search, page: 1 })
+                         : ( ajax.data || {} )
+
+          return new Promise(resolve => {
+            $.ajax({
+              url       : typeof ajax.url === 'function' ? ajax.url(params) : ajax.url,
+              dataType  : ajax.dataType || 'json',
+              data      : params,
+              beforeSend: ajax.beforeSend,
+              success   : data => {
+                const processed = typeof ajax.processResults === 'function'
+                                  ? ajax.processResults(data, { page: 1 })
+                                  : { results: data }
+                resolve(( processed.results || [] ).map(s2_normalizeOption))
+              },
+              error     : () => resolve([]),
+            })
+          })
+        }
+
+        return ( staticData || s2_optionsFromSelect(selectEl) ).
+          map(s2_normalizeOption).
+          filter(opt => opt.id !== '' || opt.text !== '').
+          filter(opt => s2_matchesSearch(opt, search))
+      }
+
+      // Work out the initially selected items
+      let selected
+      if (staticData) {
+        selected = staticData.filter(opt => opt.selected)
+      }
+      else {
+        selected = [...selectEl.selectedOptions].map(opt => ( {
+          id  : opt.value,
+          text: opt.textContent,
+        } )).filter(opt => opt.id !== '')
+      }
+
+      const syncSelect = items => {
+
+        const chosen = ( multiple ? items : ( items ? [items] : [] ) ).filter(Boolean).map(s2_normalizeOption)
+        const ids = chosen.map(item => item.id)
+
+        // make sure an <option> exists for every chosen value (ajax / tags results)
+        chosen.forEach(item => {
+          if (![...selectEl.options].some(opt => opt.value === item.id)) {
+            selectEl.appendChild(new Option(item.text, item.id, false, false))
+          }
+        })
+
+        for (let option of selectEl.options) {
+          option.selected = ids.includes(option.value)
+        }
+
+        if (!multiple && !ids.length) {
+          selectEl.value = ''
+        }
+
+        $(selectEl).trigger('change')
+        $(selectEl).trigger('select2:select')
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }))
+      }
+
+      const picker = MakeEl.ItemPicker({
+        id          : pickerId,
+        multiple,
+        tags,
+        selected,
+        noneSelected: placeholder ?? selectEl.dataset.placeholder ?? 'Any...',
+        clearable   : multiple || Boolean(opts.allowClear) || Boolean(selectEl.dataset.clearable),
+        fetchOptions,
+        createOption: async value => {
+          selectEl.appendChild(new Option(value, value, true, true))
+          return {
+            id  : value,
+            text: value,
+          }
+        },
+        onChange    : syncSelect,
+      })
+
+      selectEl.classList.add('hidden', 'picker-initialized')
+      selectEl.insertAdjacentElement('beforebegin', picker)
+    }
+
+    $.fn.select2 = function (opts) {
+      return this.each(function () {
+        if (this.tagName === 'SELECT') {
+          s2_init(this, opts)
+        }
+      })
+    }
+  }
+
   function picker (selector, args) {
     return $(selector).select2(args)
   }
