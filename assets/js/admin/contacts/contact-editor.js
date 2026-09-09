@@ -3183,13 +3183,13 @@
       // We set multiple to false so only get one image from the uploader
       let attachment = file_frame.state().get('selection').first().toJSON()
 
-      $('.profile-picture')[0].style.backgroundImage = `url(${ attachment.url })`
-
       ContactsStore.patch(getContact().ID, {
         meta: {
           profile_picture: attachment.url,
         }
       })
+
+      $('.contact-picture > .gh-square-image')[0].style.backgroundImage = `url(${ attachment.url })`
 
     })
     // Finally, open the modal
