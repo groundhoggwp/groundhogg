@@ -508,11 +508,15 @@ code.meta-replacement-code {
       text-transform: capitalize;
     }
 
+    .activity-icon {
+      position: absolute;
+      left: -25px;
+      top: 0;
+      transform: translateX(-50%);
+    }
+
     // icons: small, flat, sitting on the rail
     .activity-icon.no-frame {
-      position: absolute;
-      left: -22px;
-      transform: translateX(-50%);
       height: 24px;
       width: 24px;
       display: flex;
@@ -522,11 +526,7 @@ code.meta-replacement-code {
 
     .activity-icon:not(.no-frame) {
 
-      position: absolute;
-      left: -33px;
-      top: 0;
       box-sizing: border-box;
-
       height: 20px;
       width: 20px;
       display: flex;
@@ -616,6 +616,12 @@ code.meta-replacement-code {
         margin-bottom: 8px;
       }
 
+      // these rows have no gutter - the time (+ date if a different day) shows inline
+      .activity-info .diff-time {
+        display: inline;
+        font-size: 11px;
+      }
+
       li.activity-item {
         margin-left: 24px;
         font-size: 13px;
@@ -628,6 +634,7 @@ code.meta-replacement-code {
           height: 16px;
           width: 16px;
           left: -21px;
+          transform: none;
 
           svg {
             width: 11px;

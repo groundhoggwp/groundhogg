@@ -1012,6 +1012,7 @@
             ymdhis   : activity.i18n.ymdhis,
             actions  : [ ...this.eventActions(activity), editorLink ].filter(Boolean),
             children : activity.children,
+            childDay : this.dayKey(activity.time),
           })
         }
         case 2: {
@@ -1035,6 +1036,7 @@
             ymdhis   : activity.i18n.ymdhis,
             actions  : this.eventActions(activity),
             children : activity.children,
+            childDay : this.dayKey(activity.time),
           })
         }
         case 3: {
@@ -1058,6 +1060,7 @@
             ymdhis   : activity.i18n.ymdhis,
             actions  : this.eventActions(activity),
             children : activity.children,
+            childDay : this.dayKey(activity.time),
           })
         }
       }
@@ -1140,6 +1143,7 @@
       className = '',
       tabindex = false,
       children = [],
+      childDay = null, // the day the parent event happened - engagement rows omit the date when it matches
     }) {
 
       return Li({
@@ -1160,15 +1164,15 @@
           extra ? Div({ className: 'event-extra' }, extra) : null,
           details,
         ]),
-        children && children.length ? this.Engagement(children) : null,
+        children && children.length ? this.Engagement(children, childDay) : null,
       ])
     },
 
-    Engagement (children) {
+    Engagement (children, sendDay) {
 
       let rendered = children.map(c => {
         try {
-          return this.engagementItem(c)
+          return this.engagementItem(c, sendDay)
         }
         catch (e) {
           return null
@@ -1205,9 +1209,17 @@
 
     /**
      * A single engagement row nested under a send event. The parent already names
-     * the email/broadcast, so opens/clicks only show the action + date.
+     * the email/broadcast, so opens/clicks only show the action + when it happened
+     * (time only, plus the date when it's a different day than the send).
      */
-    engagementItem (activity) {
+    engagementItem (activity, sendDay) {
+
+      const d = new Date(activity.time * 1000)
+      const sameDay = sendDay && this.dayKey(activity.time) === sendDay
+      const when = sameDay
+                   ? dateI18n(compactTimeFormat, d)
+                   : `${ dateI18n('M j', d) }, ${ dateI18n(compactTimeFormat, d) }`
+      const whenTitle = dateI18n(wpDateFormats.datetimeAbbreviated || wpDateFormats.datetime, d)
 
       switch (activity.data.activity_type) {
 
@@ -1216,8 +1228,8 @@
             iconClass: 'email_opened',
             icon     : icons.open_email,
             body     : __('Opened', 'groundhogg'),
-            diffTime : activity.i18n.diff_time,
-            ymdhis   : activity.i18n.ymdhis,
+            diffTime : when,
+            ymdhis   : whenTitle,
           })
 
         case 'email_link_click': {
@@ -1231,8 +1243,8 @@
               target: '_blank',
               href  : link,
             }, escHTML(short))),
-            diffTime : activity.i18n.diff_time,
-            ymdhis   : activity.i18n.ymdhis,
+            diffTime : when,
+            ymdhis   : whenTitle,
           })
         }
       }
