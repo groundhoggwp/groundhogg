@@ -425,7 +425,7 @@ class License_Manager {
         return self::$licenses;
 	}
 
-    public static function save_licenses() {
+	public static function save_licenses() {
 	    update_option( 'gh_licenses', self::$licenses );
     }
 
@@ -463,12 +463,138 @@ class License_Manager {
 	/**
 	 * Get a list of the expired licenses
 	 *
-	 * @return array
+	 * @return License[]
 	 */
 	public static function get_expired_licenses() {
 		return array_filter( self::get_licenses(), function ( License $license ) {
-			return ! $license->is_valid();
+			return $license->is_expired();
 		} );
+	}
+
+
+	/**
+	 * Checks if there are missing licenses for installed official extensions.
+	 *
+	 * Compares the list of installed official extensions with the list of accessible items
+	 * and determines whether there are any installed extensions that lack the required licenses.
+	 *
+	 * @return bool True if there are missing licenses, false otherwise.
+	 */
+	public static function has_missing_licenses() {
+        $installed  = Extension::installed_official_extension_ids();
+        $accessible = self::get_accessible_items();
+
+        return count( array_diff( $installed, $accessible ) ) > 0;
+	}
+
+	/**
+	 * Get the installed official extensions that are not covered by any registered license.
+	 *
+	 * @return Extension[]
+	 */
+	public static function get_unlicensed_extensions() {
+
+		$accessible   = self::get_accessible_items();
+		$official_ids = Extension_Upgrader::get_extension_ids();
+
+		return array_values( array_filter( Extension::get_extensions(), function ( Extension $extension ) use ( $accessible, $official_ids ) {
+
+			$item_id = $extension->get_download_id();
+
+			// only nag about official extensions
+			if ( ! in_array( $item_id, $official_ids ) ) {
+				return false;
+			}
+
+			return ! in_array( $item_id, $accessible );
+		} ) );
+	}
+
+	/**
+	 * Build a groundhogg.io URL for renewing or purchasing a license, with tracking params.
+	 *
+	 * @param string $path
+	 * @param array  $query
+	 *
+	 * @return string
+	 */
+	public static function groundhogg_io_url( string $path = '', array $query = [] ) {
+		return add_query_arg( array_merge( [
+			'utm_source'   => 'plugin',
+			'utm_medium'   => 'wp-dash',
+			'utm_campaign' => 'license-management',
+		], $query ), 'https://groundhogg.io/' . ltrim( $path, '/' ) );
+	}
+
+	/**
+	 * Show a nag when installed official extensions have no active license.
+	 *
+	 * @return void
+	 */
+	public static function missing_licenses_notice() {
+
+		$unlicensed = self::get_unlicensed_extensions();
+
+		if ( empty( $unlicensed ) ) {
+			return;
+		}
+
+		?>
+        <div class="notice notice-warning display-flex gap-20" style="margin: 20px 0">
+			<?php groundhogg_icon( 30 ); ?>
+            <div class="error-description">
+                <p><?php esc_html_e( 'The following installed extensions do not have an active license. Activate or purchase a license to keep receiving updates and support.', 'groundhogg' ); ?></p>
+                <ul style="list-style-type: disc; padding-left: 20px; margin: 0">
+					<?php foreach ( $unlicensed as $extension ): ?>
+                        <li><?php echo esc_html( $extension->get_display_name() ); ?></li>
+					<?php endforeach; ?>
+                </ul>
+                <p class="display-flex gap-10">
+                    <a class="gh-button primary"
+                       href="<?php echo esc_url( self::groundhogg_io_url( 'pricing/', [ 'utm_content' => 'missing-license' ] ) ); ?>"
+                       target="_blank"><?php esc_html_e( 'Purchase a license', 'groundhogg' ); ?></a>
+                </p>
+            </div>
+        </div>
+		<?php
+	}
+
+	/**
+	 * Show a nag when one or more registered licenses are expired.
+	 *
+	 * @return void
+	 */
+	public static function expired_licenses_notice() {
+
+		$expired = self::get_expired_licenses();
+
+		if ( empty( $expired ) ) {
+			return;
+		}
+
+		?>
+        <div class="notice notice-error display-flex gap-20" style="margin: 20px 0">
+			<?php groundhogg_icon( 30 ); ?>
+            <div class="error-description">
+                <p><?php esc_html_e( 'The following licenses have expired. Renew now to continue receiving updates and support.', 'groundhogg' ); ?></p>
+                <ul style="list-style-type: disc; padding-left: 20px; margin: 0">
+					<?php foreach ( $expired as $license ): ?>
+                        <li><?php printf(
+								/* translators: 1: extension name, 2: expiry date */
+								esc_html_x( '%1$s — expired %2$s', 'notice', 'groundhogg' ),
+								esc_html( $license->item_name ),
+								esc_html( $license->expiry() )
+							); ?></li>
+					<?php endforeach; ?>
+                </ul>
+                <p class="display-flex gap-10">
+                    <a class="gh-button primary"
+                       href="<?php echo esc_url( self::groundhogg_io_url( 'account/', [ 'utm_content' => 'expired-license' ] ) ); ?>"
+                       target="_blank"><?php esc_html_e( 'Renew your license', 'groundhogg' ); ?></a>
+                </p>
+            </div>
+        </div>
+		<?php
 	}
 
 	/**

@@ -1777,6 +1777,17 @@ class HTML {
         ], dashicon('bell'), '', true );
     }
 
+
+	/**
+	 * Outputs a review nag button.
+	 *
+	 * This button prompts users to leave a review, but it is only displayed under certain conditions:
+	 * - It does not appear on white-labeled installs.
+	 * - It is restricted to users with the capability to install plugins.
+	 * - It does not appear if the review notice has been dismissed.
+	 *
+	 * @return void|string Returns void if the button is not displayed, otherwise echoes the button HTML.
+	 */
 	public function review_nag_button() {
 
 		// don't show on white labeled installs
@@ -1788,6 +1799,38 @@ class HTML {
 			'href' => '#gh-review-please',
 			'class' => 'gh-button secondary effect-balanced-reflection small'
 		], '⭐⭐⭐⭐⭐🙏', '', true );
+	}
+
+	/**
+	 * Display license-related notifications such as missing or expired licenses.
+	 *
+	 * Prevents the display of nags on white-labeled installations or for users without the appropriate permissions.
+	 * Triggers notification links to manage unlicensed or expired extensions.
+	 *
+	 * @return void
+	 */
+	public function license_nags() {
+
+		// don't show on white labeled installs
+		if ( is_white_labeled() || ! current_user_can( 'manage_gh_licenses' ) || notices()->is_dismissed( 'expired-license' ) ){
+			return;
+		}
+
+		if ( License_Manager::has_missing_licenses() ){
+			$this->e( 'a', [
+				'href' => admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] ),
+				'class' => 'gh-button danger text small'
+			], esc_html__( '🚨 Unlicensed Extensions', 'groundhogg' ), '', true );
+            return;
+		}
+
+        if ( License_Manager::has_expired_licenses() ){
+	        $this->e( 'a', [
+		        'href' => admin_page_url( 'gh_settings', [ 'tab' => 'extensions' ] ),
+		        'class' => 'gh-button danger text small'
+	        ], esc_html__( '🚨 License Expired', 'groundhogg' ), '', true );
+            return;
+        }
 	}
 
 	/**

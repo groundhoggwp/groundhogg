@@ -226,6 +226,10 @@ class Settings_Page extends Admin_Page {
 
 	public function view_extensions() {
 
+        License_Manager::missing_licenses_notice();
+
+        License_Manager::expired_licenses_notice();
+
 		License_Manager::add_license_form();
 
         License_Manager::manage_licenses();
@@ -1989,6 +1993,9 @@ class Settings_Page extends Admin_Page {
         <div id="" class="gh-header is-sticky no-padding display-flex flex-start" style="margin-left:-20px;padding-right: 10px">
 			<?php header_icon(); ?>
             <h1><?php esc_html_e( 'Settings', 'groundhogg' ); ?></h1>
+	        <?php html()->license_nags(); ?>
+	        <?php html()->review_nag_button(); ?>
+	        <?php html()->notifications_button(); ?>
 	        <?php html( html()->button( [
 				'text'  => __( 'Save Changes' , 'groundhogg' ),
 				'class' => 'gh-button primary',
