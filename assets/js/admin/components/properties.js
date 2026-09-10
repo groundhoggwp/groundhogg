@@ -285,6 +285,13 @@
 			className: 'full-width', options, selected: value, ...props,
 		})}`
       }, onMount: ({ id, multiple, name, ...props }, onChange) => {
+
+        if ( multiple ){
+          let selectEl = document.getElementById(id)
+          selectEl.dataset.placeholder = __('Select...', 'groundhogg')
+          Groundhogg.Select2Picker(selectEl)
+        }
+
         $(`#${id}`).on('change', (e) => {
 
           if (multiple) {
