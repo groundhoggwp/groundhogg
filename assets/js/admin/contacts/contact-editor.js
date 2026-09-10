@@ -28,6 +28,7 @@
     moreMenu,
     escHTML,
     sanitizeHTML,
+    safeURL,
     dialog,
     skeleton,
   } = Groundhogg.element
@@ -487,9 +488,16 @@
    * @param opts
    * @return {HTMLElement|null}
    */
+  // coerce an arbitrary detail value to a safe, displayable string
+  const stringifyDetail = v => escHTML(
+    v === null || v === undefined
+    ? ''
+    : typeof v === 'object' ? JSON.stringify(v) : String(v),
+  )
+
   const ActivityDetails = (details, {
-    key = k => k,
-    value = v => v,
+    key = k => escHTML(String(k ?? '')),
+    value = stringifyDetail,
     heading = __('Details'),
     open = false,
   } = {}) => {
@@ -696,7 +704,7 @@
             event_name,
             event_value,
           } = meta
-          return `${ event_name }: <code>${ event_value }</code>`
+          return `${ escHTML(event_name) }: <code>${ escHTML(event_value) }</code>`
         },
         preload   : () => {},
       },
@@ -723,8 +731,8 @@
         }) => {
           /* translators: sentby: the name of a user, subject: the subject line of an email */
           return sprintf(__('%(sentby)s sent an email with subject %(subject)s', 'groundhogg'), {
-            sentby: bold(i18n.sent_by),
-            subject: `<a href="#" class="view-composed-email-log-item" data-activity-id="${ ID }">${ bold(meta.subject) }</a>`
+            sentby: bold(escHTML(i18n.sent_by)),
+            subject: `<a href="#" class="view-composed-email-log-item" data-activity-id="${ escHTML(String(ID)) }">${ bold(escHTML(meta.subject)) }</a>`
           })
         },
         preload: () => {},
@@ -750,15 +758,14 @@
         icon  : icons.link_click,
         render: ({ data }) => {
 
-          const maybeTruncateLink = (link) => {
-            return link.length > 50 ? `${ link.substring(0, 47) }...` : link
-          }
+          const link = data.referer || ''
 
           /* translators: 1: the link clicked, 2: the title of an email */
           return sprintf(__('Clicked %1$s in %2$s', 'groundhogg'), el('a', {
-              target: '_blank',
-              href  : data.referer,
-            }, bold(maybeTruncateLink(data.referer))),
+              target   : '_blank',
+              href     : safeURL(link),
+              className: 'clicked-link',
+            }, bold(escHTML(link))),
             el('a', {
               href: parseInt(data.funnel_id) === 1
                     ? adminPageURL('gh_reporting', {
@@ -777,7 +784,7 @@
         icon  : '<span class="dashicons dashicons-upload"></span>',
         render: ({ i18n }) => {
           /* translators: user: the name of a user, file: the name of a file */
-          return sprintf(__('Imported by %(user)s from %(file)s', 'groundhogg'), { user: bold(i18n.by), file: bold(i18n.file) } )
+          return sprintf(__('Imported by %(user)s from %(file)s', 'groundhogg'), { user: bold(escHTML(i18n.by)), file: bold(escHTML(i18n.file)) } )
         },
       },
       funnel_conversion  : {
@@ -804,16 +811,16 @@
         }) => {
 
           let html = [
-            `Tracked <code>${ data.activity_type }</code>`,
+            `Tracked <code>${ escHTML(data.activity_type) }</code>`,
           ]
 
           if (data.value) {
-            html.push(` for <b>${ data.value }</b>`)
+            html.push(` for <b>${ escHTML(data.value) }</b>`)
           }
 
           html.push(ActivityDetails(meta, {
-            key  : k => `<code>${ k }</code>`,
-            value: v => JSON.stringify(v),
+            key  : k => `<code>${ escHTML(String(k ?? '')) }</code>`,
+            value: v => escHTML(JSON.stringify(v)),
           }))
 
           return Fragment(html)
@@ -871,7 +878,7 @@
           case 'import':
             icon = '<span class="dashicons dashicons-upload"></span>'
             /* translators: %s: the name of a file */
-            before = sprintf(__('Contact imported from %s.', 'groundhogg'), bold(activity.data.name))
+            before = sprintf(__('Contact imported from %s.', 'groundhogg'), bold(escHTML(activity.data.name)))
             break
           default:
             if (activity.form) {
@@ -879,11 +886,11 @@
               heading = __('Submission', 'groundhogg')
               /* translators: 1: the form name, 2: the flow name */
               before = sprintf(__('Submitted %1$s in flow %2$s', 'groundhogg'),
-                bold(activity.data.name), flowLink())
+                bold(escHTML(activity.data.name)), flowLink())
             }
             else {
               /* translators: %s: a form name */
-              before = sprintf(__('Contact updated by %s', 'groundhogg'), bold(activity.data.name))
+              before = sprintf(__('Contact updated by %s', 'groundhogg'), bold(escHTML(activity.data.name)))
             }
         }
 
@@ -905,7 +912,7 @@
           body     : sprintf(
             /* translators: %s: a url/path */
             __('Visited %s', 'groundhogg'),
-            `<a href="${ escHTML(activity.data.path) }" target="_blank">${ escHTML(activity.data.path) }</a>`),
+            `<a href="${ escHTML(safeURL(activity.data.path)) }" class="clicked-link" target="_blank">${ escHTML(activity.data.path) }</a>`),
           diffTime : activity.i18n.diff_time,
           ymdhis   : activity.i18n.ymdhis,
         })
@@ -972,7 +979,8 @@
           return null
         }
 
-        return ActivityDetails(rows, { heading: __('Error', 'groundhogg'), open: true })
+        // rows are already escaped / intentionally wrapped in <code>
+        return ActivityDetails(rows, { heading: __('Error', 'groundhogg'), open: true, value: v => v })
       }
 
       const rowId = `ti-${ pending ? 'qe' : 'ev' }-${ activity.ID }`
@@ -1267,16 +1275,16 @@
 
         case 'email_link_click': {
           let link = activity.data.referer || ''
-          let short = link.length > 50 ? `${ link.substring(0, 47) }...` : link
           return this.ActivityItem({
             id       : `ti-act-${ activity.ID }`,
             iconClass: 'email_link_click',
             icon     : icons.link_click,
             /* translators: %s: the link that was clicked */
             body     : sprintf(__('Clicked %s', 'groundhogg'), el('a', {
-              target: '_blank',
-              href  : link,
-            }, escHTML(short))),
+              target   : '_blank',
+              href     : safeURL(link),
+              className: 'clicked-link',
+            }, escHTML(link))),
             diffTime : when,
             ymdhis   : whenTitle,
           })

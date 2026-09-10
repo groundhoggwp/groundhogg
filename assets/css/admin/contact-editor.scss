@@ -428,6 +428,25 @@ code.meta-replacement-code {
       word-break: break-word;
     }
 
+    // clicked / visited URLs: shown truncated to a single line, expand to the full
+    // link (wrapping) while hovered or focused
+    .clicked-link {
+      display: inline-block;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+
+      &:hover,
+      &:focus {
+        max-width: 100%;
+        overflow: visible;
+        white-space: normal;
+        word-break: break-all;
+      }
+    }
+
     // inline actions (run again, cancel, open in editor…), revealed on hover after the timestamp
     .activity-actions {
       margin-left: 8px;

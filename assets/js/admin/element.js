@@ -538,6 +538,47 @@
   const escHTML = string => specialChars(string)
 
   /**
+   * Return a URL only if it uses a safe scheme, otherwise return a fallback.
+   *
+   * Guards against `javascript:`, `data:`, `vbscript:` and similar when a URL comes from
+   * untrusted data (tracking referers, page paths, ...). Protocol-relative (`//host`),
+   * root-relative (`/path`), anchor (`#x`) and query (`?x`) values are allowed through;
+   * anything with an explicit scheme must be http(s) or mailto/tel.
+   *
+   * @param url      {*}      the candidate URL
+   * @param fallback {string} returned when `url` is unsafe (default '#')
+   * @returns {string}
+   */
+  const safeURL = (url, fallback = '#') => {
+    if (!isString(url)) {
+      return fallback
+    }
+
+    let trimmed = url.trim()
+
+    // browsers strip tabs / newlines before resolving the scheme, so strip them here too
+    // (e.g. "java\tscript:...") before deciding whether the scheme is safe
+    let bare = trimmed.replace(/[\t\r\n]/g, '')
+
+    // relative / same-document references carry no scheme
+    if (/^(?:[/?#]|$)/.test(bare)) {
+      return trimmed
+    }
+
+    // has an explicit scheme? only allow known-safe ones
+    let scheme = bare.match(/^([a-z][a-z0-9+.-]*):/i)
+
+    if (!scheme) {
+      // no scheme and not clearly relative (e.g. "example.com/x") - leave as-is, it's inert
+      return trimmed
+    }
+
+    return [ 'http', 'https', 'mailto', 'tel' ].includes(scheme[1].toLowerCase())
+           ? trimmed
+           : fallback
+  }
+
+  /**
    * Strip unwanted HTML, kses-style.
    *
    * Elements not present in `allowed` are unwrapped (their text content is kept); attributes
@@ -3323,6 +3364,7 @@ ${ afterProgress() }`,
     replacementsWidget,
     escHTML,
     sanitizeHTML,
+    safeURL,
     skeleton,
   }
 
