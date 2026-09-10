@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Background_Tasks;
+use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Contact;
@@ -26,6 +27,7 @@ use WP_REST_Response;
 use WP_REST_Server;
 use function Groundhogg\as_class;
 use function Groundhogg\db;
+use function Groundhogg\flagged;
 use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
@@ -1033,22 +1035,25 @@ class Contacts_Api extends Base_Object_Api {
 			return $v !== null;
 		} );
 
-		$common = array_merge( [
+		$common = [
 			'contact_id' => $ID,
 			'order'      => $order,
 			'found_rows' => false,
-		], $time_range );
+		];
+
+		$ranged = array_merge( $common, $time_range );
 
 		// submissions
-		$submissions = as_class( db()->submissions->query( array_merge( $common, [ 'orderby' => 'date_created' ] ) ), Submission::class );
+		$submissions = as_class( db()->submissions->query( array_merge( $ranged, [ 'orderby' => 'date_created' ] ) ), Submission::class );
 		// activity
-		$activity = as_class( db()->activity->query( array_merge( $common, [ 'orderby' => 'timestamp' ] ) ), Activity::class );
+		$activity = as_class( db()->activity->query( array_merge( $ranged, [ 'orderby' => 'timestamp' ] ) ), Activity::class );
 		// events - only those that actually ran; skipped/cancelled events are noise on the timeline
-		$events = as_class( db()->events->query( array_merge( $common, [ 'orderby' => 'time', 'status' => [ Event::COMPLETE, Event::FAILED ] ] ) ), Event::class );
-		// event queue
-		$event_queue = as_class( db()->event_queue->query( array_merge( $common, [ 'status' => Event::WAITING, 'orderby' => 'time' ] ) ), Event_Queue_Item::class );
+		$events = as_class( db()->events->query( array_merge( $ranged, [ 'orderby' => 'time', 'status' => [ Event::COMPLETE, Event::FAILED ] ] ) ), Event::class );
 		// page visits
-		$page_visits = as_class( db()->page_visits->query( array_merge( $common, [ 'orderby' => 'timestamp' ] ) ), Page_Visit::class );
+		$page_visits = as_class( db()->page_visits->query( array_merge( $ranged, [ 'orderby' => 'timestamp' ] ) ), Page_Visit::class );
+		// event queue - always the contact's full WAITING list, regardless of the time window, so
+		// an incremental refresh can drop events that have since fired
+		$event_queue = as_class( db()->event_queue->query( array_merge( $common, [ 'status' => Event::WAITING, 'orderby' => 'time' ] ) ), Event_Queue_Item::class );
 
 		// Collect related funnel/email IDs so the timeline can be hydrated in a single request
 		$funnel_ids = [];
@@ -1081,24 +1086,68 @@ class Contacts_Api extends Base_Object_Api {
 			}
 		}
 
-		$funnel_ids = array_values( array_unique( array_filter( $funnel_ids ) ) );
-		$email_ids  = array_values( array_unique( array_filter( $email_ids ) ) );
+		// The same step / broadcast is referenced by many events (e.g. every newsletter send).
+		// Serialize the events without their embedded step, and return the distinct steps /
+		// broadcasts once each for the frontend to hydrate.
+		$step_ids      = [];
+		$broadcast_ids = [];
 
-		$funnels = $funnel_ids
-			? as_class( db()->funnels->query( [ 'include' => $funnel_ids, 'limit' => count( $funnel_ids ), 'found_rows' => false ] ), Funnel::class )
-			: [];
-		$emails = $email_ids
-			? as_class( db()->emails->query( [ 'include' => $email_ids, 'limit' => count( $email_ids ), 'found_rows' => false ] ), Email::class )
-			: [];
+		foreach ( array_merge( $events, $event_queue ) as $event ) {
+			switch ( (int) $event->event_type ) {
+				case Event::FUNNEL:
+					$step_ids[] = $event->step_id;
+					break;
+				case Event::BROADCAST:
+					$broadcast_ids[] = $event->step_id;
+					break;
+			}
+		}
+
+		flagged( 'gh_timeline_omit_step', true );
+		$events_data      = array_map( fn( $event ) => $event->get_as_array(), $events );
+		$event_queue_data = array_map( fn( $event ) => $event->get_as_array(), $event_queue );
+		flagged( 'gh_timeline_omit_step', false );
+
+		$step_ids      = array_values( array_unique( array_filter( $step_ids ) ) );
+		$broadcast_ids = array_values( array_unique( array_filter( $broadcast_ids ) ) );
+		$funnel_ids    = array_values( array_unique( array_filter( $funnel_ids ) ) );
+		$email_ids     = array_values( array_unique( array_filter( $email_ids ) ) );
+
+		$include_query = function ( $ids, $db, $class ) {
+			return $ids
+				? as_class( $db->query( [ 'include' => $ids, 'limit' => count( $ids ), 'found_rows' => false ] ), $class )
+				: [];
+		};
+
+		$funnels    = $include_query( $funnel_ids, db()->funnels, Funnel::class );
+		$emails     = $include_query( $email_ids, db()->emails, Email::class );
+		$broadcasts = $include_query( $broadcast_ids, db()->broadcasts, Broadcast::class );
+
+		// steps: keep the flow editor's generated title but allow only basic inline formatting
+		$steps = array_map( function ( $step ) {
+			$arr = $step->get_as_array();
+			$arr['data']['step_title'] = wp_kses( $arr['data']['step_title'] ?? '', [
+				'b'      => [],
+				'strong' => [],
+				'u'      => [],
+				'i'      => [],
+				'em'     => [],
+				'code'   => [],
+			] );
+
+			return $arr;
+		}, $include_query( $step_ids, db()->steps, Step::class ) );
 
 		return self::SUCCESS_RESPONSE( [
 			'submissions' => $submissions,
 			'activity'    => $activity,
-			'events'      => $events,
-			'event_queue' => $event_queue,
+			'events'      => $events_data,
+			'event_queue' => $event_queue_data,
 			'page_visits' => $page_visits,
 			'funnels'     => $funnels,
 			'emails'      => $emails,
+			'steps'       => $steps,
+			'broadcasts'  => $broadcasts,
 		] );
 	}
 

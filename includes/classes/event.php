@@ -685,6 +685,13 @@ class Event extends Base_Object {
 			'ymdhis'    => $date->ymdhis(),
 		];
 
+		// The related step/broadcast/email is often repeated across many events (e.g. every
+		// newsletter send). Consumers that hydrate it separately can set the `gh_timeline_omit_step`
+		// flag to skip embedding it here.
+		if ( flagged( 'gh_timeline_omit_step' ) ) {
+			return $array;
+		}
+
 		switch ( $this->get_event_type() ) {
 			case Event::FUNNEL:
 				return array_merge( $array, [
