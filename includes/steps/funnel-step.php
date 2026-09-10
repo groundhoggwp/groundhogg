@@ -20,7 +20,6 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
 use function Groundhogg\isset_not_empty;
-use function Groundhogg\kses_e;
 use function Groundhogg\markdown2html;
 use function Groundhogg\sanitize_payload;
 
@@ -948,7 +947,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		];
 
 		if ( $this->get_posted_data( 'step_title' ) ) {
-			$data['step_title'] = sanitize_text_field( $this->get_posted_data( 'step_title' ) );
+            $data['step_title'] = $this->get_posted_data( 'step_title' );
 		}
 
 		if ( $step->is_benchmark() ) {

@@ -26,13 +26,23 @@
     confirmationModal,
     adminPageURL,
     moreMenu,
-    setFrameContent,
-    loadingDots,
-    spinner,
     escHTML,
+    sanitizeHTML,
     dialog,
     skeleton,
   } = Groundhogg.element
+
+  // titles from the flow editor / emails may carry basic inline formatting - allow only that.
+  // Cached because the same handful of titles render across many timeline rows.
+  const INLINE_TITLE_TAGS = { b: [], strong: [], u: [], i: [], em: [], code: [] }
+  const titleHTMLCache = new Map()
+  const titleHTML = str => {
+    str = String(str ?? '')
+    if (!titleHTMLCache.has(str)) {
+      titleHTMLCache.set(str, sanitizeHTML(str, INLINE_TITLE_TAGS))
+    }
+    return titleHTMLCache.get(str)
+  }
 
   const {
     currentUser,
@@ -91,6 +101,8 @@
 
   // whether the single /timeline request has run this session (it also hydrates the funnel/email stores)
   let timelineHydrated = false
+  // steps referenced by timeline events, hydrated separately from the events (kept across tab switches)
+  const timelineStepsById = {}
 
   const maybeCall = (maybeFunc, ...args) => {
     if (typeof maybeFunc === 'string') {
@@ -731,7 +743,7 @@
                 tab : 'funnels',
                 step: data.step_id,
               }),
-          }, bold(EmailsStore.get(data.email_id).data.title)))
+          }, bold(titleHTML(EmailsStore.get(data.email_id).data.title))))
         },
       },
       email_link_click   : {
@@ -757,7 +769,7 @@
                   tab : 'funnels',
                   step: data.step_id,
                 }),
-            }, bold(EmailsStore.get(data.email_id).data.title))
+            }, bold(titleHTML(EmailsStore.get(data.email_id).data.title)))
           )
         },
       },
@@ -772,7 +784,7 @@
         icon  : '<span class="dashicons dashicons-flag"></span>',
         render: ({ data }) => {
 
-          let funnelTitle = bold(FunnelsStore.get(data.funnel_id).data.title)
+          let funnelTitle = bold(titleHTML(FunnelsStore.get(data.funnel_id).data.title))
           let link = el('a', {
             href: adminPageURL('gh_funnels', {
               action: 'edit',
@@ -828,7 +840,7 @@
         const flowLink = () => el('a', {
           href  : funnel.admin + `#${ activity.data.step_id }`,
           target: '_blank',
-        }, bold(funnel.data.title))
+        }, bold(titleHTML(funnel.data.title)))
 
         let icon = icons.contact
         let before
@@ -838,19 +850,19 @@
             icon = icons.form
             /* translators: 1: the form name, 2: the flow name */
             before = sprintf(__('Submitted form %1$s in flow %2$s', 'groundhogg'),
-              bold(activity.form.data.step_title), flowLink())
+              bold(titleHTML(activity.form.data.step_title)), flowLink())
             break
           case 'webhook':
             icon = icons.webhook
             /* translators: 1: the step name, 2: the flow name */
             before = sprintf(__('Received request to %1$s in flow %2$s', 'groundhogg'),
-              bold(activity.form.data.step_title), flowLink())
+              bold(titleHTML(activity.form.data.step_title)), flowLink())
             break
           case 'webhook_response':
             icon = icons.webhook
             /* translators: 1: the step name, 2: the flow name */
             before = sprintf(__('Received response from %1$s in flow %2$s', 'groundhogg'),
-              bold(activity.form.data.step_title), flowLink())
+              bold(titleHTML(activity.form.data.step_title)), flowLink())
             break
           case 'api':
             icon = icons.api
@@ -876,6 +888,7 @@
         }
 
         return this.ActivityItem({
+          id       : `ti-sub-${ activity.ID }`,
           iconClass: 'submission',
           icon,
           body     : before,
@@ -886,6 +899,7 @@
 
       if (activity.type === 'page_visit') {
         return this.ActivityItem({
+          id       : `ti-pv-${ activity.ID }`,
           iconClass: 'page-visit',
           icon     : icons.link_click,
           body     : sprintf(
@@ -910,6 +924,7 @@
                    : this.types.fallback
 
       return this.ActivityItem({
+        id        : `ti-act-${ activity.ID }`,
         className : `${ activity.data.activity_type } activity`,
         tabindex  : 0,
         iconClass : activity.data.activity_type,
@@ -960,8 +975,14 @@
         return ActivityDetails(rows, { heading: __('Error', 'groundhogg'), open: true })
       }
 
+      const rowId = `ti-${ pending ? 'qe' : 'ev' }-${ activity.ID }`
+
       switch (parseInt(activity.data.event_type)) {
         case 1: {
+
+          if (!step) {
+            return null
+          }
 
           let grouped = !!activity.grouped
           let funnel = FunnelsStore.get(step.data.funnel_id)
@@ -970,7 +991,8 @@
             return null
           }
 
-          let title = escHTML(step.data.step_title)
+          // the flow editor's generated title, kses'd server-side to basic inline formatting
+          let title = titleHTML(step.data.step_title)
 
           // completed -> just the step title; pending / failed -> "Pending — title" (not bold)
           let label = pending
@@ -994,6 +1016,7 @@
           }, Groundhogg.rawStepTypes[step.data.step_type].name)
 
           return this.ActivityItem({
+            id       : rowId,
             iconClass: `${ step.data.step_group } ${ pending ? 'pending' : '' } ${ failed ? 'failed' : '' }`,
             icon     : pending ? icons.hourglass : stepTypeIcon(step.data.step_type),
             body     : `<span>${ label }</span>`,
@@ -1007,7 +1030,7 @@
                          stepTypeName,
                          el('a', {
                            href: funnel.admin + '#' + activity.data.step_id,
-                         }, funnel.data.title)),
+                         }, titleHTML(funnel.data.title))),
             diffTime : activity.i18n.diff_time,
             ymdhis   : activity.i18n.ymdhis,
             actions  : [ ...this.eventActions(activity), editorLink ].filter(Boolean),
@@ -1017,7 +1040,11 @@
         }
         case 2: {
 
-          let objectTitleDisplay = bold(activity.broadcast.object.data.title)
+          if (!activity.broadcast) {
+            return null
+          }
+
+          let objectTitleDisplay = bold(titleHTML(activity.broadcast.object?.data?.title || __('Broadcast', 'groundhogg')))
 
           if (!pending && activity.broadcast.data.object_type === 'email') {
             objectTitleDisplay = emailLogLink(objectTitleDisplay)
@@ -1028,6 +1055,7 @@
                      : failed ? strings.failed_broadcast : strings.received_broadcast
 
           return this.ActivityItem({
+            id       : rowId,
             iconClass: `broadcast ${ failed ? 'failed' : '' }`,
             icon     : icons.megaphone,
             body     : `<span>${ sprintf(verb, objectTitleDisplay) }</span>`,
@@ -1041,7 +1069,8 @@
         }
         case 3: {
 
-          let emailTitleDisplay = bold(activity.email.email.data.title)
+          let email = activity.email?.email || EmailsStore.get(activity.data.email_id)
+          let emailTitleDisplay = bold(titleHTML(email ? email.data.title : __('Email', 'groundhogg')))
 
           if (!pending) {
             emailTitleDisplay = emailLogLink(emailTitleDisplay)
@@ -1052,6 +1081,7 @@
                      : failed ? strings.failed_email : strings.received_email
 
           return this.ActivityItem({
+            id       : rowId,
             iconClass: `broadcast ${ failed ? 'failed' : '' }`,
             icon     : icons.email,
             body     : `<span>${ sprintf(verb, emailTitleDisplay) }</span>`,
@@ -1131,6 +1161,7 @@
     },
 
     ActivityItem ({
+      id = false, // stable id so morphdom can match the row across re-renders
       icon = '',
       iconClass = '',
       iconFramed = true,
@@ -1147,6 +1178,7 @@
     }) {
 
       return Li({
+        id,
         className: `activity-item ${ className }`.trim(),
         tabindex : tabindex === false ? false : tabindex,
       }, [
@@ -1225,6 +1257,7 @@
 
         case 'email_opened':
           return this.ActivityItem({
+            id       : `ti-act-${ activity.ID }`,
             iconClass: 'email_opened',
             icon     : icons.open_email,
             body     : __('Opened', 'groundhogg'),
@@ -1236,6 +1269,7 @@
           let link = activity.data.referer || ''
           let short = link.length > 50 ? `${ link.substring(0, 47) }...` : link
           return this.ActivityItem({
+            id       : `ti-act-${ activity.ID }`,
             iconClass: 'email_link_click',
             icon     : icons.link_click,
             /* translators: %s: the link that was clicked */
@@ -1257,6 +1291,7 @@
      * A collapsible timeline group (flow run, browsing session, ...).
      */
     CollapsibleGroup ({
+      id = false,
       className,
       iconClass,
       icon,
@@ -1267,6 +1302,7 @@
     }) {
 
       return Li({
+        id,
         className: `activity-item group ${ className } closed`,
         ...dataAttrs,
       }, [
@@ -1297,9 +1333,12 @@
     renderFlowGroup (group) {
 
       let funnel = FunnelsStore.get(group.funnel_id)
-      let title = funnel ? funnel.data.title : __('Flow', 'groundhogg')
+      let title = funnel ? titleHTML(funnel.data.title) : __('Flow', 'groundhogg')
+      // keyed by the run's entry event so morphdom keeps the open/closed state across re-renders
+      let entryId = group.items.reduce((a, b) => a.time <= b.time ? a : b, group.items[0]).ID
 
       return this.CollapsibleGroup({
+        id       : `ti-fg-${ group.funnel_id }-${ entryId }`,
         className: 'flow-group',
         iconClass: 'funnel',
         icon     : icons.funnel,
@@ -1318,7 +1357,10 @@
         return this.renderActivity(session.items[0])
       }
 
+      let entryId = session.items.reduce((a, b) => a.time <= b.time ? a : b, session.items[0]).ID
+
       return this.CollapsibleGroup({
+        id       : `ti-vs-${ entryId }`,
         className: 'visit-session',
         iconClass: 'page-visit',
         icon     : icons.link_click,
@@ -1591,7 +1633,7 @@
         if (bucket.key !== currentBucket) {
           flushRun()
           currentBucket = bucket.key
-          items.push(Li({ className: 'timeline-date-header' }, bucket.label))
+          items.push(Li({ id: `ti-th-${ bucket.key }`, className: 'timeline-date-header' }, bucket.label))
         }
 
         let el = this.renderNode(node)
@@ -1636,9 +1678,28 @@
         map(a => this.types[a.data.activity_type].preload(a))
 
       Promise.all(promises).catch(() => {}).finally(() => {
-        let tree = this.buildTree(activities, order)
-        el.innerHTML = ''
-        el.append(this.render(tree))
+
+        let next = this.render(this.buildTree(activities, order))
+        let current = el.querySelector('#activity-timeline')
+
+        if (current) {
+          // morph in place so a refresh only touches what changed, and scroll position,
+          // hover, and expanded groups / detail panels survive
+          morphdom(current, next, {
+            onBeforeElUpdated: (fromEl, toEl) => {
+              // keep the user's expand/collapse choice through a re-render
+              if (fromEl.classList.contains('group') || fromEl.classList.contains('activity-details')) {
+                toEl.classList.toggle('closed', fromEl.classList.contains('closed'))
+              }
+              return !fromEl.isEqualNode(toEl)
+            },
+          })
+        }
+        else {
+          el.innerHTML = ''
+          el.append(next)
+        }
+
         this.onMount()
       })
 
@@ -1688,46 +1749,35 @@
         },
         onMount: () => {
 
-          const clearFeedCache = () => {
-            [
-              EventQueue,
-              EventsStore,
-              SubmissionsStore,
-              ActivityStore,
-              PageVisitsStore,
-            ].forEach(store => {
-              store.clearItems()
-              store.clearResultsCache()
-            })
-          }
+          const nowUnix = () => Math.floor(Date.now() / 1000)
 
           let order = 'desc'
           let filter = null
           let filterOptions = []
+          let stepsById = timelineStepsById // module-scoped so it survives tab switches
 
-          // rolling time window - the timeline requests activity newer than `after`,
-          // widened by "Load earlier activity"
-          const DEFAULT_LOOKBACK_DAYS = 365
-          let lookbackDays = DEFAULT_LOOKBACK_DAYS
-          let previousItemCount = null
+          // The timeline holds everything from `windowAfter` up to now. "Load earlier" slides
+          // `windowAfter` back in fixed slices; "refresh" fetches only what's new since `newestLoaded`.
+          const DEFAULT_LOOKBACK_DAYS = 90
+          const LOAD_EARLIER_DAYS = 90
+          let windowAfter = nowUnix() - ( DEFAULT_LOOKBACK_DAYS * 86400 )
+          let newestLoaded = null
+          let loadEarlierStep = LOAD_EARLIER_DAYS
+          let emptyStreak = 0
           let atStartOfHistory = false
-          let wideningWindow = false
 
-          const resetWindow = () => {
-            lookbackDays = DEFAULT_LOOKBACK_DAYS
-            previousItemCount = null
-            atStartOfHistory = false
-            wideningWindow = false
-          }
+          // nothing predates the contact - a hard floor for "load earlier"
+          const contactCreatedUnix = ( () => {
+            let parsed = Date.parse(String(contact?.data?.date_created || '').replace(/-/g, '/'))
+            return isNaN(parsed) ? 0 : Math.floor(parsed / 1000)
+          } )()
 
           $('#refresh-timeline').on('click', e => {
 
             $(e.currentTarget).find('.dashicons').addClass('spinning')
 
-            resetWindow()
-            clearFeedCache()
-
-            fetchActivity().then(() => {
+            // incremental: only what's newer than what we already hold (+ the full pending queue)
+            fetchActivity({ after: newestLoaded ?? windowAfter }).then(() => {
               $(e.currentTarget).find('.dashicons').removeClass('spinning')
             })
           })
@@ -1738,16 +1788,16 @@
           })
 
           $('#activity-order').on('change', (e) => {
+            // order only affects the client-side sort / grouping - no refetch needed
             order = e.target.value
-            clearFeedCache()
-            fetchActivity()
+            loadTimeline()
           })
 
           // Build the "filter by" options from what's actually in the timeline:
           // activity types, plus specific flows / emails / broadcasts that appear.
           const buildFilterOptions = (activities) => {
 
-            let opts = [
+            let typeOpts = [
               { id: 'flows', text: __('All flow activity', 'groundhogg') },
               { id: 'broadcasts', text: __('All broadcasts', 'groundhogg') },
               { id: 'submissions', text: __('Form submissions', 'groundhogg') },
@@ -1755,9 +1805,10 @@
             ]
 
             if (isWPFusionActive) {
-              opts.push({ id: 'wp_fusion', text: __('WPFusion activity', 'groundhogg') })
+              typeOpts.push({ id: 'wp_fusion', text: __('WPFusion activity', 'groundhogg') })
             }
 
+            let specificOpts = []
             let seenFunnels = new Set()
             let seenEmails = new Set()
             let seenBroadcasts = new Set()
@@ -1768,10 +1819,10 @@
               if (funnelId > 1 && !seenFunnels.has(funnelId)) {
                 seenFunnels.add(funnelId)
                 let funnel = FunnelsStore.get(funnelId)
-                opts.push({
+                specificOpts.push({
                   id  : `flow:${ funnelId }`,
                   /* translators: %s: a flow name */
-                  text: sprintf(__('Flow: %s', 'groundhogg'), funnel ? funnel.data.title : `#${ funnelId }`),
+                  text: sprintf(__('Flow: %s', 'groundhogg'), funnel ? titleHTML(funnel.data.title) : `#${ funnelId }`),
                 })
               }
 
@@ -1780,25 +1831,27 @@
                 seenEmails.add(emailId)
                 let email = EmailsStore.get(emailId)
                 if (email) {
-                  opts.push({
+                  specificOpts.push({
                     id  : `email:${ emailId }`,
                     /* translators: %s: an email subject */
-                    text: sprintf(__('Email: %s', 'groundhogg'), email.data.title),
+                    text: sprintf(__('Email: %s', 'groundhogg'), titleHTML(email.data.title)),
                   })
                 }
               }
 
               if (a.type === 'event' && parseInt(a.data.event_type) === 2 && a.broadcast && !seenBroadcasts.has(a.broadcast.ID)) {
                 seenBroadcasts.add(a.broadcast.ID)
-                opts.push({
+                specificOpts.push({
                   id  : `broadcast:${ a.broadcast.ID }`,
                   /* translators: %s: a broadcast name */
-                  text: sprintf(__('Broadcast: %s', 'groundhogg'), a.broadcast.object?.data?.title || `#${ a.broadcast.ID }`),
+                  text: sprintf(__('Broadcast: %s', 'groundhogg'), titleHTML(a.broadcast.object?.data?.title) || `#${ a.broadcast.ID }`),
                 })
               }
             })
 
-            return opts
+            specificOpts.sort((a, b) => a.text.localeCompare(b.text))
+
+            return [ ...typeOpts, ...specificOpts ]
           }
 
           const applyFilter = (activities) => {
@@ -1883,50 +1936,86 @@
             },
           }))
 
-          const fetchActivity = () => {
+          // The four time-bounded stores. The queue is handled separately (always fetched whole).
+          const rangedStores = [ SubmissionsStore, ActivityStore, EventsStore, PageVisitsStore ]
 
-            return get(`${ ContactsStore.route }/${contact.ID}/timeline`, {
-              order,
-              after: Math.floor(Date.now() / 1000) - ( lookbackDays * 86400 ),
-            }).then(response => {
+          /**
+           * @param before  upper bound (unix) - omit for "everything since `after`"
+           * @param after   lower bound (unix)
+           * @param replace  clear the ranged stores first (initial load / order reset)
+           */
+          const fetchActivity = ({ before = null, after = windowAfter, replace = false } = {}) => {
 
-              // Hydration data embedded in the single timeline request
+            let params = { order, after }
+            if (before !== null) {
+              params.before = before
+            }
+
+            return get(`${ ContactsStore.route }/${contact.ID}/timeline`, params).then(response => {
+
+              // Hydration data - events reference these by id rather than embedding them
               FunnelsStore.itemsFetched(response.funnels || [])
               EmailsStore.itemsFetched(response.emails || [])
+              BroadcastsStore.itemsFetched(response.broadcasts || [])
 
-              SubmissionsStore.itemsFetched( response.submissions )
+              ;( response.steps || [] ).forEach(step => { stepsById[step.ID] = step })
+
+              if (replace) {
+                rangedStores.forEach(s => {
+                  s.clearItems()
+                  s.clearResultsCache()
+                })
+              }
+
+              SubmissionsStore.itemsFetched(response.submissions)
               ActivityStore.itemsFetched(response.activity)
               EventsStore.itemsFetched(response.events)
-              EventQueue.itemsFetched(response.event_queue)
               PageVisitsStore.itemsFetched(response.page_visits)
 
-              // broadcast records embedded on broadcast events (used by the email log modal)
-              response.events.
+              // the pending queue is always returned whole - rebuild it so fired events drop off
+              EventQueue.clearItems()
+              EventQueue.itemsFetched(response.event_queue)
+
+              // fallback for an unhydrated response (step still embedded on the event)
+              ;( response.events || [] ).
                 filter(e => parseInt(e.data.event_type) === 2 && e.broadcast).
                 forEach(e => BroadcastsStore.itemsFetched([e.broadcast]))
-
-              // if widening the window returned nothing older, we've reached the start of history
-              let itemCount = [
-                'submissions', 'activity', 'events', 'event_queue', 'page_visits',
-              ].reduce((n, k) => n + ( Array.isArray(response[k]) ? response[k].length : 0 ), 0)
-
-              if (wideningWindow && previousItemCount !== null && itemCount <= previousItemCount) {
-                atStartOfHistory = true
-              }
-              previousItemCount = itemCount
-              wideningWindow = false
 
               timelineHydrated = true
 
               loadTimeline()
+
+              return response
             })
           }
 
           const loadEarlier = () => {
-            lookbackDays *= 2
-            wideningWindow = true
-            clearFeedCache()
-            fetchActivity()
+
+            let sliceBefore = windowAfter
+            let sliceAfter = windowAfter - ( loadEarlierStep * 86400 )
+            windowAfter = sliceAfter
+
+            fetchActivity({ before: sliceBefore, after: sliceAfter }).then(response => {
+
+              let got = [ 'submissions', 'activity', 'events', 'page_visits' ].
+                reduce((n, k) => n + ( Array.isArray(response[k]) ? response[k].length : 0 ), 0)
+
+              if (got) {
+                emptyStreak = 0
+                loadEarlierStep = LOAD_EARLIER_DAYS
+              }
+              else {
+                // skip dormant stretches faster; give up after a few empty slices in a row
+                emptyStreak++
+                loadEarlierStep = Math.min(loadEarlierStep * 2, 730)
+              }
+
+              if (windowAfter <= contactCreatedUnix || emptyStreak >= 3) {
+                atStartOfHistory = true
+              }
+
+              renderLoadEarlier()
+            })
           }
 
           const renderLoadEarlier = () => {
@@ -1942,9 +2031,21 @@
               `<button id="load-earlier-activity" class="gh-button secondary text">${ __('Load earlier activity', 'groundhogg') }</button>`)
 
             $('#load-earlier-activity').on('click', e => {
-              $(e.currentTarget).prop('disabled', true).text(__('Loading…', 'groundhogg'))
+              $(e.currentTarget).prop('disabled', true).addClass('loading-dots').text(__('Loading', 'groundhogg'))
               loadEarlier()
             })
+          }
+
+          // re-attach the step / broadcast an event references (unless it's still embedded)
+          const hydrateEvent = (e) => {
+            switch (parseInt(e.data.event_type)) {
+              case 1:
+                return e.step ? {} : { step: stepsById[e.data.step_id] }
+              case 2:
+                return e.broadcast ? {} : { broadcast: BroadcastsStore.get(e.data.step_id) }
+              default:
+                return {}
+            }
           }
 
           const loadTimeline = () => {
@@ -1961,11 +2062,13 @@
               } )),
               ...EventsStore.getItems().map(e => ( {
                 ...e,
+                ...hydrateEvent(e),
                 type: 'event',
                 time: parseInt(e.data.time) + parseFloat(e.data.micro_time),
               } )),
               ...EventQueue.getItems().map(e => ( {
                 ...e,
+                ...hydrateEvent(e),
                 type   : 'event',
                 pending: true,
                 time   : parseInt(e.data.time) + parseFloat(e.data.micro_time),
@@ -1989,14 +2092,29 @@
 
               })
 
+            // track the bounds of what we hold (ignore pending/future queue items)
+            allActivities.forEach(a => {
+              if (a.pending) {
+                return
+              }
+              if (newestLoaded === null || a.time > newestLoaded) {
+                newestLoaded = a.time
+              }
+              if (a.time < windowAfter) {
+                windowAfter = a.time
+              }
+            })
+
+            if (windowAfter <= contactCreatedUnix) {
+              atStartOfHistory = true
+            }
+
             filterOptions = buildFilterOptions(allActivities)
             allActivities = applyFilter(allActivities)
 
             ActivityTimeline.mount('#activity-here', allActivities, {
               order,
-              needsRefresh: () => {
-                fetchActivity()
-              },
+              needsRefresh: () => fetchActivity({ after: newestLoaded ?? windowAfter }),
             })
 
             $('#activity-here').
@@ -2016,7 +2134,7 @@
             return
           }
 
-          fetchActivity()
+          fetchActivity({ after: windowAfter, replace: true })
         },
       },
       {
@@ -2344,8 +2462,7 @@
 
       const $btn = $('#save-primary')
 
-      let { stop } = loadingDots('#save-primary')
-      $btn.prop('disabled', true)
+      $btn.prop('disabled', true).addClass( 'loading-dots' )
 
       let data = new FormData(e.currentTarget)
 
@@ -2359,8 +2476,7 @@
 
         ContactsStore.itemsFetched([r.data.contact])
 
-        $btn.prop('disabled', false)
-        stop()
+        $btn.prop('disabled', false).removeClass('loading-dots')
 
         dialog({
           message: __('Changes saved!', 'groundhogg'),
@@ -2394,8 +2510,7 @@
 
     const commitMetaChanges = () => {
 
-      let { stop } = loadingDots('#save-meta')
-      $('#save-meta').prop('disabled', true)
+      $('#save-meta').prop('disabled', true).addClass( 'loading-dots' )
 
       Promise.all([
         ContactsStore.patchMeta(getContact().ID, metaChanges),
@@ -2406,7 +2521,6 @@
         metaChanges = {}
         deleteKeys = []
 
-        stop()
         mount()
         dialog({
           message: __('Changes saved!', 'groundhogg'),
@@ -2529,9 +2643,7 @@
                         <button id="cancel-meta-changes"
                                 class="gh-button danger text">${ __('Cancel') }
                         </button>
-                        <button id="save-meta" class="gh-button primary">
-                            ${ __('Save Changes', 'groundhogg') }
-                        </button>
+                        <button id="save-meta" class="gh-button primary">${ __('Save Changes', 'groundhogg') }</button>
                     </div>
                 </div>
             </div>`
@@ -2720,9 +2832,7 @@
                         <button id="cancel-meta-changes"
                                 class="gh-button danger text">${ __('Cancel', 'groundhogg') }
                         </button>
-                        <button id="save-meta" class="gh-button primary">
-                            ${ __('Save Changes', 'groundhogg') }
-                        </button>
+                        <button id="save-meta" class="gh-button primary">${ __('Save Changes', 'groundhogg') }</button>
                     </div>
                 </div>
             </div>`
