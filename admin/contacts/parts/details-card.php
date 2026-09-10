@@ -6,6 +6,7 @@ use Groundhogg\Preferences;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_email_address_hostname;
+use function Groundhogg\guess_name_from_email;
 use function Groundhogg\html;
 use function Groundhogg\is_free_email_provider;
 
@@ -25,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
     <!-- FIRST -->
     <h1 id="contact-full-name">
-		<?php echo esc_html( trim( $contact->get_full_name() ) ?: $contact->get_email() ); ?></span>
+		<?php echo esc_html( trim( $contact->get_full_name() ) ?: guess_name_from_email( $contact->get_email() ) ); ?></span>
     </h1>
     <div class="gh-panel">
         <div id="contact-more-actions" class="display-flex gap-5" style="padding: 20px 20px 20px 0"></div>

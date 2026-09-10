@@ -2024,6 +2024,44 @@ function split_name( $name ) {
 }
 
 /**
+ * Guess a person's name from an email address.
+ *
+ * Uses the local part (before the @) and splits it on common separators
+ * (. _ - +) to produce a capitalized name. If there is no separator the
+ * local part is returned unchanged.
+ *
+ * e.g. john.doe@example.com  => "John Doe"
+ *      mynamelast@example.com => "mynamelast"
+ *
+ * @param string $email
+ *
+ * @return string
+ */
+function guess_name_from_email( $email ) {
+
+	$email = trim( $email );
+
+	// Grab the local part before the @
+	$local = strpos( $email, '@' ) !== false ? substr( $email, 0, strpos( $email, '@' ) ) : $email;
+
+	// Drop anything after a + (sub-addressing) and trailing digits
+	$local = preg_replace( '/\+.*$/', '', $local );
+	$local = preg_replace( '/\d+$/', '', $local );
+
+	// No separator, return the local part as-is
+	if ( ! preg_match( '/[._\-]/', $local ) ) {
+		return $local;
+	}
+
+	$parts = preg_split( '/[._\-]+/', $local, - 1, PREG_SPLIT_NO_EMPTY );
+	$parts = array_map( function ( $part ) {
+		return function_exists( 'mb_convert_case' ) ? mb_convert_case( $part, MB_CASE_TITLE, 'UTF-8' ) : ucfirst( $part );
+	}, $parts );
+
+	return implode( ' ', $parts );
+}
+
+/**
  * Split on the last n occurrences of a delimiter
  *
  * @param $string
