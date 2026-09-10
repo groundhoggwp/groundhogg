@@ -363,10 +363,22 @@ class Emails_Api extends Base_Object_Api {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
 		}
 
+		// A global block is a reusable content fragment embedded into other
+		// emails, not a standalone sendable email.
+		if ( $email->is_global_block() ) {
+			return self::ERROR_400( 'not_sendable', 'That email is a global block and cannot be sent on its own.' );
+		}
+
 		$to = $request->get_param( 'to' );
 
 		if ( empty( $to ) ) {
 			return self::ERROR_422();
+		}
+
+		$recipient_check = $this->check_recipient_view_access( (array) $to );
+
+		if ( is_wp_error( $recipient_check ) ) {
+			return $recipient_check;
 		}
 
 		if ( is_array( $to ) && count( $to ) !== 1 ) { // sending to multiple contacts
@@ -460,6 +472,12 @@ class Emails_Api extends Base_Object_Api {
 
 		if ( empty( $to ) && empty( $cc ) && empty( $bcc ) ) {
 			return self::ERROR_401( 'no_recipients', 'No recipients were defined.' );
+		}
+
+		$recipient_check = $this->check_recipient_view_access( array_merge( $to, $cc, $bcc ) );
+
+		if ( is_wp_error( $recipient_check ) ) {
+			return $recipient_check;
 		}
 
 		// Get relevant contact records
@@ -726,6 +744,39 @@ class Emails_Api extends Base_Object_Api {
 
 	public function get_db_table_name() {
 		return 'emails';
+	}
+
+	/**
+	 * send_permissions_callback() ('send_emails') gates the send routes; on top of
+	 * that a caller must be able to view_contact any recipient that belongs to an
+	 * existing contact - otherwise 'send_emails' alone lets a caller email
+	 * contacts outside their team. Raw addresses that don't match a contact are
+	 * left alone (there is no contact to scope against). The abilities layer
+	 * (Groundhogg\Abilities\Emails) makes the same check.
+	 *
+	 * @param array $recipients contact IDs and/or email addresses
+	 *
+	 * @return true|\WP_Error
+	 */
+	protected function check_recipient_view_access( array $recipients ) {
+
+		foreach ( $recipients as $recipient ) {
+
+			if ( empty( $recipient ) ) {
+				continue;
+			}
+
+			$contact = get_contactdata( is_numeric( $recipient ) ? absint( $recipient ) : sanitize_email( $recipient ) );
+
+			if ( $contact && $contact->exists() && ! current_user_can( 'view_contact', $contact ) ) {
+				return self::ERROR_403(
+					'cannot_send',
+					'You do not have permission to send email to one or more of the specified recipients.'
+				);
+			}
+		}
+
+		return true;
 	}
 
 	public function send_permissions_callback() {
