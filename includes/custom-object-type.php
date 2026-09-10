@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  *  - a type-scoped DB proxy (Custom_Object_Table) registered with the DB Manager
  *    so get_db(), create_object_from_type() and relationships all resolve it
- *  - a REST controller at gh/v4/objects/{type}
+ *  - a REST controller at gh/v4/objects/{type}, unless 'show_in_rest' is false
  *
  * Types may be registered at any point up to rest_api_init; registration is
  * deferred until the DB Manager is ready.
@@ -73,6 +73,9 @@ class Custom_Object_Type {
 			// Optional per-operation capability overrides:
 			// [ 'view' => '', 'create' => '', 'edit' => '', 'delete' => '' ]
 			'capabilities' => [],
+			// Register the REST controller at gh/v4/objects/{type}. Set false to
+			// keep the type PHP-only (DB proxy, query builder, relationships).
+			'show_in_rest' => true,
 		] );
 	}
 
@@ -156,8 +159,8 @@ class Custom_Object_Type {
 	}
 
 	/**
-	 * Register the DB proxy and REST controller once the DB Manager is ready.
-	 * Safe to call repeatedly.
+	 * Register the DB proxy, and the REST controller unless 'show_in_rest' is
+	 * false, once the DB Manager is ready. Safe to call repeatedly.
 	 */
 	public function maybe_bootstrap() {
 
@@ -185,7 +188,18 @@ class Custom_Object_Type {
 
 		$this->booted = true;
 
-		$this->api = new Custom_Objects_Api( $this );
+		if ( $this->rest_enabled() ) {
+			$this->api = new Custom_Objects_Api( $this );
+		}
+	}
+
+	/**
+	 * Whether this type exposes a REST controller at gh/v4/objects/{type}.
+	 *
+	 * @return bool
+	 */
+	public function rest_enabled() {
+		return (bool) $this->args['show_in_rest'];
 	}
 
 	/**

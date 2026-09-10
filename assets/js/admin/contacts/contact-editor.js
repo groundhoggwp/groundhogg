@@ -500,6 +500,7 @@
     value = stringifyDetail,
     heading = __('Details'),
     open = false,
+    className = '',
   } = {}) => {
 
     // object provided, parse to label => value
@@ -521,7 +522,7 @@
     }
 
     return Div({
-      className: `gh-panel outlined ${ open ? '' : 'closed' } activity-details overflow-hidden`,
+      className: `gh-panel outlined ${ open ? '' : 'closed' } activity-details overflow-hidden ${ className }`.trim(),
       style    : { marginTop: '5px' },
     }, [
       Div({
@@ -980,7 +981,12 @@
         }
 
         // rows are already escaped / intentionally wrapped in <code>
-        return ActivityDetails(rows, { heading: __('Error', 'groundhogg'), open: true, value: v => v })
+        return ActivityDetails(rows, {
+          heading  : __('Error', 'groundhogg'),
+          open     : true,
+          value    : v => v,
+          className: 'activity-details--error',
+        })
       }
 
       const rowId = `ti-${ pending ? 'qe' : 'ev' }-${ activity.ID }`

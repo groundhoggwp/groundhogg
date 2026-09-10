@@ -309,6 +309,17 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-details table td:first-child {
   word-break: normal;
 }
+#activity-timeline li.activity-item .activity-details--error {
+  border-color: rgba(233, 31, 79, 0.5);
+  box-shadow: 0 0 0 1px rgba(233, 31, 79, 0.1);
+}
+#activity-timeline li.activity-item .activity-details--error .gh-panel-header {
+  background-color: rgba(233, 31, 79, 0.1);
+  border-bottom-color: rgba(233, 31, 79, 0.5);
+}
+#activity-timeline li.activity-item .activity-details--error .gh-panel-header h2 {
+  color: rgb(233, 31, 79);
+}
 #activity-timeline li.activity-item:not(:hover, :active, :focus, :focus-within) .activity-actions {
   display: none;
 }

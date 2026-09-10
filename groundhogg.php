@@ -8,6 +8,8 @@
  * Author URI: https://groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Text Domain: groundhogg
  * Domain Path: /languages
+ * Requires at least: 6.9
+ * Requires PHP: 7.4
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl.md
  *

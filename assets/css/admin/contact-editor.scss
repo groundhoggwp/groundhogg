@@ -380,6 +380,21 @@ code.meta-replacement-code {
       word-break: normal;
     }
 
+    // error details card - make it read as "something went wrong here"
+    .activity-details--error {
+      border-color: $error-red-50;
+      box-shadow: 0 0 0 1px $error-red-10;
+
+      .gh-panel-header {
+        background-color: $error-red-10;
+        border-bottom-color: $error-red-50;
+
+        h2 {
+          color: $error-red;
+        }
+      }
+    }
+
     &:not(:hover, :active, :focus, :focus-within) {
       .activity-actions {
         display: none;
