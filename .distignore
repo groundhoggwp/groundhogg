@@ -1,6 +1,7 @@
 /.wordpress-org
 /.git
 /.github
+/.claude
 /node_modules
 /vendor
 /bin

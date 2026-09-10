@@ -1,6 +1,7 @@
 # Directories
 /.wordpress-org export-ignore
 /.github export-ignore
+/.claude export-ignore
 /node_modules export-ignore
 /vendor export-ignore
 /bin export-ignore

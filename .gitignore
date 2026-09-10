@@ -3,6 +3,7 @@
 /wp-cli.phar
 /composer.phar
 /.idea/
+/.claude/
 /phpunit.phar
 /.php-cs-fixer.cache
 /.php-cs-fixer.dist.php

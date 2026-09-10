@@ -217,6 +217,19 @@ Our integrations with [WooCommerce](https://groundhogg.io/downloads/woocommerce/
 * Track GDPR consent in your CRM
 * Prevent marketing to those who withdraw consent.
 
+### 🤖 AI & MCP Ready
+
+Let AI assistants and agents work inside your CRM — safely.
+
+* Groundhogg registers **abilities** with the WordPress Abilities API, so AI agents and MCP clients can act on your CRM through a supported, permission-checked interface.
+* **Contacts:** find, create, update, and search contacts, read and add notes, and list tags, owners, custom fields, and saved searches.
+* **Email:** list saved emails and sender profiles, and send a saved or one-off email to specific contacts.
+* **Broadcasts:** schedule a broadcast to a segment, list and cancel broadcasts, and read open & click reports.
+* **Flows:** list flows and add a contact or a whole segment to one.
+* Every action runs through the same capability and per-object permission checks as the rest of Groundhogg — an agent can only do what its user is allowed to do.
+
+This is an early release and an active work in progress. More abilities, including SMS, are on the way.
+
 ## 🙌 Get more with premium features!
 
 Groundhogg CRM & Marketing Automation has 45+ extensions to help you expand and integrate Groundhogg to help you build your all in one solution.
