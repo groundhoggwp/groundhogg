@@ -441,7 +441,7 @@ function add_review_link_in_footer( $text ) {
 	return preg_replace( "/<\/span>/", sprintf( __( ' | Like Groundhogg? <a target="_blank" href="%s">Leave a Review</a>!</span>', 'groundhogg' ), 'https://wordpress.org/support/plugin/groundhogg/reviews/#new-post' ), $text );
 }
 
-add_filter( 'admin_footer_text', __NAMESPACE__ . '\add_review_link_in_footer' );
+//add_filter( 'admin_footer_text', __NAMESPACE__ . '\add_review_link_in_footer' );
 
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\safe_css_filter_rgb_to_hex', 10 );
 add_filter( 'groundhogg/admin/emails/sanitize_email_content', __NAMESPACE__ . '\add_safe_style_attributes_to_email', 10 );
