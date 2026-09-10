@@ -64,6 +64,16 @@ class Broadcasts extends DB {
 		return 'send_time';
 	}
 
+	/**
+	 * send_time is stored as a UNIX timestamp, not a MySQL datetime string, so
+	 * before/after/range date queries have to compare against a timestamp.
+	 *
+	 * @return string
+	 */
+	public function get_date_key_format() {
+		return 'unix';
+	}
+
 	protected function maybe_register_filters() {
 		parent::maybe_register_filters();
 

@@ -1307,8 +1307,10 @@ abstract class DB {
 	protected $current_query;
 
 	/**
-	 * Given a date, convert it to the correct format for querying.
-	 * timestamp, time, etc would require UNIX while date_created would require MySQL datetime.
+	 * Given a date, convert it to the correct format for querying against the
+	 * date key column: a UNIX timestamp for 'unix' keys (time, timestamp,
+	 * send_time, ...), a MySQL datetime string otherwise. Keys off
+	 * get_date_key_format() so a table only has to declare its format there.
 	 *
 	 * @param $date
 	 *
@@ -1319,14 +1321,9 @@ abstract class DB {
 		// this covers most date formats
 		$date = new DateTimeHelper( $date );
 
-		switch ( $this->get_date_key() ) {
-			case 'time':
-			case 'timestamp':
-				return $date->getTimestamp();
-			case 'date_created':
-			default:
-				return $date->ymdhis();
-		}
+		return $this->get_date_key_format() === 'unix'
+			? $date->getTimestamp()
+			: $date->ymdhis();
 	}
 
 	/**
