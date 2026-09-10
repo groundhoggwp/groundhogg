@@ -2,6 +2,10 @@
 
 namespace Groundhogg\Abilities;
 
+use Groundhogg\Abilities\Broadcasts\Cancel_Broadcast;
+use Groundhogg\Abilities\Broadcasts\Get_Broadcast;
+use Groundhogg\Abilities\Broadcasts\List_Broadcasts;
+use Groundhogg\Abilities\Broadcasts\Send_Email_Broadcast;
 use Groundhogg\Abilities\Contacts\Add_Contact_Note;
 use Groundhogg\Abilities\Contacts\Create_Contact;
 use Groundhogg\Abilities\Contacts\Get_Contact;
@@ -11,6 +15,12 @@ use Groundhogg\Abilities\Contacts\List_Owners;
 use Groundhogg\Abilities\Contacts\List_Saved_Searches;
 use Groundhogg\Abilities\Contacts\Search_Contacts;
 use Groundhogg\Abilities\Contacts\Update_Contact;
+use Groundhogg\Abilities\Funnels\Add_To_Flow;
+use Groundhogg\Abilities\Funnels\List_Flows;
+use Groundhogg\Abilities\Emails\List_Email_Templates;
+use Groundhogg\Abilities\Emails\List_Sender_Profiles;
+use Groundhogg\Abilities\Emails\Send_Composed_Email;
+use Groundhogg\Abilities\Emails\Send_Email_Template;
 use Groundhogg\Abilities\Tags\List_Tags;
 
 class Abilities {
@@ -45,13 +55,18 @@ class Abilities {
 		] );
 
 		wp_register_ability_category( 'groundhogg-funnels', [
-			'label'       => __( 'Groundhogg Funnels', 'groundhogg' ),
-			'description' => __( 'Find, inspect, and manage Groundhogg funnels.', 'groundhogg' ),
+			'label'       => __( 'Groundhogg Flows', 'groundhogg' ),
+			'description' => __( 'Find Groundhogg flows and add contacts to them.', 'groundhogg' ),
 		] );
 
 		wp_register_ability_category( 'groundhogg-email', [
 			'label'       => __( 'Groundhogg Email', 'groundhogg' ),
 			'description' => __( 'Find, inspect, and manage Groundhogg emails.', 'groundhogg' ),
+		] );
+
+		wp_register_ability_category( 'groundhogg-broadcasts', [
+			'label'       => __( 'Groundhogg Broadcasts', 'groundhogg' ),
+			'description' => __( 'Schedule Groundhogg email broadcasts and review their performance.', 'groundhogg' ),
 		] );
 	}
 
@@ -68,6 +83,16 @@ class Abilities {
 			List_Tags::class,
 			Add_Contact_Note::class,
 			List_Contact_Notes::class,
+			List_Email_Templates::class,
+			List_Sender_Profiles::class,
+			Send_Composed_Email::class,
+			Send_Email_Template::class,
+			Send_Email_Broadcast::class,
+			List_Broadcasts::class,
+			Get_Broadcast::class,
+			Cancel_Broadcast::class,
+			List_Flows::class,
+			Add_To_Flow::class,
 		] as $ability ){
 
 			$ability = new $ability();
