@@ -6076,8 +6076,8 @@
           <li>${ __('Your business phone number.', 'groundhogg-pro') } <code>{business_phone}</code>
           </li>
           <li>${ __('Links to your terms of service and privacy policy.', 'groundhogg-pro') }</li>
-          <li>${ __('The link to unsubscribe.', 'groundhogg-pro') } <code>{unsubscribe_link}</code>
-          <li>${ __('The link to view in browser.', 'groundhogg-pro') } <code>{view_in_browser_link}</code>
+          <li>${ __('The link to unsubscribe.', 'groundhogg-pro') } <code>{unsubscribe_url}</code>
+          <li>${ __('The link to view in browser.', 'groundhogg-pro') } <code>{view_in_browser_url}</code>
           </li>
       </ul>
       <p>${ __('Any links will still be automatically be converted to tracking links.', 'groundhogg-pro') }</p>

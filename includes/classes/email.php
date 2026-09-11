@@ -265,8 +265,10 @@ class Email extends Base_Object_With_Meta {
 		// Do plain text replacements
 		$content = do_replacements_plain_text( $content, $this->get_contact() );
 
-		// Unsub link that may be in the footer
-		$content = str_replace( '#unsubscribe_link#', $this->get_unsubscribe_link(), $content );
+		// Unsub link that may be in the footer. #unsubscribe_url# is the
+		// current name; #unsubscribe_link# is kept working for older saved
+		// content (it's a bare URL, not a link, hence the rename).
+		$content = str_replace( [ '#unsubscribe_link#', '#unsubscribe_url#' ], $this->get_unsubscribe_link(), $content );
 
 		// Fix markdown line breaks
 		$content = preg_replace( '/(?<=[^\\S])\h\\n/', "  \n", $content );
@@ -739,9 +741,12 @@ class Email extends Base_Object_With_Meta {
 				// this is now handled by Block_Registry::parse_blocks()
 //				$content = $this->maybe_hide_blocks( $content );
 
-				// Special handling for footer unsub link
+				// Special handling for footer unsub link. #unsubscribe_url# is
+				// the current name; #unsubscribe_link# is kept working for
+				// older saved content (it's a bare URL, not a link, hence the
+				// rename).
 				if ( $this->has_footer_block() ) {
-					$content = str_replace( '#unsubscribe_link#', $this->get_unsubscribe_link(), $content );
+					$content = str_replace( [ '#unsubscribe_link#', '#unsubscribe_url#' ], $this->get_unsubscribe_link(), $content );
 				}
 				break;
 			// Legacy plain text editor

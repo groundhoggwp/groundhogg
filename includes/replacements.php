@@ -411,24 +411,24 @@ class Replacements implements \JsonSerializable {
 				'description'    => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'confirmation_link_raw',
+				'code'        => 'confirmation_url',
 				'group'       => 'compliance',
 				'callback'    => [ $this, 'replacement_confirmation_link_raw' ],
-				'name'        => __( 'Raw Confirmation Link', 'groundhogg' ),
-				'description' => _x( 'A link to confirm the email address of a contact which can be placed in a button or link.', 'replacement', 'groundhogg' ),
+				'name'        => __( 'Confirmation URL', 'groundhogg' ),
+				'description' => _x( 'The bare URL to confirm the email address of a contact - use this when you need just the URL, e.g. for a button or a link href.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'unsubscribe_link',
+				'code'        => 'unsubscribe_url',
 				'group'       => 'compliance',
 				'callback'    => [ $this, 'replacement_unsubscribe_link' ],
-				'name'        => __( 'Unsubscribe Link', 'groundhogg' ),
-				'description' => _x( 'A link that will unsubscribe the contact.', 'replacement', 'groundhogg' ),
+				'name'        => __( 'Unsubscribe URL', 'groundhogg' ),
+				'description' => _x( 'The bare URL that will unsubscribe the contact.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'auto_login_link',
+				'code'        => 'auto_login_url',
 				'group'       => 'site',
 				'callback'    => [ $this, 'replacement_auto_login_link' ],
-				'name'        => __( 'Auto-Login link', 'groundhogg' ),
+				'name'        => __( 'Auto-Login URL', 'groundhogg' ),
 				'description' => _x( 'Automatically login the contact if they have a user account.', 'replacement', 'groundhogg' ),
 			],
 			[
@@ -524,25 +524,18 @@ class Replacements implements \JsonSerializable {
 				'description' => _x( 'Return the featured image URL of a single recent post.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'        => 'post_link',
+				'code'        => 'post_url',
 				'group'       => 'post',
 				'callback'    => [ $this, 'post_url' ],
-				'name'        => __( 'Post Link', 'groundhogg' ),
+				'name'        => __( 'Post URL', 'groundhogg' ),
 				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
 			],
 			[
-				'code'     => 'post_url',
-				'group'    => 'post',
-				'callback' => [ $this, 'post_url' ],
-//				'name'        => __( 'Post URL', 'groundhogg' ),
-//				'description' => _x( 'The URL of a single recent post.', 'replacement', 'groundhogg' ),
-			],
-			[
-				'code'        => 'view_in_browser_link',
+				'code'        => 'view_in_browser_url',
 				'group'       => 'email',
 				'callback'    => [ $this, 'view_in_browser_link' ],
-				'name'        => __( 'View in browser link', 'groundhogg' ),
-				'description' => _x( 'Link to view the email in the browser', 'replacement', 'groundhogg' ),
+				'name'        => __( 'View in browser URL', 'groundhogg' ),
+				'description' => _x( 'The bare URL to view the email in the browser', 'replacement', 'groundhogg' ),
 			],
 			[
 				'code'         => 'andList',
@@ -640,6 +633,22 @@ class Replacements implements \JsonSerializable {
 				get_array_var( $replacement, 'default_args' ),
 				get_array_var( $replacement, 'callback_plain' )
 			);
+		}
+
+		// Back-compat: these codes returned a bare URL despite being named
+		// "_link" (only {confirmation_link} itself returns an actual <a> tag).
+		// Renamed to the correct "_url" name above; the old code is kept
+		// working under its original name for existing saved content, but
+		// hidden from the picker so new content uses the correct name.
+		foreach ( [
+			'confirmation_link_raw' => 'confirmation_url',
+			'unsubscribe_link'      => 'unsubscribe_url',
+			'auto_login_link'       => 'auto_login_url',
+			'view_in_browser_link'  => 'view_in_browser_url',
+			'post_link'             => 'post_url',
+		] as $legacy_code => $current_code ) {
+			$this->add( $legacy_code, $this->replacement_codes[ $current_code ]['callback'] );
+			$this->make_hidden( $legacy_code );
 		}
 
 		do_action( 'groundhogg/replacements/init', $this );
