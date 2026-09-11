@@ -15,12 +15,18 @@ use Groundhogg\Abilities\Contacts\List_Owners;
 use Groundhogg\Abilities\Contacts\List_Saved_Searches;
 use Groundhogg\Abilities\Contacts\Search_Contacts;
 use Groundhogg\Abilities\Contacts\Update_Contact;
+use Groundhogg\Abilities\Db\Describe_Table;
+use Groundhogg\Abilities\Db\Query_Table;
 use Groundhogg\Abilities\Funnels\Add_To_Flow;
 use Groundhogg\Abilities\Funnels\List_Flows;
+use Groundhogg\Abilities\Emails\Create_Email;
 use Groundhogg\Abilities\Emails\List_Email_Templates;
 use Groundhogg\Abilities\Emails\List_Sender_Profiles;
 use Groundhogg\Abilities\Emails\Send_Composed_Email;
 use Groundhogg\Abilities\Emails\Send_Email_Template;
+use Groundhogg\Abilities\Emails\Update_Email;
+use Groundhogg\Abilities\Reports\Get_Reports;
+use Groundhogg\Abilities\Reports\List_Report_Types;
 use Groundhogg\Abilities\Tags\List_Tags;
 
 class Abilities {
@@ -68,6 +74,16 @@ class Abilities {
 			'label'       => __( 'Groundhogg Broadcasts', 'groundhogg' ),
 			'description' => __( 'Schedule Groundhogg email broadcasts and review their performance.', 'groundhogg' ),
 		] );
+
+		wp_register_ability_category( 'groundhogg-reports', [
+			'label'       => __( 'Groundhogg Reports', 'groundhogg' ),
+			'description' => __( 'Pull Groundhogg\'s built-in and custom reports.', 'groundhogg' ),
+		] );
+
+		wp_register_ability_category( 'groundhogg-db', [
+			'label'       => __( 'Groundhogg Database', 'groundhogg' ),
+			'description' => __( 'Direct, read-only access to Groundhogg\'s own database tables. Administrators only.', 'groundhogg' ),
+		] );
 	}
 
 	public function register_abilities() {
@@ -85,6 +101,8 @@ class Abilities {
 			List_Contact_Notes::class,
 			List_Email_Templates::class,
 			List_Sender_Profiles::class,
+			Create_Email::class,
+			Update_Email::class,
 			Send_Composed_Email::class,
 			Send_Email_Template::class,
 			Send_Email_Broadcast::class,
@@ -93,6 +111,10 @@ class Abilities {
 			Cancel_Broadcast::class,
 			List_Flows::class,
 			Add_To_Flow::class,
+			List_Report_Types::class,
+			Get_Reports::class,
+			Describe_Table::class,
+			Query_Table::class,
 		] as $ability ){
 
 			$ability = new $ability();

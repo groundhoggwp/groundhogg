@@ -16,6 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * groundhogg/add-to-flow, and so on - so they all accept the same audience
  * parameters and turn them into a Contact_Query the same way.
  *
+ * Includes filtering by contact meta / custom field values (`meta`), built on
+ * Contact_Query's own `meta_query` query var (the same mechanism the pie-chart /
+ * table custom reports use via joinMeta()) - so any ability built on this schema
+ * can, for example, segment on a custom field the site collected in a survey.
+ *
  * Unlike the other classes in this namespace it does NOT extend Schema: it
  * describes *input*, not an output shape, so it has no get_schema()/transform().
  *
@@ -36,7 +41,19 @@ class Segment_Schema {
 	 * opposed to refinements like tags_exclude or marketable, or nothing at all).
 	 * Used by has_audience().
 	 */
-	private const AUDIENCE_KEYS = [ 'search', 'include', 'tags_include', 'saved_search', 'owner', 'users_include' ];
+	private const AUDIENCE_KEYS = [ 'search', 'include', 'tags_include', 'saved_search', 'owner', 'users_include', 'meta' ];
+
+	/**
+	 * Comparison operators accepted by a `meta` condition's `compare`, matching
+	 * what Where::compare() understands. "empty"/"not_empty" ignore `value`.
+	 */
+	private const META_COMPARISONS = [
+		'equals', 'not_equals',
+		'less_than', 'greater_than', 'less_than_or_equal_to', 'greater_than_or_equal_to',
+		'in', 'not_in',
+		'like', 'not_like', 'contains', 'not_contains', 'starts_with', 'ends_with',
+		'empty', 'not_empty',
+	];
 
 	/**
 	 * The input_schema `properties` for a contact segment. Every condition is
@@ -126,6 +143,36 @@ class Segment_Schema {
 			'saved_search' => [
 				'type'        => 'string',
 				'description' => __( 'ID of a saved search to merge in - see groundhogg/list-saved-searches. Other params still apply on top.', 'groundhogg' ),
+			],
+			'meta' => [
+				'type'        => 'array',
+				'description' => __( 'Filter by contact meta / custom field values - see groundhogg/list-custom-fields for keys. Conditions combine per meta_relation.', 'groundhogg' ),
+				'items'       => [
+					'type'                 => 'object',
+					'additionalProperties' => false,
+					'required'             => [ 'key' ],
+					'properties'           => [
+						'key' => [
+							'type'        => 'string',
+							'description' => __( 'The meta/custom-field key, e.g. "cancel_reason".', 'groundhogg' ),
+						],
+						'value' => [
+							'description' => __( 'Value to compare against. Omit for compare "empty" or "not_empty". An array of values for "in" / "not_in".', 'groundhogg' ),
+						],
+						'compare' => [
+							'type'        => 'string',
+							'enum'        => self::META_COMPARISONS,
+							'default'     => 'equals',
+							'description' => __( 'How to compare. "contains"/"starts_with"/"ends_with" are substring matches; "in"/"not_in" expect value to be an array.', 'groundhogg' ),
+						],
+					],
+				],
+			],
+			'meta_relation' => [
+				'type'        => 'string',
+				'enum'        => [ 'AND', 'OR' ],
+				'default'     => 'AND',
+				'description' => __( 'How multiple `meta` conditions combine with each other. Doesn\'t affect how `meta` combines with the other segment params, which are always ANDed in.', 'groundhogg' ),
 			],
 		];
 	}
@@ -254,6 +301,51 @@ class Segment_Schema {
 
 		if ( ! empty( $input['saved_search'] ) ) {
 			$query['saved_search'] = sanitize_text_field( $input['saved_search'] );
+		}
+
+		if ( ! empty( $input['meta'] ) && is_array( $input['meta'] ) ) {
+
+			$meta_query = [];
+
+			foreach ( $input['meta'] as $condition ) {
+
+				$condition = (array) $condition;
+				$key       = isset( $condition['key'] ) ? sanitize_key( $condition['key'] ) : '';
+
+				if ( ! $key ) {
+					continue;
+				}
+
+				$compare = in_array( $condition['compare'] ?? 'equals', self::META_COMPARISONS, true )
+					? $condition['compare']
+					: 'equals';
+
+				// "empty"/"not_empty" ignore the value entirely (Where::compare()
+				// matches on $compare before ever looking at it), but Contact_Query's
+				// meta_query parsing destructures 'value' out of every condition
+				// regardless - always provide the key so that never hits an
+				// undefined-array-key warning. Where::compare() parameterizes the
+				// value, so no further sanitizing here beyond keeping it to a scalar
+				// or a flat array of scalars (for "in"/"not_in").
+				$value = $condition['value'] ?? '';
+
+				$meta_query[] = [
+					'key'     => $key,
+					'compare' => $compare,
+					'value'   => is_array( $value )
+						? array_values( array_filter( $value, 'is_scalar' ) )
+						: ( is_scalar( $value ) ? $value : '' ),
+				];
+			}
+
+			if ( ! empty( $meta_query ) ) {
+
+				if ( ! empty( $input['meta_relation'] ) && strtoupper( $input['meta_relation'] ) === 'OR' ) {
+					$meta_query['relation'] = 'OR';
+				}
+
+				$query['meta_query'] = $meta_query;
+			}
 		}
 
 		return $query;

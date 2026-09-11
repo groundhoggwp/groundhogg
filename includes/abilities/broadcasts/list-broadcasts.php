@@ -4,10 +4,12 @@ namespace Groundhogg\Abilities\Broadcasts;
 
 use Groundhogg\Abilities\Ability;
 use Groundhogg\Abilities\Schemas\Broadcast_Schema;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Utils\DateTimeHelper;
 use Throwable;
 use WP_Error;
 use function Groundhogg\get_db;
+use function Groundhogg\is_sms_plugin_active;
 
 /**
  * Lists broadcasts, most recent first, so an agent can see what has been sent or
@@ -20,6 +22,12 @@ use function Groundhogg\get_db;
  * Per-broadcast stats (sent / opened / clicked / unsubscribed) each cost a few
  * COUNT queries, so they are only included when "stats" is passed in expand -
  * request them with a small limit.
+ *
+ * The gh_broadcasts table has no title/subject column of its own to search -
+ * `search` instead LEFT JOINs the emails table (and sms, if that add-on is
+ * active) on object_id/object_type and matches against their title/subject,
+ * mirroring exactly what Broadcasts_Table::prepare_items() does for the
+ * search box on the Broadcasts admin page (admin/broadcasts/broadcasts-table.php).
  */
 class List_Broadcasts extends Ability {
 
@@ -52,6 +60,10 @@ class List_Broadcasts extends Ability {
 					'before' => [
 						'type'        => 'string',
 						'description' => __( 'Only include broadcasts whose send time is on or before this. Same accepted formats as "after".', 'groundhogg' ),
+					],
+					'search' => [
+						'type'        => 'string',
+						'description' => __( 'Free-text search matched against the title and subject of the broadcast\'s email (or SMS, if active) - the broadcast itself has no searchable text of its own.', 'groundhogg' ),
 					],
 					'expand' => [
 						'type'        => 'array',
@@ -135,8 +147,45 @@ class List_Broadcasts extends Ability {
 			$query_vars[ $param ] = sanitize_text_field( $input[ $param ] );
 		}
 
-		$db      = get_db( 'broadcasts' );
+		$db = get_db( 'broadcasts' );
+
+		$search_callback = null;
+
+		if ( ! empty( $input['search'] ) ) {
+
+			$search = sanitize_text_field( $input['search'] );
+
+			// Same join-and-LIKE approach as Broadcasts_Table::prepare_items() -
+			// gh_broadcasts itself has no title/subject to search, so this joins
+			// in the object it's actually about.
+			$search_callback = function ( Table_Query &$query ) use ( $search ) {
+
+				$emailJoin = $query->addJoin( 'LEFT', 'emails' );
+				$emailJoin->onColumn( 'ID', 'object_id' )
+				          ->equals( "$query->alias.object_type", 'email' );
+
+				$searchWhere = $query->where()->subWhere();
+
+				$searchWhere->like( "$emailJoin->alias.title", '%' . $query->db->esc_like( $search ) . '%' );
+				$searchWhere->like( "$emailJoin->alias.subject", '%' . $query->db->esc_like( $search ) . '%' );
+
+				if ( is_sms_plugin_active() ) {
+					$smsJoin = $query->addJoin( 'LEFT', 'sms' );
+					$smsJoin->onColumn( 'ID', 'object_id' )
+					        ->equals( "$query->alias.object_type", 'sms' );
+
+					$searchWhere->like( "$smsJoin->alias.title", '%' . $query->db->esc_like( $search ) . '%' );
+				}
+			};
+
+			add_action( 'groundhogg/broadcast/pre_get_results', $search_callback );
+		}
+
 		$results = $db->query( $query_vars );
+
+		if ( $search_callback ) {
+			remove_action( 'groundhogg/broadcast/pre_get_results', $search_callback );
+		}
 
 		// Capture found_rows() before Broadcast_Schema transform runs its own
 		// queries (the stats expand especially) - same caveat as groundhogg/list-tags.
