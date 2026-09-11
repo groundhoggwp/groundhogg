@@ -383,7 +383,7 @@ class HTML {
 			$content = implode( '', $content );
 		}
 
-		return sprintf( '<%1$s %2$s>%3$s</%1$s>', esc_html( $e ), array_to_atts( $atts ), $content );
+        return '<' . trim( esc_html( $e ) . ' ' . array_to_atts( $atts ) ) . '>' . $content . '</' . esc_html( $e ) . '>';
 	}
 
 	/**
