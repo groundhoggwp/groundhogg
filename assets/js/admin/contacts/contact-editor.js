@@ -496,7 +496,9 @@
   )
 
   const ActivityDetails = (details, {
-    key = k => escHTML(String(k ?? '')),
+    // labels may legitimately arrive wrapped in <code> (server-side code_it()) or other basic
+    // inline formatting - keep that, strip anything hostile
+    key = k => titleHTML(String(k ?? '')),
     value = stringifyDetail,
     heading = __('Details'),
     open = false,
