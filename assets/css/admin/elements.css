@@ -3205,4 +3205,314 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
   justify-self: end;
 }
 
+.gh-calendar {
+  background: #fff;
+  border: 1px solid var(--gh-panel-gray);
+  border-radius: var(--gh-panel-border-radius);
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+.gh-calendar .gh-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid var(--gh-panel-gray);
+  flex-wrap: wrap;
+}
+.gh-calendar .gh-calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  order: 1;
+}
+.gh-calendar .gh-calendar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gh-dark);
+  order: 2;
+  flex-grow: 1;
+}
+.gh-calendar .gh-calendar-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  order: 3;
+  margin-left: auto;
+}
+.gh-calendar .gh-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: auto;
+  grid-auto-rows: minmax(110px, auto);
+  background-color: var(--gh-panel-gray);
+  gap: 1px;
+}
+.gh-calendar .gh-calendar-weekday {
+  background-color: var(--gh-dark-5);
+  color: var(--gh-dark-50);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 6px 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gh-calendar .gh-calendar-day {
+  --gh-calendar-day-bg: #fff;
+  background-color: var(--gh-calendar-day-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  min-width: 0;
+}
+.gh-calendar .gh-calendar-day.other-month {
+  --gh-calendar-day-bg: var(--gh-background-color);
+}
+.gh-calendar .gh-calendar-day.other-month .gh-calendar-day-number {
+  color: var(--gh-dark-30);
+}
+.gh-calendar .gh-calendar-day.clickable:not(.not-clickable) {
+  cursor: pointer;
+}
+.gh-calendar .gh-calendar-day.clickable:not(.not-clickable):hover {
+  background-color: color-mix(in srgb, var(--gh-primary) 5%, var(--gh-calendar-day-bg));
+}
+.gh-calendar .gh-calendar-day.is-today .gh-calendar-day-number {
+  background-color: var(--gh-primary);
+  color: #fff;
+  font-weight: 600;
+}
+.gh-calendar .gh-calendar-day-number {
+  align-self: flex-end;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 11px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--gh-dark-50);
+}
+.gh-calendar .gh-calendar-events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.gh-calendar .gh-calendar-event {
+  background-color: var(--gh-dark-5);
+  border-left: 3px solid var(--gh-dark-30);
+  border-radius: var(--gh-border-radius);
+  padding: 3px 5px;
+  font-size: 12px;
+  line-height: 1.3;
+  min-width: 0;
+  overflow: hidden;
+}
+.gh-calendar .gh-calendar-event[tabindex] {
+  cursor: pointer;
+}
+.gh-calendar .gh-calendar-event[tabindex]:hover {
+  background-color: var(--gh-dark-10);
+}
+.gh-calendar .gh-calendar-event[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: var(--gh-focused-shadow);
+}
+.gh-calendar .gh-calendar-event .gh-calendar-event-title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--gh-dark);
+}
+.gh-calendar .gh-calendar-event .gh-calendar-event-time {
+  display: block;
+  font-size: 11px;
+  color: var(--gh-dark-50);
+}
+.gh-calendar .gh-calendar-more {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 5px;
+  text-align: left;
+  font-size: 11px;
+  color: var(--gh-primary);
+}
+.gh-calendar .gh-calendar-more:hover {
+  text-decoration: underline;
+}
+.gh-calendar .gh-calendar-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  overflow: hidden;
+  background-color: var(--gh-primary-10);
+}
+.gh-calendar .gh-calendar-loading .gh-calendar-loading-bar {
+  height: 100%;
+  width: 33%;
+  background-color: var(--gh-primary);
+  animation: gh-calendar-loading 1.2s ease-in-out infinite;
+}
+.gh-calendar.is-loading .gh-calendar-grid {
+  opacity: 0.5;
+  pointer-events: none;
+}
+@media screen and (max-width: 782px) {
+  .gh-calendar .gh-calendar-grid {
+    grid-auto-rows: minmax(70px, auto);
+  }
+  .gh-calendar .gh-calendar-day {
+    padding: 2px;
+  }
+  .gh-calendar .gh-calendar-event {
+    font-size: 11px;
+    padding: 2px 3px;
+  }
+  .gh-calendar .gh-calendar-event .gh-calendar-event-time {
+    display: none;
+  }
+}
+
+@keyframes gh-calendar-loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+.gh-broadcast-calendar .gh-calendar-event.status-sent {
+  background-color: var(--gh-action-green-10);
+  border-left-color: var(--gh-action-green);
+}
+.gh-broadcast-calendar .gh-calendar-event.status-sending {
+  background-color: var(--gh-benchmark-orange-10);
+  border-left-color: var(--gh-benchmark-orange);
+}
+.gh-broadcast-calendar .gh-calendar-event.status-scheduled {
+  background-color: var(--gh-primary-10);
+  border-left-color: var(--gh-primary);
+}
+.gh-broadcast-calendar .gh-calendar-event.status-pending {
+  background-color: var(--gh-purple-10);
+  border-left-color: var(--gh-purple);
+}
+.gh-broadcast-calendar .gh-calendar-event.status-cancelled {
+  background-color: var(--gh-error-red-10);
+  border-left-color: var(--gh-error-red);
+}
+.gh-broadcast-calendar .gh-calendar-event.status-cancelled .gh-calendar-event-title {
+  text-decoration: line-through;
+  color: var(--gh-dark-50);
+}
+.gh-broadcast-calendar .gh-calendar-event .gh-calendar-event-type {
+  margin-right: 3px;
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+  vertical-align: text-top;
+  color: var(--gh-dark-50);
+}
+.gh-broadcast-calendar .gh-calendar-day.is-past:not(.is-today) .gh-calendar-day-number {
+  color: var(--gh-dark-30);
+}
+
+.gh-broadcast-calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--gh-dark-50);
+}
+.gh-broadcast-calendar-legend .gh-broadcast-calendar-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.gh-broadcast-calendar-legend button.gh-broadcast-calendar-legend-item {
+  background: none;
+  border: none;
+  border-radius: var(--gh-border-radius);
+  color: inherit;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 5px;
+}
+.gh-broadcast-calendar-legend button.gh-broadcast-calendar-legend-item:hover {
+  background-color: var(--gh-dark-5);
+}
+.gh-broadcast-calendar-legend button.gh-broadcast-calendar-legend-item:focus-visible {
+  outline: none;
+  box-shadow: var(--gh-focused-shadow);
+}
+.gh-broadcast-calendar-legend button.gh-broadcast-calendar-legend-item.is-muted {
+  opacity: 0.35;
+}
+.gh-broadcast-calendar-legend .gh-broadcast-calendar-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.gh-broadcast-calendar-legend .gh-broadcast-calendar-legend-swatch.status-sent {
+  background-color: var(--gh-action-green);
+}
+.gh-broadcast-calendar-legend .gh-broadcast-calendar-legend-swatch.status-sending {
+  background-color: var(--gh-benchmark-orange);
+}
+.gh-broadcast-calendar-legend .gh-broadcast-calendar-legend-swatch.status-scheduled {
+  background-color: var(--gh-primary);
+}
+.gh-broadcast-calendar-legend .gh-broadcast-calendar-legend-swatch.status-pending {
+  background-color: var(--gh-purple);
+}
+.gh-broadcast-calendar-legend .gh-broadcast-calendar-legend-swatch.status-cancelled {
+  background-color: var(--gh-error-red);
+}
+
+.gh-broadcast-calendar-details {
+  min-width: 320px;
+  max-width: 380px;
+}
+.gh-broadcast-calendar-details .gh-broadcast-calendar-details-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  text-align: center;
+}
+.gh-broadcast-calendar-details .gh-broadcast-calendar-details-stats .gh-broadcast-calendar-stat {
+  background-color: var(--gh-dark-5);
+  border-radius: var(--gh-border-radius);
+  padding: 8px 4px;
+}
+.gh-broadcast-calendar-details .gh-broadcast-calendar-details-stats .gh-broadcast-calendar-stat .gh-broadcast-calendar-stat-number {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gh-dark);
+}
+.gh-broadcast-calendar-details .gh-broadcast-calendar-details-stats .gh-broadcast-calendar-stat .gh-broadcast-calendar-stat-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--gh-dark-50);
+}
+
 /*# sourceMappingURL=elements.css.map */

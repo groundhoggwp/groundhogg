@@ -967,12 +967,18 @@
 
     // console.log({right, left, bottom, top, width, height})
 
+    // the modal is anchored to an element that may sit close to an edge, so the
+    // offset is clamped to whatever still leaves a margin on the far side. The
+    // vertical case below does the same thing.
+    const EDGE = 20
+    const furthest = Math.max(EDGE, window.innerWidth - width - EDGE)
+
     switch (from) {
       case 'left':
-        modal.style.left = left + 'px'
+        modal.style.left = Math.min(left, furthest) + 'px'
         break
       case 'right':
-        modal.style.right = ( window.innerWidth - right ) + 'px'
+        modal.style.right = Math.min(window.innerWidth - right, furthest) + 'px'
         modal.style.left = 'auto'
         break
     }
@@ -1767,6 +1773,433 @@
 
   }
 
+  /**
+   * Lazily access wp.i18n. make-el is also loaded on the frontend where wp-i18n
+   * is not guaranteed to be present, so it can't be destructured at load time.
+   *
+   * @return {{__: function, _x: function, _n: function, sprintf: function}}
+   */
+  const i18n = () => window.wp?.i18n ?? {
+    __     : text => text,
+    _x     : text => text,
+    _n     : (single, plural, number) => number === 1 ? single : plural,
+    sprintf: (format, ...args) => format.replace(/%(?:\d+\$)?[sd]/g, () => args.shift()),
+  }
+
+  /**
+   * The locale used for date formatting, falls back to the browser locale
+   *
+   * @return {string|undefined}
+   */
+  const getLocale = () => window.Groundhogg?.locale ?? undefined
+
+  /**
+   * Normalize anything date-ish into a Date
+   *
+   * Numeric values are treated as unix timestamps. Anything smaller than 1e11 is
+   * assumed to be in seconds, which is how Groundhogg stores them, anything
+   * larger is assumed to be in milliseconds.
+   *
+   * @param date {Date|number|string}
+   * @return {Date}
+   */
+  const toDate = date => {
+
+    if (date instanceof Date) {
+      return date
+    }
+
+    if (isNumeric(date)) {
+      let num = parseFloat(date)
+      return new Date(num < 1e11 ? num * 1000 : num)
+    }
+
+    return new Date(date)
+  }
+
+  /**
+   * Midnight, local time, of the given date
+   *
+   * @param date {Date|number|string}
+   * @return {Date}
+   */
+  const startOfDay = date => {
+    let d = toDate(date)
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  }
+
+  /**
+   * The first of the month, local time, of the given date
+   *
+   * @param date {Date|number|string}
+   * @return {Date}
+   */
+  const startOfMonth = date => {
+    let d = toDate(date)
+    return new Date(d.getFullYear(), d.getMonth(), 1)
+  }
+
+  /**
+   * A stable Y-m-d key for a date in local time.
+   *
+   * Date.toISOString() can't be used here because it converts to UTC and would
+   * bucket evening events into the following day.
+   *
+   * @param date {Date|number|string}
+   * @return {string}
+   */
+  const dayKey = date => {
+    let d = toDate(date)
+    return `${ d.getFullYear() }-${ String(d.getMonth() + 1).padStart(2, '0') }-${ String(d.getDate()).padStart(2, '0') }`
+  }
+
+  /**
+   * Add days to a date, normalized to midnight
+   *
+   * @param date {Date|number|string}
+   * @param days {number}
+   * @return {Date}
+   */
+  const addDays = (date, days) => {
+    let d = startOfDay(date)
+    d.setDate(d.getDate() + days)
+    return d
+  }
+
+  /**
+   * Add months to a date, landing on the first of the resulting month
+   *
+   * @param date {Date|number|string}
+   * @param months {number}
+   * @return {Date}
+   */
+  const addMonths = (date, months) => {
+    let d = toDate(date)
+    return new Date(d.getFullYear(), d.getMonth() + months, 1)
+  }
+
+  /**
+   * Merge caller supplied attributes into the ones a component computed for
+   * itself, so that a className coming from the outside adds to the component's
+   * own classes instead of replacing them.
+   *
+   * @param own {Object} the attributes the component built
+   * @param extra {Object} the attributes supplied by the caller
+   * @return {Object}
+   */
+  const mergeAttributes = (own, extra = {}) => {
+
+    const {
+      className = '',
+      ...rest
+    } = extra ?? {}
+
+    return {
+      ...own,
+      ...rest,
+      className: [
+        own.className,
+        Array.isArray(className) ? className.join(' ') : className,
+      ].filter(c => c).join(' '),
+    }
+  }
+
+  /**
+   * A month view calendar.
+   *
+   * Events are arbitrary objects, the calendar only needs to know how to read a
+   * date off them and how to render them. The displayed month can either be left
+   * to the calendar, or driven from the outside by passing a new `month` on every
+   * render, which is what you want when the events for a month have to be fetched.
+   *
+   * @param id {string} required, the calendar morphs itself by ID
+   * @param month {Date|number|string} any date within the month to display
+   * @param events {Array} the events to place in the grid
+   * @param getEventDate {function} reads the date off an event
+   * @param renderEvent {function} renders the contents of an event chip
+   * @param renderDayNumber {function} replaces the day number in the corner of a cell
+   * @param renderEmptyDay {function} rendered in cells that have no events
+   * @param eventProps {function} extra attributes for an event chip
+   * @param dayProps {function} extra attributes for a day cell
+   * @param startOfWeek {number} 0 = Sunday, 1 = Monday, etc...
+   * @param maxEventsPerDay {number} 0 for no limit, otherwise collapse the rest behind a "+ N more"
+   * @param showHeader {boolean} whether to render the month nav
+   * @param headerActions {Array|function} extra elements rendered to the right of the month nav
+   * @param loading {boolean} whether events are currently being fetched
+   * @param locale {string}
+   * @param onMonthChange {function} called with the first of the newly displayed month
+   * @param onDayClick {function} called when a day cell is clicked
+   * @param onEventClick {function} called when an event chip is clicked
+   * @param className {string}
+   *
+   * @return {Element}
+   */
+  const Calendar = ({
+    id = 'calendar',
+    month = new Date(),
+    events = [],
+    getEventDate = event => event.date,
+    renderEvent = event => Span({ className: 'gh-calendar-event-title' }, `${ event.title ?? '' }`),
+    renderDayNumber = null,
+    renderEmptyDay = null,
+    eventProps = () => ( {} ),
+    dayProps = () => ( {} ),
+    startOfWeek = 0,
+    maxEventsPerDay = 0,
+    showHeader = true,
+    headerActions = [],
+    loading = false,
+    locale = getLocale(),
+    onMonthChange = () => {},
+    onDayClick = null,
+    onEventClick = null,
+    className = '',
+  }) => {
+
+    const {
+      __,
+      _x,
+      sprintf,
+    } = i18n()
+
+    const propMonth = startOfMonth(month)
+
+    const State = useState({
+      month    : propMonth,
+      // tracked separately so a changed month prop can win over internal nav
+      monthProp: propMonth.getTime(),
+      expanded : [],
+    }, id)
+
+    // the caller moved the month, their value wins
+    if (State.monthProp !== propMonth.getTime()) {
+      State.set({
+        month    : propMonth,
+        monthProp: propMonth.getTime(),
+        expanded : [],
+      })
+    }
+
+    const monthFormat = new Intl.DateTimeFormat(locale, {
+      month: 'long',
+      year : 'numeric',
+    })
+    const weekdayFormat = new Intl.DateTimeFormat(locale, { weekday: 'short' })
+    const fullDayFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full' })
+
+    const goToMonth = (date, morph) => {
+
+      let newMonth = startOfMonth(date)
+
+      State.set({
+        month    : newMonth,
+        monthProp: newMonth.getTime(),
+        expanded : [],
+      })
+
+      morph()
+      onMonthChange(newMonth)
+    }
+
+    return Div({
+      id,
+      className: `gh-calendar ${ loading ? 'is-loading' : '' } ${ className }`.trim(),
+      State,
+    }, morph => {
+
+      // everything below is derived from the displayed month, which changes on
+      // its own when the month nav is used. A morph only re-runs this function,
+      // not the component, so none of it can be hoisted out.
+      const firstOfMonth = State.month
+      const monthIndex = firstOfMonth.getMonth()
+
+      // how many days of the previous month are needed to fill the first row
+      const leading = ( firstOfMonth.getDay() - startOfWeek + 7 ) % 7
+      const gridStart = addDays(firstOfMonth, -leading)
+      const daysInMonth = new Date(firstOfMonth.getFullYear(), monthIndex + 1, 0).getDate()
+      const numWeeks = Math.ceil(( leading + daysInMonth ) / 7)
+
+      const todayKey = dayKey(new Date())
+
+      // bucket the events by day
+      const byDay = {}
+
+      events.forEach(event => {
+
+        let date = getEventDate(event)
+
+        if (date === null || date === undefined || date === '') {
+          return
+        }
+
+        let key = dayKey(date)
+
+        byDay[key] = byDay[key] ?? []
+        byDay[key].push(event)
+      })
+
+      // within a day, events run in chronological order
+      Object.values(byDay).forEach(list => list.sort((a, b) => toDate(getEventDate(a)) - toDate(getEventDate(b))))
+
+      // morphdom reuses the cell and chip elements between renders, and a reused
+      // element keeps the listener it was created with. Handlers therefore read
+      // the events back out of State, which is stable, instead of closing over
+      // the array they were rendered from.
+      State.set({ byDay })
+
+      const EventChip = (event, date, key, index) => {
+
+        const handleActivate = e => {
+          e.stopPropagation()
+          onEventClick({
+            // chips morph positionally, so the event at this index is whatever
+            // the cell is showing right now
+            event: ( State.byDay[key] ?? [] )[index] ?? event,
+            date,
+            el: e.currentTarget,
+            morph,
+          })
+        }
+
+        return Div(mergeAttributes({
+          className: 'gh-calendar-event',
+          tabindex : onEventClick ? 0 : null,
+          onClick  : onEventClick ? handleActivate : null,
+          onKeydown: onEventClick ? e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              handleActivate(e)
+            }
+          } : null,
+        }, maybeCall(eventProps, {
+          event,
+          date,
+        })), maybeCall(renderEvent, event, date))
+      }
+
+      const DayCell = date => {
+
+        let key = dayKey(date)
+        let dayEvents = byDay[key] ?? []
+        let inMonth = date.getMonth() === monthIndex
+        let isToday = key === todayKey
+        let expanded = State.expanded.includes(key)
+
+        let visible = maxEventsPerDay > 0 && !expanded
+          ? dayEvents.slice(0, maxEventsPerDay)
+          : dayEvents
+        let hidden = dayEvents.length - visible.length
+
+        return Div(mergeAttributes({
+          id       : `${ id }-day-${ key }`,
+          className: [
+            'gh-calendar-day',
+            inMonth ? 'in-month' : 'other-month',
+            isToday ? 'is-today' : '',
+            dayEvents.length ? 'has-events' : 'is-empty',
+            onDayClick ? 'clickable' : '',
+          ].filter(c => c).join(' '),
+          dataDay  : key,
+          onClick  : onDayClick ? e => {
+
+            // the click belongs to something else inside the cell
+            if (clickedIn(e.target, '.gh-calendar-event') || clickedIn(e.target, '.gh-calendar-more')) {
+              return
+            }
+
+            onDayClick({
+              date,
+              events: State.byDay[key] ?? [],
+              el    : e.currentTarget,
+              morph,
+            })
+          } : null,
+        }, maybeCall(dayProps, {
+          date,
+          events: dayEvents,
+          inMonth,
+          isToday,
+        })), [
+          Div({
+            className: 'gh-calendar-day-number',
+            title    : fullDayFormat.format(date),
+          }, renderDayNumber
+            ? maybeCall(renderDayNumber, {
+              date,
+              events: dayEvents,
+              inMonth,
+              isToday,
+            })
+            : `${ date.getDate() }`),
+          Div({
+            className: 'gh-calendar-events',
+          }, [
+            ...visible.map((event, i) => EventChip(event, date, key, i)),
+            hidden > 0 ? Button({
+              className: 'gh-calendar-more',
+              type     : 'button',
+              onClick  : e => {
+                e.stopPropagation()
+                State.set({ expanded: [...State.expanded, key] })
+                morph()
+              },
+              /* translators: %d: the number of additional events hidden within a calendar day */
+            }, sprintf(__('+ %d more', 'groundhogg'), hidden)) : null,
+            !dayEvents.length && renderEmptyDay ? maybeCall(renderEmptyDay, { date }) : null,
+          ]),
+        ])
+      }
+
+      return Fragment([
+
+        showHeader ? Div({
+          className: 'gh-calendar-header',
+        }, [
+          Div({
+            className: 'gh-calendar-nav',
+          }, [
+            Button({
+              className   : 'gh-button secondary text icon',
+              type        : 'button',
+              'aria-label': _x('Previous month', 'calendar navigation', 'groundhogg'),
+              onClick     : e => goToMonth(addMonths(State.month, -1), morph),
+            }, Dashicon('arrow-left-alt2')),
+            Button({
+              className: 'gh-button secondary text',
+              type     : 'button',
+              onClick  : e => goToMonth(new Date(), morph),
+            }, _x('Today', 'calendar navigation', 'groundhogg')),
+            Button({
+              className   : 'gh-button secondary text icon',
+              type        : 'button',
+              'aria-label': _x('Next month', 'calendar navigation', 'groundhogg'),
+              onClick     : e => goToMonth(addMonths(State.month, 1), morph),
+            }, Dashicon('arrow-right-alt2')),
+          ]),
+          Div({
+            className: 'gh-calendar-title',
+          }, monthFormat.format(firstOfMonth)),
+          Div({
+            className: 'gh-calendar-actions',
+          }, maybeCall(headerActions, { morph })),
+        ]) : null,
+
+        Div({
+          className: 'gh-calendar-grid',
+        }, [
+          ...Array(7).fill(0).map((_, i) => Div({
+            className: 'gh-calendar-weekday',
+          }, weekdayFormat.format(addDays(gridStart, i)))),
+          ...Array(numWeeks * 7).fill(0).map((_, i) => DayCell(addDays(gridStart, i))),
+        ]),
+
+        loading ? Div({
+          className: 'gh-calendar-loading',
+        }, Div({ className: 'gh-calendar-loading-bar' })) : null,
+      ])
+    })
+  }
+
   const ButtonToggle = ({
     id = '',
     options = [],
@@ -2057,6 +2490,14 @@
     ButtonToggle,
     MultiButtonToggle,
     DayOfMonthPicker,
+    Calendar,
+    mergeAttributes,
+    toDate,
+    startOfDay,
+    startOfMonth,
+    dayKey,
+    addDays,
+    addMonths,
     Autocomplete,
     ProgressBar,
     Accordion,

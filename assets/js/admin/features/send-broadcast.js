@@ -596,6 +596,14 @@
               broadcast: r.item,
             })
 
+            // let the rest of the page react, the broadcast calendar listens for
+            // this so a newly scheduled broadcast shows up without a reload
+            document.dispatchEvent(new CustomEvent('groundhogg/broadcast/scheduled', {
+              detail: {
+                broadcast: r.item,
+              },
+            }))
+
           }).catch(err => {
             dialog({
               message: err.message,

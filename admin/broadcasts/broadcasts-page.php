@@ -11,6 +11,7 @@ use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\enqueue_broadcast_assets;
+use function Groundhogg\enqueue_broadcast_calendar_assets;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_url_var;
@@ -93,12 +94,128 @@ class Broadcasts_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
+	 * The calendar shows a whole month at a time, so there's nothing to paginate.
+	 * Leaving the parent to add its "Per page" option would put an otherwise empty
+	 * Screen Options tab at the top of the page.
+	 */
+	public function screen_options() {
+
+		if ( $this->showing_calendar() ) {
+			return;
+		}
+
+		parent::screen_options();
+	}
+
+	/**
 	 * enqueue editor scripts
 	 */
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
 
+		if ( $this->showing_calendar() ) {
+			enqueue_broadcast_calendar_assets();
+
+			// the switcher link in the calendar's month nav is built in JS, but the
+			// nonce that lets it persist the choice has to come from here
+			wp_add_inline_script( 'groundhogg-admin-broadcast-calendar', 'var GroundhoggBroadcastCalendar = ' . wp_json_encode( [
+				'tableUrl' => $this->layout_url( 'table' ),
+			] ), 'before' );
+
+			return;
+		}
+
 		enqueue_broadcast_assets();
+	}
+
+	/**
+	 * Meta key holding the user's preferred way of looking at the broadcasts list
+	 */
+	const LAYOUT_PREFERENCE = 'gh_broadcasts_layout';
+
+	/**
+	 * Nonce action guarding writes to the layout preference
+	 */
+	const LAYOUT_NONCE = 'gh_broadcasts_layout';
+
+	/**
+	 * A link that switches to the given layout and remembers the choice.
+	 *
+	 * Returned raw, callers escape it. array_to_atts() runs href through esc_url()
+	 * and the calendar hands it to setAttribute, so wp_nonce_url()'s esc_html()
+	 * would be wrong for both.
+	 *
+	 * @param string $layout
+	 *
+	 * @return string
+	 */
+	protected function layout_url( $layout ) {
+		return add_query_arg( [
+			'_layout_nonce' => wp_create_nonce( self::LAYOUT_NONCE ),
+		], admin_page_url( 'gh_broadcasts', [ 'layout' => $layout ] ) );
+	}
+
+	/**
+	 * Whether the broadcasts are being shown in the calendar rather than the classic table.
+	 *
+	 * The calendar is the default, the table is still available at ?layout=table
+	 * for searching, sorting and bulk actions.
+	 *
+	 * @return bool
+	 */
+	protected function showing_calendar() {
+
+		if ( $this->get_current_tab() !== 'broadcasts' || ! $this->current_action_is( 'view' ) ) {
+			return false;
+		}
+
+		return $this->get_layout_preference() === 'calendar';
+	}
+
+	/**
+	 * Which of the two layouts to show the broadcasts in.
+	 *
+	 * An explicit ?layout= in the URL wins and is remembered against the user, so
+	 * whichever one they last switched to is the one they come back to.
+	 *
+	 * The param is deliberately not called 'view', which the Recurring Schedules
+	 * table on the sibling tab already uses for its own status filters.
+	 *
+	 * @return string either 'calendar' or 'table'
+	 */
+	protected function get_layout_preference() {
+
+		static $layout = null;
+
+		// the answer can't change within a request, and this writes user meta
+		if ( $layout !== null ) {
+			return $layout;
+		}
+
+		$layouts   = [ 'calendar', 'table' ];
+		$requested = get_url_var( 'layout' );
+
+		// they followed one of the layout switcher links
+		if ( $requested && in_array( $requested, $layouts, true ) ) {
+
+			$layout = $requested;
+
+			// The param alone only decides how this one request renders, which keeps
+			// bookmarks and the table's own links working. Writing the preference
+			// takes a nonce, so a forged link can't quietly change what the user
+			// comes back to. A stale nonce still switches, it just doesn't stick.
+			if ( wp_verify_nonce( get_url_var( '_layout_nonce' ), self::LAYOUT_NONCE )
+			     && get_user_meta( get_current_user_id(), self::LAYOUT_PREFERENCE, true ) !== $layout ) {
+				update_user_meta( get_current_user_id(), self::LAYOUT_PREFERENCE, $layout );
+			}
+
+			return $layout;
+		}
+
+		// one_of falls back to the first option, so an unset or junk value is a calendar
+		$layout = one_of( get_user_meta( get_current_user_id(), self::LAYOUT_PREFERENCE, true ), $layouts );
+
+		return $layout;
 	}
 
 	public function get_priority() {
@@ -314,16 +431,32 @@ class Broadcasts_Page extends Tabbed_Admin_Page {
 			];
 		}
 
+		// the calendar has its own link back to the table in the month nav
+		if ( $this->get_current_tab() === 'broadcasts' && $this->current_action_is( 'view' ) && ! $this->showing_calendar() ) {
+			$actions[] = [
+				'link'   => $this->layout_url( 'calendar' ),
+				'action' => esc_html__( 'Calendar view', 'groundhogg' ),
+				'target' => '_self',
+				'id'     => 'gh-broadcast-calendar-view'
+			];
+		}
+
 		return $actions;
 	}
 
 	/**
-	 * Display the table
+	 * Display the broadcasts, either in the calendar or the classic table
 	 */
 	public function view() {
 
 		// fix sending broadcasts
 		Broadcast::transition_from_sending_to_sent();
+
+		if ( $this->showing_calendar() ) {
+			$this->calendar();
+
+			return;
+		}
 
 		$broadcasts_table = new Broadcasts_Table();
 
@@ -335,6 +468,16 @@ class Broadcasts_Page extends Tabbed_Admin_Page {
 			<?php $broadcasts_table->display(); ?>
         </form>
 
+		<?php
+	}
+
+	/**
+	 * Mount point for the broadcast calendar, everything else is rendered by
+	 * assets/js/admin/broadcasts/broadcast-calendar.js
+	 */
+	public function calendar() {
+		?>
+        <div id="gh-broadcast-calendar-mount" style="margin-top: 20px"></div>
 		<?php
 	}
 

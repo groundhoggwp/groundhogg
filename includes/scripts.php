@@ -337,6 +337,18 @@ class Scripts {
 			'wp-date',
 		] );
 
+		wp_register_script( 'groundhogg-admin-broadcast-calendar', GROUNDHOGG_ASSETS_URL . 'js/admin/broadcasts/broadcast-calendar' . $dot_min . '.js', [
+			'groundhogg-admin',
+			'groundhogg-admin-data',
+			'groundhogg-admin-element',
+			'groundhogg-admin-components',
+			'groundhogg-admin-formatting',
+			'groundhogg-admin-filter-contacts',
+			'groundhogg-admin-send-broadcast',
+			'groundhogg-make-el',
+			'wp-i18n',
+		], GROUNDHOGG_VERSION );
+
 		wp_register_script( 'groundhogg-admin-funnel-scheduler', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/funnel-scheduler' . $dot_min . '.js', [
 			'groundhogg-admin',
 			'groundhogg-admin-data',
@@ -672,8 +684,10 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-fullframe', GROUNDHOGG_ASSETS_URL . 'js/frontend/fullframe' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
 
 		foreach ( [
+			'groundhogg-make-el',
 			'groundhogg-admin-element',
 			'groundhogg-admin-components',
+			'groundhogg-admin-broadcast-calendar',
 			'groundhogg-admin-replies',
 			'groundhogg-admin-properties',
 			'groundhogg-admin-contact-search',

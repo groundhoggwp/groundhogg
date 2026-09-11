@@ -7007,6 +7007,15 @@ function enqueue_broadcast_assets() {
 }
 
 /**
+ * Enqueue assets for the broadcast calendar
+ */
+function enqueue_broadcast_calendar_assets() {
+	enqueue_broadcast_assets();
+	wp_enqueue_script( 'groundhogg-admin-broadcast-calendar' );
+	do_action( 'groundhogg_enqueue_broadcast_calendar_assets' );
+}
+
+/**
  * Enqueue the new block editor
  */
 function enqueue_email_block_editor_assets( $extra = [] ) {

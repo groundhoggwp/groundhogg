@@ -113,6 +113,62 @@ class Broadcasts_Api extends Base_Object_Api {
 	}
 
 	/**
+	 * Read a list of broadcasts.
+	 *
+	 * Serializing a broadcast in full also serializes the email or SMS behind it,
+	 * which merges replacements and builds the whole message. That's far too
+	 * expensive for a list, so `context=embed` returns just the columns, the
+	 * audience size and the title. This is what the broadcast calendar asks for.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function read( WP_REST_Request $request ) {
+
+		$response = parent::read( $request );
+
+		if ( is_wp_error( $response ) || $request->get_param( 'context' ) !== 'embed' ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+
+		$data['items'] = array_values( array_map( [ $this, 'map_to_embedded_array' ], $data['items'] ) );
+
+		$response->set_data( $data );
+
+		return $response;
+	}
+
+	/**
+	 * A broadcast without the object it's sending
+	 *
+	 * @param Broadcast $broadcast
+	 *
+	 * @return array
+	 */
+	protected function map_to_embedded_array( Broadcast $broadcast ) {
+		return [
+			'ID'    => $broadcast->get_id(),
+			'data'  => [
+				'object_id'      => $broadcast->get_object_id(),
+				'object_type'    => $broadcast->get_broadcast_type(),
+				'schedule_id'    => absint( $broadcast->schedule_id ),
+				'scheduled_by'   => $broadcast->get_scheduled_by_id(),
+				'send_time'      => $broadcast->get_send_time(),
+				'query'          => $broadcast->get_query(),
+				'status'         => $broadcast->get_status(),
+				'date_scheduled' => $broadcast->get_date_scheduled(),
+			],
+			'meta'  => [
+				'total_contacts' => absint( $broadcast->get_meta( 'total_contacts' ) ),
+			],
+			'title' => $broadcast->get_title(),
+		];
+	}
+
+	/**
 	 * Get recent queries used in broadcasts
 	 *
 	 * @param  WP_REST_Request  $request

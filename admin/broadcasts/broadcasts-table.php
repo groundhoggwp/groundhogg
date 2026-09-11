@@ -186,7 +186,8 @@ class Broadcasts_Table extends WP_List_Table {
 			$view_content .= " <span class='count'>(" . _nf( $num ) . ")</span>";
 
 			$views[ $c ] = html()->e( 'a', [
-				'href'  => admin_page_url( 'gh_broadcasts', [ 'status' => $c ] ),
+				// stay on the table, the calendar filters by status itself
+				'href'  => admin_page_url( 'gh_broadcasts', [ 'status' => $c, 'layout' => 'table' ] ),
 				'class' => $this->get_view() === $c ? 'current' : ''
 			], $view_content );
 
@@ -298,7 +299,10 @@ class Broadcasts_Table extends WP_List_Table {
 	protected function column_from_user( $broadcast ) {
 		$user      = get_userdata( $broadcast->get_scheduled_by_id() );
 		$from_user = esc_html( $user->display_name );
-		$queryUrl  = admin_url( 'admin.php?page=gh_broadcasts&scheduled_by=' . $broadcast->get_scheduled_by_id() );
+		$queryUrl  = esc_url( admin_page_url( 'gh_broadcasts', [
+			'scheduled_by' => $broadcast->get_scheduled_by_id(),
+			'layout'       => 'table',
+		] ) );
 
 		return "<a href='$queryUrl'>$from_user</a>";
 	}
