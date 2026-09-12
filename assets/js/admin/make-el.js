@@ -1586,12 +1586,11 @@
      * @returns {*}
      * @constructor
      */
-    const Render = () => Div({
+    const Render = () => Div(mergeAttributes({
       id,
       className: `gh-picker-container`,
       tabindex : '0',
-      ...attributes,
-    }, Div({
+    }, attributes), Div({
       id       : `${ id }-picker`,
       className: `gh-picker ${ optionsVisible() ? 'options-visible' : '' }`,
       tabindex : '0',
@@ -2047,6 +2046,59 @@
       // the array they were rendered from.
       State.set({ byDay })
 
+      // jump straight to a month instead of paging through them one at a time
+      const openMonthPicker = anchor => {
+
+        const picker = Groundhogg.createState({ year: State.month.getFullYear() })
+        const shortMonth = new Intl.DateTimeFormat(locale, { month: 'short' })
+
+        MiniModal({
+          target       : anchor,
+          from         : 'left',
+          dialogClasses: 'gh-calendar-month-picker',
+        }, ({ close }) => Div({
+          id: `${ id }-month-picker`,
+        }, morphPicker => Fragment([
+
+          Div({
+            className: 'gh-calendar-month-picker-year',
+          }, [
+            Button({
+              className   : 'gh-button secondary text icon',
+              type        : 'button',
+              'aria-label': _x('Previous year', 'calendar navigation', 'groundhogg'),
+              onClick     : e => {
+                picker.set({ year: picker.year - 1 })
+                morphPicker()
+              },
+            }, Dashicon('arrow-left-alt2')),
+            Span({
+              className: 'gh-calendar-month-picker-year-label',
+            }, `${ picker.year }`),
+            Button({
+              className   : 'gh-button secondary text icon',
+              type        : 'button',
+              'aria-label': _x('Next year', 'calendar navigation', 'groundhogg'),
+              onClick     : e => {
+                picker.set({ year: picker.year + 1 })
+                morphPicker()
+              },
+            }, Dashicon('arrow-right-alt2')),
+          ]),
+
+          Div({
+            className: 'gh-calendar-month-picker-months',
+          }, Array(12).fill(0).map((_, m) => Button({
+            className: `gh-calendar-month-picker-month ${ picker.year === State.month.getFullYear() && m === State.month.getMonth() ? 'current' : '' }`,
+            type     : 'button',
+            onClick  : e => {
+              close()
+              goToMonth(new Date(picker.year, m, 1), morph)
+            },
+          }, shortMonth.format(new Date(picker.year, m, 1))))),
+        ])))
+      }
+
       const EventChip = (event, date, key, index) => {
 
         const handleActivate = e => {
@@ -2176,8 +2228,11 @@
               onClick     : e => goToMonth(addMonths(State.month, 1), morph),
             }, Dashicon('arrow-right-alt2')),
           ]),
-          Div({
-            className: 'gh-calendar-title',
+          Button({
+            className   : 'gh-calendar-title',
+            type        : 'button',
+            'aria-label': _x('Jump to a month', 'calendar navigation', 'groundhogg'),
+            onClick     : e => openMonthPicker(e.currentTarget),
           }, monthFormat.format(firstOfMonth)),
           Div({
             className: 'gh-calendar-actions',

@@ -11,11 +11,15 @@
     Calendar,
     Modal,
     MiniModal,
+    ItemPicker,
     makeEl,
     startOfMonth,
   } = MakeEl
 
-  const { broadcasts: BroadcastsStore } = Groundhogg.stores
+  const {
+    broadcasts: BroadcastsStore,
+    campaigns : CampaignsStore,
+  } = Groundhogg.stores
 
   const {
     get: apiGet,
@@ -182,6 +186,7 @@
     month     : monthFromHash() ?? startOfMonth(new Date()),
     broadcasts: [],
     statuses  : [], // empty means all of them
+    campaigns : [], // { id, text } as the picker wants them, empty means all
     loading   : true,
   })
 
@@ -232,6 +237,17 @@
 
     if (State.statuses.length) {
       query.status = State.statuses
+    }
+
+    if (State.campaigns.length) {
+      // a group per campaign, because groups are OR'd and the filter itself ANDs
+      // every campaign named within one group
+      query.filters = urlEncodeFilters(State.campaigns.map(({ id }) => [
+        {
+          type     : 'campaigns',
+          campaigns: [id],
+        },
+      ]))
     }
 
     return BroadcastsStore.fetchItems(query)
@@ -607,6 +623,38 @@
     ])))
   }
 
+  /**
+   * Narrow the calendar to one or more campaigns
+   *
+   * @param morph {function}
+   * @return {Element}
+   */
+  const CampaignFilter = morph => ItemPicker({
+    id          : 'gh-broadcast-calendar-campaigns',
+    className   : 'gh-broadcast-calendar-campaign-filter',
+    noneSelected: __('All campaigns', 'groundhogg'),
+    selected    : State.campaigns,
+    fetchOptions: async search => {
+
+      let campaigns = await CampaignsStore.fetchItems({
+        search,
+        limit: 20,
+      })
+
+      return campaigns.map(({
+        ID,
+        data,
+      }) => ( {
+        id  : ID,
+        text: data.name,
+      } ))
+    },
+    onChange    : items => {
+      State.set({ campaigns: items })
+      load(morph)
+    },
+  })
+
   const BroadcastCalendar = () => Div({
     id: 'gh-broadcast-calendar-wrap',
   }, morph => Calendar({
@@ -628,6 +676,7 @@
       className: isPast(date) ? 'is-past not-clickable' : '',
     } ),
     headerActions  : () => [
+      CampaignFilter(morph),
       StatusFilter(morph),
       An({
         className: 'gh-button secondary text small',

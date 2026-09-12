@@ -3734,12 +3734,28 @@ div:has( > button.hide-panel) {
     order: 1;
   }
 
-  .gh-calendar-title {
+  // a button, because it opens the month picker
+  button.gh-calendar-title {
+    background: none;
+    border: none;
+    border-radius: var(--gh-border-radius);
+    cursor: pointer;
     font-size: 16px;
     font-weight: 600;
     color: var(--gh-dark);
     order: 2;
-    flex-grow: 1;
+    padding: 2px 6px;
+    text-align: left;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: var(--gh-dark-5);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--gh-focused-shadow);
+    }
   }
 
   .gh-calendar-actions {
@@ -3937,6 +3953,54 @@ div:has( > button.hide-panel) {
   }
 }
 
+.gh-calendar-month-picker {
+
+  .gh-calendar-month-picker-year {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+
+  .gh-calendar-month-picker-year-label {
+    font-weight: 600;
+    color: var(--gh-dark);
+  }
+
+  .gh-calendar-month-picker-months {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+
+  .gh-calendar-month-picker-month {
+    background-color: var(--gh-dark-5);
+    border: none;
+    border-radius: var(--gh-border-radius);
+    color: var(--gh-dark);
+    cursor: pointer;
+    font-size: 13px;
+    min-width: 56px;
+    padding: 6px 8px;
+
+    &:hover {
+      background-color: var(--gh-dark-15);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--gh-focused-shadow);
+    }
+
+    &.current {
+      background-color: var(--gh-primary);
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+}
+
 @keyframes gh-calendar-loading {
   0% {
     transform: translateX(-100%);
@@ -3996,6 +4060,11 @@ div:has( > button.hide-panel) {
       color: var(--gh-dark-30);
     }
   }
+}
+
+.gh-broadcast-calendar-campaign-filter {
+  min-width: 180px;
+  max-width: 260px;
 }
 
 .gh-broadcast-calendar-legend {
