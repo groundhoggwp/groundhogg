@@ -6,6 +6,7 @@ use Groundhogg\Abilities\Broadcasts\Cancel_Broadcast;
 use Groundhogg\Abilities\Broadcasts\Get_Broadcast;
 use Groundhogg\Abilities\Broadcasts\List_Broadcasts;
 use Groundhogg\Abilities\Broadcasts\Send_Email_Broadcast;
+use Groundhogg\Abilities\Campaigns\List_Campaigns;
 use Groundhogg\Abilities\Contacts\Add_Contact_Note;
 use Groundhogg\Abilities\Contacts\Create_Contact;
 use Groundhogg\Abilities\Contacts\Get_Contact;
@@ -61,6 +62,11 @@ class Abilities {
 			'description' => __( 'Find and manage Groundhogg tags.', 'groundhogg' ),
 		] );
 
+		wp_register_ability_category( 'groundhogg-campaigns', [
+			'label'       => __( 'Groundhogg Campaigns', 'groundhogg' ),
+			'description' => __( 'Find Groundhogg campaigns, used to group flows, broadcasts, and emails.', 'groundhogg' ),
+		] );
+
 		wp_register_ability_category( 'groundhogg-funnels', [
 			'label'       => __( 'Groundhogg Flows', 'groundhogg' ),
 			'description' => __( 'Find Groundhogg flows and add contacts to them.', 'groundhogg' ),
@@ -103,6 +109,7 @@ class Abilities {
 			List_Saved_Searches::class,
 			List_Owners::class,
 			List_Tags::class,
+			List_Campaigns::class,
 			Add_Contact_Note::class,
 			List_Contact_Notes::class,
 			List_Email_Templates::class,
