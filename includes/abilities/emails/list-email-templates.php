@@ -19,6 +19,11 @@ use function Groundhogg\get_db;
  * is almost never needed just to pick which email to send, so it is only
  * returned when explicitly requested via `expand`. When expanding content, keep
  * `limit` small.
+ *
+ * `campaigns` filters via the generic object_relationships-backed 'related'
+ * query var (DB::query()) - an email is the primary/parent side of its
+ * relationship to a campaign, same direction Email::get_related_objects('campaign')
+ * reads (see groundhogg/create-email's and groundhogg/update-email's campaigns param).
  */
 class List_Email_Templates extends Ability {
 
@@ -56,6 +61,11 @@ class List_Email_Templates extends Ability {
 						'type'        => 'string',
 						'enum'        => [ 'marketing', 'transactional' ],
 						'description' => __( 'Only include emails of this message type. Global blocks are always excluded regardless of this filter.', 'groundhogg' ),
+					],
+					'campaigns' => [
+						'type'        => 'array',
+						'items'       => [ 'type' => 'integer' ],
+						'description' => __( 'Only include emails tagged with at least one of these campaign IDs. Find IDs with groundhogg/list-campaigns.', 'groundhogg' ),
 					],
 					'expand' => [
 						'type'        => 'array',
@@ -129,6 +139,13 @@ class List_Email_Templates extends Ability {
 			$query_vars['message_type'] = sanitize_text_field( $input['message_type'] );
 		} else {
 			$query_vars['message_type'] = [ '!=', 'global_block' ];
+		}
+
+		if ( ! empty( $input['campaigns'] ) ) {
+			$query_vars['related'] = [
+				'id'   => wp_parse_id_list( $input['campaigns'] ),
+				'type' => 'campaign',
+			];
 		}
 
 		$db      = get_db( 'emails' );

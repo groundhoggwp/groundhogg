@@ -12,6 +12,11 @@ use function Groundhogg\get_db;
  *
  * The step list is only included when "steps" is passed in expand - it loads
  * every step object per flow.
+ *
+ * `campaigns` filters via the generic object_relationships-backed 'related'
+ * query var (DB::query()) - a funnel is the primary/parent side of its
+ * relationship to a campaign, same direction Funnel::get_related_objects('campaign')
+ * reads.
  */
 class List_Flows extends Ability {
 
@@ -40,6 +45,11 @@ class List_Flows extends Ability {
 						'type'        => 'string',
 						'enum'        => [ 'active', 'inactive', 'archived' ],
 						'description' => __( 'Only include flows with this status. Contacts can only be added to "active" flows.', 'groundhogg' ),
+					],
+					'campaigns' => [
+						'type'        => 'array',
+						'items'       => [ 'type' => 'integer' ],
+						'description' => __( 'Only include flows tagged with at least one of these campaign IDs. Find IDs with groundhogg/list-campaigns.', 'groundhogg' ),
 					],
 					'expand' => [
 						'type'        => 'array',
@@ -100,6 +110,13 @@ class List_Flows extends Ability {
 
 		if ( ! empty( $input['status'] ) ) {
 			$query_vars['status'] = sanitize_text_field( $input['status'] );
+		}
+
+		if ( ! empty( $input['campaigns'] ) ) {
+			$query_vars['related'] = [
+				'id'   => wp_parse_id_list( $input['campaigns'] ),
+				'type' => 'campaign',
+			];
 		}
 
 		$db      = get_db( 'funnels' );

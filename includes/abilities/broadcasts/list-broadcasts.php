@@ -28,6 +28,11 @@ use function Groundhogg\is_sms_plugin_active;
  * active) on object_id/object_type and matches against their title/subject,
  * mirroring exactly what Broadcasts_Table::prepare_items() does for the
  * search box on the Broadcasts admin page (admin/broadcasts/broadcasts-table.php).
+ *
+ * `campaigns` filters via the generic object_relationships-backed 'related'
+ * query var (DB::query()) - a broadcast is the primary/parent side of its
+ * relationship to a campaign, same direction Broadcast::get_related_objects('campaign')
+ * reads.
  */
 class List_Broadcasts extends Ability {
 
@@ -64,6 +69,11 @@ class List_Broadcasts extends Ability {
 					'search' => [
 						'type'        => 'string',
 						'description' => __( 'Free-text search matched against the title and subject of the broadcast\'s email (or SMS, if active) - the broadcast itself has no searchable text of its own.', 'groundhogg' ),
+					],
+					'campaigns' => [
+						'type'        => 'array',
+						'items'       => [ 'type' => 'integer' ],
+						'description' => __( 'Only include broadcasts tagged with at least one of these campaign IDs. Find IDs with groundhogg/list-campaigns.', 'groundhogg' ),
 					],
 					'expand' => [
 						'type'        => 'array',
@@ -122,6 +132,13 @@ class List_Broadcasts extends Ability {
 
 		if ( ! empty( $input['status'] ) ) {
 			$query_vars['status'] = sanitize_text_field( $input['status'] );
+		}
+
+		if ( ! empty( $input['campaigns'] ) ) {
+			$query_vars['related'] = [
+				'id'   => wp_parse_id_list( $input['campaigns'] ),
+				'type' => 'campaign',
+			];
 		}
 
 		// The broadcasts DB knows send_time is a UNIX timestamp (get_date_key_format
