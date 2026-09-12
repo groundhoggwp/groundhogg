@@ -28,6 +28,7 @@ use Groundhogg\Abilities\Emails\Update_Email;
 use Groundhogg\Abilities\Reports\Get_Reports;
 use Groundhogg\Abilities\Reports\List_Report_Types;
 use Groundhogg\Abilities\Tags\List_Tags;
+use Groundhogg\Abilities\Utils\Upload_Media;
 
 class Abilities {
 
@@ -84,6 +85,11 @@ class Abilities {
 			'label'       => __( 'Groundhogg Database', 'groundhogg' ),
 			'description' => __( 'Direct, read-only access to Groundhogg\'s own database tables. Administrators only.', 'groundhogg' ),
 		] );
+
+		wp_register_ability_category( 'groundhogg-utils', [
+			'label'       => __( 'Groundhogg Utilities', 'groundhogg' ),
+			'description' => __( 'General-purpose utilities that support the other categories but aren\'t specific to any one of them.', 'groundhogg' ),
+		] );
 	}
 
 	public function register_abilities() {
@@ -115,6 +121,7 @@ class Abilities {
 			Get_Reports::class,
 			Describe_Table::class,
 			Query_Table::class,
+			Upload_Media::class,
 		] as $ability ){
 
 			$ability = new $ability();
