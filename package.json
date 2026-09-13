@@ -41,5 +41,8 @@
     "uglify-es": "^3.3.10",
     "uglify-js": "^3.17.3",
     "vue": "^3.2.40"
+  },
+  "overrides": {
+    "form-data": "4.0.4"
   }
 }
