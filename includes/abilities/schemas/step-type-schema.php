@@ -3,7 +3,10 @@
 namespace Groundhogg\Abilities\Schemas;
 
 use Groundhogg\Abilities\Traits\Has_Optin_Status;
+use Groundhogg\Email;
 use Groundhogg\Plugin;
+use WP_Error;
+use function Groundhogg\parse_tag_list;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,9 +26,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Scope, deliberately narrower than "every registered step type":
  *
  * - Premium step types are excluded entirely (not in supported_types(), no settings
- *   schema) - deferred, see the create-flow/list-step-types planning.
+ *   schema) - deferred, see the create-flow/list-step-types planning. A premium
+ *   add-on can still opt its own types in via extend(), same as any other.
  * - Two non-premium but Groundhogg-flagged-legacy types are excluded from
- *   supported_types() (still visible via list-step-types' full registered-type
+ *   BUILTIN_TYPES (still visible via list-step-types' full registered-type
  *   listing, just not buildable): `form_fill` (superseded by `web_form`) and
  *   `email_opened` (superseded by nothing directly, but Groundhogg's own
  *   `is_legacy()` marks it deprecated).
@@ -34,49 +38,174 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   passthrough) rather than nothing - create-flow can still be asked to build
  *   one, just without real per-field validation/guidance.
  *
+ * Extensible, via extend(), so a 3rd-party add-on's own step type can become
+ * something groundhogg/create-flow can build - opt-in, not automatic, since a
+ * step type existing at all (registered with Groundhogg's own step manager)
+ * says nothing about what its settings should look like or how any
+ * cross-references in them should resolve; only the add-on itself knows that:
+ *
+ *     Step_Type_Schema::extend(
+ *         'my_addon_step',                 // already registered via
+ *                                           // Plugin::instance()->step_manager->add_step(),
+ *                                           // separately - extend() opts an
+ *                                           // *existing* step type into
+ *                                           // create-flow, it doesn't register
+ *                                           // one with Groundhogg itself
+ *         [
+ *             'type'                 => 'object',
+ *             'additionalProperties' => false,
+ *             'required'             => [ 'thing_id' ],
+ *             'properties'           => [
+ *                 'thing_id' => [ 'type' => 'integer', 'description' => __( 'ID of an existing Thing.', 'my-plugin' ) ],
+ *             ],
+ *         ],
+ *         [],   // branch_keys - only non-empty for a branching logic type
+ *         function ( array $settings, array $declared ) {
+ *             // Optional - omit entirely for a type with nothing to resolve
+ *             // beyond what Groundhogg's own per-type sanitizer already does.
+ *             if ( ! empty( $settings['thing_id'] ) && ! my_addon_thing_exists( $settings['thing_id'] ) ) {
+ *                 return new WP_Error( 'my_addon_thing_not_found', __( 'thing_id does not match an existing Thing.', 'my-plugin' ) );
+ *             }
+ *             return [ 'settings' => $settings ];
+ *             // or, for a setting that must be written only after
+ *             // Funnel::set_step_levels() has finalized step ordering (see
+ *             // task_completed's own `tasks` handling in resolve_settings()
+ *             // below for why that's sometimes necessary):
+ *             // return [ 'settings' => $settings, 'deferred_settings' => [ 'some_key' => $value ] ];
+ *         }
+ *     );
+ *
+ * Call this once (e.g. on `init`, after both Groundhogg and the add-on's own
+ * step type registration have run) - before any ability builds its schema.
+ *
  * Two settings reference *other steps in the same flow being created*, not an
  * existing Groundhogg object: `task_completed`'s `tasks` and `send_email`'s
  * `reply_in_thread` (also `email_opened`'s `email_steps`, irrelevant here since
  * that type isn't supported). These are documented in their schemas as taking the
  * *local* `id` a caller assigns to an earlier step node in create-flow's input
- * tree - resolved to real step IDs, and only written after Funnel::set_step_levels()
- * has finalized step ordering, since e.g. task_completed's own sanitizer filters
- * referenced IDs through `is_before($step)`, which needs real, final step_order to
- * evaluate correctly (not the temporary order a step gets at insert time).
+ * tree - resolved to real step IDs via resolve_step_reference() (below, also
+ * available to an add-on's own resolver), and only written after
+ * Funnel::set_step_levels() has finalized step ordering, since e.g.
+ * task_completed's own sanitizer filters referenced IDs through
+ * `is_before($step)`, which needs real, final step_order to evaluate correctly
+ * (not the temporary order a step gets at insert time).
  */
 class Step_Type_Schema {
 
 	use Has_Optin_Status;
 
 	/**
-	 * Step types groundhogg/create-flow can actually build. Everything else either
-	 * isn't registered at all, is premium (deferred), or is a legacy type Groundhogg
+	 * Step types groundhogg/create-flow ships already knowing how to build.
+	 * Everything else either isn't registered at all, is premium (deferred), is
+	 * a legacy type Groundhogg itself has superseded, or hasn't been opted in via
+	 * extend() - see the class docblock.
+	 */
+	private const BUILTIN_TYPES = [
+		// Benchmarks
+		'web_form',
+		'account_created',
+		'link_click',
+		'tag_applied',
+		'tag_removed',
+		'email_confirmed',
+		'optin_status_changed',
+		'task_completed',
+		// Actions
+		'send_email',
+		'admin_notification',
+		'apply_tag',
+		'remove_tag',
+		'apply_note',
+		'create_task',
+		'delay_timer',
+		// Logic
+		'if_else',
+	];
+
+	/**
+	 * Add-on-registered step types, keyed by type. Populated by extend().
+	 *
+	 * @var array<string, array{settings_schema: array, branch_keys: string[], resolver: ?callable}>
+	 */
+	private static array $extensions = [];
+
+	/**
+	 * Opt an already-registered Groundhogg step type into groundhogg/create-flow -
+	 * see the class docblock for the full picture.
+	 *
+	 * @param string        $type            The step type key. Must already be
+	 *                                       registered with Groundhogg's own step
+	 *                                       manager (Plugin::instance()->step_manager) -
+	 *                                       refused with _doing_it_wrong() if not,
+	 *                                       since extend() opts an existing type
+	 *                                       in rather than registering a new one.
+	 *                                       Also refused if already supported
+	 *                                       (a BUILTIN_TYPES member or a previous
+	 *                                       extend() call).
+	 * @param array         $settings_schema The JSON Schema for this type's
+	 *                                       `settings` in create-flow.
+	 * @param string[]      $branch_keys     The valid `branches` map keys for this
+	 *                                       type, if it's a branching logic type -
+	 *                                       empty for anything else.
+	 * @param callable|null $resolver        function( array $settings, array $declared ): array|WP_Error.
+	 *                                       Optional - omit for a type with
+	 *                                       nothing to resolve beyond what
+	 *                                       Groundhogg's own per-type sanitizer
+	 *                                       already does. $declared is
+	 *                                       local id => ['id'=>int,'type'=>string]
+	 *                                       for every step created so far (see
+	 *                                       resolve_step_reference()). Returns
+	 *                                       `['settings' => array]`, or
+	 *                                       `['settings' => array, 'deferred_settings' => array]`
+	 *                                       for a meta key/value map that must be
+	 *                                       written only after
+	 *                                       Funnel::set_step_levels() has run -
+	 *                                       see resolve_settings()'s own docblock.
+	 *                                       Return a WP_Error to reject the input.
+	 *
+	 * @return void
+	 */
+	public static function extend( string $type, array $settings_schema, array $branch_keys = [], ?callable $resolver = null ) {
+
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $type ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				// Translators: %s is the step type key.
+				sprintf( 'Step type "%s" is not registered with Groundhogg\'s step manager - register it there (Plugin::instance()->step_manager->add_step()) before opting it into create-flow.', $type ),
+				'4.8'
+			);
+
+			return;
+		}
+
+		if ( in_array( $type, self::BUILTIN_TYPES, true ) || isset( self::$extensions[ $type ] ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				// Translators: %s is the step type key.
+				sprintf( 'Step type "%s" is already supported by groundhogg/create-flow.', $type ),
+				'4.8'
+			);
+
+			return;
+		}
+
+		self::$extensions[ $type ] = [
+			'settings_schema' => $settings_schema,
+			'branch_keys'     => $branch_keys,
+			'resolver'        => $resolver,
+		];
+	}
+
+	/**
+	 * Step types groundhogg/create-flow can actually build - the built-in set
+	 * plus anything opted in via extend(). Everything else either isn't
+	 * registered at all, is premium (deferred), or is a legacy type Groundhogg
 	 * itself has superseded - see the class docblock.
 	 *
 	 * @return string[]
 	 */
 	public static function supported_types(): array {
-		return [
-			// Benchmarks
-			'web_form',
-			'account_created',
-			'link_click',
-			'tag_applied',
-			'tag_removed',
-			'email_confirmed',
-			'optin_status_changed',
-			'task_completed',
-			// Actions
-			'send_email',
-			'admin_notification',
-			'apply_tag',
-			'remove_tag',
-			'apply_note',
-			'create_task',
-			'delay_timer',
-			// Logic
-			'if_else',
-		];
+		return array_merge( self::BUILTIN_TYPES, array_keys( self::$extensions ) );
 	}
 
 	/**
@@ -121,21 +250,24 @@ class Step_Type_Schema {
 
 	/**
 	 * The valid branch keys for a branch-logic step type - what create-flow's input
-	 * tree's `branches` map keys must be for a step of this type. Only `if_else` is
-	 * supported (fixed 'yes'/'no' - Groundhogg's own If_Else::get_branches() is
-	 * hardcoded, not configurable). Any other type (including premium branch-logic
-	 * types like split_path, where branch keys are dynamic per-instance) returns [].
+	 * tree's `branches` map keys must be for a step of this type. `if_else` is
+	 * fixed ('yes'/'no' - Groundhogg's own If_Else::get_branches() is hardcoded,
+	 * not configurable); an extend()'d type's own branch_keys come from its
+	 * registration. Any other type (including a premium branch-logic type not
+	 * opted in, e.g. split_path, where branch keys are dynamic per-instance)
+	 * returns [].
 	 *
 	 * @param string $type
 	 *
 	 * @return string[]
 	 */
 	public static function branch_keys( string $type ): array {
+
 		if ( $type === 'if_else' ) {
 			return [ 'yes', 'no' ];
 		}
 
-		return [];
+		return self::$extensions[ $type ]['branch_keys'] ?? [];
 	}
 
 	/**
@@ -149,6 +281,10 @@ class Step_Type_Schema {
 	 * @return array
 	 */
 	public static function settings_schema( string $type ): array {
+
+		if ( isset( self::$extensions[ $type ] ) ) {
+			return self::$extensions[ $type ]['settings_schema'];
+		}
 
 		switch ( $type ) {
 			case 'web_form':
@@ -415,6 +551,181 @@ class Step_Type_Schema {
 					'additionalProperties' => true,
 				];
 		}
+	}
+
+	/**
+	 * Resolve one step's `settings` into what should actually be written via
+	 * Step::update_meta() - the single place cross-references/translations
+	 * happen for both built-in and add-on-registered (extend()'s $resolver)
+	 * step types alike, so groundhogg/create-flow itself doesn't need any
+	 * type-specific knowledge beyond what's registered here.
+	 *
+	 * @param string $type
+	 * @param array  $settings The input node's `settings`, as given.
+	 * @param array  $declared local id => ['id'=>int,'type'=>string] of every
+	 *                         step created so far (earlier in create-flow's
+	 *                         input tree) - see resolve_step_reference().
+	 *
+	 * @return array{settings: array, deferred_settings: array}|WP_Error
+	 *         `settings` is written immediately by the caller; `deferred_settings`
+	 *         (a meta key=>value map, often empty) is written only after
+	 *         Funnel::set_step_levels() has finalized step ordering - for any
+	 *         setting whose own sanitizer depends on final order, like
+	 *         task_completed's `tasks` below (filtered through
+	 *         `is_before($step)`, which needs real, final step_order to
+	 *         evaluate correctly - not the provisional order a step gets at
+	 *         insert time).
+	 */
+	public static function resolve_settings( string $type, array $settings, array $declared ) {
+
+		if ( isset( self::$extensions[ $type ]['resolver'] ) ) {
+
+			$result = call_user_func( self::$extensions[ $type ]['resolver'], $settings, $declared );
+
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
+
+			return wp_parse_args( (array) $result, [ 'settings' => $settings, 'deferred_settings' => [] ] );
+		}
+
+		$deferred = [];
+
+		switch ( $type ) {
+
+			case 'apply_tag':
+			case 'remove_tag':
+			case 'tag_applied':
+			case 'tag_removed':
+
+				if ( ! empty( $settings['tags'] ) ) {
+
+					// $create = false: never mint a tag from a typo.
+					$resolved = parse_tag_list( $settings['tags'], 'ID', false );
+
+					if ( empty( $resolved ) ) {
+						return new WP_Error( 'groundhogg_unknown_tags', __( 'None of the tags given match an existing tag.', 'groundhogg' ) );
+					}
+
+					$settings['tags'] = $resolved;
+				}
+
+				break;
+
+			case 'send_email':
+
+				if ( ! empty( $settings['email_id'] ) ) {
+
+					$email = new Email( absint( $settings['email_id'] ) );
+
+					if ( ! $email->exists() ) {
+						return new WP_Error( 'groundhogg_email_not_found', __( 'send_email\'s email_id does not match an existing email. Find one with groundhogg/list-email-templates.', 'groundhogg' ) );
+					}
+				}
+
+				if ( ! empty( $settings['reply_in_thread'] ) ) {
+
+					$ref = self::resolve_step_reference( $settings['reply_in_thread'], $declared, 'send_email' );
+
+					if ( is_wp_error( $ref ) ) {
+						return $ref;
+					}
+
+					$settings['reply_in_thread'] = $ref;
+				}
+
+				break;
+
+			case 'task_completed':
+
+				if ( ! empty( $settings['tasks'] ) && is_array( $settings['tasks'] ) ) {
+
+					$ids = [];
+
+					foreach ( $settings['tasks'] as $local_ref ) {
+
+						$ref = self::resolve_step_reference( $local_ref, $declared, 'create_task' );
+
+						if ( is_wp_error( $ref ) ) {
+							return $ref;
+						}
+
+						$ids[] = $ref;
+					}
+
+					$deferred['tasks'] = $ids;
+				}
+
+				// Written later regardless of whether `tasks` was given (an empty
+				// deferred write is harmless, and keeps this one code path).
+				unset( $settings['tasks'] );
+
+				break;
+
+			case 'if_else':
+
+				$include = Segment_Schema::to_filters( (array) ( $settings['include_condition'] ?? [] ) );
+
+				if ( is_wp_error( $include ) ) {
+					return $include;
+				}
+
+				$exclude = Segment_Schema::to_filters( (array) ( $settings['exclude_condition'] ?? [] ) );
+
+				if ( is_wp_error( $exclude ) ) {
+					return $exclude;
+				}
+
+				unset( $settings['include_condition'], $settings['exclude_condition'] );
+
+				$settings['include_filters'] = $include;
+				$settings['exclude_filters'] = $exclude;
+
+				break;
+		}
+
+		return [ 'settings' => $settings, 'deferred_settings' => $deferred ];
+	}
+
+	/**
+	 * Resolve a settings field referencing another step in the same flow by its
+	 * local `id` (create-flow's step node `id`), requiring it to already exist
+	 * (i.e. be declared earlier in the input tree) and be of the expected step
+	 * type. Available to an add-on's own extend() resolver, not just the
+	 * built-in send_email/task_completed handling above.
+	 *
+	 * @param mixed  $local_id
+	 * @param array  $declared      local id => ['id'=>int,'type'=>string].
+	 * @param string $expected_type
+	 *
+	 * @return int|WP_Error The real step ID.
+	 */
+	public static function resolve_step_reference( $local_id, array $declared, string $expected_type ) {
+
+		$local_id = sanitize_key( (string) $local_id );
+
+		if ( ! isset( $declared[ $local_id ] ) ) {
+			return new WP_Error(
+				'groundhogg_unknown_step_reference',
+				// Translators: %s is the referenced local step id.
+				sprintf( __( '"%s" doesn\'t refer to an earlier step in this flow. It must be declared (via that step\'s own `id`) before the step that references it.', 'groundhogg' ), $local_id )
+			);
+		}
+
+		if ( $declared[ $local_id ]['type'] !== $expected_type ) {
+			return new WP_Error(
+				'groundhogg_wrong_step_reference_type',
+				sprintf(
+				// Translators: %1$s local id, %2$s its actual type, %3$s expected type.
+					__( '"%1$s" refers to a %2$s step, but a %3$s step was expected here.', 'groundhogg' ),
+					$local_id,
+					$declared[ $local_id ]['type'],
+					$expected_type
+				)
+			);
+		}
+
+		return $declared[ $local_id ]['id'];
 	}
 
 	/**

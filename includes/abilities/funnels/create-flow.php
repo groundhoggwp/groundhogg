@@ -3,14 +3,11 @@
 namespace Groundhogg\Abilities\Funnels;
 
 use Groundhogg\Abilities\Ability;
-use Groundhogg\Abilities\Schemas\Segment_Schema;
 use Groundhogg\Abilities\Schemas\Step_Type_Schema;
 use Groundhogg\Campaign;
-use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use WP_Error;
-use function Groundhogg\parse_tag_list;
 
 /**
  * Creates a new Groundhogg flow (funnel), including its full sequence of
@@ -32,34 +29,39 @@ use function Groundhogg\parse_tag_list;
  * input tree instead of drag-and-drop.
  *
  * Every step type in `steps` must be one groundhogg/list-step-types reports as
- * `buildable: true`. `settings` is intentionally NOT validated against a
- * per-type JSON Schema here (see groundhogg/list-step-types' settings_schema for
- * that, per type - embedding all of them into this ability's own static input
- * schema would be impractical given how many step types and how varied their
- * shapes are). Unknown/malformed settings keys are silently dropped or coerced
- * by Groundhogg's own per-type sanitizer (Step::update_meta() -> that type's
- * get_settings_schema(), if it has one) - a pure coercer, not a validator, so it
- * never surfaces a rejection. This ability adds its own explicit validation only
- * where silent coercion would be actively misleading: tag names/slugs/IDs are
- * resolved against real tags (parse_tag_list(..., false) - never auto-creates,
- * unlike Groundhogg's own tag-setting sanitizers, since by the time a real
- * contact submits a form in the admin UI a tag picker has already resolved
- * things - there's no equivalent picker step here), send_email's `email_id`
- * must reference an existing email, and step-to-step references (below) must
- * resolve to an already-declared step of the right type.
+ * `buildable: true` (Step_Type_Schema::supported_types()) - the built-in set,
+ * plus anything a 3rd-party add-on has opted in via Step_Type_Schema::extend()
+ * (see that class's own docblock). `settings` is intentionally NOT validated
+ * against a per-type JSON Schema in *this ability's* own input schema (see
+ * groundhogg/list-step-types' settings_schema for that, per type - embedding
+ * all of them here would be impractical given how many step types exist and
+ * how varied their shapes are, and impossible to do at all for a type an add-on
+ * registers after this ability's own schema is already built).
  *
- * Two settings reference *other steps in this same flow*, by a caller-assigned
- * local `id` (a step node's own `id` property) rather than Groundhogg's real,
- * not-yet-known step ID: send_email's `reply_in_thread` and task_completed's
- * `tasks`. Both require the referenced step to already appear earlier in the
- * input tree (its real ID is then already known - no placeholder-remap pass
- * needed). `tasks` specifically is also written in a *third* pass, after
- * Funnel::set_step_levels() has finalized step ordering - Task_Completed's own
- * sanitizer filters referenced IDs through `is_before($step)`, which needs real,
- * final step_order to evaluate correctly, not the provisional order a step gets
- * at insert time (Funnel::add_step()'s default is just an incrementing count).
- * `reply_in_thread` has no such ordering-dependent check and is written
- * immediately.
+ * All cross-reference resolution/translation (tag names -> real tag IDs,
+ * send_email's `email_id` needing to reference an existing email, the two
+ * step-to-step references below, if_else's condition -> Filters DSL
+ * translation, and whatever a 3rd-party type's own extend() resolver does) is
+ * centralized in Step_Type_Schema::resolve_settings() - this ability has no
+ * type-specific knowledge of its own beyond calling it. Anything that method
+ * doesn't touch passes through untouched for Groundhogg's own per-type
+ * sanitizer (Step::update_meta() -> that type's get_settings_schema(), if it
+ * has one) - a pure coercer, not a validator, so it never surfaces a rejection
+ * on its own.
+ *
+ * Two built-in settings reference *other steps in this same flow*, by a
+ * caller-assigned local `id` (a step node's own `id` property) rather than
+ * Groundhogg's real, not-yet-known step ID: send_email's `reply_in_thread` and
+ * task_completed's `tasks` (Step_Type_Schema::resolve_step_reference(), also
+ * available to an add-on's own resolver). Both require the referenced step to
+ * already appear earlier in the input tree (its real ID is then already known -
+ * no placeholder-remap pass needed). A resolver can ask for a setting to be
+ * written only after Funnel::set_step_levels() has finalized step ordering
+ * (via `deferred_settings` - task_completed's `tasks` needs this since its own
+ * sanitizer filters referenced IDs through `is_before($step)`, which needs
+ * real, final step_order to evaluate correctly, not the provisional order a
+ * step gets at insert time); `reply_in_thread` has no such ordering-dependent
+ * check and is written immediately.
  *
  * Always created `status: inactive` - a live/active funnel's Step::update_meta()
  * routes through a changes/commit queue meant for the wp-admin editor's own
@@ -226,7 +228,7 @@ class Create_Flow extends Ability {
 		}
 
 		$declared = []; // local id => [ 'id' => real step ID, 'type' => step type ]
-		$deferred = []; // [ [ 'step_id' => int, 'ids' => [...real create_task step IDs...] ], ... ]
+		$deferred = []; // [ [ 'step_id' => int, 'settings' => [key=>value, ...] ], ... ] - see Step_Type_Schema::resolve_settings()
 
 		$steps_out = $this->create_branch( $funnel, $input['steps'], 'main', $declared, $deferred );
 
@@ -245,11 +247,12 @@ class Create_Flow extends Ability {
 			// in-memory step_order is whatever Funnel::add_step() gave it at
 			// insert time, never updated in place by set_step_levels() above
 			// (which works through its own, separately-fetched Step instances).
-			// Task_Completed's own sanitizer filters `tasks` through
+			// task_completed's own sanitizer filters `tasks` through
 			// is_before($step), which reads $step's step_order - reusing the
 			// stale instance here silently drops every reference, since as far as
-			// it knows nothing is "before" it yet.
-			( new Step( $entry['step_id'] ) )->update_meta( 'tasks', $entry['ids'] );
+			// it knows nothing is "before" it yet. Same caution applies to
+			// whatever an add-on's own deferred_settings might need.
+			( new Step( $entry['step_id'] ) )->update_meta( $entry['settings'] );
 		}
 
 		if ( ! empty( $input['campaigns'] ) ) {
@@ -328,12 +331,11 @@ class Create_Flow extends Ability {
 			}
 
 			$input_settings = (array) ( $node['settings'] ?? [] );
-			$deferred_tasks = null;
 
-			$resolved_settings = $this->resolve_settings( $type, $input_settings, $declared, $deferred_tasks );
+			$resolved = Step_Type_Schema::resolve_settings( $type, $input_settings, $declared );
 
-			if ( is_wp_error( $resolved_settings ) ) {
-				return $resolved_settings;
+			if ( is_wp_error( $resolved ) ) {
+				return $resolved;
 			}
 
 			$title = ! empty( $node['title'] ) ? sanitize_text_field( $node['title'] ) : $info['name'];
@@ -343,7 +345,7 @@ class Create_Flow extends Ability {
 				'step_type'  => $type,
 				'step_group' => $info['group'],
 				'branch'     => $branch,
-				'meta'       => $resolved_settings,
+				'meta'       => $resolved['settings'],
 			] );
 
 			if ( ! $step ) {
@@ -358,8 +360,8 @@ class Create_Flow extends Ability {
 				$declared[ $local_id ] = [ 'id' => $step->get_id(), 'type' => $type ];
 			}
 
-			if ( $deferred_tasks !== null ) {
-				$deferred[] = [ 'step_id' => $step->get_id(), 'ids' => $deferred_tasks ];
+			if ( ! empty( $resolved['deferred_settings'] ) ) {
+				$deferred[] = [ 'step_id' => $step->get_id(), 'settings' => $resolved['deferred_settings'] ];
 			}
 
 			$out_node = [
@@ -410,161 +412,5 @@ class Create_Flow extends Ability {
 		}
 
 		return $out;
-	}
-
-	/**
-	 * Resolve one step's `settings` into what actually gets written via
-	 * Step::update_meta() - only the handful of fields this ability explicitly
-	 * validates/translates (see the class docblock); everything else passes
-	 * through untouched for Groundhogg's own per-type sanitizer to handle.
-	 *
-	 * @param string     $type
-	 * @param array      $settings       The input node's `settings`, as given.
-	 * @param array      $declared       local id => ['id'=>int,'type'=>string] of
-	 *                                   every step created so far (earlier in tree
-	 *                                   order) - see create_branch().
-	 * @param array|null $deferred_tasks By reference, out param. Set to the
-	 *                                   resolved list of real create_task step IDs
-	 *                                   when $type is task_completed and `tasks`
-	 *                                   was given - the caller writes these
-	 *                                   separately, after set_step_levels().
-	 *
-	 * @return array|WP_Error
-	 */
-	private function resolve_settings( string $type, array $settings, array $declared, &$deferred_tasks ) {
-
-		switch ( $type ) {
-
-			case 'apply_tag':
-			case 'remove_tag':
-			case 'tag_applied':
-			case 'tag_removed':
-
-				if ( ! empty( $settings['tags'] ) ) {
-
-					// $create = false: never mint a tag from a typo.
-					$resolved = parse_tag_list( $settings['tags'], 'ID', false );
-
-					if ( empty( $resolved ) ) {
-						return new WP_Error( 'groundhogg_unknown_tags', __( 'None of the tags given match an existing tag.', 'groundhogg' ) );
-					}
-
-					$settings['tags'] = $resolved;
-				}
-
-				break;
-
-			case 'send_email':
-
-				if ( ! empty( $settings['email_id'] ) ) {
-
-					$email = new Email( absint( $settings['email_id'] ) );
-
-					if ( ! $email->exists() ) {
-						return new WP_Error( 'groundhogg_email_not_found', __( 'send_email\'s email_id does not match an existing email. Find one with groundhogg/list-email-templates.', 'groundhogg' ) );
-					}
-				}
-
-				if ( ! empty( $settings['reply_in_thread'] ) ) {
-
-					$ref = $this->resolve_step_reference( $settings['reply_in_thread'], $declared, 'send_email' );
-
-					if ( is_wp_error( $ref ) ) {
-						return $ref;
-					}
-
-					$settings['reply_in_thread'] = $ref;
-				}
-
-				break;
-
-			case 'task_completed':
-
-				if ( ! empty( $settings['tasks'] ) && is_array( $settings['tasks'] ) ) {
-
-					$ids = [];
-
-					foreach ( $settings['tasks'] as $local_ref ) {
-
-						$ref = $this->resolve_step_reference( $local_ref, $declared, 'create_task' );
-
-						if ( is_wp_error( $ref ) ) {
-							return $ref;
-						}
-
-						$ids[] = $ref;
-					}
-
-					$deferred_tasks = $ids;
-				}
-
-				// Written later regardless of whether `tasks` was given (an empty
-				// deferred write is harmless, and keeps this one code path).
-				unset( $settings['tasks'] );
-
-				break;
-
-			case 'if_else':
-
-				$include = Segment_Schema::to_filters( (array) ( $settings['include_condition'] ?? [] ) );
-
-				if ( is_wp_error( $include ) ) {
-					return $include;
-				}
-
-				$exclude = Segment_Schema::to_filters( (array) ( $settings['exclude_condition'] ?? [] ) );
-
-				if ( is_wp_error( $exclude ) ) {
-					return $exclude;
-				}
-
-				unset( $settings['include_condition'], $settings['exclude_condition'] );
-
-				$settings['include_filters'] = $include;
-				$settings['exclude_filters'] = $exclude;
-
-				break;
-		}
-
-		return $settings;
-	}
-
-	/**
-	 * Resolve a settings field referencing another step in this flow by its
-	 * local `id`, requiring it to already exist (i.e. be declared earlier in the
-	 * input tree) and be of the expected step type.
-	 *
-	 * @param mixed  $local_id
-	 * @param array  $declared      local id => ['id'=>int,'type'=>string].
-	 * @param string $expected_type
-	 *
-	 * @return int|WP_Error The real step ID.
-	 */
-	private function resolve_step_reference( $local_id, array $declared, string $expected_type ) {
-
-		$local_id = sanitize_key( (string) $local_id );
-
-		if ( ! isset( $declared[ $local_id ] ) ) {
-			return new WP_Error(
-				'groundhogg_unknown_step_reference',
-				// Translators: %s is the referenced local step id.
-				sprintf( __( '"%s" doesn\'t refer to an earlier step in this flow. It must be declared (via that step\'s own `id`) before the step that references it.', 'groundhogg' ), $local_id )
-			);
-		}
-
-		if ( $declared[ $local_id ]['type'] !== $expected_type ) {
-			return new WP_Error(
-				'groundhogg_wrong_step_reference_type',
-				sprintf(
-				// Translators: %1$s local id, %2$s its actual type, %3$s expected type.
-					__( '"%1$s" refers to a %2$s step, but a %3$s step was expected here.', 'groundhogg' ),
-					$local_id,
-					$declared[ $local_id ]['type'],
-					$expected_type
-				)
-			);
-		}
-
-		return $declared[ $local_id ]['id'];
 	}
 }
