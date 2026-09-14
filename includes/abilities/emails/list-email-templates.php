@@ -18,12 +18,14 @@ use function Groundhogg\get_db;
  * The email body (`content` / `plain_text`) is large - tens of KB per email - and
  * is almost never needed just to pick which email to send, so it is only
  * returned when explicitly requested via `expand`. When expanding content, keep
- * `limit` small.
+ * `limit` small, or use groundhogg/get-email-template to fetch one email's full
+ * body directly once you have its id.
  *
  * `campaigns` filters via the generic object_relationships-backed 'related'
  * query var (DB::query()) - an email is the primary/parent side of its
  * relationship to a campaign, same direction Email::get_related_objects('campaign')
- * reads (see groundhogg/create-email's and groundhogg/update-email's campaigns param).
+ * reads (see groundhogg/create-email-template's and groundhogg/update-email-template's
+ * campaigns param).
  */
 class List_Email_Templates extends Ability {
 

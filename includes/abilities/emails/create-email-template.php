@@ -64,9 +64,9 @@ use function Groundhogg\get_sender_profiles;
  * this lives in email meta (`template`, `width`, `alignment`, `direction`,
  * `backgroundColor`, etc.), read back via Email_Schema's `template_settings`.
  */
-class Create_Email extends Ability {
+class Create_Email_Template extends Ability {
 
-	protected const string NAME       = 'groundhogg/create-email';
+	protected const string NAME       = 'groundhogg/create-email-template';
 	protected const string CATEGORY   = 'groundhogg-email';
 	protected const string CAPABILITY = 'add_emails';
 
@@ -77,7 +77,7 @@ class Create_Email extends Ability {
 	protected function get_args(): array {
 
 		return [
-			'label'       => __( 'Create Email', 'groundhogg' ),
+			'label'       => __( 'Create Email Template', 'groundhogg' ),
 			'description' => __( 'Create a new saved Groundhogg email (subject + HTML body). Always creates a brand-new email, never returns an existing one. Use the returned id with groundhogg/send-email-template, or attach it to a broadcast/funnel step.', 'groundhogg' ),
 
 			'input_schema' => [
@@ -283,7 +283,7 @@ class Create_Email extends Ability {
 	 * email_kses() already applies internally for rgb() colors and quoted font
 	 * families.
 	 *
-	 * Public so groundhogg/update-email can reuse it without duplicating it.
+	 * Public so groundhogg/update-email-template can reuse it without duplicating it.
 	 *
 	 * @param string $content
 	 *

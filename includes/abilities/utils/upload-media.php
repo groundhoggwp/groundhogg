@@ -8,10 +8,10 @@ use WP_Error;
 /**
  * Uploads a file into the WordPress Media Library and returns its ID, URL,
  * and relative path - the missing piece for building an email (via
- * groundhogg/create-email or groundhogg/update-email) that includes a real
- * image rather than a placeholder: upload the image first, then use the
- * returned `url` as an `image` block's `src` (see the groundhogg-block-email
- * skill) or a plain `<img>` src in HTML content.
+ * groundhogg/create-email-template or groundhogg/update-email-template) that
+ * includes a real image rather than a placeholder: upload the image first,
+ * then use the returned `url` as an `image` block's `src` (see the
+ * groundhogg-block-email skill) or a plain `<img>` src in HTML content.
  *
  * `data` is base64, not a raw file upload - abilities are called with a JSON
  * payload, not a multipart form, so there's no "attach a file" mechanism to
@@ -48,7 +48,7 @@ class Upload_Media extends Ability {
 
 		return [
 			'label'       => __( 'Upload Media', 'groundhogg' ),
-			'description' => __( 'Upload a file (e.g. an image) into the WordPress Media Library from base64 data. Returns the attachment\'s id, URL, and relative path, for use as an image src elsewhere - e.g. an image block in groundhogg/create-email\'s content.', 'groundhogg' ),
+			'description' => __( 'Upload a file (e.g. an image) into the WordPress Media Library from base64 data. Returns the attachment\'s id, URL, and relative path, for use as an image src elsewhere - e.g. an image block in groundhogg/create-email-template\'s content.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',

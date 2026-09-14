@@ -19,18 +19,19 @@ use function Groundhogg\get_sender_profiles;
  * (it passes whatever `data`/`meta` it's given straight through).
  *
  * `content`/`editor` and `template_settings` follow the exact same rules as
- * groundhogg/create-email (see that class's docblock) - this exists because
- * that ability has no update path of its own: it always inserts a new row,
- * so fixing a mistake (wrong template_settings, a typo in content, ...) on an
- * email it just created has no other way back short of creating a fresh one.
+ * groundhogg/create-email-template (see that class's docblock) - this exists
+ * because that ability has no update path of its own: it always inserts a new
+ * row, so fixing a mistake (wrong template_settings, a typo in content, ...)
+ * on an email it just created has no other way back short of creating a fresh
+ * one.
  *
  * `campaigns`, when present, replaces the full set of campaigns on the email
  * (added/removed by diffing against what's already there) - same as the REST
  * route, not an additive merge.
  */
-class Update_Email extends Ability {
+class Update_Email_Template extends Ability {
 
-	protected const string NAME       = 'groundhogg/update-email';
+	protected const string NAME       = 'groundhogg/update-email-template';
 	protected const string CATEGORY   = 'groundhogg-email';
 	protected const string CAPABILITY = 'edit_emails';
 
@@ -41,7 +42,7 @@ class Update_Email extends Ability {
 	protected function get_args(): array {
 
 		return [
-			'label'       => __( 'Update Email', 'groundhogg' ),
+			'label'       => __( 'Update Email Template', 'groundhogg' ),
 			'description' => __( 'Update an existing saved Groundhogg email. Every field is optional - only fields actually provided are changed. Find the id with groundhogg/list-email-templates.', 'groundhogg' ),
 
 			'input_schema' => [
@@ -64,7 +65,7 @@ class Update_Email extends Ability {
 					],
 					'content' => [
 						'type'        => 'string',
-						'description' => __( 'The email body. Sanitized with the same allowed-HTML rules as the email editor. Shape depends on `editor`: plain HTML for "html", or the block editor\'s comment-annotated HTML for "blocks" - see groundhogg/create-email\'s description for the exact format. Required if `editor` is given (and vice versa) - changing one without the other would leave the content and the editor-type flag out of sync.', 'groundhogg' ),
+						'description' => __( 'The email body. Sanitized with the same allowed-HTML rules as the email editor. Shape depends on `editor`: plain HTML for "html", or the block editor\'s comment-annotated HTML for "blocks" - see groundhogg/create-email-template\'s description for the exact format. Required if `editor` is given (and vice versa) - changing one without the other would leave the content and the editor-type flag out of sync.', 'groundhogg' ),
 					],
 					'editor' => [
 						'type'        => 'string',
@@ -105,7 +106,7 @@ class Update_Email extends Ability {
 					'template_settings' => [
 						'type'                 => 'object',
 						'additionalProperties' => false,
-						'description'          => __( 'The outer page layout/background this email renders inside of. Only the properties actually given are changed - see groundhogg/create-email\'s `template_settings` for what each one does.', 'groundhogg' ),
+						'description'          => __( 'The outer page layout/background this email renders inside of. Only the properties actually given are changed - see groundhogg/create-email-template\'s `template_settings` for what each one does.', 'groundhogg' ),
 						'properties'           => Email_Schema::template_settings_properties(),
 					],
 				],
@@ -182,11 +183,11 @@ class Update_Email extends Ability {
 			$editor = $input['editor'] === 'blocks' ? 'blocks' : 'html';
 
 			$data['content'] = $editor === 'blocks'
-				? Create_Email::kses_preserving_block_comments( $input['content'] )
+				? Create_Email_Template::kses_preserving_block_comments( $input['content'] )
 				: email_kses( $input['content'] );
 
-			// Same meta flags groundhogg/create-email writes - see that class's
-			// docblock for why these specific keys.
+			// Same meta flags groundhogg/create-email-template writes - see that
+			// class's docblock for why these specific keys.
 			$meta_updates = $editor === 'blocks'
 				? [ 'type' => 'blocks', 'blocks' => true ]
 				: [ 'type' => 'html', 'blocks' => false ];

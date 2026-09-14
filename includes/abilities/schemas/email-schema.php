@@ -54,11 +54,11 @@ class Email_Schema extends Schema {
 				'editor_type' => [
 					'type'        => 'string',
 					'enum'        => [ 'html', 'blocks', 'legacy_blocks', 'legacy_plain' ],
-					'description' => __( 'Which editor this email\'s content was built with, and which one wp-admin will open it in. "html": raw HTML (from the meta "type" flag, or content starting with "<!DOCTYPE"). "blocks": the current block editor (from the meta "blocks" flag) - content is HTML annotated with block comments ("<!--text:uuid {...}-->...<!--/text:uuid-->", etc.) that get parsed back into editable blocks. "legacy_blocks"/"legacy_plain": older formats inferred from the content itself. groundhogg/create-email\'s `editor` input controls which of "html"/"blocks" it produces.', 'groundhogg' ),
+					'description' => __( 'Which editor this email\'s content was built with, and which one wp-admin will open it in. "html": raw HTML (from the meta "type" flag, or content starting with "<!DOCTYPE"). "blocks": the current block editor (from the meta "blocks" flag) - content is HTML annotated with block comments ("<!--text:uuid {...}-->...<!--/text:uuid-->", etc.) that get parsed back into editable blocks. "legacy_blocks"/"legacy_plain": older formats inferred from the content itself. groundhogg/create-email-template\'s `editor` input controls which of "html"/"blocks" it produces.', 'groundhogg' ),
 				],
 				'template_settings' => [
 					'type'        => 'object',
-					'description' => __( 'The outer page layout/background this email renders inside of - distinct from the block/HTML content itself. Mirrors the "Template Settings" panel in wp-admin\'s email editor. Set via groundhogg/create-email\'s or groundhogg/update-email\'s `template_settings` input.', 'groundhogg' ),
+					'description' => __( 'The outer page layout/background this email renders inside of - distinct from the block/HTML content itself. Mirrors the "Template Settings" panel in wp-admin\'s email editor. Set via groundhogg/create-email-template\'s or groundhogg/update-email-template\'s `template_settings` input.', 'groundhogg' ),
 					'properties'  => self::template_settings_properties(),
 				],
 				'from' => [
@@ -99,15 +99,16 @@ class Email_Schema extends Schema {
 	/**
 	 * The `template_settings` object's properties - shared by the output
 	 * schema above and the `template_settings` input on
-	 * groundhogg/create-email and groundhogg/update-email, so the property
-	 * names, enums, and descriptions can't drift out of sync between them.
+	 * groundhogg/create-email-template and groundhogg/update-email-template, so
+	 * the property names, enums, and descriptions can't drift out of sync
+	 * between them.
 	 *
 	 * @param bool $with_defaults Include `default` values for "layout" and
-	 *                            "direction" - appropriate for create-email,
+	 *                            "direction" - appropriate for create-email-template,
 	 *                            where a brand-new email needs a sensible
 	 *                            starting point. Leave false for the output
-	 *                            schema and for update-email, where an absent
-	 *                            property should be left untouched rather
+	 *                            schema and for update-email-template, where an
+	 *                            absent property should be left untouched rather
 	 *                            than implying it would reset to a default.
 	 *
 	 * @return array
