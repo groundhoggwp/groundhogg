@@ -42,13 +42,13 @@ use function Groundhogg\track_activity;
  */
 class Send_Composed_Email extends Ability {
 
-	protected const string NAME       = 'groundhogg/send-composed-email';
-	protected const string CATEGORY   = 'groundhogg-email';
-	protected const string CAPABILITY = 'send_emails';
+	protected const NAME       = 'groundhogg/send-composed-email';
+	protected const CATEGORY   = 'groundhogg-email';
+	protected const CAPABILITY = 'send_emails';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = true;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = true;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

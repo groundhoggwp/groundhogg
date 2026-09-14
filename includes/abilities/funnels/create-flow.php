@@ -76,13 +76,13 @@ use WP_Error;
  */
 class Create_Flow extends Ability {
 
-	protected const string NAME       = 'groundhogg/create-flow';
-	protected const string CATEGORY   = 'groundhogg-funnels';
-	protected const string CAPABILITY = 'add_funnels';
+	protected const NAME       = 'groundhogg/create-flow';
+	protected const CATEGORY   = 'groundhogg-funnels';
+	protected const CAPABILITY = 'add_funnels';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

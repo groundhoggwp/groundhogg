@@ -25,12 +25,12 @@ use function Groundhogg\get_db;
  */
 class List_Contact_Notes extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-contact-notes';
-	protected const string CATEGORY   = 'groundhogg-contacts';
-	protected const string CAPABILITY = 'view_notes';
+	protected const NAME       = 'groundhogg/list-contact-notes';
+	protected const CATEGORY   = 'groundhogg-contacts';
+	protected const CAPABILITY = 'view_notes';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

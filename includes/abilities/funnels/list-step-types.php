@@ -25,12 +25,12 @@ use Groundhogg\Abilities\Schemas\Step_Type_Schema;
  */
 class List_Step_Types extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-step-types';
-	protected const string CATEGORY   = 'groundhogg-funnels';
-	protected const string CAPABILITY = 'view_funnels';
+	protected const NAME       = 'groundhogg/list-step-types';
+	protected const CATEGORY   = 'groundhogg-funnels';
+	protected const CAPABILITY = 'view_funnels';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

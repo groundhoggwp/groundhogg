@@ -20,12 +20,12 @@ use function Groundhogg\get_db;
  */
 class List_Flows extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-flows';
-	protected const string CATEGORY   = 'groundhogg-funnels';
-	protected const string CAPABILITY = 'view_funnels';
+	protected const NAME       = 'groundhogg/list-flows';
+	protected const CATEGORY   = 'groundhogg-funnels';
+	protected const CAPABILITY = 'view_funnels';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

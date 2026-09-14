@@ -21,12 +21,12 @@ use function Groundhogg\get_sender_profiles;
  */
 class List_Sender_Profiles extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-sender-profiles';
-	protected const string CATEGORY   = 'groundhogg-email';
-	protected const string CAPABILITY = 'send_emails';
+	protected const NAME       = 'groundhogg/list-sender-profiles';
+	protected const CATEGORY   = 'groundhogg-email';
+	protected const CAPABILITY = 'send_emails';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

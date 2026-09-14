@@ -36,12 +36,12 @@ use function Groundhogg\is_sms_plugin_active;
  */
 class List_Broadcasts extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-broadcasts';
-	protected const string CATEGORY   = 'groundhogg-broadcasts';
-	protected const string CAPABILITY = 'view_broadcasts';
+	protected const NAME       = 'groundhogg/list-broadcasts';
+	protected const CATEGORY   = 'groundhogg-broadcasts';
+	protected const CAPABILITY = 'view_broadcasts';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

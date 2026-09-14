@@ -13,12 +13,12 @@ use function Groundhogg\replacements;
  */
 class List_Replacement_Codes extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-replacement-codes';
-	protected const string CATEGORY   = 'groundhogg-email';
-	protected const string CAPABILITY = 'view_emails';
+	protected const NAME       = 'groundhogg/list-replacement-codes';
+	protected const CATEGORY   = 'groundhogg-email';
+	protected const CAPABILITY = 'view_emails';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

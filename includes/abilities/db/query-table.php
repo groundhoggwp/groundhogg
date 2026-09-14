@@ -39,12 +39,12 @@ use function Groundhogg\get_db;
  */
 class Query_Table extends Ability {
 
-	protected const string NAME       = 'groundhogg/query-table';
-	protected const string CATEGORY   = 'groundhogg-db';
-	protected const string CAPABILITY = 'manage_options';
+	protected const NAME       = 'groundhogg/query-table';
+	protected const CATEGORY   = 'groundhogg-db';
+	protected const CAPABILITY = 'manage_options';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	/**
 	 * Groundhogg's own core DB tables that may be queried through this ability.

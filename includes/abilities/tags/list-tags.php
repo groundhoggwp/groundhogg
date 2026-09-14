@@ -13,12 +13,12 @@ use function Groundhogg\get_db;
  */
 class List_Tags extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-tags';
-	protected const string CATEGORY   = 'groundhogg-tags';
-	protected const string CAPABILITY = 'manage_tags';
+	protected const NAME       = 'groundhogg/list-tags';
+	protected const CATEGORY   = 'groundhogg-tags';
+	protected const CAPABILITY = 'manage_tags';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

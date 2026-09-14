@@ -66,13 +66,13 @@ use function Groundhogg\get_sender_profiles;
  */
 class Create_Email_Template extends Ability {
 
-	protected const string NAME       = 'groundhogg/create-email-template';
-	protected const string CATEGORY   = 'groundhogg-email';
-	protected const string CAPABILITY = 'add_emails';
+	protected const NAME       = 'groundhogg/create-email-template';
+	protected const CATEGORY   = 'groundhogg-email';
+	protected const CAPABILITY = 'add_emails';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

@@ -40,13 +40,13 @@ use WP_Error;
  */
 class Send_Email_Broadcast extends Ability {
 
-	protected const string NAME       = 'groundhogg/send-email-broadcast';
-	protected const string CATEGORY   = 'groundhogg-broadcasts';
-	protected const string CAPABILITY = 'schedule_broadcasts';
+	protected const NAME       = 'groundhogg/send-email-broadcast';
+	protected const CATEGORY   = 'groundhogg-broadcasts';
+	protected const CAPABILITY = 'schedule_broadcasts';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = true;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = true;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

@@ -35,13 +35,13 @@ use function Groundhogg\send_email_notification;
  */
 class Send_Email_Template extends Ability {
 
-	protected const string NAME       = 'groundhogg/send-email-template';
-	protected const string CATEGORY   = 'groundhogg-email';
-	protected const string CAPABILITY = 'send_emails';
+	protected const NAME       = 'groundhogg/send-email-template';
+	protected const CATEGORY   = 'groundhogg-email';
+	protected const CAPABILITY = 'send_emails';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = true;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = true;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

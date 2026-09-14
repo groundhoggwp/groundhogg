@@ -31,13 +31,13 @@ use function Groundhogg\get_sender_profiles;
  */
 class Update_Email_Template extends Ability {
 
-	protected const string NAME       = 'groundhogg/update-email-template';
-	protected const string CATEGORY   = 'groundhogg-email';
-	protected const string CAPABILITY = 'edit_emails';
+	protected const NAME       = 'groundhogg/update-email-template';
+	protected const CATEGORY   = 'groundhogg-email';
+	protected const CAPABILITY = 'edit_emails';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = true;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = true;
 
 	protected function get_args(): array {
 

@@ -22,13 +22,13 @@ use WP_Error;
  */
 class Deactivate_Flow extends Ability {
 
-	protected const string NAME       = 'groundhogg/deactivate-flow';
-	protected const string CATEGORY   = 'groundhogg-funnels';
-	protected const string CAPABILITY = 'edit_funnels';
+	protected const NAME       = 'groundhogg/deactivate-flow';
+	protected const CATEGORY   = 'groundhogg-funnels';
+	protected const CAPABILITY = 'edit_funnels';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = true;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = true;
 
 	protected function get_args(): array {
 

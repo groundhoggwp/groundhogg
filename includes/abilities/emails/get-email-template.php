@@ -17,12 +17,12 @@ use WP_Error;
  */
 class Get_Email_Template extends Ability {
 
-	protected const string NAME       = 'groundhogg/get-email-template';
-	protected const string CATEGORY   = 'groundhogg-email';
-	protected const string CAPABILITY = 'view_emails';
+	protected const NAME       = 'groundhogg/get-email-template';
+	protected const CATEGORY   = 'groundhogg-email';
+	protected const CAPABILITY = 'view_emails';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

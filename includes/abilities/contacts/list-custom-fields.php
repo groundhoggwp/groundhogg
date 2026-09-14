@@ -14,12 +14,12 @@ use Groundhogg\Properties;
  */
 class List_Custom_Fields extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-custom-fields';
-	protected const string CATEGORY   = 'groundhogg-contacts';
-	protected const string CAPABILITY = 'edit_contacts';
+	protected const NAME       = 'groundhogg/list-custom-fields';
+	protected const CATEGORY   = 'groundhogg-contacts';
+	protected const CAPABILITY = 'edit_contacts';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

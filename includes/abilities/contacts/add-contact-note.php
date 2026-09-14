@@ -19,13 +19,13 @@ use function Groundhogg\get_contactdata;
  */
 class Add_Contact_Note extends Ability {
 
-	protected const string NAME       = 'groundhogg/add-contact-note';
-	protected const string CATEGORY   = 'groundhogg-contacts';
-	protected const string CAPABILITY = 'add_notes';
+	protected const NAME       = 'groundhogg/add-contact-note';
+	protected const CATEGORY   = 'groundhogg-contacts';
+	protected const CAPABILITY = 'add_notes';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

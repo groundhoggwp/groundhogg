@@ -13,12 +13,12 @@ use function Groundhogg\get_db;
  */
 class List_Campaigns extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-campaigns';
-	protected const string CATEGORY   = 'groundhogg-campaigns';
-	protected const string CAPABILITY = 'manage_campaigns';
+	protected const NAME       = 'groundhogg/list-campaigns';
+	protected const CATEGORY   = 'groundhogg-campaigns';
+	protected const CAPABILITY = 'manage_campaigns';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

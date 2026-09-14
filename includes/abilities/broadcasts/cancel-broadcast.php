@@ -22,13 +22,13 @@ use WP_Error;
  */
 class Cancel_Broadcast extends Ability {
 
-	protected const string NAME       = 'groundhogg/cancel-broadcast';
-	protected const string CATEGORY   = 'groundhogg-broadcasts';
-	protected const string CAPABILITY = 'cancel_broadcasts';
+	protected const NAME       = 'groundhogg/cancel-broadcast';
+	protected const CATEGORY   = 'groundhogg-broadcasts';
+	protected const CAPABILITY = 'cancel_broadcasts';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = true;
-	protected const bool IDEMPOTENT  = true;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = true;
+	protected const IDEMPOTENT  = true;
 
 	protected function get_args(): array {
 

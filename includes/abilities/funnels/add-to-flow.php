@@ -33,13 +33,13 @@ use function Groundhogg\is_a_contact;
  */
 class Add_To_Flow extends Ability {
 
-	protected const string NAME       = 'groundhogg/add-to-flow';
-	protected const string CATEGORY   = 'groundhogg-funnels';
-	protected const string CAPABILITY = 'start_flows';
+	protected const NAME       = 'groundhogg/add-to-flow';
+	protected const CATEGORY   = 'groundhogg-funnels';
+	protected const CAPABILITY = 'start_flows';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = true;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = true;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

@@ -4,14 +4,14 @@ namespace Groundhogg\Abilities;
 
 abstract class Ability {
 
-	protected const string NAME       = '';
-	protected const string CATEGORY   = '';
-	protected const string CAPABILITY = '';
+	protected const NAME       = '';
+	protected const CATEGORY   = '';
+	protected const CAPABILITY = '';
 
-	protected const bool PUBLIC      = true;
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = false;
+	protected const PUBLIC      = true;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = false;
 
 	/**
 	 * Register the ability.

@@ -36,13 +36,13 @@ use WP_Error;
  */
 class Upload_Media extends Ability {
 
-	protected const string NAME       = 'groundhogg/upload-media';
-	protected const string CATEGORY   = 'groundhogg-utils';
-	protected const string CAPABILITY = 'upload_files';
+	protected const NAME       = 'groundhogg/upload-media';
+	protected const CATEGORY   = 'groundhogg-utils';
+	protected const CAPABILITY = 'upload_files';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = false;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = false;
 
 	protected function get_args(): array {
 

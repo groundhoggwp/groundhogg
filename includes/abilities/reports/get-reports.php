@@ -36,12 +36,12 @@ use function Groundhogg\array_find;
  */
 class Get_Reports extends Ability {
 
-	protected const string NAME       = 'groundhogg/get-reports';
-	protected const string CATEGORY   = 'groundhogg-reports';
-	protected const string CAPABILITY = 'view_reports';
+	protected const NAME       = 'groundhogg/get-reports';
+	protected const CATEGORY   = 'groundhogg-reports';
+	protected const CAPABILITY = 'view_reports';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

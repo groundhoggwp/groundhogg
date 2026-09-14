@@ -15,12 +15,12 @@ use WP_Error;
  */
 class Get_Broadcast extends Ability {
 
-	protected const string NAME       = 'groundhogg/get-broadcast';
-	protected const string CATEGORY   = 'groundhogg-broadcasts';
-	protected const string CAPABILITY = 'view_broadcasts';
+	protected const NAME       = 'groundhogg/get-broadcast';
+	protected const CATEGORY   = 'groundhogg-broadcasts';
+	protected const CAPABILITY = 'view_broadcasts';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

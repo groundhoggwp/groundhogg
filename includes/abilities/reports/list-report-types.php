@@ -15,12 +15,12 @@ use Groundhogg\Reports;
  */
 class List_Report_Types extends Ability {
 
-	protected const string NAME       = 'groundhogg/list-report-types';
-	protected const string CATEGORY   = 'groundhogg-reports';
-	protected const string CAPABILITY = 'view_reports';
+	protected const NAME       = 'groundhogg/list-report-types';
+	protected const CATEGORY   = 'groundhogg-reports';
+	protected const CAPABILITY = 'view_reports';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 

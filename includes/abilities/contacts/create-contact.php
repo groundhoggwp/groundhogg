@@ -33,13 +33,13 @@ class Create_Contact extends Ability {
 	use Has_Optin_Status;
 	use Has_Owner_Validation;
 
-	protected const string NAME       = 'groundhogg/create-contact';
-	protected const string CATEGORY   = 'groundhogg-contacts';
-	protected const string CAPABILITY = 'add_contacts';
+	protected const NAME       = 'groundhogg/create-contact';
+	protected const CATEGORY   = 'groundhogg-contacts';
+	protected const CAPABILITY = 'add_contacts';
 
-	protected const bool READONLY    = false;
-	protected const bool DESTRUCTIVE = false;
-	protected const bool IDEMPOTENT  = true;
+	protected const READONLY    = false;
+	protected const DESTRUCTIVE = false;
+	protected const IDEMPOTENT  = true;
 
 	protected function get_args(): array {
 

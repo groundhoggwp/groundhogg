@@ -10,12 +10,12 @@ use WP_Error;
 
 class Search_Contacts extends Ability {
 
-	protected const string NAME       = 'groundhogg/search-contacts';
-	protected const string CATEGORY   = 'groundhogg-contacts';
-	protected const string CAPABILITY = 'view_contacts';
+	protected const NAME       = 'groundhogg/search-contacts';
+	protected const CATEGORY   = 'groundhogg-contacts';
+	protected const CAPABILITY = 'view_contacts';
 
-	protected const bool READONLY   = true;
-	protected const bool IDEMPOTENT = true;
+	protected const READONLY   = true;
+	protected const IDEMPOTENT = true;
 
 	protected function get_args(): array {
 
