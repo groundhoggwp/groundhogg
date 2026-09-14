@@ -172,6 +172,10 @@ class Add_To_Flow extends Ability {
 			);
 		}
 
+		// The plain array form, not to_contact_query()'s live query object -
+		// this gets stored and re-run in background batches (Background_Tasks::
+		// add_contacts_to_funnel() below); a live query object (and anything a
+		// filter attached to it) can't survive that round trip.
 		$query = Segment_Schema::to_query( $input );
 
 		if ( is_wp_error( $query ) ) {

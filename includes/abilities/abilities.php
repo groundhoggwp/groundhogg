@@ -18,14 +18,19 @@ use Groundhogg\Abilities\Contacts\Search_Contacts;
 use Groundhogg\Abilities\Contacts\Update_Contact;
 use Groundhogg\Abilities\Db\Describe_Table;
 use Groundhogg\Abilities\Db\Query_Table;
+use Groundhogg\Abilities\Funnels\Activate_Flow;
 use Groundhogg\Abilities\Funnels\Add_To_Flow;
+use Groundhogg\Abilities\Funnels\Create_Flow;
+use Groundhogg\Abilities\Funnels\Deactivate_Flow;
 use Groundhogg\Abilities\Funnels\List_Flows;
-use Groundhogg\Abilities\Emails\Create_Email;
+use Groundhogg\Abilities\Funnels\List_Step_Types;
+use Groundhogg\Abilities\Emails\Create_Email_Template;
+use Groundhogg\Abilities\Emails\Get_Email_Template;
 use Groundhogg\Abilities\Emails\List_Email_Templates;
 use Groundhogg\Abilities\Emails\List_Sender_Profiles;
 use Groundhogg\Abilities\Emails\Send_Composed_Email;
 use Groundhogg\Abilities\Emails\Send_Email_Template;
-use Groundhogg\Abilities\Emails\Update_Email;
+use Groundhogg\Abilities\Emails\Update_Email_Template;
 use Groundhogg\Abilities\Reports\Get_Reports;
 use Groundhogg\Abilities\Reports\List_Report_Types;
 use Groundhogg\Abilities\Tags\List_Tags;
@@ -113,9 +118,10 @@ class Abilities {
 			Add_Contact_Note::class,
 			List_Contact_Notes::class,
 			List_Email_Templates::class,
+			Get_Email_Template::class,
 			List_Sender_Profiles::class,
-			Create_Email::class,
-			Update_Email::class,
+			Create_Email_Template::class,
+			Update_Email_Template::class,
 			Send_Composed_Email::class,
 			Send_Email_Template::class,
 			Send_Email_Broadcast::class,
@@ -123,6 +129,10 @@ class Abilities {
 			Get_Broadcast::class,
 			Cancel_Broadcast::class,
 			List_Flows::class,
+			List_Step_Types::class,
+			Create_Flow::class,
+			Activate_Flow::class,
+			Deactivate_Flow::class,
 			Add_To_Flow::class,
 			List_Report_Types::class,
 			Get_Reports::class,
