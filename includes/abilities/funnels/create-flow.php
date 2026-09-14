@@ -122,7 +122,7 @@ class Create_Flow extends Ability {
 
 		return [
 			'label'       => __( 'Create Flow', 'groundhogg' ),
-			'description' => __( 'Create a new Groundhogg flow (funnel) with its full sequence of steps, including branching logic. Always creates a brand-new, inactive flow - never returns an existing one, and never activates it. See groundhogg/list-step-types for the available step types and their settings.', 'groundhogg' ),
+			'description' => __( 'Create a new Groundhogg flow (funnel) with its full sequence of steps, including branching logic. Always creates a brand-new, inactive flow - never returns an existing one, and never activates it. See groundhogg/list-step-types for the available step types and their settings. For guidance on choosing step types, structuring branches, and making sure every step is reachable - plus a downloadable Claude skill that packages this reasoning - see https://groundhogg.io/doc/working-with-the-abilities-api-mcp/.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -320,7 +320,15 @@ class Create_Flow extends Ability {
 				);
 			}
 
-			$branch_keys = Step_Type_Schema::branch_keys( $type );
+			$input_settings = (array) ( $node['settings'] ?? [] );
+
+			// Passing $input_settings (not $resolved['settings'], computed below)
+			// - branch keys are about the shape of what the caller asked for, so
+			// a dynamic-branch-key type (see Step_Type_Schema::extend()'s own
+			// docblock for a split_path-style example) should compute them from
+			// what was actually given, not from whatever resolve_settings() below
+			// may have already transformed those same settings into.
+			$branch_keys = Step_Type_Schema::branch_keys( $type, $input_settings );
 
 			if ( ! empty( $node['branches'] ) && empty( $branch_keys ) ) {
 				return new WP_Error(
@@ -329,8 +337,6 @@ class Create_Flow extends Ability {
 					sprintf( __( 'Step type "%s" doesn\'t support `branches`.', 'groundhogg' ), $type )
 				);
 			}
-
-			$input_settings = (array) ( $node['settings'] ?? [] );
 
 			$resolved = Step_Type_Schema::resolve_settings( $type, $input_settings, $declared );
 

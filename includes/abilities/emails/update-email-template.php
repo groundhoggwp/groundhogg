@@ -43,7 +43,7 @@ class Update_Email_Template extends Ability {
 
 		return [
 			'label'       => __( 'Update Email Template', 'groundhogg' ),
-			'description' => __( 'Update an existing saved Groundhogg email. Every field is optional - only fields actually provided are changed. Find the id with groundhogg/list-email-templates.', 'groundhogg' ),
+			'description' => __( 'Update an existing saved Groundhogg email. Every field is optional - only fields actually provided are changed. Find the id with groundhogg/list-email-templates. See groundhogg/create-email-template\'s description for a link to block-editor authoring guidance.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',

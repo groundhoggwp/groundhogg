@@ -36,7 +36,7 @@ class List_Step_Types extends Ability {
 
 		return [
 			'label'       => __( 'List Step Types', 'groundhogg' ),
-			'description' => __( 'List the flow/funnel step types available on this site (triggers, actions, and branching logic), with their settings shape. Use the returned type/settings_schema with groundhogg/create-flow.', 'groundhogg' ),
+			'description' => __( 'List the flow/funnel step types available on this site (triggers, actions, and branching logic), with their settings shape. Use the returned type/settings_schema with groundhogg/create-flow. See groundhogg/create-flow\'s description for a link to further flow-design guidance.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
