@@ -289,7 +289,7 @@ class License_Manager {
     public function pre_get_option_gh_master_license() {
 	    $license = self::get_master_license();
 
-	    return empty( $license ) ? null : $license;
+	    return empty( $license ) ? false : $license;
     }
 
 	/**
