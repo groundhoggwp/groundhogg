@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.8
+Stable tag: 4.8.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -390,6 +390,13 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.8.1 (2026-09-14) =
+* ADDED "Create Flow" and "Activate Flow" abilities, so an AI agent can build a flow (funnel) from scratch, including branching steps, and turn it on. A new "List Step Types" ability lists the buildable step types and their settings so an agent can discover what's available before building.
+* ADDED "List Replacement Codes" ability for discovering the merge tags available for use in emails.
+* ADDED Add-ons can now register their own ability categories and abilities alongside Groundhogg's, and extend the contact and segment schemas with their own fields, so the WordPress Abilities API integration introduced in 4.8 isn't limited to what Groundhogg itself provides.
+* TWEAKED Email-related abilities are now named consistently around "email template" (`create-email-template`, `update-email-template`, `get-email-template`) instead of a mix of "email" and "email-template".
+* TWEAKED Ability descriptions now link out to relevant documentation for easier reference when working with an agent.
 
 = 4.8 (2026-09-10) =
 * ADDED AI agents and other tools can now act on your CRM through the WordPress Abilities API: find and manage contacts and their notes, create and send saved or one-off emails, schedule and report on broadcasts, and add contacts to flows. Every ability runs through the same capability and per-object permission checks as the rest of Groundhogg. This is an early release — more abilities, including SMS, are coming in future updates.
