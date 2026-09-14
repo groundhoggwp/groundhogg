@@ -87,7 +87,7 @@ class Create_Email_Template extends Ability {
 				'properties'           => [
 					'subject' => [
 						'type'        => 'string',
-						'description' => __( 'The subject line. May contain merge tags like {first_name}, resolved per-recipient at send time.', 'groundhogg' ),
+						'description' => __( 'The subject line. May contain merge tags like {first_name}, resolved per-recipient at send time. See groundhogg/list-replacement-codes for every code available on this site.', 'groundhogg' ),
 					],
 					'title' => [
 						'type'        => 'string',
@@ -95,7 +95,7 @@ class Create_Email_Template extends Ability {
 					],
 					'content' => [
 						'type'        => 'string',
-						'description' => __( 'The email body. Sanitized with the same allowed-HTML rules as the email editor. Supports merge-field replacements, resolved per-recipient at send time. Shape depends on `editor`: plain HTML for "html", or the block editor\'s comment-annotated HTML for "blocks" - see the class description for the exact format.', 'groundhogg' ),
+						'description' => __( 'The email body. Sanitized with the same allowed-HTML rules as the email editor. Supports merge-field replacements, resolved per-recipient at send time - see groundhogg/list-replacement-codes for every code available. Shape depends on `editor`: plain HTML for "html", or the block editor\'s comment-annotated HTML for "blocks" - see the class description for the exact format.', 'groundhogg' ),
 					],
 					'editor' => [
 						'type'        => 'string',

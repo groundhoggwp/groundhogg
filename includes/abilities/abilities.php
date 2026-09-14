@@ -27,6 +27,7 @@ use Groundhogg\Abilities\Funnels\List_Step_Types;
 use Groundhogg\Abilities\Emails\Create_Email_Template;
 use Groundhogg\Abilities\Emails\Get_Email_Template;
 use Groundhogg\Abilities\Emails\List_Email_Templates;
+use Groundhogg\Abilities\Emails\List_Replacement_Codes;
 use Groundhogg\Abilities\Emails\List_Sender_Profiles;
 use Groundhogg\Abilities\Emails\Send_Composed_Email;
 use Groundhogg\Abilities\Emails\Send_Email_Template;
@@ -122,6 +123,7 @@ class Abilities {
 			List_Sender_Profiles::class,
 			Create_Email_Template::class,
 			Update_Email_Template::class,
+			List_Replacement_Codes::class,
 			Send_Composed_Email::class,
 			Send_Email_Template::class,
 			Send_Email_Broadcast::class,

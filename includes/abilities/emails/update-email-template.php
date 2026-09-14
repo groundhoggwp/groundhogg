@@ -57,7 +57,7 @@ class Update_Email_Template extends Ability {
 					],
 					'subject' => [
 						'type'        => 'string',
-						'description' => __( 'The subject line. May contain merge tags like {first_name}, resolved per-recipient at send time.', 'groundhogg' ),
+						'description' => __( 'The subject line. May contain merge tags like {first_name}, resolved per-recipient at send time. See groundhogg/list-replacement-codes for every code available on this site.', 'groundhogg' ),
 					],
 					'title' => [
 						'type'        => 'string',
