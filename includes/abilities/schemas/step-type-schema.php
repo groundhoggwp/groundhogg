@@ -78,6 +78,52 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Call this once (e.g. on `init`, after both Groundhogg and the add-on's own
  * step type registration have run) - before any ability builds its schema.
  *
+ * A branch-logic type whose branch keys are defined *per step instance* (by
+ * that step's own `settings`, not fixed for the whole type - e.g. a
+ * split_path-style step, where a caller's `settings.branches` map names the
+ * branches, plus an implicit 'else') registers branch_keys as a callable
+ * instead of a plain array:
+ *
+ *     Step_Type_Schema::extend(
+ *         'my_addon_split',
+ *         [
+ *             'type'                 => 'object',
+ *             'additionalProperties' => false,
+ *             'properties'           => [
+ *                 'branches' => [
+ *                     'type'        => 'object',
+ *                     'description' => __( 'Maps a branch key to that branch\'s audience.', 'my-plugin' ),
+ *                     'additionalProperties' => [
+ *                         'type'       => 'object',
+ *                         'properties' => Segment_Schema::properties(),
+ *                     ],
+ *                 ],
+ *             ],
+ *         ],
+ *         function ( array $settings ): array {
+ *             // Called with the real step node's `settings` while create-flow
+ *             // validates/builds its `branches` map, and with `[]` when no
+ *             // specific instance exists yet (groundhogg/list-step-types'
+ *             // abstract, type-level discovery) - `[]` here still correctly
+ *             // reports the one branch every instance always has.
+ *             return array_merge( array_keys( $settings['branches'] ?? [] ), [ 'else' ] );
+ *         },
+ *         function ( array $settings, array $declared ) {
+ *             // Translate each named branch's Segment_Schema-shaped audience
+ *             // into whatever this step type's real settings need, the same
+ *             // way if_else's own resolve_settings() case translates
+ *             // include_condition/exclude_condition via Segment_Schema::to_filters().
+ *             foreach ( (array) ( $settings['branches'] ?? [] ) as $key => $condition ) {
+ *                 $filters = Segment_Schema::to_filters( (array) $condition );
+ *                 if ( is_wp_error( $filters ) ) {
+ *                     return $filters;
+ *                 }
+ *                 $settings['branches'][ $key ] = [ 'filters' => $filters ];
+ *             }
+ *             return [ 'settings' => $settings ];
+ *         }
+ *     );
+ *
  * Two settings reference *other steps in the same flow being created*, not an
  * existing Groundhogg object: `task_completed`'s `tasks` and `send_email`'s
  * `reply_in_thread` (also `email_opened`'s `email_steps`, irrelevant here since
@@ -125,7 +171,7 @@ class Step_Type_Schema {
 	/**
 	 * Add-on-registered step types, keyed by type. Populated by extend().
 	 *
-	 * @var array<string, array{settings_schema: array, branch_keys: string[], resolver: ?callable}>
+	 * @var array<string, array{settings_schema: array, branch_keys: string[]|callable, resolver: ?callable}>
 	 */
 	private static array $extensions = [];
 
@@ -133,39 +179,61 @@ class Step_Type_Schema {
 	 * Opt an already-registered Groundhogg step type into groundhogg/create-flow -
 	 * see the class docblock for the full picture.
 	 *
-	 * @param string        $type            The step type key. Must already be
-	 *                                       registered with Groundhogg's own step
-	 *                                       manager (Plugin::instance()->step_manager) -
-	 *                                       refused with _doing_it_wrong() if not,
-	 *                                       since extend() opts an existing type
-	 *                                       in rather than registering a new one.
-	 *                                       Also refused if already supported
-	 *                                       (a BUILTIN_TYPES member or a previous
-	 *                                       extend() call).
-	 * @param array         $settings_schema The JSON Schema for this type's
-	 *                                       `settings` in create-flow.
-	 * @param string[]      $branch_keys     The valid `branches` map keys for this
-	 *                                       type, if it's a branching logic type -
-	 *                                       empty for anything else.
-	 * @param callable|null $resolver        function( array $settings, array $declared ): array|WP_Error.
-	 *                                       Optional - omit for a type with
-	 *                                       nothing to resolve beyond what
-	 *                                       Groundhogg's own per-type sanitizer
-	 *                                       already does. $declared is
-	 *                                       local id => ['id'=>int,'type'=>string]
-	 *                                       for every step created so far (see
-	 *                                       resolve_step_reference()). Returns
-	 *                                       `['settings' => array]`, or
-	 *                                       `['settings' => array, 'deferred_settings' => array]`
-	 *                                       for a meta key/value map that must be
-	 *                                       written only after
-	 *                                       Funnel::set_step_levels() has run -
-	 *                                       see resolve_settings()'s own docblock.
-	 *                                       Return a WP_Error to reject the input.
+	 * @param string          $type            The step type key. Must already be
+	 *                                         registered with Groundhogg's own step
+	 *                                         manager (Plugin::instance()->step_manager) -
+	 *                                         refused with _doing_it_wrong() if not,
+	 *                                         since extend() opts an existing type
+	 *                                         in rather than registering a new one.
+	 *                                         Also refused if already supported
+	 *                                         (a BUILTIN_TYPES member or a previous
+	 *                                         extend() call).
+	 * @param array           $settings_schema The JSON Schema for this type's
+	 *                                         `settings` in create-flow.
+	 * @param string[]|callable $branch_keys   The valid `branches` map keys for this
+	 *                                         type, if it's a branching logic type -
+	 *                                         empty array for anything else. A plain
+	 *                                         array for a fixed set (mirroring
+	 *                                         if_else's hardcoded 'yes'/'no'), or a
+	 *                                         callable - function( array $settings ): string[] -
+	 *                                         when branch keys are dynamic, defined
+	 *                                         per step instance by that step's own
+	 *                                         `settings` rather than fixed by type
+	 *                                         (e.g. a split_path-style step, where
+	 *                                         the branches come from the caller's
+	 *                                         own `settings.branches` map plus an
+	 *                                         implicit 'else' - see the class
+	 *                                         docblock's example). Called with `[]`
+	 *                                         when no specific instance is available
+	 *                                         (groundhogg/list-step-types' abstract,
+	 *                                         type-level discovery) - return
+	 *                                         whatever's true with no settings at
+	 *                                         all (e.g. just the implicit branch).
+	 * @param callable|null   $resolver        function( array $settings, array $declared ): array|WP_Error.
+	 *                                         Optional - omit for a type with
+	 *                                         nothing to resolve beyond what
+	 *                                         Groundhogg's own per-type sanitizer
+	 *                                         already does. $declared is
+	 *                                         local id => ['id'=>int,'type'=>string]
+	 *                                         for every step created so far (see
+	 *                                         resolve_step_reference()). Returns
+	 *                                         `['settings' => array]`, or
+	 *                                         `['settings' => array, 'deferred_settings' => array]`
+	 *                                         for a meta key/value map that must be
+	 *                                         written only after
+	 *                                         Funnel::set_step_levels() has run -
+	 *                                         see resolve_settings()'s own docblock.
+	 *                                         Return a WP_Error to reject the input.
 	 *
 	 * @return void
 	 */
-	public static function extend( string $type, array $settings_schema, array $branch_keys = [], ?callable $resolver = null ) {
+	public static function extend( string $type, array $settings_schema, $branch_keys = [], ?callable $resolver = null ) {
+
+		if ( ! is_array( $branch_keys ) && ! is_callable( $branch_keys ) ) {
+			_doing_it_wrong( __METHOD__, '$branch_keys must be an array or a callable.', '4.8' );
+
+			return;
+		}
 
 		if ( ! Plugin::instance()->step_manager->type_is_registered( $type ) ) {
 			_doing_it_wrong(
@@ -253,21 +321,35 @@ class Step_Type_Schema {
 	 * tree's `branches` map keys must be for a step of this type. `if_else` is
 	 * fixed ('yes'/'no' - Groundhogg's own If_Else::get_branches() is hardcoded,
 	 * not configurable); an extend()'d type's own branch_keys come from its
-	 * registration. Any other type (including a premium branch-logic type not
-	 * opted in, e.g. split_path, where branch keys are dynamic per-instance)
-	 * returns [].
+	 * registration, either a fixed array or (for a type whose branches are
+	 * defined per-instance by its own `settings` - e.g. a split_path-style step,
+	 * see extend()'s own docblock) a callable evaluated against $settings. Any
+	 * other type (including a premium branch-logic type not opted in) returns [].
 	 *
 	 * @param string $type
+	 * @param array  $settings The step node's own `settings`, for a type whose
+	 *                         branch_keys is a callable. Pass [] (the default) for
+	 *                         the abstract, type-level case with no specific
+	 *                         instance available (groundhogg/list-step-types'
+	 *                         discovery) - a callable should return whatever's
+	 *                         true with no settings at all (e.g. just an implicit
+	 *                         branch every instance of the type always has).
 	 *
 	 * @return string[]
 	 */
-	public static function branch_keys( string $type ): array {
+	public static function branch_keys( string $type, array $settings = [] ): array {
 
 		if ( $type === 'if_else' ) {
 			return [ 'yes', 'no' ];
 		}
 
-		return self::$extensions[ $type ]['branch_keys'] ?? [];
+		$branch_keys = self::$extensions[ $type ]['branch_keys'] ?? [];
+
+		if ( is_callable( $branch_keys ) ) {
+			return (array) call_user_func( $branch_keys, $settings );
+		}
+
+		return $branch_keys;
 	}
 
 	/**
