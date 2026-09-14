@@ -5,7 +5,6 @@ namespace Groundhogg\Abilities\Contacts;
 use Groundhogg\Abilities\Ability;
 use Groundhogg\Abilities\Schemas\Contact_Schema;
 use Groundhogg\Abilities\Schemas\Segment_Schema;
-use Groundhogg\Contact_Query;
 use Throwable;
 use WP_Error;
 
@@ -32,10 +31,15 @@ class Search_Contacts extends Ability {
 						'type'        => 'array',
 						'items'       => [
 							'type' => 'string',
-							'enum' => [ 'tags', 'meta' ],
+							// 'sql' is search-contacts' own debugging addition, not
+							// part of Contact_Schema::expand_options() (it's about
+							// the query as a whole, not a per-contact section, and
+							// wouldn't make sense on get-contact/create-contact/
+							// update-contact's single-row fetches).
+							'enum' => array_merge( Contact_Schema::expand_options(), [ 'sql' ] ),
 						],
 						'default'     => [ 'tags' ],
-						'description' => __( 'Optional extra sections to expand on each contact, beyond the standard fields. Available: tags, meta (raw custom field/meta values - see groundhogg/list-custom-fields to interpret them).', 'groundhogg' ),
+						'description' => __( 'Optional extra sections to expand, beyond the standard fields. Per-contact: tags, meta (raw custom field/meta values - see groundhogg/list-custom-fields to interpret them), plus any sections an installed add-on has registered. Query-level (not per-contact): "sql" adds a top-level `sql` field with the raw SQL Contact_Query built for this search - useful for debugging why a search matched (or didn\'t match) what was expected. Note it reflects the modern query builder\'s attempt specifically; if that attempt threw and Contact_Query silently fell back to its legacy query engine, this SQL will NOT be what actually ran.', 'groundhogg' ),
 					],
 					'limit' => [
 						'type'        => 'integer',
@@ -64,6 +68,10 @@ class Search_Contacts extends Ability {
 						'type'  => 'array',
 						'items' => Contact_Schema::get_schema(),
 					],
+					'sql' => [
+						'type'        => 'string',
+						'description' => __( 'Only present when "sql" is passed in expand. The raw SQL Contact_Query built for this search - see the `expand` input\'s description for a caveat about legacy-query fallback.', 'groundhogg' ),
+					],
 				],
 			],
 		];
@@ -74,19 +82,21 @@ class Search_Contacts extends Ability {
 		$limit  = ! empty( $input['limit'] ) ? min( absint( $input['limit'] ), 100 ) : 25;
 		$offset = ! empty( $input['offset'] ) ? absint( $input['offset'] ) : 0;
 
-		$query_vars = Segment_Schema::to_query( $input );
+		// Executes immediately below, so a live query object (to_contact_query())
+		// rather than the plain array to_query() gives - lets an add-on hook
+		// groundhogg/segment_schema/contact_query and manipulate the query
+		// directly (joins, raw where conditions), and lets pagination be applied
+		// here by just chaining onto it.
+		$contact_query = Segment_Schema::to_contact_query( $input );
 
-		if ( is_wp_error( $query_vars ) ) {
-			return $query_vars;
+		if ( is_wp_error( $contact_query ) ) {
+			return $contact_query;
 		}
 
-		$query_vars['number']     = $limit;
-		$query_vars['offset']     = $offset;
-		$query_vars['found_rows'] = true;
+		$contact_query->setLimit( $limit )->setOffset( $offset )->setFoundRows( true );
 
 		try {
-			$contact_query = new Contact_Query();
-			$results       = $contact_query->query( $query_vars );
+			$results = $contact_query->query();
 		} catch ( Throwable $e ) {
 			// Contact_Query's modern query building already falls back to a legacy query on
 			// most exceptions, but malformed values can still throw a TypeError (not an
@@ -100,9 +110,20 @@ class Search_Contacts extends Ability {
 			return Contact_Schema::transform( $raw, $expand );
 		}, $results );
 
-		return [
+		$output = [
 			'total_items' => $contact_query->found_items,
 			'contacts'    => $contacts,
 		];
+
+		if ( in_array( 'sql', $expand, true ) ) {
+			// Called after query() rather than before: get_sql()'s own
+			// maybe_setup_query() call is a no-op by this point (already run), so
+			// this reflects the exact query state query() actually built - not a
+			// fresh, possibly-different build. See the `expand` input's
+			// description for the legacy-fallback caveat.
+			$output['sql'] = $contact_query->get_sql();
+		}
+
+		return $output;
 	}
 }

@@ -4,6 +4,7 @@ namespace Groundhogg\Abilities\Schemas;
 
 use DateTime;
 use Exception;
+use Groundhogg\Abilities\Traits\Extensible_Schema;
 use Groundhogg\Contact;
 use Groundhogg\Preferences;
 
@@ -23,57 +24,104 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Meta is returned as a raw key => value map, since custom field names are user-defined
  * per install. Use the groundhogg/list-custom-fields ability to look up what each meta
  * key actually means (label, type, group).
+ *
+ * Extensible via the Extensible_Schema trait, so an add-on can expose additional
+ * read-only fields on groundhogg/get-contact and groundhogg/search-contacts
+ * results without modifying this class or either of those abilities - one call
+ * registers a new bounded-but-optional property (schema, expand option, and the
+ * callback that computes it), the same "only when asked for" treatment
+ * 'tags'/'meta' get above:
+ *
+ *     Contact_Schema::extend(
+ *         'ltv',
+ *         __( 'Lifetime value: total spend across all WooCommerce orders.', 'my-plugin' ),
+ *         function ( Contact $contact ) {
+ *             return (float) wc_get_customer_total_spent( $contact->get_user_id() );
+ *         },
+ *         'number'
+ *     );
+ *
+ * Call this once (e.g. on `init`, after confirming both Groundhogg and the
+ * dependency it needs are active) - before any ability builds its input/output
+ * schema. See Extensible_Schema's own docblock for what extend() can't express
+ * and the three underlying filters (`groundhogg/contact_schema/properties`,
+ * `groundhogg/contact_schema/transform`, `groundhogg/contact_schema/expand_options`)
+ * available for those cases.
  */
 class Contact_Schema extends Schema {
 
+	use Extensible_Schema;
+
+	protected static function extension_hook_prefix(): string {
+		return 'contact_schema';
+	}
+
+	protected static function builtin_property_keys(): array {
+		return [ 'id', 'email', 'first_name', 'last_name', 'date_created', 'optin_status', 'tags', 'meta' ];
+	}
+
 	public static function get_schema(): array {
+
+		$properties = [
+			'id' => [
+				'type' => 'integer',
+			],
+			'email' => [
+				'type'   => 'string',
+				'format' => 'email',
+			],
+			'first_name' => [
+				'type' => 'string',
+			],
+			'last_name' => [
+				'type' => 'string',
+			],
+			'date_created' => [
+				'type'        => 'string',
+				'format'      => 'date-time',
+				'description' => __( 'When the contact was created.', 'groundhogg' ),
+			],
+			'optin_status' => [
+				'type'        => 'object',
+				'description' => __( 'Whether/how the contact can be marketed to.', 'groundhogg' ),
+				'properties'  => [
+					'value' => [
+						'type'        => 'integer',
+						'description' => __( 'The raw Groundhogg\Preferences status constant.', 'groundhogg' ),
+					],
+					'label' => [
+						'type' => 'string',
+					],
+				],
+			],
+			'tags' => [
+				'type'        => 'array',
+				'description' => __( 'Only present when "tags" is passed in include.', 'groundhogg' ),
+				'items'       => Tag_Schema::get_schema(),
+			],
+			'meta' => [
+				'type'                 => 'object',
+				'description'          => __( 'Only present when "meta" is passed in include. Raw meta key => value pairs, including custom fields. See groundhogg/list-custom-fields to map keys to labels.', 'groundhogg' ),
+				'additionalProperties' => true,
+			],
+		];
 
 		return [
 			'type'       => 'object',
-			'properties' => [
-				'id' => [
-					'type' => 'integer',
-				],
-				'email' => [
-					'type'   => 'string',
-					'format' => 'email',
-				],
-				'first_name' => [
-					'type' => 'string',
-				],
-				'last_name' => [
-					'type' => 'string',
-				],
-				'date_created' => [
-					'type'        => 'string',
-					'format'      => 'date-time',
-					'description' => __( 'When the contact was created.', 'groundhogg' ),
-				],
-				'optin_status' => [
-					'type'        => 'object',
-					'description' => __( 'Whether/how the contact can be marketed to.', 'groundhogg' ),
-					'properties'  => [
-						'value' => [
-							'type'        => 'integer',
-							'description' => __( 'The raw Groundhogg\Preferences status constant.', 'groundhogg' ),
-						],
-						'label' => [
-							'type' => 'string',
-						],
-					],
-				],
-				'tags' => [
-					'type'        => 'array',
-					'description' => __( 'Only present when "tags" is passed in include.', 'groundhogg' ),
-					'items'       => Tag_Schema::get_schema(),
-				],
-				'meta' => [
-					'type'                 => 'object',
-					'description'          => __( 'Only present when "meta" is passed in include. Raw meta key => value pairs, including custom fields. See groundhogg/list-custom-fields to map keys to labels.', 'groundhogg' ),
-					'additionalProperties' => true,
-				],
-			],
+			'properties' => self::extend_properties( $properties ),
 		];
+	}
+
+	/**
+	 * The valid values for groundhogg/get-contact's and groundhogg/search-contacts'
+	 * own `expand` input parameter (their `enum`, not just this class's $include).
+	 * extend()'d keys are included automatically - see the class docblock for
+	 * the escape hatch when an add-on isn't going through extend().
+	 *
+	 * @return string[]
+	 */
+	public static function expand_options(): array {
+		return self::extend_expand_options( [ 'tags', 'meta' ] );
 	}
 
 	/**
@@ -81,7 +129,9 @@ class Contact_Schema extends Schema {
 	 * (a contact ID, email, or raw DB row), and returns the schema shape.
 	 *
 	 * @param Contact|int|string|object $object
-	 * @param array                     $include Optional sections to include: 'tags', 'meta'.
+	 * @param array                     $include Optional sections to include: 'tags', 'meta',
+	 *                                           plus anything an add-on has registered via
+	 *                                           Contact_Schema::extend() (see the class docblock).
 	 *
 	 * @return array
 	 */
@@ -123,7 +173,7 @@ class Contact_Schema extends Schema {
 			$data['meta'] = $object->get_all_meta();
 		}
 
-		return $data;
+		return self::extend_transform( $data, $object, $include );
 	}
 
 	/**

@@ -87,10 +87,10 @@ class Create_Contact extends Ability {
 						'type'        => 'array',
 						'items'       => [
 							'type' => 'string',
-							'enum' => [ 'tags', 'meta' ],
+							'enum' => Contact_Schema::expand_options(),
 						],
 						'default'     => [ 'tags' ],
-						'description' => __( 'Optional extra sections to expand on the returned contact. Available: tags, meta.', 'groundhogg' ),
+						'description' => __( 'Optional extra sections to expand on the returned contact. Available: tags, meta, plus any sections an installed add-on has registered.', 'groundhogg' ),
 					],
 				],
 			],
