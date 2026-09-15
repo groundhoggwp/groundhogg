@@ -2,8 +2,560 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Form\Form_Fields;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Settings {
+
+	/**
+	 * Settings registered via add_setting(), keyed by the fully-prefixed option id.
+	 *
+	 * This is the preferred way to register a Groundhogg setting going forward: unlike
+	 * Settings_Page (admin/settings/settings-page.php), which is only concerned with
+	 * rendering settings fields across tabs/sections in wp-admin, this registry exists so a
+	 * setting's type/enum/description are known in one place and can be reused to build
+	 * ability input/output schemas (see get_setting_schema()/get_settings_schema()), and so
+	 * a sanitize_callback is always applied - whether the option is saved from wp-admin, the
+	 * REST API, an ability, or straight update_option()/add_option() calls - since it hooks
+	 * WP's own `sanitize_option_{$option}` filter.
+	 *
+	 * @var array<string, array>
+	 */
+	protected array $registered_settings = [];
+
+	/**
+	 * Groups registered via add_group(), keyed by group id. Purely organizational (e.g. to
+	 * fetch related settings together with get_settings()) - not tied to Settings_Page's tabs.
+	 *
+	 * @var array<string, array>
+	 */
+	protected array $registered_groups = [];
+
+	public function __construct() {
+		$this->register_settings();
+	}
+
+	/**
+	 * Register the settings that have been migrated to the new registry so far.
+	 *
+	 * Only the business_info settings are registered here for now - this is meant to
+	 * establish the shape of the registry, not to migrate every setting at once. Settings
+	 * not registered here are unaffected and continue to work exactly as before.
+	 *
+	 * @return void
+	 */
+	protected function register_settings() {
+
+		$this->add_group( 'business_info', [
+			'label' => __( 'Business Info', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'business_name', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'The business name as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'street_address_1', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'Business street address, line 1, as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'street_address_2', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'Business street address, line 2 (optional), as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'city', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'Business city, as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'zip_or_postal', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'Business zip/postal code, as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'region', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'Business state/province/region, as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'country', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'Business country, as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'phone', [
+			'group'       => 'business_info',
+			'type'        => 'string',
+			'description' => __( 'Business phone number, as it appears in the email footer.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'policies', [
+			'label' => __( 'Policies', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'privacy_policy', [
+			'group'       => 'policies',
+			'type'        => 'string',
+			'description' => __( 'Link to the site\'s privacy policy, used in emails and preference/consent forms.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'terms', [
+			'group'       => 'policies',
+			'type'        => 'string',
+			'description' => __( 'Link to the site\'s terms & conditions, used in emails and preference/consent forms.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'double_optin', [
+			'label' => __( 'Double Opt-in', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'strict_confirmation', [
+			'group'       => 'double_optin',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Only send email to contacts with a confirmed email address, outside of the grace period.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'confirmation_grace_period', [
+			'group'       => 'double_optin',
+			'type'        => 'integer',
+			'default'     => 14,
+			'description' => __( 'Number of days a newly-created, unconfirmed contact can still be emailed before strict_confirmation cuts them off.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'gdpr', [
+			'label' => __( 'GDPR', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'enable_gdpr', [
+			'group'       => 'gdpr',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Add a consent checkbox to forms and a "Delete Everything" button to the preferences page.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'strict_gdpr', [
+			'group'       => 'gdpr',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Never email a contact without explicit consent. Only takes effect when enable_gdpr is also on.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'cookies', [
+			'label' => __( 'Cookies', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'disable_unnecessary_cookies', [
+			'group'       => 'cookies',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Prevent the lead-source, page-visits, and form-impressions cookies from being set.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'overrides', [
+			'label' => __( 'Sender Profiles', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'override_from_name', [
+			'group'       => 'overrides',
+			'type'        => 'string',
+			'description' => __( 'Fallback "From Name" used when an email has none set. Falls back to the site name when empty.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'override_from_email', [
+			'group'             => 'overrides',
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_email',
+			'description'       => __( 'Fallback "From Email" used when an email has none set. Falls back to the site admin email when empty.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'support_license', [
+			'type'        => 'string',
+			'description' => __( 'License key used to open support tickets from the Help page.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'guided_setup_finished', [
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Whether the guided setup wizard has been completed.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'is_send_time_optimization_enabled', [
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Whether broadcasts are, by default, sent using send-time optimization rather than immediately/scheduled as-is.', 'groundhogg' ),
+		] );
+
+		/**
+		 * gh_master_license is intentionally NOT registered here - get_option('gh_master_license')
+		 * is intercepted by a `pre_option_gh_master_license` filter (License_Manager) that computes
+		 * it live from the gh_licenses option, so it isn't really a plain, independently-writable
+		 * setting. See License_Manager::get_master_license().
+		 */
+
+		$this->add_setting( 'custom_reports', [
+			'type'              => 'array',
+			'sanitize_callback' => 'Groundhogg\sanitize_payload',
+			'description'       => __( 'Custom reports shown on the Reports page. Each item is an object with at least id, name, and type; other properties vary by report type.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'email_editor', [
+			'label' => __( 'Email Editor', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'email_editor_color_palette', [
+			'group'             => 'email_editor',
+			'type'              => 'array',
+			'sanitize_callback' => [ $this, 'sanitize_deep_text_setting' ],
+			'description'       => __( 'The color swatches offered in the email block editor. A flat array of hex color strings.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'email_editor_global_fonts', [
+			'group'             => 'email_editor',
+			'type'              => 'array',
+			'sanitize_callback' => [ $this, 'sanitize_deep_text_setting' ],
+			'description'       => __( 'Named font presets available in the email block editor. Each item is an object with name, id, and a style object (lineHeight, fontFamily, fontWeight, fontSize, fontStyle, textTransform).', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'email_editor_global_social_accounts', [
+			'group'             => 'email_editor',
+			'type'              => 'array',
+			'sanitize_callback' => [ $this, 'sanitize_deep_text_setting' ],
+			'description'       => __( 'Social accounts available to the email block editor\'s social links block. Each item is a 2-element [platform, url] tuple, not an object.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'email_editor_block_defaults', [
+			'group'             => 'email_editor',
+			'type'              => 'object',
+			'sanitize_callback' => 'Groundhogg\sanitize_payload',
+			'description'       => __( 'Default attributes applied to new blocks in the email block editor, keyed by block type. Always includes a version key.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'custom_fields', [
+			'label' => __( 'Custom Fields', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'custom_profile_fields', [
+			'group'             => 'custom_fields',
+			'type'              => 'array',
+			'sanitize_callback' => [ Form_Fields::class, 'sanitize_form_and_map' ],
+			'description'       => __( 'Custom fields shown on the contact profile edit screen. A 2-element [form, map] tuple: form is a list of field definitions ({id, name, label, description, required, type, mapFrom, mapTo}); map relates field ids to contact meta keys.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'custom_preference_fields', [
+			'group'             => 'custom_fields',
+			'type'              => 'array',
+			'sanitize_callback' => [ Form_Fields::class, 'sanitize_form_and_map' ],
+			'description'       => __( 'Custom fields shown on the contact-facing preferences page. Same 2-element [form, map] tuple shape as custom_profile_fields.', 'groundhogg' ),
+		] );
+	}
+
+	/**
+	 * Shared sanitize_callback for settings whose value is an arbitrarily-nested
+	 * array/object of strings - deep-sanitizes every scalar leaf with
+	 * sanitize_text_field(), same as the REST options API's own handling of these
+	 * settings pre-registry (see filter_option_sanitize_callback() in includes/filters.php).
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 */
+	public function sanitize_deep_text_setting( $value ) {
+		return map_deep( $value, 'sanitize_text_field' );
+	}
+
+	/**
+	 * Register a group settings can be organized under via add_setting()'s 'group' arg.
+	 * This is purely organizational - unlike Settings_Page's tabs/sections, it has no
+	 * bearing on wp-admin rendering.
+	 *
+	 * @param string $id   the group id
+	 * @param array  $args ['label' => string, 'description' => string]
+	 *
+	 * @return void
+	 */
+	public function add_group( string $id, array $args = [] ) {
+		$this->registered_groups[ $id ] = wp_parse_args( $args, [
+			'label'       => $id,
+			'description' => '',
+		] );
+	}
+
+	/**
+	 * Get the groups registered via add_group(), keyed by group id.
+	 *
+	 * @return array<string, array>
+	 */
+	public function get_groups(): array {
+		return $this->registered_groups;
+	}
+
+	/**
+	 * Register a setting so it's known outside of wherever it happens to be read/written -
+	 * in particular so it can be exposed as part of an ability's input/output schema (see
+	 * get_setting_schema()) - and so a sanitize_callback always runs on it via WP's
+	 * `sanitize_option_{$option}` filter, which core applies from both add_option() and
+	 * update_option().
+	 *
+	 * @param string $id   the option id, with or without the gh_ prefix - it will be added
+	 *                     automatically, matching prefix()/get_option()/update_option()
+	 * @param array  $args {
+	 *
+	 * @type string $type json schema type: string|integer|number|boolean|array|object
+	 * @type mixed $enum optional; either a list of allowed values, or a callable
+	 *                     returning one - useful when the choices are dynamic (e.g.
+	 *                     depend on other data)
+	 * @type string $description human-readable description, used for ability schemas
+	 * @type mixed $default default value; also used as the fallback when an incoming
+	 *                     value fails its enum check
+	 * @type callable|string $sanitize_callback called on the value via
+	 *                     `sanitize_option_{$id}`; guessed from 'type' when omitted
+	 * @type string $group optional id of a group registered via add_group()
+	 *                     }
+	 *
+	 * @return void
+	 */
+	public function add_setting( string $id, array $args = [] ) {
+
+		$id = $this->prefix( $id );
+
+		$args = wp_parse_args( $args, [
+			'type'              => 'string',
+			'enum'              => null,
+			'description'       => '',
+			'default'           => null,
+			'sanitize_callback' => null,
+			'group'             => null,
+		] );
+
+		if ( ! $args['sanitize_callback'] ) {
+			$args['sanitize_callback'] = $this->guess_sanitize_callback( $args['type'] );
+		}
+
+		$this->registered_settings[ $id ] = $args;
+
+		add_filter( "sanitize_option_{$id}", [ $this, 'sanitize_registered_setting' ], 10, 2 );
+	}
+
+	/**
+	 * Best-guess sanitize_callback for a setting based on its declared type, used by
+	 * add_setting() when one isn't explicitly provided.
+	 *
+	 * @param string $type
+	 *
+	 * @return callable
+	 */
+	protected function guess_sanitize_callback( string $type ) {
+
+		switch ( $type ) {
+			case 'integer':
+			case 'int':
+				return 'absint';
+			case 'number':
+			case 'float':
+			case 'double':
+				return 'floatval';
+			case 'boolean':
+			case 'bool':
+				return [ $this, 'sanitize_boolean_setting' ];
+			case 'array':
+				return function ( $value ) {
+					return is_array( $value ) ? array_values( $value ) : (array) $value;
+				};
+			case 'object':
+				return function ( $value ) {
+					return is_object( $value ) ? $value : (object) $value;
+				};
+			case 'string':
+			default:
+				return 'sanitize_text_field';
+		}
+	}
+
+	/**
+	 * Default boolean sanitize_callback (see guess_sanitize_callback()). A handful of
+	 * checkbox settings pre-date this registry and still submit `name="option[]"` from the
+	 * classic wp-admin settings form for backwards compat (e.g. gh_strict_confirmation), so
+	 * the raw incoming value may be `['on']`/`[]` as well as the plain `'on'`/`''` a REST or
+	 * ability caller would send - both are normalized to a real PHP bool here, matching what
+	 * is_option_enabled() already tolerates when reading.
+	 *
+	 * @param mixed $value
+	 *
+	 * @return bool
+	 */
+	public function sanitize_boolean_setting( $value ): bool {
+
+		if ( is_array( $value ) ) {
+			return in_array( 'on', $value, true ) || in_array( true, $value, true );
+		}
+
+		return rest_sanitize_boolean( $value );
+	}
+
+	/**
+	 * Resolve a setting's 'enum' arg, which may be a plain list of allowed values or a
+	 * callable returning one (for dynamic choices).
+	 *
+	 * @param mixed $enum
+	 *
+	 * @return array|null
+	 */
+	protected function resolve_enum( $enum ) {
+
+		if ( is_callable( $enum ) ) {
+			return call_user_func( $enum );
+		}
+
+		return $enum;
+	}
+
+	/**
+	 * The `sanitize_option_{$option}` callback for every setting registered via
+	 * add_setting(). Runs the setting's sanitize_callback, then enforces its enum (if any),
+	 * falling back to the registered default when the value isn't an allowed choice.
+	 *
+	 * @param mixed  $value
+	 * @param string $option
+	 *
+	 * @return mixed
+	 */
+	public function sanitize_registered_setting( $value, string $option ) {
+
+		if ( ! isset( $this->registered_settings[ $option ] ) ) {
+			return $value;
+		}
+
+		$args = $this->registered_settings[ $option ];
+
+		if ( $args['sanitize_callback'] ) {
+			$value = call_user_func( $args['sanitize_callback'], $value );
+		}
+
+		$enum = $this->resolve_enum( $args['enum'] );
+
+		if ( $enum ) {
+			if ( is_array( $value ) ) {
+				$value = array_values( array_intersect( $value, $enum ) );
+			} else if ( ! in_array( $value, $enum, true ) ) {
+				$value = $args['default'];
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Whether a setting has been registered via add_setting().
+	 *
+	 * @param string $id with or without the gh_ prefix
+	 *
+	 * @return bool
+	 */
+	public function is_setting_registered( string $id ): bool {
+		return isset( $this->registered_settings[ $this->prefix( $id ) ] );
+	}
+
+	/**
+	 * Get the args a setting was registered with via add_setting().
+	 *
+	 * @param string $id with or without the gh_ prefix
+	 *
+	 * @return array|null
+	 */
+	public function get_setting( string $id ) {
+		return $this->registered_settings[ $this->prefix( $id ) ] ?? null;
+	}
+
+	/**
+	 * Get the registered settings, optionally limited to one group.
+	 *
+	 * @param string|null $group a group id registered via add_group()
+	 *
+	 * @return array<string, array>
+	 */
+	public function get_settings( ?string $group = null ): array {
+
+		if ( ! $group ) {
+			return $this->registered_settings;
+		}
+
+		return array_filter( $this->registered_settings, function ( $args ) use ( $group ) {
+			return $args['group'] === $group;
+		} );
+	}
+
+	/**
+	 * Get the JSON-schema-style attributes for a registered setting - type, description,
+	 * and (when applicable) enum/default - suitable for use as a property within an
+	 * ability's input/output schema.
+	 *
+	 * @param string $id with or without the gh_ prefix
+	 *
+	 * @return array|null
+	 */
+	public function get_setting_schema( string $id ) {
+
+		$id = $this->prefix( $id );
+
+		if ( ! isset( $this->registered_settings[ $id ] ) ) {
+			return null;
+		}
+
+		$args = $this->registered_settings[ $id ];
+
+		$schema = [
+			'type'        => $args['type'],
+			'description' => $args['description'],
+		];
+
+		$enum = $this->resolve_enum( $args['enum'] );
+
+		if ( $enum ) {
+			$schema['enum'] = $enum;
+		}
+
+		if ( $args['default'] !== null ) {
+			$schema['default'] = $args['default'];
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Get JSON-schema-style properties for several registered settings at once, keyed by
+	 * option id - e.g. to build the `properties` of an ability's input/output schema.
+	 *
+	 * @param string[]|null $ids limit to these ids (with or without the gh_ prefix);
+	 *                            defaults to every registered setting
+	 *
+	 * @return array<string, array>
+	 */
+	public function get_settings_schema( ?array $ids = null ): array {
+
+		$ids = $ids ? array_map( [ $this, 'prefix' ], $ids ) : array_keys( $this->registered_settings );
+
+		$schema = [];
+
+		foreach ( $ids as $id ) {
+			$setting_schema = $this->get_setting_schema( $id );
+
+			if ( $setting_schema ) {
+				$schema[ $id ] = $setting_schema;
+			}
+		}
+
+		return $schema;
+	}
 
 	/**
 	 * Check if the site is global multisite enabled
@@ -66,12 +618,22 @@ class Settings {
 	 */
 	public function get_option( $key, $default = false ) {
 		$key = $this->prefix( $key );
+
 		if ( $this->is_global_multisite() ) {
-			return get_blog_option( get_network()->site_id, $key, $default );
+			$value = get_blog_option( get_network()->site_id, $key, $default );
 		} else {
-			return get_option( $key, $default );
+			$value = get_option( $key, $default );
 		}
 
+		// Coerce to the registered type/enum, same as sanitize_option_{$key} does on write -
+		// so a value stored before the setting was registered (or written some other way)
+		// still comes back matching its declared schema, not whatever shape happens to be
+		// in the DB. See sanitize_registered_setting().
+		if ( isset( $this->registered_settings[ $key ] ) ) {
+			$value = $this->sanitize_registered_setting( $value, $key );
+		}
+
+		return $value;
 	}
 
 	/**

@@ -34,6 +34,8 @@ use Groundhogg\Abilities\Emails\Send_Email_Template;
 use Groundhogg\Abilities\Emails\Update_Email_Template;
 use Groundhogg\Abilities\Reports\Get_Reports;
 use Groundhogg\Abilities\Reports\List_Report_Types;
+use Groundhogg\Abilities\Settings\List_Settings;
+use Groundhogg\Abilities\Settings\Update_Settings;
 use Groundhogg\Abilities\Tags\List_Tags;
 use Groundhogg\Abilities\Utils\Upload_Media;
 
@@ -185,6 +187,11 @@ class Abilities {
 			'description' => __( 'General-purpose utilities that support the other categories but aren\'t specific to any one of them.', 'groundhogg' ),
 		] );
 
+		wp_register_ability_category( 'groundhogg-settings', [
+			'label'       => __( 'Groundhogg Settings', 'groundhogg' ),
+			'description' => __( 'List and update Groundhogg settings that have been registered for ability access.', 'groundhogg' ),
+		] );
+
 		foreach ( self::$extra_categories as $slug => $args ) {
 			wp_register_ability_category( $slug, $args );
 		}
@@ -227,6 +234,8 @@ class Abilities {
 			Describe_Table::class,
 			Query_Table::class,
 			Upload_Media::class,
+			List_Settings::class,
+			Update_Settings::class,
 		], self::$extra_abilities );
 
 		foreach ( $abilities as $ability ) {
