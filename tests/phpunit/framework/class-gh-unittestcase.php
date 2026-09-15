@@ -18,11 +18,11 @@ class GH_UnitTestCase extends WP_UnitTestCase_Base
 		return $factory;
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 	}
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 	}
 }
