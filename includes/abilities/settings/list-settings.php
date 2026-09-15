@@ -38,6 +38,12 @@ class List_Settings extends Ability {
 						'enum'        => array_keys( Plugin::$instance->settings->get_groups() ),
 						'description' => __( 'Only include settings registered under this group.', 'groundhogg' ),
 					],
+					'reveal' => [
+						'type'        => 'array',
+						'items'       => [ 'type' => 'string' ],
+						'default'     => [],
+						'description' => __( 'Ids of sensitive settings to return unredacted - see the sensitive flag on each item. Only named ids are ever exposed, and only if WP_DEBUG is on or the groundhogg/settings/expose_sensitive_values filter allows it; otherwise they stay redacted regardless.', 'groundhogg' ),
+					],
 				],
 			],
 
@@ -68,10 +74,15 @@ class List_Settings extends Ability {
 									'description' => __( 'The setting\'s default value, when one is defined.', 'groundhogg' ),
 								],
 								'description' => [
-									'type' => 'string',
+									'type'        => 'string',
+									'description' => __( 'Notes when the value is redacted - see sensitive.', 'groundhogg' ),
+								],
+								'sensitive' => [
+									'type'        => 'boolean',
+									'description' => __( 'True if this is a secret (license key, API key, token, etc). Its value is redacted unless WP_DEBUG is on or the groundhogg/settings/expose_sensitive_values filter allows it.', 'groundhogg' ),
 								],
 								'value' => [
-									'description' => __( 'The setting\'s current stored value.', 'groundhogg' ),
+									'description' => __( 'The setting\'s current stored value, or a redacted placeholder when sensitive is true and the value isn\'t currently exposed.', 'groundhogg' ),
 								],
 							],
 						],
@@ -87,6 +98,10 @@ class List_Settings extends Ability {
 
 		$group = ! empty( $input['group'] ) ? sanitize_key( $input['group'] ) : null;
 
+		$reveal = array_map( function ( $id ) {
+			return preg_replace( '/^gh_/', '', (string) $id );
+		}, (array) ( $input['reveal'] ?? [] ) );
+
 		$settings = $settings_registry->get_settings( $group );
 
 		$list = [];
@@ -95,10 +110,15 @@ class List_Settings extends Ability {
 
 			$schema = $settings_registry->get_setting_schema( $id );
 
+			$short_id  = preg_replace( '/^gh_/', '', $id );
+			$requested = in_array( $short_id, $reveal, true );
+			$value     = $settings_registry->get_redacted_value( $id, $settings_registry->get_option( $id ), $requested );
+
 			$list[] = array_merge( $schema, [
-				'id'    => preg_replace( '/^gh_/', '', $id ),
-				'group' => $args['group'],
-				'value' => $settings_registry->get_option( $id ),
+				'id'        => $short_id,
+				'group'     => $args['group'],
+				'sensitive' => $settings_registry->is_setting_sensitive( $id ),
+				'value'     => $value,
 			] );
 		}
 

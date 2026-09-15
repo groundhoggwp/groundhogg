@@ -46,6 +46,12 @@ class Update_Settings extends Ability {
 						'additionalProperties' => true,
 						'description'          => __( 'Key/value pairs to update, keyed by setting id - see groundhogg/list-settings.', 'groundhogg' ),
 					],
+					'reveal' => [
+						'type'        => 'array',
+						'items'       => [ 'type' => 'string' ],
+						'default'     => [],
+						'description' => __( 'Ids of sensitive settings (see groundhogg/list-settings\' sensitive flag) to return unredacted in the response. Only named ids are ever exposed, and only if WP_DEBUG is on or the groundhogg/settings/expose_sensitive_values filter allows it; otherwise they come back redacted even though you just set them.', 'groundhogg' ),
+					],
 				],
 			],
 
@@ -61,7 +67,7 @@ class Update_Settings extends Ability {
 									'type' => 'string',
 								],
 								'value' => [
-									'description' => __( 'The value now stored, after sanitization - may differ from what was passed in.', 'groundhogg' ),
+									'description' => __( 'The value now stored, after sanitization - may differ from what was passed in. Redacted for sensitive settings unless named in `reveal` (and WP_DEBUG is on or the groundhogg/settings/expose_sensitive_values filter allows it).', 'groundhogg' ),
 								],
 								'changed' => [
 									'type'        => 'boolean',
@@ -99,6 +105,10 @@ class Update_Settings extends Ability {
 			);
 		}
 
+		$reveal = array_map( function ( $id ) {
+			return preg_replace( '/^gh_/', '', (string) $id );
+		}, (array) ( $input['reveal'] ?? [] ) );
+
 		$updated = [];
 
 		foreach ( $incoming as $id => $value ) {
@@ -109,9 +119,12 @@ class Update_Settings extends Ability {
 
 			$after = $settings_registry->get_option( $id );
 
+			$short_id  = preg_replace( '/^gh_/', '', $id );
+			$requested = in_array( $short_id, $reveal, true );
+
 			$updated[] = [
-				'id'      => preg_replace( '/^gh_/', '', $id ),
-				'value'   => $after,
+				'id'      => $short_id,
+				'value'   => $settings_registry->get_redacted_value( $id, $after, $requested ),
 				'changed' => $before !== $after,
 			];
 		}

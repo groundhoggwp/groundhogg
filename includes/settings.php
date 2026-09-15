@@ -181,6 +181,7 @@ class Settings {
 
 		$this->add_setting( 'support_license', [
 			'type'        => 'string',
+			'sensitive'   => true,
 			'description' => __( 'License key used to open support tickets from the Help page.', 'groundhogg' ),
 		] );
 
@@ -329,6 +330,14 @@ class Settings {
 	 * @type callable|string $sanitize_callback called on the value via
 	 *                     `sanitize_option_{$id}`; guessed from 'type' when omitted
 	 * @type string $group optional id of a group registered via add_group()
+	 * @type bool $sensitive mark as a secret (license key, API key, token, etc.) - its
+	 *                     value is redacted by get_redacted_value() (used by the
+	 *                     list-settings/update-settings abilities) unless WP_DEBUG is on
+	 *                     or the `groundhogg/settings/expose_sensitive_values` filter
+	 *                     returns true. get_setting_schema() notes this in the
+	 *                     description whenever the value is currently being redacted.
+	 *                     Does NOT affect get_option() - internal code always gets the
+	 *                     real value.
 	 *                     }
 	 *
 	 * @return void
@@ -344,6 +353,7 @@ class Settings {
 			'default'           => null,
 			'sanitize_callback' => null,
 			'group'             => null,
+			'sensitive'         => false,
 		] );
 
 		if ( ! $args['sanitize_callback'] ) {
@@ -508,6 +518,83 @@ class Settings {
 	}
 
 	/**
+	 * Whether a setting was registered with 'sensitive' => true (a license key, API key,
+	 * token, or other secret).
+	 *
+	 * @param string $id with or without the gh_ prefix
+	 *
+	 * @return bool
+	 */
+	public function is_setting_sensitive( string $id ): bool {
+		$setting = $this->get_setting( $id );
+
+		return $setting ? (bool) $setting['sensitive'] : false;
+	}
+
+	/**
+	 * Whether sensitive setting values should currently be exposed in full - true when
+	 * WP_DEBUG is on, or when the `groundhogg/settings/expose_sensitive_values` filter is
+	 * used to opt back in (e.g. for a trusted internal tool). False means
+	 * get_redacted_value() masks sensitive values.
+	 *
+	 * @param string $id with or without the gh_ prefix - passed to the filter so it can
+	 *                    choose to expose only specific settings
+	 *
+	 * @return bool
+	 */
+	public function should_expose_sensitive_value( string $id ): bool {
+
+		$debug = defined( 'WP_DEBUG' ) && WP_DEBUG;
+
+		/**
+		 * Filter whether a sensitive setting's real value should be exposed (e.g. by
+		 * groundhogg/list-settings) instead of the redacted placeholder.
+		 *
+		 * @param bool   $expose defaults to whether WP_DEBUG is on
+		 * @param string $id     the fully-prefixed option id
+		 */
+		return (bool) apply_filters( 'groundhogg/settings/expose_sensitive_values', $debug, $this->prefix( $id ) );
+	}
+
+	/**
+	 * Redact a sensitive setting's value for display/export (e.g. the list-settings and
+	 * update-settings abilities). Non-sensitive settings, and empty values (nothing to
+	 * hide), always pass through unchanged. A sensitive value is only ever returned in
+	 * full when BOTH:
+	 *
+	 * - $requested is true - the caller explicitly asked for this specific id (e.g. named
+	 *   it in an ability's `reveal` input) - naming a setting is a deliberate, auditable
+	 *   act, unlike a blanket "don't redact" flag that could reveal every secret at once
+	 *   without anyone having asked for each one by name; and
+	 * - should_expose_sensitive_value() allows it - the site-level gate (WP_DEBUG or the
+	 *   `groundhogg/settings/expose_sensitive_values` filter), which decides whether
+	 *   exposing sensitive values is even possible on this site at all.
+	 *
+	 * Neither alone is enough - an id in $requested is still redacted if the site-level
+	 * gate is closed, and the gate being open does NOT reveal anything that wasn't
+	 * explicitly requested. This never affects get_option() itself - internal code always
+	 * sees the real value.
+	 *
+	 * @param string $id        with or without the gh_ prefix
+	 * @param mixed  $value     the value to (maybe) redact - usually get_option( $id )
+	 * @param bool   $requested whether the caller explicitly asked to see this id
+	 *
+	 * @return mixed
+	 */
+	public function get_redacted_value( string $id, $value, bool $requested = false ) {
+
+		if ( empty( $value ) || ! $this->is_setting_sensitive( $id ) ) {
+			return $value;
+		}
+
+		if ( $requested && $this->should_expose_sensitive_value( $id ) ) {
+			return $value;
+		}
+
+		return is_string( $value ) ? str_repeat( '•', 8 ) : true;
+	}
+
+	/**
 	 * Whether a setting has been registered via add_setting().
 	 *
 	 * @param string $id with or without the gh_ prefix
@@ -574,6 +661,10 @@ class Settings {
 
 		if ( $args['default'] !== null && ! array_key_exists( 'default', $schema ) ) {
 			$schema['default'] = $args['default'];
+		}
+
+		if ( $args['sensitive'] && ! $this->should_expose_sensitive_value( $id ) ) {
+			$schema['description'] = trim( $schema['description'] . ' ' . __( '(Sensitive: the value is redacted by default. Explicitly name this id in `reveal` to expose it - only takes effect if WP_DEBUG is on or the `groundhogg/settings/expose_sensitive_values` filter allows it.)', 'groundhogg' ) );
 		}
 
 		return $schema;
