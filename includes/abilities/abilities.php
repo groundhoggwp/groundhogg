@@ -8,6 +8,7 @@ use Groundhogg\Abilities\Broadcasts\List_Broadcasts;
 use Groundhogg\Abilities\Broadcasts\Send_Email_Broadcast;
 use Groundhogg\Abilities\Campaigns\List_Campaigns;
 use Groundhogg\Abilities\Contacts\Add_Contact_Note;
+use Groundhogg\Abilities\Contacts\Add_Custom_Field;
 use Groundhogg\Abilities\Contacts\Create_Contact;
 use Groundhogg\Abilities\Contacts\Get_Contact;
 use Groundhogg\Abilities\Contacts\List_Contact_Notes;
@@ -16,6 +17,7 @@ use Groundhogg\Abilities\Contacts\List_Owners;
 use Groundhogg\Abilities\Contacts\List_Saved_Searches;
 use Groundhogg\Abilities\Contacts\Search_Contacts;
 use Groundhogg\Abilities\Contacts\Update_Contact;
+use Groundhogg\Abilities\Contacts\Update_Custom_Field;
 use Groundhogg\Abilities\Db\Describe_Table;
 use Groundhogg\Abilities\Db\Query_Table;
 use Groundhogg\Abilities\Funnels\Activate_Flow;
@@ -205,6 +207,8 @@ class Abilities {
 			Update_Contact::class,
 			Search_Contacts::class,
 			List_Custom_Fields::class,
+			Add_Custom_Field::class,
+			Update_Custom_Field::class,
 			List_Saved_Searches::class,
 			List_Owners::class,
 			List_Tags::class,

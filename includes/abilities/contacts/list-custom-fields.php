@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Contacts;
 
 use Groundhogg\Abilities\Ability;
+use Groundhogg\Abilities\Schemas\Property_Field_Schema;
 use Groundhogg\Properties;
 
 /**
@@ -23,21 +24,9 @@ class List_Custom_Fields extends Ability {
 
 	protected function get_args(): array {
 
-		$group_schema = [
-			'type'       => 'object',
-			'properties' => [
-				'id' => [
-					'type' => 'string',
-				],
-				'name' => [
-					'type' => 'string',
-				],
-			],
-		];
-
 		return [
 			'label'       => __( 'List Custom Fields', 'groundhogg' ),
-			'description' => __( 'List the custom field definitions configured for contacts, including their group/tab, so raw contact meta keys (from groundhogg/get-contact or groundhogg/search-contacts with meta included) can be mapped to human-readable labels and types.', 'groundhogg' ),
+			'description' => __( 'List the custom field definitions configured for contacts, including their group/tab, so raw contact meta keys (from groundhogg/get-contact or groundhogg/search-contacts with meta included) can be mapped to human-readable labels and types. Use groundhogg/add-custom-field and groundhogg/update-custom-field to manage them.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -50,32 +39,7 @@ class List_Custom_Fields extends Ability {
 				'properties' => [
 					'fields' => [
 						'type'  => 'array',
-						'items' => [
-							'type'       => 'object',
-							'properties' => [
-								'name' => [
-									'type'        => 'string',
-									'description' => __( 'The meta key this field is stored under on the contact.', 'groundhogg' ),
-								],
-								'label' => [
-									'type' => 'string',
-								],
-								'type' => [
-									'type'        => 'string',
-									'description' => __( 'The field type, e.g. text, dropdown, checkbox, textarea.', 'groundhogg' ),
-								],
-								'group' => $group_schema,
-								'tab'   => $group_schema,
-								'options' => [
-									'type'        => 'array',
-									'items'       => [
-										'type' => 'string',
-									],
-									'description' => __( 'Available choices, for fields with a fixed set of options (e.g. dropdown).', 'groundhogg' ),
-								],
-							],
-							'required' => [ 'name', 'label', 'type' ],
-						],
+						'items' => Property_Field_Schema::get_schema(),
 					],
 				],
 			],
@@ -84,32 +48,10 @@ class List_Custom_Fields extends Ability {
 
 	public function __invoke( $input ) {
 
-		$properties = Properties::instance();
-		$fields     = $properties->get_fields();
-
-		$fields = array_values( array_map( function ( $field ) use ( $properties ) {
-
-			$group = $properties->get_group( $field['group'] ?? '' );
-			$tab   = $group ? $properties->get_tab( $group['tab'] ?? '' ) : false;
-
-			return [
-				'name'    => $field['name'] ?? '',
-				'label'   => $field['label'] ?? '',
-				'type'    => $field['type'] ?? '',
-				'group'   => [
-					'id'   => $group['id'] ?? ( $field['group'] ?? '' ),
-					'name' => $group['name'] ?? '',
-				],
-				'tab'     => [
-					'id'   => $tab['id'] ?? '',
-					'name' => $tab['name'] ?? '',
-				],
-				'options' => $field['options'] ?? [],
-			];
-		}, $fields ) );
+		$fields = Properties::instance()->get_fields();
 
 		return [
-			'fields' => $fields,
+			'fields' => array_values( array_map( [ Property_Field_Schema::class, 'transform' ], $fields ) ),
 		];
 	}
 }
