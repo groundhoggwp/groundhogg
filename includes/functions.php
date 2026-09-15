@@ -2988,13 +2988,18 @@ function generate_contact_with_map( array $fields, array $map = [], array $submi
 
 	// Add Tags
 	if ( ! empty( $tags ) ) {
-		$contact->apply_tag( $tags );
+		// Tag names are rendered verbatim by the {tag_names} merge tag, and a new tag can be
+		// created here from raw mapped input, so scrub them the same as any other untrusted value.
+		$contact->apply_tag( Replacements::scrub_merge_tags( $tags ) );
 	}
 
 	// Add notes
 	if ( ! empty( $notes ) ) {
 		foreach ( $notes as $note ) {
-			$contact->add_note( $note, 'system' );
+			// Note content is untrusted (mapped from raw input) and Contact::add_note() runs
+			// do_replacements() on it immediately, so scrub it first to prevent an immediate
+			// merge-tag expansion (e.g. {user.user_pass}) from being baked into the stored note.
+			$contact->add_note( Replacements::scrub_merge_tags( $note ), 'system' );
 		}
 	}
 
@@ -6073,6 +6078,54 @@ function map_func_to_attr( &$arr, $key, $func ) {
 			$arr->$key = call_user_func( $func, $arr->$key );
 		}
 	}
+}
+
+/**
+ * Neutralize anything that looks like a registered WP shortcode in a value (or, recursively, in
+ * every string in an array), WITHOUT deleting it, so the original text stays visible but can't be
+ * parsed as a shortcode by a later do_shortcode() call. Uses WP's own get_shortcode_regex() so
+ * only strings that would actually be recognized as a currently-registered shortcode are touched.
+ *
+ * In HTML context the brackets are HTML-entity encoded (renders identically, no longer parses as
+ * a shortcode delimiter); with $html false the match is stripped instead, since there's no HTML
+ * entity fallback in a plain-text context.
+ *
+ * Shared by Replacements::escape_shortcodes() (for merge-tag output — see includes/replacements.php)
+ * and anywhere else untrusted input reaches a do_shortcode() call outside that pipeline, e.g. the
+ * sticky/echoed value of a public form field after a failed validation (Input::get_value(), which
+ * reflects raw, un-sanitized $_POST back into the page and then runs do_shortcode() on the
+ * rendered field — see includes/form/fields/input.php and field.php).
+ *
+ * @param mixed $value
+ * @param bool  $html
+ *
+ * @return mixed
+ */
+function escape_shortcodes( $value, $html = true ) {
+
+	if ( is_array( $value ) ) {
+		return array_map( function ( $v ) use ( $html ) {
+			return escape_shortcodes( $v, $html );
+		}, $value );
+	}
+
+	if ( ! is_string( $value ) || ! str_contains( $value, '[' ) ) {
+		return $value;
+	}
+
+	$pattern = '/' . get_shortcode_regex() . '/s';
+
+	if ( ! preg_match( $pattern, $value ) ) {
+		return $value;
+	}
+
+	if ( ! $html ) {
+		return preg_replace( $pattern, '', $value );
+	}
+
+	return preg_replace_callback( $pattern, function ( $matches ) {
+		return str_replace( [ '[', ']' ], [ '&#91;', '&#93;' ], $matches[0] );
+	}, $value );
 }
 
 /**

@@ -5,6 +5,7 @@ namespace Groundhogg\Form;
 
 use Groundhogg\Contact;
 use Groundhogg\Properties;
+use Groundhogg\Replacements;
 use Groundhogg\Step;
 use Groundhogg\Submission;
 use Groundhogg\Utils\DateTimeHelper;
@@ -2297,55 +2298,75 @@ class Form_v2 extends Step {
 			$fields[] = $config['turnstile'];
 		}
 
-		foreach ( $fields as $field ) {
+		// Field values are untrusted input, and almost every field type sanitizes its raw
+		// value via WP's sanitize_text_field()/sanitize_textarea_field() (including 3rd-party
+		// field types that follow the same convention). Hook in here so anything that looks
+		// like a merge tag is stripped at that same choke point, before it can ever be stored
+		// as contact data/meta and later re-expanded (e.g. {user.user_pass}) when displayed
+		// back to a contact via a merge tag elsewhere. Scoped to this method only.
+		add_filter( 'sanitize_text_field', [ Replacements::class, 'scrub_merge_tags' ] );
+		add_filter( 'sanitize_textarea_field', [ Replacements::class, 'scrub_merge_tags' ] );
 
-			$isset = self::check_field_isset( $field, $posted_data );
+		try {
+			foreach ( $fields as $field ) {
 
-			// if the field was not provided, but is required
-			if ( isset_not_empty( $field, 'required' ) && ! $isset ) {
-				$this->add_error( new WP_Error( 'field-required', __( 'This field is required', 'groundhogg' ), $field['label'] ) );
-				continue;
+				$isset = self::check_field_isset( $field, $posted_data );
+
+				// if the field was not provided, but is required
+				if ( isset_not_empty( $field, 'required' ) && ! $isset ) {
+					$this->add_error( new WP_Error( 'field-required', __( 'This field is required', 'groundhogg' ), $field['label'] ) );
+					continue;
+				}
+
+				$result = null;
+
+				// if a value was provided, we must validate it
+				if ( $isset ) {
+					$result = self::validate_field( $field, $posted_data );
+				}
+
+				if ( is_wp_error( $result ) ) {
+					$result->add_data( $field['label'] );
+					$this->add_error( $result );
+				}
 			}
 
-			$result = null;
-
-			// if a value was provided, we must validate it
-			if ( $isset ) {
-				$result = self::validate_field( $field, $posted_data );
+			if ( $this->has_errors() ) {
+				return false;
 			}
 
-			if ( is_wp_error( $result ) ) {
-				$result->add_data( $field['label'] );
-				$this->add_error( $result );
+			$data                  = [];
+			$meta                  = [];
+			$tags                  = [];
+			$submission_additional = []; // arbitrary additional information to add to the submission record
+
+			foreach ( $fields as $field ) {
+				self::before_create_contact( $field, $posted_data, $data, $meta, $tags, $submission_additional );
 			}
+
+			do_action_ref_array( 'groundhogg/form/v2/before_create_contact', [
+				$posted_data,
+				&$data,
+				&$meta,
+				&$tags,
+				$this
+			] );
+		} finally {
+			remove_filter( 'sanitize_text_field', [ Replacements::class, 'scrub_merge_tags' ] );
+			remove_filter( 'sanitize_textarea_field', [ Replacements::class, 'scrub_merge_tags' ] );
 		}
-
-		if ( $this->has_errors() ) {
-			return false;
-		}
-
-		$data                  = [];
-		$meta                  = [];
-		$tags                  = [];
-		$submission_additional = []; // arbitrary additional information to add to the submission record
-
-		foreach ( $fields as $field ) {
-			self::before_create_contact( $field, $posted_data, $data, $meta, $tags, $submission_additional );
-		}
-
-		do_action_ref_array( 'groundhogg/form/v2/before_create_contact', [
-			$posted_data,
-			&$data,
-			&$meta,
-			&$tags,
-			$this
-		] );
 
 		// let's check if this is probably spam first
 		if ( $this->spam_check( $posted_data ) ){
 			$this->add_error( 'spam', __( 'Unable to process submission.', 'groundhogg' ) );
 			return false;
 		}
+
+		// Form submissions are unauthenticated/untrusted input. Strip anything that looks like
+		// a merge tag so it can't be stored as contact data/meta and later re-expanded (e.g.
+		// {user.user_pass}) when displayed back via a merge tag elsewhere.
+		$data = Replacements::scrub_merge_tags( $data );
+		$meta = Replacements::scrub_merge_tags( $meta );
 
 		$email = get_array_var( $data, 'email' );
 

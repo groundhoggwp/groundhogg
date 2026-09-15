@@ -56,10 +56,6 @@ class Replacements implements \JsonSerializable {
 
 		add_action( 'init', [ $this, 'setup_defaults' ] );
 
-		if ( is_admin_groundhogg_page() ) {
-			add_action( 'admin_footer', [ $this, 'replacements_in_footer' ] );
-		}
-
 		// Todo: add additional hooks that might trigger a cache invalidation
 		add_action( 'groundhogg/contact/post_update', [ $this, 'invalidate_replacements_cache' ] );
 		add_action( 'groundhogg/api/contact/updated', [ $this, 'invalidate_replacements_cache' ] );
@@ -393,6 +389,7 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'replacement_owner_signature' ],
 				'name'        => __( 'Email Signature', 'groundhogg' ),
 				'description' => _x( 'The contact owner\'s signature.', 'replacement', 'groundhogg' ),
+				'nested'      => true,
 			],
 			[
 				'code'         => 'owner',
@@ -409,6 +406,7 @@ class Replacements implements \JsonSerializable {
 				'callback_plain' => [ $this, 'replacement_confirmation_link_plain_text' ],
 				'name'           => __( 'Confirmation Link', 'groundhogg' ),
 				'description'    => _x( 'A link to confirm the email address of a contact.', 'replacement', 'groundhogg' ),
+				'nested'         => true,
 			],
 			[
 				'code'        => 'confirmation_url',
@@ -486,6 +484,7 @@ class Replacements implements \JsonSerializable {
 				'callback_plain' => [ $this, 'posts_plain' ],
 				'name'           => __( 'Recent Posts', 'groundhogg' ),
 				'description'    => _x( 'Show links posts in your email.', 'replacement', 'groundhogg' ),
+				'nested'         => true,
 			],
 			[
 				'code'        => 'post_title',
@@ -493,6 +492,7 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'post_title' ],
 				'name'        => __( 'Post Title', 'groundhogg' ),
 				'description' => _x( 'Return the title of a single recent post.', 'replacement', 'groundhogg' ),
+				'nested'      => true,
 			],
 			[
 				'code'        => 'post_excerpt',
@@ -500,6 +500,7 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'post_excerpt' ],
 				'name'        => __( 'Post Excerpt', 'groundhogg' ),
 				'description' => _x( 'Return the excerpt of a single recent post.', 'replacement', 'groundhogg' ),
+				'nested'      => true,
 			],
 			[
 				'code'        => 'post_content',
@@ -507,6 +508,7 @@ class Replacements implements \JsonSerializable {
 				'callback'    => [ $this, 'post_content' ],
 				'name'        => __( 'Post Content', 'groundhogg' ),
 				'description' => _x( 'Return the content of a single recent post.', 'replacement', 'groundhogg' ),
+				'nested'      => true,
 			],
 			[
 				'code'           => 'post_featured_image',
@@ -631,7 +633,8 @@ class Replacements implements \JsonSerializable {
 				get_array_var( $replacement, 'name' ),
 				get_array_var( $replacement, 'group' ),
 				get_array_var( $replacement, 'default_args' ),
-				get_array_var( $replacement, 'callback_plain' )
+				get_array_var( $replacement, 'callback_plain' ),
+				get_array_var( $replacement, 'nested', false )
 			);
 		}
 
@@ -664,10 +667,17 @@ class Replacements implements \JsonSerializable {
 	 * @param string   $group          the group where it should be displayed
 	 * @param string   $default_args   the default args that should be inserted when selected
 	 * @param callable $plain_callback callback for when rendering plain text replacements
+	 * @param bool     $nested         whether this code's return value is allowed to contain
+	 *                                 further merge tags that should also be expanded. Leave
+	 *                                 false (the default) unless the value is something an admin
+	 *                                 deliberately stores as reusable templated content (a custom
+	 *                                 field, post content, a signature, etc.) — everything else
+	 *                                 gets its return value escaped instead, so untrusted/stored
+	 *                                 data can never be re-interpreted as a tag.
 	 *
 	 * @return bool
 	 */
-	function add( $code, $callback, $description = '', $name = '', $group = 'other', $default_args = '', $plain_callback = '' ) {
+	function add( $code, $callback, $description = '', $name = '', $group = 'other', $default_args = '', $plain_callback = '', $nested = false ) {
 
 		if ( ! $code || ! is_callable( $callback ) ) {
 			return false;
@@ -700,6 +710,7 @@ class Replacements implements \JsonSerializable {
 				'description'    => $description,
 				'insert'         => ! empty( $default_args ) ? sprintf( '{%s.%s}', $code, $default_args ) : sprintf( '{%s}', $code ),
 				'hidden'         => false,
+				'nested'         => (bool) $nested,
 			];
 
 			return true;
@@ -836,6 +847,105 @@ class Replacements implements \JsonSerializable {
 	}
 
 	const PATTERN = '/{([A-Za-z_0-9][^{}\n]+)}/';
+
+	/**
+	 * Strip anything that looks like a merge tag out of a value (or, recursively, out of
+	 * every string in an array of values). Intended for sanitizing untrusted input (e.g.
+	 * public form submissions) before it is persisted as contact data/meta, so it can
+	 * never later be re-expanded by tackle_replacements() when the value is displayed
+	 * back to a contact via a merge tag of its own (2nd-order injection).
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 */
+	public static function scrub_merge_tags( $value ) {
+
+		if ( is_array( $value ) ) {
+			return array_map( [ __CLASS__, 'scrub_merge_tags' ], $value );
+		}
+
+		if ( ! is_string( $value ) ) {
+			return $value;
+		}
+
+		return preg_replace( self::PATTERN, '', $value );
+	}
+
+	/**
+	 * Neutralize anything that looks like a merge tag in a value (or, recursively, in every
+	 * string in an array), WITHOUT deleting it, so the original text stays visible to the
+	 * reader but can never be picked up as a tag by the next recursive tackle_replacements()
+	 * pass. This is the escaping counterpart to scrub_merge_tags().
+	 *
+	 * This is do_replacement()'s default treatment of a replacement code's return value: a
+	 * code's output is data, not a template, unless the code is explicitly registered with
+	 * 'nested' => true (see Replacements::add()) — reserved for the small set of codes whose
+	 * value is trusted, admin-authored templated content that isn't also a common target for
+	 * untrusted input (post content, signatures, the confirmation link text). Custom fields
+	 * ({meta.x} and the bare-field-name shorthand) are deliberately NOT in that set even though
+	 * an admin could put a merge tag in one on purpose — custom fields are also exactly what
+	 * public-facing forms write to, so treating them as safe-to-recurse would let attacker-
+	 * controlled input regain the same 2nd-order injection this whole mechanism exists to stop.
+	 * Everything else gets escaped here so stored/untrusted data (a note, a tag name, a form
+	 * answer, arbitrary usermeta, …) can never be re-interpreted as a tag just because it
+	 * happens to contain "{...}".
+	 *
+	 * In an HTML context the braces are HTML-entity encoded, which renders identically but no
+	 * longer matches PATTERN. In a plain-text context (e.g. SMS) entities would show up as
+	 * literal garbage text, and an invisible zero-width-space trick would force GSM7 SMS
+	 * encoding into UCS-2 (halving the segment size), so we just scrub instead.
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 */
+	public function escape_merge_tags( $value ) {
+
+		if ( is_array( $value ) ) {
+			return array_map( [ $this, 'escape_merge_tags' ], $value );
+		}
+
+		if ( ! is_string( $value ) || ! preg_match( self::PATTERN, $value ) ) {
+			return $value;
+		}
+
+		if ( ! $this->context_is_html() ) {
+			return self::scrub_merge_tags( $value );
+		}
+
+		return preg_replace_callback( self::PATTERN, function ( $matches ) {
+			return '&#123;' . $matches[1] . '&#125;';
+		}, $value );
+	}
+
+	/**
+	 * Neutralize anything that looks like a registered WP shortcode in a value (or, recursively,
+	 * in every string in an array), WITHOUT deleting it.
+	 *
+	 * Email::get_merged_content() runs do_replacements() and then do_shortcode() over the same
+	 * string (see includes/classes/email.php): merge tags are expanded first, and only afterward
+	 * is the whole result passed to do_shortcode(). Shortcodes in an email are meant to be
+	 * whatever the admin placed in the template via the editor — but do_shortcode() can't tell
+	 * the difference between that and a "[shortcode]"-shaped string that arrived via an expanded
+	 * merge tag (a note, a custom field, a tag name, a form answer, …), and would happily execute
+	 * ANY shortcode registered anywhere on the site (not just Groundhogg's own), not merely
+	 * re-run Groundhogg's own tag syntax. So this is applied alongside escape_merge_tags() for
+	 * the same non-'nested' replacement codes in do_replacement() — see the comment there.
+	 *
+	 * Uses WP's own get_shortcode_regex() so only strings that would actually be recognized as a
+	 * currently-registered shortcode are touched (avoids false positives on incidental brackets).
+	 *
+	 * Delegates to the shared \Groundhogg\escape_shortcodes() (includes/functions.php), which is
+	 * also used outside this class wherever untrusted input reaches a do_shortcode() call.
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 */
+	public function escape_shortcodes( $value ) {
+		return \Groundhogg\escape_shortcodes( $value, $this->context_is_html() );
+	}
 
 	/**
 	 * Recursive function to tackle nested replacement codes until no more replacements are found.
@@ -993,8 +1103,19 @@ class Replacements implements \JsonSerializable {
 				return '';
 			}
 
-			// tackle inner replacements within the returned text
-			$text = $this->tackle_replacements( $text );
+			// A replacement's return value is data, not a template, by default: it must not be
+			// picked up as a tag by the next pass (this is what stops e.g. a note or form answer
+			// containing "{user.user_pass}" from being expanded when it's displayed back). Only
+			// codes explicitly registered with 'nested' => true get to recurse — deliberately a
+			// short, curated list (post content, signatures, the confirmation link text), and
+			// deliberately excluding custom fields ({meta.x}/bare shorthand), since those are
+			// also exactly what public-facing forms write to; see Replacements::add().
+			if ( ! empty( $this->replacement_codes[ $code ]['nested'] ) ) {
+				$text = $this->tackle_replacements( $text );
+			} else {
+				$text = $this->escape_merge_tags( $text );
+				$text = $this->escape_shortcodes( $text );
+			}
 
 			/**
 			 * Filter the return value of a given replacement code
@@ -1047,8 +1168,10 @@ class Replacements implements \JsonSerializable {
 			return '';
 		}
 
-		// tackle inner replacements within the returned text
-		$text = $this->tackle_replacements( $text );
+		// This is the bare-field-name shorthand for a custom field (same data as {meta.<field>}),
+		// so it's treated the same way: escaped by default, same as the 'meta' code.
+		$text = $this->escape_merge_tags( $text );
+		$text = $this->escape_shortcodes( $text );
 
 		wp_cache_set( $cache_key, $text, 'groundhogg/replacements' );
 
@@ -1124,7 +1247,13 @@ class Replacements implements \JsonSerializable {
 	}
 
 	public function show_replacements_button( $short = false ) {
+
 		wp_enqueue_script( 'groundhogg-admin-replacements' );
+
+        if ( ! flagged( 'replacements_table_added_to_footer' ) ){
+            add_action( 'admin_footer', [ $this, 'replacements_in_footer' ] );
+            flagged( 'replacements_table_added_to_footer', true );
+        }
 
 		html( html()->modal_link( array(
 			'title'              => esc_html__( 'Replacements', 'groundhogg' ),
@@ -1351,6 +1480,7 @@ class Replacements implements \JsonSerializable {
 		$tag_ids = $this->get_current_contact()->get_tags();
 		$tags    = array_map( [ $this, 'get_contact_tag_names' ], $tag_ids );
 
+		// Not registered as 'nested', so do_replacement() escapes this return value by default.
 		return implode( ',', $tags );
 	}
 
@@ -1368,6 +1498,50 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
+	 * Determine whether a WP_User property or usermeta key should be withheld from
+	 * {user.<key>} output. This is a disallow list rather than an allow list so that
+	 * existing/custom usages of other fields keep working; it blocks known-sensitive
+	 * WP_User properties plus any key whose name suggests it holds a credential,
+	 * secret, or token (e.g. from another plugin's usermeta).
+	 *
+	 * @param string $key
+	 *
+	 * @return bool
+	 */
+	protected function is_disallowed_user_key( $key ) {
+
+		$disallowed_keys = apply_filters( 'groundhogg/replacements/user/disallowed_keys', [
+			'user_pass',
+			'user_activation_key',
+			'session_tokens',
+			'_application_passwords',
+		] );
+
+		if ( in_array( strtolower( $key ), array_map( 'strtolower', $disallowed_keys ), true ) ) {
+			return true;
+		}
+
+		$disallowed_patterns = apply_filters( 'groundhogg/replacements/user/disallowed_key_patterns', [
+			'pass',
+			'secret',
+			'token',
+			'private_key',
+			'api_key',
+			'auth_key',
+			'2fa',
+			'otp',
+		] );
+
+		foreach ( $disallowed_patterns as $pattern ) {
+			if ( stripos( $key, $pattern ) !== false ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Return the contact meta
 	 *
 	 * @param $contact_id int
@@ -1381,6 +1555,11 @@ class Replacements implements \JsonSerializable {
 		}
 
 		return self::handle_meta_replacement( $arg, function ( $key ) {
+
+			if ( $this->is_disallowed_user_key( $key ) ) {
+				return '';
+			}
+
 			$rep = $this->get_current_contact()->get_userdata()->$key;
 
 			// Try to get from meta
@@ -2772,6 +2951,7 @@ class Replacements implements \JsonSerializable {
 			$submission = $submissions[0];
 		}
 
+		// Not registered as 'nested', so do_replacement() escapes this return value by default.
 		$answers = $submission->get_answers( $props['hidden'] );
 
 		switch ( $props['layout'] ) {

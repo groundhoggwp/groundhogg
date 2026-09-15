@@ -4,6 +4,7 @@ namespace Groundhogg\Form\Fields;
 
 use Groundhogg\Form\Form;
 use Groundhogg\Step;
+use function Groundhogg\escape_shortcodes;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -106,7 +107,12 @@ abstract class Input extends Field {
 		}
 
 		if ( Plugin::$instance->submission_handler->has_errors() ) {
-			return Plugin::$instance->submission_handler->get_posted_data( $this->get_name() );
+			// This is the raw, unsanitized value the visitor just POSTed, echoed back so the
+			// field stays filled in after a failed validation. Field::shortcode()/Input::shortcode()
+			// run do_shortcode() on the rendered field HTML, entirely outside the merge-tag
+			// pipeline, so a submitted value shaped like a registered shortcode would otherwise
+			// execute immediately on this same page load — no email, no admin, no wait required.
+			return escape_shortcodes( Plugin::$instance->submission_handler->get_posted_data( $this->get_name() ) );
 		}
 
 		return esc_attr( $this->get_att( "value" ) );

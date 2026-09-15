@@ -695,6 +695,12 @@ class Contact extends Base_Object_With_Meta {
 
 		// Only update different data from the current.
 		$data = $this->sanitize_columns( $data );
+
+		// Contact fields are profile data, not templates. Strip anything that looks like a merge
+		// tag so untrusted input (e.g. a form's "name" field) can never be stored here and later
+		// re-expanded (2nd-order injection) when a merge tag referencing this field is rendered.
+		$data = Replacements::scrub_merge_tags( $data );
+
 		$data = array_diff_assoc( $data, $this->data );
 
 		// if the contact is marked as spam or blocked, only an admin that can edit the contact can change the opt-in status.
@@ -1520,6 +1526,11 @@ class Contact extends Base_Object_With_Meta {
 			} catch ( PropertyException $e ) {
 				// this means that the property does not exist... so do nothing.
 			}
+
+			// Contact meta is profile data, not a template. Strip anything that looks like a merge
+			// tag so untrusted input can never be stored here and later re-expanded (2nd-order
+			// injection) when a merge tag referencing this meta key is rendered.
+			$value = Replacements::scrub_merge_tags( $value );
 		}
 
 		return parent::add_meta( $key, $value );
@@ -1547,6 +1558,11 @@ class Contact extends Base_Object_With_Meta {
 			} catch ( PropertyException $e ) {
 				// this means that the property does not exist... so do nothing.
 			}
+
+			// Contact meta is profile data, not a template. Strip anything that looks like a merge
+			// tag so untrusted input can never be stored here and later re-expanded (2nd-order
+			// injection) when a merge tag referencing this meta key is rendered.
+			$value = Replacements::scrub_merge_tags( $value );
 		}
 
 		return parent::update_meta( $key, $value );

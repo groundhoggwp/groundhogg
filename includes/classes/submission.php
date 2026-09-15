@@ -97,7 +97,12 @@ class Submission extends Base_Object_With_Meta {
 		$array = is_array( $array ) ? $array : [ $array ];
 
 		foreach ( $array as $item => $value ) {
-			$this->add_meta( $item, $value );
+
+			// Posted data is untrusted input, and is later rendered verbatim by the
+			// {form_submission} merge tag (Replacements::replacement_form_submission()).
+			// Strip anything that looks like a merge tag so it can't be re-expanded
+			// (2nd-order injection) when that tag is used in an email.
+			$this->add_meta( $item, Replacements::scrub_merge_tags( $value ) );
 		}
 	}
 
