@@ -1018,6 +1018,18 @@ span.gh-text.bold {
   background: rgba(233, 31, 79, 0.1);
 }
 
+#dashboard .dashboard-widget-column .gh-panel-header > h2 {
+  cursor: move;
+}
+#dashboard .dashboard-widget-column .sortable-placeholder {
+  border: 1px dashed var(--gh-panel-gray);
+  border-radius: var(--gh-panel-border-radius);
+  background: var(--gh-dark-5);
+}
+#dashboard .dashboard-widget-column .ui-sortable-helper {
+  box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
+}
+
 .wp-core-ui select {
   vertical-align: initial;
 }

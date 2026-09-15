@@ -1297,6 +1297,26 @@ span.gh-text {
   }
 }
 
+#dashboard {
+
+  .dashboard-widget-column {
+
+    .gh-panel-header > h2 {
+      cursor: move;
+    }
+
+    .sortable-placeholder {
+      border: 1px dashed var(--gh-panel-gray);
+      border-radius: var(--gh-panel-border-radius);
+      background: var(--gh-dark-5);
+    }
+
+    .ui-sortable-helper {
+      box-shadow: $box-shadow;
+    }
+  }
+}
+
 .wp-core-ui {
 
   select {

@@ -529,7 +529,8 @@ class Scripts {
 			'groundhogg-admin-remote-notifications',
 			'groundhogg-admin-tasks',
 			'groundhogg-admin-components',
-			'groundhogg-admin-reporting'
+			'groundhogg-admin-reporting',
+			'jquery-ui-sortable'
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-gutenberg-filters', GROUNDHOGG_ASSETS_URL . 'js/admin/features/gutenberg' . $dot_min . '.js', [

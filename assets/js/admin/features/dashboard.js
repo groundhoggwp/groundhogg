@@ -88,6 +88,85 @@
     localStorage.setItem('gh_collapsed_widgets', JSON.stringify(disabledWidgets))
   }
 
+  const DASHBOARD_LAYOUT_KEY = 'gh_dashboard_widget_order'
+
+  // The order widgets would appear in if the user has never customized anything
+  const getDefaultLayout = () => {
+    const layout = { 1: [], 2: [], 3: [] }
+    Widgets.keys().forEach(id => {
+      const col = Widgets.get(id).col || 1
+      if (!layout[col]) {
+        layout[col] = []
+      }
+      layout[col].push(id)
+    })
+    return layout
+  }
+
+  // The default layout, overridden by whatever order/columns the user has dragged widgets into
+  const getDashboardLayout = () => {
+
+    const layout = getDefaultLayout()
+
+    let saved
+    try {
+      saved = JSON.parse(localStorage.getItem(DASHBOARD_LAYOUT_KEY))
+    }
+    catch (e) {
+      saved = null
+    }
+
+    if (!saved) {
+      return layout
+    }
+
+    const placed = []
+
+    Object.keys(layout).forEach(col => {
+      layout[col] = (saved[col] || []).filter(id => {
+        if (!Widgets.has(id) || placed.includes(id)) {
+          return false
+        }
+        placed.push(id)
+        return true
+      })
+    })
+
+    // Append any widgets missing from the saved layout, e.g. newly added widgets
+    Widgets.keys().forEach(id => {
+      if (placed.includes(id)) {
+        return
+      }
+      const col = Widgets.get(id).col || 1
+      layout[col].push(id)
+    })
+
+    return layout
+  }
+
+  const saveDashboardLayout = layout => localStorage.setItem(DASHBOARD_LAYOUT_KEY, JSON.stringify(layout))
+
+  // Reads the current on-screen widget order for each column and persists it
+  const syncDashboardLayoutFromDOM = () => {
+
+    const layout = getDashboardLayout()
+
+    Object.keys(layout).forEach(col => {
+      const colEl = document.getElementById(`dashboard-col-${ col }`)
+
+      if (!colEl) {
+        return
+      }
+
+      const visibleIds = [ ...colEl.children ].map(el => el.dataset.id)
+      const hiddenIds = layout[col].filter(id => isWidgetDisabled(id))
+
+      layout[col] = [ ...visibleIds, ...hiddenIds ]
+    })
+
+    saveDashboardLayout(layout)
+  }
+
   const Widget = ({
     id,
     name = '',
@@ -103,6 +182,7 @@
 
     const El = () => Div({
       id       : `${ id }-widget`,
+      dataId   : id,
       className: `gh-panel ${ isWidgetCollapsed(id) ? 'closed' : '' }`,
     }, [
       Div({ className: `gh-panel-header` }, [
@@ -130,10 +210,28 @@
   }
 
   const WidgetColumn = (col = 0) => Div({
-    className: 'display-flex column gap-20 full-width span-4',
-  }, Widgets.map((item, id) => {
+    id       : `dashboard-col-${ col }`,
+    className: 'display-flex column gap-20 full-width span-4 dashboard-widget-column',
+    onCreate : el => {
+      $(el).sortable({
+        items               : '> .gh-panel',
+        handle              : '.gh-panel-header > h2',
+        connectWith         : '.dashboard-widget-column',
+        placeholder         : 'sortable-placeholder',
+        forcePlaceholderSize: true,
+        start               : (e, ui) => {
+          ui.placeholder.height(ui.item.height())
+        },
+        update              : (e, ui) => {
+          syncDashboardLayoutFromDOM()
+        },
+      })
+    },
+  }, getDashboardLayout()[col].map(id => {
 
-    if (item.col !== col) {
+    const item = Widgets.get(id)
+
+    if (!item) {
       return null
     }
 
