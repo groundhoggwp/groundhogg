@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.8.1
+Stable tag: 4.8.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -390,6 +390,13 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.8.2 (2026-09-15) =
+* ADDED "List Settings" and "Update Settings" abilities, backed by a new settings registry with JSON-schema validation, so an agent can discover and change a plugin's registered settings instead of only the objects (contacts, emails, flows, etc.) abilities already covered.
+* ADDED "Add Custom Field" and "Update Custom Field" abilities for creating and editing a contact's custom fields, with the same validation rules the contact editor itself uses.
+* ADDED A "Groundhogg Extensions" ability category: "List Extensions" to see which official add-ons are installed and licensed, "Check License" and "Activate License" to manage a license key, and "Install Extension" to remotely install and activate one - gated on WordPress's own `install_plugins`/`activate_plugins` capabilities since it installs code on the site.
+* ADDED "Create Tag" and "Create Campaign"/"Associate Campaign" abilities for creating tags and campaigns and attaching a campaign to other objects, rather than requiring one to already exist.
+* SECURITY Hardened handling of contact-submitted data to prevent it from being reinterpreted as active content elsewhere in the CRM. Credit: Ayukiab, via Patchstack.
 
 = 4.8.1 (2026-09-14) =
 * ADDED "Create Flow" and "Activate Flow" abilities, so an AI agent can build a flow (funnel) from scratch, including branching steps, and turn it on. A new "List Step Types" ability lists the buildable step types and their settings so an agent can discover what's available before building.
