@@ -129,6 +129,7 @@ class Settings {
 			'group'       => 'double_optin',
 			'type'        => 'integer',
 			'default'     => 14,
+			'schema'      => [ 'minimum' => 0, 'maximum' => 365 ],
 			'description' => __( 'Number of days a newly-created, unconfirmed contact can still be emailed before strict_confirmation cuts them off.', 'groundhogg' ),
 		] );
 
@@ -311,12 +312,20 @@ class Settings {
 	 * @param array  $args {
 	 *
 	 * @type string $type json schema type: string|integer|number|boolean|array|object
-	 * @type mixed $enum optional; either a list of allowed values, or a callable
-	 *                     returning one - useful when the choices are dynamic (e.g.
-	 *                     depend on other data)
+	 * @type array|callable $schema extra JSON-schema properties (e.g. enum, minimum,
+	 *                     maximum, format, items, pattern) merged on top of {type,
+	 *                     description} by get_setting_schema(). May be a callable
+	 *                     returning that array instead, for schemas that depend on
+	 *                     dynamic data (e.g. an enum built from other settings) - the
+	 *                     whole array is expected to be dynamic in that case, not just
+	 *                     the 'enum' key within it. enum/minimum/maximum/pattern/maxLength
+	 *                     here are also enforced when the setting is sanitized (see
+	 *                     enforce_schema_constraints()) - enum/pattern reject to 'default',
+	 *                     minimum/maximum clamp, maxLength truncates. Anything else (items,
+	 *                     format, etc.) is currently descriptive only.
 	 * @type string $description human-readable description, used for ability schemas
 	 * @type mixed $default default value; also used as the fallback when an incoming
-	 *                     value fails its enum check
+	 *                     value fails its schema's enum/pattern check
 	 * @type callable|string $sanitize_callback called on the value via
 	 *                     `sanitize_option_{$id}`; guessed from 'type' when omitted
 	 * @type string $group optional id of a group registered via add_group()
@@ -330,7 +339,7 @@ class Settings {
 
 		$args = wp_parse_args( $args, [
 			'type'              => 'string',
-			'enum'              => null,
+			'schema'            => [],
 			'description'       => '',
 			'default'           => null,
 			'sanitize_callback' => null,
@@ -403,26 +412,26 @@ class Settings {
 	}
 
 	/**
-	 * Resolve a setting's 'enum' arg, which may be a plain list of allowed values or a
-	 * callable returning one (for dynamic choices).
+	 * Resolve a setting's 'schema' arg to a plain array - it may itself be a callable
+	 * returning one, for schemas that depend on dynamic data.
 	 *
-	 * @param mixed $enum
+	 * @param array|callable $schema
 	 *
-	 * @return array|null
+	 * @return array
 	 */
-	protected function resolve_enum( $enum ) {
+	protected function resolve_schema( $schema ) {
 
-		if ( is_callable( $enum ) ) {
-			return call_user_func( $enum );
+		if ( is_callable( $schema ) ) {
+			$schema = call_user_func( $schema );
 		}
 
-		return $enum;
+		return is_array( $schema ) ? $schema : [];
 	}
 
 	/**
 	 * The `sanitize_option_{$option}` callback for every setting registered via
-	 * add_setting(). Runs the setting's sanitize_callback, then enforces its enum (if any),
-	 * falling back to the registered default when the value isn't an allowed choice.
+	 * add_setting(). Runs the setting's sanitize_callback, then enforces whatever
+	 * constraints its resolved schema declares (see enforce_schema_constraints()).
 	 *
 	 * @param mixed  $value
 	 * @param string $option
@@ -441,13 +450,57 @@ class Settings {
 			$value = call_user_func( $args['sanitize_callback'], $value );
 		}
 
-		$enum = $this->resolve_enum( $args['enum'] );
+		$schema = $this->resolve_schema( $args['schema'] );
 
-		if ( $enum ) {
+		return $this->enforce_schema_constraints( $value, $schema, $args['default'] );
+	}
+
+	/**
+	 * Enforce the JSON-schema constraints a setting's resolved schema declares, against
+	 * an already-sanitize_callback'd value:
+	 *
+	 * - enum: value must be one of the allowed choices (arrays are filtered down to the
+	 *   allowed subset); otherwise falls back to $default
+	 * - minimum/maximum: numeric values are clamped into range, not rejected
+	 * - pattern: string must match (as a PCRE pattern, no delimiters); otherwise falls
+	 *   back to $default
+	 * - maxLength: strings longer than this are truncated
+	 *
+	 * Anything else a schema declares (items, format, minLength, etc.) is currently
+	 * descriptive only - add a case here if a setting needs it actually enforced.
+	 *
+	 * @param mixed $value
+	 * @param array $schema
+	 * @param mixed $default fallback used when a check rejects the value outright
+	 *                        (enum/pattern) rather than clamping/truncating it
+	 *
+	 * @return mixed
+	 */
+	protected function enforce_schema_constraints( $value, array $schema, $default ) {
+
+		if ( ! empty( $schema['enum'] ) ) {
 			if ( is_array( $value ) ) {
-				$value = array_values( array_intersect( $value, $enum ) );
-			} else if ( ! in_array( $value, $enum, true ) ) {
-				$value = $args['default'];
+				$value = array_values( array_intersect( $value, $schema['enum'] ) );
+			} else if ( ! in_array( $value, $schema['enum'], true ) ) {
+				return $default;
+			}
+		}
+
+		if ( is_numeric( $value ) ) {
+			if ( isset( $schema['minimum'] ) && $value < $schema['minimum'] ) {
+				$value = $schema['minimum'];
+			}
+			if ( isset( $schema['maximum'] ) && $value > $schema['maximum'] ) {
+				$value = $schema['maximum'];
+			}
+		}
+
+		if ( is_string( $value ) ) {
+			if ( isset( $schema['pattern'] ) && ! preg_match( '#' . $schema['pattern'] . '#', $value ) ) {
+				return $default;
+			}
+			if ( isset( $schema['maxLength'] ) && mb_strlen( $value ) > $schema['maxLength'] ) {
+				$value = mb_substr( $value, 0, $schema['maxLength'] );
 			}
 		}
 
@@ -496,7 +549,8 @@ class Settings {
 
 	/**
 	 * Get the JSON-schema-style attributes for a registered setting - type, description,
-	 * and (when applicable) enum/default - suitable for use as a property within an
+	 * and default, plus whatever the setting's 'schema' arg contributes (enum, minimum,
+	 * maximum, format, items, pattern, etc.) - suitable for use as a property within an
 	 * ability's input/output schema.
 	 *
 	 * @param string $id with or without the gh_ prefix
@@ -513,18 +567,12 @@ class Settings {
 
 		$args = $this->registered_settings[ $id ];
 
-		$schema = [
+		$schema = array_merge( [
 			'type'        => $args['type'],
 			'description' => $args['description'],
-		];
+		], $this->resolve_schema( $args['schema'] ) );
 
-		$enum = $this->resolve_enum( $args['enum'] );
-
-		if ( $enum ) {
-			$schema['enum'] = $enum;
-		}
-
-		if ( $args['default'] !== null ) {
+		if ( $args['default'] !== null && ! array_key_exists( 'default', $schema ) ) {
 			$schema['default'] = $args['default'];
 		}
 

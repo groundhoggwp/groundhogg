@@ -440,6 +440,13 @@ function replacements() {
 }
 
 /**
+ * @return Settings
+ */
+function settings() {
+	return Plugin::instance()->settings;
+}
+
+/**
  * @return Tracking
  */
 function tracking() {
