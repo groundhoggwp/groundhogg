@@ -28,8 +28,9 @@
   } = Groundhogg.pickers
 
   const {
-    emails: EmailsStore,
-    tags  : TagsStore,
+    emails : EmailsStore,
+    tags   : TagsStore,
+    funnels: FunnelsStore,
   } = Groundhogg.stores
 
   const {
@@ -47,7 +48,8 @@
     Fragment,
     Input,
     Select,
-    Label
+    Label,
+    Skeleton
   } = MakeEl
 
   const {
@@ -941,6 +943,123 @@
 
   Funnel.registerStepCallbacks('remove_tag', {
     onActive: tagPickerCallback,
+  })
+
+  const addToFlowCallback = async ({
+    ID,
+    meta,
+  }) => {
+
+    const {
+      funnel_id = 0,
+      step_id   = 0,
+    } = meta
+
+    const funnelPickerId = `step_${ ID }_funnel`
+    const funnelStepPickerId = `step_${ ID }_funnel_step`
+
+    const showSkeleton = (id) => {
+      const el = document.getElementById(id)
+
+      if (el) {
+        el.closest('.gh-panel').classList.add('ignore-morph')
+        el.replaceWith(Skeleton({ id }, [ 'full' ]))
+      }
+    }
+
+    showSkeleton(funnelPickerId)
+    showSkeleton(funnelStepPickerId)
+
+    let funnel = null
+
+    if (funnel_id) {
+      await FunnelsStore.maybeFetchItem(funnel_id)
+      funnel = FunnelsStore.get(funnel_id)
+    }
+
+    const funnelPicker = document.getElementById(funnelPickerId)
+
+    if (funnelPicker) {
+
+      funnelPicker.closest('.gh-panel').classList.add('ignore-morph')
+
+      funnelPicker.replaceWith(ItemPicker({
+        id          : funnelPickerId,
+        noneSelected: __('Select a flow...', 'groundhogg'),
+        selected    : funnel ? {
+          id  : funnel.ID,
+          text: funnel.data.title,
+        } : [],
+        multiple    : false,
+        fetchOptions: (search) => FunnelsStore.fetchItems({
+            search,
+            status: 'active',
+          }).
+          then(funnels => funnels.map(({
+            ID,
+            data,
+          }) => ( {
+            id  : ID,
+            text: data.title,
+          } ))),
+        onChange    : item => {
+          Funnel.updateStepMeta({
+            funnel_id: item ? item.id : 0,
+            step_id  : 0,
+          })
+
+          addToFlowCallback({
+            ID,
+            meta: {
+              funnel_id: item ? item.id : 0,
+              step_id  : 0,
+            },
+          })
+        },
+      }))
+    }
+
+    const stepPicker = document.getElementById(funnelStepPickerId)
+
+    if (stepPicker) {
+
+      stepPicker.closest('.gh-panel').classList.add('ignore-morph')
+
+      if (!funnel) {
+        stepPicker.replaceWith(Div({ id: funnelStepPickerId }))
+      }
+      else {
+
+        const actionSteps = ( funnel.steps || [] ).filter(step => step.data.step_group === 'action')
+        const selectedStep = actionSteps.find(step => step.ID === step_id)
+
+        stepPicker.replaceWith(ItemPicker({
+          id          : funnelStepPickerId,
+          noneSelected: __('First step (default)', 'groundhogg'),
+          selected    : selectedStep ? {
+            id  : selectedStep.ID,
+            text: selectedStep.data.step_title,
+          } : [],
+          multiple    : false,
+          fetchOptions: () => Promise.resolve(actionSteps.map(({
+            ID,
+            data,
+          }) => ( {
+            id  : ID,
+            text: data.step_title,
+          } ))),
+          onChange    : item => {
+            Funnel.updateStepMeta({
+              step_id: item ? item.id : 0,
+            })
+          },
+        }))
+      }
+    }
+  }
+
+  Funnel.registerStepCallbacks('add_to_flow', {
+    onActive: addToFlowCallback,
   })
 
   Funnel.registerStepCallbacks('if_else', {

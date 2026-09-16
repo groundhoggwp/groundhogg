@@ -4,7 +4,9 @@ namespace Groundhogg\Abilities\Schemas;
 
 use Groundhogg\Abilities\Traits\Has_Optin_Status;
 use Groundhogg\Email;
+use Groundhogg\Funnel;
 use Groundhogg\Plugin;
+use Groundhogg\Step;
 use WP_Error;
 use function Groundhogg\parse_tag_list;
 
@@ -164,6 +166,7 @@ class Step_Type_Schema {
 		'apply_note',
 		'create_task',
 		'delay_timer',
+		'add_to_flow',
 		// Logic
 		'if_else',
 	];
@@ -623,6 +626,22 @@ class Step_Type_Schema {
 						],
 					],
 				];
+			case 'add_to_flow':
+				return [
+					'type'                 => 'object',
+					'additionalProperties' => false,
+					'required'             => [ 'flow_id' ],
+					'properties'           => [
+						'flow_id' => [
+							'type'        => 'integer',
+							'description' => __( 'ID of an existing flow to add the contact to - see groundhogg/list-flows. Must already exist; create-flow does not create the target flow.', 'groundhogg' ),
+						],
+						'step_id' => [
+							'type'        => 'integer',
+							'description' => __( 'Enter the contact at this step instead of flow_id\'s first action step. Must belong to flow_id - see groundhogg/list-flows with expand "steps".', 'groundhogg' ),
+						],
+					],
+				];
 			case 'if_else':
 				return self::if_else_settings_schema();
 			default:
@@ -741,6 +760,33 @@ class Step_Type_Schema {
 				// Written later regardless of whether `tasks` was given (an empty
 				// deferred write is harmless, and keeps this one code path).
 				unset( $settings['tasks'] );
+
+				break;
+
+			case 'add_to_flow':
+
+				if ( ! empty( $settings['flow_id'] ) ) {
+
+					$funnel = new Funnel( absint( $settings['flow_id'] ) );
+
+					if ( ! $funnel->exists() ) {
+						return new WP_Error( 'groundhogg_flow_not_found', __( 'add_to_flow\'s flow_id does not match an existing flow. Find one with groundhogg/list-flows.', 'groundhogg' ) );
+					}
+
+					unset( $settings['flow_id'] );
+					$settings['funnel_id'] = $funnel->get_id();
+
+					if ( ! empty( $settings['step_id'] ) ) {
+
+						$target_step = new Step( absint( $settings['step_id'] ) );
+
+						if ( ! $target_step->exists() || $target_step->get_funnel_id() !== $funnel->get_id() ) {
+							return new WP_Error( 'groundhogg_step_not_in_flow', __( 'add_to_flow\'s step_id does not belong to flow_id.', 'groundhogg' ) );
+						}
+
+						$settings['step_id'] = $target_step->get_id();
+					}
+				}
 
 				break;
 

@@ -3,6 +3,7 @@
 namespace Groundhogg\Steps;
 
 use Groundhogg\Steps\Actions\Action;
+use Groundhogg\Steps\Actions\Add_To_Flow;
 use Groundhogg\Steps\Actions\Admin_Notification;
 use Groundhogg\Steps\Actions\Apply_Note;
 use Groundhogg\Steps\Actions\Apply_Tag;
@@ -91,6 +92,7 @@ class Manager {
 		$this->add_step( new Apply_Note() );
 		$this->add_step( new Create_Task() );
 		$this->add_step( new Delay_Timer() );
+		$this->add_step( new Add_To_Flow() );
 
 		/* Benchmarks */
 
