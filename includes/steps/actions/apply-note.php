@@ -2,9 +2,11 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
+use function Groundhogg\bold_it;
 use function Groundhogg\do_replacements;
 use function Groundhogg\html;
 use function Groundhogg\one_of;
@@ -141,6 +143,8 @@ class Apply_Note extends Action {
 		$event->set_args( [
 			'note' => $note->ID
 		] );
+
+		Simulator::log( sprintf( '📝 Added note: %s', bold_it( wp_trim_words( wp_strip_all_tags( $finished_note ), 12 ) ) ) );
 
 		return true;
 

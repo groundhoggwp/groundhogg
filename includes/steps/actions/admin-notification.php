@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
@@ -351,6 +352,8 @@ class Admin_Notification extends Action {
 
 		// No recipients defined, skip
 		if ( empty( $send_to ) ) {
+			Simulator::log( '⚠️ Notification skipped - no valid recipients' );
+
 			return false;
 		}
 
@@ -384,8 +387,12 @@ class Admin_Notification extends Action {
 		remove_action( 'wp_mail_failed', [ $this, 'mail_failed' ] );
 
 		if ( $this->has_errors() ) {
+			Simulator::log( sprintf( '❌ Notification failed: %s', $this->get_last_error()->get_error_message() ) );
+
 			return $this->get_last_error();
 		}
+
+		Simulator::log( sprintf( '📨 Sent notification to %s', andList( array_map( 'bold_it', $send_to ) ) ) );
 
 		return $sent;
 

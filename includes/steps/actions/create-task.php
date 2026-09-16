@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Classes\Task;
 use Groundhogg\Contact;
 use Groundhogg\Event;
@@ -253,6 +254,8 @@ class Create_Task extends Action {
 		$event->set_args( [
 			'task_id' => $task->ID
 		] );
+
+		Simulator::log( sprintf( '✅ Created task %s, due %s', bold_it( $summary ), $dueDate->format( 'M j, Y' ) ) );
 
 		return true;
 	}

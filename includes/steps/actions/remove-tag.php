@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
@@ -115,6 +116,16 @@ class Remove_Tag extends Apply_Tag {
 	public function run( $contact, $event ) {
 		$tags = wp_parse_id_list( $this->get_setting( 'tags' ) );
 
-		return $contact->remove_tag( $tags );
+		$removed_tags = array_intersect( $tags, $contact->get_tags() );
+
+		$result = $contact->remove_tag( $tags );
+
+		if ( $removed_tags ) {
+			Simulator::log( sprintf( '🏷️ Removed %s', andList( array_bold( parse_tag_list( $removed_tags, 'name', false ) ) ) ) );
+		} else {
+			Simulator::log( '➖ No tags removed - contact didn\'t have them' );
+		}
+
+		return $result;
 	}
 }

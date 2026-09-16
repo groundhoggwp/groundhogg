@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Step;
@@ -134,7 +135,19 @@ class Apply_Tag extends Action {
 	 * @return true
 	 */
 	public function run( $contact, $event ) {
-		return $contact->add_tag( $this->get_setting( 'tags' ) );
+
+		$tags     = wp_parse_id_list( $this->get_setting( 'tags' ) );
+		$new_tags = array_diff( $tags, $contact->get_tags() );
+
+		$result = $contact->add_tag( $this->get_setting( 'tags' ) );
+
+		if ( $new_tags ) {
+			Simulator::log( sprintf( '🏷️ Applied %s', andList( array_bold( parse_tag_list( $new_tags, 'name', false ) ) ) ) );
+		} else {
+			Simulator::log( '➖ No new tags applied - contact already has them all' );
+		}
+
+		return $result;
 	}
 
 	/**

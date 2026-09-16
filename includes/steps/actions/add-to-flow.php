@@ -2,10 +2,12 @@
 
 namespace Groundhogg\Steps\Actions;
 
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
+use function Groundhogg\bold_it;
 use function Groundhogg\html;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -70,6 +72,8 @@ class Add_To_Flow extends Action {
 			html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'funnel' ) ] ),
 			html()->e( 'div', [ 'id' => $this->setting_id_prefix( 'funnel_step' ) ] )
 		] );
+
+		html( 'p' );
 	}
 
 	public function get_settings_schema() {
@@ -161,7 +165,17 @@ class Add_To_Flow extends Action {
 			return new \WP_Error( 'no_entry_step', __( 'The selected flow has no valid entry step.', 'groundhogg' ) );
 		}
 
-		return $target_step->enqueue( $contact );
+		$result = $target_step->enqueue( $contact );
+
+		if ( is_wp_error( $result ) ) {
+			Simulator::log( sprintf( '❌ Failed to add to %s: %s', bold_it( $funnel->get_title() ), $result->get_error_message() ) );
+		} else if ( $result ) {
+			Simulator::log( sprintf( '➡️ Added to %s at %s', bold_it( $funnel->get_title() ), bold_it( $target_step->get_title() ) ) );
+		} else {
+			Simulator::log( sprintf( '⚠️ Not added to %s - already in progress or ineligible', bold_it( $funnel->get_title() ) ) );
+		}
+
+		return $result;
 	}
 
 	/**

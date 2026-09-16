@@ -139,9 +139,15 @@ class Simulator {
 	}
 
 	/**
-	 * Respond to the request
+	 * Respond to the request - behavior depends entirely on who's calling:
+	 * - AJAX (the funnel editor's own "Simulate" panel): send a JSON response and terminate,
+	 *   same as always.
+	 * - WP-CLI (`wp groundhogg-tests simulate`): print a success message, same as always.
+	 * - Anything else (e.g. a WordPress Ability, or any other plain PHP caller): return the
+	 *   flow/options data structurally instead of dying or fataling (WP_CLI::success() would
+	 *   fatal with "Class WP_CLI not found" outside an actual CLI request).
 	 *
-	 * @return void
+	 * @return array|void
 	 */
 	public static function respond() {
 
@@ -152,7 +158,16 @@ class Simulator {
 			] );
 		}
 
-		WP_CLI::success( 'Simulation complete!' );
+		if ( doing_cli() ) {
+			WP_CLI::success( 'Simulation complete!' );
+
+			return;
+		}
+
+		return [
+			'flow'    => self::$flow,
+			'options' => self::$options,
+		];
 	}
 
 	/**
@@ -203,7 +218,12 @@ class Simulator {
 		self::$is_dry_run = $dryRun;
 
 		if ( ! $step->exists() ) {
-			wp_send_json_error();
+
+			if ( wp_doing_ajax() ) {
+				wp_send_json_error();
+			}
+
+			return new \WP_Error( 'invalid_step', 'The provided step does not exist.' );
 		}
 
 		self::$is_simulating = true;
@@ -349,8 +369,12 @@ class Simulator {
 
 						array_unshift( $siblings, $next );
 
+						// Populated regardless of calling context - only AJAX terminates early
+						// on it here; other callers (CLI, or a plain PHP/Ability caller) pick it
+						// up from the final respond() once the loop below ends this run.
+						self::$options = get_object_ids( $siblings );
+
 						if ( wp_doing_ajax() ) {
-							self::$options = get_object_ids( $siblings );
 							self::respond();
 						}
 
@@ -374,7 +398,7 @@ class Simulator {
 
 		self::$is_simulating = false;
 
-		self::respond();
+		return self::respond();
 	}
 
 }
