@@ -391,11 +391,14 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.8.2 (2026-09-15) =
+= 4.8.2 (2026-09-16) =
+* ADDED "Add to Flow" action step, so a flow can enroll the contact in another flow (or restart the same one) at its first step or a step you choose, instead of requiring a separate manual step or automation to do it.
+* ADDED "Simulate Flow" and "Live Simulate Flow" abilities, so an agent can trace what a flow would do for a contact from a given step (branches taken, roughly when timers resolve) with no side effects, or actually run it for real - the same simulation the funnel editor's own "Simulate" panel uses.
 * ADDED "List Settings" and "Update Settings" abilities, backed by a new settings registry with JSON-schema validation, so an agent can discover and change a plugin's registered settings instead of only the objects (contacts, emails, flows, etc.) abilities already covered.
 * ADDED "Add Custom Field" and "Update Custom Field" abilities for creating and editing a contact's custom fields, with the same validation rules the contact editor itself uses.
 * ADDED A "Groundhogg Extensions" ability category: "List Extensions" to see which official add-ons are installed and licensed, "Check License" and "Activate License" to manage a license key, and "Install Extension" to remotely install and activate one - gated on WordPress's own `install_plugins`/`activate_plugins` capabilities since it installs code on the site.
 * ADDED "Create Tag" and "Create Campaign"/"Associate Campaign" abilities for creating tags and campaigns and attaching a campaign to other objects, rather than requiring one to already exist.
+* TWEAKED Dashboard widgets can now be reordered by drag-and-drop; the layout is remembered per-browser.
 * SECURITY Hardened handling of contact-submitted data to prevent it from being reinterpreted as active content elsewhere in the CRM. Credit: Ayukiab, via Patchstack.
 
 = 4.8.1 (2026-09-14) =

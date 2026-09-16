@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enrolls the contact in another (or the same) flow, either at its first
  * action step or at a specific step chosen in the settings.
  *
- * @since       File available since Release 4.9
+ * @since       File available since Release 4.8.2
  * @subpackage  Elements/Actions
  * @author      Adrian Tobey <info@groundhogg.io>
  * @copyright   Copyright (c) 2026, Groundhogg Inc.
