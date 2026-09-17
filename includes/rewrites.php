@@ -274,8 +274,22 @@ class Rewrites {
 				break;
 
 			case 'emails':
-				$template = $template_loader->get_template_part( 'emails/email', '', false );
-				break;
+				// This route rendered any email in the browser using whatever contact the
+				// visitor's tracking cookie pointed at, with no authorization check of any
+				// kind — an anonymous visitor could bind that cookie to an arbitrary existing
+				// contact via a public form (using only that contact's email address) and then
+				// load any email here to have every merge tag it contains resolved in that
+				// contact's context. The real "View in browser" link uses a signed, expiring,
+				// per-contact permissions key against the separate archive/{event_id} route
+				// (Email::browser_view_link(), 'browser_view' case above), and the admin
+				// preview/test-send feature uses its own HMAC-signed preview_email link
+				// (the 'preview_email' check at the top of this method) — neither depends on
+				// this route, so it's disabled outright rather than retrofitted.
+				wp_die(
+					esc_html__( 'This direct email link has been disabled for security reasons. To view an email in your browser, use the "View in browser" link included in the email itself.', 'groundhogg' ),
+					esc_html__( 'Link disabled', 'groundhogg' ),
+					[ 'response' => 403 ]
+				);
 			case 'forms':
 				if ( get_query_var( 'form_step' ) ) {
 					$template = $template_loader->get_template_part( 'form/form', '', false );

@@ -855,6 +855,11 @@ class Replacements implements \JsonSerializable {
 	 * never later be re-expanded by tackle_replacements() when the value is displayed
 	 * back to a contact via a merge tag of its own (2nd-order injection).
 	 *
+	 * Loops to a fixed point rather than a single preg_replace pass: PATTERN can't match across
+	 * embedded braces, so a single pass on "{user{user.data}.data}" removes only the inner
+	 * "{user.data}" and leaves the surrounding "{user" + ".data}" concatenated back into a brand
+	 * new, complete "{user.data}" tag. Repeating until nothing changes closes that reconstruction.
+	 *
 	 * @param mixed $value
 	 *
 	 * @return mixed
@@ -869,7 +874,12 @@ class Replacements implements \JsonSerializable {
 			return $value;
 		}
 
-		return preg_replace( self::PATTERN, '', $value );
+		do {
+			$previous = $value;
+			$value    = preg_replace( self::PATTERN, '', $value );
+		} while ( $value !== $previous );
+
+		return $value;
 	}
 
 	/**
@@ -914,9 +924,18 @@ class Replacements implements \JsonSerializable {
 			return self::scrub_merge_tags( $value );
 		}
 
-		return preg_replace_callback( self::PATTERN, function ( $matches ) {
-			return '&#123;' . $matches[1] . '&#125;';
-		}, $value );
+		// Loop to a fixed point for the same reason scrub_merge_tags() does: a single pass on
+		// e.g. "{user{user.data}.data}" only encodes the inner "{user.data}" match, leaving an
+		// outer "{user&#123;user.data&#125;.data}" shell whose braces are, once again, a brand
+		// new complete tag with nothing embedded in it — repeat until there's nothing left to encode.
+		do {
+			$previous = $value;
+			$value    = preg_replace_callback( self::PATTERN, function ( $matches ) {
+				return '&#123;' . $matches[1] . '&#125;';
+			}, $value );
+		} while ( $value !== $previous );
+
+		return $value;
 	}
 
 	/**
@@ -1498,47 +1517,39 @@ class Replacements implements \JsonSerializable {
 	}
 
 	/**
-	 * Determine whether a WP_User property or usermeta key should be withheld from
-	 * {user.<key>} output. This is a disallow list rather than an allow list so that
-	 * existing/custom usages of other fields keep working; it blocks known-sensitive
-	 * WP_User properties plus any key whose name suggests it holds a credential,
-	 * secret, or token (e.g. from another plugin's usermeta).
+	 * Determine whether a WP_User property or usermeta key is permitted in {user.<key>} /
+	 * {owner.<attr>} output.
+	 *
+	 * This used to be a deny list, which is fundamentally unsound for a generic "read any key"
+	 * accessor: it only ever blocks key NAMES someone thought to list. It missed 'data' — WP_User's
+	 * own public $data property, the raw wp_users row as a stdClass — which isn't sensitive-sounding
+	 * by name but hands back user_pass/user_activation_key wholesale (and gets print_r()'d into the
+	 * output by handle_meta_replacement(), disclosing them). An allow list of specific, known-safe
+	 * fields is the only version of this that's actually safe by construction: anything not
+	 * explicitly named here is withheld, whatever it turns out to contain.
 	 *
 	 * @param string $key
 	 *
 	 * @return bool
 	 */
-	protected function is_disallowed_user_key( $key ) {
+	protected function is_allowed_user_key( $key ) {
 
-		$disallowed_keys = apply_filters( 'groundhogg/replacements/user/disallowed_keys', [
-			'user_pass',
-			'user_activation_key',
-			'session_tokens',
-			'_application_passwords',
+		$allowed_keys = apply_filters( 'groundhogg/replacements/user/allowed_keys', [
+			'ID',
+			'user_login',
+			'user_nicename',
+			'user_email',
+			'user_url',
+			'user_registered',
+			'display_name',
+			'first_name',
+			'last_name',
+			'nickname',
+			'description',
+			'locale',
 		] );
 
-		if ( in_array( strtolower( $key ), array_map( 'strtolower', $disallowed_keys ), true ) ) {
-			return true;
-		}
-
-		$disallowed_patterns = apply_filters( 'groundhogg/replacements/user/disallowed_key_patterns', [
-			'pass',
-			'secret',
-			'token',
-			'private_key',
-			'api_key',
-			'auth_key',
-			'2fa',
-			'otp',
-		] );
-
-		foreach ( $disallowed_patterns as $pattern ) {
-			if ( stripos( $key, $pattern ) !== false ) {
-				return true;
-			}
-		}
-
-		return false;
+		return in_array( $key, $allowed_keys, true );
 	}
 
 	/**
@@ -1556,7 +1567,7 @@ class Replacements implements \JsonSerializable {
 
 		return self::handle_meta_replacement( $arg, function ( $key ) {
 
-			if ( $this->is_disallowed_user_key( $key ) ) {
+			if ( ! $this->is_allowed_user_key( $key ) ) {
 				return '';
 			}
 
@@ -1565,6 +1576,12 @@ class Replacements implements \JsonSerializable {
 			// Try to get from meta
 			if ( ! $rep ) {
 				$rep = get_user_meta( $this->get_current_contact()->get_user_id(), $key, true );
+			}
+
+			// Never disclose a whole object/array (e.g. WP_User::$data, the raw wp_users row) —
+			// handle_meta_replacement() would print_r() it, dumping every property verbatim.
+			if ( is_object( $rep ) || is_array( $rep ) ) {
+				return '';
 			}
 
 			return $rep;
@@ -1917,7 +1934,19 @@ class Replacements implements \JsonSerializable {
 			return false;
 		}
 
-		return $user->$attr;
+		// Same unrestricted-property-read risk as {user.<key>} (the owner is still just a
+		// WP_User), so route through the same allow-list.
+		if ( ! $this->is_allowed_user_key( $attr ) ) {
+			return '';
+		}
+
+		$rep = $user->$attr;
+
+		if ( is_object( $rep ) || is_array( $rep ) ) {
+			return '';
+		}
+
+		return $rep;
 	}
 
 	/**

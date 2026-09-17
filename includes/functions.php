@@ -6103,6 +6103,11 @@ function map_func_to_attr( &$arr, $key, $func ) {
  * reflects raw, un-sanitized $_POST back into the page and then runs do_shortcode() on the
  * rendered field — see includes/form/fields/input.php and field.php).
  *
+ * Loops to a fixed point rather than a single pass, the same way and for the same reason as
+ * Replacements::scrub_merge_tags(): a single pass only touches the innermost match, and can leave
+ * an outer bracket pair — with nothing live left inside it — that becomes a brand new match on
+ * the very next scan.
+ *
  * @param mixed $value
  * @param bool  $html
  *
@@ -6126,13 +6131,19 @@ function escape_shortcodes( $value, $html = true ) {
 		return $value;
 	}
 
-	if ( ! $html ) {
-		return preg_replace( $pattern, '', $value );
-	}
+	do {
+		$previous = $value;
 
-	return preg_replace_callback( $pattern, function ( $matches ) {
-		return str_replace( [ '[', ']' ], [ '&#91;', '&#93;' ], $matches[0] );
-	}, $value );
+		if ( ! $html ) {
+			$value = preg_replace( $pattern, '', $value );
+		} else {
+			$value = preg_replace_callback( $pattern, function ( $matches ) {
+				return str_replace( [ '[', ']' ], [ '&#91;', '&#93;' ], $matches[0] );
+			}, $value );
+		}
+	} while ( $value !== $previous );
+
+	return $value;
 }
 
 /**

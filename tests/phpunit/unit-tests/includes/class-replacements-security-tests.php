@@ -16,7 +16,7 @@ use function Groundhogg\replacements;
  * @see Replacements::escape_shortcodes()
  * @see \Groundhogg\escape_shortcodes()
  * @see Replacements::do_replacement() nested vs. escaped branching
- * @see Replacements::is_disallowed_user_key()
+ * @see Replacements::is_allowed_user_key()
  * @see Contact::update(), Contact::add_meta(), Contact::update_meta()
  * @see \Groundhogg\generate_contact_with_map()
  */
@@ -143,6 +143,18 @@ class Replacements_Security_Tests extends GH_UnitTestCase {
 		$this->assertTrue( Replacements::scrub_merge_tags( true ) );
 	}
 
+	/**
+	 * A single preg_replace pass can't match across the embedded "{", so it only removes the
+	 * inner "{user.data}" and leaves "{user" + ".data}" concatenated back into a fresh, complete,
+	 * live tag. scrub_merge_tags() must loop until nothing changes to actually close this off.
+	 */
+	public function test_scrub_merge_tags_closes_nested_reconstruction() {
+		$result = Replacements::scrub_merge_tags( '{user{user.data}.data}' );
+
+		$this->assertNoSubstring( '{', $result );
+		$this->assertNoSubstring( 'user.data', $result );
+	}
+
 	/* ---------------------------------------------------------------------
 	 * Replacements::escape_merge_tags()
 	 * ------------------------------------------------------------------- */
@@ -168,6 +180,20 @@ class Replacements_Security_Tests extends GH_UnitTestCase {
 	public function test_escape_merge_tags_leaves_tag_free_strings_untouched() {
 		do_replacements( '', 0, 'html' );
 		$this->assertSame( 'no tags here', replacements()->escape_merge_tags( 'no tags here' ) );
+	}
+
+	/**
+	 * Same reconstruction risk as scrub_merge_tags(): a single pass only encodes the inner
+	 * "{user.data}", leaving an outer "{user&#123;user.data&#125;.data}" shell whose braces are —
+	 * again — a complete, unescaped tag. Must loop until there's nothing left to encode.
+	 */
+	public function test_escape_merge_tags_closes_nested_reconstruction() {
+		do_replacements( '', 0, 'html' );
+
+		$result = replacements()->escape_merge_tags( '{user{user.data}.data}' );
+
+		$this->assertNoSubstring( '{', $result );
+		$this->assertNoSubstring( '}', $result );
 	}
 
 	/* ---------------------------------------------------------------------
@@ -256,15 +282,53 @@ class Replacements_Security_Tests extends GH_UnitTestCase {
 		);
 	}
 
-	public function test_user_tag_withholds_keys_matching_disallowed_patterns() {
+	public function test_user_tag_withholds_keys_not_on_the_allow_list() {
 		$user_id = self::factory()->user->create();
 		update_user_meta( $user_id, 'my_api_key', 'ABCD-1234' );
+		// Arbitrary usermeta is withheld too, even when it isn't sensitive-looking by name —
+		// the allow-list only ever returns explicitly named, known-safe fields.
 		update_user_meta( $user_id, 'favorite_color', 'blue' );
 
 		$contact = get_contactdata( $user_id, true );
 
 		$this->assertSame( '', do_replacements( '{user.my_api_key}', $contact ) );
-		$this->assertSame( 'blue', do_replacements( '{user.favorite_color}', $contact ) );
+		$this->assertSame( '', do_replacements( '{user.favorite_color}', $contact ) );
+	}
+
+	/**
+	 * The bug Patchstack found in the deny-list this replaced: 'data' isn't sensitive-sounding by
+	 * name, but WP_User::$data is the raw wp_users row (a stdClass containing user_pass and
+	 * user_activation_key), and handle_meta_replacement() print_r()s whatever it gets back.
+	 */
+	public function test_user_tag_withholds_data_property() {
+		$user_id = self::factory()->user->create( [ 'user_pass' => 'Sup3rSecret!' ] );
+		$contact = get_contactdata( $user_id, true );
+
+		$result = do_replacements( '{user.data}', $contact );
+
+		$this->assertSame( '', $result );
+		$this->assertNoSubstring( 'user_pass', $result );
+	}
+
+	/**
+	 * {owner.<attr>} used to have no filtering at all — not even the old deny-list — so this is
+	 * the same allow-list applied to the same underlying WP_User property read.
+	 */
+	public function test_owner_tag_withholds_disallowed_wp_user_properties() {
+		$owner_id = self::factory()->user->create( [
+			'user_pass'  => 'Sup3rSecret!',
+			'user_email' => 'gh-security-owner-test@example.org',
+			'role'       => 'administrator',
+		] );
+
+		$contact = get_contactdata( self::factory()->contacts->create( [ 'owner_id' => $owner_id ] ) );
+
+		$this->assertSame( '', do_replacements( '{owner.user_pass}', $contact ) );
+		$this->assertSame( '', do_replacements( '{owner.data}', $contact ) );
+		$this->assertSame(
+			'gh-security-owner-test@example.org',
+			do_replacements( '{owner.user_email}', $contact )
+		);
 	}
 
 	/* ---------------------------------------------------------------------

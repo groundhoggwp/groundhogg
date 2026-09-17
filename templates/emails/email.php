@@ -3,6 +3,13 @@ namespace Groundhogg;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+// Belt-and-suspenders: the 'emails' subpage is already refused at the routing level
+// (Rewrites::template_include()), before this template is ever reached. This check stays here
+// too in case something else ever includes this template directly.
+if ( ! current_user_can( 'view_emails' ) ) {
+	wp_die( esc_html__( 'You do not have permission to view this email.', 'groundhogg' ), '', [ 'response' => 403 ] );
+}
+
 define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
 
 $email_id = absint( get_query_var( 'email_id' ) );
