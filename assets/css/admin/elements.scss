@@ -3844,6 +3844,16 @@ div:has( > button.hide-panel) {
       }
     }
 
+    // outside the calendar's minDate/maxDate
+    &.out-of-range {
+      --gh-calendar-day-bg: var(--gh-background-color);
+      background-image: repeating-linear-gradient(135deg, transparent 0 6px, var(--gh-dark-5) 6px 7px);
+
+      .gh-calendar-day-number {
+        color: var(--gh-dark-30);
+      }
+    }
+
     &.is-today {
       .gh-calendar-day-number {
         background-color: var(--gh-primary);
@@ -4004,8 +4014,14 @@ div:has( > button.hide-panel) {
     min-width: 56px;
     padding: 6px 8px;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: var(--gh-dark-15);
+    }
+
+    // outside the calendar's minDate/maxDate
+    &:disabled {
+      color: var(--gh-dark-30);
+      cursor: default;
     }
 
     &:focus-visible {

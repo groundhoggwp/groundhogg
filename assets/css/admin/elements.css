@@ -3310,6 +3310,13 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
 .gh-calendar .gh-calendar-day.clickable:not(.not-clickable):hover {
   background-color: color-mix(in srgb, var(--gh-primary) 5%, var(--gh-calendar-day-bg));
 }
+.gh-calendar .gh-calendar-day.out-of-range {
+  --gh-calendar-day-bg: var(--gh-background-color);
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, var(--gh-dark-5) 6px 7px);
+}
+.gh-calendar .gh-calendar-day.out-of-range .gh-calendar-day-number {
+  color: var(--gh-dark-30);
+}
 .gh-calendar .gh-calendar-day.is-today .gh-calendar-day-number {
   background-color: var(--gh-primary);
   color: #fff;
@@ -3440,8 +3447,12 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
   min-width: 56px;
   padding: 6px 8px;
 }
-.gh-calendar-month-picker .gh-calendar-month-picker-month:hover {
+.gh-calendar-month-picker .gh-calendar-month-picker-month:hover:not(:disabled) {
   background-color: var(--gh-dark-15);
+}
+.gh-calendar-month-picker .gh-calendar-month-picker-month:disabled {
+  color: var(--gh-dark-30);
+  cursor: default;
 }
 .gh-calendar-month-picker .gh-calendar-month-picker-month:focus-visible {
   outline: none;

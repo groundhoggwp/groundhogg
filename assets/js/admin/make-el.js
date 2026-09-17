@@ -1911,6 +1911,12 @@
    * to the calendar, or driven from the outside by passing a new `month` on every
    * render, which is what you want when the events for a month have to be fetched.
    *
+   * minDate and maxDate bound the calendar: prev/next, Today and the month picker
+   * can't leave the months they fall in, and days outside them are shown but
+   * can't be clicked and don't show events. A `month` outside the range is
+   * displayed as the nearest month inside it. If you drive `month` yourself, clamp
+   * it the same way, or you'll be fetching a month the calendar isn't showing.
+   *
    * @param id {string} required, the calendar morphs itself by ID
    * @param month {Date|number|string} any date within the month to display
    * @param events {Array} the events to place in the grid
@@ -1926,6 +1932,8 @@
    * @param headerActions {Array|function} extra elements rendered to the right of the month nav
    * @param loading {boolean} whether events are currently being fetched
    * @param locale {string}
+   * @param minDate {Date|number|string|null} the earliest day that can be shown, navigation stops at its month
+   * @param maxDate {Date|number|string|null} the latest day that can be shown, navigation stops at its month
    * @param onMonthChange {function} called with the first of the newly displayed month
    * @param onDayClick {function} called when a day cell is clicked
    * @param onEventClick {function} called when an event chip is clicked
@@ -1949,6 +1957,8 @@
     headerActions = [],
     loading = false,
     locale = getLocale(),
+    minDate = null,
+    maxDate = null,
     onMonthChange = () => {},
     onDayClick = null,
     onEventClick = null,
@@ -1961,7 +1971,88 @@
       sprintf,
     } = i18n()
 
-    const propMonth = startOfMonth(month)
+    /**
+     * A bound given as anything date-ish, or null when there isn't a usable one
+     *
+     * @param date {Date|number|string|null}
+     * @param normalize {function} startOfMonth or startOfDay
+     * @return {Date|null}
+     */
+    const toBound = (date, normalize) => {
+
+      if (date === null || date === undefined || date === '') {
+        return null
+      }
+
+      let bound = normalize(date)
+
+      return isNaN(bound.getTime()) ? null : bound
+    }
+
+    let bounds = {
+      minMonth: toBound(minDate, startOfMonth),
+      maxMonth: toBound(maxDate, startOfMonth),
+      minDay  : toBound(minDate, startOfDay),
+      maxDay  : toBound(maxDate, startOfDay),
+    }
+
+    // a backwards range would pin navigation to one end, so it bounds nothing
+    if (bounds.minDay && bounds.maxDay && bounds.minDay > bounds.maxDay) {
+      bounds = {
+        minMonth: null,
+        maxMonth: null,
+        minDay  : null,
+        maxDay  : null,
+      }
+    }
+
+    // The helpers below read the bounds back off State at call time instead of
+    // closing over `bounds`. morphdom reuses buttons and cells along with the
+    // listener they were first created with, so a closure would go on enforcing
+    // whatever range was in place on the first render. State doesn't exist yet
+    // while the initial month is being clamped, hence the fallback.
+    let StateRef = null
+    const getBounds = () => StateRef?.bounds ?? bounds
+
+    /**
+     * The first of the month containing date, pulled back inside the range
+     *
+     * @param date {Date|number|string}
+     * @return {Date}
+     */
+    const clampMonth = date => {
+
+      const {
+        minMonth,
+        maxMonth,
+      } = getBounds()
+
+      let target = startOfMonth(date)
+
+      if (minMonth && target < minMonth) {
+        return new Date(minMonth)
+      }
+
+      if (maxMonth && target > maxMonth) {
+        return new Date(maxMonth)
+      }
+
+      return target
+    }
+
+    const monthInRange = date => clampMonth(date).getTime() === startOfMonth(date).getTime()
+
+    const dayInRange = date => {
+
+      const {
+        minDay,
+        maxDay,
+      } = getBounds()
+
+      return !( minDay && date < minDay ) && !( maxDay && date > maxDay )
+    }
+
+    const propMonth = clampMonth(month)
 
     const State = useState({
       month    : propMonth,
@@ -1969,6 +2060,9 @@
       monthProp: propMonth.getTime(),
       expanded : [],
     }, id)
+
+    StateRef = State
+    State.set({ bounds })
 
     // the caller moved the month, their value wins
     if (State.monthProp !== propMonth.getTime()) {
@@ -1988,7 +2082,12 @@
 
     const goToMonth = (date, morph) => {
 
-      let newMonth = startOfMonth(date)
+      let newMonth = clampMonth(date)
+
+      // the range blocked the move outright, nothing changed so nothing to report
+      if (newMonth.getTime() !== startOfMonth(date).getTime() && newMonth.getTime() === State.month.getTime()) {
+        return
+      }
 
       State.set({
         month    : newMonth,
@@ -2067,6 +2166,7 @@
               className   : 'gh-button secondary text icon',
               type        : 'button',
               'aria-label': _x('Previous year', 'calendar navigation', 'groundhogg'),
+              disabled    : Boolean(getBounds().minMonth) && picker.year - 1 < getBounds().minMonth.getFullYear(),
               onClick     : e => {
                 picker.set({ year: picker.year - 1 })
                 morphPicker()
@@ -2079,6 +2179,7 @@
               className   : 'gh-button secondary text icon',
               type        : 'button',
               'aria-label': _x('Next year', 'calendar navigation', 'groundhogg'),
+              disabled    : Boolean(getBounds().maxMonth) && picker.year + 1 > getBounds().maxMonth.getFullYear(),
               onClick     : e => {
                 picker.set({ year: picker.year + 1 })
                 morphPicker()
@@ -2091,6 +2192,7 @@
           }, Array(12).fill(0).map((_, m) => Button({
             className: `gh-calendar-month-picker-month ${ picker.year === State.month.getFullYear() && m === State.month.getMonth() ? 'current' : '' }`,
             type     : 'button',
+            disabled : !monthInRange(new Date(picker.year, m, 1)),
             onClick  : e => {
               close()
               goToMonth(new Date(picker.year, m, 1), morph)
@@ -2132,7 +2234,9 @@
       const DayCell = date => {
 
         let key = dayKey(date)
-        let dayEvents = byDay[key] ?? []
+        let inRange = dayInRange(date)
+        // days outside the range are part of the grid but hold nothing
+        let dayEvents = inRange ? byDay[key] ?? [] : []
         let inMonth = date.getMonth() === monthIndex
         let isToday = key === todayKey
         let expanded = State.expanded.includes(key)
@@ -2149,13 +2253,20 @@
             inMonth ? 'in-month' : 'other-month',
             isToday ? 'is-today' : '',
             dayEvents.length ? 'has-events' : 'is-empty',
-            onDayClick ? 'clickable' : '',
+            inRange ? '' : 'out-of-range',
+            onDayClick && inRange ? 'clickable' : '',
           ].filter(c => c).join(' '),
           dataDay  : key,
           onClick  : onDayClick ? e => {
 
             // the click belongs to something else inside the cell
             if (clickedIn(e.target, '.gh-calendar-event') || clickedIn(e.target, '.gh-calendar-more')) {
+              return
+            }
+
+            // checked here rather than by leaving the listener off, because the
+            // cell element outlives the render that decided whether it was in range
+            if (!dayInRange(date)) {
               return
             }
 
@@ -2171,6 +2282,7 @@
           events: dayEvents,
           inMonth,
           isToday,
+          inRange,
         })), [
           Div({
             className: 'gh-calendar-day-number',
@@ -2214,17 +2326,21 @@
               className   : 'gh-button secondary text icon',
               type        : 'button',
               'aria-label': _x('Previous month', 'calendar navigation', 'groundhogg'),
+              disabled    : !monthInRange(addMonths(firstOfMonth, -1)),
               onClick     : e => goToMonth(addMonths(State.month, -1), morph),
             }, Dashicon('arrow-left-alt2')),
             Button({
               className: 'gh-button secondary text',
               type     : 'button',
+              // when today is outside the range this would only snap to the nearest end
+              disabled : !monthInRange(new Date()),
               onClick  : e => goToMonth(new Date(), morph),
             }, _x('Today', 'calendar navigation', 'groundhogg')),
             Button({
               className   : 'gh-button secondary text icon',
               type        : 'button',
               'aria-label': _x('Next month', 'calendar navigation', 'groundhogg'),
+              disabled    : !monthInRange(addMonths(firstOfMonth, 1)),
               onClick     : e => goToMonth(addMonths(State.month, 1), morph),
             }, Dashicon('arrow-right-alt2')),
           ]),
