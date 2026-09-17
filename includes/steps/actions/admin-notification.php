@@ -392,7 +392,7 @@ class Admin_Notification extends Action {
 			return $this->get_last_error();
 		}
 
-		Simulator::log( sprintf( '📨 Sent notification to %s', andList( array_map( 'bold_it', $send_to ) ) ) );
+		Simulator::log( sprintf( '📨 Sent notification to %s', andList( array_map( fn( $email ) => bold_it( $email ), $send_to ) ) ) );
 
 		return $sent;
 
