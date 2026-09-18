@@ -468,7 +468,8 @@ class Event extends Base_Object {
 		} else {
 			try {
 				$result = $step->run( $this->get_contact(), $this );
-			} catch ( \Exception $e ) {
+			} catch ( \Throwable $e ) {
+				// Catch Errors (TypeError, etc.) as well as Exceptions so a misbehaving step can't kill the queue
 				$result = new WP_Error( 'exception', $e->getMessage() );
 			}
 		}
@@ -497,7 +498,14 @@ class Event extends Base_Object {
 		}
 
 		if ( ! is_wp_error( $result ) && method_exists( $step, 'run_after' ) ) {
-			call_user_func( [ $step, 'run_after' ], $this->get_contact(), $this );
+			try {
+				call_user_func( [ $step, 'run_after' ], $this->get_contact(), $this );
+			} catch ( \Throwable $e ) {
+				// The event already ran, so don't fail it. Just log the problem and carry on
+				if ( function_exists( 'error_log' ) ) {
+					error_log( sprintf( 'Groundhogg: run_after failed for event %d: %s', $this->get_id(), $e->getMessage() ) );
+				}
+			}
 		}
 
 		/**
