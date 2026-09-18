@@ -694,6 +694,32 @@ class Step_Type_Schema {
 
 		switch ( $type ) {
 
+			case 'web_form':
+
+				// Form_v2 (includes/form/form-v2.php, get_cleaned_json_config()) reads
+				// fields/button/recaptcha/turnstile as ONE nested object under a single
+				// 'form' meta key, not as separate flat meta keys the way every other
+				// step type's settings are written (and the way web_form_settings_schema()
+				// otherwise describes them, matching groundhogg/list-step-types' generic
+				// per-key documentation). after_submit/success_message/success_page/
+				// form_name/enable_ajax/accent_color/theme genuinely ARE flat meta keys
+				// (Form_v2::get_after_submit()/get_success_message() read them directly) -
+				// only these four belong nested.
+				$form_config = [];
+
+				foreach ( [ 'fields', 'button', 'recaptcha', 'turnstile' ] as $key ) {
+					if ( isset( $settings[ $key ] ) ) {
+						$form_config[ $key ] = $settings[ $key ];
+						unset( $settings[ $key ] );
+					}
+				}
+
+				if ( ! empty( $form_config ) ) {
+					$settings['form'] = $form_config;
+				}
+
+				break;
+
 			case 'apply_tag':
 			case 'remove_tag':
 			case 'tag_applied':

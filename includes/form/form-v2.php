@@ -1667,6 +1667,20 @@ class Form_v2 extends Step {
 	protected $contact = false;
 
 	/**
+	 * The Submission record created by the most recent call to submit(), if any.
+	 *
+	 * @var int|false
+	 */
+	protected $last_submission_id = false;
+
+	/**
+	 * @return int|false
+	 */
+	public function get_last_submission_id() {
+		return $this->last_submission_id;
+	}
+
+	/**
 	 * Overrides provided by the shortcode
 	 *
 	 * @var array
@@ -2226,7 +2240,10 @@ class Form_v2 extends Step {
 	 */
 	public function get_success_url() {
 		$url = $this->get_meta( 'success_page' );
-		$url = do_replacements( $url, get_contactdata() );
+		// Deliberately not pre-resolved via get_contactdata() — leaving the contact argument
+		// empty lets Replacements::process() apply its own ambient-resolution gating (an
+		// unverified tracked contact only gets its own just-submitted data, not the full record).
+		$url = do_replacements( $url );
 
 		// No https? must be a relative URL
 		if ( ! preg_match( '@https?://@', $url ) ) {
@@ -2248,7 +2265,8 @@ class Form_v2 extends Step {
 	public function get_success_message() {
 		$message = $this->get_meta( 'success_message' );
 
-		return wpautop( do_replacements( $message, get_contactdata() ) );
+		// See the identical note in get_success_url().
+		return wpautop( do_replacements( $message ) );
 	}
 
 	/**
@@ -2402,6 +2420,8 @@ class Form_v2 extends Step {
 			'contact_id' => $contact->get_id(),
 			'name'       => $this->get_name()
 		] );
+
+		$this->last_submission_id = $submission->get_id();
 
 		// Add the submission data.
 		$submission_data = array_merge( $data, $meta, $submission_additional );

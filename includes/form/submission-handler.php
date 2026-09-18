@@ -374,10 +374,10 @@ class Submission_Handler extends Supports_Errors {
 				'user_id' => get_current_user_id()
 			] );
 
-			after_form_submit_handler( $contact );
+			after_form_submit_handler( $contact, $submission->get_id() );
 		} else {
 
-			after_form_submit_handler( $contact );
+			after_form_submit_handler( $contact, $submission->get_id() );
 		}
 
 		$feed_response = apply_filters( 'groundhogg/form/submission_handler/feed', true, $submission, $contact, $this );
@@ -414,7 +414,12 @@ class Submission_Handler extends Supports_Errors {
 					] );
 				}
 
-				$success_message = do_replacements( $this->step->get_meta( 'success_message' ), $contact->get_id() );
+				// Deliberately not resolved via $contact->get_id() — leaving the contact argument
+				// empty lets Replacements::process() apply its own ambient-resolution gating (an
+				// unverified tracked contact only gets its own just-submitted data, not the full
+				// record). form_filled() (via after_form_submit_handler() above) has already run
+				// by this point, so the ambient resolution correctly reaches this same contact.
+				$success_message = do_replacements( $this->step->get_meta( 'success_message' ) );
 
 				if ( ! $success_message ) {
 					$success_message = __( 'Your submission has been received!', 'groundhogg' );
@@ -437,7 +442,8 @@ class Submission_Handler extends Supports_Errors {
 
 			} else {
 
-				$success_page = do_replacements( $this->step->get_meta( 'success_page' ), $contact->get_id() );
+				// See the identical note above the success_message case.
+				$success_page = do_replacements( $this->step->get_meta( 'success_page' ) );
 				wp_redirect( $success_page );
 				die();
 

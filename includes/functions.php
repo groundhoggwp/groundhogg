@@ -1826,9 +1826,15 @@ function sanitize_from_name( $name ) {
 /**
  * This function is for use by any form or eccom extensions which is essentially a copy of the PROCESS method in the submission handler.
  *
- * @param $contact Contact
+ * @param $contact        Contact
+ * @param $submission_id  int|false the Submission record created for this fill, if the caller
+ *                        has one — passed through to Tracking::form_filled() so an unverified
+ *                        session (an existing contact matched by unverified email) can be scoped
+ *                        to just its own submitted data. Callers with no Submission on hand (e.g.
+ *                        3rd-party form integrations) can omit it; the session then defaults to
+ *                        the safe/blocked state for the same code paths.
  */
-function after_form_submit_handler( &$contact ) {
+function after_form_submit_handler( &$contact, $submission_id = false ) {
 
 	if ( ! is_a_contact( $contact ) ) {
 		return;
@@ -1849,9 +1855,10 @@ function after_form_submit_handler( &$contact ) {
 	/**
 	 * Helper function.
 	 *
-	 * @param $contact Contact
+	 * @param $contact       Contact
+	 * @param $submission_id int|false
 	 */
-	do_action( 'groundhogg/after_form_submit', $contact );
+	do_action( 'groundhogg/after_form_submit', $contact, $submission_id );
 }
 
 add_action( 'groundhogg/after_form_submit', __NAMESPACE__ . '\extrapolate_location_after_signup', 9 );

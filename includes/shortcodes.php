@@ -164,7 +164,10 @@ class Shortcodes {
 	 * @return string the updated content,.
 	 */
 	public function merge_replacements_shortcode( $atts, $content = '' ) {
-		return do_replacements( do_shortcode( $content ), get_contactdata() );
+		// Deliberately not pre-resolved via get_contactdata() — leaving the contact argument
+		// empty lets Replacements::process() apply its own ambient-resolution gating (an
+		// unverified tracked contact only gets its own submitted data, not the full record).
+		return do_replacements( do_shortcode( $content ) );
 	}
 
 	/**

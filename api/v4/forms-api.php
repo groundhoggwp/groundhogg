@@ -104,7 +104,7 @@ class Forms_Api extends Base_Api {
 			return $error;
 		}
 
-		after_form_submit_handler( $contact );
+		after_form_submit_handler( $contact, $form->get_last_submission_id() );
 
 		$cookie = [
 			'value'  => tracking()->get_tracking_cookie_value(),
