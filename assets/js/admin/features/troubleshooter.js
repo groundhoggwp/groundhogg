@@ -1072,7 +1072,7 @@
         let integrations = Object.values(GroundhoggTroubleshooter.active_plugins)
         let chosen = []
 
-        $('#integrations').select2({
+        $('#integrations').ghSelect2({
           data: integrations.map(i => ( {
             id: i.Name,
             text: i.Name,

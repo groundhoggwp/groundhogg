@@ -767,7 +767,7 @@
           updateField({ width: parseInt(e.target.value) })
         })
 
-        $('#property-field-group').select2({
+        $('#property-field-group').ghSelect2({
           data: properties.groups.map( ({id, name}) => ({id, text:name, selected: newField.group === id }) ),
           multiple: false,
         }).on( 'change', e => newField.group = e.target.value )

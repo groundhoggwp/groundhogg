@@ -182,7 +182,7 @@
           })
         })
 
-        $('#locale, #time-zone, #country').select2()
+        $('#locale, #time-zone, #country').ghSelect2()
 
       },
     },

@@ -539,7 +539,7 @@
                   } )), value.map(id => `${id}`)) }`
     },
     onMount (filter, updateFilter) {
-      $('#filter-value').select2()
+      $('#filter-value').ghSelect2()
       $('#filter-value, #filter-compare').on('change', function (e) {
         const $el = $(this)
         updateFilter({
@@ -641,7 +641,7 @@
 
     },
     onMount (filter, updateFilter) {
-      $('#filter-value').select2()
+      $('#filter-value').ghSelect2()
       $('#filter-value, #filter-compare').on('change', function (e) {
         const $el = $(this)
         // console.log($el.val())
@@ -816,7 +816,7 @@
     },
     onMount (filter, updateFilter) {
 
-      $('#filter-role').select2({
+      $('#filter-role').ghSelect2({
         placeholder: __('Select a role', 'groundhogg'),
       }).on('change', function (e) {
         const $el = $(this)
@@ -873,7 +873,7 @@
     },
     onMount (filter, updateFilter) {
 
-      $('#filter-country').select2().on('change', function (e) {
+      $('#filter-country').ghSelect2().on('change', function (e) {
         const $el = $(this)
         updateFilter({
           country: $el.val(),
@@ -977,7 +977,7 @@
     onMount (filter, updateFilter) {
       // console.log(filter)
 
-      $('#filter-locale').select2({
+      $('#filter-locale').ghSelect2({
         multiple: true,
       }).on('change', function (e) {
 
@@ -1295,7 +1295,7 @@
         ].join('')
       },
       onMount (filter, updateFilter) {
-        $('#filter-value').select2()
+        $('#filter-value').ghSelect2()
         $('#filter-value').on('change', function (e) {
           const $el = $(this)
           // console.log($el.val())
@@ -2136,7 +2136,7 @@
 
       SearchesStore.maybeFetchItems().then(items => {
 
-        $('#filter-search').select2({
+        $('#filter-search').ghSelect2({
           data       : [
             {
               id  : '',

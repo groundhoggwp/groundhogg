@@ -50,8 +50,14 @@
    * Supported select2 options: data, ajax (url, data, dataType, beforeSend,
    * processResults), multiple, tags, placeholder, allowClear. Presentational
    * options (width, tokenSeparators, delay, ...) are ignored.
+   *
+   * groundhogg-admin loads on every wp-admin screen (not just Groundhogg's
+   * own pages), so the polyfill is installed lazily: Groundhogg code calls
+   * `$.fn.ghSelect2`, which only defines `$.fn.select2` the first time it is
+   * actually needed and none exists. Defining it eagerly hijacked other
+   * plugins' `.select2()` calls (e.g. LearnDash's admin filters).
    */
-  if (typeof $.fn.select2 === 'undefined') {
+  {
 
     const s2_normalizeOption = opt => {
 
@@ -199,17 +205,37 @@
       selectEl.insertAdjacentElement('beforebegin', picker)
     }
 
-    $.fn.select2 = function (opts) {
+    const polyfill = function (opts) {
       return this.each(function () {
         if (this.tagName === 'SELECT') {
           s2_init(this, opts)
         }
       })
     }
+
+    // On Groundhogg's own screens install eagerly so add-ons calling .select2() directly keep working
+    if (Groundhogg.isGroundhoggPage && typeof $.fn.select2 !== 'function') {
+      $.fn.select2 = polyfill
+    }
+
+    // Uses a real select2 when one exists, otherwise installs the polyfill on first use.
+    // Installing it as $.fn.select2 keeps add-ons that call .select2() on Groundhogg screens working.
+    $.fn.ghSelect2 = function (opts) {
+
+      if (!this.length) {
+        return this
+      }
+
+      if (typeof $.fn.select2 !== 'function') {
+        $.fn.select2 = polyfill
+      }
+
+      return this.select2(opts)
+    }
   }
 
   function picker (selector, args) {
-    return $(selector).select2(args)
+    return $(selector).ghSelect2(args)
   }
 
   $.fn.ghPicker = function ({
@@ -222,7 +248,7 @@
     ...rest
   }) {
 
-    this.select2({
+    this.ghSelect2({
       tokenSeparators: [
         '/',
         ',',
@@ -274,7 +300,7 @@
     select2opts = {},
   ) {
 
-    return $(selector).select2({
+    return $(selector).ghSelect2({
       tags           : tags,
       multiple       : multiple,
       tokenSeparators: [

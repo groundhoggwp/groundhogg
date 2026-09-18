@@ -708,7 +708,7 @@
           'zip',
         ]
 
-        $('#file-types').select2({
+        $('#file-types').ghSelect2({
           tags: true,
           data: [
             ...file_types.map(ft => ( { id: ft, text: ft, selected: true } )),
