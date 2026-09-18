@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.8.2
+Stable tag: 4.8.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -391,6 +391,15 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.8.3 (2026-09-18) =
+* ADDED Custom reports have been rebuilt for a faster, more consistent editor, with new "Table (Tags)" and "Pie Chart (Tags)" report types that group contact counts by one or more tags, with drill-down to the matching contacts.
+* TWEAKED Calendar date pickers have clearer hover states, greyed-out dates that are out of range, and a more interactive month picker.
+* FIXED Admin Notification steps could fail with a fatal error, leaving events stuck "In Progress" and sending duplicate notifications.
+* FIXED Groundhogg's bundled select2 replacement no longer takes over other plugins' select2 dropdowns in wp-admin.
+* FIXED "Translation loading for the groundhogg domain was triggered too early" notice on WordPress 6.7+, by loading the plugin textdomain before the plugin initializes.
+* FIXED Forms built with the "Create Flow" ability could not be submitted.
+* SECURITY Further hardened how contact data and email rendering are handled for visitors whose identity has not been verified. Credit: Ayukiab, via Patchstack.
+
 = 4.8.2 (2026-09-16) =
 * ADDED "Add to Flow" action step, so a flow can enroll the contact in another flow (or restart the same one) at its first step or a step you choose, instead of requiring a separate manual step or automation to do it.
 * ADDED "Simulate Flow" and "Live Simulate Flow" abilities, so an agent can trace what a flow would do for a contact from a given step (branches taken, roughly when timers resolve) with no side effects, or actually run it for real - the same simulation the funnel editor's own "Simulate" panel uses.
@@ -399,7 +408,6 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED A "Groundhogg Extensions" ability category: "List Extensions" to see which official add-ons are installed and licensed, "Check License" and "Activate License" to manage a license key, and "Install Extension" to remotely install and activate one - gated on WordPress's own `install_plugins`/`activate_plugins` capabilities since it installs code on the site.
 * ADDED "Create Tag" and "Create Campaign"/"Associate Campaign" abilities for creating tags and campaigns and attaching a campaign to other objects, rather than requiring one to already exist.
 * TWEAKED Dashboard widgets can now be reordered by drag-and-drop; the layout is remembered per-browser.
-* FIXED "Translation loading for the groundhogg domain was triggered too early" notice on WordPress 6.7+, by loading the plugin textdomain before the plugin initializes.
 * SECURITY Hardened handling of contact-submitted data to prevent it from being reinterpreted as active content elsewhere in the CRM. Credit: Ayukiab, via Patchstack.
 
 = 4.8.1 (2026-09-14) =
