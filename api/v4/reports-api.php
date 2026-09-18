@@ -11,6 +11,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reports;
+use Groundhogg\Tag;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 use WP_REST_Request;
@@ -102,9 +103,52 @@ class Reports_Api extends Base_Api {
 					remove_action( 'groundhogg/contact_query/pre_get_contacts', $setGroupby );
 
 					foreach ( $records as &$record ) {
-						$record->value = maybe_unserialize( $record->value ) ?: 'Empty';
+						$record->value = maybe_unserialize( $record->value ) ?: __( 'Empty', 'groundhogg' );
 						$record->count = $report['type'] === 'table' ? _nf( $record->total ) : $record->total;
 					}
+
+					return $records;
+
+				case 'pie_chart_tags':
+				case 'table_tags':
+
+					$tag_ids = wp_parse_id_list( $report['tags'] ?? [] );
+					$records = [];
+
+					foreach ( $tag_ids as $tag_id ) {
+
+						$tag = new Tag( $tag_id );
+
+						if ( ! $tag->exists() ) {
+							continue;
+						}
+
+						$tag_filters = [ [ [ 'type' => 'tags', 'tags' => [ $tag_id ] ] ] ];
+
+						// AND the report's own filters onto the tag condition
+						if ( ! empty( $report['filters'] ) || ! empty( $report['exclude_filters'] ) ) {
+							foreach ( $tag_filters as &$or_group ) {
+								$or_group[] = [
+									'type'            => 'sub_query',
+									'include_filters' => $report['filters'],
+									'exclude_filters' => $report['exclude_filters'],
+								];
+							}
+						}
+
+						$count = ( new Contact_Query( [ 'filters' => $tag_filters ] ) )->count();
+
+						$records[] = (object) [
+							'id'    => $tag_id,
+							'value' => $tag->get_name(),
+							'count' => $report['type'] === 'table_tags' ? _nf( $count ) : $count,
+							'total' => $count,
+						];
+					}
+
+					usort( $records, function ( $a, $b ) {
+						return $b->total <=> $a->total;
+					} );
 
 					return $records;
 

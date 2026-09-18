@@ -1,12 +1,28 @@
 ( ($) => {
 
   const {
+    Div,
+    Button,
+    Input,
+    Select,
+    Label,
+    Table,
+    TBody,
+    Tr,
+    Td,
+    Fragment,
+    Dashicon,
+    H2,
+    Pg,
+    ModalWithHeader,
+    ItemPicker,
+    makeEl,
+  } = MakeEl
+
+  const {
     moreMenu,
     loadingModal,
     icons,
-    select,
-    modal,
-    input,
     uuid,
     dialog,
     dangerConfirmationModal,
@@ -15,17 +31,19 @@
 
   const {
     routes,
-    post,
     get,
   } = Groundhogg.api
 
   const {
     options: OptionsStore,
+    tags: TagsStore,
   } = Groundhogg.stores
 
   const { createFilters } = Groundhogg.filters.functions
 
   const { metaPicker } = Groundhogg.pickers
+
+  const { debounce } = Groundhogg.functions
 
   const { __ } = wp.i18n
 
@@ -34,28 +52,28 @@
       replace(/../g, color => ( '0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16) ).substr(-2))
   }
 
-  const openReportInContactsView = (report, filters = null ) => {
+  const openReportInContactsView = (report, filters = null) => {
 
     const {
       filters: include_filters = [],
-      exclude_filters = []
+      exclude_filters = [],
     } = report
 
     // no other filters provided
-    if ( filters === null ){
+    if (filters === null) {
 
       window.open(adminPageURL('gh_contacts', {
-        filters: Groundhogg.filters.urlEncodeFilters(include_filters),
+        filters        : Groundhogg.filters.urlEncodeFilters(include_filters),
         exclude_filters: Groundhogg.filters.urlEncodeFilters(exclude_filters),
       }), '_blank')
 
-      return;
+      return
     }
 
-    if ( include_filters.length || exclude_filters.length ) {
-      filters.forEach( or => {
+    if (include_filters.length || exclude_filters.length) {
+      filters.forEach(or => {
         or.push({
-          type           : 'sub_query',
+          type: 'sub_query',
           include_filters,
           exclude_filters,
         })
@@ -67,241 +85,240 @@
     }), '_blank')
   }
 
+  const CustomFieldSetting = ({ field = '' }) => Div({ className: 'row' }, Div({ className: 'col' }, [
+    Label({ for: 'value' }, __('Custom Field', 'groundhogg')),
+    Input({ id: 'field', value: field }),
+  ]))
+
+  const CustomFieldSettingOnMount = (report, updateReport) => {
+    metaPicker('#field').on('change', e => {
+      updateReport({ field: e.target.value })
+    })
+  }
+
+  const TagsSetting = ({ tags = [] }, updateReport) => Div({ className: 'row' }, Div({ className: 'col' }, [
+    Label({}, __('Tags', 'groundhogg')),
+    ItemPicker({
+      id          : 'report-tags',
+      noneSelected: __('Select tags...', 'groundhogg'),
+      selected    : tags.filter(id => TagsStore.has(id)).map(id => {
+        const tag = TagsStore.get(id)
+        return {
+          id,
+          text: tag.data.tag_name,
+        }
+      }),
+      fetchOptions: async (search) => {
+        const items = await TagsStore.fetchItems({
+          search,
+          limit: 30,
+        })
+
+        return items.map(({
+          ID,
+          data,
+        }) => ( {
+          id  : ID,
+          text: data.tag_name,
+        } ))
+      },
+      onChange    : items => updateReport({ tags: items.map(({ id }) => id) }),
+    }),
+  ]))
+
+  const TagsSettingOnMount = (report, updateReport, morph) => {
+    // the picker filters selected tags down to what's already cached, so
+    // preload any tags that weren't and re-render once they're available
+    TagsStore.maybeFetchItems(report.tags || []).then(() => morph())
+  }
+
+  /**
+   * Builds an onMount for a pie_chart-style report, given a function that maps a data row
+   * (and the report) to the drilldown filters used when a slice is clicked
+   */
+  const renderPieChartOnMount = (buildDrilldownFilters) => ({
+    id,
+    data,
+    ...report
+  }) => {
+
+    let cuttoff = 11
+
+    let ctx = $(`.pie-chart[data-id=${ id }]`)[0].getContext('2d')
+
+    let _data = data
+
+    if (_data.length > cuttoff) {
+      _data = data.slice(0, cuttoff)
+
+      let _rest = data.slice(cuttoff).reduce((carr, i) => {
+        return carr + parseInt(i.count)
+      }, 0)
+
+      _data.push({
+        count: _rest,
+        value: __('Other', 'groundhogg'),
+      })
+    }
+
+    const openInContactsView = (rows) => (e, arr) => {
+
+      if (arr.length && arr[0]._view) {
+
+        let filters = buildDrilldownFilters(rows[arr[0]._index], report)
+
+        if (filters) {
+          openReportInContactsView(report, filters)
+        }
+      }
+
+    }
+
+    let chart = new Chart(ctx, {
+      type   : 'doughnut',
+      data   : {
+        datasets: [
+          {
+            data           : _data.map(({ count }) => count),
+            backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
+          },
+        ],
+        labels  : _data.map(({ value }) => value),
+      },
+      options: {
+        onClick: (e, arr) => {
+
+          if (arr.length && arr[0]._index === cuttoff && arr[0]._view.label === __('Other', 'groundhogg')) {
+
+            let _data = data.slice(cuttoff)
+
+            Groundhogg.element.modal({
+              content: `<canvas class="pie-chart-large" style="height: 600px" data-id="${ id }"></canvas>`,
+              onOpen : () => {
+
+                let ctx = $(`.pie-chart-large[data-id=${ id }]`)[0].getContext('2d')
+
+                let chart = new Chart(ctx, {
+                  type   : 'doughnut',
+                  data   : {
+                    datasets: [
+                      {
+                        data           : _data.map(({ count }) => count),
+                        backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
+                      },
+                    ],
+                    labels  : _data.map(({ value }) => value),
+                  },
+                  options: {
+
+                    maintainAspectRatio: false,
+                    aspectRatio        : 1,
+                    onClick            : openInContactsView(_data),
+                    legend             : {
+                      position: 'bottom',
+                    },
+                  },
+                })
+              },
+            })
+
+            return
+          }
+
+          openInContactsView(_data)(e, arr)
+
+        },
+        legend : {
+          position: 'right',
+        },
+      },
+    })
+
+  }
+
+  /**
+   * Builds a render() for a table-style report, given a function that maps a data row
+   * (and the report) to the drilldown filters used when a row's total is clicked
+   */
+  const renderTableReport = (buildDrilldownFilters) => (report) => {
+
+    const { id, data } = report
+
+    const State = Groundhogg.createState({ num: 10 })
+
+    const dataRow = (row) => Tr({}, [
+      Td({}, row.value),
+      Td({
+        className: 'number-total',
+        onClick  : e => {
+          let filters = buildDrilldownFilters(row, report)
+
+          if (filters) {
+            openReportInContactsView(report, filters)
+          }
+        },
+      }, `${ row.count }`),
+    ])
+
+    return Div({ id: `table-${ id }` }, morph => Fragment([
+      Table({ className: 'groundhogg-report-table' }, TBody({}, data.slice(0, State.num).map(dataRow))),
+      data.length > 10 ? Div({ className: 'inside' }, Div({ className: 'display-flex flex-end gap-10 align-center' }, [
+        Label({}, __('Number of records', 'groundhogg')),
+        Div({ className: 'gh-input-group' }, [10, 25, 50].filter(n => n < data.length).map(n => Button({
+          className: `gh-button ${ State.num === n ? 'primary' : 'secondary' } num-records`,
+          onClick  : e => {
+            State.set({ num: n })
+            morph()
+          },
+        }, `${ n }`))),
+      ])) : null,
+    ]))
+  }
+
+  const metaDrilldownFilters = (row, report) => [[
+    {
+      type   : 'meta',
+      meta   : report.field,
+      value  : row.value,
+      compare: 'equals',
+    },
+  ]]
+
+  const tagsDrilldownFilters = (row) => row.id ? [[
+    {
+      type   : 'tags',
+      tags   : [ row.id ],
+      compare: 'includes',
+    },
+  ]] : null
+
   const ReportTypes = {
 
     pie_chart: {
-      name    : __('Pie Chart', 'groundhogg'),
-      settings: ({ field = '' }) => {
-        // language=HTML
-        return `
-            <div class="row">
-                <div class="col">
-                    <label for="value">${ __('Custom Field') }</label>
-                    ${ input({
-                        id   : 'field',
-                        value: field,
-                    }) }
-                </div>
-            </div>`
-      },
-      settingsOnMount: (filter, updateReport) => {
-        metaPicker('#field').on('change', e => {
-          updateReport({
-            field: e.target.value,
-          })
-        })
-      },
-      render : ({
-        id,
-        data,
-      }) => {
-
-        // language=HTML
-        return `
-            <div class="inside">
-                <canvas class="pie-chart" data-id="${ id }"></canvas>
-            </div>
-        `
-      },
-      onMount: ({
-        id,
-        field,
-        data,
-        ...report
-      }) => {
-
-        let cuttoff = 11
-
-        let ctx = $(`.pie-chart[data-id=${ id }]`)[0].getContext('2d')
-
-        let _data = data
-
-        if (_data.length > cuttoff) {
-          _data = data.slice(0, cuttoff)
-
-          let _rest = data.slice(cuttoff).reduce((carr, i) => {
-            return carr + parseInt(i.count)
-          }, 0)
-
-          _data.push({
-            count: _rest,
-            value: __('Other'),
-          })
-        }
-
-        const openInContactsView = (e, arr) => {
-
-          if (arr.length && arr[0]._view) {
-
-            let filters = [[{
-              type   : 'meta',
-              meta   : field,
-              value  : arr[0]._view.label,
-              compare: 'equals',
-            }]]
-
-            openReportInContactsView( report, filters )
-          }
-
-        }
-
-        let chart = new Chart(ctx, {
-          type   : 'doughnut',
-          data   : {
-            datasets: [
-              {
-                data           : _data.map(({ count }) => count),
-                backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
-              },
-            ],
-            labels  : _data.map(({ value }) => value),
-          },
-          options: {
-            onClick: (e, arr) => {
-
-              if (arr.length && arr[0]._index === cuttoff && arr[0]._view.label === __('Other')) {
-
-                let _data = data.slice(cuttoff)
-
-                modal({
-                  content: `<canvas class="pie-chart-large" style="height: 600px" data-id="${ id }"></canvas>`,
-                  onOpen : () => {
-
-                    let ctx = $(`.pie-chart-large[data-id=${ id }]`)[0].getContext('2d')
-
-                    let chart = new Chart(ctx, {
-                      type   : 'doughnut',
-                      data   : {
-                        datasets: [
-                          {
-                            data           : _data.map(({ count }) => count),
-                            backgroundColor: _data.map((d, i) => adjust('#4fa4ff', -( i * 30 ))),
-                          },
-                        ],
-                        labels  : _data.map(({ value }) => value),
-                      },
-                      options: {
-
-                        maintainAspectRatio: false,
-                        aspectRatio        : 1,
-                        onClick            : openInContactsView,
-                        legend             : {
-                          position: 'bottom',
-                        },
-                      },
-                    })
-                  },
-                })
-
-                return
-              }
-
-              openInContactsView(e, arr)
-
-            },
-            legend : {
-              position: 'right',
-            },
-          },
-        })
-
-      },
+      name           : __('Pie Chart', 'groundhogg'),
+      settings       : CustomFieldSetting,
+      settingsOnMount: CustomFieldSettingOnMount,
+      render         : ({ id }) => Div({ className: 'inside' }, makeEl('canvas', { className: 'pie-chart', dataId: id })),
+      onMount        : renderPieChartOnMount(metaDrilldownFilters),
     },
     table    : {
-      name    : __('Table', 'groundhogg'),
-      settings: ({ field = '' }) => {
-        // language=HTML
-        return `
-            <div class="row">
-                <div class="col">
-                    <label for="value">${ __('Custom Field') }</label>
-                    ${ input({
-                        id   : 'field',
-                        value: field,
-                    }) }
-                </div>
-            </div>`
-      },
-      settingsOnMount: (filter, updateReport) => {
-        metaPicker('#field').on('change', e => {
-          updateReport({
-            field: e.target.value,
-          })
-        })
-      },
-      render : ({
-        id,
-        data,
-        num = 10,
-      }) => {
-
-        // language=HTML
-        return `
-            <table class="groundhogg-report-table">
-                <tbody>
-                </tbody>
-            </table>
-            ${ data.length > 10 ?
-               `<div class="inside">
-                <div class="display-flex flex-end gap-10 align-center">
-                    <label>${ __('Number of records') }</label>
-                    <div class="gh-input-group">
-                    </div>
-                </div>
-            </div>` : '' }`
-      },
-      onMount: ({
-        id,
-        data,
-        field,
-        ...report
-      }) => {
-
-        let num = 10
-
-        const setData = () => {
-          $(`#${ id } tbody`).html(data.slice(0, num).map(row => dataRow(row)).join(''))
-          $(`#${ id } .gh-input-group`).
-            html([
-              10,
-              25,
-              50,
-            ].filter(i => i < data.length).map(_num => `<button class="gh-button ${ num === _num
-                                                                                    ? 'primary'
-                                                                                    : 'secondary' } num-records" data-num="${ _num }">${ _num }</button>`))
-
-          $(`#${ id } .num-records`).on('click', e => {
-            num = parseInt(e.target.dataset.num)
-            setData()
-          })
-
-          $(`.number-total[data-id=${ id }]`).on('click', e => {
-            openReportInContactsView(report, [[
-              {
-                type   : 'meta',
-                meta   : field,
-                value  : e.target.dataset.value,
-                compare: 'equals',
-              },
-            ]])
-          })
-        }
-
-        const dataRow = ({
-          value,
-          count,
-        }) => {
-          // language=HTML
-          return `
-              <tr>
-                  <td>${ value }</td>
-                  <td class="number-total" data-id="${ id }" data-value="${ value }">${ count }</td>
-              </tr>`
-        }
-
-        setData()
-
-      },
+      name           : __('Table', 'groundhogg'),
+      settings       : CustomFieldSetting,
+      settingsOnMount: CustomFieldSettingOnMount,
+      render         : renderTableReport(metaDrilldownFilters),
+    },
+    pie_chart_tags: {
+      name           : __('Pie Chart (Tags)', 'groundhogg'),
+      settings       : TagsSetting,
+      settingsOnMount: TagsSettingOnMount,
+      render         : ({ id }) => Div({ className: 'inside' }, makeEl('canvas', { className: 'pie-chart', dataId: id })),
+      onMount        : renderPieChartOnMount(tagsDrilldownFilters),
+    },
+    table_tags: {
+      name           : __('Table (Tags)', 'groundhogg'),
+      settings       : TagsSetting,
+      settingsOnMount: TagsSettingOnMount,
+      render         : renderTableReport(tagsDrilldownFilters),
     },
     number   : {
       name           : __('Number', 'groundhogg'),
@@ -309,7 +326,7 @@
         value = 'contacts',
         field = '',
         activity = '',
-      }) => {
+      }, updateReport) => {
 
         //  total number of contacts
         //  SUM of a custom field
@@ -319,98 +336,67 @@
 
           switch (value) {
             case 'contacts':
-              return ''
+              return null
             case 'sum':
             case 'average':
             case 'distinct':
-              // language=HTML
-              return `
-                  <div class="row">
-                      <div class="col">
-                          <label for="value">${ __('Custom Field') }</label>
-                          ${ input({
-                              id   : 'field',
-                              value: field,
-                          }) }
-                      </div>
-                  </div>`
+              return Div({ className: 'row' }, Div({ className: 'col' }, [
+                Label({ for: 'value' }, __('Custom Field', 'groundhogg')),
+                Input({ id: 'field', value: field }),
+              ]))
             case 'activity':
             case 'activity_sum_value':
             case 'activity_avg_value':
-              // language=HTML
-              return `
-                  <div class="row">
-                      <div class="col">
-                          <label for="value">${ __('Activity Type') }</label>
-                          ${ input({
-                              id   : 'activity',
-                              value: activity,
-                          }) }
-                      </div>
-                  </div>`
+              return Div({ className: 'row' }, Div({ className: 'col' }, [
+                Label({ for: 'value' }, __('Activity Type', 'groundhogg')),
+                Input({
+                  id      : 'activity',
+                  value   : activity,
+                  onInput : e => updateReport({ activity: e.target.value }),
+                  onChange: e => updateReport({ activity: e.target.value }),
+                }),
+              ]))
           }
         }
 
-        // language=HTML
-        return `
-            <div class="row">
-                <div class="col display-flex column">
-                    <label for="value">${ __('Report Value') }</label>
-                    ${ select({
-                        id: 'value',
-                    }, {
-                        contacts          : __('Total number of contacts', 'groundhogg'),
-                        sum               : __('Sum of a custom field', 'groundhogg'),
-                        average           : __('Average of a custom field', 'groundhogg'),
-                        distinct          : __('Number of distinct custom field values', 'groundhogg'),
-                        activity          : __('Count of activities'),
-                        activity_sum_value: __('Sum value of activities'),
-                        activity_avg_value: __('Average value of activities'),
-                    }, value) }
-                </div>
-            </div>
-            ${ maybeExtra() }`
+        return Fragment([
+          Div({ className: 'row' }, Div({ className: 'col display-flex column' }, [
+            Label({ for: 'value' }, __('Report Value', 'groundhogg')),
+            Select({
+              id      : 'value',
+              options : {
+                contacts          : __('Total number of contacts', 'groundhogg'),
+                sum               : __('Sum of a custom field', 'groundhogg'),
+                average           : __('Average of a custom field', 'groundhogg'),
+                distinct          : __('Number of distinct custom field values', 'groundhogg'),
+                activity          : __('Count of activities', 'groundhogg'),
+                activity_sum_value: __('Sum value of activities', 'groundhogg'),
+                activity_avg_value: __('Average value of activities', 'groundhogg'),
+              },
+              selected: value,
+              onChange: e => {
+                updateReport({ value: e.target.value }, true)
+                document.getElementById('value').focus()
+              },
+            }),
+          ])),
+          maybeExtra(),
+        ])
       },
-      settingsOnMount: (filter, updateReport) => {
-        $('#value').on('change', e => {
-          updateReport({
-            value: e.target.value,
-          }, true)
-          $('#value').focus()
-        })
-
-        $('#activity').on('change', e => {
-          updateReport({
-            activity: e.target.value,
-          })
-        })
-
+      settingsOnMount: (report, updateReport) => {
         metaPicker('#field').on('change', e => {
-          updateReport({
-            field: e.target.value,
-          })
+          updateReport({ field: e.target.value })
         })
       },
-      render         : ({
-        id,
-        data,
-      }) => {
+      render         : (report) => {
 
-        // language=HTML
-        return `
-            <div class="inside">
-                <div data-id="${ id }" class="big-number display-flex center">
-                    ${ data }
-                </div>
-            </div>`
-      },
-      onMount        : ({
-        id,
-        ...report
-      }) => {
-        $(`.big-number[data-id=${ id }]`).on('click', e => {
-          openReportInContactsView( report )
-        })
+        const { id, data } = report
+
+        return Div({ className: 'inside' }, Div({
+          className: 'big-number display-flex center',
+          dataId   : id,
+          onClick  : e => openReportInContactsView(report),
+        }, `${ data }`))
       },
     },
   }
@@ -418,43 +404,59 @@
   const renderReport = (report) => {
 
     if (report.type === 'header') {
-      // language=HTML
-      return `
-          ${ report.order > 0 ? `<button class="add-new-report">
-              <span class="dashicons dashicons-plus-alt2"></span>
-          </button>` : '' }
-          <div id="${ report.id }" class="gh-report-header report ${ report.type }" data-id="${ report.id }">
-              <h2>${ report.name }</h2>
-              <button class="report-more gh-button secondary text icon" data-id="${ report.id }">${ icons.verticalDots }
-              </button>
-          </div>`
+      return Fragment([
+        report.order > 0 ? Button({
+          className: 'add-new-report',
+          onClick  : onAddNewReportClick,
+        }, Dashicon('plus-alt2')) : null,
+        Div({
+          id       : report.id,
+          className: `gh-report-header report ${ report.type }`,
+          dataId   : report.id,
+        }, [
+          H2({}, report.name),
+          Button({
+            className: 'report-more gh-button secondary text icon',
+            dataId   : report.id,
+            onClick  : e => onReportMoreClick(e, report),
+          }, icons.verticalDots),
+        ]),
+      ])
     }
 
     try {
-      // language=HTML
-      return `
-          <div id="${ report.id }" class="gh-panel report ${ report.type }" data-id="${ report.id }">
-              <div class="gh-panel-header">
-                  <h2>${ report.name }</h2>
-                  <button class="report-more gh-button secondary text icon" data-id="${ report.id }">${ icons.verticalDots }
-                  </button>
-              </div>
-              ${ ReportTypes[report.type].render(report) }
-          </div>`
+      return Div({
+        id       : report.id,
+        className: `gh-panel report ${ report.type }`,
+        dataId   : report.id,
+      }, [
+        Div({ className: 'gh-panel-header' }, [
+          H2({}, report.name),
+          Button({
+            className: 'report-more gh-button secondary text icon',
+            dataId   : report.id,
+            onClick  : e => onReportMoreClick(e, report),
+          }, icons.verticalDots),
+        ]),
+        ReportTypes[report.type].render(report),
+      ])
     }
     catch (e) {
-      // language=HTML
-      return `
-          <div id="${ report.id }" class="gh-panel report ${ report.type }" data-id="${ report.id }">
-              <div class="gh-panel-header">
-                  <h2>${ report.name }</h2>
-                  <button class="report-more gh-button secondary text icon" data-id="${ report.id }">${ icons.verticalDots }
-                  </button>
-              </div>
-              <div class="inside">
-                  <p>${ __('Something went wrong...') }</p>
-              </div>
-          </div>`
+      return Div({
+        id       : report.id,
+        className: `gh-panel report ${ report.type }`,
+        dataId   : report.id,
+      }, [
+        Div({ className: 'gh-panel-header' }, [
+          H2({}, report.name),
+          Button({
+            className: 'report-more gh-button secondary text icon',
+            dataId   : report.id,
+            onClick  : e => onReportMoreClick(e, report),
+          }, icons.verticalDots),
+        ]),
+        Div({ className: 'inside' }, Pg({}, __('Something went wrong...', 'groundhogg'))),
+      ])
     }
   }
 
@@ -475,89 +477,168 @@
     })
   }
 
+  const onCreateFirstReport = () => {
+    editReport({
+      type           : 'number',
+      name           : __('New Report', 'groundhogg'),
+      id             : uuid(),
+      filters        : [],
+      exclude_filters: [],
+      order          : reports.length,
+    })
+  }
+
+  const onAddNewReportClick = (e) => {
+
+    let order = getElementIndex(e.currentTarget)
+
+    moreMenu(e.currentTarget.querySelector('span') ?? e.currentTarget, [
+      {
+        key     : 'report',
+        text    : __('Report', 'groundhogg'),
+        onSelect: () => {
+          editReport({
+            type           : 'number',
+            name           : __('New Report', 'groundhogg'),
+            id             : uuid(),
+            filters        : [],
+            exclude_filters: [],
+            order,
+          })
+        },
+      },
+      {
+        key     : 'header',
+        text    : __('Header', 'groundhogg'),
+        onSelect: () => {
+          editHeader({
+            type : 'header',
+            name : __('New Header', 'groundhogg'),
+            id   : uuid(),
+            order,
+          })
+        },
+      },
+    ])
+  }
+
+  const onReportMoreClick = (e, report) => {
+
+    moreMenu(e.currentTarget, {
+      items   : [
+        {
+          key : 'edit',
+          text: __('Edit', 'groundhogg'),
+        },
+        {
+          key : 'delete',
+          text: `<span class="gh-text danger">${ __('Delete', 'groundhogg') }</span>`,
+        },
+      ],
+      onSelect: k => {
+        switch (k) {
+          case 'edit':
+
+            if (report.type === 'header') {
+              editHeader(report)
+              break
+            }
+
+            editReport(report)
+            break
+          case 'delete':
+
+            dangerConfirmationModal({
+              alert      : `<p>${ __('Are you sure you want to delete this report?', 'groundhogg') }</p>`,
+              confirmText: __('Delete', 'groundhogg'),
+              onConfirm  : () => {
+                reports = reports.filter(r => r.id !== report.id)
+                commitReports().then(() => {
+                  dialog({
+                    message: __('Report deleted.', 'groundhogg'),
+                  })
+                  mount()
+                })
+              },
+            })
+
+            break
+        }
+      },
+    })
+  }
+
   const mount = () => {
 
-    let $container = $('#custom-reports')
+    let container = document.getElementById('custom-reports')
 
     // no reports yet
     if (!reports.length > 0) {
-      //language=HTML
-      $container.html(`
-          <div class="full display-flex column center align-center">
-              <p>Use custom reports to keep track of the numbers that matter most!</p>
-              <button id="create-first-report" class="gh-button primary medium">Create your first report!</button>
-          </div>`)
-      $('#create-first-report').on('click', e => {
-
-        let newReport = {
-          type           : 'number',
-          name           : __('New Report'),
-          id             : uuid(),
-          filters        : [],
-          exclude_filters: [],
-          order          : reports.length,
-        }
-
-        editReport(newReport)
-      })
+      container.replaceChildren(Div({ className: 'full display-flex column center align-center' }, [
+        Pg({}, __('Use custom reports to keep track of the numbers that matter most!', 'groundhogg')),
+        Button({
+          id       : 'create-first-report',
+          className: 'gh-button primary medium',
+          onClick  : onCreateFirstReport,
+        }, __('Create your first report!', 'groundhogg')),
+      ]))
       return
     }
 
-    $container.
-      html([
-        ...reports.sort(({ order: a }, { order: b }) => a - b).map(report => renderReport(report)),
-        //language=HTML
-        `
-            <button class="add-new-report">
-                <span class="dashicons dashicons-plus-alt2"></span>
-            </button>
-        `,
-      ].join(''))
+    container.replaceChildren(
+      ...reports.slice().sort(({ order: a }, { order: b }) => a - b).map(report => renderReport(report)),
+      Button({
+        className: 'add-new-report',
+        onClick  : onAddNewReportClick,
+      }, Dashicon('plus-alt2')),
+    )
+
     onMount()
     window.dispatchEvent(new Event('resize'))
   }
 
-  const renderReportEdit = (report) => {
-
-    // language=HTML
-    return `
-        <h2>${ __('Create Report') }</h2>
-        <div class="gh-rows-and-columns">
-            <div class="row">
-                <div class="col">
-                    <label for="name">${ __('Name', 'groundhogg') }</label>
-                    ${ input({
-                        id   : 'name',
-                        value: report.name,
-                    }) }
-                </div>
-            </div>
-            <div class="row">
-                <div class="col display-flex column">
-                    <label for="report-type">${ __('Report Type', 'groundhogg') }</label>
-                    ${ select({
-                        id: 'report-type',
-                    }, Object.keys(ReportTypes).map(type => ( {
-                        value: type,
-                        text : ReportTypes[type].name,
-                    } )), report.type) }
-                </div>
-            </div>
-            ${ ReportTypes[report.type].settings(report) }
-            <div class="row">
-                <div class="col">
-                    <label>${ __('Filter Contacts', 'groundhogg') }</label>
-                    <div id="filters-here"></div>
-                    <div id="exclude-filters-here"></div>
-                </div>
-            </div>
-        </div>
-        <div class="space-between align-right" style="margin-top: 20px">
-            <button class="gh-button primary" id="save">${ __('Save Report', 'groundhogg') }</button>
-        </div>`
-  }
-
-  let commitTimeout
+  const renderReportEdit = (report, { updateReport, save }) => Fragment([
+    Div({ className: 'gh-rows-and-columns' }, [
+      Div({ className: 'row' }, Div({ className: 'col' }, [
+        Label({ for: 'name' }, __('Name', 'groundhogg')),
+        Input({
+          id      : 'name',
+          value   : report.name,
+          onInput : e => updateReport({ name: e.target.value }),
+          onChange: e => updateReport({ name: e.target.value }),
+        }),
+      ])),
+      Div({ className: 'row' }, Div({ className: 'col display-flex column' }, [
+        Label({ for: 'report-type' }, __('Report Type', 'groundhogg')),
+        Select({
+          id      : 'report-type',
+          options : Object.keys(ReportTypes).map(type => ( {
+            value: type,
+            text : ReportTypes[type].name,
+          } )),
+          selected: report.type,
+          onChange: e => {
+            updateReport({ type: e.target.value }, true)
+            document.getElementById('report-type').focus()
+          },
+        }),
+      ])),
+      ReportTypes[report.type].settings(report, updateReport),
+      Div({ className: 'row' }, Div({ className: 'col' }, [
+        Label({}, __('Filter Contacts', 'groundhogg')),
+        Div({ id: 'filters-here' }),
+        Div({ id: 'exclude-filters-here' }),
+      ])),
+    ]),
+    Div({
+      className: 'space-between align-right',
+      style    : { marginTop: '20px' },
+    }, Button({
+      className: 'gh-button primary',
+      id       : 'save',
+      onClick  : save,
+    }, __('Save Report', 'groundhogg'))),
+  ])
 
   $('#custom-reports').sortable({
     handle     : 'h2',
@@ -594,7 +675,7 @@
     })
   }
 
-  const debouncedCommit = Groundhogg.functions.debounce(commitReports, 500)
+  const debouncedCommit = debounce(commitReports, 500)
 
   const scrollTo = id => {
 
@@ -606,155 +687,137 @@
   }
 
   const editReport = (report) => {
-    modal({
-      width: 600,
-      // language=HTML
-      content      : renderReportEdit(report),
+
+    let modalMorph
+
+    const wireUp = () => {
+
+      ReportTypes[report.type].settingsOnMount(report, updateReport, modalMorph)
+
+      createFilters('#filters-here', report.filters, (filters) => {
+        report = {
+          ...report,
+          filters,
+        }
+      }).init()
+
+      createFilters('#exclude-filters-here', report.exclude_filters, (exclude_filters) => {
+        report = {
+          ...report,
+          exclude_filters,
+        }
+      }).init()
+    }
+
+    const updateReport = (props, reload = false) => {
+
+      report = {
+        ...report,
+        ...props,
+      }
+
+      if (reload) {
+        modalMorph()
+        wireUp()
+      }
+    }
+
+    ModalWithHeader({
+      header       : __('Create Report', 'groundhogg'),
+      width        : 600,
       dialogClasses: 'overflow-auto',
-      onOpen       : ({
-        close,
-        setContent,
-      }) => {
-
-        const updateReport = (props, reload = false) => {
-
-          report = {
-            ...report,
-            ...props,
-          }
-
-          if (reload) {
-            setContent(renderReportEdit(report))
-            onMount()
-          }
-        }
-
-        const onMount = () => {
-
-          ReportTypes[report.type].settingsOnMount(report, updateReport)
-
-          $('#name').on('change input', e => {
-            updateReport({
-              name: e.target.value,
-            })
-          })
-
-          $('#report-type').on('change', e => {
-            updateReport({
-              type: e.target.value,
-            }, true)
-            $('#report-type').focus()
-          })
-
-          createFilters('#filters-here', report.filters, (filters) => {
-            updateReport({
-              filters,
-            })
-          }).init()
-
-          createFilters('#exclude-filters-here', report.exclude_filters, (exclude_filters) => {
-            updateReport({
-              exclude_filters,
-            })
-          }).init()
-
-          $('#save').on('click', () => {
-
-            // if the report already exists
-            if (reports.find(r => r.id === report.id)) {
-              reports = reports.map(r => r.id === report.id ? report : r)
-            }
-            else {
-
-              // tackle order collision
-              reports.forEach(r => {
-                if (r.order >= report.order) {
-                  r.order += 1
-                }
-              })
-
-              reports.push(report)
-            }
-
-            commitReports().then(() => {
-              dialog({
-                message: __('Reports saved!', 'groundhogg'),
-              })
-            }).then(() => {
-              close()
-              loadReport(report.id).then(() => {
-                scrollTo(report.id)
-              })
-            })
-          })
-        }
-
-        onMount()
+      onOpen       : ({ morph }) => {
+        modalMorph = morph
+        wireUp()
       },
+    }, ({ close }) => {
 
+      const save = () => {
+
+        // if the report already exists
+        if (reports.find(r => r.id === report.id)) {
+          reports = reports.map(r => r.id === report.id ? report : r)
+        }
+        else {
+
+          // tackle order collision
+          reports.forEach(r => {
+            if (r.order >= report.order) {
+              r.order += 1
+            }
+          })
+
+          reports.push(report)
+        }
+
+        commitReports().then(() => {
+          dialog({
+            message: __('Reports saved!', 'groundhogg'),
+          })
+        }).then(() => {
+          close()
+          loadReport(report.id).then(() => {
+            scrollTo(report.id)
+          })
+        })
+      }
+
+      return renderReportEdit(report, {
+        updateReport,
+        save,
+      })
     })
   }
 
   const editHeader = (report) => {
-    modal({
-      width: 400,
-      // language=HTML
-      content: `
-          <h2>${ __('Edit Header') }</h2>
-          <div class="gh-input-group">
-              ${ input({
-                  name : 'name',
-                  id   : 'name',
-                  value: report.name,
-              }) }
-              <button class="gh-button primary" id="save">${ __('Save') }</button>
-          </div>`,
-      onOpen : ({
-        close,
-        setContent,
-      }) => {
 
-        const updateReport = (props) => {
+    ModalWithHeader({
+      header: __('Edit Header', 'groundhogg'),
+      width : 400,
+    }, ({ close }) => {
 
-          report = {
-            ...report,
-            ...props,
-          }
+      const updateReport = (props) => {
+        report = {
+          ...report,
+          ...props,
+        }
+      }
+
+      const save = () => {
+
+        // if the report already exists
+        if (reports.find(r => r.id === report.id)) {
+          reports = reports.map(r => r.id === report.id ? report : r)
+        }
+        else {
+          reports.push(report)
         }
 
-        const onMount = () => {
-
-          $('#name').on('change input', e => {
-            updateReport({
-              name: e.target.value,
-            })
+        commitReports().then(() => {
+          dialog({
+            message: __('Reports saved!', 'groundhogg'),
           })
+        }).then(() => {
+          mount()
+          close()
+          scrollTo(report.id)
+        })
+      }
 
-          $('#save').on('click', () => {
-
-            // if the report already exists
-            if (reports.find(r => r.id === report.id)) {
-              reports = reports.map(r => r.id === report.id ? report : r)
-            }
-            else {
-              reports.push(report)
-            }
-
-            commitReports().then(() => {
-              dialog({
-                message: __('Reports saved!', 'groundhogg'),
-              })
-            }).then(() => {
-              mount()
-              close()
-              scrollTo(report.id)
-            })
-          })
-        }
-
-        onMount()
-      },
-
+      return Div({ className: 'gh-input-group' }, [
+        Input({
+          name    : 'name',
+          id      : 'name',
+          value   : report.name,
+          onInput : e => updateReport({ name: e.target.value }),
+          onChange: e => updateReport({ name: e.target.value }),
+        }),
+        Button({
+          className: 'gh-button primary',
+          id       : 'save',
+          onClick  : save,
+        }, __('Save', 'groundhogg')),
+      ])
     })
   }
 
@@ -766,6 +829,10 @@
         return
       }
 
+      if (!ReportTypes[report.type].onMount) {
+        return
+      }
+
       try {
         ReportTypes[report.type].onMount(report)
       }
@@ -773,94 +840,11 @@
 
       }
     })
-
-    $('.report-more').on('click', e => {
-
-      let reportId = e.currentTarget.dataset.id
-      let report = reports.find(r => r.id === reportId)
-
-      moreMenu(e.currentTarget, {
-        items   : [
-          {
-            key : 'edit',
-            text: __('Edit'),
-          },
-          {
-            key : 'delete',
-            text: `<span class="gh-text danger">${ __('Delete') }</span>`,
-          },
-        ],
-        onSelect: k => {
-          switch (k) {
-            case 'edit':
-
-              if (report.type === 'header') {
-                editHeader(report)
-                break
-              }
-
-              editReport(report)
-              break
-            case 'delete':
-
-              dangerConfirmationModal({
-                alert      : `<p>${ __('Are you sure you want to delete this report?', 'groundhogg') }</p>`,
-                confirmText: __('Delete'),
-                onConfirm  : () => {
-                  reports = reports.filter(r => r.id !== report.id)
-                  commitReports().then(() => {
-                    dialog({
-                      message: __('Report deleted.', 'groundhogg'),
-                    })
-                    mount()
-                  })
-                },
-              })
-
-              break
-          }
-        },
-      })
-    })
   }
 
   function getElementIndex (element) {
     return Array.prototype.indexOf.call(element.parentNode.children, element)
   }
-
-  $(document).on('click', 'button.add-new-report', e => {
-
-    let order = getElementIndex(e.currentTarget)
-
-    Groundhogg.element.moreMenu(e.currentTarget.querySelector('span'), [
-      {
-        key     : 'report',
-        text    : 'Report',
-        onSelect: () => {
-          editReport({
-            type           : 'number',
-            name           : __('New Report'),
-            id             : uuid(),
-            filters        : [],
-            exclude_filters: [],
-            order          : order,
-          })
-        },
-      },
-      {
-        key     : 'header',
-        text    : 'Header',
-        onSelect: () => {
-          editHeader({
-            type : 'header',
-            name : __('New Header'),
-            id   : uuid(),
-            order: order,
-          })
-        },
-      },
-    ])
-  })
 
   const { close } = loadingModal()
 

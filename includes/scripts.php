@@ -465,6 +465,7 @@ class Scripts {
 			'moment',
 			'groundhogg-admin',
 			'groundhogg-admin-element',
+			'groundhogg-make-el',
 			'groundhogg-admin-data'
 		], GROUNDHOGG_VERSION, true );
 
