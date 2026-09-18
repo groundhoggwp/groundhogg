@@ -37,7 +37,8 @@ define( 'GROUNDHOGG_URL', plugins_url( '/', GROUNDHOGG__FILE__ ) );
 define( 'GROUNDHOGG_ASSETS_PATH', GROUNDHOGG_PATH . 'assets/' );
 define( 'GROUNDHOGG_ASSETS_URL', GROUNDHOGG_URL . 'assets/' );
 
-add_action( 'plugins_loaded', 'groundhogg_load_plugin_textdomain' );
+// Must run before Plugin::init() (plugins_loaded priority 0) so early gettext calls don't trigger just-in-time loading
+add_action( 'plugins_loaded', 'groundhogg_load_plugin_textdomain', -1 );
 
 define( 'GROUNDHOGG_TEXT_DOMAIN', 'groundhogg' );
 define( 'GROUNDHOGG_MINIMUM_PHP_VERSION', '7.4' );

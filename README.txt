@@ -399,6 +399,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED A "Groundhogg Extensions" ability category: "List Extensions" to see which official add-ons are installed and licensed, "Check License" and "Activate License" to manage a license key, and "Install Extension" to remotely install and activate one - gated on WordPress's own `install_plugins`/`activate_plugins` capabilities since it installs code on the site.
 * ADDED "Create Tag" and "Create Campaign"/"Associate Campaign" abilities for creating tags and campaigns and attaching a campaign to other objects, rather than requiring one to already exist.
 * TWEAKED Dashboard widgets can now be reordered by drag-and-drop; the layout is remembered per-browser.
+* FIXED "Translation loading for the groundhogg domain was triggered too early" notice on WordPress 6.7+, by loading the plugin textdomain before the plugin initializes.
 * SECURITY Hardened handling of contact-submitted data to prevent it from being reinterpreted as active content elsewhere in the CRM. Credit: Ayukiab, via Patchstack.
 
 = 4.8.1 (2026-09-14) =
