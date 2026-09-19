@@ -54,12 +54,14 @@ use Groundhogg\Abilities\Utils\Upload_Media;
  * Registers Groundhogg's own abilities/categories, and acts as the registry add-ons use to
  * register their own alongside them - Abilities::add_category() and Abilities::add_ability().
  *
- * Both must be called before the WP Abilities API actually registers anything - the
- * 'wp_abilities_api_categories_init'/'wp_abilities_api_init' hooks below, which normally fire on
- * 'init'. Groundhogg's own bootstrap runs on 'plugins_loaded' at priority 0 (see Plugin::init()),
- * so any add-on's own 'plugins_loaded' (default priority 10) or 'init' callback is early enough.
- * Registering from that far out just queues the category/class; if a call ever comes in after the
- * relevant hook has already fired, it's applied immediately instead of being silently dropped.
+ * WordPress only accepts registrations while the 'wp_abilities_api_categories_init' and
+ * 'wp_abilities_api_init' actions are running (they normally fire on 'init'); anywhere else
+ * wp_register_ability()/wp_register_ability_category() call _doing_it_wrong() and return null.
+ * Groundhogg's own bootstrap runs on 'plugins_loaded' at priority 0 (see Plugin::init()), so any
+ * add-on's own 'plugins_loaded' (default priority 10) or 'init' callback is early enough: the
+ * call is queued and applied when the action runs. Calling from inside one of those actions
+ * registers straight away. Calling after the action has finished is too late - WordPress would
+ * refuse it, so it's reported with _doing_it_wrong() instead of being silently lost.
  *
  * Example - a 3rd-party add-on registering its own category and ability:
  *
@@ -94,6 +96,14 @@ class Abilities {
 	 */
 	protected static array $extra_categories = [];
 
+	/**
+	 * Ability classes / category slugs already handed to WordPress, so a request that is both
+	 * queued and made mid-action is never registered twice.
+	 *
+	 * @var array<string, true>
+	 */
+	protected static array $registered = [];
+
 	public function __construct() {
 
 		if ( ! function_exists( 'wp_register_ability' ) ) {
@@ -124,11 +134,16 @@ class Abilities {
 	 */
 	public static function add_category( string $slug, array $args ) {
 
+		if ( ! doing_action( 'wp_abilities_api_categories_init' ) && did_action( 'wp_abilities_api_categories_init' ) ) {
+			self::too_late( __METHOD__, 'wp_abilities_api_categories_init' );
+
+			return;
+		}
+
 		self::$extra_categories[ $slug ] = $args;
 
-		// The categories hook already fired - register it right away rather than dropping it.
-		if ( did_action( 'wp_abilities_api_categories_init' ) && function_exists( 'wp_register_ability_category' ) ) {
-			wp_register_ability_category( $slug, $args );
+		if ( doing_action( 'wp_abilities_api_categories_init' ) ) {
+			self::register_category( $slug, $args );
 		}
 	}
 
@@ -143,73 +158,117 @@ class Abilities {
 	 */
 	public static function add_ability( string $class ) {
 
+		if ( ! doing_action( 'wp_abilities_api_init' ) && did_action( 'wp_abilities_api_init' ) ) {
+			self::too_late( __METHOD__, 'wp_abilities_api_init' );
+
+			return;
+		}
+
 		self::$extra_abilities[] = $class;
 
-		// The abilities hook already fired - register it right away rather than dropping it.
-		if ( did_action( 'wp_abilities_api_init' ) ) {
-			new $class();
+		if ( doing_action( 'wp_abilities_api_init' ) ) {
+			self::instantiate( $class );
 		}
+	}
+
+	/**
+	 * Report a registration that arrived after WordPress stopped accepting them.
+	 *
+	 * @param string $method the add_*() method the add-on called
+	 * @param string $hook   the action that has already finished
+	 *
+	 * @return void
+	 */
+	protected static function too_late( string $method, string $hook ) {
+		_doing_it_wrong(
+			esc_html( $method ),
+			/* translators: %s: an action name */
+			esc_html( sprintf( __( 'Too late to register: WordPress only accepts registrations while the %s action runs. Call this on plugins_loaded or earlier.', 'groundhogg' ), $hook ) ),
+			'4.8.4'
+		);
+	}
+
+	protected static function register_category( string $slug, array $args ) {
+
+		if ( isset( self::$registered[ 'category:' . $slug ] ) ) {
+			return;
+		}
+
+		self::$registered[ 'category:' . $slug ] = true;
+
+		wp_register_ability_category( $slug, $args );
+	}
+
+	protected static function instantiate( string $class ) {
+
+		if ( isset( self::$registered[ $class ] ) || ! class_exists( $class ) ) {
+			return;
+		}
+
+		self::$registered[ $class ] = true;
+
+		new $class();
 	}
 
 	public function register_categories() {
 
-		wp_register_ability_category( 'groundhogg-contacts', [
+		self::register_category( 'groundhogg-contacts', [
 			'label'       => __( 'Groundhogg Contacts', 'groundhogg' ),
 			'description' => __( 'Find, inspect, and manage contacts in Groundhogg.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-tags', [
+		self::register_category( 'groundhogg-tags', [
 			'label'       => __( 'Groundhogg Tags', 'groundhogg' ),
 			'description' => __( 'Find and manage Groundhogg tags.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-campaigns', [
+		self::register_category( 'groundhogg-campaigns', [
 			'label'       => __( 'Groundhogg Campaigns', 'groundhogg' ),
 			'description' => __( 'Find Groundhogg campaigns, used to group flows, broadcasts, and emails.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-funnels', [
+		self::register_category( 'groundhogg-funnels', [
 			'label'       => __( 'Groundhogg Flows', 'groundhogg' ),
 			'description' => __( 'Find Groundhogg flows and add contacts to them.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-email', [
+		self::register_category( 'groundhogg-email', [
 			'label'       => __( 'Groundhogg Email', 'groundhogg' ),
 			'description' => __( 'Find, inspect, and manage Groundhogg emails.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-broadcasts', [
+		self::register_category( 'groundhogg-broadcasts', [
 			'label'       => __( 'Groundhogg Broadcasts', 'groundhogg' ),
 			'description' => __( 'Schedule Groundhogg email broadcasts and review their performance.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-reports', [
+		self::register_category( 'groundhogg-reports', [
 			'label'       => __( 'Groundhogg Reports', 'groundhogg' ),
 			'description' => __( 'Pull Groundhogg\'s built-in and custom reports.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-db', [
+		self::register_category( 'groundhogg-db', [
 			'label'       => __( 'Groundhogg Database', 'groundhogg' ),
 			'description' => __( 'Direct, read-only access to Groundhogg\'s own database tables. Administrators only.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-utils', [
+		self::register_category( 'groundhogg-utils', [
 			'label'       => __( 'Groundhogg Utilities', 'groundhogg' ),
 			'description' => __( 'General-purpose utilities that support the other categories but aren\'t specific to any one of them.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-extensions', [
+		self::register_category( 'groundhogg-extensions', [
 			'label'       => __( 'Groundhogg Extensions', 'groundhogg' ),
 			'description' => __( 'Manage Groundhogg add-on extensions and their licenses.', 'groundhogg' ),
 		] );
 
-		wp_register_ability_category( 'groundhogg-settings', [
+		self::register_category( 'groundhogg-settings', [
 			'label'       => __( 'Groundhogg Settings', 'groundhogg' ),
 			'description' => __( 'List and update Groundhogg settings that have been registered for ability access.', 'groundhogg' ),
 		] );
 
 		foreach ( self::$extra_categories as $slug => $args ) {
-			wp_register_ability_category( $slug, $args );
+			self::register_category( $slug, $args );
 		}
 	}
 
@@ -266,7 +325,7 @@ class Abilities {
 		], self::$extra_abilities );
 
 		foreach ( $abilities as $ability ) {
-			new $ability();
+			self::instantiate( $ability );
 		}
 	}
 }
