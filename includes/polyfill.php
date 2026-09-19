@@ -22,3 +22,13 @@ if ( ! function_exists( 'array_is_list' ) ) {
 		return true;
 	}
 }
+
+// PHP 8.3 introduced these date exceptions. Broadcast::schedule() throws DateException, and
+// callers catch it, so define them on older versions. Must stay in the global namespace.
+if ( ! class_exists( 'DateException', false ) ) {
+	class DateException extends Exception {}
+}
+
+if ( ! class_exists( 'DateMalformedStringException', false ) ) {
+	class DateMalformedStringException extends DateException {}
+}
