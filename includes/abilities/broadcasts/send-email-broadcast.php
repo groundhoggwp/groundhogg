@@ -194,15 +194,25 @@ class Send_Email_Broadcast extends Ability {
 			);
 		}
 
-		// The plain array form, not to_contact_query()'s live query object -
-		// this gets stored (Broadcast::schedule()'s 'query' arg below) and, for
-		// a "dynamic" segment_type, re-run later against whatever then matches;
-		// a live query object (and anything a filter attached to it) can't
-		// survive that round trip.
-		$query = Segment_Schema::to_query( $input );
+		// Filters, not to_contact_query()'s live query object - this gets stored
+		// (Broadcast::schedule()'s 'query' arg below) and, for a "dynamic"
+		// segment_type, re-run later against whatever then matches; a live query
+		// object (and anything attached to it) can't survive that round trip.
+		// Same translation create-flow uses for logic steps. The filters are
+		// stored under Contact_Query's `filters` query var.
+		$filters = Segment_Schema::to_filters( $input );
 
-		if ( is_wp_error( $query ) ) {
-			return $query;
+		if ( is_wp_error( $filters ) ) {
+			return $filters;
+		}
+
+		$query = empty( $filters ) ? [] : [ 'filters' => $filters ];
+
+		// `search` has no Filters equivalent (to_filters() drops it), but it counts
+		// as an audience above - carry it as a plain query var so it still narrows
+		// rather than silently widening to everyone.
+		if ( ! empty( $input['search'] ) ) {
+			$query['search'] = sanitize_text_field( $input['search'] );
 		}
 
 		$args = [
