@@ -26,6 +26,62 @@ abstract class Roles {
 	public function __construct() {
 		add_action( 'groundhogg/activated', [ $this, 'install_roles_and_caps' ] );
 		add_filter( 'map_meta_cap', [ $this, 'map_meta_cap' ], 10, 4 );
+
+		// User Role Editor integration, lists our caps under a "Groundhogg" group
+		add_filter( 'ure_capabilities_groups_tree', [ $this, 'ure_register_caps_group' ] );
+		add_filter( 'ure_custom_capability_groups', [ $this, 'ure_assign_cap_group' ], 10, 2 );
+	}
+
+	/**
+	 * Register the Groundhogg group in the User Role Editor capabilities list
+	 *
+	 * @param array $groups
+	 *
+	 * @return array
+	 */
+	public function ure_register_caps_group( $groups ) {
+		$groups['groundhogg'] = [
+			'caption' => 'Groundhogg',
+			'parent'  => 'all',
+			'level'   => 1,
+		];
+
+		return $groups;
+	}
+
+	/**
+	 * Put the caps managed by this class in the Groundhogg group in User Role Editor
+	 *
+	 * @param string[] $groups
+	 * @param string   $cap_id
+	 *
+	 * @return string[]
+	 */
+	public function ure_assign_cap_group( $groups, $cap_id ) {
+		if ( in_array( $cap_id, $this->get_all_caps(), true ) ) {
+			$groups[] = 'groundhogg';
+		}
+
+		return $groups;
+	}
+
+	/**
+	 * Every cap this class adds to roles, based on the get_{role}_caps() methods.
+	 * Classes with a more precise list can override this.
+	 *
+	 * @return string[]
+	 */
+	public function get_all_caps() {
+		$roles = array_unique( array_merge( [ 'administrator' ], array_keys( $this->get_wp_roles()->roles ) ) );
+		$caps  = [];
+
+		foreach ( $roles as $role ) {
+			if ( method_exists( $this, "get_{$role}_caps" ) ) {
+				$caps = array_merge( $caps, call_user_func( [ $this, "get_{$role}_caps" ] ) );
+			}
+		}
+
+		return array_unique( $caps );
 	}
 
 	/**
