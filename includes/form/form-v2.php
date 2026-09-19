@@ -2630,7 +2630,7 @@ class Posted_Data implements \ArrayAccess, \JsonSerializable {
 	 */
 	#[\ReturnTypeWillChange]
 	public function offsetGet( $offset ) {
-		return $this->posted[ $offset ];
+		return $this->posted[ $offset ] ?? null;
 	}
 
 	/**

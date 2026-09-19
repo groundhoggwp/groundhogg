@@ -285,6 +285,11 @@ class Plugin {
 	 */
 	private function init_components() {
 
+		// TODO: split into two methods - one on plugins_loaded for what add-ons need early (DBs, roles,
+		// groundhogg/init/v2) and one on init for anything that translates strings while constructing.
+		// Settings::__construct() defers itself to init as a stopgap. Watch add-ons that read
+		// Plugin::$instance->settings etc. on plugins_loaded, and keep the "Settings & DBs first" ordering.
+
 		// Settings & DBS needs to go first...
 		$this->settings = new Settings();
 		$this->roles    = new Main_Roles();

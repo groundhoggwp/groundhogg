@@ -32,7 +32,14 @@ class Settings {
 	protected array $registered_groups = [];
 
 	public function __construct() {
-		$this->register_settings();
+
+		// The registry translates labels/descriptions, which must not happen before init on WP 6.7+
+		// (and the textdomain may have no .mo to preload, e.g. en_US), so wait for init.
+		if ( did_action( 'init' ) ) {
+			$this->register_settings();
+		} else {
+			add_action( 'init', [ $this, 'register_settings' ], 0 );
+		}
 	}
 
 	/**
@@ -44,7 +51,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	protected function register_settings() {
+	public function register_settings() {
 
 		$this->add_group( 'business_info', [
 			'label' => __( 'Business Info', 'groundhogg' ),

@@ -293,12 +293,12 @@ class Contacts extends DB {
 
 		$column = ! empty( $where ) && is_string( $where ) ? $where : $this->primary_key;
 
-		if ( isset( $data['email'] ) ) {
+		// prevent empty email addresses
+		if ( isset( $data['email'] ) && empty( $data['email'] ) ) {
+			unset( $data['email'] );
+		}
 
-			// prevent empty email addresses
-			if ( empty( $data['email'] ) ) {
-				unset( $data['email'] );
-			}
+		if ( isset( $data['email'] ) ) {
 
 			// check to see if this email address is already in use
 			$query = new Table_Query( $this );
@@ -317,10 +317,10 @@ class Contacts extends DB {
 
 			// it is being used by another contact :/
 			if ( $query->count() > 0 ) {
-				unset( $data['user_id'] );
 				// let's safely resync the IDs after this update is complete.
 				$user_id    = absint( $data['user_id'] );
 				$contact_id = absint( $row_id_or_where );
+				unset( $data['user_id'] );
 
 				add_action_use_once( 'groundhogg/db/post_update/contact', fn() => safe_user_id_sync( $user_id, $contact_id ) );
 			}

@@ -223,9 +223,16 @@ class Utils {
 			$iv  = self::$secret_iv;
 
 			//backwards compat
-			if ( function_exists( 'ctype_xdigit' ) && ctype_xdigit( $key ) ) {
-				$key = hex2bin( $key );
-				$iv  = hex2bin( $iv );
+			if ( function_exists( 'ctype_xdigit' ) ) {
+
+				// check each independently, the IV may not be valid hex even if the key is
+				if ( ctype_xdigit( $key ) && strlen( $key ) % 2 === 0 ) {
+					$key = hex2bin( $key );
+				}
+
+				if ( ctype_xdigit( $iv ) && strlen( $iv ) % 2 === 0 ) {
+					$iv = hex2bin( $iv );
+				}
 			}
 
 			$output = false;
