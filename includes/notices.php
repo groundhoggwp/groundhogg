@@ -27,6 +27,7 @@ class Notices {
 	const DISMISSED_NOTICES_OPTION = 'gh_dismissed_notices';
 	const READ_NOTICES_OPTION = 'gh_read_notices';
 	const REMOTE_NOTICES_URL = 'https://groundhogg.io/wp-json/gh/v4/broadcasts/archive';
+	const CDN_NOTICES_URL = 'https://cdn.groundhogg.io/broadcasts';
 
 	public static $dismissed_notices = [];
 	public static $read_notices = [];
@@ -185,7 +186,14 @@ class Notices {
 	 */
 	function fetch_remote_notices() {
 
-		$response = remote_post_json( self::REMOTE_NOTICES_URL, [ 'campaign' => 'dashboard-notifications' ], 'GET', [], true, DAY_IN_SECONDS );
+		$body = [ 'campaign' => 'dashboard-notifications' ];
+
+		// Try the CDN first, fall back to groundhogg.io if it's unreachable or returns something unexpected
+		$response = remote_post_json( self::CDN_NOTICES_URL, $body, 'GET', [], true, DAY_IN_SECONDS );
+
+		if ( is_wp_error( $response ) || ! isset( $response['items'] ) ) {
+			$response = remote_post_json( self::REMOTE_NOTICES_URL, $body, 'GET', [], true, DAY_IN_SECONDS );
+		}
 
 		if ( is_wp_error( $response ) ) {
 			return $response;

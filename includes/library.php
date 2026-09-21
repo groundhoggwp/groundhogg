@@ -8,6 +8,11 @@ class Library extends Supports_Errors {
 	const LIBRARY_URL = 'https://library.groundhogg.io/wp-json/gh/v4/';
 
 	/**
+	 * Cached mirror of the library, served from the edge. Same endpoints, prefixed with library/
+	 */
+	const CDN_URL = 'https://cdn.groundhogg.io/library/';
+
+	/**
 	 * Get the library url
 	 *
 	 * @return mixed|null
@@ -32,6 +37,18 @@ class Library extends Supports_Errors {
 	 * @return array|bool|\WP_Error
 	 */
 	public function request( $endpoint = '', $body = [], $method = 'GET', $headers = [] ) {
+
+		// Try the CDN first for cacheable reads, but only when the library url hasn't been filtered
+		// (e.g. pointed at a dev library), since the CDN only mirrors the production library.
+		if ( strtoupper( $method ) === 'GET' && $this->get_library_url() === self::LIBRARY_URL ) {
+
+			$cdn_result = remote_post_json( self::CDN_URL . ltrim( $endpoint, '/' ), $body, $method, $headers, false, DAY_IN_SECONDS );
+
+			// Only accept a well-formed library response, otherwise fall back to the library itself
+			if ( ! is_wp_error( $cdn_result ) && ( get_array_var( $cdn_result, 'items' ) || get_array_var( $cdn_result, 'item' ) ) ) {
+				return $cdn_result;
+			}
+		}
 
 		$url = $this->get_library_url() . $endpoint;
 
