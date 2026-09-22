@@ -284,6 +284,10 @@ class Tracking {
 
 			if ( is_a_contact( $contact ) ) {
 				$this->add_tracking_cookie_param( 'contact_id', $contact->get_id() );
+				// Only Groundhogg itself could have produced a string that decrypts to a real
+				// contact with this site's own secret key — as trustworthy a proof of identity
+				// as the signed tracking links below.
+				$this->add_tracking_cookie_param( 'verified', true );
 
 				// `id` is the event ID in hexadecimal
 				if ( $event_id = get_url_var( 'ge' ) ) {
@@ -336,6 +340,15 @@ class Tracking {
 		$tracking_action  = get_query_var( 'tracking_action' );
 		$tracking_payload = get_query_var( 'tracking_payload' );
 
+		// Set below for the branches that actually verify the contact_id/event_id they end up
+		// with — either a cryptographic signature, or (the signature-changed fallback, and the
+		// legacy click format, which never had a signature) confirming the exact URL appears in
+		// the real, regenerated email content, which isn't producible without knowing a real
+		// contact_id/event_id pair. Left false for the legacy 'open' pixel format below, which
+		// reads contact_id/event_id straight from the query string with no verification of any
+		// kind — not proof of identity, just correlation an attacker could as easily guess.
+		$verified_by_signature = false;
+
 		try {
 
 			if ( ! empty( $tracking_payload ) ){
@@ -382,6 +395,8 @@ class Tracking {
 				set_query_var( 'contact_id', $contact_id );
 				set_query_var( 'event_id', $event_id );
 
+				$verified_by_signature = true;
+
 			}
 			else if ( $tracking_action === 'click' ) { // legacy tracking link
 
@@ -418,6 +433,8 @@ class Tracking {
 					$this->invalid_link_screen();
 					return;
 				}
+
+				$verified_by_signature = true;
 			}
 			else if ( $tracking_action === 'open' ) { // legacy open
 				$contact_id = absint( get_query_var( 'contact_id' ) );
@@ -455,6 +472,10 @@ class Tracking {
 		$this->add_tracking_cookie_param( 'event_id', $event->get_id() );
 		$this->add_tracking_cookie_param( 'source', $tracking_via );
 		$this->add_tracking_cookie_param( 'action', $tracking_action );
+
+		if ( $verified_by_signature ) {
+			$this->add_tracking_cookie_param( 'verified', true );
+		}
 
 		switch ( $tracking_via ) {
 			case 'email':

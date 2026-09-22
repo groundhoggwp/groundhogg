@@ -2,7 +2,9 @@
 
 use Groundhogg\Submission;
 use Groundhogg\Tracking;
+use function Groundhogg\base64url_encode;
 use function Groundhogg\do_replacements;
+use function Groundhogg\encrypt;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\tracking;
 
@@ -87,6 +89,25 @@ class Tracking_Verification_Tests extends GH_UnitTestCase {
 
 		$this->assertFalse( tracking()->is_current_contact_verified() );
 		$this->assertSame( [ 123 ], tracking()->get_current_session_submission_ids() );
+	}
+
+	/**
+	 * The most common real-world way a contact ever gets tracked at all: clicking a link in an
+	 * email they received. Only Groundhogg itself, holding the site's own secret key, could have
+	 * produced a string that decrypts to a real contact — as strong a proof of identity as the
+	 * unsubscribe flow's signed permissions key.
+	 */
+	public function test_failsafe_identity_tracking_is_verified() {
+		$contact = get_contactdata( self::factory()->contacts->create() );
+
+		$_GET['gi'] = base64url_encode( encrypt( $contact->get_email() ) );
+
+		tracking()->handle_failsafe_tracking();
+
+		unset( $_GET['gi'] );
+
+		$this->assertSame( $contact->get_id(), tracking()->get_current_contact_id() );
+		$this->assertTrue( tracking()->is_current_contact_verified() );
 	}
 
 	public function test_repeat_submission_accumulates_session_submission_ids() {
