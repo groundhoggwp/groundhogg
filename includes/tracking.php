@@ -107,7 +107,6 @@ class Tracking {
 		add_action( 'template_redirect', [ $this, 'handle_failsafe_tracking' ] );
 
 		add_action( 'groundhogg/after_form_submit', [ $this, 'form_filled' ], 10, 2 );
-		add_action( 'groundhogg/contact/created', [ $this, 'track_newly_created_contact' ] );
 
 		add_action( 'groundhogg/preferences/erase_profile', [ $this, 'remove_tracking_cookie' ] );
 
@@ -1117,42 +1116,17 @@ class Tracking {
 	const MAX_SESSION_SUBMISSIONS = 10;
 
 	/**
-	 * Contact IDs created (not matched) during this request, via Contact::create(). A form
-	 * submission that resolves to one of these has nothing to protect — there's no pre-existing
-	 * history on the record for an unverified submitter to read back. Anything else was matched
-	 * by a submitted email alone, which is not proof of identity.
+	 * Whether the currently tracked contact (if any) has been independently verified — this
+	 * browser proved it via a signed link (click tracking, confirmation, unsubscribe, etc., all
+	 * of which pass 'verified' => true to start_tracking()), or via a linked WP login.
 	 *
-	 * @var int[]
-	 */
-	protected $newly_created_contact_ids = [];
-
-	/**
-	 * @param $contact Contact
-	 */
-	public function track_newly_created_contact( $contact ) {
-		if ( is_a_contact( $contact ) ) {
-			$this->newly_created_contact_ids[] = $contact->get_id();
-		}
-	}
-
-	/**
-	 * @param $contact_id int
-	 *
-	 * @return bool
-	 */
-	protected function is_newly_created_contact( $contact_id ) {
-		return in_array( $contact_id, $this->newly_created_contact_ids, true );
-	}
-
-	/**
-	 * Whether the currently tracked contact (if any) has been independently verified — either
-	 * this browser proved it via a signed link (click tracking, confirmation, unsubscribe, etc.,
-	 * all of which pass 'verified' => true to start_tracking()), or the contact was newly created
-	 * by this same request and so has no history to protect.
-	 *
-	 * False for a contact matched purely by a submitted, unverified email address. Used by
-	 * Replacements to decide whether the full contact record may be read, or only the data this
-	 * session has itself submitted (see get_current_session_submission_ids()).
+	 * False for a contact matched purely by a submitted, unverified email address — including one
+	 * created by this same request. A newly-created contact has nothing on it yet, but a
+	 * background action (a benchmark, an integration, a business rule) can attach data to it a
+	 * moment later that the anonymous submitter has no claim to see, so "just created it" is not
+	 * treated as proof of identity either. Used by Replacements to decide whether the full contact
+	 * record may be read, or only the data this session has itself submitted (see
+	 * get_current_session_submission_ids()).
 	 *
 	 * @return bool
 	 */
@@ -1187,10 +1161,12 @@ class Tracking {
 	/**
 	 * Sets the cookie upon a form fill.
 	 *
-	 * A submitted email matching an *existing* contact is not proof of identity, so unless this
-	 * request just created the contact (nothing to protect yet) or this browser was already
-	 * verified as this exact contact from an earlier, independently-proven interaction, the
-	 * session is marked unverified and scoped to only the submissions it has itself made — see
+	 * A submitted email is not proof of identity, whether it matched an existing contact or just
+	 * created one — a newly-created contact still has no history yet, but something else (a
+	 * benchmark, an integration, an admin) can add to it moments later, and this submitter has no
+	 * more claim to that than anyone else. So unless this browser was already verified as this
+	 * exact contact from an earlier, independently-proven interaction, the session is marked
+	 * unverified and scoped to only the submissions it has itself made — see
 	 * is_current_contact_verified() / get_current_session_submission_ids(), and how Replacements
 	 * consults them.
 	 *
@@ -1206,15 +1182,11 @@ class Tracking {
 		$same_contact_already_tracked = $this->get_current_contact_id() === $contact->get_id();
 		$already_verified             = $same_contact_already_tracked && $this->is_current_contact_verified();
 
-		if ( $this->is_newly_created_contact( $contact->get_id() ) || $already_verified ) {
-			if ( ! $same_contact_already_tracked ) {
-				$this->start_tracking( $contact, '', [ 'verified' => true ] );
-			}
-
+		if ( $already_verified ) {
 			return;
 		}
 
-		// Matched (or re-matched) an existing contact via an unverified, self-reported email.
+		// Matched an existing contact, or just created a new one, via an unverified, self-reported email.
 		$submission_ids = $this->get_current_session_submission_ids();
 
 		if ( $submission_id ) {

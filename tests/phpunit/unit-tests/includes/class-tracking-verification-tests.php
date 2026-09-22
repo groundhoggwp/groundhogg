@@ -17,7 +17,6 @@ use function Groundhogg\tracking;
  * @see Tracking::form_filled()
  * @see Tracking::is_current_contact_verified()
  * @see Tracking::get_current_session_submission_ids()
- * @see Tracking::track_newly_created_contact()
  * @see Replacements::process() ambient-resolution gating ($unverified_ambient_context)
  * @see Replacements::get_unverified_submission_value()
  * @see Replacements::replacement_form_submission() submission_ids scoping
@@ -33,7 +32,7 @@ class Tracking_Verification_Tests extends GH_UnitTestCase {
 	 * between test methods (and between this class and any other test touching tracking()).
 	 */
 	protected function reset_tracking_state() {
-		foreach ( [ 'cookie', 'newly_created_contact_ids' ] as $prop ) {
+		foreach ( [ 'cookie' ] as $prop ) {
 			$ref = new ReflectionProperty( Tracking::class, $prop );
 			$ref->setAccessible( true );
 			$ref->setValue( tracking(), [] );
@@ -69,20 +68,25 @@ class Tracking_Verification_Tests extends GH_UnitTestCase {
 	 * Tracking::form_filled() — verified vs. unverified
 	 * ------------------------------------------------------------------- */
 
-	public function test_newly_created_contact_is_verified() {
+	/**
+	 * A brand-new contact has no history yet, but a background action (a benchmark, an
+	 * integration, an admin) can attach data to it moments after creation that this anonymous
+	 * submitter has no more claim to than anyone else. "I just created this record" is not proof
+	 * of identity, so it gets the same unverified, submission-scoped treatment as matching an
+	 * existing contact.
+	 */
+	public function test_newly_created_contact_is_still_unverified() {
 		$contact = get_contactdata( self::factory()->contacts->create() );
 
-		do_action( 'groundhogg/contact/created', $contact );
+		tracking()->form_filled( $contact, 123 );
 
-		tracking()->form_filled( $contact );
-
-		$this->assertTrue( tracking()->is_current_contact_verified() );
-		$this->assertSame( [], tracking()->get_current_session_submission_ids() );
+		$this->assertFalse( tracking()->is_current_contact_verified() );
+		$this->assertSame( [ 123 ], tracking()->get_current_session_submission_ids() );
 	}
 
 	public function test_matched_existing_contact_is_unverified() {
-		// Not firing groundhogg/contact/created — simulates matching a pre-existing contact
-		// purely by submitted email, exactly like Form_v2::submit()'s new Contact($data) does.
+		// Simulates matching a pre-existing contact purely by submitted email, exactly like
+		// Form_v2::submit()'s new Contact($data) does.
 		$contact = get_contactdata( self::factory()->contacts->create() );
 
 		tracking()->form_filled( $contact, 123 );
@@ -265,8 +269,9 @@ class Tracking_Verification_Tests extends GH_UnitTestCase {
 			'first_name' => 'RealName',
 		] ) );
 
-		do_action( 'groundhogg/contact/created', $contact );
-		tracking()->form_filled( $contact );
+		// Simulates an already-independently-verified session (e.g. from an earlier signed
+		// tracking-link click or unsubscribe), not a plain form submission.
+		tracking()->start_tracking( $contact, '', [ 'verified' => true ] );
 
 		$this->assertSame( 'RealName', do_replacements( '{first_name}' ) );
 	}
