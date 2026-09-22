@@ -607,8 +607,9 @@ class Where {
 	 * Adds a sub where clause, in brackets
 	 *
 	 * @param string        $relation 'OR' or 'AND'
-	 * @param callable|null $callback If provided, called with the sub Where instance, and this
-	 *                                (the parent) Where is returned instead for chaining.
+	 * @param callable|null $callback If provided, called with the sub Where instance and the
+	 *                                Table_Query (as the 2nd arg), and this (the parent) Where
+	 *                                is returned instead for chaining.
 	 *
 	 * @return Where|static
 	 */
@@ -617,7 +618,7 @@ class Where {
 		$this->addCondition( $where );
 
 		if ( is_callable( $callback ) ) {
-			call_user_func( $callback, $where );
+			call_user_func( $callback, $where, $this->query );
 
 			return $this;
 		}

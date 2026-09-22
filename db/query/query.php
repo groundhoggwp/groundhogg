@@ -601,12 +601,13 @@ class Query {
 	 * @param $compare
 	 *
 	 * @return Where|static If a callback is passed as $column, it's called with the Where instance
-	 *                      and this Table_Query is returned instead for chaining.
+	 *                      and this Table_Query (as the 2nd arg), and this Table_Query is returned
+	 *                      instead for chaining.
 	 */
 	public function where( $column = false, $value = null, $compare = '=' ) {
 
 		if ( ! is_string( $column ) && is_callable( $column ) ) {
-			call_user_func( $column, $this->where );
+			call_user_func( $column, $this->where, $this );
 
 			return $this;
 		}
