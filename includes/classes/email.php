@@ -759,13 +759,21 @@ class Email extends Base_Object_With_Meta {
 				// Handle open tracking image
 				if ( ! is_option_enabled( 'gh_disable_open_tracking' ) && $this->event && $this->event->exists() ) {
 
+					$tracking_img = html()->e( 'img', [
+						'src'    => $this->get_open_tracking_src(),
+						'width'  => '0',
+						'height' => '0',
+						'alt'    => '',
+					] );
+
+					// "HTML editor" content is not guaranteed to be a full document
+					// (e.g. groundhogg/create-email-template allows a bare fragment
+					// for editor: "html") - fall back to appending the pixel when
+					// there's no </body> to splice it into.
 					if ( str_contains( $content, '</body>' ) ) {
-						$content = str_replace( '</body>', html()->e( 'img', [
-								'src'    => $this->get_open_tracking_src(),
-								'width'  => '0',
-								'height' => '0',
-								'alt'    => '',
-							] ) . '</body>', $content );
+						$content = str_replace( '</body>', $tracking_img . '</body>', $content );
+					} else {
+						$content .= $tracking_img;
 					}
 
 				}
