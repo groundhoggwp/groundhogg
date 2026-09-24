@@ -30,6 +30,12 @@ class Table_Query extends Query {
 	protected $db_table;
 
 	/**
+	 * Found rows from the last call to get_results(), and the cache key of the query they belong to
+	 */
+	protected int $last_found_rows = 0;
+	protected string $last_results_key = '';
+
+	/**
 	 * @param $table      DB|string
 	 */
 	public function __construct( $table, $params = [] ) {
@@ -445,36 +451,44 @@ class Table_Query extends Query {
 		$cache_key   = $this->create_cache_key( __METHOD__ );
 		$cache_value = $this->db_table->cache_get( $cache_key, $found );
 
-		if ( $found ) {
-			return $cache_value;
+		// Items and found rows are cached together, so SELECT FOUND_ROWS() never runs after a cache hit
+		// where it would return the count from whatever query happened to run last
+		if ( $found && is_array( $cache_value ) && isset( $cache_value['items'], $cache_value['found_rows'] ) ) {
+			$this->last_results_key = $cache_key;
+			$this->last_found_rows  = $cache_value['found_rows'];
+
+			return $cache_value['items'];
 		}
 
 		$items = $this->db->get_results( $this->get_select_sql() );
 
-		$this->db_table->cache_set( $cache_key, $items );
+		// Without SQL_CALC_FOUND_ROWS, FOUND_ROWS() is just the number of rows returned
+		$found_rows = $this->found_rows ? (int) $this->db->get_var( 'SELECT FOUND_ROWS()' ) : count( $items );
+
+		$this->db_table->cache_set( $cache_key, [
+			'items'      => $items,
+			'found_rows' => $found_rows,
+		] );
+
+		$this->last_results_key = $cache_key;
+		$this->last_found_rows  = $found_rows;
 
 		return $items;
 	}
 
 	/**
-	 * Return the number of found rows for a query
+	 * Return the number of found rows for the query
+	 * Runs the query first if its results were not already retrieved
 	 *
 	 * @return int
 	 */
 	public function get_found_rows() {
 
-		$cache_key   = $this->create_cache_key( __METHOD__ );
-		$cache_value = $this->db_table->cache_get( $cache_key, $found );
-
-		if ( $found ) {
-			return $cache_value;
+		if ( $this->last_results_key !== $this->create_cache_key( __CLASS__ . '::get_results' ) ) {
+			$this->get_results();
 		}
 
-		$rows = (int) $this->db->get_var( 'SELECT FOUND_ROWS()' );
-
-		$this->db_table->cache_set( $cache_key, $rows );
-
-		return $rows;
+		return $this->last_found_rows;
 	}
 
 	/**
@@ -488,11 +502,6 @@ class Table_Query extends Query {
 	public function get_objects( string $as = '' ) {
 
 		$items = $this->get_results();
-
-		// We should do this here because subsequent queries during object creation might impact
-		if ( $this->found_rows ) {
-			$this->get_found_rows();
-		}
 
 		if ( $as && class_exists( $as ) ) {
 			array_map_to_class( $items, $as );

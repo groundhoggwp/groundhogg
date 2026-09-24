@@ -710,18 +710,8 @@ class Query {
 		 */
 		do_action_ref_array( 'groundhogg/query/pre_get_results', [ $this ] );
 
-		$cache_key   = $this->create_cache_key( __METHOD__ );
-		$cache_value = wp_cache_get( $cache_key, 'groundhogg', false, $found );
-
-		if ( $found ) {
-			return $cache_value;
-		}
-
-		$items = $this->db->get_results( $this->get_select_sql() );
-
-		wp_cache_set( $cache_key, $items, 'groundhogg' );
-
-		return $items;
+		// Not cached, there's no way to know when tables that aren't managed by Groundhogg change
+		return $this->db->get_results( $this->get_select_sql() );
 	}
 
 	/**
@@ -730,19 +720,7 @@ class Query {
 	 * @return int
 	 */
 	public function get_found_rows() {
-
-		$cache_key   = $this->create_cache_key( __METHOD__ );
-		$cache_value = wp_cache_get( $cache_key, 'groundhogg', false, $found );
-
-		if ( $found ) {
-			return $cache_value;
-		}
-
-		$rows = (int) $this->db->get_var( 'SELECT FOUND_ROWS()' );
-
-		wp_cache_set( $cache_key, $rows, 'groundhogg' );
-
-		return $rows;
+		return (int) $this->db->get_var( 'SELECT FOUND_ROWS()' );
 	}
 
 	/**
@@ -764,14 +742,6 @@ class Query {
 	 */
 	public function get_var( $x = 0, $y = 0 ) {
 
-		$cache_key = $this->create_cache_key( __METHOD__ );
-
-		$cache_value = wp_cache_get( $cache_key, 'groundhogg', false, $found );
-
-		if ( $found ) {
-			return $cache_value;
-		}
-
 		$query = [
 			$this->_select(),
 			$this->_joins(),
@@ -779,12 +749,7 @@ class Query {
 //			$this->_groupby(),
 		];
 
-		$result = $this->db->get_var( implode( ' ', $query ), $x, $y );
-
-		wp_cache_set( $cache_key, $result, 'groundhogg' );
-
-		return $result;
-
+		return $this->db->get_var( implode( ' ', $query ), $x, $y );
 	}
 
 	public static function coalesceEmptyString( string $col ) {
