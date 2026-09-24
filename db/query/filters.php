@@ -99,8 +99,6 @@ class Filters {
 	/**
 	 * Parse a given filter set based on the registered filters
 	 *
-	 * @throws FilterException
-	 *
 	 * @param Where          $where
 	 * @param bool           $negate  Whether this is NOT IN or IN
 	 *
@@ -137,9 +135,40 @@ class Filters {
 
 			// And Group
 			foreach ( $filter_group as $filter ) {
-				$this->parse_filter( $filter, $ands );
+				try {
+					$this->parse_filter( $filter, $ands );
+				} catch ( \Exception $exception ) {
+					$this->handle_filter_error( $exception, $filter, $ands );
+				}
 			}
 		}
+	}
+
+	/**
+	 * A filter that can't be applied must never widen the result set, so the whole AND group
+	 * it belongs to is made to match nothing.
+	 *
+	 * @param \Exception $exception
+	 * @param mixed      $filter
+	 * @param Where      $where the AND group the filter belongs to
+	 *
+	 * @return void
+	 */
+	protected function handle_filter_error( \Exception $exception, $filter, Where $where ) {
+
+		$where->addCondition( '1=0' );
+
+		_doing_it_wrong( __METHOD__, esc_html( $exception->getMessage() ), '4.8.4' );
+
+		/**
+		 * Fires when a filter could not be applied, either because its type is not registered
+		 * or its callback threw. The filter's AND group will match nothing.
+		 *
+		 * @param \Exception $exception
+		 * @param mixed      $filter
+		 * @param Where      $where
+		 */
+		do_action( 'groundhogg/query/filter_error', $exception, $filter, $where );
 	}
 
 	/**

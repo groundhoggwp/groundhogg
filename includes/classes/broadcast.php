@@ -395,6 +395,64 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Run a batch query, watching for any part of it that could not be applied.
+	 *
+	 * A filter that can't be applied matches nothing, which in an exclusion means excluding
+	 * nobody, so the broadcast could reach contacts it was never meant to. Usually caused by a
+	 * saved segment that relies on a filter registered by an outdated or deactivated add-on.
+	 *
+	 * @param Contact_Query $c_query
+	 *
+	 * @return Contact[]|false false if any part of the query could not be applied
+	 */
+	protected function query_batch( Contact_Query $c_query ) {
+
+		[ $contacts, $errors ] = self::track_query_errors( fn() => $c_query->query( null, true ) );
+
+		return $errors ? false : $contacts;
+	}
+
+	/**
+	 * Run a contact query, collecting any errors from filters or query vars that could not be applied.
+	 *
+	 * @param callable $callback runs the query
+	 *
+	 * @return array [ the callback's result, string[] error messages ]
+	 */
+	protected static function track_query_errors( callable $callback ): array {
+
+		$errors = [];
+		$track  = function ( $e ) use ( &$errors ) {
+			$errors[] = $e->getMessage();
+		};
+
+		add_action( 'groundhogg/query/filter_error', $track );
+		add_action( 'groundhogg/contact_query/error', $track );
+
+		try {
+			$result = $callback();
+		} finally {
+			remove_action( 'groundhogg/query/filter_error', $track );
+			remove_action( 'groundhogg/contact_query/error', $track );
+		}
+
+		return [ $result, $errors ];
+	}
+
+	/**
+	 * Cancel a broadcast whose query could not be applied. Whatever was scheduled in earlier
+	 * batches is unreliable, so scrap the run rather than send a partial broadcast.
+	 * cancel() also cancels any WAITING events and the background task.
+	 *
+	 * @return void
+	 */
+	protected function cancel_invalid_query() {
+		$this->update_meta( 'schedule_error', 'invalid_query' );
+		$this->delete_meta( 'schedule_lock' );
+		$this->cancel();
+	}
+
+	/**
 	 * Enqueue a batch of broadcast events
 	 *
 	 * @return bool|int
@@ -447,21 +505,10 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			$c_query->where()->greaterThan( 'ID', $last_id );
 		}
 
-		$contacts = $c_query->query( null, true );
+		$contacts = $this->query_batch( $c_query );
 
-		// The modern query engine threw and Contact_Query fell back to the legacy
-		// engine, which does not honour the `ID > last_id` keyset boundary or the
-		// batch limit set above. Continuing would re-schedule the entire audience on
-		// every batch (duplicate sends, count far exceeding the segment total).
-		// Usually caused by a saved segment that relies on filters registered by an
-		// outdated add-on. Cancel the broadcast: whatever was scheduled in earlier
-		// batches is unreliable, so scrap the run rather than send a
-		// partial/duplicated broadcast. cancel() also cancels any WAITING events and
-		// the background task.
-		if ( $c_query->used_legacy_fallback() ) {
-			$this->update_meta( 'schedule_error', 'legacy_query_fallback' );
-			$this->delete_meta( 'schedule_lock' );
-			$this->cancel();
+		if ( $contacts === false ) {
+			$this->cancel_invalid_query();
 
 			return false;
 		}
@@ -624,8 +671,15 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 
 		$c_query = new Contact_Query( $query );
 		$c_query->setOrderby( [ 'ID', 'ASC' ] )->setGroupby( 'ID' );
-		$contacts = $c_query->query( null, true );
-		$total    = $c_query->found_items;
+		$contacts = $this->query_batch( $c_query );
+
+		if ( $contacts === false ) {
+			$this->cancel_invalid_query();
+
+			return false;
+		}
+
+		$total = $c_query->found_items;
 
 		$batch_interval        = $this->get_meta( 'batch_interval' );
 		$batch_interval_length = absint( $this->get_meta( 'batch_interval_length' ) );
@@ -1234,7 +1288,12 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			$query['marketable'] = true;
 		}
 
-		$num_contacts = db()->contacts->count( $query );
+		[ $num_contacts, $query_errors ] = self::track_query_errors( fn() => db()->contacts->count( $query ) );
+
+		// Rather than send to the wrong audience, refuse to schedule if any part of the query can't be applied
+		if ( ! empty( $query_errors ) ) {
+			throw new SchedulingException( sprintf( 'Some of the filters could not be applied: %s', implode( '; ', array_unique( $query_errors ) ) ) );
+		}
 
 		if ( $num_contacts === 0 ) {
 			throw new NoContactsException( 'No contacts match the given filters.' );

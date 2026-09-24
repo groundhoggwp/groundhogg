@@ -48,27 +48,6 @@ class Contact_Query extends Table_Query {
 	protected $date_key = 'date_created';
 
 	/**
-	 * We'll also keep the legacy query on hand in the event there is an error
-	 *
-	 * @var Legacy_Contact_Query
-	 */
-	protected $legacy_query;
-
-	/**
-	 * Whether the most recent query(), count() or get_sql() call fell back to the
-	 * Legacy_Contact_Query because the modern query engine threw.
-	 *
-	 * When true, anything applied to the modern query object via method calls
-	 * (setLimit(), setOrderby(), where()->..., setGroupby(), etc.) was NOT honoured,
-	 * because the legacy engine only sees the raw query vars. Callers that depend on
-	 * that behaviour — most notably the broadcast scheduler's `ID > last_id` keyset
-	 * pagination — must check this and refuse to proceed.
-	 *
-	 * @var bool
-	 */
-	protected bool $used_legacy_fallback = false;
-
-	/**
 	 * @var int flags for later
 	 */
 	protected int $flags;
@@ -77,9 +56,6 @@ class Contact_Query extends Table_Query {
 		$this->query_vars   = $query_vars;
 		$this->flags = $flags;
 		parent::__construct( 'contacts' );
-
-		// Nice...
-		$this->legacy_query = new Legacy_Contact_Query( $query_vars );
 	}
 
 	protected function is_flag_set( int $flag ): bool {
@@ -2512,13 +2488,13 @@ class Contact_Query extends Table_Query {
 		_deprecated_function( __METHOD__, '3.2' );
 
 		$this->date_key = $string;
-		$this->legacy_query->set_date_key( $string );
 	}
 
 	/**
-	 * Backwards compat for Legacy Contact Query
+	 * Filters registered this way belonged to the legacy query engine, which has been removed.
+	 * They are no longer applied, and any filter of that type will match nothing.
 	 *
-	 * @deprecated use the Contact_Query::$filters->register() instead
+	 * @deprecated use Contact_Query::filters()->register() instead
 	 *
 	 * @param ...$args
 	 *
@@ -2526,7 +2502,6 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function register_filter( ...$args ) {
 		_deprecated_function( __METHOD__, '3.2', 'Contact_Query::filters()->register()' );
-		Legacy_Contact_Query::register_filter( ...$args );
 	}
 
 	/**
@@ -2552,71 +2527,31 @@ class Contact_Query extends Table_Query {
 	 */
 	public function set_query_var( string $var, $value ) {
 		$this->query_vars[ $var ] = $value;
-		$this->legacy_query->set_query_var( $var, $value );
 	}
 
 	/**
-	 * Whether the most recent query(), count() or get_sql() call fell back to the
-	 * Legacy_Contact_Query because the modern query engine threw.
+	 * Handle an exception thrown while setting up the query, typically because of malformed
+	 * query vars. The query will return nothing rather than risk returning too much.
 	 *
-	 * @return bool
-	 */
-	public function used_legacy_fallback(): bool {
-		return $this->used_legacy_fallback;
-	}
-
-	/**
-	 * Handle an exception thrown by the modern query engine before falling back to
-	 * the Legacy_Contact_Query.
-	 *
-	 * The modern engine throws when a saved segment references a filter that is not
-	 * registered with Contact_Query — typically a legacy filter registered by an
-	 * outdated add-on. We still fall back so the query returns something, but this
-	 * must never be silent: callers that rely on modern-only behaviour need to be
-	 * able to detect it (see used_legacy_fallback()), and site owners need a
-	 * breadcrumb to find the offending add-on.
-	 *
-	 * @throws \Throwable
-	 *
-	 * @param  \Throwable  $e
+	 * @param \Exception $e
 	 *
 	 * @return void
 	 */
-	protected function handle_legacy_fallback( \Throwable $e ) {
+	protected function handle_query_exception( \Exception $e ) {
 
-		$this->used_legacy_fallback = true;
-
-		$message = sprintf(
-			'Contact_Query fell back to Legacy_Contact_Query: %s | query_vars: %s',
-			$e->getMessage(),
-			wp_json_encode( $this->query_vars )
-		);
-
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( '[Groundhogg] ' . $message );
-		}
+		_doing_it_wrong( __METHOD__, esc_html( $e->getMessage() ), '4.8.4' );
 
 		/**
-		 * Fires whenever the modern contact query engine throws and the query falls
-		 * back to the legacy engine. Hook for telemetry or an admin notice.
+		 * Fires when the contact query could not be set up. The query will match nothing.
 		 *
-		 * @param \Throwable    $e          the exception thrown by the modern engine
+		 * @param \Exception    $e          the exception
 		 * @param array         $query_vars the query vars being processed
 		 * @param Contact_Query $query      the query instance
 		 */
-		do_action( 'groundhogg/contact_query/legacy_fallback', $e, $this->query_vars, $this );
+		do_action( 'groundhogg/contact_query/error', $e, $this->query_vars, $this );
 
-		/**
-		 * Allow forcing the exception to propagate instead of silently falling back
-		 * to the legacy engine. Defaults to false for backwards compatibility.
-		 *
-		 * @param bool          $throw
-		 * @param \Throwable     $e
-		 * @param Contact_Query  $query
-		 */
-		if ( apply_filters( 'groundhogg/contact_query/throw_on_legacy_fallback', false, $e, $this ) ) {
-			throw $e;
-		}
+		$this->where = new Where( $this );
+		$this->where->addCondition( '1=0' );
 	}
 
 	/**
@@ -2633,10 +2568,14 @@ class Contact_Query extends Table_Query {
 		}
 		try {
 			$this->maybe_setup_query();
-		} catch ( \Exception|FilterException $exception ) {
-			$this->handle_legacy_fallback( $exception );
+		} catch ( \Exception $exception ) {
+			$this->handle_query_exception( $exception );
 
-			return $this->legacy_query->get_sql( $query );
+			// setup may have thrown before the select clause was applied, which matters if this is used as a sub query
+			$select = get_array_var( $this->query_vars, 'select' );
+			if ( $select ) {
+				$this->setSelect( ...ensure_array( $select ) );
+			}
 		}
 
 		return $this->get_select_sql();
@@ -2676,10 +2615,10 @@ class Contact_Query extends Table_Query {
 
 		try {
 			$items = $this->get_results();
-		} catch ( FilterException|\Exception $exception ) {
-			$this->handle_legacy_fallback( $exception );
-			$items             = $this->legacy_query->query( $query_vars );
-			$this->found_items = $this->legacy_query->found_items;
+		} catch ( \Exception $exception ) {
+			$this->handle_query_exception( $exception );
+			$items             = [];
+			$this->found_items = 0;
 		}
 
 		if ( $as_objects ) {
@@ -2706,10 +2645,10 @@ class Contact_Query extends Table_Query {
 
 		try {
 			$this->maybe_setup_query();
-		} catch ( FilterException|\Exception $exception ) {
-			$this->handle_legacy_fallback( $exception );
+		} catch ( \Exception $exception ) {
+			$this->handle_query_exception( $exception );
 
-			return $this->legacy_query->count( $query_vars );
+			return 0;
 		}
 
 		if ( $this->groupby ) {
