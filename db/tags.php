@@ -121,6 +121,17 @@ class Tags extends DB {
 	}
 
 	/**
+	 * Retrieve tags from the database
+	 *
+	 * @access  public
+	 * @since   2.1
+	 */
+	public function get_tags() {
+		return $this->query( [], 'tag_name' );
+	}
+
+
+	/**
 	 * Given a list of tags, make sure that the tags exist, if they don't add/or remove them
 	 *
 	 * @param array $maybe_tags
