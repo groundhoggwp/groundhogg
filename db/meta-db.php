@@ -59,7 +59,22 @@ abstract class Meta_DB extends DB {
 			'_delete_orphaned_meta'
 		], 10, 1 );
 
+		// Meta writes go through the WP metadata API, which doesn't know about our cache groups
+		// Hooking here also catches direct calls to add_metadata() etc. that bypass this class
+		foreach ( [ 'added', 'updated', 'deleted' ] as $action ) {
+			add_action( "{$action}_{$this->get_object_type()}_meta", [ $this, 'meta_changed' ], 10, 0 );
+		}
+
 		parent::add_additional_actions();
+	}
+
+	/**
+	 * Invalidate cached queries when meta is added, updated, or deleted
+	 *
+	 * @return void
+	 */
+	public function meta_changed() {
+		$this->cache_set_last_changed();
 	}
 
 	/**

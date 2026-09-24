@@ -141,6 +141,7 @@ class Event_Queue extends DB {
 		$wpdb->query( "DELETE FROM $event_queue WHERE ( $where ) AND status != 'waiting' ORDER BY ID;" );
 
 		$this->cache_set_last_changed();
+		get_db( 'events' )->cache_set_last_changed();
 	}
 
 	/**

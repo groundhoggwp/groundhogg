@@ -59,6 +59,8 @@ class Page_Visits extends DB {
 		$compare_date      = time() - ( $retention_in_days * DAY_IN_SECONDS );
 
 		$wpdb->query( "DELETE from {$this->table_name} WHERE timestamp <= $compare_date" );
+
+		$this->cache_set_last_changed();
 	}
 
 	/**

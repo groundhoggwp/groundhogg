@@ -196,6 +196,7 @@ class Events extends DB {
 		}
 
 		$this->cache_set_last_changed();
+		get_db( 'event_queue' )->cache_set_last_changed();
 
 		return $inserted;
 	}

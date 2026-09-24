@@ -159,6 +159,8 @@ class Tag_Relationships extends DB {
 
 		$wpdb->query( "UPDATE $this->table_name SET contact_id = $contact->ID WHERE contact_id = $other->ID AND tag_id NOT IN ($tag_ids)" );
 
+		$this->cache_set_last_changed();
+
 	}
 
 	/**
