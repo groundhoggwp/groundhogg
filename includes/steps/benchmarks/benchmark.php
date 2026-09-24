@@ -132,15 +132,28 @@ abstract class Benchmark extends Funnel_Step {
 		// Accepts no arguments, but requires that child implementations setup the data ahead of time.
 		foreach ( $this->get_complete_hooks() as $hook => $args ) {
 			if ( is_array( $args ) ) {
+				add_action( $args[0], [ $this, 'reset' ], 97, 0 );
 				add_action( $args[0], [ $this, 'setup' ], 98, $args[1] );
 				add_action( $args[0], [ $this, 'complete' ], 99, 0 );
 			} else {
+				add_action( $hook, [ $this, 'reset' ], 97, 0 );
 				add_action( $hook, [ $this, 'setup' ], 98, $args );
 				add_action( $hook, [ $this, 'complete' ], 99, 0 );
 			}
 		}
 
 		parent::__construct();
+	}
+
+	/**
+	 * Step elements are singletons, so clear the data and args before each hook fire
+	 * otherwise a trigger that fires more than once in a request would carry over the previous fire's values
+	 *
+	 * @return void
+	 */
+	public function reset() {
+		$this->data = [];
+		$this->args = [];
 	}
 
 	/**
@@ -207,9 +220,10 @@ abstract class Benchmark extends Funnel_Step {
 
 				if ( $this->can_complete_step() ) {
 
-					$this->args = array_merge( $this->data_as_args(), $this->args );
+					// explicit args take precedence over those derived from data, don't write back so nothing accumulates between contacts or steps
+					$args = array_merge( $this->data_as_args(), $this->args );
 
-					$step->benchmark_enqueue( $this->get_current_contact(), $this->args );
+					$step->benchmark_enqueue( $this->get_current_contact(), $args );
 				}
 			}
 		}
