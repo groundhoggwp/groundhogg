@@ -3,8 +3,10 @@
 namespace Groundhogg\DB\Query;
 
 use Exception;
+use Groundhogg\DB\DB;
 use Groundhogg\Main_Roles;
 use wpdb;
+use function Groundhogg\db;
 use function Groundhogg\get_team_ids;
 use function Groundhogg\has_team;
 use function Groundhogg\md5serialize;
@@ -35,12 +37,56 @@ class Query {
 	protected Where $where;
 
 	/**
-	 * @param $table string
+	 * Cache groups of the tables this query reads from directly
+	 *
+	 * @var string[] group => group
+	 */
+	protected array $cache_groups = [];
+
+	/**
+	 * Sub queries whose tables this query also depends on
+	 *
+	 * @var Query[]
+	 */
+	protected array $sub_queries = [];
+
+	/**
+	 * Whether this query reads from a table whose changes can't be tracked
+	 *
+	 * @var bool
+	 */
+	protected bool $untracked_table = false;
+
+	/**
+	 * true to cache using the last_changed of every table the query depends on,
+	 * false to not cache,
+	 * or a number of seconds to cache for regardless of changes to tables other than the main one
+	 *
+	 * @var bool|int
+	 */
+	protected $cache = true;
+
+	/**
+	 * Queries that are currently being set up, any query created in the meantime is treated as their sub query
+	 *
+	 * @var Query[]
+	 */
+	protected static array $collectors = [];
+
+	/**
+	 * @param $table string|Query
 	 */
 	public function __construct( $table, string $alias = '' ) {
 
 		global $wpdb;
 		$this->db = $wpdb;
+
+		// Queries created while another is being set up are most likely its sub queries
+		if ( ! empty( self::$collectors ) ) {
+			end( self::$collectors )->add_dependency( $this );
+		}
+
+		$this->add_table_dependency( $table );
 
 		$this->table = is_a( $table, Query::class ) ? "($table)" : $table;
 
@@ -118,6 +164,9 @@ class Query {
 					break;
 				case 'found_rows':
 					$this->setFoundRows( $value );
+					break;
+				case 'cache':
+					$this->setCache( $value );
 					break;
 			}
 		}
@@ -440,6 +489,160 @@ class Query {
 	 *
 	 * @return $this
 	 */
+	/**
+	 * Set how the results of this query are cached
+	 *
+	 * @param bool|int $cache true to cache until a table the query depends on changes, false to not cache,
+	 *                        or a number of seconds for which results may be stale
+	 *
+	 * @return $this
+	 */
+	public function setCache( $cache ) {
+
+		if ( is_numeric( $cache ) ) {
+			$cache = absint( $cache ) ?: false;
+		} else {
+			$cache = filter_var( $cache, FILTER_VALIDATE_BOOLEAN );
+		}
+
+		$this->cache = $cache;
+
+		return $this;
+	}
+
+	/**
+	 * Register the main table of the query as a dependency
+	 *
+	 * @param $table string|Query
+	 *
+	 * @return void
+	 */
+	protected function add_table_dependency( $table ) {
+		$this->add_dependency( $table );
+	}
+
+	/**
+	 * Register a table or sub query that this query reads from, so its cached results
+	 * are invalidated when that table changes
+	 *
+	 * @param DB|Query|string $table a DB, a sub query, or a table name
+	 *
+	 * @return void
+	 */
+	public function add_dependency( $table ) {
+
+		if ( is_a( $table, Query::class ) ) {
+			if ( $table !== $this ) {
+				$this->sub_queries[ spl_object_id( $table ) ] = $table;
+			}
+
+			return;
+		}
+
+		if ( is_a( $table, DB::class ) ) {
+			$group = $table->get_cache_group();
+
+			$this->cache_groups[ $group ] = $group;
+
+			return;
+		}
+
+		if ( ! is_string( $table ) || empty( $table ) ) {
+			$this->untracked_table = true;
+
+			return;
+		}
+
+		$db = db()->get_db_by_table_name( $table );
+
+		if ( $db ) {
+			$this->add_dependency( $db );
+
+			return;
+		}
+
+		/**
+		 * Provide a cache group for a table that isn't managed by Groundhogg, so queries that read from it can be cached.
+		 * Whoever provides the group must also call DB::set_group_last_changed( $group ) whenever the table changes.
+		 *
+		 * @param string|false $group      the cache group, false if not tracked
+		 * @param string       $table_name the name of the table
+		 */
+		$group = apply_filters( 'groundhogg/query/table_cache_group', false, $table );
+
+		if ( is_string( $group ) && ! empty( $group ) ) {
+			$this->cache_groups[ $group ] = $group;
+
+			return;
+		}
+
+		$this->untracked_table = true;
+	}
+
+	/**
+	 * Get the cache groups of all the tables this query and its sub queries read from
+	 *
+	 * @param array $visited used to avoid cycles
+	 *
+	 * @return string[]
+	 */
+	public function get_cache_groups( array &$visited = [] ): array {
+
+		$visited[ spl_object_id( $this ) ] = true;
+
+		$groups = $this->cache_groups;
+
+		foreach ( $this->sub_queries as $id => $sub_query ) {
+			if ( ! isset( $visited[ $id ] ) ) {
+				$groups += $sub_query->get_cache_groups( $visited );
+			}
+		}
+
+		return $groups;
+	}
+
+	/**
+	 * Whether this query or any of its sub queries reads from a table whose changes can't be tracked
+	 *
+	 * @param array $visited used to avoid cycles
+	 *
+	 * @return bool
+	 */
+	public function has_untracked_table( array &$visited = [] ): bool {
+
+		if ( $this->untracked_table ) {
+			return true;
+		}
+
+		$visited[ spl_object_id( $this ) ] = true;
+
+		foreach ( $this->sub_queries as $id => $sub_query ) {
+			if ( ! isset( $visited[ $id ] ) && $sub_query->has_untracked_table( $visited ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Treat any query created while running the callback as a sub query of this one
+	 *
+	 * @param callable $callback
+	 *
+	 * @return mixed whatever the callback returns
+	 */
+	protected function collect_dependencies( callable $callback ) {
+
+		self::$collectors[] = $this;
+
+		try {
+			return call_user_func( $callback );
+		} finally {
+			array_pop( self::$collectors );
+		}
+	}
+
 	public function setFoundRows( bool $val ) {
 		$this->found_rows = $val;
 
@@ -643,6 +846,7 @@ class Query {
 	 */
 	public function addJoin( $direction, $table ) {
 		$join                        = new Join( $direction, $table, $this );
+		$this->add_dependency( $join->table );
 		$this->joins[ $join->alias ] = $join;
 
 		return $join;

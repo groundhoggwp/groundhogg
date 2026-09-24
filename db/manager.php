@@ -145,6 +145,24 @@ class Manager {
 	 *
 	 * @return string[]
 	 */
+	/**
+	 * Find the DB that manages a table
+	 *
+	 * @param string $table_name the full table name, including the prefix
+	 *
+	 * @return DB|false
+	 */
+	public function get_db_by_table_name( string $table_name ) {
+
+		foreach ( $this->dbs as $db ) {
+			if ( $db && $db->table_name === $table_name ) {
+				return $db;
+			}
+		}
+
+		return false;
+	}
+
 	public function get_table_names() {
 		$table_names = [];
 

@@ -694,15 +694,26 @@ abstract class DB {
 	 * @since  2.8
 	 */
 	public function cache_set_last_changed() {
+		self::set_group_last_changed( $this->get_cache_group() );
+	}
+
+	/**
+	 * Sets the last_changed value of any cache group, invalidating cached queries that depend on it
+	 *
+	 * @param string $group
+	 *
+	 * @return void
+	 */
+	public static function set_group_last_changed( string $group ) {
 
 		// Use our own cache instead
 		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
-			self::$cache[ $this->get_cache_group() ]['last_changed'] = microtime();
+			self::$cache[ $group ]['last_changed'] = microtime();
 
 			return;
 		}
 
-		wp_cache_set_last_changed( $this->get_cache_group() );
+		wp_cache_set_last_changed( $group );
 	}
 
 	/**
@@ -712,20 +723,28 @@ abstract class DB {
 	 * @since  2.8
 	 */
 	public function cache_get_last_changed() {
+		return self::get_group_last_changed( $this->get_cache_group() );
+	}
+
+	/**
+	 * Retrieves the last_changed value of any cache group
+	 *
+	 * @param string $group
+	 *
+	 * @return string
+	 */
+	public static function get_group_last_changed( string $group ) {
 
 		// Use our own cache instead
 		if ( ! is_option_enabled( 'gh_use_object_cache' ) ) {
-			if ( $this->_exists( 'last_changed', $this->get_cache_group() ) ) {
-				return self::$cache[ $this->get_cache_group() ]['last_changed'];
-			} else {
-				$last_changed                                            = microtime();
-				self::$cache[ $this->get_cache_group() ]['last_changed'] = $last_changed;
-
-				return $last_changed;
+			if ( ! isset( self::$cache[ $group ]['last_changed'] ) ) {
+				self::$cache[ $group ]['last_changed'] = microtime();
 			}
+
+			return self::$cache[ $group ]['last_changed'];
 		}
 
-		return wp_cache_get_last_changed( $this->get_cache_group() );
+		return wp_cache_get_last_changed( $group );
 	}
 
 	/**
@@ -744,13 +763,14 @@ abstract class DB {
 	/**
 	 * Get the results from the cache
 	 *
-	 * @param $cache_key string
-	 * @param $found     bool if a result was found
+	 * @param $cache_key    string
+	 * @param $found        bool if a result was found
+	 * @param $last_changed string|null salt for the key, defaults to this table's last_changed
 	 *
 	 * @return false|mixed
 	 */
-	public function cache_get( $cache_key, &$found = null ) {
-		$last_changed = $this->cache_get_last_changed();
+	public function cache_get( $cache_key, &$found = null, $last_changed = null ) {
+		$last_changed = $last_changed ?? $this->cache_get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
 
 		// Use our own cache instead
@@ -781,11 +801,13 @@ abstract class DB {
 	 *
 	 * @param $cache_key
 	 * @param $data
+	 * @param $last_changed string|null salt for the key, defaults to this table's last_changed
+	 * @param $expire       int how long the object cache should keep it
 	 *
 	 * @return bool
 	 */
-	public function cache_set( $cache_key, $data ) {
-		$last_changed = $this->cache_get_last_changed();
+	public function cache_set( $cache_key, $data, $last_changed = null, $expire = MINUTE_IN_SECONDS ) {
+		$last_changed = $last_changed ?? $this->cache_get_last_changed();
 		$cache_key    = "$cache_key:$last_changed";
 
 		// Use our own cache instead
@@ -801,7 +823,7 @@ abstract class DB {
 			return false;
 		}
 
-		return wp_cache_set( $cache_key, $data, $this->get_cache_group(), MINUTE_IN_SECONDS );
+		return wp_cache_set( $cache_key, $data, $this->get_cache_group(), $expire );
 	}
 
 	/**

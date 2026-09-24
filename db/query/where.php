@@ -426,6 +426,8 @@ class Where {
 	 * @return $this
 	 */
 	public function exists( Query $query ) {
+		$this->query->add_dependency( $query );
+
 		return $this->addCondition( "EXISTS ($query)" );
 	}
 
@@ -447,6 +449,7 @@ class Where {
 		$column = $this->sanitize_column( $column );
 
 		if ( is_a( $values, Query::class ) ) {
+			$this->query->add_dependency( $values );
 			$this->addCondition( "$column IN ( $values )" );
 
 			return $this;
@@ -476,6 +479,7 @@ class Where {
 		$column = $this->sanitize_column( $column );
 
 		if ( is_a( $values, Query::class ) ) {
+			$this->query->add_dependency( $values );
 			$this->addCondition( "$column NOT IN ( $values )" );
 
 			return $this;

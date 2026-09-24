@@ -1839,7 +1839,24 @@ class Contact_Query extends Table_Query {
 
 		$this->setup_flag = true;
 
+		// Filters can build sub queries against other tables, cached results must depend on them too
+		$this->collect_dependencies( fn() => $this->setup_query() );
+	}
+
+	/**
+	 * Build the query from the query vars
+	 *
+	 * @throws FilterException
+	 * @return void
+	 */
+	protected function setup_query() {
+
 		$this->parse_query_vars();
+
+		// Set before the filters are parsed, they may depend on it
+		if ( isset( $this->query_vars['cache'] ) ) {
+			$this->setCache( $this->query_vars['cache'] );
+		}
 
 		self::set_where_conditions( $this->query_vars, $this->where );
 
@@ -2225,6 +2242,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		$activity_table = get_db( 'activity' );
+		$this->add_dependency( $activity_table );
 
 		$join = $this->db->prepare( "LEFT JOIN $activity_table->table_name $activity_table_alias 
 		ON {$this->alias}.ID = $activity_table_alias.contact_id 
@@ -2690,7 +2708,7 @@ class Contact_Query extends Table_Query {
 		/**
 		 * Before getting the results of the query
 		 */
-		do_action_ref_array( 'groundhogg/contact_query/pre_get_contacts', [ &$this ] );
+		$this->collect_dependencies( fn() => do_action_ref_array( 'groundhogg/contact_query/pre_get_contacts', [ &$this ] ) );
 
 		$items = parent::get_results();
 
