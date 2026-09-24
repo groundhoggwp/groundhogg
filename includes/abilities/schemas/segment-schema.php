@@ -5,6 +5,8 @@ namespace Groundhogg\Abilities\Schemas;
 use Groundhogg\Abilities\Traits\Has_Optin_Status;
 use Groundhogg\Contact_Query;
 use WP_Error;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\base64_json_encode;
 use function Groundhogg\parse_tag_list;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -204,7 +206,7 @@ class Segment_Schema {
 	 */
 	public static function extend( string $key, array $schema, callable $callback, bool $is_audience_key = false ) {
 
-		if ( array_key_exists( $key, self::base_properties() ) || isset( self::$extensions[ $key ] ) ) {
+		if ( $key === 'exclude_segment' || array_key_exists( $key, self::base_properties() ) || isset( self::$extensions[ $key ] ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				sprintf( 'A Segment_Schema property named "%s" already exists.', $key ),
@@ -361,6 +363,18 @@ class Segment_Schema {
 			$properties[ $key ] = $extension['schema'];
 		}
 
+		// Nests the schema inside itself one level deep - built from $properties
+		// as it stands right now (before `exclude_segment` is added below), so
+		// this can't recurse any further. See to_query()'s handling of
+		// `exclude_segment` for how it's turned into the `exclude_filters` query
+		// var via to_filters().
+		$properties['exclude_segment'] = [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'properties'           => $properties,
+			'description'          => __( 'Exclude contacts matching this nested segment definition - same shape as this schema itself (minus exclude_segment; nesting only goes one level deep). Combined with `AND NOT (...)` against the rest of this segment.', 'groundhogg' ),
+		];
+
 		// See the class docblock for how an add-on adds its own properties here.
 		return apply_filters( 'groundhogg/segment_schema/properties', $properties );
 	}
@@ -401,6 +415,11 @@ class Segment_Schema {
 	 * are ANDed. Returns a WP_Error when tags_include names only tags that do not
 	 * exist - without this, Contact_Query would treat the empty resolved list as
 	 * "no tag constraint" and match every contact.
+	 *
+	 * `exclude_segment`, if present, is itself run through to_filters() and
+	 * merged in as the `exclude_filters` query var - contacts matching that
+	 * nested segment are excluded rather than required. See properties()' own
+	 * definition of `exclude_segment` for its shape.
 	 *
 	 * Does not run the query. The caller should wrap its own Contact_Query call in
 	 * try/catch - a malformed value can still throw a TypeError from inside it.
@@ -563,6 +582,23 @@ class Segment_Schema {
 				$query['include_filters'][0] ?? [],
 				$extension_conditions
 			);
+		}
+
+		if ( ! empty( $input['exclude_segment'] ) && is_array( $input['exclude_segment'] ) ) {
+
+			$exclude_filters = self::to_filters( $input['exclude_segment'] );
+
+			if ( is_wp_error( $exclude_filters ) ) {
+				return $exclude_filters;
+			}
+
+			if ( ! empty( $exclude_filters ) ) {
+				// Contact_Query natively understands `exclude_filters` alongside
+				// `include_filters` (db.php's `case 'exclude_filters'`) - contacts
+				// matching this Filters-DSL condition list are excluded rather than
+				// required.
+				$query['exclude_filters'] = $exclude_filters;
+			}
 		}
 
 		// See the class docblock for how an add-on translates its own input
@@ -861,6 +897,51 @@ class Segment_Schema {
 
 		// See the class docblock for how an add-on adds its own conditions here.
 		return apply_filters( 'groundhogg/segment_schema/filters', empty( $conditions ) ? [] : [ $conditions ], $input );
+	}
+
+	/**
+	 * Build a wp-admin Contacts page URL (`gh_contacts`) pre-loaded with this
+	 * segment's filters, for handing back to a human as "here's this audience in
+	 * the UI" - e.g. an ability's output alongside a live Contact_Query result.
+	 * Uses the same `filters`/`exclude_filters` query args (base64_json_encode()'d
+	 * Filters-DSL) the Contacts page's own scripts() method and
+	 * contact_filters_link() already read - see admin\contacts\contacts-page.php.
+	 *
+	 * `exclude_segment`, if present, becomes `exclude_filters` here exactly as it
+	 * does in to_query() - see to_query()'s docblock.
+	 *
+	 * @param array $input
+	 *
+	 * @return string|WP_Error
+	 */
+	public static function to_admin_url( array $input ) {
+
+		$filters = self::to_filters( $input );
+
+		if ( is_wp_error( $filters ) ) {
+			return $filters;
+		}
+
+		$args = [];
+
+		if ( ! empty( $filters ) ) {
+			$args['filters'] = base64_json_encode( $filters );
+		}
+
+		if ( ! empty( $input['exclude_segment'] ) && is_array( $input['exclude_segment'] ) ) {
+
+			$exclude_filters = self::to_filters( $input['exclude_segment'] );
+
+			if ( is_wp_error( $exclude_filters ) ) {
+				return $exclude_filters;
+			}
+
+			if ( ! empty( $exclude_filters ) ) {
+				$args['exclude_filters'] = base64_json_encode( $exclude_filters );
+			}
+		}
+
+		return admin_page_url( 'gh_contacts', $args );
 	}
 
 	/**

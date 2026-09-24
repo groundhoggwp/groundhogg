@@ -72,6 +72,10 @@ class Search_Contacts extends Ability {
 						'type'        => 'string',
 						'description' => __( 'Only present when "sql" is passed in expand. The raw SQL Contact_Query built for this search - see the `expand` input\'s description for a caveat about legacy-query fallback.', 'groundhogg' ),
 					],
+					'admin_url' => [
+						'type'        => 'string',
+						'description' => __( 'A wp-admin Contacts page URL pre-loaded with this same search\'s filters, for handing back to a person to view/refine in the UI.', 'groundhogg' ),
+					],
 				],
 			],
 		];
@@ -114,6 +118,12 @@ class Search_Contacts extends Ability {
 			'total_items' => $contact_query->found_items,
 			'contacts'    => $contacts,
 		];
+
+		$admin_url = Segment_Schema::to_admin_url( $input );
+
+		if ( ! is_wp_error( $admin_url ) ) {
+			$output['admin_url'] = $admin_url;
+		}
 
 		if ( in_array( 'sql', $expand, true ) ) {
 			// Called after query() rather than before: get_sql()'s own
