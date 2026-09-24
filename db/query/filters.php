@@ -174,11 +174,13 @@ class Filters {
 	/**
 	 * Given a date range, create a before & and after
 	 *
-	 * @param array $filter
+	 * @param array    $filter
+	 * @param bool     $format
+	 * @param int|null $now    timestamp the range is relative to, defaults to the current time
 	 *
 	 * @return DateTimeHelper[]
 	 */
-	public static function get_before_and_after_from_date_range( $filter, $format = false ) {
+	public static function get_before_and_after_from_date_range( $filter, $format = false, $now = null ) {
 
 		$filter = wp_parse_args( $filter, [
 			'date_range' => 'any',
@@ -187,8 +189,8 @@ class Filters {
 			'days'       => 0, // any positive integer
 		] );
 
-		$after  = new DateTimeHelper(); // now
-		$before = new DateTimeHelper(); // now
+		$after  = new DateTimeHelper( $now ?? 'now' );
+		$before = new DateTimeHelper( $now ?? 'now' );
 
 		switch ( $filter['date_range'] ) {
 			default:
@@ -380,6 +382,26 @@ class Filters {
 	}
 
 	/**
+	 * The time relative date ranges should be based on for a query.
+	 * Queries that allow stale results use the start of the current minute, so rolling ranges like
+	 * "in the last 7 days" produce the same SQL, and the same cache key, for the whole minute.
+	 *
+	 * @param Query $query
+	 *
+	 * @return int|null null for the current time
+	 */
+	public static function get_now_for_query( Query $query ) {
+
+		if ( ! $query->allows_stale_results() ) {
+			return null;
+		}
+
+		$now = time();
+
+		return $now - ( $now % MINUTE_IN_SECONDS );
+	}
+
+	/**
 	 * Handler for date related query filter clauses
 	 *
 	 * @param string          $column the table column
@@ -406,7 +428,7 @@ class Filters {
 
 		try {
 
-			[ 'before' => $before, 'after' => $after ] = self::get_before_and_after_from_date_range( $filter );
+			[ 'before' => $before, 'after' => $after ] = self::get_before_and_after_from_date_range( $filter, false, self::get_now_for_query( $where->query ) );
 
 			if ( method_exists( $before, $format ) ) {
 				$before = call_user_func( [ $before, $format ] );

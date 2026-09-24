@@ -511,6 +511,27 @@ class Query {
 	}
 
 	/**
+	 * Whether results may be stale, either because this query allows it or because it's
+	 * being built as part of a query that does
+	 *
+	 * @return bool
+	 */
+	public function allows_stale_results(): bool {
+
+		if ( is_int( $this->cache ) ) {
+			return true;
+		}
+
+		foreach ( self::$collectors as $collector ) {
+			if ( is_int( $collector->cache ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Register the main table of the query as a dependency
 	 *
 	 * @param $table string|Query

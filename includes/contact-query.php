@@ -301,7 +301,7 @@ class Contact_Query extends Table_Query {
 		 * @type $before DateTimeHelper
 		 * @type $after  DateTimeHelper
 		 */
-		[ 'before' => $before, 'after' => $after ] = Filters::get_before_and_after_from_date_range( $filter );
+		[ 'before' => $before, 'after' => $after ] = Filters::get_before_and_after_from_date_range( $filter, false, Filters::get_now_for_query( $where->query ) );
 
 		if ( $filter['compare'] === 'is_not' ) {
 			$where->not();

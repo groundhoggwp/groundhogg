@@ -87,6 +87,11 @@ class Table_Query extends Query {
 			'search_columns' => $this->db_table->get_searchable_columns(),
 		] );
 
+		// Set before any date ranges are parsed, they depend on it
+		if ( isset( $params['cache'] ) ) {
+			$this->setCache( $params['cache'] );
+		}
+
 		foreach ( $params as $param => $value ) {
 			$param = strtolower( $param );
 
