@@ -325,30 +325,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 			<?php
 			return;
 		endif; ?>
-		<?php if ( get_url_var( 'action' ) === 'view_updates' && ! get_request_var( 'confirm' ) ):
-			do_action( 'groundhogg/admin/tools/updates', get_request_var( 'updater' ) );
-
-			return;
-		endif; ?>
-		<?php if ( get_url_var( 'action' ) === 'view_updates' && get_request_var( 'confirm' ) === 'yes' ): ?>
-            <p><?php esc_html_e( '⚠️ Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ); ?></p>
-			<?php
-
-			html( 'a', [
-				'class' => 'big-button button-primary',
-				'href'  => add_query_arg( [
-					'updater'             => sanitize_text_field( get_request_var( 'updater' ) ),
-					'manual_update'       => sanitize_text_field( get_request_var( 'manual_update' ) ),
-					'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
-				], get_request_uri() )
-			], sprintf(
-				/* translators: 1: version number to update to */
-				esc_html__( 'Yes, perform update %s', 'groundhogg' ),
-				sanitize_text_field( get_request_var( 'manual_update' ) )
-			) );
-
-			return;
-		endif; ?>
         <div class="post-box-grid">
 			<?php do_action( 'groundhogg/admin/tools/system_status/before' ); ?>
             <div class="gh-panel">
@@ -447,18 +423,17 @@ class Tools_Page extends Tabbed_Admin_Page {
 								'required'    => true,
 	                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
 								'options'     => apply_filters( 'groundhogg/admin/tools/updaters', [] ),
-								'option_none' => esc_html__( 'Select plugin to view updates', 'groundhogg' )
+								'option_none' => esc_html__( 'Select plugin to view updates', 'groundhogg' ),
+								'selected'    => get_url_var( 'action' ) === 'view_updates' ? get_request_var( 'updater' ) : '',
+								'onchange'    => 'this.form.submit()',
 							] );
-
-							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-							echo html()->submit( [
-								'class' => 'gh-button primary',
-								'text'  => esc_html__( 'View Updates' , 'groundhogg' )
-							] )
 
 							?>
                         </div>
                     </form>
+					<?php if ( get_url_var( 'action' ) === 'view_updates' && get_request_var( 'updater' ) ): ?>
+						<?php do_action( 'groundhogg/admin/tools/updates', get_request_var( 'updater' ) ); ?>
+					<?php endif; ?>
                 </div>
             </div>
 			<?php
