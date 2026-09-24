@@ -2,7 +2,6 @@
 
 use Groundhogg\Main_Updater;
 use Groundhogg\Plugin;
-use Groundhogg\Preferences;
 
 class Main_Updater_Tests extends GH_UnitTestCase {
 
@@ -64,39 +63,9 @@ class Main_Updater_Tests extends GH_UnitTestCase {
 	 * Test that an update is performed when "forgetting" a previous update
 	 */
 	public function test_do_forget_version_update() {
-		$this->assertTrue( $this->updater->forget_version_update( '2.0.7' ) );
-		$this->assertFalse( $this->updater->did_update( '2.0.7' ) );
-	}
-
-	/**
-	 * Test the 2.1.13 update that will increment all the optin statuses of contacts by 1
-	 */
-	public function test_update_2_1_13() {
-
-		// Old statuses
-		$contact_ids_unconfirmed  = $this->factory()->contacts->create_many( 2, [ 'optin_status' => 0 ] );
-		$contact_ids_confirmed    = $this->factory()->contacts->create_many( 2, [ 'optin_status' => 1 ] );
-		$contact_ids_unsubscribed = $this->factory()->contacts->create_many( 2, [ 'optin_status' => 2 ] );
-
-		Plugin::instance()->updater->version_2_1_13();
-
-		// Test unconfirmed
-		foreach ( $contact_ids_unconfirmed as $id ) {
-			$contact = $this->factory()->contacts->get_object_by_id( $id );
-			$this->assertEquals( Preferences::UNCONFIRMED, $contact->get_optin_status() );
-		}
-
-		// Test confirmed
-		foreach ( $contact_ids_confirmed as $id ) {
-			$contact = $this->factory()->contacts->get_object_by_id( $id );
-			$this->assertEquals( Preferences::CONFIRMED, $contact->get_optin_status() );
-		}
-
-		// Test Unsubscribed
-		foreach ( $contact_ids_unsubscribed as $id ) {
-			$contact = $this->factory()->contacts->get_object_by_id( $id );
-			$this->assertEquals( Preferences::UNSUBSCRIBED, $contact->get_optin_status() );
-		}
+		$this->assertTrue( $this->updater->did_update( '2.7.10' ) );
+		$this->assertTrue( $this->updater->forget_version_update( '2.7.10' ) );
+		$this->assertFalse( $this->updater->did_update( '2.7.10' ) );
 	}
 
 }

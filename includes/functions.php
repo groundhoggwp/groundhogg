@@ -1361,6 +1361,12 @@ function get_cookie( $cookie = '', $default = false ) {
  * @return bool
  */
 function set_cookie( $cookie = '', $value = '', $expiration = HOUR_IN_SECONDS ) {
+
+	// Can't send a cookie once output has started
+	if ( headers_sent() ) {
+		return false;
+	}
+
 	return setcookie( $cookie, $value, time() + $expiration, COOKIEPATH, COOKIE_DOMAIN );
 }
 

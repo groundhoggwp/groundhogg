@@ -22,10 +22,12 @@ class Tracking_Tests extends GH_UnitTestCase {
 		$tracking = \Groundhogg\Plugin::$instance->tracking;
 
 		$event_id = \Groundhogg\get_db( 'events' )->add( [
-			'queued_id' => 1234
+			'queued_id' => 1234,
+			'time'      => time(), // events without a time are rejected
 		] );
 
-		$tracking->add_tracking_cookie_param( 'event_id', 1234 );
+		// Links carry the queued_id, but it's converted to the event ID before it goes in the cookie
+		$tracking->add_tracking_cookie_param( 'event_id', $event_id );
 
 		$this->assertEquals( $event_id, $tracking->get_current_event()->get_id() );
 

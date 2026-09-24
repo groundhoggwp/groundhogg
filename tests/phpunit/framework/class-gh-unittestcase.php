@@ -18,11 +18,23 @@ class GH_UnitTestCase extends WP_UnitTestCase_Base
 		return $factory;
 	}
 
+	/**
+	 * Tracking is a singleton with protected, in-memory cookie state that would otherwise leak
+	 * between tests, e.g. a contact tracked by creating a user changes how later merge tags render.
+	 */
+	protected function reset_tracking_state() {
+		$ref = new ReflectionProperty( \Groundhogg\Tracking::class, 'cookie' );
+		$ref->setAccessible( true );
+		$ref->setValue( \Groundhogg\tracking(), [] );
+	}
+
 	public function tearDown(): void {
+		$this->reset_tracking_state();
 		parent::tearDown();
 	}
 
 	public function setUp(): void {
 		parent::setUp();
+		$this->reset_tracking_state();
 	}
 }

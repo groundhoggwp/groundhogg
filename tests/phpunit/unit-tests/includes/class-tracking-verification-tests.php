@@ -28,28 +28,6 @@ class Tracking_Verification_Tests extends GH_UnitTestCase {
 	}
 
 	/**
-	 * Tracking is a singleton with protected, in-memory cookie state that would otherwise leak
-	 * between test methods (and between this class and any other test touching tracking()).
-	 */
-	protected function reset_tracking_state() {
-		foreach ( [ 'cookie' ] as $prop ) {
-			$ref = new ReflectionProperty( Tracking::class, $prop );
-			$ref->setAccessible( true );
-			$ref->setValue( tracking(), [] );
-		}
-	}
-
-	public function setUp(): void {
-		parent::setUp();
-		$this->reset_tracking_state();
-	}
-
-	public function tearDown(): void {
-		$this->reset_tracking_state();
-		parent::tearDown();
-	}
-
-	/**
 	 * Helper: create a Submission (not the 'form' type, so get_answers() doesn't need a real
 	 * Form_v2 config behind it) and post the given data to it.
 	 */

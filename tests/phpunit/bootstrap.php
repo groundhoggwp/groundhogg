@@ -33,10 +33,14 @@ function _manually_load_plugin() {
  */
 function _manually_install_groundhogg() {
 	Plugin::instance()->installer->activation_hook( false );
+
+	// WP_Roles::add_cap() doesn't update the cached WP_Role objects, so reload them or the new caps won't apply until the next run
+	wp_roles()->for_site();
 }
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
-tests_add_filter( 'init', '_manually_install_groundhogg' );
+// Install before automatic updates run at init priority 8, the same as activation does on a real site
+tests_add_filter( 'init', '_manually_install_groundhogg', 1 );
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';

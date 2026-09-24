@@ -69,18 +69,24 @@ class Old_Updater extends Updater {
 	 * Activity Caps
 	 */
 	public function version_2_5_7_4() {
+		global $wpdb;
+
+		// Delete directly, contactmeta shares the 'contact' object type so DB::delete() would fire the contact deleted hooks
+		$table = get_db( 'contactmeta' )->get_table_name();
 
 		// Contacts with this birthday only got it probably because of a bug
-		get_db( 'contactmeta' )->delete( [
+		$wpdb->delete( $table, [
 			'meta_key'   => 'birthday',
 			'meta_value' => '1970-01-01'
 		] );
 
 		// Contacts with this birthday only got it probably because of a bug
-		get_db( 'contactmeta' )->delete( [
+		$wpdb->delete( $table, [
 			'meta_key'   => 'birthday',
 			'meta_value' => '1999-11-30'
 		] );
+
+		get_db( 'contactmeta' )->cache_set_last_changed();
 	}
 
 	/**

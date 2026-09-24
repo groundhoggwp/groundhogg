@@ -28,15 +28,19 @@ class Account_Created_Tests extends GH_UnitTestCase {
 		] );
 
 		$account_created = $funnel->add_step( [
-			'step_title' => 'Account Created',
-			'step_type'  => Account_Created::TYPE,
-			'step_group' => Account_Created::GROUP,
-			'meta'       => [
+			'step_title'  => 'Account Created',
+			'step_type'   => Account_Created::TYPE,
+			'step_group'  => Account_Created::GROUP,
+			'step_status' => 'active', // steps default to inactive, which can't be completed
+			'meta'        => [
 				'role' => [
 					'subscriber'
 				]
 			]
 		] );
+
+		// active steps save settings as pending changes, commit them like the funnel editor does
+		$account_created->commit();
 
 		$user_id = $this->factory()->user->create();
 
@@ -63,15 +67,19 @@ class Account_Created_Tests extends GH_UnitTestCase {
 		] );
 
 		$account_created = $funnel->add_step( [
-			'step_title' => 'Account Created',
-			'step_type'  => Account_Created::TYPE,
-			'step_group' => Account_Created::GROUP,
-			'meta'       => [
+			'step_title'  => 'Account Created',
+			'step_type'   => Account_Created::TYPE,
+			'step_group'  => Account_Created::GROUP,
+			'step_status' => 'active', // steps default to inactive, which can't be completed
+			'meta'        => [
 				'role' => [
 					'subscriber'
 				]
 			]
 		] );
+
+		// active steps save settings as pending changes, commit them like the funnel editor does
+		$account_created->commit();
 
 		$user_id = $this->factory()->user->create( [
 			'role' => 'administrator'

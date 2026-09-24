@@ -1,5 +1,6 @@
 <?php
 
+use Groundhogg\Tag_Mapping;
 use function Groundhogg\convert_user_to_contact_when_user_registered;
 use function Groundhogg\create_user_from_contact;
 use function Groundhogg\get_contactdata;
@@ -47,6 +48,10 @@ class Function_Tests extends GH_UnitTestCase {
 	public function test_contact_has_tags_when_new_user_is_registered() {
 
 		$this->factory()->contacts->get_db()->truncate();
+
+		// Role tags come from tag mapping, which is opt-in and only registers its hooks when enabled at construction
+		update_option( 'gh_enable_tag_mapping', 'on' );
+		new Tag_Mapping();
 
 		$user_id = $this->factory()->user->create( [
 			'role' => 'subscriber'

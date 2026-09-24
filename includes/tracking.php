@@ -664,8 +664,7 @@ class Tracking {
 			return $this->event;
 		}
 
-		// It's likely that the event is being set by an email link click,
-		// so reference the `queued_id` rather than the actual event `ID`
+		// The cookie stores the event `ID`, email link clicks convert the link's `queued_id` before setting it
 		$event = new Event( $id );
 
 		if ( ! $event->exists() ) {

@@ -855,6 +855,8 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 		// admin_enqueue_scripts is what registers the handle (Scripts::register_admin_scripts(), already
 		// hooked from plugin bootstrap) and is what Incoming_Messages::enqueue() is hooked to as well - firing
 		// it is how this runs for real, rather than only checking enqueue() in isolation.
+		// Other listeners (like WP_Site_Health) expect a screen, as they would in a real admin request.
+		set_current_screen( 'groundhogg_page_gh_settings' );
 		$_GET = [];
 		do_action( 'admin_enqueue_scripts' );
 		$this->assertFalse( $enqueued() );
