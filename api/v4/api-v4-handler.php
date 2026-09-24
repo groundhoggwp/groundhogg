@@ -49,6 +49,8 @@ class API_V4_HANDLER {
 		$this->searches    = new Searches_Api();
 		$this->reports     = new Reports_Api();
 		$this->email_log   = new Email_Log_Api();
+		$this->messages    = new Messages_Api();
+		$this->inbox       = new Inbox_Api();
 		$this->unsubscribe = new Unsubscribe_Api();
 		$this->campaigns   = new Campaigns_Api();
 		$this->tracking    = new Tracking_Api();

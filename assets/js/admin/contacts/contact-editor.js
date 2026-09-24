@@ -65,6 +65,10 @@
     submissions: SubmissionsStore,
   } = Groundhogg.stores
 
+  // The messages on the timeline are without what they said, which can be a lot. They're not in the store that a
+  // message is read into when it's opened, or that would be what was opened.
+  const TimelineMessages = Groundhogg.createStore('timeline_messages', Groundhogg.api.routes.v4.messages)
+
   const {
     post,
     delete: _delete,
@@ -925,6 +929,10 @@
         return this.renderEvent(activity)
       }
 
+      if (activity.type === 'message') {
+        return this.renderMessage(activity)
+      }
+
       if (this.hiddenActivity.includes(activity.data.activity_type)) {
         return null
       }
@@ -944,6 +952,64 @@
         diffTime  : activity.i18n.diff_time,
         ymdhis    : activity.i18n.ymdhis,
         children  : activity.children,
+      })
+    },
+
+    /**
+     * A message, an email that someone sent to the contact from Groundhogg or from their own mailbox, or one that the
+     * contact sent. What it said is read when it's opened, the link is handled by the messages component.
+     */
+    renderMessage (message) {
+
+      const {
+        direction,
+        subject,
+        in_reply_to,
+      } = message.data
+
+      const {
+        sent_by,
+        sender,
+        diff_time,
+        ymdhis,
+      } = message.i18n
+
+      const inbound = direction === 'inbound'
+
+      const link = `<a href="#" class="view-message" data-message-id="${ escHTML(String(message.ID)) }">${ bold(escHTML(subject || __('(no subject)', 'groundhogg'))) }</a>`
+
+      let body
+
+      if (!inbound) {
+        /* translators: sentby: the name of a user, subject: the subject line of an email */
+        body = sprintf(__('%(sentby)s sent an email with subject %(subject)s', 'groundhogg'), {
+          sentby : bold(escHTML(sent_by)),
+          subject: link,
+        })
+      }
+      else if (in_reply_to) {
+        /* translators: from: the name of the person that wrote it, subject: the subject line of an email */
+        body = sprintf(__('%(from)s replied to an email with subject %(subject)s', 'groundhogg'), {
+          from   : bold(escHTML(sender)),
+          subject: link,
+        })
+      }
+      else {
+        /* translators: sentby: the name of the person that wrote it, subject: the subject line of an email */
+        body = sprintf(__('%(sentby)s sent an email with subject %(subject)s', 'groundhogg'), {
+          sentby : bold(escHTML(sender)),
+          subject: link,
+        })
+      }
+
+      return this.ActivityItem({
+        id       : `ti-msg-${ message.ID }`,
+        className: `message ${ direction } activity`,
+        iconClass: `message ${ direction }`,
+        icon     : inbound ? icons.email : icons.open_email,
+        body,
+        diffTime : diff_time,
+        ymdhis,
       })
     },
 
@@ -1818,6 +1884,7 @@
               { id: 'broadcasts', text: __('All broadcasts', 'groundhogg') },
               { id: 'submissions', text: __('Form submissions', 'groundhogg') },
               { id: 'web', text: __('Web activity', 'groundhogg') },
+              { id: 'messages', text: __('Messages', 'groundhogg') },
             ]
 
             if (isWPFusionActive) {
@@ -1901,6 +1968,8 @@
                 return activities.filter(a => a.type === 'submission')
               case 'web':
                 return activities.filter(a => a.type === 'page_visit')
+              case 'messages':
+                return activities.filter(a => a.type === 'message')
               case 'wp_fusion':
                 return activities.filter(a => a.type === 'activity' && a.data.activity_type === 'wp_fusion')
             }
@@ -1953,7 +2022,7 @@
           }))
 
           // The four time-bounded stores. The queue is handled separately (always fetched whole).
-          const rangedStores = [ SubmissionsStore, ActivityStore, EventsStore, PageVisitsStore ]
+          const rangedStores = [ SubmissionsStore, ActivityStore, EventsStore, PageVisitsStore, TimelineMessages ]
 
           /**
            * @param before  upper bound (unix) - omit for "everything since `after`"
@@ -1987,6 +2056,7 @@
               ActivityStore.itemsFetched(response.activity)
               EventsStore.itemsFetched(response.events)
               PageVisitsStore.itemsFetched(response.page_visits)
+              TimelineMessages.itemsFetched(response.messages || [])
 
               // the pending queue is always returned whole - rebuild it so fired events drop off
               EventQueue.clearItems()
@@ -2013,7 +2083,7 @@
 
             fetchActivity({ before: sliceBefore, after: sliceAfter }).then(response => {
 
-              let got = [ 'submissions', 'activity', 'events', 'page_visits' ].
+              let got = [ 'submissions', 'activity', 'events', 'page_visits', 'messages' ].
                 reduce((n, k) => n + ( Array.isArray(response[k]) ? response[k].length : 0 ), 0)
 
               if (got) {
@@ -2094,6 +2164,11 @@
                 type: 'page_visit',
                 time: parseInt(v.data.timestamp),
               } )),
+              ...TimelineMessages.getItems().map(m => ( {
+                ...m,
+                type: 'message',
+                time: parseInt(m.timestamp),
+              } )),
             ].sort(
               (a, b) => {
 
@@ -2145,6 +2220,7 @@
             || EventQueue.hasItems()
             || PageVisitsStore.hasItems()
             || SubmissionsStore.hasItems()
+            || TimelineMessages.hasItems()
           )) {
             loadTimeline()
             return
@@ -2389,36 +2465,27 @@
         },
       },
       {
-        id     : 'inbox',
-        name   : __('Inbox'),
+        id     : 'messages',
+        name   : __('Messages', 'groundhogg'),
         render : () => {
           // language=HTML
           return `
               <div class="gh-panel top-left-square">
-                  <div class="inside" id="inbox-here">
-                      <p>
-                          ${ sprintf(
-                                  __('Hi %s, we\'re still working on the inbox feature! We know how important this is for you, so our team is working around the clock to make it a reality!',
-                                          'groundhogg'),
-                                  Groundhogg.currentUser.data.display_name) }</p>
-                      <p>
-                          ${ __( 'You can help us get there faster by giving us a <a target="_blank" href="https://wordpress.org/support/plugin/groundhogg/reviews/">⭐⭐⭐⭐⭐ review!</a>' ) }</p>
-                  </div>
+                  <div id="messages-here"></div>
               </div>`
         },
         onMount: () => {
 
-          // get( `${ContactsStore.route}/${contact.ID}/inbox`).then( r => {
-          //   console.log(r)
-          // } )
-
+          morphdom(document.getElementById('messages-here'), Groundhogg.ObjectMessages({
+            object_id   : contact.ID,
+            object_type : 'contact',
+            title       : false,
+            id          : 'messages-here',
+            onNewMessage: () => sendEmail(),
+          }))
         },
       },
     ]
-
-    // if (Groundhogg.isWhiteLabeled) {
-    tabs.splice(tabs.findIndex(t => t.id === 'inbox'), 1)
-    // }
 
     const template = () => {
       // language=HTML

@@ -3,6 +3,7 @@
 namespace Groundhogg;
 
 use Groundhogg\Background\Iterate_Over_List;
+use Groundhogg\Background\Migrate_Composed_Emails;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Steps\Actions\Send_Email;
 
@@ -359,6 +360,15 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 					get_db( 'custom_objects' )->create_table();
 					get_db( 'custom_object_meta' )->create_table();
+				},
+			],
+			'4.9' => [
+				'automatic'   => true,
+				'description' => __( 'Add the messages table and move composed emails from activity to messages.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'messages' )->create_table();
+
+					Background_Tasks::add( new Migrate_Composed_Emails() );
 				},
 			],
 		];

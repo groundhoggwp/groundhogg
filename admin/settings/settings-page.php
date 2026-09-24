@@ -94,6 +94,8 @@ class Settings_Page extends Admin_Page {
 		add_action( 'admin_init', array( $this, 'register_sections' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( "groundhogg/admin/settings/api_tab/after_form", [ $this, 'api_keys_table' ] );
+
+		Incoming_Messages::init();
 	}
 
 	public function get_slug() {

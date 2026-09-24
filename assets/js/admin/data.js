@@ -931,6 +931,7 @@
       primaryKey: 'id',
     }),
     email_log: ObjectStore(Groundhogg.api.routes.v4.email_log),
+    messages: ObjectStore(Groundhogg.api.routes.v4.messages),
   }
 
   Groundhogg.createStore = (id, route = '', extra = {}) => {

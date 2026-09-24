@@ -619,6 +619,11 @@ code.meta-replacement-code {
         color: var(--gh-primary);
       }
 
+      // what a contact wrote to us, the emails we sent are the default
+      &.message.inbound {
+        color: var(--gh-primary);
+      }
+
       &.pending {
         opacity: 0.6;
       }

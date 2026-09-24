@@ -5,6 +5,8 @@ namespace Groundhogg\Api\V4;
 // Exit if accessed directly
 use Groundhogg\Block_Registry;
 use Groundhogg\Campaign;
+use Groundhogg\Classes\Inbox;
+use Groundhogg\Classes\Message;
 use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Email_Logger;
@@ -30,7 +32,6 @@ use function Groundhogg\maybe_explode;
 use function Groundhogg\process_events;
 use function Groundhogg\redact;
 use function Groundhogg\send_email_notification;
-use function Groundhogg\track_activity;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -520,7 +521,17 @@ class Emails_Api extends Base_Object_Api {
 
 		add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
 
+		// we assign the Message-ID ourselves, so that a reply can be matched to what we sent
+		$message_id = Message::use_message_id();
+
+		// replies go to the inbox, when there is one
+		if ( $reply_to = Inbox::reply_to( $message_id ) ) {
+			$headers[] = 'Reply-To: ' . $reply_to;
+		}
+
 		$result = \Groundhogg_Email_Services::send_type( $type, $to, $subject, $content, $headers );
+
+		Message::release_message_id();
 
 		if ( $this->has_errors() ) {
 			return $this->get_last_error();
@@ -530,7 +541,7 @@ class Emails_Api extends Base_Object_Api {
 			return self::ERROR_500();
 		}
 
-		$subject = redact( $subject );
+		$response_subject = redact( $subject );
 
 		$all_recipients = array_unique( array_merge( $to, $bcc, $cc ) );
 
@@ -541,17 +552,19 @@ class Emails_Api extends Base_Object_Api {
 				continue;
 			}
 
-			track_activity( $contact, 'composed_email_sent', [], [
-				'subject' => $subject,
-				'from'    => $from_email,
-				'sent_by' => get_current_user_id(),
-				'log_id'  => Email_Logger::get_last_log_id()
+			Message::record_composed_email( $contact, [
+				'subject'      => $subject,
+				'content'      => $content,
+				'from_address' => $from_email,
+				'user_id'      => get_current_user_id(),
+				'email_log_id' => Email_Logger::get_last_log_id() ?: 0,
+				'message_id'   => $message_id,
 			] );
 		}
 
 		$result = [
 			'from'    => $from_email,
-			'subject' => $subject,
+			'subject' => $response_subject,
 		];
 
 		if ( Email_Logger::is_enabled() ) {

@@ -2926,6 +2926,7 @@
       },
     }),
     Button({
+      type     : 'button', // this can be embedded inside a <form> (e.g. the settings page) - never submit it
       className: 'gh-button icon secondary',
       onClick  : e => {
         copyText(text)

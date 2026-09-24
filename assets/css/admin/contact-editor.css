@@ -493,6 +493,9 @@ code.meta-replacement-code {
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).funnel {
   color: var(--gh-primary);
 }
+#activity-timeline li.activity-item .activity-icon:not(.no-frame).message.inbound {
+  color: var(--gh-primary);
+}
 #activity-timeline li.activity-item .activity-icon:not(.no-frame).pending {
   opacity: 0.6;
 }

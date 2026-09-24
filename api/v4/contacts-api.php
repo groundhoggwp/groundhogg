@@ -11,6 +11,7 @@ use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
+use Groundhogg\Classes\Message;
 use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
@@ -1051,6 +1052,15 @@ class Contacts_Api extends Base_Object_Api {
 		$events = as_class( db()->events->query( array_merge( $ranged, [ 'orderby' => 'time', 'status' => [ Event::COMPLETE, Event::FAILED ] ] ) ), Event::class );
 		// page visits
 		$page_visits = as_class( db()->page_visits->query( array_merge( $ranged, [ 'orderby' => 'timestamp' ] ) ), Page_Visit::class );
+		// messages, composed emails and what was received. Automated emails are events, and are already here.
+		$messages = as_class( db()->messages->query( array_merge( $time_range, [
+			'object_type' => 'contact',
+			'object_id'   => $ID,
+			'order'       => $order,
+			'orderby'     => 'date_created',
+			'found_rows'  => false,
+		] ) ), Message::class );
+		$messages = array_values( array_filter( $messages, fn( $message ) => current_user_can( 'view_message', $message ) ) );
 		// event queue - always the contact's full WAITING list, regardless of the time window, so
 		// an incremental refresh can drop events that have since fired
 		$event_queue = as_class( db()->event_queue->query( array_merge( $common, [ 'status' => Event::WAITING, 'orderby' => 'time' ] ) ), Event_Queue_Item::class );
@@ -1144,6 +1154,7 @@ class Contacts_Api extends Base_Object_Api {
 			'events'      => $events_data,
 			'event_queue' => $event_queue_data,
 			'page_visits' => $page_visits,
+			'messages'    => array_map( fn( $message ) => $message->get_timeline_array( $contact ), $messages ),
 			'funnels'     => $funnels,
 			'emails'      => $emails,
 			'steps'       => $steps,

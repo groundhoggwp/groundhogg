@@ -80,6 +80,7 @@ class Manager {
 		$this->form_impressions     = new Form_Impressions();
 		$this->notes                = new Notes();
 		$this->tasks                = new Tasks();
+		$this->messages             = new Messages();
 		$this->permissions_keys     = new Permissions_Keys();
 		$this->email_log            = new Email_Log();
 		$this->event_queue          = new Event_Queue();

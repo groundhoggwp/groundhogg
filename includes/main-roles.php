@@ -185,6 +185,13 @@ class Main_Roles extends Roles {
 			'delete_log'              => [ 'delete_logs' ],
 			'start_flows'             => [ 'view_funnels', 'send_emails' ],
 			'schedule_flows'          => [ 'view_funnels', 'schedule_broadcasts' ],
+			// Messages have no caps of their own, they are governed by the contact permissions.
+			// Messages are only ever created and changed server side (sent or received), so
+			// add/edit are not granted to anyone, otherwise an inbound reply could be forged over REST.
+			'view_messages'           => [ 'view_contacts' ],
+			'delete_messages'         => [ 'delete_contacts' ],
+			'add_messages'            => [ 'do_not_allow' ],
+			'edit_messages'           => [ 'do_not_allow' ],
 		];
 
 		if ( key_exists( $cap, $primitive_cap_map ) ) {
@@ -322,6 +329,43 @@ class Main_Roles extends Roles {
 						     && ! user_can( $user_id, 'view_' . $associated_type, $associated ) ) {
 							$caps[] = 'do_not_allow';
 						}
+					}
+				}
+
+				break;
+			case 'view_message':
+			case 'edit_message':
+			case 'delete_message':
+
+				$action  = explode( '_', $cap )[0];
+				$message = $args[0] ?? null;
+
+				// didn't pass the full object
+				if ( ! is_object( $message ) || ! method_exists( $message, 'get_id' ) ) {
+					$message = create_object_from_type( $message, 'message' );
+				}
+
+				// Not a real object
+				if ( ! $message || ! $message->exists() ) {
+					$caps = [ 'do_not_allow' ];
+					break;
+				}
+
+				// the blanket cap for this action, which maps to the contact permissions
+				$caps = $primitive_cap_map[ $action . '_messages' ];
+
+				// a message is only as visible as the object it's attached to
+				$associated = $message->get_associated_object();
+
+				if ( is_object( $associated ) && method_exists( $associated, 'exists' ) && $associated->exists() ) {
+
+					$associated_type = $associated->_get_object_type();
+
+					/** This filter is documented above, in the note and task cascade */
+					$cascade_types = apply_filters( 'groundhogg/roles/note_association_cap_check_types', [ 'contact', 'deal', 'company' ], $associated, $action );
+
+					if ( in_array( $associated_type, $cascade_types, true ) && ! user_can( $user_id, 'view_' . $associated_type, $associated ) ) {
+						$caps[] = 'do_not_allow';
 					}
 				}
 

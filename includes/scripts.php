@@ -277,6 +277,7 @@ class Scripts {
 			'jquery-ui-sortable',
 			'groundhogg-admin-tasks',
 			'groundhogg-admin-notes',
+			'groundhogg-admin-messages',
 			'groundhogg-admin-components',
 			'groundhogg-admin-properties',
 			'groundhogg-admin',
@@ -313,6 +314,19 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
 			'groundhogg-admin-saved-replies',
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-messages', GROUNDHOGG_ASSETS_URL . 'js/admin/components/messages' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-admin-data',
+			'groundhogg-make-el',
+		], GROUNDHOGG_VERSION );
+
+		wp_register_script( 'groundhogg-admin-incoming-messages', GROUNDHOGG_ASSETS_URL . 'js/admin/settings/incoming-messages' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-admin-data',
+			'groundhogg-admin-components',
+			'groundhogg-make-el',
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-saved-replies', GROUNDHOGG_ASSETS_URL . 'js/admin/components/replies' . $dot_min . '.js', [
@@ -627,6 +641,8 @@ class Scripts {
 						'submissions' => rest_url( Base_Api::NAME_SPACE . '/submissions' ),
 						'tasks'       => rest_url( Base_Api::NAME_SPACE . '/tasks' ),
 						'email_log'   => rest_url( Base_Api::NAME_SPACE . '/email_log' ),
+						'messages'    => rest_url( Base_Api::NAME_SPACE . '/messages' ),
+						'inbox'       => rest_url( Base_Api::NAME_SPACE . '/inbox' ),
 					]
 				]
 			],
@@ -701,6 +717,7 @@ class Scripts {
 			'groundhogg-admin-contact-editor',
 			'groundhogg-admin-tasks',
 			'groundhogg-admin-notes',
+			'groundhogg-admin-messages',
 			'groundhogg-admin-remote-notifications',
 			'groundhogg-admin-form-builder-v2',
 			'groundhogg-admin-flow-simulator',

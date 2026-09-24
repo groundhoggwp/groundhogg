@@ -559,9 +559,27 @@ table.wp-list-table th#stats, table.wp-list-table th#sending_to {
   max-width: 100%;
 }
 
-.wp-list-table#updates-list th:first-child,
-.wp-list-table#updates-list th:nth-child(2) {
-  width: 100px;
+.gh-updates-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.gh-updates-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--gh-panel-gray);
+}
+.gh-updates-list li:last-child {
+  border-bottom: none;
+}
+.gh-updates-list .gh-update-version {
+  flex: 0 0 80px;
+  text-align: center;
+}
+.gh-updates-list .gh-update-description {
+  flex: 1;
 }
 
 label.block {

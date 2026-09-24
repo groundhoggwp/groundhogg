@@ -3,6 +3,8 @@
 namespace Groundhogg\Abilities\Emails;
 
 use Groundhogg\Abilities\Ability;
+use Groundhogg\Classes\Inbox;
+use Groundhogg\Classes\Message;
 use Groundhogg\Email_Logger;
 use WP_Error;
 use function Groundhogg\do_replacements;
@@ -10,9 +12,9 @@ use function Groundhogg\email_kses;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
+use function Groundhogg\get_sender_profiles;
 use function Groundhogg\is_sending;
 use function Groundhogg\redact;
-use function Groundhogg\track_activity;
 
 /**
  * Sends a one-off, free-form ("composed") email - subject and HTML body supplied
@@ -157,12 +159,55 @@ class Send_Composed_Email extends Ability {
 			}
 		}
 
-		$from_email = ! empty( $input['from_email'] ) ? sanitize_email( $input['from_email'] ) : get_default_from_email();
-		$from_name  = ! empty( $input['from_name'] ) ? sanitize_text_field( $input['from_name'] ) : get_default_from_name();
+		$from_email = get_default_from_email();
+		$from_name  = get_default_from_name();
+
+		$profile_id = ! empty( $input['sender_profile'] ) ? sanitize_text_field( $input['sender_profile'] ) : '';
+		$profile    = false;
+
+		if ( $profile_id ) {
+
+			$profiles = get_sender_profiles();
+
+			if ( ! isset( $profiles[ $profile_id ] ) ) {
+				return new WP_Error(
+					'groundhogg_invalid_sender_profile',
+					__( 'Not a valid sender profile. See groundhogg/list-sender-profiles.', 'groundhogg' )
+				);
+			}
+
+			$profile    = $profiles[ $profile_id ];
+			$from_email = $profile['from_email'];
+			$from_name  = $profile['from_name'];
+		}
+
+		if ( ! empty( $input['from_email'] ) ) {
+			$from_email = sanitize_email( $input['from_email'] );
+		}
+
+		if ( ! empty( $input['from_name'] ) ) {
+			$from_name = sanitize_text_field( $input['from_name'] );
+		}
 
 		// Merge-field replacement is resolved against the first `to` address, if
 		// it belongs to a contact - same as Emails_Api::send_email().
 		$contact = ! empty( $to ) ? get_contactdata( $to[0] ) : false;
+
+		// Profiles such as "owner" contain merge tags; resolve them against the contact.
+		if ( $profile ) {
+
+			if ( $contact && $contact->exists() ) {
+				$from_email = sanitize_email( do_replacements( $from_email, $contact ) );
+				$from_name  = sanitize_text_field( do_replacements( $from_name, $contact ) );
+			}
+
+			if ( ! is_email( $from_email ) ) {
+				return new WP_Error(
+					'groundhogg_invalid_sender_profile',
+					__( 'The sender profile could not be resolved to a valid email address. The "owner" profile requires the first "to" address to belong to a contact with an owner.', 'groundhogg' )
+				);
+			}
+		}
 
 		$content = $input['content'];
 
@@ -201,7 +246,17 @@ class Send_Composed_Email extends Ability {
 
 		add_action( 'wp_mail_failed', $catch );
 
+		// we assign the Message-ID ourselves, so that a reply can be matched to what we sent
+		$message_id = Message::use_message_id();
+
+		// replies go to the inbox, when there is one
+		if ( $reply_to = Inbox::reply_to( $message_id ) ) {
+			$headers[] = 'Reply-To: ' . $reply_to;
+		}
+
 		$result = \Groundhogg_Email_Services::send_type( $type, $to, $subject, $content, $headers );
+
+		Message::release_message_id();
 
 		remove_action( 'wp_mail_failed', $catch );
 
@@ -213,7 +268,7 @@ class Send_Composed_Email extends Ability {
 			return new WP_Error( 'groundhogg_email_not_sent', __( 'The email could not be sent.', 'groundhogg' ) );
 		}
 
-		$subject = redact( $subject );
+		$response_subject = redact( $subject );
 
 		$all_recipients = array_values( array_unique( array_merge( $to, $cc, $bcc ) ) );
 
@@ -227,18 +282,20 @@ class Send_Composed_Email extends Ability {
 				continue;
 			}
 
-			track_activity( $recipient_contact, 'composed_email_sent', [], [
-				'subject' => $subject,
-				'from'    => $from_email,
-				'sent_by' => get_current_user_id(),
-				'log_id'  => $log_id,
+			Message::record_composed_email( $recipient_contact, [
+				'subject'      => $subject,
+				'content'      => $content,
+				'from_address' => $from_email,
+				'user_id'      => get_current_user_id(),
+				'email_log_id' => $log_id ?: 0,
+				'message_id'   => $message_id,
 			] );
 		}
 
 		$response = [
 			'sent'       => true,
 			'from'       => $from_email,
-			'subject'    => $subject,
+			'subject'    => $response_subject,
 			'recipients' => $all_recipients,
 		];
 

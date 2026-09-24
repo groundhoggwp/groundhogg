@@ -680,6 +680,193 @@ h2.nav-tab-wrapper.gh {
   }
 }
 
+.messages-widget {
+  padding: 10px;
+
+  .messages-header {
+    margin-bottom: 15px;
+
+    .messages-search {
+      min-width: 200px;
+    }
+  }
+
+  .messages-hint {
+    margin: -5px 0 10px;
+    font-size: 12px;
+    color: var(--gh-dark-50);
+  }
+
+  .messages-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .messages-load-earlier {
+    text-align: center;
+  }
+
+  .message-row {
+    display: flex;
+
+    // sent: right aligned, solid brand colour, like an outgoing text
+    &.outbound {
+      justify-content: flex-end;
+
+      .message-bubble {
+        background: var(--gh-primary);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+
+        .message-meta {
+          color: rgba(255, 255, 255, 0.75);
+        }
+
+        // broadcast and flow emails, lighter so they read as automated and not a person
+        &.automated {
+          background: var(--gh-primary-10);
+          color: #1c1c1e;
+          border: 1px solid var(--gh-primary-20);
+
+          .message-meta {
+            color: rgba(28, 28, 30, 0.6);
+          }
+        }
+      }
+    }
+
+    // received: left aligned, neutral grey, like an incoming text
+    &.inbound {
+      justify-content: flex-start;
+
+      .message-bubble {
+        background: #e9e9eb;
+        color: #1c1c1e;
+        border-bottom-left-radius: 4px;
+
+        .message-meta {
+          color: rgba(28, 28, 30, 0.6);
+        }
+      }
+    }
+  }
+
+  .message-bubble {
+    max-width: 75%;
+    min-width: 200px;
+    padding: 10px 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    &:hover {
+      filter: brightness(0.97);
+    }
+
+    &.expanded {
+      width: 75%;
+      cursor: default;
+    }
+
+    &.failed {
+      outline: 1px solid var(--gh-danger, #d63638);
+    }
+
+    .message-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--gh-dark-50);
+
+      .message-sender {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .message-time {
+        margin-left: auto;
+        white-space: nowrap;
+      }
+    }
+
+    .message-subject {
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .message-source {
+      margin-top: 2px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .message-note {
+      padding: 10px 12px;
+      font-size: 13px;
+      font-style: italic;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .message-preview {
+      margin-top: 2px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .message-body {
+      margin-top: 10px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: auto;
+
+      .message-frame {
+        display: block;
+        width: 100%;
+        min-height: 60px;
+        border: 0;
+      }
+    }
+  }
+}
+
+// a message, opened from the timeline. It's in a modal, so it's not inside the messages widget.
+.message-modal {
+  width: min(900px, 90vw);
+
+  .message-modal-header {
+    align-items: flex-start;
+    padding: 15px 20px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .message-modal-details div {
+      font-size: 13px;
+    }
+  }
+
+  .message-frame {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: #fff;
+  }
+
+  .message-note {
+    padding: 20px;
+    font-style: italic;
+  }
+}
+
 .tasks-widget {
   overflow: auto;
 
@@ -1076,6 +1263,11 @@ a.action-link {
   &.red {
     background: $error-red-25;
     color: darken($error-red, 35)
+  }
+
+  &.colorless {
+    background: var(--gh-dark-5);
+    color: var(--gh-dark);
   }
 
   &.dark {

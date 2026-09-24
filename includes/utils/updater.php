@@ -128,29 +128,32 @@ abstract class Updater {
 
 		usort( $updates, 'version_compare' );
 
-		$_this = $this;
-
-		html()->list_table( [
-			'id' => 'updates-list'
-		], [
-			__( 'Completed', 'groundhogg' ),
-			__( 'Version', 'groundhogg' ),
-			__( 'Description', 'groundhogg' ),
-		],
-			array_map_with_keys( array_reverse( $updates ), function ( $update ) use ( $_this ) {
-				return [
-					$this->did_update( $update ) ? "<span style=\"color: green\">&#x2705;</span>" : '-',
-					html()->e( 'a', [
-						'href' => add_query_arg( [
-							'updater'       => $this->get_updater_name(),
-							'manual_update' => $update,
-							'confirm'       => 'yes',
+		?>
+        <ul id="updates-list" class="gh-updates-list">
+			<?php foreach ( array_reverse( $updates ) as $update ): ?>
+                <li>
+					<?php
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated link
+					echo html()->e( 'a', [
+						'class'      => 'gh-update-version pill danger-confirm' . ( $this->did_update( $update ) ? ' success' : ' colorless' ),
+						'data-alert' => __( 'Re-performing previous updates can cause unexpected issues and should be done with caution. We recommend you backup your site, or export your contact list before proceeding.', 'groundhogg' ),
+						'href'       => add_query_arg( [
+							'updater'             => $this->get_updater_name(),
+							'manual_update'       => $update,
+							'manual_update_nonce' => wp_create_nonce( 'gh_manual_update' ),
 						], get_request_uri() )
-					], $update ),
-					kses( $_this->get_update_description( $update ), 'simple' )
-				];
-			} )
-		);
+					], $update );
+					?>
+                    <span class="gh-update-description">
+						<?php
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized via kses
+						echo kses( $this->get_update_description( $update ), 'simple' );
+						?>
+                    </span>
+                </li>
+			<?php endforeach; ?>
+        </ul>
+		<?php
 	}
 
 	/**
