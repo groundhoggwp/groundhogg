@@ -213,18 +213,50 @@ class Help_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
+	 * Find a support user created before the support user's ID was stored.
+	 *
+	 * The login and email of an account are chosen by its owner, so they can't be used to identify the support user on their own.
+	 * Only an account that is already an administrator is adopted, so matching it can't be used to escalate privileges.
+	 *
+	 * @return false|WP_User
+	 */
+	protected function get_legacy_support_user() {
+
+		foreach ( [ self::SUPPORT_EMAIL, self::HELP_EMAIL ] as $email ) {
+
+			$user = get_user_by( 'email', $email );
+
+			if ( $user && in_array( 'administrator', (array) $user->roles, true ) ) {
+				return $user;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Create a support user
 	 *
 	 * @return false|WP_User
 	 */
 	public function create_support_user() {
 
-		$user_login = get_option( 'gh_support_user_login', self::SUPPORT_LOGIN );
+		// Only trust the account we created ourselves
+		$user = get_userdata( absint( get_option( 'gh_support_user_id' ) ) );
 
-		$user = get_user_by( 'login', $user_login );
+		if ( ! $user ) {
+			$user = $this->get_legacy_support_user();
+		}
 
 		// No user exists, create one
 		if ( ! $user ) {
+
+			$user_login = self::SUPPORT_LOGIN;
+
+			// Never reuse an existing account with the support login, it may belong to someone else
+			if ( username_exists( $user_login ) ) {
+				$user_login = uniqid( self::SUPPORT_LOGIN . '_' );
+			}
 
 			$user_id = wp_create_user( $user_login, wp_generate_password(), self::SUPPORT_EMAIL );
 
@@ -233,14 +265,10 @@ class Help_Page extends Tabbed_Admin_Page {
 			}
 
 			$user = get_userdata( $user_id );
-
-		} // User exists, but does not belong to us
-		else if ( ! in_array( $user->user_email, [ self::SUPPORT_EMAIL, self::HELP_EMAIL ] ) ) {
-			// Set a unique login
-			update_option( 'gh_support_user_login', uniqid( self::SUPPORT_LOGIN . '_' ) );
-
-			return $this->create_support_user();
 		}
+
+		update_option( 'gh_support_user_id', $user->ID );
+		delete_option( 'gh_support_user_login' );
 
 		// Set locale to en_US
 		update_user_meta( $user->ID, 'locale', 'en_US' );
