@@ -149,7 +149,12 @@
       ]
     }
 
-    Groundhogg.components.emailModal( email, activityUpdated )
+    Groundhogg.components.emailModal( email, () => {
+      activityUpdated()
+
+      // a composed email is a message, the thread has it now. Nothing to click if the messages tab hasn't been opened
+      $('#refresh-messages').click()
+    } )
   }
 
   const strings = {
