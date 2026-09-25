@@ -64,7 +64,7 @@ class Inbox_Api extends Base_Api {
 			'provisioned'      => Inbox::is_provisioned(),
 			'site_matches'     => Inbox::site_matches(),
 			'active'           => Inbox::is_active(),
-			'address'          => Inbox::address(),
+			'address'          => Inbox::pretty_address(),
 			'reply_address'    => Inbox::reply_address(),
 			'endpoint_current' => Inbox::endpoint_is_current(),
 			'last_received'    => Inbox::last_received(),

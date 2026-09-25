@@ -921,7 +921,9 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 
 		$this->assertSame( 200, $status );
 		$this->assertTrue( $data['provisioned'] );
-		$this->assertSame( Inbox::address(), $data['address'] );
+		// it's the address with the name of whoever is looking at it, that's still the same address to the relay
+		$this->assertSame( Inbox::pretty_address(), $data['address'] );
+		$this->assertStringEndsWith( Inbox::address(), $data['address'] );
 		$this->assertSame( Inbox::reply_address(), $data['reply_address'] );
 		$this->assertTrue( Inbox::is_provisioned() );
 

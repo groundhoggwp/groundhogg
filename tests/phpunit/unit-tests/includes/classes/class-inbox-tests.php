@@ -259,6 +259,238 @@ class Inbox_Tests extends GH_UnitTestCase {
 		$this->assertEquals( $b->get_id(), $message->object_id );
 	}
 
+	public function test_a_message_from_one_of_us_to_the_reply_address_goes_to_the_contact_the_token_is_for() {
+
+		$contact = $this->create_contact( 'jordan' );
+		$sent    = $this->create_sent( $contact );
+		$rep     = get_user_by( 'id', self::factory()->user->create( [ 'role' => 'sales_rep', 'user_email' => $this->addr( 'adrian' ) ] ) );
+
+		// a colleague answering from their own mailbox writes to the reply address, not to the contact, and the
+		// headers don't say what it's in reply to
+		$message = Message::ingest( $this->payload( [
+			'from'        => $rep->user_email,
+			'to'          => $this->reply_to( $sent ),
+			'envelope_to' => $this->reply_to( $sent ),
+		] ) );
+
+		$this->assertInstanceOf( Message::class, $message );
+		$this->assertSame( Message::OUTBOUND, $message->direction );
+		$this->assertEquals( $contact->get_id(), $message->object_id );
+		$this->assertSame( $sent->thread_id, $message->thread_id );
+	}
+
+	public function test_a_message_from_one_of_us_to_a_reply_address_with_a_made_up_token_still_does_not_match() {
+
+		$this->create_contact( 'jordan' );
+		$rep = get_user_by( 'id', self::factory()->user->create( [ 'role' => 'sales_rep', 'user_email' => $this->addr( 'adrian' ) ] ) );
+
+		$forged = preg_replace( '/\+([a-z2-7]{16})[a-z2-7]+@/', '+$1' . str_repeat( 'a', 24 ) . '@', Inbox::reply_to( Message::generate_message_id() ) );
+
+		$result = Message::ingest( $this->payload( [
+			'from'        => $rep->user_email,
+			'to'          => $forged,
+			'envelope_to' => $forged,
+		] ) );
+
+		$this->assertWPError( $result );
+	}
+
+	/* ---------------------------------------------------------------------
+	 * a name in front of the address
+	 * ------------------------------------------------------------------- */
+
+	protected function create_user( array $args = [] ) {
+		return get_user_by( 'id', self::factory()->user->create( array_merge( [ 'role' => 'sales_rep' ], $args ) ) );
+	}
+
+	public function test_the_secret_address_gets_the_name_of_the_user_in_front_of_it() {
+
+		$user = $this->create_user( [ 'first_name' => 'Adrian', 'last_name' => 'Tobey' ] );
+		wp_set_current_user( $user->ID );
+
+		$this->assertSame( 'adrian.tobey-s' . $this->run_id . '@inbox.example.com', Inbox::pretty_address() );
+		$this->assertSame( 'adrian.tobey-s' . $this->run_id . '@inbox.example.com', Inbox::pretty_address( $user ) );
+	}
+
+	public function test_the_name_falls_back_on_the_display_name_then_the_login_then_the_email() {
+
+		$display = $this->create_user( [ 'display_name' => 'Jordan  O\'Rivera-Smith' ] );
+		$this->assertSame( 'jordan.o.rivera.smith-s' . $this->run_id . '@inbox.example.com', Inbox::pretty_address( $display ) );
+
+		$login = $this->create_user( [ 'user_login' => 'sam_lee', 'display_name' => '' ] );
+		$this->assertSame( 'sam.lee-s' . $this->run_id . '@inbox.example.com', Inbox::pretty_address( $login ) );
+
+		$email = $this->create_user( [ 'user_login' => '__', 'display_name' => '###', 'user_email' => 'pat.kim@example.org' ] );
+		$this->assertSame( 'pat.kim-s' . $this->run_id . '@inbox.example.com', Inbox::pretty_address( $email ) );
+	}
+
+	public function test_accents_are_dropped_from_the_name() {
+
+		$user = $this->create_user( [ 'first_name' => 'José', 'last_name' => 'Müller' ] );
+
+		$this->assertSame( 'jose.muller-s' . $this->run_id . '@inbox.example.com', Inbox::pretty_address( $user ) );
+	}
+
+	public function test_a_name_that_is_too_long_is_cut_at_a_word_and_the_address_stays_within_64_characters() {
+
+		// the ids that the relay gives are 26 characters, so there are 37 for the name
+		update_option( Inbox::ADDRESS_OPTION, str_repeat( 'a', 26 ) . '@inbox.example.com' );
+
+		$user = $this->create_user( [ 'first_name' => 'Bartholomew Maximilian', 'last_name' => 'Featherstonehaugh' ] );
+
+		$address = Inbox::pretty_address( $user );
+		[ $local ] = explode( '@', $address );
+
+		$this->assertSame( 'bartholomew.maximilian-' . str_repeat( 'a', 26 ) . '@inbox.example.com', $address );
+		$this->assertLessThanOrEqual( 64, strlen( $local ) );
+
+		// one word that doesn't fit is cut short instead
+		$single = $this->create_user( [ 'first_name' => str_repeat( 'x', 60 ), 'last_name' => '' ] );
+		[ $local ] = explode( '@', Inbox::pretty_address( $single ) );
+
+		$this->assertSame( 64, strlen( $local ) );
+		$this->assertSame( str_repeat( 'x', 37 ) . '-' . str_repeat( 'a', 26 ), $local );
+	}
+
+	public function test_there_is_no_name_when_there_is_no_user_or_nothing_that_can_be_one() {
+
+		$this->assertSame( $this->inbox_address, Inbox::pretty_address() );
+
+		$nothing = $this->create_user( [ 'user_login' => '___', 'display_name' => '###', 'user_email' => '###@example.org' ] );
+		$this->assertSame( $this->inbox_address, Inbox::pretty_address( $nothing ) );
+
+		delete_option( Inbox::ADDRESS_OPTION );
+		$this->assertSame( '', Inbox::pretty_address( $nothing ) );
+	}
+
+	public function test_the_name_can_be_changed_with_a_filter_and_only_what_can_be_in_an_address_is_kept() {
+
+		$user = $this->create_user( [ 'first_name' => 'Adrian', 'last_name' => 'Tobey' ] );
+
+		add_filter( 'groundhogg/inbox/address_prefix', fn() => ' Support Team! ' );
+		$this->assertSame( 'supportteam-s' . $this->run_id . '@inbox.example.com', Inbox::pretty_address( $user ) );
+
+		remove_all_filters( 'groundhogg/inbox/address_prefix' );
+		add_filter( 'groundhogg/inbox/address_prefix', fn() => str_repeat( 'x', 60 ) );
+		$this->assertSame( $this->inbox_address, Inbox::pretty_address( $user ), 'one that doesn\'t fit is not used' );
+
+		remove_all_filters( 'groundhogg/inbox/address_prefix' );
+	}
+
+	public function test_an_address_with_a_name_in_front_of_it_is_still_the_inbox() {
+
+		$user = $this->create_user( [ 'first_name' => 'Adrian', 'last_name' => 'Tobey' ] );
+
+		$this->assertSame( 'inbox', Inbox::route( [ Inbox::pretty_address( $user ) ] ) );
+		$this->assertSame( 'inbox', Inbox::route( [ 'anything.at.all-' . strtoupper( 's' . $this->run_id ) . '@inbox.example.com' ] ) );
+
+		// with a name, an id that isn't ours is still not
+		$this->assertSame( 'unknown', Inbox::route( [ 'adrian.tobey-sabcdefabcdef@inbox.example.com' ] ) );
+	}
+
+	public function test_a_reply_address_with_a_name_in_front_of_it_is_still_a_reply_with_a_valid_token() {
+
+		$contact = $this->create_contact( 'jordan' );
+		$sent    = $this->create_sent( $contact );
+
+		$plain  = $this->reply_to( $sent );
+		$named  = 'support.team-' . $plain;
+		$forged = preg_replace( '/(\+[a-z2-7]{16})[a-z2-7]{16}@/', '$1' . str_repeat( 'a', 16 ) . '@', $named );
+
+		$this->assertSame( 'reply', Inbox::route( [ $named ] ) );
+		$this->assertNotSame( '', Inbox::verify_reply( [ $named ] ) );
+		$this->assertSame( Inbox::verify_reply( [ $plain ] ), Inbox::verify_reply( [ $named ] ) );
+		$this->assertSame( '', Inbox::verify_reply( [ $forged ] ), 'a name doesn\'t make a token valid' );
+	}
+
+	public function test_the_reply_address_gets_the_name_of_who_sent_the_email() {
+
+		$sender  = $this->create_user( [ 'first_name' => 'Adrian', 'last_name' => 'Tobey' ] );
+		$contact = $this->create_contact( 'jordan' );
+		$sent    = $this->create_sent( $contact );
+
+		$plain = Inbox::reply_to( $sent->message_id );
+		$named = Inbox::reply_to( $sent->message_id, $sender );
+
+		$this->assertSame( 'adrian.tobey-' . $plain, $named );
+
+		// the current user is who it's for when nobody's said
+		wp_set_current_user( $sender->ID );
+		$this->assertSame( $named, Inbox::reply_to( $sent->message_id ) );
+	}
+
+	public function test_a_reply_to_the_address_with_a_name_is_received_by_its_token() {
+
+		$sender  = $this->create_user( [ 'first_name' => 'Adrian', 'last_name' => 'Tobey' ] );
+		$contact = $this->create_contact( 'jordan' );
+		$sent    = $this->create_sent( $contact );
+		$named   = Inbox::reply_to( $sent->message_id, $sender );
+
+		$this->assertSame( 'reply', Inbox::route( [ $named ] ) );
+		$this->assertNotSame( '', Inbox::verify_reply( [ $named ] ) );
+
+		$message = Message::ingest( $this->payload( [
+			'from'        => 'jordan.rivera@work.example.org',
+			'envelope_to' => $named,
+		] ) );
+
+		$this->assertInstanceOf( Message::class, $message );
+		$this->assertSame( Message::INBOUND, $message->direction );
+		$this->assertEquals( $contact->get_id(), $message->object_id );
+		$this->assertSame( $sent->thread_id, $message->thread_id );
+	}
+
+	public function test_the_name_on_the_reply_address_is_shortened_or_left_out_to_stay_within_64_characters() {
+
+		$contact = $this->create_contact( 'jordan' );
+		$sent    = $this->create_sent( $contact );
+		[ $plain_local ] = explode( '@', Inbox::reply_to( $sent->message_id ) );
+
+		// the plain one is 14 + 1 + 32 characters here, so 17 are left for a name and the "-"
+		$this->assertSame( 47, strlen( $plain_local ) );
+
+		// a name that's too long for it is cut to the words that fit
+		$long = $this->create_user( [ 'first_name' => 'Bartholomew', 'last_name' => 'Featherstonehaugh' ] );
+		[ $local ] = explode( '@', Inbox::reply_to( $sent->message_id, $long ) );
+		$this->assertSame( 'bartholomew-' . $plain_local, $local );
+
+		// and one that has no word that fits isn't used, the address isn't a bad one
+		$none = $this->create_user( [ 'first_name' => str_repeat( 'x', 30 ), 'last_name' => '' ] );
+		[ $local ] = explode( '@', Inbox::reply_to( $sent->message_id, $none ) );
+		$this->assertSame( str_repeat( 'x', 16 ) . '-' . $plain_local, $local );
+		$this->assertSame( 64, strlen( $local ) );
+	}
+
+	public function test_the_filter_says_which_address_a_name_is_for() {
+
+		$sender  = $this->create_user( [ 'first_name' => 'Adrian', 'last_name' => 'Tobey' ] );
+		$contact = $this->create_contact( 'jordan' );
+		$sent    = $this->create_sent( $contact );
+
+		add_filter( 'groundhogg/inbox/address_prefix', fn( $prefix, $user, $route ) => $route === 'reply' ? 'support' : $prefix, 10, 3 );
+
+		$this->assertStringStartsWith( 'support-', Inbox::reply_to( $sent->message_id, $sender ) );
+		$this->assertStringStartsWith( 'adrian.tobey-', Inbox::pretty_address( $sender ) );
+
+		remove_all_filters( 'groundhogg/inbox/address_prefix' );
+	}
+
+	public function test_a_message_to_the_inbox_address_with_a_name_is_received() {
+
+		$contact = $this->create_contact( 'jordan' );
+		$user    = $this->create_user( [ 'first_name' => 'Adrian', 'last_name' => 'Tobey' ] );
+
+		$message = Message::ingest( $this->payload( [
+			'from'        => $this->addr( 'jordan' ),
+			'to'          => Inbox::pretty_address( $user ),
+			'envelope_to' => Inbox::pretty_address( $user ),
+		] ) );
+
+		$this->assertInstanceOf( Message::class, $message );
+		$this->assertEquals( $contact->get_id(), $message->object_id );
+		$this->assertSame( Message::INBOUND, $message->direction );
+	}
+
 	public function test_the_reply_address_without_a_token_is_not_trusted_whoever_it_says_it_is_from() {
 
 		// the address is in the header of every email that was sent, this is what someone that's had one would do

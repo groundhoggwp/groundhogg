@@ -256,7 +256,10 @@ class Message extends Base_Object {
 				}
 			}
 
-			$parent = self::find_parent( $payload['in_reply_to'], $payload['references'], $to );
+			// the reply address says what it's a reply to even when the headers don't, a colleague that answers from their
+			// own mailbox writes to it, not to the contact
+			$parent = self::find_parent( $payload['in_reply_to'], $payload['references'], $to )
+			          ?? ( $reply_id ? self::find_parent_by_reply_id( $reply_id, $to ) : null );
 
 			// sent to an address that isn't theirs, but in reply to something that is
 			if ( empty( $objects ) && $parent && self::is_object( $parent->get_associated_object() ) ) {

@@ -150,6 +150,115 @@ class Inbox {
 	}
 
 	/**
+	 * The secret address, with the name of a person in front of it, so that it's recognizable where it's used, in a mailbox
+	 * that has it in the BCC or in a routing rule, "adrian.tobey-mb6hbhvtwcshqtfr2r673a4jg5@groundhogg.email". The
+	 * relay ignores everything up to the last "." or "-" of the address, so it's the same address, and it's still the secret
+	 * one: the name doesn't say anything about who's allowed to use it.
+	 *
+	 * @param \WP_User|int|null $user whoever is looking at it, the current user by default
+	 *
+	 * @return string the address without a name if there isn't one to use, and empty if there's no address
+	 */
+	public static function pretty_address( $user = null ) {
+
+		$address = self::address();
+
+		return $address ? self::with_name( $address, $user, 'inbox' ) : '';
+	}
+
+	/**
+	 * An address with the name of a person in front of it, if there's a name and there's room for it
+	 *
+	 * @param string             $address the address, its local part can have a token in it after a "+"
+	 * @param \WP_User|int|null $user
+	 * @param string             $route   inbox|reply, which address it is
+	 *
+	 * @return string the address as it was if there's no name to use
+	 */
+	protected static function with_name( string $address, $user, string $route ) {
+
+		$user = is_a( $user, \WP_User::class ) ? $user : get_user_by( 'id', $user ?: get_current_user_id() );
+
+		[ $local, $domain ] = explode( '@', $address, 2 );
+
+		// the local part is at most 64 characters, and the separator is one of them
+		$prefix = $user ? self::name_prefix( $user, 64 - strlen( $local ) - 1 ) : '';
+
+		/**
+		 * Filter the name that goes in front of the secret address, and the address that replies go to. It's anything that
+		 * can be in an address, and it's left out if there isn't room for it.
+		 *
+		 * @param string          $prefix
+		 * @param \WP_User|false  $user
+		 * @param string          $route inbox|reply
+		 */
+		$prefix = (string) apply_filters( 'groundhogg/inbox/address_prefix', $prefix, $user, $route );
+		$prefix = trim( preg_replace( '/[^a-z0-9._]+/', '', strtolower( $prefix ) ), '._' );
+
+		if ( $prefix === '' || strlen( $prefix ) + 1 + strlen( $local ) > 64 ) {
+			return $address;
+		}
+
+		$named = $prefix . '-' . $local . '@' . $domain;
+
+		return is_email( $named ) ? $named : $address;
+	}
+
+	/**
+	 * A name for a person that can go in an address: "adrian.tobey". Their name if they have one, and what they log in with
+	 * or the start of their email if they don't. Words are separated by a ".", a "-" can't be in it because the relay
+	 * treats the last one as the end of the name.
+	 *
+	 * @param \WP_User $user
+	 * @param int      $max  the most characters there's room for
+	 *
+	 * @return string empty if there's nothing usable
+	 */
+	protected static function name_prefix( \WP_User $user, int $max ) {
+
+		$candidates = [
+			trim( $user->first_name . ' ' . $user->last_name ),
+			$user->display_name,
+			$user->user_login,
+			strstr( (string) $user->user_email, '@', true ),
+		];
+
+		foreach ( $candidates as $candidate ) {
+
+			// letters without their accents, and anything that isn't a letter or a number is a break between words
+			$words = preg_split( '/[^a-z0-9]+/', strtolower( remove_accents( (string) $candidate ) ), -1, PREG_SPLIT_NO_EMPTY );
+
+			if ( empty( $words ) ) {
+				continue;
+			}
+
+			// as many of the words as fit, a word isn't cut short unless the first one doesn't
+			$name = '';
+
+			foreach ( $words as $word ) {
+
+				$next = $name === '' ? $word : $name . '.' . $word;
+
+				if ( strlen( $next ) > $max ) {
+					break;
+				}
+
+				$name = $next;
+			}
+
+			if ( $name === '' ) {
+				$name = substr( $words[0], 0, max( 0, $max ) );
+			}
+
+			if ( $name !== '' ) {
+				return $name;
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * The public address that replies go to, without a token
 	 *
 	 * @return string
@@ -173,11 +282,13 @@ class Inbox {
 	/**
 	 * An address that identifies one email, that a reply to it can be sent to.
 	 *
-	 * @param string $message_id the Message-ID of the email, as given by Message::generate_message_id()
+	 * @param string             $message_id the Message-ID of the email, as given by Message::generate_message_id()
+	 * @param \WP_User|int|null $user       who is sending it, the current user by default. Their name goes in front of the
+	 *                                      address, so that a contact sees who it goes to, there's only room for a short one
 	 *
 	 * @return string empty if replies aren't being sent to the inbox
 	 */
-	public static function reply_to( string $message_id ) {
+	public static function reply_to( string $message_id, $user = null ) {
 
 		/**
 		 * Whether the emails the site sends should have a Reply-To that sends replies to the inbox. On by default,
@@ -206,7 +317,7 @@ class Inbox {
 			return '';
 		}
 
-		return $local . '@' . $domain;
+		return self::with_name( $local . '@' . $domain, $user, 'reply' );
 	}
 
 	/**
@@ -260,7 +371,7 @@ class Inbox {
 				return 'reply';
 			}
 
-			if ( $base && $base === self::address() ) {
+			if ( $base && $base === self::split( self::address() )[0] ) {
 				$route = 'inbox';
 			}
 		}
@@ -274,7 +385,7 @@ class Inbox {
 	 * @return bool
 	 */
 	protected static function is_reply_route( string $route ) {
-		return $route === self::reply_address();
+		return $route === self::split( self::reply_address() )[0];
 	}
 
 	/**
@@ -295,7 +406,19 @@ class Inbox {
 		[ $local, $domain ] = explode( '@', $address, 2 );
 		[ $local, $token ] = array_pad( explode( '+', $local, 2 ), 2, '' );
 
-		return [ $local . '@' . $domain, $token ];
+		return [ self::strip_name( $local ) . '@' . $domain, $token ];
+	}
+
+	/**
+	 * The relay ignores a name in front of an address, everything up to the last "." or "-" of the part before the
+	 * "+", and the ids in the addresses never have either, so this has to too or it wouldn't know the address.
+	 *
+	 * @param string $local the local part of an address, without the token
+	 *
+	 * @return string
+	 */
+	protected static function strip_name( string $local ) {
+		return preg_replace( '/^.*[.\-]/', '', $local );
 	}
 
 	/**
