@@ -850,7 +850,123 @@ class Funnel extends Base_Object_With_Meta {
 		return apply_filters( 'groundhogg/funnel/export', $export, $this );
 	}
 
+	/**
+	 * How many times each funnel was put in editing mode by start_editing(), by funnel ID.
+	 * Static because steps load their own Funnel instance.
+	 *
+	 * @var int[]
+	 */
+	protected static $editing = [];
+
+	/**
+	 * Treat this funnel as open in the flow editor, so get_steps() includes inactive steps with their changes merged,
+	 * the same as the editor sees them. For editing a funnel from outside the editor, like abilities.
+	 * Calls can be nested, so every call must be paired with stop_editing().
+	 *
+	 * @return void
+	 */
+	public function start_editing() {
+		$id = $this->get_id();
+
+		self::$editing[ $id ] = ( self::$editing[ $id ] ?? 0 ) + 1;
+	}
+
+	/**
+	 * Undo start_editing()
+	 *
+	 * @return void
+	 */
+	public function stop_editing() {
+		$id = $this->get_id();
+
+		if ( empty( self::$editing[ $id ] ) ) {
+			return;
+		}
+
+		self::$editing[ $id ] --;
+
+		if ( ! self::$editing[ $id ] ) {
+			unset( self::$editing[ $id ] );
+		}
+	}
+
+	/**
+	 * Run a callback with the funnel in editing mode
+	 *
+	 * @param callable $callback
+	 *
+	 * @return mixed whatever the callback returns
+	 */
+	public function while_editing( callable $callback ) {
+		$this->start_editing();
+
+		try {
+			return $callback();
+		} finally {
+			$this->stop_editing();
+		}
+	}
+
+	/**
+	 * Snapshot the steps as the editor sees them, with their changes merged, for restore()
+	 * Same shape as the steps the flow editor keeps for undo/redo.
+	 *
+	 * @return array[] [ [ 'ID' => int, 'data' => array, 'meta' => array ], ... ]
+	 */
+	public function snapshot() {
+		return $this->while_editing( function () {
+			return array_values( array_map( function ( Step $step ) {
+				return [
+					'ID'   => $step->get_id(),
+					'data' => $step->get_data(),
+					'meta' => $step->get_meta(),
+				];
+			}, $this->get_steps() ) );
+		} );
+	}
+
+	/**
+	 * Restore the steps to a snapshot from snapshot() or the flow editor's undo/redo.
+	 * Steps added since are soft deleted, and deleted steps come back by updating their row,
+	 * which is why Step::delete() is a soft delete until the changes are committed.
+	 * On an active funnel this is staged in the changes like any other edit.
+	 *
+	 * @param array[] $snapshot
+	 *
+	 * @return void
+	 */
+	public function restore( array $snapshot ) {
+		$this->while_editing( function () use ( $snapshot ) {
+
+			$keep_step_ids = wp_parse_id_list( wp_list_pluck( $snapshot, 'ID' ) );
+
+			// delete steps that were added that aren't in the snapshot
+			foreach ( $this->get_steps() as $step ) {
+				if ( ! in_array( $step->ID, $keep_step_ids ) ) {
+					$step->delete();
+				}
+			}
+
+			// update current steps with data from the snapshot
+			foreach ( $snapshot as $step_state ) {
+
+				$step = new Step( absint( $step_state['ID'] ) );
+				if ( $step->exists() ) {
+					$step->update( $step_state['data'] );
+				} else {
+					$step->create( $step_state['data'] );
+				}
+
+				$step->update_meta( $step_state['meta'] );
+			}
+		} );
+	}
+
 	public function is_editing() {
+
+		if ( ! empty( self::$editing[ $this->get_id() ] ) ) {
+			return true;
+		}
 
 		if ( wp_doing_ajax() || wp_is_serving_rest_request() ) {
 			wp_parse_str( wp_parse_url( wp_get_referer(), PHP_URL_QUERY ), $params );
