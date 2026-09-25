@@ -86,6 +86,12 @@ class Create_Flow extends Ability {
 
 	protected function get_args(): array {
 
+		// WordPress' own validator (rest_validate_value_from_schema(), run by
+		// WP_Ability::execute() on both input and output) doesn't resolve `$ref`
+		// and requires a `type` on every schema it walks. So the top-level step
+		// nodes are inlined in full, and the recursive `$ref`s in `branches` carry
+		// a `type` alongside - WordPress checks that much, while MCP clients
+		// (JSON Schema 2020-12, where `$ref` siblings apply) get the full shape.
 		$step_node_schema = [
 			'type'                 => 'object',
 			'additionalProperties' => false,
@@ -113,9 +119,53 @@ class Create_Flow extends Ability {
 					'type'                 => 'object',
 					'additionalProperties' => [
 						'type'  => 'array',
-						'items' => [ '$ref' => '#/$defs/step_node' ],
+						'items' => [
+							'type' => 'object',
+							'$ref' => '#/$defs/step_node',
+						],
 					],
 					'description'          => __( 'Only for branching logic types (currently just if_else - branch_keys ["yes","no"]). Maps each branch key to the ordered list of step nodes that branch contains.', 'groundhogg' ),
+				],
+			],
+		];
+
+		$step_node_out_schema = [
+			'type'       => 'object',
+			'properties' => [
+				'id' => [
+					'type'        => 'integer',
+					'description' => __( 'The real, persisted step ID.', 'groundhogg' ),
+				],
+				'local_id' => [
+					'type'        => 'string',
+					'description' => __( 'Only present if the input node had its own `id`. Echoed back for reference.', 'groundhogg' ),
+				],
+				'type' => [
+					'type' => 'string',
+				],
+				'type_name' => [
+					'type' => 'string',
+				],
+				'group' => [
+					'type' => 'string',
+					'enum' => [ 'benchmark', 'action', 'logic' ],
+				],
+				'title' => [
+					'type' => 'string',
+				],
+				'settings' => [
+					'type'        => 'object',
+					'description' => __( 'Echoes back the input node\'s own `settings`, as given (not Groundhogg\'s internal stored shape, where the two differ - e.g. if_else\'s include_condition/exclude_condition rather than its internal include_filters/exclude_filters).', 'groundhogg' ),
+				],
+				'branches' => [
+					'type'                 => 'object',
+					'additionalProperties' => [
+						'type'  => 'array',
+						'items' => [
+							'type' => 'object',
+							'$ref' => '#/$defs/step_node_out',
+						],
+					],
 				],
 			],
 		];
@@ -143,7 +193,7 @@ class Create_Flow extends Ability {
 					'steps' => [
 						'type'        => 'array',
 						'minItems'    => 1,
-						'items'       => [ '$ref' => '#/$defs/step_node' ],
+						'items'       => $step_node_schema,
 						'description' => __( 'The flow\'s main sequence, in order. A benchmark (trigger) step is an entry/jump point and can appear anywhere in the sequence, not just first - a contact can enter (or jump to) the flow at any trigger whenever it matches, independent of the steps around it. Adjacent triggers act as an OR ("any of these happen").', 'groundhogg' ),
 					],
 				],
@@ -152,43 +202,7 @@ class Create_Flow extends Ability {
 			'output_schema' => [
 				'type'       => 'object',
 				'$defs'      => [
-					'step_node_out' => [
-						'type'       => 'object',
-						'properties' => [
-							'id' => [
-								'type'        => 'integer',
-								'description' => __( 'The real, persisted step ID.', 'groundhogg' ),
-							],
-							'local_id' => [
-								'type'        => 'string',
-								'description' => __( 'Only present if the input node had its own `id`. Echoed back for reference.', 'groundhogg' ),
-							],
-							'type' => [
-								'type' => 'string',
-							],
-							'type_name' => [
-								'type' => 'string',
-							],
-							'group' => [
-								'type' => 'string',
-								'enum' => [ 'benchmark', 'action', 'logic' ],
-							],
-							'title' => [
-								'type' => 'string',
-							],
-							'settings' => [
-								'type'        => 'object',
-								'description' => __( 'Echoes back the input node\'s own `settings`, as given (not Groundhogg\'s internal stored shape, where the two differ - e.g. if_else\'s include_condition/exclude_condition rather than its internal include_filters/exclude_filters).', 'groundhogg' ),
-							],
-							'branches' => [
-								'type'                 => 'object',
-								'additionalProperties' => [
-									'type'  => 'array',
-									'items' => [ '$ref' => '#/$defs/step_node_out' ],
-								],
-							],
-						],
-					],
+					'step_node_out' => $step_node_out_schema,
 				],
 				'properties' => [
 					'id' => [
@@ -205,7 +219,7 @@ class Create_Flow extends Ability {
 					],
 					'steps' => [
 						'type'  => 'array',
-						'items' => [ '$ref' => '#/$defs/step_node_out' ],
+						'items' => $step_node_out_schema,
 					],
 				],
 			],
