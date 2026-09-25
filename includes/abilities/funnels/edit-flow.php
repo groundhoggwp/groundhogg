@@ -119,7 +119,7 @@ class Edit_Flow extends Ability {
 				'type'                 => 'object',
 				'additionalProperties' => false,
 				'required'             => [ 'flow_id', 'operations' ],
-				'$defs'                => [
+				'definitions' => [
 					'step_node' => Step_Tree_Builder::node_schema(),
 				],
 				'properties'           => [
@@ -182,14 +182,14 @@ class Edit_Flow extends Ability {
 
 			'output_schema' => [
 				'type'       => 'object',
-				'$defs'      => array_merge( $flow_schema['$defs'], [
+				'definitions' => array_merge( $flow_schema['definitions'], [
 					'step_node_out' => Step_Tree_Builder::node_out_schema(),
 				] ),
 				'properties' => [
 					'dry_run'       => [
 						'type' => 'boolean',
 					],
-					'flow'          => array_diff_key( $flow_schema, [ '$defs' => true ] ),
+					'flow'          => array_diff_key( $flow_schema, [ 'definitions' => true ] ),
 					'added'         => [
 						'type'        => 'array',
 						'description' => __( 'The steps each "add" created, in the order of the operations.', 'groundhogg' ),

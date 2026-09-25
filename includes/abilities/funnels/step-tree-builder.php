@@ -47,7 +47,7 @@ class Step_Tree_Builder {
 	protected $deferred = [];
 
 	/**
-	 * The JSON Schema for a step node build() takes. Branches refer to it as `#/$defs/step_node`,
+	 * The JSON Schema for a step node build() takes. Branches refer to it as `#/definitions/step_node`,
 	 * so the ability's input schema must define it there.
 	 *
 	 * WordPress' own validator (rest_validate_value_from_schema(), run by
@@ -56,6 +56,12 @@ class Step_Tree_Builder {
 	 * top-level step nodes in full, and the recursive `$ref`s in `branches` carry
 	 * a `type` alongside - WordPress checks that much, while MCP clients
 	 * (JSON Schema 2020-12, where `$ref` siblings apply) get the full shape.
+	 *
+	 * It's `definitions`, not `$defs`: wp_prepare_json_schema_for_client() keeps only
+	 * draft-04 keywords when WordPress publishes ability schemas (the abilities REST
+	 * endpoint, the AI client), so `$defs` would be dropped and the `$ref`s left
+	 * pointing at nothing. `#/definitions/...` is still a plain JSON pointer to newer
+	 * clients.
 	 *
 	 * @return array
 	 */
@@ -89,7 +95,7 @@ class Step_Tree_Builder {
 						'type'  => 'array',
 						'items' => [
 							'type' => 'object',
-							'$ref' => '#/$defs/step_node',
+							'$ref' => '#/definitions/step_node',
 						],
 					],
 					'description'          => __( 'Only for branching logic types (currently just if_else - branch_keys ["yes","no"]). Maps each branch key to the ordered list of step nodes that branch contains.', 'groundhogg' ),
@@ -99,7 +105,7 @@ class Step_Tree_Builder {
 	}
 
 	/**
-	 * The JSON Schema for a step node build() returns. Branches refer to it as `#/$defs/step_node_out`,
+	 * The JSON Schema for a step node build() returns. Branches refer to it as `#/definitions/step_node_out`,
 	 * so the ability's output schema must define it there. See node_schema().
 	 *
 	 * @return array
@@ -139,7 +145,7 @@ class Step_Tree_Builder {
 						'type'  => 'array',
 						'items' => [
 							'type' => 'object',
-							'$ref' => '#/$defs/step_node_out',
+							'$ref' => '#/definitions/step_node_out',
 						],
 					],
 				],

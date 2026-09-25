@@ -81,6 +81,94 @@ class Abilities_Schema_Tests extends GH_UnitTestCase {
 		$this->assertSame( [], $untyped, 'These schemas have no `type`.' );
 	}
 
+	/**
+	 * Every `$ref` in a schema, at any depth
+	 *
+	 * @return string[] path => ref
+	 */
+	protected function find_refs( array $schema, string $path ): array {
+
+		$refs = [];
+
+		foreach ( $schema as $key => $value ) {
+			if ( $key === '$ref' && is_string( $value ) ) {
+				$refs[ $path ] = $value;
+			} else if ( is_array( $value ) ) {
+				$refs = array_merge( $refs, $this->find_refs( $value, "{$path}.{$key}" ) );
+			}
+		}
+
+		return $refs;
+	}
+
+	/**
+	 * Whether a local `$ref` (a JSON pointer like #/definitions/node) points at a schema in the document
+	 */
+	protected function ref_resolves( array $schema, string $ref ): bool {
+
+		if ( ! str_starts_with( $ref, '#/' ) ) {
+			return false;
+		}
+
+		$target = $schema;
+
+		foreach ( explode( '/', substr( $ref, 2 ) ) as $token ) {
+			$token = str_replace( [ '~1', '~0' ], [ '/', '~' ], $token );
+
+			if ( ! is_array( $target ) || ! array_key_exists( $token, $target ) ) {
+				return false;
+			}
+
+			$target = $target[ $token ];
+		}
+
+		return is_array( $target );
+	}
+
+	/**
+	 * Every `$ref` must still point at something after WordPress prepares the schema for clients - the
+	 * abilities REST endpoint and the AI client both publish schemas through wp_prepare_json_schema_for_client(),
+	 * which keeps only draft-04 keywords, so e.g. `$defs` is dropped while `$ref`s into it stay. The MCP adapter
+	 * publishes the schemas as they are, so they must resolve there too.
+	 */
+	public function test_every_groundhogg_ability_schema_ref_resolves_for_clients() {
+
+		$abilities = array_filter( wp_get_abilities(), function ( WP_Ability $ability ) {
+			return str_starts_with( $ability->get_name(), 'groundhogg/' );
+		} );
+
+		$broken = [];
+		$found  = 0;
+
+		foreach ( $abilities as $ability ) {
+			foreach ( [ 'input' => $ability->get_input_schema(), 'output' => $ability->get_output_schema() ] as $which => $schema ) {
+
+				if ( empty( $schema ) ) {
+					continue;
+				}
+
+				$versions = [ 'as registered' => $schema ];
+
+				if ( function_exists( 'wp_prepare_json_schema_for_client' ) ) {
+					$versions['prepared for clients'] = wp_prepare_json_schema_for_client( $schema );
+				}
+
+				foreach ( $versions as $version => $prepared ) {
+					foreach ( $this->find_refs( $prepared, "{$ability->get_name()} {$which}" ) as $path => $ref ) {
+						$found ++;
+
+						if ( ! $this->ref_resolves( $prepared, $ref ) ) {
+							$broken[] = "$path: $ref ($version)";
+						}
+					}
+				}
+			}
+		}
+
+		$this->assertGreaterThan( 0, $found, 'Expected some $refs to check.' );
+		$this->assertSame( [], $broken, 'These $refs don\'t resolve.' );
+	}
+
 	public function test_create_flow_executes_through_abilities_api() {
 
 		$result = wp_get_ability( 'groundhogg/create-flow' )->execute( [

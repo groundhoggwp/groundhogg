@@ -45,7 +45,7 @@ class Get_Flow extends Ability {
 	const BENCHMARK_BRANCH = 'then';
 
 	/**
-	 * The JSON Schema for a step node in the tree. Branches refer to it as `#/$defs/step_node`,
+	 * The JSON Schema for a step node in the tree. Branches refer to it as `#/definitions/step_node`,
 	 * see flow_schema().
 	 *
 	 * @return array
@@ -110,7 +110,7 @@ class Get_Flow extends Ability {
 						'type'  => 'array',
 						'items' => [
 							'type' => 'object',
-							'$ref' => '#/$defs/step_node',
+							'$ref' => '#/definitions/step_node',
 						],
 					],
 				],
@@ -157,7 +157,7 @@ class Get_Flow extends Ability {
 
 		return [
 			'type'       => 'object',
-			'$defs'      => [
+			'definitions' => [
 				'step_node' => $step_node_schema,
 			],
 			'properties' => [

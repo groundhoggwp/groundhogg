@@ -45,13 +45,13 @@ class Discard_Flow_Changes extends Ability {
 
 			'output_schema' => [
 				'type'       => 'object',
-				'$defs'      => $flow_schema['$defs'],
+				'definitions' => $flow_schema['definitions'],
 				'properties' => [
 					'had_changes' => [
 						'type'        => 'boolean',
 						'description' => __( 'False if there was nothing to discard.', 'groundhogg' ),
 					],
-					'flow'        => array_diff_key( $flow_schema, [ '$defs' => true ] ),
+					'flow'        => array_diff_key( $flow_schema, [ 'definitions' => true ] ),
 				],
 			],
 		];

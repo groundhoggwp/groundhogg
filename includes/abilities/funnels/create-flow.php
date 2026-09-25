@@ -96,7 +96,7 @@ class Create_Flow extends Ability {
 				'type'                 => 'object',
 				'additionalProperties' => false,
 				'required'             => [ 'title', 'steps' ],
-				'$defs'                => [
+				'definitions' => [
 					'step_node' => $step_node_schema,
 				],
 				'properties'           => [
@@ -119,7 +119,7 @@ class Create_Flow extends Ability {
 
 			'output_schema' => [
 				'type'       => 'object',
-				'$defs'      => [
+				'definitions' => [
 					'step_node_out' => $step_node_out_schema,
 				],
 				'properties' => [
