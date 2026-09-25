@@ -265,7 +265,14 @@ class Delay_Timer extends Action {
 			'run_on_dom'        => [
 				'default'  => [],
 				'sanitize' => function ( $value ) {
-					return array_intersect( array_map( 'absint', $value ), range( 1, 31 ) );
+					// 'last' must stay a string so calc_run_time()'s strict === 'last' check matches
+					$days = array_map( function ( $day ) {
+						return $day === 'last' ? 'last' : absint( $day );
+					}, (array) $value );
+
+					return array_values( array_filter( $days, function ( $day ) {
+						return $day === 'last' || ( $day >= 1 && $day <= 31 );
+					} ) );
 				}
 			],
 		];
@@ -318,7 +325,8 @@ class Delay_Timer extends Action {
 
 				$date->modify( $settings['run_time'] );
 
-				if ( $date->isPast() ) {
+				// relative to the base time, not the current time, so historical base times work too
+				if ( $date->getTimestamp() < $baseTimestamp ) {
 					$date->modify( '+1 day' );
 				}
 
@@ -342,116 +350,8 @@ class Delay_Timer extends Action {
 				break;
 		}
 
-		$date->setMin();
-
-		$next_year = date( 'Y', strtotime( '+1 year', $baseTimestamp ) );
-		$time      = $date->format( 'H:i:s' );
-
-		// The date to run on
-		switch ( $settings['run_on_type'] ) {
-			default:
-			case 'any':
-				// Do nothing :)
-				break;
-			case 'weekday':
-				// If it is not a weekday modify to the next Monday
-				if ( ! in_array( $date->format( 'l' ), [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' ] ) ) {
-					$date->modify( "next Monday {$time}" );
-				}
-				break;
-			case 'weekend':
-				// If is a weekday modify to the following saturday
-				if ( ! in_array( $date->format( 'l' ), [ 'Saturday', 'Sunday' ] ) ) {
-					$date->modify( "next Saturday {$time}" );
-				}
-				break;
-			case 'day_of_week':
-
-				$run_on_dow_type       = $settings['run_on_dow_type'];
-				$run_on_month_type     = $settings['run_on_month_type'];
-				$selected_days_of_week = $settings['run_on_dow'];
-
-				// Generate a list of all possible combinations of days and months
-				// TODO There is probably a more efficient way to do this other than brute forcing it.
-				foreach ( $selected_days_of_week as $day_of_week ) {
-
-					if ( $run_on_month_type !== 'any' ) {
-
-						foreach ( $settings['run_on_months'] as $month ) {
-
-							if ( $run_on_dow_type === 'any' ) {
-								foreach ( [ 'first', 'second', 'third', 'fourth', 'last' ] as $type ) {
-									$date->minMax( "$type $day_of_week of $month $time" );
-									$date->minMax( "$type $day_of_week of $month $next_year $time" );
-								}
-							} else {
-								$date->minMax( "$run_on_dow_type $day_of_week of $month $time" );
-								$date->minMax( "$run_on_dow_type $day_of_week of $month $next_year $time" );
-							}
-
-						}
-
-					} else {
-
-						if ( $run_on_dow_type === 'any' ) {
-							$date->minMax( "$day_of_week $time" );
-							$date->minMax( "next $day_of_week $time" );
-						} else {
-							$date->minMax( "$run_on_dow_type $day_of_week of this month $time" );
-							$date->minMax( "$run_on_dow_type $day_of_week of next month $time" );
-						}
-
-					}
-
-				}
-
-				$date->useMax();
-
-				break;
-			case 'day_of_month':
-
-				// Generate a list of all possible combinations of days and months
-				// TODO There is probably a more efficient way to do this other than brute forcing it.
-				foreach ( $settings['run_on_dom'] as $day_of_month ) {
-
-					if ( $settings['run_on_month_type'] !== 'any' ) {
-
-						foreach ( $settings['run_on_months'] as $month ) {
-
-							if ( $day_of_month === 'last' ) {
-								$date->minMax( "last day of $month this year" );
-								$date->minMax( "last day of $month $next_year" );
-							} else {
-
-								// do this year and next year
-								$date->minMax( "$month $day_of_month" );
-								$date->minMax( "$month $day_of_month $next_year" );
-							}
-
-						}
-
-					} else {
-						if ( $day_of_month === 'last' ) {
-							$date->minMax( "last day of this month" );
-							$date->minMax( "last day of next month" );
-						} else {
-
-							$thisMonth = $date->format( 'F' );
-
-							$date->minMax( "$thisMonth $day_of_month" );
-
-							$nextMonthDate = clone $date;
-							$nextMonthDate->modify( '+1 month' );
-
-							$date->minMax( $nextMonthDate->format( "Y-m-$day_of_month" ) );
-
-						}
-					}
-				}
-
-				$date->useMax();
-
-				break;
+		if ( in_array( $settings['run_on_type'], [ 'weekday', 'weekend', 'day_of_week', 'day_of_month' ] ) ) {
+			$this->next_matching_day( $date, $settings );
 		}
 
 		// if the calculated time is now, lets advanced the base time by a minute...
@@ -461,5 +361,113 @@ class Delay_Timer extends Action {
 		}
 
 		return $date->getTimestamp();
+	}
+
+	/**
+	 * Move the date forward to the first day, starting with the date itself, that matches the run_on_* settings.
+	 * Walks the calendar a day at a time, skipping whole months that aren't selected, and keeps the time of day.
+	 * If no day matches within 5 years (e.g. the 30th of February) the date is left unchanged.
+	 *
+	 * @param DateTimeHelper $date
+	 * @param array          $settings
+	 *
+	 * @return void
+	 */
+	protected function next_matching_day( DateTimeHelper $date, array $settings ) {
+
+		switch ( $settings['run_on_type'] ) {
+			case 'weekday':
+				$matches = function ( $date ) {
+					return $date->format( 'N' ) <= 5;
+				};
+				break;
+			case 'weekend':
+				$matches = function ( $date ) {
+					return $date->format( 'N' ) >= 6;
+				};
+				break;
+			case 'day_of_week':
+
+				$days_of_week = array_map( 'strtolower', (array) $settings['run_on_dow'] );
+				$dow_type     = $settings['run_on_dow_type'];
+				$nth          = array_search( $dow_type, [ 1 => 'first', 'second', 'third', 'fourth' ] );
+
+				if ( empty( $days_of_week ) ) {
+					return;
+				}
+
+				$matches = function ( $date ) use ( $days_of_week, $dow_type, $nth ) {
+
+					if ( ! in_array( strtolower( $date->format( 'l' ) ), $days_of_week ) ) {
+						return false;
+					}
+
+					$day = (int) $date->format( 'j' );
+
+					if ( $dow_type === 'last' ) {
+						return $day + 7 > (int) $date->format( 't' );
+					}
+
+					return ! $nth || (int) ceil( $day / 7 ) === $nth;
+				};
+
+				break;
+			case 'day_of_month':
+
+				$days_of_month = array_map( 'intval', array_filter( (array) $settings['run_on_dom'], 'is_numeric' ) );
+				$last_day      = in_array( 'last', (array) $settings['run_on_dom'], true );
+
+				if ( empty( $days_of_month ) && ! $last_day ) {
+					return;
+				}
+
+				$matches = function ( $date ) use ( $days_of_month, $last_day ) {
+					$day = (int) $date->format( 'j' );
+
+					return in_array( $day, $days_of_month, true ) || ( $last_day && $day === (int) $date->format( 't' ) );
+				};
+
+				break;
+			default:
+				return;
+		}
+
+		$months = false;
+
+		if ( $settings['run_on_month_type'] !== 'any' && in_array( $settings['run_on_type'], [ 'day_of_week', 'day_of_month' ] ) ) {
+			$months = array_map( 'strtolower', (array) $settings['run_on_months'] );
+
+			if ( empty( $months ) ) {
+				return;
+			}
+		}
+
+		$start = $date->getTimestamp();
+		$time  = array_map( 'intval', explode( ':', $date->format( 'H:i:s' ) ) );
+		$limit = ( clone $date )->modify( '+5 years' ); // long enough for the 29th of February
+
+		while ( $date < $limit ) {
+
+			[ $year, $month, $day ] = array_map( 'intval', explode( '-', $date->format( 'Y-n-j' ) ) );
+
+			if ( $months && ! in_array( strtolower( $date->format( 'F' ) ), $months ) ) {
+				$date->setDate( $year, $month + 1, 1 );
+				continue;
+			}
+
+			if ( $matches( $date ) ) {
+
+				// setDate() shifts the time when it lands in a DST gap, so restore the wall clock time
+				if ( $date->getTimestamp() !== $start ) {
+					$date->setTime( ...$time );
+				}
+
+				return;
+			}
+
+			$date->setDate( $year, $month, $day + 1 );
+		}
+
+		$date->setTimestamp( $start );
 	}
 }
