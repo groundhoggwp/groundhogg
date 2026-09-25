@@ -452,9 +452,11 @@ class Scripts {
 			'wp-edit-post'
 		], GROUNDHOGG_VERSION );
 
-		wp_register_script( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'js/admin/features/setup' . $dot_min . '.js', [
+		wp_register_script( 'groundhogg-admin-guided-setup', GROUNDHOGG_ASSETS_URL . 'js/admin/features/guided-setup-v2' . $dot_min . '.js', [
+			'groundhogg-make-el',
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
+			'wp-i18n',
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-troubleshooter', GROUNDHOGG_ASSETS_URL . 'js/admin/features/troubleshooter' . $dot_min . '.js', [

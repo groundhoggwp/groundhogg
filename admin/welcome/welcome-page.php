@@ -162,7 +162,7 @@ class Welcome_Page extends Admin_Page {
 
 		// No other service is currently in use.
 		else:
-			$smtp_fix_link = admin_page_url( 'gh_guided_setup', [ 'step' => '3' ] );
+			$smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
 
 		endif;
 

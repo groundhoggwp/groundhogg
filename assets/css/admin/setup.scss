@@ -1,85 +1,18 @@
-$primary-blue: rgb(0, 117, 255);
-$primary-blue-60: rgba(0, 117, 255, 0.60);
-$primary-blue-50: rgba(0, 117, 255, 0.50);
-$primary-blue-20: rgba(0, 117, 255, 0.20);
-$primary-blue-10: rgba(0, 117, 255, 0.10);
-$primary-blue-7: rgba(0, 117, 255, 0.07);
-$primary-blue-2: rgba(0, 117, 255, 0.02);
-$primary-dark: rgb(16, 38, 64);
-$primary-dark-50: rgba(16, 38, 64, 0.5);
-$primary-dark-30: rgba(16, 38, 64, 0.3);
-$primary-dark-15: rgba(16, 38, 64, 0.15);
-$primary-dark-10: rgba(16, 38, 64, 0.10);
-$primary-dark-5: rgba(16, 38, 64, 0.05);
-$error-red: rgb(233, 31, 79);
-$error-red-50: rgba(233, 31, 79, 0.5);
-$error-red-10: rgba(233, 31, 79, 0.10);
-$secondary-purple: rgb(108, 25, 173);
-$alert-yellow-50: rgba(255, 238, 88, 0.50);
-$alert-yellow: rgb(255, 238, 88);
-$benchmark-orange: rgb(245, 129, 21);
-$benchmark-orange-50: rgba(245, 129, 21, 0.50);
-$benchmark-orange-25: rgba(245, 129, 21, 0.25);
-$action-green: rgb(158, 206, 56);
-$action-green-50: rgba(158, 206, 56, 0.5);
-$box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
-
-#wpcontent {
-  //padding: 0;
-}
-
 #wpfooter {
   display: none;
 }
 
-
-#more-details-content{
-
-  padding: 20px;
-
-  figure {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  img{
-    max-width: 100%;
-  }
-
-  h2{
-    margin-top: 1em;
-  }
-
-  ul{
-    list-style: disc;
-    padding-left: 20px;
-  }
-}
-
-.thumbnail{
-  max-width: 100%;
-}
-
-#troubleshooter{
-
-  .gh-panel.outlined{
-    .inside{
-      p:first-child{
-        margin-top: 0;
-      }
-    }
-  }
-
-}
-
-.wp-list-table{
-  pre{
+.wp-list-table {
+  pre {
     margin: 0;
   }
 }
 
-#troubleshooter,
-#guided-setup {
+//
+// Troubleshooter, on the help page
+//
+
+#troubleshooter {
   width: 600px;
   margin: auto;
   padding: 60px 0;
@@ -88,80 +21,400 @@ $box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.05);
     margin-top: 0;
   }
 
-  p, label, ul, ol, li{
+  p, label, ul, ol, li {
     font-size: 16px;
   }
 
-  ul:not(.select2-selection__rendered,#doc-results) {
+  ul:not(.select2-selection__rendered, #doc-results) {
     list-style: disc;
     padding-left: 20px;
+  }
+
+  .gh-panel.outlined {
+    .inside {
+      p:first-child {
+        margin-top: 0;
+      }
+    }
   }
 
   .step {
     .logo {
       width: 400px;
-      margin: auto;
-      margin-bottom: 40px;
+      margin: 0 auto 40px;
     }
 
-    > .gh-panel {
-
-      &:has(img.plugin-header-image){
-        position: relative;
-        padding-top: 195px;
-        overflow: hidden;
-      }
-
-      img.plugin-header-image{
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-      }
-
-      > .inside {
-        padding: 40px;
-      }
-    }
-
-
-    label {
-      //font-weight: 500;
+    > .gh-panel > .inside {
+      padding: 40px;
     }
 
     input.input, select {
       font-size: 16px;
       padding: 4px 12px;
     }
-
-
   }
+}
 
-  #services {
+//
+// Guided setup
+//
 
-    .download.gh-panel {
+#guided-setup {
+  max-width: 680px;
+  margin: auto;
+  padding: 40px 16px 60px;
 
-      img {
-        width: 180px;
-        border-radius: var(--gh-border-radius);
-      }
+  .gs-logo {
+    width: 280px;
+    margin: 0 auto 30px;
 
-      .plugin-actions {
-        //background: $primary-blue-2;
-        border-top: 1px solid var(--gh-dark-10);
-        padding: 20px;
-      }
-
-      h2 {
-        margin-top: 0;
-      }
-
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    svg {
+      width: 100%;
+      height: auto;
     }
   }
 
+  // the steps, numbered, across the top
+  .gs-stepper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
 
+    li {
+      margin: 0;
+    }
+
+    .gs-stepper-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0;
+      border: none;
+      background: none;
+      font-size: 14px;
+      color: var(--gh-dark-50, rgba(16, 38, 64, 0.5));
+    }
+
+    button.gs-stepper-step {
+      cursor: pointer;
+
+      &:hover {
+        color: var(--primary-blue, rgb(0, 117, 255));
+      }
+    }
+
+    .gs-stepper-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid currentColor;
+
+      .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .done .gs-stepper-step {
+      color: var(--primary-dark, rgb(16, 38, 64));
+    }
+
+    .done .gs-stepper-number {
+      border-color: var(--action-green, rgb(158, 206, 56));
+      background: var(--action-green, rgb(158, 206, 56));
+      color: #fff;
+    }
+
+    .current .gs-stepper-step {
+      color: var(--primary-dark, rgb(16, 38, 64));
+      font-weight: 600;
+    }
+
+    .current .gs-stepper-number {
+      border-color: var(--primary-blue, rgb(0, 117, 255));
+      background: var(--primary-blue, rgb(0, 117, 255));
+      color: #fff;
+    }
+  }
+
+  .gs-panel > .inside {
+    padding: 40px;
+
+    @media (max-width: 600px) {
+      padding: 20px;
+    }
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: 26px;
+    line-height: 1.3;
+
+    .dashicons {
+      color: var(--action-green, rgb(158, 206, 56));
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      vertical-align: middle;
+    }
+  }
+
+  h3 {
+    margin: 30px 0 10px;
+  }
+
+  p, label {
+    font-size: 15px;
+  }
+
+  p.description {
+    font-size: 13px;
+  }
+
+  .gs-lead {
+    margin: 0 0 25px;
+    color: var(--gh-dark-50, rgba(16, 38, 64, 0.7));
+  }
+
+  .gs-notice {
+    margin: 0 0 20px;
+  }
+
+  .gs-center {
+    text-align: center;
+    margin: 30px 0;
+  }
+
+  // two columns of fields, "full" ones span both
+  .gs-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 20px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .gs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+
+    &.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    input.input {
+      width: 100%;
+      font-size: 15px;
+      padding: 4px 12px;
+    }
+
+    .gh-input-group input.input {
+      flex-grow: 1;
+    }
+
+    p.description {
+      margin: 0;
+    }
+  }
+
+  // how the sender and footer will look in an email
+  .gs-email-preview {
+    margin-top: 25px;
+    border: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+    border-radius: var(--gh-border-radius, 5px);
+    overflow: hidden;
+    font-size: 13px;
+
+    .gs-email-preview-from {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+      background: var(--gh-dark-5, rgba(16, 38, 64, 0.05));
+    }
+
+    .gs-email-preview-label {
+      color: var(--gh-dark-50, rgba(16, 38, 64, 0.5));
+    }
+
+    .gs-email-preview-body {
+      padding: 15px;
+    }
+
+    .gs-email-preview-line {
+      height: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      background: var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+
+      &.short {
+        width: 60%;
+      }
+    }
+
+    .gs-email-preview-footer {
+      padding: 0 15px 15px;
+      text-align: center;
+      color: var(--gh-dark-50, rgba(16, 38, 64, 0.6));
+      line-height: 1.6;
+    }
+
+    .gs-missing {
+      font-style: italic;
+      color: var(--error-red, rgb(233, 31, 79));
+    }
+  }
+
+  // the privacy questions
+  .gs-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .gs-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    border: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+    border-radius: var(--gh-border-radius, 5px);
+    cursor: pointer;
+
+    &:has(input:checked) {
+      border-color: var(--primary-blue, rgb(0, 117, 255));
+      background: var(--primary-blue-2, rgba(0, 117, 255, 0.02));
+    }
+
+    input[type=checkbox] {
+      margin-top: 3px;
+    }
+
+    p.description {
+      margin: 4px 0 0;
+    }
+  }
+
+  // what to do next
+  .gs-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .gs-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    border: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+    border-radius: var(--gh-border-radius, 5px);
+
+    > .dashicons {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      color: var(--primary-blue, rgb(0, 117, 255));
+    }
+
+    h3 {
+      margin: 10px 0 5px;
+    }
+
+    p {
+      margin: 0 0 15px;
+      flex-grow: 1;
+    }
+
+    .gs-done {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin: 0;
+      flex-grow: 0;
+      color: var(--action-green, rgb(158, 206, 56));
+    }
+  }
+
+  .gs-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+  }
+}
+
+// the team modal is appended to the body, outside of #guided-setup
+.gs-team {
+  p {
+    margin-top: 0;
+  }
+
+  .gs-notice {
+    margin: 0 0 15px;
+  }
+
+  .gs-invite {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr auto auto;
+    gap: 8px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+
+    input.input {
+      width: 100%;
+    }
+  }
+
+  .gs-roles {
+    margin: 15px 0 0;
+    padding-left: 18px;
+    list-style: disc;
+    color: var(--gh-dark-50, rgba(16, 38, 64, 0.7));
+  }
+
+  .gs-members {
+    display: flex;
+    flex-direction: column;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .gs-member {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    border-top: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+  }
 }

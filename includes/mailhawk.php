@@ -85,7 +85,7 @@ class Mailhawk {
 			);
 		}
 
-		$redirect = guided_setup_finished() ? \MailHawk\get_admin_mailhawk_uri() : admin_page_url( 'gh_guided_setup', [ 'step' => '6' ] );
+		$redirect = \MailHawk\get_admin_mailhawk_uri();
 
 		return array(
 			'partner_id'   => self::PARTNER_ID,

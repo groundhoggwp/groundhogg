@@ -2,108 +2,339 @@
   display: none;
 }
 
-#more-details-content {
-  padding: 20px;
-}
-#more-details-content figure {
-  margin-left: 0;
-  margin-right: 0;
-}
-#more-details-content img {
-  max-width: 100%;
-}
-#more-details-content h2 {
-  margin-top: 1em;
-}
-#more-details-content ul {
-  list-style: disc;
-  padding-left: 20px;
-}
-
-.thumbnail {
-  max-width: 100%;
-}
-
-#troubleshooter .gh-panel.outlined .inside p:first-child {
-  margin-top: 0;
-}
-
 .wp-list-table pre {
   margin: 0;
 }
 
-#troubleshooter,
-#guided-setup {
+#troubleshooter {
   width: 600px;
   margin: auto;
   padding: 60px 0;
 }
-#troubleshooter h1,
-#guided-setup h1 {
+#troubleshooter h1 {
   margin-top: 0;
 }
-#troubleshooter p, #troubleshooter label, #troubleshooter ul, #troubleshooter ol, #troubleshooter li,
-#guided-setup p,
-#guided-setup label,
-#guided-setup ul,
-#guided-setup ol,
-#guided-setup li {
+#troubleshooter p, #troubleshooter label, #troubleshooter ul, #troubleshooter ol, #troubleshooter li {
   font-size: 16px;
 }
-#troubleshooter ul:not(.select2-selection__rendered, #doc-results),
-#guided-setup ul:not(.select2-selection__rendered, #doc-results) {
+#troubleshooter ul:not(.select2-selection__rendered, #doc-results) {
   list-style: disc;
   padding-left: 20px;
 }
-#troubleshooter .step .logo,
-#guided-setup .step .logo {
+#troubleshooter .gh-panel.outlined .inside p:first-child {
+  margin-top: 0;
+}
+#troubleshooter .step .logo {
   width: 400px;
-  margin: auto;
-  margin-bottom: 40px;
+  margin: 0 auto 40px;
 }
-#troubleshooter .step > .gh-panel:has(img.plugin-header-image),
-#guided-setup .step > .gh-panel:has(img.plugin-header-image) {
-  position: relative;
-  padding-top: 195px;
-  overflow: hidden;
-}
-#troubleshooter .step > .gh-panel img.plugin-header-image,
-#guided-setup .step > .gh-panel img.plugin-header-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-}
-#troubleshooter .step > .gh-panel > .inside,
-#guided-setup .step > .gh-panel > .inside {
+#troubleshooter .step > .gh-panel > .inside {
   padding: 40px;
 }
-#troubleshooter .step input.input, #troubleshooter .step select,
-#guided-setup .step input.input,
-#guided-setup .step select {
+#troubleshooter .step input.input, #troubleshooter .step select {
   font-size: 16px;
   padding: 4px 12px;
 }
-#troubleshooter #services .download.gh-panel,
-#guided-setup #services .download.gh-panel {
+
+#guided-setup {
+  max-width: 680px;
+  margin: auto;
+  padding: 40px 16px 60px;
+}
+#guided-setup .gs-logo {
+  width: 280px;
+  margin: 0 auto 30px;
+}
+#guided-setup .gs-logo svg {
+  width: 100%;
+  height: auto;
+}
+#guided-setup .gs-stepper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+#guided-setup .gs-stepper li {
+  margin: 0;
+}
+#guided-setup .gs-stepper .gs-stepper-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: var(--gh-dark-50, rgba(16, 38, 64, 0.5));
+}
+#guided-setup .gs-stepper button.gs-stepper-step {
+  cursor: pointer;
+}
+#guided-setup .gs-stepper button.gs-stepper-step:hover {
+  color: var(--primary-blue, rgb(0, 117, 255));
+}
+#guided-setup .gs-stepper .gs-stepper-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid currentColor;
+}
+#guided-setup .gs-stepper .gs-stepper-number .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+#guided-setup .gs-stepper .done .gs-stepper-step {
+  color: var(--primary-dark, rgb(16, 38, 64));
+}
+#guided-setup .gs-stepper .done .gs-stepper-number {
+  border-color: var(--action-green, rgb(158, 206, 56));
+  background: var(--action-green, rgb(158, 206, 56));
+  color: #fff;
+}
+#guided-setup .gs-stepper .current .gs-stepper-step {
+  color: var(--primary-dark, rgb(16, 38, 64));
+  font-weight: 600;
+}
+#guided-setup .gs-stepper .current .gs-stepper-number {
+  border-color: var(--primary-blue, rgb(0, 117, 255));
+  background: var(--primary-blue, rgb(0, 117, 255));
+  color: #fff;
+}
+#guided-setup .gs-panel > .inside {
+  padding: 40px;
+}
+@media (max-width: 600px) {
+  #guided-setup .gs-panel > .inside {
+    padding: 20px;
+  }
+}
+#guided-setup h1 {
+  margin: 0 0 10px;
+  font-size: 26px;
+  line-height: 1.3;
+}
+#guided-setup h1 .dashicons {
+  color: var(--action-green, rgb(158, 206, 56));
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  vertical-align: middle;
+}
+#guided-setup h3 {
+  margin: 30px 0 10px;
+}
+#guided-setup p, #guided-setup label {
+  font-size: 15px;
+}
+#guided-setup p.description {
+  font-size: 13px;
+}
+#guided-setup .gs-lead {
+  margin: 0 0 25px;
+  color: var(--gh-dark-50, rgba(16, 38, 64, 0.7));
+}
+#guided-setup .gs-notice {
+  margin: 0 0 20px;
+}
+#guided-setup .gs-center {
+  text-align: center;
+  margin: 30px 0;
+}
+#guided-setup .gs-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px 20px;
+}
+@media (max-width: 600px) {
+  #guided-setup .gs-fields {
+    grid-template-columns: 1fr;
+  }
+}
+#guided-setup .gs-field {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 5px;
+  min-width: 0;
 }
-#troubleshooter #services .download.gh-panel img,
-#guided-setup #services .download.gh-panel img {
-  width: 180px;
-  border-radius: var(--gh-border-radius);
+#guided-setup .gs-field.full {
+  grid-column: 1/-1;
 }
-#troubleshooter #services .download.gh-panel .plugin-actions,
-#guided-setup #services .download.gh-panel .plugin-actions {
-  border-top: 1px solid var(--gh-dark-10);
+#guided-setup .gs-field label {
+  font-weight: 500;
+  font-size: 14px;
+}
+#guided-setup .gs-field input.input {
+  width: 100%;
+  font-size: 15px;
+  padding: 4px 12px;
+}
+#guided-setup .gs-field .gh-input-group input.input {
+  flex-grow: 1;
+}
+#guided-setup .gs-field p.description {
+  margin: 0;
+}
+#guided-setup .gs-email-preview {
+  margin-top: 25px;
+  border: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+  border-radius: var(--gh-border-radius, 5px);
+  overflow: hidden;
+  font-size: 13px;
+}
+#guided-setup .gs-email-preview .gs-email-preview-from {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+  background: var(--gh-dark-5, rgba(16, 38, 64, 0.05));
+}
+#guided-setup .gs-email-preview .gs-email-preview-label {
+  color: var(--gh-dark-50, rgba(16, 38, 64, 0.5));
+}
+#guided-setup .gs-email-preview .gs-email-preview-body {
+  padding: 15px;
+}
+#guided-setup .gs-email-preview .gs-email-preview-line {
+  height: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+}
+#guided-setup .gs-email-preview .gs-email-preview-line.short {
+  width: 60%;
+}
+#guided-setup .gs-email-preview .gs-email-preview-footer {
+  padding: 0 15px 15px;
+  text-align: center;
+  color: var(--gh-dark-50, rgba(16, 38, 64, 0.6));
+  line-height: 1.6;
+}
+#guided-setup .gs-email-preview .gs-missing {
+  font-style: italic;
+  color: var(--error-red, rgb(233, 31, 79));
+}
+#guided-setup .gs-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#guided-setup .gs-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+  border-radius: var(--gh-border-radius, 5px);
+  cursor: pointer;
+}
+#guided-setup .gs-choice:has(input:checked) {
+  border-color: var(--primary-blue, rgb(0, 117, 255));
+  background: var(--primary-blue-2, rgba(0, 117, 255, 0.02));
+}
+#guided-setup .gs-choice input[type=checkbox] {
+  margin-top: 3px;
+}
+#guided-setup .gs-choice p.description {
+  margin: 4px 0 0;
+}
+#guided-setup .gs-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+@media (max-width: 600px) {
+  #guided-setup .gs-cards {
+    grid-template-columns: 1fr;
+  }
+}
+#guided-setup .gs-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   padding: 20px;
+  border: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+  border-radius: var(--gh-border-radius, 5px);
 }
-#troubleshooter #services .download.gh-panel h2,
-#guided-setup #services .download.gh-panel h2 {
+#guided-setup .gs-card > .dashicons {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: var(--primary-blue, rgb(0, 117, 255));
+}
+#guided-setup .gs-card h3 {
+  margin: 10px 0 5px;
+}
+#guided-setup .gs-card p {
+  margin: 0 0 15px;
+  flex-grow: 1;
+}
+#guided-setup .gs-card .gs-done {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  flex-grow: 0;
+  color: var(--action-green, rgb(158, 206, 56));
+}
+#guided-setup .gs-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 35px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
+}
+
+.gs-team p {
   margin-top: 0;
+}
+.gs-team .gs-notice {
+  margin: 0 0 15px;
+}
+.gs-team .gs-invite {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto auto;
+  gap: 8px;
+}
+@media (max-width: 600px) {
+  .gs-team .gs-invite {
+    grid-template-columns: 1fr;
+  }
+}
+.gs-team .gs-invite input.input {
+  width: 100%;
+}
+.gs-team .gs-roles {
+  margin: 15px 0 0;
+  padding-left: 18px;
+  list-style: disc;
+  color: var(--gh-dark-50, rgba(16, 38, 64, 0.7));
+}
+.gs-team .gs-members {
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.gs-team .gs-member {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 0;
+  border-top: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
 }
 
 /*# sourceMappingURL=setup.css.map */
