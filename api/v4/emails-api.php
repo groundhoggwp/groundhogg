@@ -24,6 +24,7 @@ use function Groundhogg\enqueue_event;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
+use function Groundhogg\get_sender_profiles;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\is_sending;
 use function Groundhogg\is_template_site;
@@ -457,6 +458,56 @@ class Emails_Api extends Base_Object_Api {
 
 
 	/**
+	 * Who a composed email is from. A sender profile can be given, by its id from get_sender_profiles(), and a from
+	 * email and name can be given too, which are used in place of the profile's when they are. Without any of them
+	 * it's the default sender.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @param Contact|false    $contact the first recipient, that the merge tags of a profile, like the owner's, are for
+	 *
+	 * @return string[]|\WP_Error [ email, name ]
+	 */
+	protected function resolve_sender( \WP_REST_Request $request, $contact ) {
+
+		$from_email = get_default_from_email();
+		$from_name  = get_default_from_name();
+
+		$profile_id = sanitize_text_field( (string) $request->get_param( 'sender_profile' ) );
+		$profile    = false;
+
+		if ( $profile_id ) {
+
+			$profiles = get_sender_profiles();
+
+			if ( ! isset( $profiles[ $profile_id ] ) ) {
+				return self::ERROR_401( 'invalid_sender_profile', 'Not a valid sender profile.' );
+			}
+
+			$profile    = $profiles[ $profile_id ];
+			$from_email = $profile['from_email'];
+			$from_name  = $profile['from_name'];
+		}
+
+		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: $from_email;
+		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: $from_name;
+
+		// Profiles such as "owner" have merge tags, for the first recipient
+		if ( $profile ) {
+
+			if ( $contact && $contact->exists() ) {
+				$from_email = sanitize_email( do_replacements( $from_email, $contact ) );
+				$from_name  = sanitize_text_field( do_replacements( $from_name, $contact ) );
+			}
+
+			if ( ! is_email( $from_email ) ) {
+				return self::ERROR_401( 'invalid_sender_profile', 'The sender profile could not be resolved to an email address.' );
+			}
+		}
+
+		return [ $from_email, $from_name ];
+	}
+
+	/**
 	 * Really basic send email handler
 	 *
 	 * @param \WP_REST_Request $request
@@ -486,8 +537,13 @@ class Emails_Api extends Base_Object_Api {
 		$contactRecords = array_map_to_contacts( $contactRecords );
 		$contact        = array_shift( $contactRecords );
 
-		$from_email = sanitize_email( $request->get_param( 'from_email' ) ) ?: get_default_from_email();
-		$from_name  = sanitize_text_field( $request->get_param( 'from_name' ) ) ?: get_default_from_name();
+		$from = $this->resolve_sender( $request, $contact );
+
+		if ( is_wp_error( $from ) ) {
+			return $from;
+		}
+
+		[ $from_email, $from_name ] = $from;
 
 		$content = $request->get_param( 'content' );
 

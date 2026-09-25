@@ -1125,22 +1125,103 @@
 
   }
 
+  const CUSTOM_SENDER = 'custom'
+
+  /**
+   * The sender profiles as a list, each with its id
+   *
+   * @returns {{id: string, from_name: string, from_email: string, display: string}[]}
+   */
+  const senderProfileList = () => Object.entries(Groundhogg.filters.sender_profiles || {}).map(([ id, profile ]) => ( {
+    ...profile,
+    id,
+  } ))
+
+  /**
+   * How a sender profile is shown. One with a merge tag in it, like the owner of the contact, says what it is.
+   *
+   * @param profile
+   * @returns {string} html
+   */
+  const senderProfileDisplay = profile => String(profile.from_email).includes('{')
+    ? specialChars(profile.display || profile.from_name)
+    : `${ specialChars(profile.from_name) } &lt;${ specialChars(profile.from_email) }&gt;`
+
+  /**
+   * The sender profile that goes with what a caller of the composer supplied, in order of what says the most:
+   * the id of a profile, an email address (and the name, to tell apart profiles that share an address), the id of a
+   * user. With none of them it's the profile of the current user. An address that isn't any profile's is
+   * a profile of its own, so that it's still what the email is sent from.
+   *
+   * @param sender_profile
+   * @param from_user
+   * @param from_email
+   * @param from_name
+   * @returns {{id: string, from_name: string, from_email: string}}
+   */
+  const findSenderProfile = ({ sender_profile, from_user, from_email, from_name } = {}) => {
+
+    const profiles = senderProfileList()
+    const byId = id => profiles.find(profile => profile.id === String(id))
+
+    if (sender_profile && byId(sender_profile)) {
+      return byId(sender_profile)
+    }
+
+    if (from_email) {
+
+      const email = String(from_email).toLowerCase()
+      const name = String(from_name || '').toLowerCase()
+      const matching = profiles.filter(profile => String(profile.from_email).toLowerCase() === email)
+
+      const match = ( name ? matching.find(profile => String(profile.from_name).toLowerCase() === name) : undefined )
+        // the current user's, when the address is shared with the default sender
+        ?? matching.find(profile => profile.id === `user-${ currentUser.ID }`)
+        ?? matching[0]
+
+      return match ?? {
+        id        : CUSTOM_SENDER,
+        from_name : from_name || '',
+        from_email: from_email,
+      }
+    }
+
+    if (from_user && byId(`user-${ from_user }`)) {
+      return byId(`user-${ from_user }`)
+    }
+
+    // the current user's, or what they would send from if they aren't someone that contacts can be assigned to
+    return byId(`user-${ currentUser.ID }`) ?? findSenderProfile({
+      from_email: currentUser.from_email,
+      from_name : currentUser.from_name,
+    })
+  }
+
   const EmailModal = (props, onSend = () => {}) => {
 
+    // the sender is a profile, whatever the caller gave to say who it's from
+    const sender = findSenderProfile(props)
+
+    // one that's not a profile, that was given by the caller, is offered along with them
+    const customSender = sender.id === CUSTOM_SENDER ? sender : null
+
     const State = Groundhogg.createState({
-      to        : [],
-      from_user : currentUser.ID,
-      from_name : currentUser.from_name,
-      from_email: currentUser.from_email,
-      cc        : [],
-      showCC    : false,
-      bcc       : [],
-      showBCC   : false,
-      subject   : '',
-      content   : '',
-      sending   : false,
+      to            : [],
+      cc            : [],
+      showCC        : false,
+      bcc           : [],
+      showBCC       : false,
+      subject       : '',
+      content       : '',
+      sending       : false,
       ...props,
+      // not what the caller said it's from, but the profile that it goes with
+      sender_profile: sender.id,
+      from_name     : sender.from_name,
+      from_email    : sender.from_email,
     })
+
+    const senderOptions = () => customSender ? [ customSender, ...senderProfileList() ] : senderProfileList()
 
     const EmailAddressPicker = ({
       label = '',
@@ -1196,6 +1277,7 @@
 
             const {
               to,
+              sender_profile,
               from_email,
               from_name,
               cc,
@@ -1223,8 +1305,8 @@
 
             post(`${ routes.v4.emails }/send`, {
               to,
-              from_email,
-              from_name,
+              // a profile is resolved by the server, the owner of the contact is one, an address that isn't a profile is sent as it is
+              ...( sender_profile === CUSTOM_SENDER ? { from_email, from_name } : { sender_profile } ),
               cc,
               bcc,
               subject,
@@ -1249,7 +1331,8 @@
                 ...r,
                 email: {
                   to,
-                  from_email,
+                  // as it was resolved, when it was a merge tag
+                  from_email: r.from || from_email,
                   from_name,
                   cc,
                   bcc,
@@ -1277,18 +1360,41 @@
         }, [
 
           // from
-          OwnerPicker({
-            label      : 'From:',
-            id         : 'composed-from',
-            selected   : [State.from_user],
-            multiple   : false,
-            allow0     : false,
-            itemDisplay: u => `${ u.from_name } &lt;${ u.from_email }&gt;`,
-            onChange   : item => {
+          ItemPicker({
+            id              : 'composed-from',
+            label           : `${ __('From', 'groundhogg') }:`,
+            noneSelected    : __('Select a sender...', 'groundhogg'),
+            multiple        : false,
+            style           : {
+              flexGrow: 1,
+            },
+            selected        : [ {
+              id  : State.sender_profile,
+              text: senderProfileDisplay({
+                from_name : State.from_name,
+                from_email: State.from_email,
+                display   : senderOptions().find(profile => profile.id === State.sender_profile)?.display,
+              }),
+            } ],
+            isValidSelection: id => senderOptions().some(profile => profile.id === id),
+            fetchOptions    : search => {
+
+              // what was typed is text to find, not a pattern
+              search = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+
+              return Promise.resolve(senderOptions().map(profile => ( {
+                id  : profile.id,
+                text: senderProfileDisplay(profile),
+              } )).filter(({ text }) => text.match(search)))
+            },
+            onChange        : item => {
+
+              const profile = senderOptions().find(profile => profile.id === item.id)
+
               State.set({
-                form_user : item.id,
-                from_email: getOwner(item.id).from_email,
-                from_name : getOwner(item.id).from_name,
+                sender_profile: profile.id,
+                from_email    : profile.from_email,
+                from_name     : profile.from_name,
               })
             },
           }),
