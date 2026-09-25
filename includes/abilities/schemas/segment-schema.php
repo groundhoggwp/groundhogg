@@ -286,12 +286,12 @@ class Segment_Schema {
 			],
 			'optin_status' => [
 				'type'        => 'array',
-				'items'       => [ 'enum' => self::optin_status_enum() ],
+				'items'       => [ 'type' => [ 'integer', 'string' ], 'enum' => self::optin_status_enum() ],
 				'description' => __( 'Only contacts with one of these opt-in statuses (raw int or string label).', 'groundhogg' ),
 			],
 			'optin_status_exclude' => [
 				'type'        => 'array',
-				'items'       => [ 'enum' => self::optin_status_enum() ],
+				'items'       => [ 'type' => [ 'integer', 'string' ], 'enum' => self::optin_status_enum() ],
 				'description' => __( 'Exclude contacts with one of these opt-in statuses.', 'groundhogg' ),
 			],
 			'marketable' => [
@@ -344,6 +344,7 @@ class Segment_Schema {
 							'description' => __( 'The meta/custom-field key, e.g. "cancel_reason".', 'groundhogg' ),
 						],
 						'value' => [
+							'type'        => [ 'string', 'number', 'boolean', 'array' ],
 							'description' => __( 'Value to compare against. Omit for compare "empty" or "not_empty". An array of values for "in" / "not_in".', 'groundhogg' ),
 						],
 						'compare' => [

@@ -803,31 +803,7 @@ class Funnels_Page extends Admin_Page {
 		// Undo/redo, the editor posts a snapshot of the steps from after an earlier quiet save. Deleted steps come back
 		// by updating their row, which is why Step::delete() is a soft delete until the undo history is cleared
 		if ( get_post_var( '_restore' ) ) {
-
-			$prev_step_states = json_decode( get_post_var( '_restore' ), true );
-			$keep_step_ids    = wp_parse_id_list( wp_list_pluck( $prev_step_states, 'ID' ) );
-
-			// delete steps that were added that aren't in the previous step state
-			$curr_steps = $funnel->get_steps();
-			foreach ( $curr_steps as $curr_step ) {
-				if ( ! in_array( $curr_step->ID, $keep_step_ids ) ) {
-					$curr_step->delete();
-				}
-			}
-
-			// update current steps with data from prev states
-			foreach ( $prev_step_states as $prev_step_state ) {
-
-				$step = new Step( absint( $prev_step_state['ID'] ) );
-				if ( $step->exists() ) {
-					$step->update( $prev_step_state['data'] );
-				} else {
-					$step->create( $prev_step_state['data'] );
-				}
-
-				$step->update_meta( $prev_step_state['meta'] );
-
-			}
+			$funnel->restore( json_decode( get_post_var( '_restore' ), true ) ?: [] );
 
 			return true;
 		}

@@ -30,9 +30,13 @@ use Groundhogg\Abilities\Funnels\Activate_Flow;
 use Groundhogg\Abilities\Funnels\Add_To_Flow;
 use Groundhogg\Abilities\Funnels\Create_Flow;
 use Groundhogg\Abilities\Funnels\Deactivate_Flow;
+use Groundhogg\Abilities\Funnels\Discard_Flow_Changes;
+use Groundhogg\Abilities\Funnels\Edit_Flow;
+use Groundhogg\Abilities\Funnels\Get_Flow;
 use Groundhogg\Abilities\Funnels\List_Flows;
 use Groundhogg\Abilities\Funnels\List_Step_Types;
 use Groundhogg\Abilities\Funnels\Live_Simulate_Flow;
+use Groundhogg\Abilities\Funnels\Publish_Flow_Changes;
 use Groundhogg\Abilities\Funnels\Simulate_Flow;
 use Groundhogg\Abilities\Emails\Create_Email_Template;
 use Groundhogg\Abilities\Emails\Get_Email_Template;
@@ -304,8 +308,12 @@ class Abilities {
 			Get_Broadcast::class,
 			Cancel_Broadcast::class,
 			List_Flows::class,
+			Get_Flow::class,
 			List_Step_Types::class,
 			Create_Flow::class,
+			Edit_Flow::class,
+			Publish_Flow_Changes::class,
+			Discard_Flow_Changes::class,
 			Activate_Flow::class,
 			Deactivate_Flow::class,
 			Add_To_Flow::class,
