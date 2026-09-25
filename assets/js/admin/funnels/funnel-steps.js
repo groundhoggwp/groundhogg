@@ -180,7 +180,7 @@
 
     switch (run_when) {
       case 'now':
-        preview.unshift(_x('at any time', 'groundhogg'))
+        preview.unshift(_x('at any time', 'run at any time of day', 'groundhogg'))
         break
       case 'later':
         /* translators: %s: a specific time like "09:00:00" */
