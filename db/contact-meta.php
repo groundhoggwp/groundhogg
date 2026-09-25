@@ -42,6 +42,9 @@ class Contact_Meta extends Meta_DB {
 	/**
 	 * Get the object type we're inserting/updateing/deleting.
 	 *
+	 * Shared with the contacts table, so DB::delete() on this table fires the groundhogg/db/*_delete/contact hooks
+	 * with a meta ID or where clause as if a contact was deleted. Use delete_meta() or $wpdb directly instead.
+	 *
 	 * @return string
 	 */
 	public function get_object_type() {

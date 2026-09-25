@@ -183,6 +183,8 @@ abstract class Roles {
 	 * @since  1.4.4
 	 */
 	public function add_caps() {
+		// WP_Roles::add_cap() saves the option but doesn't update the cached WP_Role objects that user_can() checks,
+		// so new caps only apply from the next request unless the roles are reloaded with wp_roles()->for_site()
 		$wp_roles = $this->get_wp_roles();
 
 		$roles = array_keys( $wp_roles->roles );
