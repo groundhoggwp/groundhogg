@@ -62,6 +62,10 @@ class Funnel_Schema extends Schema {
 								'type'        => 'string',
 								'description' => __( '"benchmark" (an entry / trigger step) or "action" (something the flow does).', 'groundhogg' ),
 							],
+							'is_conversion' => [
+								'type'        => 'boolean',
+								'description' => __( 'Whether reaching this benchmark counts as a conversion for the flow. Segment on conversions with flow_conversions.step_ids.', 'groundhogg' ),
+							],
 						],
 						'required'   => [ 'id', 'title', 'type', 'group' ],
 					],
@@ -104,6 +108,7 @@ class Funnel_Schema extends Schema {
 					'type'      => $step->get_type(),
 					'type_name' => $step->get_type_name(),
 					'group'     => $step->is_benchmark() ? 'benchmark' : 'action',
+					'is_conversion' => $step->is_conversion(),
 				];
 			}, $object->get_steps() ) );
 		}
