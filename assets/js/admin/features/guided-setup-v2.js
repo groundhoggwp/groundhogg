@@ -22,6 +22,7 @@
     Li,
     Dashicon,
     Fragment,
+    ItemPicker,
     ModalWithHeader,
     makeEl,
   } = MakeEl
@@ -117,6 +118,9 @@
     inbox         : null,
     synced        : false,
     finished      : false,
+    telemetry     : false,
+    newsletter    : false,
+    sharedUsage   : false,
   })
 
   /**
@@ -161,6 +165,14 @@
       when   : () => State.licensed,
       render : () => RepliesStep(),
       onEnter: () => loadInbox(),
+    },
+    {
+      id    : 'updates',
+      title : __('Updates', 'groundhogg'),
+      // once it's on, there's nothing to ask
+      when  : () => !Setup.telemetry,
+      render: () => UpdatesStep(),
+      save  : () => saveUpdates(),
     },
     {
       id     : 'next',
@@ -391,6 +403,45 @@
 
   const updatePreview = () => document.getElementById('gs-email-preview')?.replaceWith(EmailPreview())
 
+  /**
+   * The countries to pick from, with the one that's saved first if it isn't one of them, like one that was typed
+   * in the settings before there was a list
+   *
+   * @returns {string[]}
+   */
+  const countries = () => {
+    const current = State.business.gh_country
+    return current && !Setup.countries.includes(current) ? [ current, ...Setup.countries ] : Setup.countries
+  }
+
+  const CountryField = () => Div({ className: 'gs-field' }, [
+    Label({ for: 'gs-gh_country' }, __('Country', 'groundhogg')),
+    ItemPicker({
+      id          : 'gs-gh_country',
+      noneSelected: __('Select a country...', 'groundhogg'),
+      multiple    : false,
+      selected    : State.business.gh_country ? [
+        {
+          id  : State.business.gh_country,
+          text: specialChars(State.business.gh_country),
+        },
+      ] : [],
+      fetchOptions: search => {
+
+        search = search.trim().toLowerCase()
+
+        return Promise.resolve(countries().filter(country => country.toLowerCase().includes(search)).map(country => ( {
+          id  : country,
+          text: specialChars(country),
+        } )))
+      },
+      onChange    : item => {
+        setField('business', 'gh_country', item?.id ?? '')
+        updatePreview()
+      },
+    }),
+  ])
+
   const BusinessStep = () => {
 
     const field = props => Field({
@@ -402,6 +453,14 @@
     return [
       H1({}, __('Tell us about your business', 'groundhogg')),
       Pg({ className: 'gs-lead' }, __('Anti-spam laws require your business name and address in the footer of every marketing email. Groundhogg adds them for you.', 'groundhogg')),
+
+      Setup.prefill.from.length ? Div({ className: 'gs-prefilled' }, [
+        Dashicon('info-outline'),
+        Span({}, sprintf(
+          // translators: %s: the names of store plugins, like "WooCommerce" or "WooCommerce and Easy Digital Downloads"
+          __('We filled in what we could from %s. Check it over before you continue.', 'groundhogg'),
+          Setup.prefill.from.map(store => `<b>${ specialChars(store) }</b>`).join(` ${ __('and', 'groundhogg') } `))),
+      ]) : null,
 
       Div({ className: 'gs-fields' }, [
         field({
@@ -436,10 +495,7 @@
           name : 'gh_zip_or_postal',
           label: __('Zip / Postal code', 'groundhogg'),
         }),
-        field({
-          name : 'gh_country',
-          label: __('Country', 'groundhogg'),
-        }),
+        CountryField(),
       ]),
 
       H3({}, __('Who your emails come from', 'groundhogg')),
@@ -787,6 +843,72 @@
   }
 
   //
+  // Updates
+  //
+
+  const UpdatesStep = () => {
+
+    const choices = [
+      {
+        id         : 'telemetry',
+        label      : __('Share how I use Groundhogg', 'groundhogg'),
+        description: [
+          __('Once a week, send Groundhogg Inc. the number of active flows, new contacts and broadcasts, which add-ons are installed, and the versions of Groundhogg, WordPress and PHP, along with your email address. Never your contacts or what\'s in your emails.', 'groundhogg'),
+          State.licensed ? null : Bold({}, ' ' + __('Get 15% off your first year of a premium plan.', 'groundhogg')),
+        ],
+      },
+      {
+        id         : 'newsletter',
+        label      : __('Email me about new features', 'groundhogg'),
+        description: sprintf(
+          // translators: %s: the current user's email address
+          __('News, tips and the occasional offer, sent to %s. Unsubscribe any time.', 'groundhogg'),
+          specialChars(Setup.email)),
+      },
+    ]
+
+    return [
+      H1({}, __('Stay in the loop', 'groundhogg')),
+      Pg({ className: 'gs-lead' }, __('Help us make Groundhogg better, and hear about what\'s new. Both are optional, and you can change your mind later.', 'groundhogg')),
+
+      Div({ className: 'gs-choices' }, choices.map(({
+        id,
+        label,
+        description,
+      }) => Label({ className: 'gs-choice' }, [
+        Input({
+          type    : 'checkbox',
+          checked : State[id],
+          onChange: e => State.set({ [id]: e.target.checked }),
+        }),
+        Div({}, [
+          Bold({}, label),
+          Pg({ className: 'description' }, description),
+        ]),
+      ]))),
+
+      Continue(),
+    ]
+  }
+
+  /**
+   * Telemetry subscribes to the list too when asked, otherwise the list is subscribed to by itself
+   */
+  const saveUpdates = () => {
+
+    if (State.telemetry) {
+      return request({
+        action    : 'gh_guided_setup_telemetry',
+        subscribed: State.newsletter,
+      }).then(() => State.set({ sharedUsage: true }))
+    }
+
+    if (State.newsletter) {
+      return request({ action: 'gh_guided_setup_subscribe' })
+    }
+  }
+
+  //
   // What's next
   //
 
@@ -896,6 +1018,13 @@
         // translators: %s: the current user's display name
         __('You\'re all set, %s!', 'groundhogg'), specialChars(currentUser.data.display_name))),
       Pg({ className: 'gs-lead' }, __('Pick where you\'d like to start. You\'ll find these on your dashboard too.', 'groundhogg')),
+      State.sharedUsage && !State.licensed ? Div({ className: 'gs-coupon' }, [
+        Span({}, __('Thanks for helping out! Use code <b>IFOUND15OFF</b> for 15% off your first year.', 'groundhogg')),
+        An({
+          href  : Setup.links.pricing,
+          target: '_blank',
+        }, __('See plans', 'groundhogg')),
+      ]) : null,
       Div({ className: 'gs-cards' }, cards),
       Actions({
         primary: {
@@ -1080,7 +1209,8 @@
 
       const business = {}
 
-      BUSINESS_OPTIONS.forEach(option => business[option] = Options.get(option, ''))
+      // what's already in Groundhogg, otherwise what was entered in WooCommerce or EDD
+      BUSINESS_OPTIONS.forEach(option => business[option] = Options.get(option, '') || Setup.prefill.values[option] || '')
 
       // show what emails will actually use, so that it's saved as it's shown
       business.gh_business_name ||= Setup.site.name

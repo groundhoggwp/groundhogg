@@ -13,10 +13,13 @@ use function Groundhogg\admin_page_url;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
 use function Groundhogg\get_post_var;
+use function Groundhogg\get_user_timezone;
 use function Groundhogg\groundhogg_icon;
 use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\notices;
+use function Groundhogg\remote_post_json;
+use function Groundhogg\utils;
 use function Groundhogg\verify_admin_ajax_nonce;
 
 /**
@@ -102,6 +105,47 @@ class Guided_Setup extends Admin_Page {
 		add_action( 'wp_ajax_gh_guided_setup_sync_users', [ $this, 'sync_users' ] );
 		add_action( 'wp_ajax_gh_guided_setup_invite_user', [ $this, 'invite_user' ] );
 		add_action( 'wp_ajax_gh_guided_setup_set_role', [ $this, 'set_role' ] );
+		add_action( 'wp_ajax_gh_guided_setup_telemetry', [ $this, 'optin_to_telemetry' ] );
+		add_action( 'wp_ajax_gh_guided_setup_subscribe', [ $this, 'subscribe_to_newsletter' ] );
+	}
+
+	/**
+	 * Turn on telemetry, and maybe subscribe to the list along with it
+	 */
+	public function optin_to_telemetry() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
+		$response = Plugin::instance()->stats_collection->optin( get_post_var( 'subscribed' ) === 'true' );
+
+		// telemetry is on either way, only a problem here is worth telling them about, not one reaching groundhogg.io
+		if ( is_wp_error( $response ) && $response->get_error_code() === 'invalid_email' ) {
+			wp_send_json_error( new \WP_Error( 'invalid_email', __( 'Your WordPress account does not have a valid email address.', 'groundhogg' ) ) );
+		}
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Subscribe the current user to the newsletter, without telemetry
+	 */
+	public function subscribe_to_newsletter() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error();
+		}
+
+		$user = wp_get_current_user();
+
+		remote_post_json( 'https://groundhogg.io/wp-json/gh/v3/webhook-listener?auth_token=NCM39k3&step_id=1641', [
+			'email'     => $user->user_email,
+			'name'      => $user->display_name,
+			'time_zone' => get_user_timezone()->getName(),
+		] );
+
+		wp_send_json_success();
 	}
 
 	/**
@@ -387,6 +431,113 @@ class Guided_Setup extends Admin_Page {
 	}
 
 	/**
+	 * The name of a country from its code, as the country picker lists it
+	 *
+	 * @param string $code
+	 * @param string $fallback the store's own name for it, if Groundhogg doesn't have the code
+	 *
+	 * @return string
+	 */
+	protected function country_name( $code, $fallback = '' ) {
+		return $code ? ( utils()->location->get_countries_list( $code ) ?: $fallback ) : '';
+	}
+
+	/**
+	 * Business details that were already entered in a store plugin, keyed by the Groundhogg setting they fill
+	 *
+	 * @return array[] the store's name => [ option => value ]
+	 */
+	protected function store_details() {
+
+		$stores = [];
+
+		if ( function_exists( 'WC' ) ) {
+
+			$woo = [
+				'gh_street_address_1'    => get_option( 'woocommerce_store_address' ),
+				'gh_street_address_2'    => get_option( 'woocommerce_store_address_2' ),
+				'gh_city'                => get_option( 'woocommerce_store_city' ),
+				'gh_zip_or_postal'       => get_option( 'woocommerce_store_postcode' ),
+				'gh_override_from_name'  => get_option( 'woocommerce_email_from_name' ),
+				'gh_override_from_email' => get_option( 'woocommerce_email_from_address' ),
+			];
+
+			// The base country is US:CA until it's changed, so it's only the store's when there's an address with it
+			if ( $woo['gh_street_address_1'] || $woo['gh_city'] ) {
+				$countries = WC()->countries;
+				$country   = $countries->get_base_country();
+				$state     = $countries->get_base_state();
+				$states    = $countries->get_states( $country );
+
+				$woo['gh_country'] = $this->country_name( $country, $countries->get_countries()[ $country ] ?? '' );
+				$woo['gh_region']  = is_array( $states ) && isset( $states[ $state ] ) ? $states[ $state ] : $state;
+			}
+
+			$stores['WooCommerce'] = $woo;
+		}
+
+		if ( function_exists( 'edd_get_option' ) ) {
+
+			$edd = [
+				'gh_business_name'       => edd_get_option( 'entity_name' ),
+				'gh_street_address_1'    => edd_get_option( 'business_address' ),
+				'gh_street_address_2'    => edd_get_option( 'business_address_2' ),
+				'gh_city'                => edd_get_option( 'business_city' ),
+				'gh_zip_or_postal'       => edd_get_option( 'business_postal_code' ),
+				'gh_override_from_name'  => edd_get_option( 'from_name' ),
+				'gh_override_from_email' => edd_get_option( 'from_email' ),
+			];
+
+			// same as WooCommerce, a country by itself is more likely a default than the business's
+			if ( $edd['gh_street_address_1'] || $edd['gh_city'] ) {
+				$country = edd_get_option( 'base_country' );
+				$state   = edd_get_option( 'base_state' );
+
+				$edd['gh_country'] = $this->country_name( $country, function_exists( 'edd_get_country_name' ) ? edd_get_country_name( $country ) : '' );
+				$edd['gh_region']  = $state && function_exists( 'edd_get_state_name' ) ? edd_get_state_name( $country, $state ) : $state;
+			}
+
+			$stores['Easy Digital Downloads'] = $edd;
+		}
+
+		// store plugins keep some of these as HTML, like &ocirc;, the fields want the text
+		return array_map( function ( $details ) {
+			return array_filter( array_map( function ( $value ) {
+				return is_string( $value ) ? trim( html_entity_decode( $value, ENT_QUOTES, 'UTF-8' ) ) : '';
+			}, $details ) );
+		}, $stores );
+	}
+
+	/**
+	 * The business settings that Groundhogg doesn't have yet but a store plugin does. The first store that has a
+	 * setting fills it, so a site with both can get the address from one and the sender from the other.
+	 *
+	 * @return array values: option => value, from: the names of the stores that filled something
+	 */
+	protected function prefill() {
+
+		$values = [];
+		$from   = [];
+
+		foreach ( $this->store_details() as $store => $details ) {
+			foreach ( $details as $option => $value ) {
+
+				if ( isset( $values[ $option ] ) || get_option( $option ) ) {
+					continue;
+				}
+
+				$values[ $option ] = $value;
+				$from[ $store ]    = $store;
+			}
+		}
+
+		return [
+			'values' => $values,
+			'from'   => array_values( $from ),
+		];
+	}
+
+	/**
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
@@ -406,7 +557,12 @@ class Guided_Setup extends Admin_Page {
 				'from_email'     => get_default_from_email(),
 				'privacy_policy' => get_privacy_policy_url(),
 			],
+			'prefill'    => $this->prefill(),
+			// names, not codes, the business country is shown in the email footer as it's saved
+			'countries'  => array_values( utils()->location->get_countries_list() ),
 			'hasLicense' => (bool) Inbox_Client::license_key(),
+			'telemetry'  => Plugin::instance()->stats_collection->is_enabled(),
+			'email'      => wp_get_current_user()->user_email,
 			'unsynced'   => $can_sync ? $this->count_unsynced_users() : 0,
 			'team'       => $this->can_manage_team() ? [
 				'roles'   => $this->team_roles(),

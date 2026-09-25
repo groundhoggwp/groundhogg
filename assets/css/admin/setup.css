@@ -248,6 +248,31 @@
 #guided-setup .gs-choice p.description {
   margin: 4px 0 0;
 }
+#guided-setup .gs-prefilled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -10px 0 20px;
+  padding: 10px 15px;
+  border-radius: var(--gh-border-radius, 5px);
+  background: var(--primary-blue-7, rgba(0, 117, 255, 0.07));
+  font-size: 14px;
+}
+#guided-setup .gs-prefilled .dashicons {
+  color: var(--primary-blue, rgb(0, 117, 255));
+}
+#guided-setup .gs-coupon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 20px;
+  padding: 12px 15px;
+  border-radius: var(--gh-border-radius, 5px);
+  background: rgba(158, 206, 56, 0.15);
+  font-size: 14px;
+}
 #guided-setup .gs-cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
