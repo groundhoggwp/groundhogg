@@ -860,12 +860,14 @@ class Contact_Query extends Table_Query {
 			           ->equals( 'event_type', $event_type )
 			           ->equals( 'status', $status );
 
+			Filters::timestamp( 'time', $filter, $eventQuery->where() );
+
 			if ( $funnel_id ) {
 				$eventQuery->where()->equals( 'funnel_id', $funnel_id );
 			}
 
 			if ( $step_id ) {
-				$eventQuery->where()->equals( 'funnel_id', $step_id );
+				$eventQuery->where()->equals( 'step_id', $step_id );
 			}
 
 			if ( $email_id ) {
