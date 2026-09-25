@@ -4,8 +4,11 @@ namespace Groundhogg\Steps\Actions;
 
 use Groundhogg\Step;
 use Groundhogg\Utils\DateTimeHelper;
+use function Groundhogg\bold_it;
 use function Groundhogg\html;
 use function Groundhogg\one_of;
+use function Groundhogg\ordinal_suffix;
+use function Groundhogg\orList;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -176,7 +179,190 @@ class Delay_Timer extends Action {
 	}
 
 	public function generate_step_title( $step ) {
-		return $this->get_setting( 'delay_preview' ) ?: 'Wait 3 days';
+		return $this->get_setting( 'delay_preview' ) ?: self::delay_preview( $this->get_delay_settings( $step ?: $this->get_current_step() ) );
+	}
+
+	/**
+	 * The step's delay settings, with defaults for anything missing
+	 *
+	 * @param Step $step
+	 *
+	 * @return array
+	 */
+	protected function get_delay_settings( Step $step ) {
+		return wp_parse_args( $step->get_meta(), [
+			'delay_amount'      => 3,
+			'delay_type'        => 'days',
+			'run_on_type'       => 'any',
+			'run_when'          => 'now',
+			'run_time'          => '09:00:00',
+			'send_in_timezone'  => false,
+			'run_time_to'       => '17:00:00',
+			'run_on_dow_type'   => 'any', // Run on days of week type
+			'run_on_dow'        => [], // Run on days of week
+			'run_on_month_type' => 'any', // Run on month type
+			'run_on_months'     => [], // Run on months
+			'run_on_dom'        => [], // Run on days of month,
+		] );
+	}
+
+	/**
+	 * Human-readable summary of the delay settings.
+	 * Mirrors delayTimerName() in assets/js/admin/funnels/funnel-steps.js, which computes delay_preview in the editor,
+	 * so steps whose settings were set some other way (abilities, REST, imports) still get an accurate title.
+	 *
+	 * @param array $settings
+	 *
+	 * @return string
+	 */
+	public static function delay_preview( array $settings ) {
+
+		$format_time = function ( $time ) {
+			try {
+				return bold_it( ( new DateTimeHelper( '2021-01-01 ' . $time ) )->wpTimeFormat() );
+			} catch ( \Exception $e ) {
+				return bold_it( esc_html( $time ) );
+			}
+		};
+
+		$days_of_week = [
+			'monday'    => __( 'Monday', 'groundhogg' ),
+			'tuesday'   => __( 'Tuesday', 'groundhogg' ),
+			'wednesday' => __( 'Wednesday', 'groundhogg' ),
+			'thursday'  => __( 'Thursday', 'groundhogg' ),
+			'friday'    => __( 'Friday', 'groundhogg' ),
+			'saturday'  => __( 'Saturday', 'groundhogg' ),
+			'sunday'    => __( 'Sunday', 'groundhogg' ),
+		];
+
+		$determiners = [
+			'first'  => __( 'First', 'groundhogg' ),
+			'second' => __( 'Second', 'groundhogg' ),
+			'third'  => __( 'Third', 'groundhogg' ),
+			'fourth' => __( 'Fourth', 'groundhogg' ),
+			'last'   => __( 'Last', 'groundhogg' ),
+		];
+
+		$months = [
+			'january'   => __( 'January', 'groundhogg' ),
+			'february'  => __( 'February', 'groundhogg' ),
+			'march'     => __( 'March', 'groundhogg' ),
+			'april'     => __( 'April', 'groundhogg' ),
+			'may'       => __( 'May', 'groundhogg' ),
+			'june'      => __( 'June', 'groundhogg' ),
+			'july'      => __( 'July', 'groundhogg' ),
+			'august'    => __( 'August', 'groundhogg' ),
+			'september' => __( 'September', 'groundhogg' ),
+			'october'   => __( 'October', 'groundhogg' ),
+			'november'  => __( 'November', 'groundhogg' ),
+			'december'  => __( 'December', 'groundhogg' ),
+		];
+
+		// Bold the labels of the selected keys, skipping unknown ones
+		$bold_labels = function ( $selected, $labels ) {
+			$selected = array_filter( (array) $selected, function ( $key ) use ( $labels ) {
+				return isset( $labels[ $key ] );
+			} );
+
+			return array_values( array_map( function ( $key ) use ( $labels ) {
+				return bold_it( $labels[ $key ] );
+			}, $selected ) );
+		};
+
+		$months_list = $settings['run_on_month_type'] === 'specific'
+			? orList( $bold_labels( $settings['run_on_months'], $months ) )
+			: bold_it( __( 'any month', 'groundhogg' ) );
+
+		$preview = [];
+
+		switch ( $settings['run_when'] ) {
+			default:
+			case 'now':
+				$preview[] = _x( 'at any time', 'run at any time of day', 'groundhogg' );
+				break;
+			case 'later':
+				/* translators: %s: a specific time like "09:00:00" */
+				$preview[] = sprintf( _x( 'at %s', 'at a specific time', 'groundhogg' ), $format_time( $settings['run_time'] ) );
+				break;
+			case 'between':
+				/* translators: 1: a specific time like "09:00:00", 2: another specific time like "17:00:00" */
+				$preview[] = sprintf( _x( 'between %1$s and %2$s', 'within a time from', 'groundhogg' ), $format_time( $settings['run_time'] ), $format_time( $settings['run_time_to'] ) );
+				break;
+		}
+
+		switch ( $settings['run_on_type'] ) {
+			default:
+			case 'any':
+				$run = _x( 'run', 'verb meaning to start a process', 'groundhogg' );
+				break;
+			case 'weekday':
+				$run = _x( 'run on <b>a weekday</b>', 'verb meaning to start a process - on a weekday', 'groundhogg' );
+				break;
+			case 'weekend':
+				$run = _x( 'run on <b>a weekend</b>', 'verb meaning to start a process - on a weekend', 'groundhogg' );
+				break;
+			case 'day_of_week':
+				$dow_list = orList( $bold_labels( $settings['run_on_dow'], $days_of_week ) );
+
+				if ( isset( $determiners[ $settings['run_on_dow_type'] ] ) ) {
+					/* translators: 1: the occurrence within the month, like "first", 2: a day of the week */
+					$days = sprintf( _x( 'the %1$s %2$s', 'the - determiner - day of week', 'groundhogg' ), strtolower( $determiners[ $settings['run_on_dow_type'] ] ), $dow_list );
+				} else {
+					/* translators: %s: a day of the week */
+					$days = sprintf( _x( 'any %s', 'any - day of the week', 'groundhogg' ), $dow_list );
+				}
+
+				/* translators: 1: a list of ordinal days of the month (1st, 2nd, 3rd, etc...), 2: a list of months (February, March, April) */
+				$run = sprintf( _x( 'run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month', 'groundhogg' ), $days, $months_list );
+				break;
+			case 'day_of_month':
+				$doms = array_map( function ( $dom ) {
+					return bold_it( $dom === 'last' ? __( 'last day', 'groundhogg' ) : ordinal_suffix( $dom ) );
+				}, array_values( (array) $settings['run_on_dom'] ) );
+
+				$days = empty( $doms )
+					? bold_it( __( 'any day', 'groundhogg' ) )
+					/* translators: %s: and ordinal day of the month (1st, 2nd, 3rd, etc...) */
+					: sprintf( _x( 'the %s', 'the - ordinal day of month', 'groundhogg' ), orList( $doms ) );
+
+				/* translators: 1: a list of ordinal days of the month (1st, 2nd, 3rd, etc...), 2: a list of months (February, March, April) */
+				$run = sprintf( _x( 'run on %1$s of %2$s', 'verb meaning to start on process - on a specific day of a specific month', 'groundhogg' ), $days, $months_list );
+				break;
+		}
+
+		array_unshift( $preview, $run );
+
+		if ( $settings['delay_type'] !== 'none' ) {
+
+			$amount = absint( $settings['delay_amount'] );
+
+			switch ( $settings['delay_type'] ) {
+				case 'minutes':
+					$unit = _n( 'minute', 'minutes', $amount, 'groundhogg' );
+					break;
+				case 'hours':
+					$unit = _n( 'hour', 'hours', $amount, 'groundhogg' );
+					break;
+				default:
+				case 'days':
+					$unit = _n( 'day', 'days', $amount, 'groundhogg' );
+					break;
+				case 'weeks':
+					$unit = _n( 'week', 'weeks', $amount, 'groundhogg' );
+					break;
+				case 'months':
+					$unit = _n( 'month', 'months', $amount, 'groundhogg' );
+					break;
+				case 'years':
+					$unit = _n( 'year', 'years', $amount, 'groundhogg' );
+					break;
+			}
+
+			/* translators: %s: a duration of time like "3 days" */
+			array_unshift( $preview, sprintf( _x( 'Wait at least %s and then', 'wait for a duration', 'groundhogg' ), bold_it( $amount . ' ' . $unit ) ) );
+		}
+
+		return ucfirst( implode( ' ', $preview ) );
 	}
 
 	public function get_settings_schema() {
@@ -283,20 +469,7 @@ class Delay_Timer extends Action {
 	 */
 	public function calc_run_time( int $baseTimestamp, Step $step ): int {
 
-		$settings = wp_parse_args( $step->get_meta(), [
-			'delay_amount'      => 3,
-			'delay_type'        => 'days',
-			'run_on_type'       => 'any',
-			'run_when'          => 'now',
-			'run_time'          => '09:00:00',
-			'send_in_timezone'  => false,
-			'run_time_to'       => '17:00:00',
-			'run_on_dow_type'   => 'any', // Run on days of week type
-			'run_on_dow'        => [], // Run on days of week
-			'run_on_month_type' => 'any', // Run on month type
-			'run_on_months'     => [], // Run on months
-			'run_on_dom'        => [], // Run on days of month,
-		] );
+		$settings = $this->get_delay_settings( $step );
 
 		$contact = $step->enqueued_contact;
 		$date    = new DelayDateTime( $baseTimestamp );
