@@ -562,6 +562,29 @@ class Message_Ingest_Tests extends GH_UnitTestCase {
 	 * the reply without its quoted history
 	 * ------------------------------------------------------------------- */
 
+	public function test_the_time_of_a_message_is_right_when_the_site_is_not_in_utc() {
+
+		$this->create_contact( $this->addr( 'jordan' ) );
+		$message = Message::ingest( $this->payload() );
+
+		$this->assertInstanceOf( Message::class, $message );
+
+		// dates are stored in UTC, a site that is behind or ahead of it must not see the message as being in the past or the future
+		foreach ( [ 'America/Toronto', 'Asia/Tokyo' ] as $zone ) {
+
+			update_option( 'timezone_string', $zone );
+
+			try {
+				$array = ( new Message( $message->get_id() ) )->get_as_array();
+
+				$this->assertEqualsWithDelta( time(), $array['timestamp'], 10, $zone );
+				$this->assertMatchesRegularExpression( '/^\d+ seconds?$/', $array['i18n']['time_diff'], $zone );
+			} finally {
+				update_option( 'timezone_string', '' );
+			}
+		}
+	}
+
 	public function test_it_cuts_the_quoted_history_out_of_a_reply() {
 
 		$plain = "Sounds good, see you then.\n\nOn Tue, Sep 1, 2026 at 3:30 PM Adrian <me@example.com> wrote:\n> Are you free Thursday?\n> Let me know.";

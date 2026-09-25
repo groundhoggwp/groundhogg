@@ -29,6 +29,18 @@
     makeEl,
   } = MakeEl
 
+  /**
+   * When a message was, in the time zone of whoever is looking. The dates that are stored are in UTC and have no zone
+   * on them, so a browser would read one as being in its own zone, and be hours off. The timestamp doesn't have that.
+   *
+   * @param timestamp unix seconds
+   * @param date_created the stored UTC date, for when there's no timestamp
+   * @returns {string}
+   */
+  const formatWhen = ({ timestamp, date_created }) => formatDateTime(
+    timestamp ? timestamp * 1000 : String(date_created).replace(' ', 'T') + 'Z',
+  )
+
   const PAGE_SIZE = 25
 
   const directions = {
@@ -95,7 +107,7 @@
           makeEl('h2', {}, escHTML(subject || __('(no subject)', 'groundhogg'))),
           line(__('From', 'groundhogg'), from_address),
           line(__('To', 'groundhogg'), to_address),
-          line(direction === 'inbound' ? __('Received', 'groundhogg') : __('Sent', 'groundhogg'), formatDateTime(date_created)),
+          line(direction === 'inbound' ? __('Received', 'groundhogg') : __('Sent', 'groundhogg'), formatWhen({ timestamp: message.timestamp, date_created })),
         ]),
         Button({
           className: 'gh-button secondary icon text',
@@ -373,7 +385,7 @@
           Div({ className: 'message-meta' }, [
             Span({ className: 'message-sender' }, sender),
             status === 'failed' ? Span({ className: 'pill red' }, __('Failed', 'groundhogg')) : null,
-            Span({ className: 'message-time' }, `<abbr title="${ formatDateTime(date_created) }">${ item.i18n.time_diff }</abbr>`),
+            Span({ className: 'message-time' }, `<abbr title="${ formatWhen({ timestamp: item.timestamp, date_created }) }">${ item.i18n.time_diff }</abbr>`),
           ]),
           Div({ className: 'message-subject' }, subject || __('(no subject)', 'groundhogg')),
           automated ? Div({ className: 'message-source' }, escHTML(item.source_title)) : null,

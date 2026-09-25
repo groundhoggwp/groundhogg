@@ -797,7 +797,8 @@ class Message extends Base_Object {
 
 	public function get_as_array() {
 
-		$timestamp = ( new DateTimeHelper( $this->date_created ) )->getTimestamp();
+		// stored in UTC, DateTimeHelper reads a date as being in the time zone of the site
+		$timestamp = ( new \DateTime( $this->date_created, new \DateTimeZone( 'UTC' ) ) )->getTimestamp();
 
 		return array_merge( parent::get_as_array(), [
 			'timestamp' => $timestamp,
