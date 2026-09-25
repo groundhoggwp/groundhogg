@@ -99,6 +99,86 @@ class Message extends Base_Object {
 	}
 
 	/**
+	 * The headers that a composed email can be sent with, from what it was asked to be sent with. It's what makes an email a
+	 * reply, In-Reply-To and References, and nothing that says who it's from, who it's to or what it is, which have
+	 * their own ways of being set. Anything that isn't allowed is an error, and it's not sent, so that a
+	 * header that's wanted and not there isn't a surprise.
+	 *
+	 * @param mixed $headers a list of header names and values, { "In-Reply-To": "<a@b.com>" }
+	 *
+	 * @return string[]|\WP_Error the values by the name of the header, in its usual case. Empty if there aren't any.
+	 */
+	public static function sanitize_composed_headers( $headers ) {
+
+		if ( empty( $headers ) ) {
+			return [];
+		}
+
+		if ( ! is_array( $headers ) || array_is_list( $headers ) ) {
+			return new WP_Error( 'invalid_headers', 'The headers must be an object of the names of headers and their values.' );
+		}
+
+		/**
+		 * The headers that a composed email can be sent with
+		 *
+		 * @param string[] $allowed
+		 */
+		$allowed = array_map( 'strtolower', (array) apply_filters( 'groundhogg/message/composed/allowed_headers', [ 'In-Reply-To', 'References' ] ) );
+
+		// what is set some other way, or that a message isn't the same message with, whatever is filtered
+		$never = [ 'from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject', 'date', 'message-id', 'return-path', 'mime-version', 'content-type', 'content-transfer-encoding' ];
+
+		$clean = [];
+
+		foreach ( $headers as $name => $value ) {
+
+			$name  = trim( (string) $name );
+			$lower = strtolower( $name );
+
+			if ( ! preg_match( '/^[A-Za-z0-9-]+$/', $name ) || in_array( $lower, $never, true ) || ! in_array( $lower, $allowed, true ) ) {
+				return new WP_Error( 'invalid_header', sprintf( 'The %s header can not be set.', preg_replace( '/[^A-Za-z0-9-]/', '', $name ) ) );
+			}
+
+			$value = is_array( $value ) ? implode( ' ', $value ) : (string) $value;
+			$label = implode( '-', array_map( 'ucfirst', explode( '-', $lower ) ) );
+
+			// a line break is another header, or the body
+			if ( preg_match( '/[\x00-\x08\x0A-\x1F\x7F]/', $value ) ) {
+				return new WP_Error( 'invalid_header', sprintf( 'The value of the %s header can not have line breaks or control characters.', $label ) );
+			}
+
+			$value = trim( preg_replace( '/[ \t]+/', ' ', $value ) );
+
+			if ( in_array( $lower, [ 'in-reply-to', 'references' ], true ) ) {
+
+				// only the ids of messages, in <>
+				$ids  = self::parse_message_ids( $value );
+				$rest = trim( preg_replace( '/<[^<>\s]+>/', '', $value ) );
+
+				$valid = $ids && $rest === '';
+
+				foreach ( $ids as $id ) {
+					$valid = $valid && preg_match( '/^<[^<>\s@]+@[^<>\s@]+>$/', $id );
+				}
+
+				if ( ! $valid || count( $ids ) > 50 ) {
+					return new WP_Error( 'invalid_header', sprintf( 'The %s header must be the ids of messages, like <id@example.com>.', $label ) );
+				}
+
+				$value = implode( ' ', $ids );
+			}
+
+			if ( $value === '' || strlen( $value ) > 998 ) {
+				return new WP_Error( 'invalid_header', sprintf( 'The value of the %s header is empty, or too long.', $label ) );
+			}
+
+			$clean[ $label ] = $value;
+		}
+
+		return $clean;
+	}
+
+	/**
 	 * Record a composed (one-off, sent by a person) email against a contact.
 	 * The subject and content are redacted before they're stored.
 	 *
@@ -123,7 +203,24 @@ class Message extends Base_Object {
 			'user_id'      => get_current_user_id(),
 			'email_log_id' => 0,
 			'message_id'   => '',
+			'in_reply_to'  => '',
+			'references'   => '',
 		] );
+
+		// a reply is in the thread of what it's a reply to, when that's something that this contact has, and what
+		// isn't is a thread of its own
+		$thread_id = $args['message_id'];
+
+		if ( $args['in_reply_to'] ) {
+
+			$parent = self::find_parent( $args['in_reply_to'], $args['references'], [ $contact->get_email() ] );
+
+			if ( $parent && $parent->object_type === 'contact' && (int) $parent->object_id === (int) $contact->get_id() ) {
+				$thread_id = $parent->thread_id ?: $parent->message_id;
+			}
+		}
+
+		unset( $args['references'] ); // it's not stored
 
 		$message = new self();
 
@@ -134,7 +231,7 @@ class Message extends Base_Object {
 			'to_address'  => $contact->get_email(),
 			'subject'     => redact( (string) $args['subject'] ),
 			'content'     => redact( (string) $args['content'] ),
-			'thread_id'   => $args['message_id'], // this starts a thread
+			'thread_id'   => $thread_id, // this starts a thread, or is in one
 			'status'      => 'sent',
 		] ) );
 
@@ -359,6 +456,8 @@ class Message extends Base_Object {
 				'in_reply_to'  => $in_reply_to,
 				'thread_id'    => $thread_id ?: $message_id,
 				'status'       => $outbound ? 'sent' : 'received',
+				// a message that's been received is for someone to read
+				'is_read'      => $outbound ? 1 : 0,
 				'date_created' => $date,
 			] );
 

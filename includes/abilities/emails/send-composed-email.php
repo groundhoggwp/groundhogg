@@ -95,6 +95,11 @@ class Send_Composed_Email extends Ability {
 						'type'        => 'string',
 						'description' => __( 'Sender name. Defaults to the site\'s default "from" name. See groundhogg/list-sender-profiles for valid from name/email combinations.', 'groundhogg' ),
 					],
+					'headers' => [
+						'type'                 => 'object',
+						'additionalProperties' => [ 'type' => 'string' ],
+						'description'          => __( 'Headers that make the email a reply: "In-Reply-To", and "References", with the Message-ID of the message that it is in reply to, like {"In-Reply-To": "<id@example.com>"}. No other headers can be set.', 'groundhogg' ),
+					],
 					'type' => [
 						'type'        => 'string',
 						'enum'        => [ 'wordpress', 'transactional', 'marketing' ],
@@ -237,6 +242,17 @@ class Send_Composed_Email extends Ability {
 			$headers[] = 'Bcc: ' . implode( ',', $bcc );
 		}
 
+		// what makes it a reply
+		$extra_headers = Message::sanitize_composed_headers( $input['headers'] ?? [] );
+
+		if ( is_wp_error( $extra_headers ) ) {
+			return $extra_headers;
+		}
+
+		foreach ( $extra_headers as $header => $value ) {
+			$headers[] = "$header: $value";
+		}
+
 		// Emails_Api uses its Supports_Errors trait to catch wp_mail_failed;
 		// abilities don't have that, so capture the error locally instead.
 		$mail_error = null;
@@ -289,6 +305,8 @@ class Send_Composed_Email extends Ability {
 				'user_id'      => get_current_user_id(),
 				'email_log_id' => $log_id ?: 0,
 				'message_id'   => $message_id,
+				'in_reply_to'  => Message::parse_message_ids( $extra_headers['In-Reply-To'] ?? '' )[0] ?? '',
+				'references'   => $extra_headers['References'] ?? '',
 			] );
 		}
 

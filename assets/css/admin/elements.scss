@@ -680,14 +680,205 @@ h2.nav-tab-wrapper.gh {
   }
 }
 
+// a filter that is on or off, the one that's on is bold
+.pill.clickable {
+  cursor: pointer;
+  user-select: none;
+
+  &.active {
+    box-shadow: inset 0 0 0 1.5px currentColor;
+  }
+
+  &:not(.bold) {
+    opacity: 0.65;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+}
+
+.gh-modal.sidebar.messages-sidebar {
+  width: 480px;
+  max-width: 100%;
+
+  .messages-sidebar-contact {
+    text-decoration: none;
+  }
+
+  // the newest is at the bottom, with where a message is written under it, like a phone
+  .gh-modal-dialog {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gh-modal-dialog-content {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .messages-widget {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 0;
+
+    .messages-thread {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+
+      // a short conversation is by what's written, and not at the top
+      > :first-child {
+        margin-top: auto;
+      }
+    }
+
+    .messages-compose {
+      padding: 10px 0;
+      background: #fff;
+    }
+  }
+}
+
+// the replies that haven't been read, on the dashboard
+.unread-messages {
+  padding: 10px;
+
+  .unread-messages-toolbar {
+    margin-bottom: 10px;
+  }
+
+  .unread-messages-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .unread-messages-empty,
+  .unread-messages-more {
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .unread-message {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--gh-panel-gray);
+    }
+
+    & + .unread-message {
+      border-top: 1px solid var(--gh-dark-10);
+    }
+  }
+
+  .unread-message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .unread-message-details {
+    min-width: 0;
+    flex-grow: 1;
+  }
+
+  .unread-message-time {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--gh-dark-50);
+    white-space: nowrap;
+  }
+
+  .unread-message-subject {
+    font-weight: 500;
+  }
+
+  .unread-message-subject,
+  .unread-message-preview {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .unread-message-preview,
+  .unread-message-from {
+    font-size: 12px;
+    color: var(--gh-dark-50);
+  }
+}
+
 .messages-widget {
   padding: 10px;
 
   .messages-header {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 
     .messages-search {
-      min-width: 200px;
+      flex: 1 1 100px;
+      min-width: 100px;
+      max-width: 200px;
+      height: 26px;
+      min-height: 0;
+      padding: 0 8px;
+      font-size: 13px;
+    }
+  }
+
+  .messages-compose {
+    margin-top: 12px;
+  }
+
+  .messages-compose-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 14px;
+    border: 1px solid var(--gh-dark-15);
+    border-radius: 20px;
+    background: #fff;
+    color: var(--gh-dark-50);
+    font-size: 14px;
+    cursor: text;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--gh-primary);
+      color: var(--gh-dark);
+    }
+  }
+
+  .message-unread-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gh-primary);
+    flex-shrink: 0;
+  }
+
+  .message-more {
+    margin: -4px -6px -4px 0;
+    padding: 2px;
+    height: auto;
+    min-height: 0;
+    line-height: 1;
+
+    .dashicons {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
     }
   }
 

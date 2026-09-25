@@ -50,6 +50,23 @@ class Messages_Api extends Base_Object_Api {
 			],
 		] );
 
+		// what has been received and not read yet, a conversation at a time
+		register_rest_route( self::NAME_SPACE, '/messages/unread', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_unread' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ],
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, '/messages/read', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'mark_read' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ],
+			],
+		] );
+
 		// Not for logged in users. What delivers received messages signs the request, see Inbound_Signature
 		register_rest_route( self::NAME_SPACE, '/messages/inbound', [
 			[
@@ -57,6 +74,203 @@ class Messages_Api extends Base_Object_Api {
 				'callback'            => [ $this, 'receive' ],
 				'permission_callback' => [ $this, 'receive_permissions_callback' ],
 			],
+		] );
+	}
+
+	/**
+	 * The contacts that have received messages that have not been read, the one that was received last first.
+	 *
+	 * Each is a contact with how many messages there are to read and the last of them, without its body. What a user
+	 * can see is what they can see of the contact, and by default it's the contacts that they own, `scope=all` is
+	 * everything that they have access to.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function read_unread( WP_REST_Request $request ) {
+
+		global $wpdb;
+
+		$scope = $request->get_param( 'scope' ) === 'all' ? 'all' : 'mine';
+		$limit = min( 50, max( 1, absint( $request->get_param( 'limit' ) ?: 20 ) ) );
+
+		$messages = get_db( 'messages' )->get_table_name();
+		$contacts = get_db( 'contacts' )->get_table_name();
+
+		$join = '';
+		$args = [];
+
+		if ( $scope === 'mine' ) {
+			$join   = "INNER JOIN $contacts c ON c.ID = m.object_id AND c.owner_id = %d";
+			$args[] = get_current_user_id();
+		}
+
+		// More than the limit are read, because what can't be seen by the user is left out afterwards
+		$args[] = $limit * 3;
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names
+		$rows = $wpdb->get_results( $wpdb->prepare(
+			"SELECT m.object_id, COUNT(*) AS unread, MAX(m.ID) AS latest_id
+			FROM $messages m $join
+			WHERE m.object_type = 'contact' AND m.direction = 'inbound' AND m.is_read = 0
+			GROUP BY m.object_id
+			ORDER BY latest_id DESC
+			LIMIT %d",
+			$args
+		) );
+		// phpcs:enable
+
+		$items    = [];
+		$has_more = false;
+
+		foreach ( $rows as $row ) {
+
+			$latest = new Message( (int) $row->latest_id );
+
+			if ( ! $latest->exists() || ! current_user_can( 'view_message', $latest ) ) {
+				continue;
+			}
+
+			if ( count( $items ) >= $limit ) {
+				$has_more = true;
+				break;
+			}
+
+			$contact = $latest->get_associated_object();
+
+			$array = $latest->get_as_array();
+			unset( $array['data']['content'] ); // it's for the preview, and what it says is loaded when it's opened
+
+			$items[] = [
+				'object_type' => 'contact',
+				'object_id'   => (int) $row->object_id,
+				'unread'      => (int) $row->unread,
+				'contact'     => [
+					'ID'     => (int) $row->object_id,
+					'name'   => $contact->get_full_name() ?: $contact->get_email(),
+					'email'  => $contact->get_email(),
+					'avatar' => $contact->get_profile_picture( 96 ),
+				],
+				'latest'      => $array,
+			];
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'items'    => $items,
+			'has_more' => $has_more,
+			'scope'    => $scope,
+		] );
+	}
+
+	/**
+	 * Mark what has been received as read, or as not read. It's one message when there's a message_id. Or it's what has
+	 * been received from a contact: everything is read at once, and not read is the last message, so that there's
+	 * something to see in the list and that it's the newest that's looked at.
+	 *
+	 * @param WP_REST_Request $request message_id, or object_type (only a contact) and object_id, and read (default true)
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function mark_read( WP_REST_Request $request ) {
+
+		$read = $request->has_param( 'read' ) ? filter_var( $request->get_param( 'read' ), FILTER_VALIDATE_BOOLEAN ) : true;
+
+		if ( $request->get_param( 'message_id' ) ) {
+			return $this->mark_message_read( absint( $request->get_param( 'message_id' ) ), $read );
+		}
+
+		$object_type = sanitize_key( $request->get_param( 'object_type' ) ?: 'contact' );
+		$object_id   = absint( $request->get_param( 'object_id' ) );
+
+		if ( ! $object_id || $object_type !== 'contact' ) {
+			return self::ERROR_400( 'invalid_object', 'A contact is needed.' );
+		}
+
+		$db = get_db( 'messages' );
+
+		$where = [
+			'object_type' => $object_type,
+			'object_id'   => $object_id,
+			'direction'   => 'inbound',
+		];
+
+		$received = $db->query( array_merge( $where, [ 'orderby' => 'ID', 'order' => 'DESC', 'limit' => 1 ] ) );
+
+		// nothing to be read is not a failure
+		if ( empty( $received ) ) {
+			return self::SUCCESS_RESPONSE( [ 'updated' => 0, 'unread' => 0 ] );
+		}
+
+		$latest = new Message( $received[0] );
+
+		if ( ! current_user_can( 'view_message', $latest ) ) {
+			return self::ERROR_403( 'cannot_view', 'You do not have permission to view the messages of this contact.' );
+		}
+
+		global $wpdb;
+
+		$table = $db->get_table_name();
+
+		// not the query of the table, a 0 there is a filter that's not applied
+		if ( $read ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name
+			$updated = (int) $wpdb->query( $wpdb->prepare( "UPDATE $table SET is_read = 1 WHERE object_type = %s AND object_id = %d AND direction = 'inbound' AND is_read = 0", $object_type, $object_id ) );
+		} else {
+			$updated = (int) $wpdb->update( $table, [ 'is_read' => 0 ], [ 'ID' => $latest->get_id(), 'is_read' => 1 ], [ '%d' ], [ '%d', '%d' ] );
+		}
+
+		$db->cache_set_last_changed();
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name
+		$unread = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $table WHERE object_type = %s AND object_id = %d AND direction = 'inbound' AND is_read = 0", $object_type, $object_id ) );
+
+		return self::SUCCESS_RESPONSE( [
+			'updated' => $updated,
+			'unread'  => $unread,
+		] );
+	}
+
+	/**
+	 * One message that was received, read or not
+	 *
+	 * @param int  $message_id
+	 * @param bool $read
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	protected function mark_message_read( int $message_id, bool $read ) {
+
+		global $wpdb;
+
+		$message = new Message( $message_id );
+
+		if ( ! $message->exists() ) {
+			return self::ERROR_400( 'invalid_message', 'Not a message.' );
+		}
+
+		if ( ! $message->is_inbound() ) {
+			return self::ERROR_400( 'not_received', 'Only a message that was received can be read or not read.' );
+		}
+
+		if ( ! current_user_can( 'view_message', $message ) ) {
+			return self::ERROR_403( 'cannot_view', 'You do not have permission to view this message.' );
+		}
+
+		$db    = get_db( 'messages' );
+		$table = $db->get_table_name();
+
+		$updated = (int) $wpdb->update( $table, [ 'is_read' => $read ? 1 : 0 ], [ 'ID' => $message->get_id() ], [ '%d' ], [ '%d' ] );
+
+		$db->cache_set_last_changed();
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name
+		$unread = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $table WHERE object_type = %s AND object_id = %d AND direction = 'inbound' AND is_read = 0", $message->object_type, $message->object_id ) );
+
+		return self::SUCCESS_RESPONSE( [
+			'updated' => $updated,
+			'is_read' => (int) $read,
+			'unread'  => $unread,
 		] );
 	}
 

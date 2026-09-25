@@ -25,7 +25,7 @@ class Messages extends DB {
 	}
 
 	public function get_db_version() {
-		return '1.0';
+		return '1.1';
 	}
 
 	public function get_object_type() {
@@ -89,6 +89,7 @@ class Messages extends DB {
 			'email_log_id'    => '%d',
 			'queued_event_id' => '%d',
 			'status'          => '%s',
+			'is_read'         => '%d',
 			'date_created'    => '%s',
 		];
 	}
@@ -112,6 +113,8 @@ class Messages extends DB {
 			'email_log_id'    => 0,
 			'queued_event_id' => 0,
 			'status'          => 'sent',
+			// what we send is read, and what was here before there was a read state. Received messages start unread, see Message::ingest()
+			'is_read'         => 1,
 			'date_created'    => current_time( 'mysql', true ),
 		];
 	}
@@ -149,11 +152,13 @@ class Messages extends DB {
 		email_log_id bigint(20) unsigned NOT NULL,
 		queued_event_id bigint(20) unsigned NOT NULL,
 		status VARCHAR(20) NOT NULL,
+		is_read tinyint(1) unsigned NOT NULL DEFAULT 1,
 		date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		PRIMARY KEY (ID),
 		KEY object (object_type, object_id),
 		KEY thread_id (thread_id),
-		KEY message_id (message_id)
+		KEY message_id (message_id),
+		KEY unread (is_read, direction, object_type, object_id)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );

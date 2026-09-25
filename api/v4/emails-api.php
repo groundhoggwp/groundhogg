@@ -575,6 +575,17 @@ class Emails_Api extends Base_Object_Api {
 			$headers[] = 'Bcc: ' . implode( ',', $bcc );
 		}
 
+		// what makes it a reply
+		$extra_headers = Message::sanitize_composed_headers( $request->get_param( 'headers' ) );
+
+		if ( is_wp_error( $extra_headers ) ) {
+			return self::ERROR_400( $extra_headers->get_error_code(), $extra_headers->get_error_message() );
+		}
+
+		foreach ( $extra_headers as $header => $value ) {
+			$headers[] = "$header: $value";
+		}
+
 		add_action( 'wp_mail_failed', [ $this, 'handle_wp_mail_error' ] );
 
 		// we assign the Message-ID ourselves, so that a reply can be matched to what we sent
@@ -615,6 +626,8 @@ class Emails_Api extends Base_Object_Api {
 				'user_id'      => get_current_user_id(),
 				'email_log_id' => Email_Logger::get_last_log_id() ?: 0,
 				'message_id'   => $message_id,
+				'in_reply_to'  => Message::parse_message_ids( $extra_headers['In-Reply-To'] ?? '' )[0] ?? '',
+				'references'   => $extra_headers['References'] ?? '',
 			] );
 		}
 

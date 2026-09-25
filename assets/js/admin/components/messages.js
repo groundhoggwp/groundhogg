@@ -4,6 +4,8 @@
     escHTML,
     loadingModal,
     dialog,
+    adminPageURL,
+    moreMenu,
   } = Groundhogg.element
   const {
     formatDateTime,
@@ -11,6 +13,7 @@
   const {
     __,
     _x,
+    sprintf,
   } = wp.i18n
 
   const {
@@ -25,6 +28,7 @@
     Input,
     Iframe,
     Pg,
+    An,
     Modal,
     makeEl,
   } = MakeEl
@@ -42,6 +46,30 @@
   )
 
   const PAGE_SIZE = 25
+
+  /**
+   * A pill that filters, the one that's on is bold. Like the ones for tasks.
+   *
+   * @param id
+   * @param color
+   * @param active
+   * @param onClick
+   * @param children
+   */
+  const FilterPill = ({ id, color = 'colorless', active = false, onClick, ...props }, children) => Span({
+    id,
+    className: `pill ${ color } clickable ${ active ? 'bold active' : '' }`,
+    role     : 'button',
+    tabindex : 0,
+    onClick,
+    onKeydown: e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        onClick(e)
+      }
+    },
+    ...props,
+  }, children)
 
   const directions = {
     ''        : __('All', 'groundhogg'),
@@ -178,6 +206,20 @@
 
     let searchTimeout
 
+    const rootId = props.id ?? `messages-widget-${ object_type }-${ object_id }`
+
+    /**
+     * It reads from the top down to the newest, which is at the bottom and where a reply is written, so it's
+     * where it starts and where it goes to when there's something new. Only a panel that scrolls is moved.
+     */
+    const scrollToNewest = () => {
+      const thread = document.getElementById(rootId)?.querySelector('.messages-thread')
+
+      if (thread) {
+        thread.scrollTop = thread.scrollHeight
+      }
+    }
+
     /**
      * Fetch a page of the conversation. Pages are requested newest first, but displayed oldest
      * first like a chat, so "load earlier" prepends.
@@ -262,13 +304,13 @@
 
     return Div({
       ...props,
-      id       : props.id ?? `messages-widget-${ object_type }-${ object_id }`,
+      id       : rootId,
       className: 'messages-widget',
     }, morph => {
 
       if (!State.loaded) {
 
-        fetchFeed().then(morph)
+        fetchFeed().then(morph).then(scrollToNewest)
 
         return Skeleton({
           style: {
@@ -281,7 +323,44 @@
         ])
       }
 
-      const reload = () => fetchFeed().then(morph)
+      const reload = () => fetchFeed().then(morph).then(scrollToNewest)
+
+      /**
+       * What makes an email a reply to a message, so that a mail client puts it in the same conversation. It's the id of
+       * the message, and of what is before it in the thread, when there's one that is an id.
+       *
+       * @param message
+       * @returns {{}}
+       */
+      const replyHeaders = message => {
+
+        const isId = id => /^<[^<>\s@]+@[^<>\s@]+>$/.test(id || '')
+        const { message_id, thread_id } = message.data
+
+        if (!isId(message_id)) {
+          return {}
+        }
+
+        return {
+          'In-Reply-To': message_id,
+          'References' : [ thread_id, message_id ].filter((id, i, ids) => isId(id) && ids.indexOf(id) === i).join(' '),
+        }
+      }
+
+      /**
+       * A message that was received, read or not read. Whatever else shows what has to be read is told.
+       *
+       * @param item
+       * @param read
+       */
+      const setRead = (item, read) => Groundhogg.api.post(`${ Groundhogg.api.routes.v4.messages }/read`, {
+        message_id: item.ID,
+        read,
+      }).then(() => {
+        item.data.is_read = read ? 1 : 0
+        window.dispatchEvent(new CustomEvent('messagesread', { detail: { object_type, object_id } }))
+        morph()
+      }).catch(err => dialog({ message: err.message, type: 'error', ttl: 5000 }))
 
       const toggleExpanded = item => {
 
@@ -292,6 +371,13 @@
         }
 
         State.set({ expanded: [...State.expanded, item.key] })
+
+        // it's read when it's opened, not when it's just there. What's in a bubble is only the start of it
+        const live = State.items.find(i => i.key === item.key) ?? item
+
+        if (live.kind === 'message' && live.data.direction === 'inbound' && Number(live.data.is_read) === 0) {
+          setRead(live, true)
+        }
 
         if (item.kind === 'event') {
           // show the bubble opening right away, then fill in the body when it arrives
@@ -364,6 +450,9 @@
 
         let content = automated ? bodies[item.key] : item.data.content
 
+        // received, and not read yet
+        const unread = inbound && Number(item.data.is_read) === 0
+
         return Div({
           className: `message-row ${ inbound ? 'inbound' : 'outbound' }`,
           id       : `message-row-${ item.key }`,
@@ -383,9 +472,40 @@
           },
         }, [
           Div({ className: 'message-meta' }, [
+            unread ? Span({ className: 'message-unread-dot', title: __('Not read', 'groundhogg') }) : null,
             Span({ className: 'message-sender' }, sender),
             status === 'failed' ? Span({ className: 'pill red' }, __('Failed', 'groundhogg')) : null,
             Span({ className: 'message-time' }, `<abbr title="${ formatWhen({ timestamp: item.timestamp, date_created }) }">${ item.i18n.time_diff }</abbr>`),
+            inbound ? Button({
+              className: 'gh-button secondary text icon message-more',
+              onClick  : e => {
+
+                // not the bubble opening
+                e.stopPropagation()
+
+                // as it is now. This is the handler of the element that was first made for it, what was rendered since is not what it was made with
+                const live = State.items.find(i => i.key === item.key) ?? item
+                const notRead = Number(live.data.is_read) === 0
+
+                moreMenu(e.currentTarget, [
+                  // a reply, to who it was from and with the subject of it, it's in the thread when it's sent
+                  object_type === 'contact' ? {
+                    key     : 'reply',
+                    text    : __('Reply', 'groundhogg'),
+                    onSelect: () => Groundhogg.components.emailModal({
+                      to     : [ live.data.from_address ],
+                      subject: /^\s*re:/i.test(live.data.subject) ? live.data.subject : sprintf(__('Re: %s', 'groundhogg'), live.data.subject || ''),
+                      headers: replyHeaders(live),
+                    }, reload),
+                  } : null,
+                  {
+                    key     : 'read',
+                    text    : notRead ? __('Mark read', 'groundhogg') : __('Mark unread', 'groundhogg'),
+                    onSelect: () => setRead(live, notRead),
+                  },
+                ].filter(Boolean))
+              },
+            }, Dashicon('ellipsis')) : null,
           ]),
           Div({ className: 'message-subject' }, subject || __('(no subject)', 'groundhogg')),
           automated ? Div({ className: 'message-source' }, escHTML(item.source_title)) : null,
@@ -400,21 +520,32 @@
 
         // Toolbar
         Div({
-          className: 'messages-header display-flex gap-10 align-center flex-wrap',
+          className: 'messages-header display-flex gap-5 align-center flex-wrap',
         }, [
-          Div({ className: 'gh-input-group' }, Object.keys(directions).map(key => Button({
-            id       : `messages-direction-${ key || 'all' }`,
-            className: `gh-button small ${ State.direction === key ? 'dark' : 'grey' }`,
-            onClick  : e => {
+          ...Object.keys(directions).map(key => FilterPill({
+            id     : `messages-direction-${ key || 'all' }`,
+            color  : { '': 'colorless', outbound: 'blue', inbound: 'green' }[key],
+            active : State.direction === key,
+            onClick: e => {
               State.set({ direction: key })
               reload()
             },
-          }, directions[key]))),
+          }, directions[key])),
+          object_type === 'contact' ? FilterPill({
+            id     : 'messages-automated',
+            color  : 'orange',
+            active : State.automated,
+            title  : __('Include completed broadcast and flow emails', 'groundhogg'),
+            onClick: e => {
+              State.set({ automated: !State.automated })
+              reload()
+            },
+          }, __('Automated', 'groundhogg')) : null,
           Input({
             id         : 'messages-search',
             type       : 'search',
             className  : 'messages-search',
-            placeholder: __('Search messages...', 'groundhogg'),
+            placeholder: __('Search...', 'groundhogg'),
             value      : State.search,
             onInput    : e => {
               let value = e.target.value
@@ -432,31 +563,14 @@
               }, 300)
             },
           }),
-          object_type === 'contact' ? Button({
-            id       : 'messages-automated',
-            className: `gh-button small ${ State.automated ? 'dark' : 'grey' }`,
-            onClick  : e => {
-              State.set({ automated: !State.automated })
-              reload()
-            },
+          Button({
+            id       : 'refresh-messages',
+            className: 'gh-button secondary text icon',
+            style    : { marginLeft: 'auto' },
+            onClick  : reload,
           }, [
-            __('Automated emails', 'groundhogg'),
-            ToolTip(__('Include completed broadcast and flow emails', 'groundhogg'), 'bottom'),
-          ]) : null,
-          Div({ className: 'display-flex gap-5', style: { marginLeft: 'auto' } }, [
-            Button({
-              id       : 'refresh-messages',
-              className: 'gh-button secondary text icon',
-              onClick  : reload,
-            }, [
-              Dashicon('update-alt'),
-              ToolTip(__('Refresh', 'groundhogg'), 'left'),
-            ]),
-            typeof onNewMessage === 'function' ? Button({
-              id       : 'new-message',
-              className: 'gh-button primary small',
-              onClick  : onNewMessage,
-            }, __('New message', 'groundhogg')) : null,
+            Dashicon('update-alt'),
+            ToolTip(__('Refresh', 'groundhogg'), 'left'),
           ]),
         ]),
 
@@ -480,9 +594,53 @@
             },
           }, State.search || State.direction ? __('No matching messages.', 'groundhogg') : __('No messages yet.', 'groundhogg')),
         ]),
+
+        // where a message is written, under what it's in reply to
+        typeof onNewMessage === 'function' ? Div({ className: 'messages-compose' }, Button({
+          id       : 'new-message',
+          className: 'messages-compose-button',
+          onClick  : onNewMessage,
+        }, __('Write a message...', 'groundhogg'))) : null,
       ])
     })
   }
+
+  /**
+   * The messages of a contact in a panel that slides in.
+   *
+   * @param contact {{ID: number, name: string, email: string}}
+   * @param onClose called when the panel is closed
+   */
+  const MessagesSidebar = ({ contact, onClose = () => {} }) => {
+
+    let sidebar
+
+    sidebar = MakeEl.Sidebar({
+      className: 'messages-sidebar',
+      header   : An({
+        // the messages tab, it's where the conversation is
+        href     : adminPageURL('gh_contacts', { action: 'edit', contact: contact.ID }, 'messages'),
+        className: 'messages-sidebar-contact',
+      }, escHTML(contact.name || contact.email)),
+      onClose,
+    }, [
+      BetterObjectMessages({
+        object_type : 'contact',
+        object_id   : contact.ID,
+        title       : false,
+        onNewMessage: () => Groundhogg.components.emailModal({
+          to: [ contact.email ],
+        }, () => {
+          // what was sent is in the conversation
+          sidebar.querySelector('#refresh-messages')?.click()
+        }),
+      }),
+    ])
+
+    return sidebar
+  }
+
+  Groundhogg.MessagesSidebar = MessagesSidebar
 
   Groundhogg.messageViewer = (selector, props = {}) => {
     let el = document.querySelector(selector)

@@ -1213,6 +1213,7 @@
       showBCC       : false,
       subject       : '',
       content       : '',
+      headers       : {},
       sending       : false,
       ...props,
       // not what the caller said it's from, but the profile that it goes with
@@ -1284,6 +1285,7 @@
               bcc,
               subject,
               content,
+              headers,
             } = State
 
             if (!content) {
@@ -1311,6 +1313,8 @@
               bcc,
               subject,
               content,
+              // what makes it a reply, In-Reply-To and References, it's up to the caller
+              ...( headers && Object.keys(headers).length ? { headers } : {} ),
             }).then((r) => {
 
               if (r.status !== 'success') {
@@ -1338,6 +1342,7 @@
                   bcc,
                   subject,
                   content,
+                  headers,
                 },
               })
 

@@ -511,14 +511,170 @@ h2.nav-tab-wrapper.gh button .dashicons {
   border-top: 1px solid var(--gh-dark-15);
 }
 
+.pill.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+.pill.clickable.active {
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+.pill.clickable:not(.bold) {
+  opacity: 0.65;
+}
+.pill.clickable:not(.bold):hover, .pill.clickable:not(.bold):focus-visible {
+  opacity: 1;
+}
+
+.gh-modal.sidebar.messages-sidebar {
+  width: 480px;
+  max-width: 100%;
+}
+.gh-modal.sidebar.messages-sidebar .messages-sidebar-contact {
+  text-decoration: none;
+}
+.gh-modal.sidebar.messages-sidebar .gh-modal-dialog {
+  display: flex;
+  flex-direction: column;
+}
+.gh-modal.sidebar.messages-sidebar .gh-modal-dialog-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.gh-modal.sidebar.messages-sidebar .messages-widget {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px 0;
+}
+.gh-modal.sidebar.messages-sidebar .messages-widget .messages-thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.gh-modal.sidebar.messages-sidebar .messages-widget .messages-thread > :first-child {
+  margin-top: auto;
+}
+.gh-modal.sidebar.messages-sidebar .messages-widget .messages-compose {
+  padding: 10px 0;
+  background: #fff;
+}
+
+.unread-messages {
+  padding: 10px;
+}
+.unread-messages .unread-messages-toolbar {
+  margin-bottom: 10px;
+}
+.unread-messages .unread-messages-list {
+  display: flex;
+  flex-direction: column;
+}
+.unread-messages .unread-messages-empty,
+.unread-messages .unread-messages-more {
+  text-align: center;
+  margin: 10px 0;
+}
+.unread-messages .unread-message {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.unread-messages .unread-message:hover, .unread-messages .unread-message:focus-visible {
+  background: var(--gh-panel-gray);
+}
+.unread-messages .unread-message + .unread-message {
+  border-top: 1px solid var(--gh-dark-10);
+}
+.unread-messages .unread-message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.unread-messages .unread-message-details {
+  min-width: 0;
+  flex-grow: 1;
+}
+.unread-messages .unread-message-time {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--gh-dark-50);
+  white-space: nowrap;
+}
+.unread-messages .unread-message-subject {
+  font-weight: 500;
+}
+.unread-messages .unread-message-subject,
+.unread-messages .unread-message-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.unread-messages .unread-message-preview,
+.unread-messages .unread-message-from {
+  font-size: 12px;
+  color: var(--gh-dark-50);
+}
+
 .messages-widget {
   padding: 10px;
 }
 .messages-widget .messages-header {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 .messages-widget .messages-header .messages-search {
-  min-width: 200px;
+  flex: 1 1 100px;
+  min-width: 100px;
+  max-width: 200px;
+  height: 26px;
+  min-height: 0;
+  padding: 0 8px;
+  font-size: 13px;
+}
+.messages-widget .messages-compose {
+  margin-top: 12px;
+}
+.messages-widget .messages-compose-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px;
+  border: 1px solid var(--gh-dark-15);
+  border-radius: 20px;
+  background: #fff;
+  color: var(--gh-dark-50);
+  font-size: 14px;
+  cursor: text;
+}
+.messages-widget .messages-compose-button:hover, .messages-widget .messages-compose-button:focus-visible {
+  border-color: var(--gh-primary);
+  color: var(--gh-dark);
+}
+.messages-widget .message-unread-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gh-primary);
+  flex-shrink: 0;
+}
+.messages-widget .message-more {
+  margin: -4px -6px -4px 0;
+  padding: 2px;
+  height: auto;
+  min-height: 0;
+  line-height: 1;
+}
+.messages-widget .message-more .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 .messages-widget .messages-hint {
   margin: -5px 0 10px;

@@ -543,6 +543,7 @@ class Scripts {
 			'groundhogg-make-el',
 			'groundhogg-admin-remote-notifications',
 			'groundhogg-admin-tasks',
+			'groundhogg-admin-messages',
 			'groundhogg-admin-components',
 			'groundhogg-admin-reporting',
 			'jquery-ui-sortable'

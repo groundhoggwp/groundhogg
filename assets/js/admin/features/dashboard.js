@@ -43,6 +43,7 @@
     icons,
     adminPageURL,
     moreMenu,
+    escHTML,
   } = Groundhogg.element
 
   const {
@@ -54,7 +55,7 @@
     get,
   } = Groundhogg.api
 
-  const { formatNumber } = Groundhogg.formatting
+  const { formatNumber, formatDateTime } = Groundhogg.formatting
 
   const isWidgetDisabled = id => {
     let disabledWidgets = JSON.parse(localStorage.getItem('gh_disabled_widgets')) || []
@@ -1182,6 +1183,159 @@
     col   : 1,
     render: Searches,
   })
+
+  /**
+   * The contacts that have replied and haven't been read, the last reply of each. A click opens the conversation
+   * in a panel, which is when what was received is read. Whatever reads it, the panel or the contact's
+   * messages, says so with a `messagesread` event on the window, and it's not in the list anymore.
+   */
+  const UnreadMessages = (() => {
+
+    const SCOPE_KEY = 'gh_unread_messages_scope'
+
+    let stored = ''
+
+    try {
+      stored = localStorage.getItem(SCOPE_KEY)
+    }
+    catch (e) {
+      // no storage, it's the default
+    }
+
+    const State = Groundhogg.createState({
+      loaded  : false,
+      loading : false,
+      items   : [],
+      has_more: false,
+      scope   : stored === 'all' ? 'all' : 'mine',
+    })
+
+    let morphWidget = () => {}
+
+    const load = () => {
+      State.set({ loading: true })
+
+      return get(`${ Groundhogg.api.routes.v4.messages }/unread`, {
+        scope: State.scope,
+        limit: 10,
+      }).then(r => State.set({
+        loaded  : true,
+        loading : false,
+        items   : r.items,
+        has_more: r.has_more,
+      })).catch(() => State.set({
+        loaded : true,
+        loading: false,
+      }))
+    }
+
+    window.addEventListener('messagesread', () => load().then(() => morphWidget()))
+
+    const Row = ({ contact, unread, latest }) => {
+
+      const from = latest.data.from_address
+
+      return Div({
+        // with an id it's the same row when it's morphed. Without one an element that's there is reused, without what it does
+        id       : `unread-message-${ contact.ID }`,
+        className: 'unread-message',
+        tabindex : 0,
+        role     : 'button',
+        onClick  : () => Groundhogg.MessagesSidebar({ contact }),
+        onKeydown: e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            e.currentTarget.click()
+          }
+        },
+      }, [
+        Img({
+          className: 'unread-message-avatar',
+          src      : contact.avatar,
+          alt      : '',
+        }),
+        Div({ className: 'unread-message-details' }, [
+          Div({ className: 'unread-message-top display-flex gap-10 align-center' }, [
+            Bold({ className: 'unread-message-name' }, escHTML(contact.name)),
+            unread > 1 ? Span({ className: 'pill orange' }, String(unread)) : null,
+            Span({ className: 'unread-message-time' }, `<abbr title="${ formatDateTime(latest.timestamp * 1000) }">${ latest.i18n.time_diff }</abbr>`),
+          ]),
+          Div({ className: 'unread-message-subject' }, escHTML(latest.data.subject || __('(no subject)', 'groundhogg'))),
+          Div({ className: 'unread-message-preview' }, escHTML(latest.preview)),
+          // it's from the contact, unless it's from an address that isn't theirs
+          from && from.toLowerCase() !== contact.email.toLowerCase() ? Div({ className: 'unread-message-from' }, sprintf(__('From %s', 'groundhogg'), escHTML(from))) : null,
+        ]),
+      ])
+    }
+
+    return () => Div({
+      id       : 'unread-messages',
+      className: 'unread-messages',
+    }, morph => {
+
+      morphWidget = morph
+
+      if (!State.loaded && !State.loading) {
+        load().then(() => morph())
+      }
+
+      const setScope = scope => {
+
+        State.set({ scope })
+
+        try {
+          localStorage.setItem(SCOPE_KEY, scope)
+        }
+        catch (e) {
+          // it's the default next time
+        }
+
+        load().then(() => morph())
+        morph()
+      }
+
+      return Fragment([
+        Div({ className: 'unread-messages-toolbar display-flex gap-10 align-center' }, [
+          // pills, the one that's on is bold. Like the ones for tasks
+          ...[ [ 'mine', __('Mine', 'groundhogg') ], [ 'all', __('All', 'groundhogg') ] ].map(([ scope, text ]) => Span({
+            id       : `unread-messages-${ scope }`,
+            className: `pill colorless clickable ${ State.scope === scope ? 'bold active' : '' }`,
+            role     : 'button',
+            tabindex : 0,
+            onClick  : () => setScope(scope),
+            onKeydown: e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setScope(scope)
+              }
+            },
+          }, text)),
+          Button({
+            id       : 'refresh-unread-messages',
+            className: 'gh-button secondary text icon',
+            style    : { marginLeft: 'auto' },
+            onClick  : () => load().then(() => morph()),
+          }, Dashicon('update-alt')),
+        ]),
+        !State.loaded ? Skeleton({
+          cellAttributes: { style: { height: '60px', borderRadius: '8px' } },
+          className     : 'display-grid gap-10',
+        }, [ 'full', 'full', 'full' ]) : Div({ className: 'unread-messages-list' }, [
+          ...State.items.map(Row),
+          State.items.length === 0 ? Pg({ className: 'unread-messages-empty' }, __('You\'re all caught up! 🥳', 'groundhogg')) : null,
+          State.has_more ? Pg({ className: 'unread-messages-more' }, __('And more...', 'groundhogg')) : null,
+        ]),
+      ])
+    })
+  })()
+
+  if (userHasCap('view_contacts')) {
+    Widgets.add('replies', {
+      name  : __('Replies', 'groundhogg'),
+      col   : 2,
+      render: UnreadMessages,
+    })
+  }
 
   if (userHasCap('view_tasks')) {
     Widgets.add('tasks', {
