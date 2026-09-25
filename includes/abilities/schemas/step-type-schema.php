@@ -227,10 +227,17 @@ class Step_Type_Schema {
 	 *                                         Funnel::set_step_levels() has run -
 	 *                                         see resolve_settings()'s own docblock.
 	 *                                         Return a WP_Error to reject the input.
+	 * @param callable|null   $exporter        function( array $settings, Step $step ): array.
+	 *                                         Optional - the reverse of $resolver, for
+	 *                                         groundhogg/get-flow. Gets the step's stored
+	 *                                         meta already narrowed to the keys in
+	 *                                         $settings_schema, returns the settings in
+	 *                                         the shape $settings_schema describes. Omit
+	 *                                         if the meta is already in that shape.
 	 *
 	 * @return void
 	 */
-	public static function extend( string $type, array $settings_schema, $branch_keys = [], ?callable $resolver = null ) {
+	public static function extend( string $type, array $settings_schema, $branch_keys = [], ?callable $resolver = null, ?callable $exporter = null ) {
 
 		if ( ! is_array( $branch_keys ) && ! is_callable( $branch_keys ) ) {
 			_doing_it_wrong( __METHOD__, '$branch_keys must be an array or a callable.', '4.8' );
@@ -264,6 +271,7 @@ class Step_Type_Schema {
 			'settings_schema' => $settings_schema,
 			'branch_keys'     => $branch_keys,
 			'resolver'        => $resolver,
+			'exporter'        => $exporter,
 		];
 	}
 
@@ -818,27 +826,128 @@ class Step_Type_Schema {
 
 			case 'if_else':
 
-				$include = Segment_Schema::to_filters( (array) ( $settings['include_condition'] ?? [] ) );
+				foreach ( [ 'include', 'exclude' ] as $which ) {
 
-				if ( is_wp_error( $include ) ) {
-					return $include;
+					$condition_key = "{$which}_condition";
+					$filters_key   = "{$which}_filters";
+
+					if ( isset( $settings[ $condition_key ] ) && isset( $settings[ $filters_key ] ) ) {
+						return new WP_Error(
+							'groundhogg_conflicting_if_else_settings',
+							// Translators: %1$s the condition setting, %2$s the filters setting.
+							sprintf( __( 'Pass either %1$s or %2$s, not both.', 'groundhogg' ), $condition_key, $filters_key )
+						);
+					}
+
+					// raw filters, as groundhogg/get-flow returns them, are kept as they are
+					if ( isset( $settings[ $filters_key ] ) ) {
+						$settings[ $filters_key ] = (array) $settings[ $filters_key ];
+						continue;
+					}
+
+					$filters = Segment_Schema::to_filters( (array) ( $settings[ $condition_key ] ?? [] ) );
+
+					if ( is_wp_error( $filters ) ) {
+						return $filters;
+					}
+
+					unset( $settings[ $condition_key ] );
+
+					$settings[ $filters_key ] = $filters;
 				}
-
-				$exclude = Segment_Schema::to_filters( (array) ( $settings['exclude_condition'] ?? [] ) );
-
-				if ( is_wp_error( $exclude ) ) {
-					return $exclude;
-				}
-
-				unset( $settings['include_condition'], $settings['exclude_condition'] );
-
-				$settings['include_filters'] = $include;
-				$settings['exclude_filters'] = $exclude;
 
 				break;
 		}
 
 		return [ 'settings' => $settings, 'deferred_settings' => $deferred ];
+	}
+
+	/**
+	 * A step's settings in the shape settings_schema() describes - the reverse
+	 * of resolve_settings(), for groundhogg/get-flow. Reads the step's meta as
+	 * the Step instance currently has it (merge its changes first for the
+	 * draft a flow editor would see).
+	 *
+	 * Everything comes back in a form resolve_settings() accepts again: tags as
+	 * IDs, if_else's conditions as the stored include_filters/exclude_filters
+	 * (conditions built in the flow editor usually can't be expressed as a
+	 * segment), and references to other steps (send_email's reply_in_thread,
+	 * task_completed's tasks) as real step IDs.
+	 *
+	 * @param Step $step
+	 *
+	 * @return array|null Null if the step's type isn't in supported_types().
+	 */
+	public static function export_settings( Step $step ): ?array {
+
+		$type = $step->get_type();
+
+		if ( ! in_array( $type, self::supported_types(), true ) ) {
+			return null;
+		}
+
+		$meta = $step->get_meta();
+
+		// the stored meta is in the settings' shape, apart from what's changed below
+		$keys = array_keys( self::settings_schema( $type )['properties'] ?? [] );
+
+		switch ( $type ) {
+			case 'web_form':
+				$keys[] = 'form';
+				break;
+			case 'add_to_flow':
+				$keys[] = 'funnel_id';
+				break;
+		}
+
+		$settings = array_intersect_key( $meta, array_flip( $keys ) );
+
+		if ( isset( self::$extensions[ $type ]['exporter'] ) ) {
+			return (array) call_user_func( self::$extensions[ $type ]['exporter'], $settings, $step );
+		}
+
+		switch ( $type ) {
+
+			case 'web_form':
+
+				// see resolve_settings(), these four are nested under 'form'
+				$form = (array) ( $settings['form'] ?? [] );
+				unset( $settings['form'] );
+
+				foreach ( [ 'fields', 'button', 'recaptcha', 'turnstile' ] as $key ) {
+					if ( isset( $form[ $key ] ) ) {
+						$settings[ $key ] = $form[ $key ];
+					}
+				}
+
+				break;
+
+			case 'add_to_flow':
+
+				if ( isset( $settings['funnel_id'] ) ) {
+					$settings['flow_id'] = absint( $settings['funnel_id'] );
+					unset( $settings['funnel_id'] );
+				}
+
+				break;
+
+			case 'task_completed':
+
+				if ( isset( $settings['tasks'] ) ) {
+					$settings['tasks'] = wp_parse_id_list( $settings['tasks'] );
+				}
+
+				break;
+
+			case 'if_else':
+
+				$settings['include_filters'] = (array) ( $meta['include_filters'] ?? [] );
+				$settings['exclude_filters'] = (array) ( $meta['exclude_filters'] ?? [] );
+
+				break;
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -954,6 +1063,22 @@ class Step_Type_Schema {
 			'properties'           => Segment_Schema::properties(),
 		];
 
+		// Groundhogg's filters: groups that are ORed together, each a list of conditions that are ANDed
+		$filters_schema = [
+			'type'  => 'array',
+			'items' => [
+				'type'  => 'array',
+				'items' => [
+					'type'                 => 'object',
+					'additionalProperties' => true,
+					'required'             => [ 'type' ],
+					'properties'           => [
+						'type' => [ 'type' => 'string' ],
+					],
+				],
+			],
+		];
+
 		return [
 			'type'                 => 'object',
 			'additionalProperties' => false,
@@ -963,6 +1088,12 @@ class Step_Type_Schema {
 				] ),
 				'exclude_condition' => array_merge( $condition_schema, [
 					'description' => __( 'Contacts matching this segment are excluded from "yes" (sent down "no") even if they matched include_condition.', 'groundhogg' ),
+				] ),
+				'include_filters' => array_merge( $filters_schema, [
+					'description' => __( 'Instead of include_condition: the stored filters, exactly as groundhogg/get-flow returns them. Pass them back unchanged to keep conditions built in the flow editor.', 'groundhogg' ),
+				] ),
+				'exclude_filters' => array_merge( $filters_schema, [
+					'description' => __( 'Instead of exclude_condition: the stored filters, exactly as groundhogg/get-flow returns them.', 'groundhogg' ),
 				] ),
 			],
 		];

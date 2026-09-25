@@ -30,6 +30,7 @@ use Groundhogg\Abilities\Funnels\Activate_Flow;
 use Groundhogg\Abilities\Funnels\Add_To_Flow;
 use Groundhogg\Abilities\Funnels\Create_Flow;
 use Groundhogg\Abilities\Funnels\Deactivate_Flow;
+use Groundhogg\Abilities\Funnels\Get_Flow;
 use Groundhogg\Abilities\Funnels\List_Flows;
 use Groundhogg\Abilities\Funnels\List_Step_Types;
 use Groundhogg\Abilities\Funnels\Live_Simulate_Flow;
@@ -304,6 +305,7 @@ class Abilities {
 			Get_Broadcast::class,
 			Cancel_Broadcast::class,
 			List_Flows::class,
+			Get_Flow::class,
 			List_Step_Types::class,
 			Create_Flow::class,
 			Activate_Flow::class,
