@@ -910,9 +910,11 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	/**
 	 * Initialize the posted settings array
 	 *
-	 * @param $step Step
+	 * @param Step       $step
+	 * @param array|null $settings the step's full settings, including step_title, branch and the benchmark flags,
+	 *                             otherwise they're read from the flow editor's request, see Step::save()
 	 */
-	public function pre_save( Step $step ) {
+	public function pre_save( Step $step, ?array $settings = null ) {
 
 		$this->set_current_step( $step );
 
@@ -921,8 +923,15 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			return;
 		}
 
-        // phpcs:disable WordPress.Security -- if we're here, we know it exists and we'll sanitize it later
-		$this->posted_settings = wp_unslash( $_POST['steps'][ $step->get_id() ] );
+		$from_editor = $settings === null;
+
+		if ( $from_editor ) {
+			// phpcs:disable WordPress.Security -- if we're here, we know it exists and we'll sanitize it later
+			$settings = wp_unslash( $_POST['steps'][ $step->get_id() ] ?? [] );
+			// phpcs:enable WordPress.Security
+		}
+
+		$this->posted_settings = $settings;
 
 		// Loop through the schema and do any obvious work ahead of time.
 		foreach ( $this->get_settings_schema() as $setting => $schema ) {
@@ -942,9 +951,13 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		}
 
 		$data = [
-			'branch'     => sanitize_key( $this->get_posted_data( 'branch', 'main' ) ),
-			'step_order' => Step::increment_step_order()
+			'branch' => sanitize_key( $this->get_posted_data( 'branch', 'main' ) ),
 		];
+
+		// the editor saves the steps in order, otherwise the step keeps its place
+		if ( $from_editor ) {
+			$data['step_order'] = Step::increment_step_order();
+		}
 
 		if ( $this->get_posted_data( 'step_title' ) ) {
             $data['step_title'] = $this->get_posted_data( 'step_title' );

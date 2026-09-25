@@ -1765,14 +1765,51 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	/**
 	 * Save the step
+	 * Settings missing from $settings are reset, the same as a setting missing from the editor's request,
+	 * use update_settings() to change some of them.
+	 *
+	 * @param array|null $settings the step's full settings, including step_title, branch and the benchmark flags,
+	 *                             or null to read them from the flow editor's request
 	 */
-	public function save() {
+	public function save( ?array $settings = null ) {
 
 		$this->merge_changes(); // make sure changes are merged first as that will be relevant for some functions...
 
-		$this->get_step_element()->pre_save( $this );
+		$this->get_step_element()->pre_save( $this, $settings );
 		$this->get_step_element()->save( $this );
 		$this->get_step_element()->after_save( $this );
+	}
+
+	/**
+	 * The step's current settings, in the shape save() takes
+	 *
+	 * @return array
+	 */
+	public function get_settings() {
+
+		$this->merge_changes(); // staged changes are the current settings
+
+		$settings = array_merge( $this->get_meta(), [
+			'step_title' => $this->get_title(),
+			'branch'     => $this->branch,
+		] );
+
+		if ( $this->is_benchmark() ) {
+			$settings['is_conversion'] = (bool) $this->is_conversion;
+			$settings['is_entry']      = (bool) $this->is_entry;
+			$settings['can_passthru']  = (bool) $this->can_passthru;
+		}
+
+		return $settings;
+	}
+
+	/**
+	 * Change some of the step's settings and save it like the flow editor would, other settings are kept
+	 *
+	 * @param array $settings the settings to change, can include step_title, branch and the benchmark flags
+	 */
+	public function update_settings( array $settings ) {
+		$this->save( array_merge( $this->get_settings(), $settings ) );
 	}
 
 	/**
