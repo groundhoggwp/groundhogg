@@ -415,12 +415,12 @@ class Step_Type_Schema {
 					'properties'           => [
 						'from_status' => [
 							'type'        => 'array',
-							'items'       => [ 'enum' => self::optin_status_enum() ],
+							'items'       => [ 'type' => [ 'integer', 'string' ], 'enum' => self::optin_status_enum() ],
 							'description' => __( 'Only trigger when changing FROM one of these opt-in statuses. Empty/omitted matches any prior status.', 'groundhogg' ),
 						],
 						'status' => [
 							'type'        => 'array',
-							'items'       => [ 'enum' => self::optin_status_enum() ],
+							'items'       => [ 'type' => [ 'integer', 'string' ], 'enum' => self::optin_status_enum() ],
 							'description' => __( 'Only trigger when changing TO one of these opt-in statuses. Empty/omitted matches any new status.', 'groundhogg' ),
 						],
 					],

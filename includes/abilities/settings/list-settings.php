@@ -71,6 +71,7 @@ class List_Settings extends Ability {
 									'description' => __( 'Present only when the value is restricted to a fixed set of choices.', 'groundhogg' ),
 								],
 								'default'     => [
+									'type'        => [ 'string', 'number', 'boolean', 'array', 'object', 'null' ],
 									'description' => __( 'The setting\'s default value, when one is defined.', 'groundhogg' ),
 								],
 								'description' => [
@@ -82,6 +83,7 @@ class List_Settings extends Ability {
 									'description' => __( 'True if this is a secret (license key, API key, token, etc). Its value is redacted unless WP_DEBUG is on or the groundhogg/settings/expose_sensitive_values filter allows it.', 'groundhogg' ),
 								],
 								'value' => [
+									'type'        => [ 'string', 'number', 'boolean', 'array', 'object', 'null' ],
 									'description' => __( 'The setting\'s current stored value, or a redacted placeholder when sensitive is true and the value isn\'t currently exposed.', 'groundhogg' ),
 								],
 							],

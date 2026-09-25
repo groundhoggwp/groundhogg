@@ -100,6 +100,7 @@ class Query_Table extends Ability {
 									'description' => __( 'Must be a real column on the chosen table.', 'groundhogg' ),
 								],
 								'value' => [
+									'type'        => [ 'string', 'number', 'boolean', 'array' ],
 									'description' => __( 'Value to compare against. Omit for compare "empty"/"not_empty". An array of values for "in"/"not_in".', 'groundhogg' ),
 								],
 								'compare' => [

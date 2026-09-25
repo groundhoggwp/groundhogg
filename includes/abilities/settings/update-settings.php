@@ -67,6 +67,7 @@ class Update_Settings extends Ability {
 									'type' => 'string',
 								],
 								'value' => [
+									'type'        => [ 'string', 'number', 'boolean', 'array', 'object', 'null' ],
 									'description' => __( 'The value now stored, after sanitization - may differ from what was passed in. Redacted for sensitive settings unless named in `reveal` (and WP_DEBUG is on or the groundhogg/settings/expose_sensitive_values filter allows it).', 'groundhogg' ),
 								],
 								'changed' => [
