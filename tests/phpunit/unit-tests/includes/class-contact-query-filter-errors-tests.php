@@ -6,7 +6,7 @@ use Groundhogg\Email;
 use Groundhogg\SchedulingException;
 
 /**
- * Covers the removal of Legacy_Contact_Query. Filters the query engine can't apply must narrow
+ * Covers the removal of the legacy contact query engine. Filters the query engine can't apply must narrow
  * the results to nothing, never fall back to another engine or widen the results.
  */
 class Contact_Query_Filter_Errors_Tests extends GH_UnitTestCase {
@@ -31,8 +31,25 @@ class Contact_Query_Filter_Errors_Tests extends GH_UnitTestCase {
 		}
 	}
 
-	public function test_legacy_contact_query_is_gone() {
-		$this->assertFalse( class_exists( 'Groundhogg\Legacy_Contact_Query' ) );
+	public function test_legacy_contact_query_stub_uses_contact_query() {
+		$this->setExpectedDeprecated( 'Groundhogg\Legacy_Contact_Query' );
+
+		$query = new \Groundhogg\Legacy_Contact_Query( [
+			'include' => [ $this->contacts[0], $this->contacts[1] ]
+		] );
+
+		$this->assertCount( 2, $query->query() );
+		$this->assertEquals( 2, $query->count() );
+	}
+
+	public function test_legacy_contact_query_stub_never_widens() {
+		$this->setExpectedDeprecated( 'Groundhogg\Legacy_Contact_Query::register_filter' );
+		$this->setExpectedDeprecated( 'Groundhogg\Legacy_Contact_Query::generic_number_compare' );
+		$this->setExpectedDeprecated( 'Groundhogg\Legacy_Contact_Query::get_before_and_after_from_filter_date_range' );
+
+		$this->assertFalse( \Groundhogg\Legacy_Contact_Query::register_filter( 'some_filter', '__return_true' ) );
+		$this->assertEquals( '1=0', \Groundhogg\Legacy_Contact_Query::generic_number_compare( 'ID', 'equals', 1 ) );
+		$this->assertEquals( [ 'before' => '', 'after' => '' ], \Groundhogg\Legacy_Contact_Query::get_before_and_after_from_filter_date_range( [] ) );
 	}
 
 	public function test_unregistered_filter_matches_nothing() {

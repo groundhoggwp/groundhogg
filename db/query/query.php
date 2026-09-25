@@ -74,12 +74,23 @@ class Query {
 	protected static array $collectors = [];
 
 	/**
+	 * Default cache modes for queries created within Query::with_cache()
+	 *
+	 * @var array<bool|int>
+	 */
+	protected static array $default_cache = [];
+
+	/**
 	 * @param $table string|Query
 	 */
 	public function __construct( $table, string $alias = '' ) {
 
 		global $wpdb;
 		$this->db = $wpdb;
+
+		if ( ! empty( self::$default_cache ) ) {
+			$this->cache = end( self::$default_cache );
+		}
 
 		// Queries created while another is being set up are most likely its sub queries
 		if ( ! empty( self::$collectors ) ) {
@@ -508,6 +519,26 @@ class Query {
 		$this->cache = $cache;
 
 		return $this;
+	}
+
+	/**
+	 * Run the callback with a default cache mode for any query created during it.
+	 * Queries can still override it with setCache() or the cache query var.
+	 *
+	 * @param bool|int $cache    see setCache()
+	 * @param callable $callback
+	 *
+	 * @return mixed whatever the callback returns
+	 */
+	public static function with_cache( $cache, callable $callback ) {
+
+		self::$default_cache[] = is_numeric( $cache ) ? ( absint( $cache ) ?: false ) : (bool) $cache;
+
+		try {
+			return call_user_func( $callback );
+		} finally {
+			array_pop( self::$default_cache );
+		}
 	}
 
 	/**

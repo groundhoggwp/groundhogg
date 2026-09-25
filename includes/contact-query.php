@@ -1340,9 +1340,10 @@ class Contact_Query extends Table_Query {
 			'email_id'      => 0,
 		] );
 
-		$funnel_id = absint( $filter['funnel_id'] );
-		$step_id   = absint( $filter['step_id'] );
-		$email_id  = absint( $filter['email_id'] );
+		// Each accepts a single ID or a list of IDs, any of which matches
+		$funnel_ids = array_filter( wp_parse_id_list( $filter['funnel_id'] ) );
+		$step_ids   = array_filter( wp_parse_id_list( $filter['step_id'] ) );
+		$email_ids  = array_filter( wp_parse_id_list( $filter['email_id'] ) );
 
 		$activityQuery = new Table_Query( 'activity' );
 
@@ -1362,16 +1363,16 @@ class Contact_Query extends Table_Query {
 			unset( $filter['value_compare'] );
 		}
 
-		if ( $funnel_id ) {
-			$activityQuery->where->equals( 'funnel_id', $funnel_id );
+		if ( ! empty( $funnel_ids ) ) {
+			$activityQuery->where->in( 'funnel_id', $funnel_ids );
 		}
 
-		if ( $email_id ) {
-			$activityQuery->where->equals( 'email_id', $email_id );
+		if ( ! empty( $email_ids ) ) {
+			$activityQuery->where->in( 'email_id', $email_ids );
 		}
 
-		if ( $step_id ) {
-			$activityQuery->where->equals( 'step_id', $step_id );
+		if ( ! empty( $step_ids ) ) {
+			$activityQuery->where->in( 'step_id', $step_ids );
 		}
 
 		$alias = alias_from_filter( $filter );
@@ -1482,6 +1483,48 @@ class Contact_Query extends Table_Query {
 		}
 
 		$where->compare( "COALESCE($alias.total_visits,0)", $filter['count'], $filter['count_compare'] );
+	}
+
+	/**
+	 * Filter by how many different pages were visited, optionally only counting pages whose path matches
+	 * `link` and `compare`. Unlike page_visited, the path condition applies before counting, so
+	 * "at least 3 pages starting with /blog/" counts across all of them.
+	 *
+	 * @param       $filter
+	 * @param Where $where
+	 *
+	 * @return void
+	 */
+	public static function filter_distinct_pages_visited( $filter, Where $where ) {
+
+		$filter = wp_parse_args( $filter, [
+			'link'          => '',
+			'compare'       => 'starts_with',
+			'count'         => 1,
+			'count_compare' => 'greater_than_or_equal_to'
+		] );
+
+		$pageVisitQuery = new Table_Query( 'page_visits' );
+		$pageVisitQuery->setSelect( 'contact_id', [ 'COUNT(DISTINCT(path))', 'pages' ] )
+		               ->setGroupby( 'contact_id' );
+
+		Filters::timestamp( 'timestamp', $filter, $pageVisitQuery->where );
+
+		$path = wp_parse_url( $filter['link'], PHP_URL_PATH );
+
+		if ( $path ) {
+			Filters::string( 'path', [
+				'value'   => $path,
+				'compare' => $filter['compare']
+			], $pageVisitQuery->where );
+		}
+
+		$alias = alias_from_filter( $filter );
+
+		$join = $where->query->addJoin( 'LEFT', [ $pageVisitQuery, $alias ] );
+		$join->onColumn( 'contact_id' );
+
+		$where->compare( "COALESCE($alias.pages,0)", $filter['count'], $filter['count_compare'] );
 	}
 
 	/**

@@ -518,6 +518,58 @@ class Filters {
 	}
 
 	/**
+	 * Parse a number that may be formatted with thousands separators and either a decimal point or
+	 * a decimal comma. "1.000,99", "1,000.99" and "1000,99" all give 1000.99.
+	 *
+	 * - Both "." and "," present: whichever comes last is the decimal separator.
+	 * - One separator used more than once: it's a thousands separator, "1.000.000" is 1000000.
+	 * - One separator used once: it's a thousands separator if followed by exactly 3 digits and preceded
+	 *   by 1-3 digits not starting with 0, so "1,000" is 1000. Otherwise it's the decimal, "0.125" is 0.125.
+	 *   Which means "2.125" is read as 2125.
+	 *
+	 * @param string $value
+	 *
+	 * @return int|float float if the value has a decimal part, int otherwise
+	 */
+	public static function parse_number( string $value ) {
+
+		// Ignore anything that isn't part of the number, like currency symbols and spaces
+		$value = preg_replace( '/[^0-9.,\-]/', '', $value );
+
+		$negative = str_starts_with( $value, '-' );
+		$value    = str_replace( '-', '', $value );
+
+		$last_dot   = strrpos( $value, '.' );
+		$last_comma = strrpos( $value, ',' );
+		$decimal    = false;
+
+		if ( $last_dot !== false && $last_comma !== false ) {
+			$decimal = $last_dot > $last_comma ? '.' : ',';
+		} else if ( $last_dot !== false || $last_comma !== false ) {
+			$separator = $last_dot !== false ? '.' : ',';
+
+			if ( substr_count( $value, $separator ) === 1 ) {
+				[ $whole, $fraction ] = explode( $separator, $value );
+
+				$is_thousands = strlen( $fraction ) === 3 && preg_match( '/^[1-9]\d{0,2}$/', $whole );
+
+				if ( ! $is_thousands ) {
+					$decimal = $separator;
+				}
+			}
+		}
+
+		if ( $decimal ) {
+			$thousands = $decimal === '.' ? ',' : '.';
+			$number    = floatval( str_replace( [ $thousands, $decimal ], [ '', '.' ], $value ) );
+		} else {
+			$number = intval( str_replace( [ '.', ',' ], '', $value ) );
+		}
+
+		return $negative ? - $number : $number;
+	}
+
+	/**
 	 * Simple number comparison filter
 	 *
 	 * @param $column
@@ -551,11 +603,7 @@ class Filters {
 
 		// Convert to float or int to be on the safe side
 		if ( is_string( $value ) ) {
-			if ( str_contains( $value, ',' ) ) {
-				$value = floatval( $value );
-			} else {
-				$value = intval( $value );
-			}
+			$value = self::parse_number( $value );
 		}
 
 		if ( is_float( $value ) ) {
