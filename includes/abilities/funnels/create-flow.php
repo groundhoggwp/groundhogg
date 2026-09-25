@@ -6,7 +6,6 @@ use Groundhogg\Abilities\Ability;
 use Groundhogg\Abilities\Schemas\Step_Type_Schema;
 use Groundhogg\Campaign;
 use Groundhogg\Funnel;
-use Groundhogg\Step;
 use WP_Error;
 
 /**
@@ -23,7 +22,7 @@ use WP_Error;
  * branch_keys ["yes","no"], see groundhogg/list-step-types) nests the next step
  * node(s) for each branch directly, recursively. This ability walks that tree
  * top-down, creating real Step rows with real IDs as it goes (via
- * Funnel::add_step()), then calls Funnel::set_step_levels() once at the end to
+ * Step_Tree_Builder), then calls Funnel::set_step_levels() once at the end to
  * derive step_order/step_level/branch strings from the tree shape - the same
  * thing the live wp-admin flow editor's save path does, just driven by this
  * input tree instead of drag-and-drop.
@@ -241,10 +240,8 @@ class Create_Flow extends Ability {
 			return new WP_Error( 'groundhogg_flow_not_created', __( 'The flow could not be created.', 'groundhogg' ) );
 		}
 
-		$declared = []; // local id => [ 'id' => real step ID, 'type' => step type ]
-		$deferred = []; // [ [ 'step_id' => int, 'settings' => [key=>value, ...] ], ... ] - see Step_Type_Schema::resolve_settings()
-
-		$steps_out = $this->create_branch( $funnel, $input['steps'], 'main', $declared, $deferred );
+		$builder   = new Step_Tree_Builder( $funnel );
+		$steps_out = $builder->build( $input['steps'] );
 
 		if ( is_wp_error( $steps_out ) ) {
 			$funnel->delete();
@@ -256,18 +253,7 @@ class Create_Flow extends Ability {
 		// the branch structure just built - see the class docblock.
 		$funnel->set_step_levels();
 
-		foreach ( $deferred as $entry ) {
-			// A fresh Step instance, not the one create_branch() built - that one's
-			// in-memory step_order is whatever Funnel::add_step() gave it at
-			// insert time, never updated in place by set_step_levels() above
-			// (which works through its own, separately-fetched Step instances).
-			// task_completed's own sanitizer filters `tasks` through
-			// is_before($step), which reads $step's step_order - reusing the
-			// stale instance here silently drops every reference, since as far as
-			// it knows nothing is "before" it yet. Same caution applies to
-			// whatever an add-on's own deferred_settings might need.
-			( new Step( $entry['step_id'] ) )->update_meta( $entry['settings'] );
-		}
+		$builder->apply_deferred_settings();
 
 		if ( ! empty( $input['campaigns'] ) ) {
 			foreach ( wp_parse_id_list( $input['campaigns'] ) as $campaign_id ) {
@@ -286,151 +272,5 @@ class Create_Flow extends Ability {
 			'admin_link' => $funnel->admin_link(),
 			'steps'      => $steps_out,
 		];
-	}
-
-	/**
-	 * Recursively create every step in one branch's ordered node list, then
-	 * (for any branching logic step among them) recurse into its own `branches`.
-	 * Mutates $declared/$deferred as steps are created - see the class docblock.
-	 *
-	 * @param Funnel $funnel
-	 * @param array  $nodes    This branch's step nodes, in order.
-	 * @param string $branch   The `branch` string new steps here get - 'main' for
-	 *                         the root, "<parentStepId>-<key>" for a nested one.
-	 * @param array  $declared By reference. local id => ['id' => int, 'type' => string].
-	 * @param array  $deferred By reference. Accumulates task_completed writes to
-	 *                         apply after set_step_levels() - see __invoke().
-	 *
-	 * @return array|WP_Error Output step nodes for this branch, or the first error.
-	 */
-	private function create_branch( Funnel $funnel, array $nodes, string $branch, array &$declared, array &$deferred ) {
-
-		$out = [];
-
-		foreach ( $nodes as $node ) {
-
-			$node = (array) $node;
-			$type = $node['type'] ?? '';
-			$info = Step_Type_Schema::get_type_info( $type );
-
-			// The input schema's `type` enum already restricts this to
-			// Step_Type_Schema::supported_types(), but defend anyway rather than
-			// trust that unconditionally.
-			if ( ! $info || ! in_array( $type, Step_Type_Schema::supported_types(), true ) ) {
-				return new WP_Error(
-					'groundhogg_invalid_step_type',
-					// Translators: %s is the unsupported step type key given.
-					sprintf( __( '"%s" is not a step type groundhogg/create-flow can build. See groundhogg/list-step-types.', 'groundhogg' ), $type )
-				);
-			}
-
-			$local_id = isset( $node['id'] ) && $node['id'] !== '' ? sanitize_key( (string) $node['id'] ) : '';
-
-			if ( $local_id && isset( $declared[ $local_id ] ) ) {
-				return new WP_Error(
-					'groundhogg_duplicate_step_id',
-					// Translators: %s is the duplicated local step id.
-					sprintf( __( 'Step id "%s" is used more than once.', 'groundhogg' ), $local_id )
-				);
-			}
-
-			$input_settings = (array) ( $node['settings'] ?? [] );
-
-			// Passing $input_settings (not $resolved['settings'], computed below)
-			// - branch keys are about the shape of what the caller asked for, so
-			// a dynamic-branch-key type (see Step_Type_Schema::extend()'s own
-			// docblock for a split_path-style example) should compute them from
-			// what was actually given, not from whatever resolve_settings() below
-			// may have already transformed those same settings into.
-			$branch_keys = Step_Type_Schema::branch_keys( $type, $input_settings );
-
-			if ( ! empty( $node['branches'] ) && empty( $branch_keys ) ) {
-				return new WP_Error(
-					'groundhogg_unexpected_branches',
-					// Translators: %s is the step type given `branches` that doesn't support them.
-					sprintf( __( 'Step type "%s" doesn\'t support `branches`.', 'groundhogg' ), $type )
-				);
-			}
-
-			$resolved = Step_Type_Schema::resolve_settings( $type, $input_settings, $declared );
-
-			if ( is_wp_error( $resolved ) ) {
-				return $resolved;
-			}
-
-			$title = ! empty( $node['title'] ) ? sanitize_text_field( $node['title'] ) : $info['name'];
-
-			$step = $funnel->add_step( [
-				'step_title' => $title,
-				'step_type'  => $type,
-				'step_group' => $info['group'],
-				'branch'     => $branch,
-				'meta'       => $resolved['settings'],
-			] );
-
-			if ( ! $step ) {
-				return new WP_Error(
-					'groundhogg_step_not_created',
-					// Translators: %s is the step's title.
-					sprintf( __( 'The step "%s" could not be created.', 'groundhogg' ), $title )
-				);
-			}
-
-			if ( $local_id ) {
-				$declared[ $local_id ] = [ 'id' => $step->get_id(), 'type' => $type ];
-			}
-
-			if ( ! empty( $resolved['deferred_settings'] ) ) {
-				$deferred[] = [ 'step_id' => $step->get_id(), 'settings' => $resolved['deferred_settings'] ];
-			}
-
-			$out_node = [
-				'id'        => $step->get_id(),
-				'type'      => $type,
-				'type_name' => $info['name'],
-				'group'     => $info['group'],
-				'title'     => $title,
-				'settings'  => $input_settings,
-			];
-
-			if ( $local_id ) {
-				$out_node['local_id'] = $local_id;
-			}
-
-			if ( ! empty( $node['branches'] ) && is_array( $node['branches'] ) ) {
-
-				$out_branches = [];
-
-				foreach ( $node['branches'] as $key => $sub_nodes ) {
-
-					if ( ! in_array( $key, $branch_keys, true ) ) {
-						return new WP_Error(
-							'groundhogg_invalid_branch_key',
-							sprintf(
-							// Translators: %1$s branch key given, %2$s step type, %3$s valid branch keys.
-								__( '"%1$s" is not a valid branch for step type "%2$s" - valid branches: %3$s.', 'groundhogg' ),
-								$key,
-								$type,
-								implode( ', ', $branch_keys )
-							)
-						);
-					}
-
-					$sub_out = $this->create_branch( $funnel, (array) $sub_nodes, "{$step->get_id()}-{$key}", $declared, $deferred );
-
-					if ( is_wp_error( $sub_out ) ) {
-						return $sub_out;
-					}
-
-					$out_branches[ $key ] = $sub_out;
-				}
-
-				$out_node['branches'] = $out_branches;
-			}
-
-			$out[] = $out_node;
-		}
-
-		return $out;
 	}
 }
