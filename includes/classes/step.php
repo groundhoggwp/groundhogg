@@ -531,6 +531,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		      ->where()
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->notEquals( 'step_status', 'archived' )
 		      ->greaterThan( 'step_order', $this->get_order() );
 
 		return $query->get_objects( Step::class );
@@ -549,6 +550,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		      ->where()
 		      ->equals( 'step_group', self::BENCHMARK )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->notEquals( 'step_status', 'archived' )
 		      ->greaterThan( 'step_order', $this->get_order() );
 
 		return $query->get_objects( Step::class );
@@ -663,6 +665,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		      ->where()
 		      ->equals( 'step_group', self::ACTION )
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->notEquals( 'step_status', 'archived' )
 		      ->compare( 'step_order', $this->get_order() - 1, $this->is_action() ? '=' : '<=' );
 
 		$next = $query->get_objects( Step::class );
@@ -720,6 +723,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		      ->setLimit( 1 )
 		      ->where()
 		      ->equals( 'funnel_id', $this->get_funnel_id() )
+		      ->notEquals( 'step_status', 'archived' )
 		      ->equals( 'step_order', $this->get_order() - 1 );
 
 		$prev = $query->get_objects( Step::class );
@@ -1808,6 +1812,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	/**
 	 * Also call the delete method from the step element in the event there is cleanup
 	 *
+	 * Outside of committing this is a soft delete, the step is only flagged as deleted so the flow editor's undo/redo
+	 * can restore the row with its ID, meta and paused events (see Funnels_Page::process_edit() _restore). When the undo
+	 * history is cleared, by Funnel::commit() on Update or Funnel::remove_deleted_steps() on Activate, Step::commit()
+	 * removes the row, or archives it if contacts have been through the step so their history still points to something.
+	 *
 	 * @return bool
 	 */
 	public function delete() {
@@ -1816,12 +1825,38 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		$this->get_step_element()->delete( $this );
 
 		// If an active step is deleted, what we'll do is add a change that it was deleted,
-		// and when we do get_steps() we'll filter out steps that have that flag
+		// and when we do get_steps() we'll filter out steps that have that flag.
+		// Inactive steps don't stage changes, so the deleted status is written to the row directly.
 		if ( $this->is_committing ) {
 			return parent::delete();
 		}
 
 		return $this->update( [ 'step_status' => 'deleted' ] );
+	}
+
+	/**
+	 * Whether any contact has been through this step, in the event history or the activity (like email opens and clicks)
+	 *
+	 * @return bool
+	 */
+	public function has_history() {
+
+		$where = [
+			'funnel_id' => $this->get_funnel_id(),
+			'step_id'   => $this->get_id(),
+		];
+
+		return get_db( 'events' )->exists( array_merge( $where, [ 'event_type' => Event::FUNNEL ] ) )
+		       || get_db( 'activity' )->exists( $where );
+	}
+
+	/**
+	 * Whether the step was removed from the flow but kept for its history
+	 *
+	 * @return bool
+	 */
+	public function is_archived() {
+		return $this->step_status === 'archived';
 	}
 
 	public function delete_and_commit() {
@@ -2037,6 +2072,15 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// delete the step if it was "deleted"
 		if ( $this->step_status === 'deleted' ) {
+
+			// keep steps with history so events and activity can still show what the step was, it's no longer part of the flow
+			if ( $this->has_history() ) {
+				$result = $this->update( [ 'step_status' => 'archived' ] );
+				$this->set_is_committing( false );
+
+				return $result;
+			}
+
 			// using parent avoids having to work around is_active()
 			return $this->delete();
 		}

@@ -26,6 +26,7 @@
     Textarea,
     ItemPicker,
     Input,
+    Select,
   } = MakeEl
 
   const {
@@ -39,6 +40,7 @@
     adminPageURL,
     loadingModal,
     modal,
+    escHTML,
   } = Groundhogg.element
 
   const {
@@ -49,6 +51,109 @@
   } = wp.i18n
 
   const getFunnel = () => FunnelsStore.get(Funnel.id)
+
+  /**
+   * Ask what to do with contacts waiting at deleted steps before the changes go live
+   *
+   * @param pendingDeletes {{steps: Object[], targets: Object[]}} deleted steps with waiting contacts, and actions they can be moved to
+   * @param confirmText string the label of the button that was clicked, like Publish Changes or Activate
+   * @param onConfirm function receives the choices, step ID => { action, to }
+   */
+  const confirmDeletedSteps = (pendingDeletes, confirmText, onConfirm) => {
+
+    const {
+      steps = [],
+      targets = [],
+    } = pendingDeletes ?? {}
+
+    if (!steps.length) {
+      onConfirm({})
+      return
+    }
+
+    // cancel by default
+    const choices = Object.fromEntries(steps.map(step => [
+      step.ID, {
+        action: 'cancel',
+        to    : step.next || targets[0]?.ID || 0,
+      },
+    ]))
+
+    Modal({
+      width: '500px',
+    }, ({
+      close,
+      morph,
+    }) => Div({
+      className: 'display-flex column gap-20',
+    }, [
+      Div({ className: 'gh-header modal-header' }, [
+        H3({}, __('Contacts are waiting at deleted steps', 'groundhogg')),
+        Button({
+          className: 'gh-button icon secondary text',
+          onClick  : close,
+        }, Dashicon('no-alt')),
+      ]),
+      Pg({}, __('Choose what happens to them when your changes go live.', 'groundhogg')),
+      ...steps.map(step => Div({
+        className: 'display-flex column gap-10',
+      }, [
+        Pg({}, sprintf(_n('%1$s contact is waiting at %2$s', '%1$s contacts are waiting at %2$s', step.contacts, 'groundhogg'),
+          `<b>${ step.contacts.toLocaleString() }</b>`, `<b>${ escHTML(step.title) }</b>`)),
+        Div({
+          className: 'display-flex gap-10',
+        }, [
+          Select({
+            id      : `deleted-step-action-${ step.ID }`,
+            options : [
+              {
+                value: 'cancel',
+                text : __('Cancel their events', 'groundhogg'),
+              },
+              ...( targets.length ? [
+                {
+                  value: 'move',
+                  text : __('Move them to...', 'groundhogg'),
+                },
+              ] : [] ),
+            ],
+            selected: choices[step.ID].action,
+            onChange: e => {
+              choices[step.ID].action = e.target.value
+              morph()
+            },
+          }),
+          choices[step.ID].action === 'move' ? Select({
+            id      : `deleted-step-target-${ step.ID }`,
+            options : targets.map(target => ( {
+              value: target.ID,
+              text : escHTML(target.title),
+            } )),
+            selected: choices[step.ID].to,
+            onChange: e => {
+              choices[step.ID].to = parseInt(e.target.value)
+            },
+          }) : null,
+        ]),
+      ])),
+      Div({
+        className: 'display-flex flex-end gap-10',
+      }, [
+        Button({
+          className: 'gh-button secondary text',
+          onClick  : close,
+        }, __('Cancel', 'groundhogg')),
+        Button({
+          id       : 'confirm-deleted-steps',
+          className: 'gh-button primary',
+          onClick  : e => {
+            close()
+            onConfirm(choices)
+          },
+        }, confirmText),
+      ]),
+    ]))
+  }
 
   if (typeof Funnel !== 'undefined' && Funnel.is_editor) {
 
@@ -929,10 +1034,14 @@
 
         $('#funnel-update').on('click', e => {
 
-          const update = () => this.save({
+          const label = e.currentTarget.textContent.trim()
+          const update = () => confirmDeletedSteps(this.pending_deletes, label, choices => this.save({
             quiet   : false,
-            moreData: formData => formData.append('_commit', true),
-          })
+            moreData: formData => {
+              formData.append('_commit', true)
+              formData.append('_deleted_steps', JSON.stringify(choices))
+            },
+          }))
 
           // errors
           if (document.getElementById('step-flow').querySelector('.has-errors')) {
@@ -954,10 +1063,14 @@
 
         $('#funnel-activate').on('click', e => {
 
-          const activate = () => this.save({
+          const label = e.currentTarget.textContent.trim()
+          const activate = () => confirmDeletedSteps(this.pending_deletes, label, choices => this.save({
             quiet   : false,
-            moreData: formData => formData.append('_activate', true),
-          })
+            moreData: formData => {
+              formData.append('_activate', true)
+              formData.append('_deleted_steps', JSON.stringify(choices))
+            },
+          }))
 
           // errors
           if (document.getElementById('step-flow').querySelector('.has-errors')) {
@@ -1223,7 +1336,8 @@
 
         if (!quiet) {
           $('body').addClass('saving')
-          UndoRedoManager.clear() // reset undo states
+          // reset undo states, deleted steps can only be removed for real after this, see Step::delete()
+          UndoRedoManager.clear()
         }
         else {
           $('body').addClass('auto-saving')
@@ -1263,6 +1377,7 @@
           document.getElementById('funnel-form').dataset.status = response.data.funnel.data.status
 
           this.steps = response.data.funnel.steps
+          this.pending_deletes = response.data.pending_deletes
 
           if (!restore) {
             this.addCurrentStepsToUndoRedoHistory()

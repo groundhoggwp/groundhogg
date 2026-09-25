@@ -89,6 +89,9 @@ trait Event_Log {
 		}
 
 		// This is only used when funnel steps are deleted...
+		// Used by both the queue and history tables. Steps deleted in the flow editor are archived instead when they
+		// have history (see Step::commit()), so this only finds events when a whole funnel's steps are deleted.
+		// Contacts still waiting at a deleted step are cancelled or moved first by Funnel::resolve_deleted_step_events()
 		return $this->bulk_delete( [ 'step_id' => $id, 'event_type' => Event::FUNNEL ] );
 	}
 }

@@ -151,6 +151,7 @@ class Emails extends DB {
 			$stepQuery  = new Table_Query( 'steps' );
 			$meta_alias = $stepQuery->joinMeta( 'email_id' );
 			$stepQuery->where( 'step_type', 'send_email' );
+			$stepQuery->where()->notEquals( 'step_status', 'archived' );
 			$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );
 
 			$alias = $funnel_id ? 'funnel_' . $funnel_id : 'in_funnel';

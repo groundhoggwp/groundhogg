@@ -22,9 +22,10 @@ class Total_Benchmark_Conversion_Rate extends Base_Quick_Stat {
 		$funnel = new Funnel( $this->get_funnel_id() );
 
 		$steps = get_db( 'steps' )->query( [
-			'step_group' => 'benchmark',
-			'orderby'    => 'step_order',
-			'funnel_id'  => $funnel->get_id()
+			'step_group'  => 'benchmark',
+			'orderby'     => 'step_order',
+			'funnel_id'   => $funnel->get_id(),
+			'step_status' => [ '!=', 'archived' ],
 		] );
 
 		$steps = wp_parse_id_list( wp_list_pluck( $steps, 'ID' ) );

@@ -1732,7 +1732,8 @@ function convert_user_to_contact_when_user_registered( $userId ) {
 function get_form_list() {
 
 	$forms = get_db( 'steps' )->query( [
-		'step_type' => [ 'form_fill', 'web_form' ]
+		'step_type'   => [ 'form_fill', 'web_form' ],
+		'step_status' => [ '!=', 'archived' ],
 	] );
 
 	$form_options = array();

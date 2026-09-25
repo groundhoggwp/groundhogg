@@ -14,6 +14,7 @@ use function Groundhogg\action_url;
 use function Groundhogg\add_disable_emojis_action;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\array_apply_callbacks;
+use function Groundhogg\array_find;
 use function Groundhogg\array_map_keys;
 use function Groundhogg\check_lock;
 use function Groundhogg\db;
@@ -21,6 +22,7 @@ use function Groundhogg\download_json;
 use function Groundhogg\enqueue_email_block_editor_assets;
 use function Groundhogg\enqueue_groundhogg_modal;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_array_var;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
@@ -244,6 +246,7 @@ class Funnels_Page extends Admin_Page {
 					'funnelTourDismissed' => notices()->is_dismissed( 'funnel-tour' ),
 					'scratchFunnelURL'    => action_url( 'start_from_scratch' ),
 					'is_editor'           => true,
+					'pending_deletes'     => $this->get_pending_deletes( $funnel ),
 				] );
 
 				wp_add_inline_script( 'groundhogg-admin-funnel-editor', "var Funnel = " . wp_json_encode( $data ), 'before' );
@@ -687,9 +690,10 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		$response = [
-			'sortable' => $funnel->step_flow( false ),
-			'settings' => $funnel->step_settings( false ),
-			'funnel'   => $funnel,
+			'sortable'        => $funnel->step_flow( false ),
+			'settings'        => $funnel->step_settings( false ),
+			'funnel'          => $funnel,
+			'pending_deletes' => $this->get_pending_deletes( $funnel ),
 		];
 
 		if ( is_wp_error( $result ) ) {
@@ -702,6 +706,74 @@ class Funnels_Page extends Admin_Page {
 
 		$this->send_ajax_response( $response );
 
+	}
+
+	/**
+	 * Deleted steps that contacts are still waiting at, and the actions those contacts could be moved to
+	 *
+	 * @param Funnel $funnel
+	 *
+	 * @return array
+	 */
+	protected function get_pending_deletes( Funnel $funnel ) {
+
+		$targets = $funnel->get_move_targets();
+		$steps   = [];
+
+		foreach ( $funnel->get_deleted_steps() as $step ) {
+
+			$contacts = $funnel->count_pending_events( $step );
+
+			if ( ! $contacts ) {
+				continue;
+			}
+
+			// suggest the next action in the same branch, deleted steps keep their old order while the step that
+			// took their place is renumbered to it, so that's the first remaining one with the same order or later
+			$next = array_find( $targets, function ( Step $target ) use ( $step ) {
+				return $target->branch === $step->branch && $target->get_order() >= $step->get_order();
+			} );
+
+			$steps[] = [
+				'ID'       => $step->get_id(),
+				'title'    => $step->get_title(),
+				'contacts' => $contacts,
+				'next'     => $next ? $next->get_id() : 0,
+			];
+		}
+
+		return [
+			'steps'   => $steps,
+			'targets' => array_map( function ( Step $target ) {
+				return [
+					'ID'    => $target->get_id(),
+					'title' => $target->get_title(),
+				];
+			}, $targets ),
+		];
+	}
+
+	/**
+	 * What to do with contacts waiting at deleted steps, as chosen in the editor
+	 *
+	 * @return array
+	 */
+	protected function get_deleted_step_choices() {
+
+		$choices = json_decode( get_post_var( '_deleted_steps' ), true );
+
+		if ( ! is_array( $choices ) ) {
+			return [];
+		}
+
+		$choices = array_map_keys( $choices, 'absint' );
+
+		return array_map( function ( $choice ) {
+			return [
+				'action' => one_of( get_array_var( $choice, 'action' ), [ 'cancel', 'move' ] ),
+				'to'     => absint( get_array_var( $choice, 'to' ) ),
+			];
+		}, array_filter( $choices, 'is_array' ) );
 	}
 
 	/**
@@ -728,6 +800,8 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		// restore the prev state of the steps...
+		// Undo/redo, the editor posts a snapshot of the steps from after an earlier quiet save. Deleted steps come back
+		// by updating their row, which is why Step::delete() is a soft delete until the undo history is cleared
 		if ( get_post_var( '_restore' ) ) {
 
 			$prev_step_states = json_decode( get_post_var( '_restore' ), true );
@@ -767,6 +841,7 @@ class Funnels_Page extends Admin_Page {
 				wp_send_json_error();
 			}
 
+			// soft delete, it can still be undone, and contacts waiting at it are handled on Update or Activate
 			$step->delete();
 		}
 
@@ -899,6 +974,11 @@ class Funnels_Page extends Admin_Page {
 
 		// activate the funnel
 		if ( get_post_var( '_activate' ) ) {
+
+			// steps deleted while inactive can't be committed, so handle their contacts and remove them now
+			$funnel->resolve_deleted_step_events( $this->get_deleted_step_choices() );
+			$funnel->remove_deleted_steps();
+
 			$args['status']       = 'active';
 			$args['last_updated'] = current_time( 'mysql' );
 		}
@@ -922,7 +1002,7 @@ class Funnels_Page extends Admin_Page {
 
 		if ( get_post_var( '_commit' ) && $funnel->is_active() ) {
 			$args['last_updated'] = current_time( 'mysql' );
-			$funnel->commit();
+			$funnel->commit( $this->get_deleted_step_choices() );
 		}
 
 		$args['title'] = sanitize_text_field( get_post_var( 'funnel_title' ) );

@@ -280,6 +280,8 @@ class Funnels_Api extends Base_Object_Api {
 	/**
 	 * Commit the funnel
 	 *
+	 * Not used by the flow editor, which saves and commits through Funnels_Page::process_edit()
+	 *
 	 * @param \WP_REST_Request $request
 	 *
 	 * @return \WP_Error|\WP_REST_Response

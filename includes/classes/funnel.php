@@ -268,6 +268,121 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Steps that are deleted but not removed yet, staged for the next commit or, if the funnel is inactive, marked deleted directly
+	 *
+	 * @return Step[]
+	 */
+	public function get_deleted_steps() {
+		return array_values( array_filter( $this->get_real_steps(), function ( Step $step ) {
+			$step->merge_changes();
+
+			return $step->step_status === 'deleted';
+		} ) );
+	}
+
+	/**
+	 * How many contacts have waiting or paused events at a step
+	 *
+	 * @param Step $step
+	 *
+	 * @return int
+	 */
+	public function count_pending_events( Step $step ) {
+
+		$count = 0;
+
+		foreach ( [ Event::WAITING, Event::PAUSED ] as $status ) {
+			$count += event_queue_db()->count( [
+				'funnel_id'  => $this->get_id(),
+				'step_id'    => $step->get_id(),
+				'event_type' => Event::FUNNEL,
+				'status'     => $status,
+			] );
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Actions that contacts at a deleted step can be moved to
+	 *
+	 * @return Step[]
+	 */
+	public function get_move_targets() {
+		return array_values( array_filter( $this->get_real_steps(), function ( Step $step ) {
+			$step->merge_changes();
+
+			return $step->is_action() && $step->step_status !== 'deleted';
+		} ) );
+	}
+
+	/**
+	 * Decide what happens to contacts waiting at deleted steps, either move them to another action or cancel their events
+	 *
+	 * @param array $choices step ID => [ 'action' => 'move', 'to' => step ID ] or [ 'action' => 'cancel' ], anything else cancels
+	 *
+	 * @return void
+	 */
+	public function resolve_deleted_step_events( array $choices = [] ) {
+
+		$targets = [];
+
+		foreach ( $this->get_move_targets() as $target ) {
+			$targets[ $target->get_id() ] = $target;
+		}
+
+		$time = time();
+
+		foreach ( $this->get_deleted_steps() as $step ) {
+
+			$choice = get_array_var( $choices, $step->get_id(), [] );
+			$to     = absint( get_array_var( $choice, 'to' ) );
+
+			$where = [
+				'funnel_id'  => $this->get_id(),
+				'step_id'    => $step->get_id(),
+				'event_type' => Event::FUNNEL,
+			];
+
+			if ( get_array_var( $choice, 'action' ) === 'move' && isset( $targets[ $to ] ) ) {
+
+				// paused events stay paused, they'll run at the new step when the funnel is activated
+				foreach ( [ Event::WAITING, Event::PAUSED ] as $status ) {
+					event_queue_db()->update( array_merge( $where, [ 'status' => $status ] ), [
+						'step_id' => $to,
+						'time'    => $targets[ $to ]->get_run_time(),
+					] );
+				}
+
+				continue;
+			}
+
+			foreach ( [ Event::WAITING, Event::PAUSED ] as $status ) {
+				event_queue_db()->update( array_merge( $where, [ 'status' => $status ] ), [
+					'status'         => Event::CANCELLED,
+					'time_scheduled' => $time,
+					'error_code'     => 'step_deleted',
+					/* translators: %s: the step title */
+					'error_message'  => sprintf( __( 'The step "%s" was deleted.', 'groundhogg' ), $step->get_title() ),
+				] );
+			}
+
+			event_queue_db()->move_events_to_history( array_merge( $where, [ 'status' => Event::CANCELLED ] ), 'AND' );
+		}
+	}
+
+	/**
+	 * Remove steps that were marked deleted while the funnel was inactive, which can't be committed
+	 *
+	 * @return void
+	 */
+	public function remove_deleted_steps() {
+		foreach ( $this->get_deleted_steps() as $step ) {
+			$step->commit(); // removes steps with the deleted status
+		}
+	}
+
+	/**
 	 * Mass update status of steps related to this funnel
 	 *
 	 * @return bool
@@ -285,8 +400,10 @@ class Funnel extends Base_Object_With_Meta {
 			] );
 		}
 
+		// only active steps, archived steps aren't part of the flow anymore and must stay archived
 		return get_db( 'steps' )->update( [
-			'funnel_id' => $this->get_id()
+			'funnel_id'   => $this->get_id(),
+			'step_status' => 'active',
 		], [
 			'step_status' => 'inactive'
 		] );
@@ -378,12 +495,15 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * Merge step changes into the real data and meta
 	 */
-	public function commit() {
+	public function commit( array $deleted_step_choices = [] ) {
 
 		// can't commit if not active...
 		if ( ! $this->is_active() ) {
 			return;
 		}
+
+		// before deleted steps are removed, which also removes their events
+		$this->resolve_deleted_step_events( $deleted_step_choices );
 
 		$steps = $this->get_real_steps(); // use instead of ::get_steps() to avoid merged changes
 
@@ -631,12 +751,14 @@ class Funnel extends Base_Object_With_Meta {
 	public function get_steps( $query = [] ) {
 
 		$query = wp_parse_args( $query, [
-			'funnel_id' => $this->get_id(),
-			'orderby'   => 'step_order',
-			'order'     => 'ASC',
+			'funnel_id'   => $this->get_id(),
+			'orderby'     => 'step_order',
+			'order'       => 'ASC',
+			'step_status' => [ '!=', 'archived' ], // archived steps are only kept for their history
 		] );
 
 		// if not editing, only active steps should be included...
+		// inactive funnels aren't filtered, so they still include steps soft deleted while inactive until activation removes them
 		if ( ! $this->is_editing() && $this->is_active() ) {
 			$query['step_status'] = 'active';
 		}
@@ -662,7 +784,7 @@ class Funnel extends Base_Object_With_Meta {
 				$step->merge_changes();
 			}
 
-			// filter out "deleted" steps with the status as deleted in their changes
+			// filter out "deleted" steps with the status as deleted in their changes, or on the row for inactive funnels
 			$steps = array_filter( $steps, function ( Step $step ) {
 				return $step->step_status !== 'deleted';
 			} );
@@ -685,9 +807,10 @@ class Funnel extends Base_Object_With_Meta {
 	public function get_real_steps( $query = [] ) {
 
 		$query = wp_parse_args( $query, [
-			'funnel_id' => $this->get_id(),
-			'orderby'   => 'step_order',
-			'order'     => 'ASC',
+			'funnel_id'   => $this->get_id(),
+			'orderby'     => 'step_order',
+			'order'       => 'ASC',
+			'step_status' => [ '!=', 'archived' ], // archived steps are only kept for their history
 		] );
 
 		$steps = $this->get_steps_db()->query( $query );

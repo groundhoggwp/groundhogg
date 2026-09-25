@@ -1298,7 +1298,7 @@ class HTML {
 	 * @return string
 	 */
 	public function step_picker( $args ) {
-		$steps   = get_db( 'steps' )->query( [], 'step_order' );
+		$steps   = get_db( 'steps' )->query( [ 'step_status' => [ '!=', 'archived' ] ], 'step_order' );
 		$options = array();
 		foreach ( $steps as $step ) {
 			$step = new Step( $step->ID );

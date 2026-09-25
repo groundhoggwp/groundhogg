@@ -234,6 +234,7 @@ class Emails_Table extends Table {
 		$stepQuery  = new Table_Query( 'steps' );
 		$meta_alias = $stepQuery->joinMeta( 'email_id' );
 		$stepQuery->where( 'step_type', 'send_email' );
+		$stepQuery->where()->notEquals( 'step_status', 'archived' );
 		$stepQuery->setSelect( 'step_type', [ "$meta_alias.meta_value", 'email_id' ], 'funnel_id' );
 
 		$funnelQuery = new Table_Query( 'funnels' );
