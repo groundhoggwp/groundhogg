@@ -30,6 +30,7 @@ use Groundhogg\Abilities\Funnels\Activate_Flow;
 use Groundhogg\Abilities\Funnels\Add_To_Flow;
 use Groundhogg\Abilities\Funnels\Create_Flow;
 use Groundhogg\Abilities\Funnels\Deactivate_Flow;
+use Groundhogg\Abilities\Funnels\Edit_Flow;
 use Groundhogg\Abilities\Funnels\Get_Flow;
 use Groundhogg\Abilities\Funnels\List_Flows;
 use Groundhogg\Abilities\Funnels\List_Step_Types;
@@ -308,6 +309,7 @@ class Abilities {
 			Get_Flow::class,
 			List_Step_Types::class,
 			Create_Flow::class,
+			Edit_Flow::class,
 			Activate_Flow::class,
 			Deactivate_Flow::class,
 			Add_To_Flow::class,

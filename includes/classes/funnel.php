@@ -962,6 +962,65 @@ class Funnel extends Base_Object_With_Meta {
 		} );
 	}
 
+	/**
+	 * Back up the steps exactly as they're stored, their rows (including staged changes) and meta, for rollback().
+	 * Unlike snapshot(), which is the editor's view of the steps for undo/redo.
+	 *
+	 * @return array[] step ID => [ 'row' => array, 'meta' => array ]
+	 */
+	public function backup() {
+
+		$backup = [];
+
+		foreach ( $this->get_steps_db()->query( [ 'funnel_id' => $this->get_id() ] ) as $row ) {
+			$backup[ absint( $row->ID ) ] = [
+				'row'  => (array) $row,
+				'meta' => get_db( 'stepmeta' )->get_meta( $row->ID ) ?: [],
+			];
+		}
+
+		return $backup;
+	}
+
+	/**
+	 * Put the steps back exactly as they were in backup(), deleting any steps added since.
+	 * Writes to the tables directly, so nothing is staged, cascaded, or hooked into like editing the steps would.
+	 *
+	 * @param array[] $backup from backup()
+	 *
+	 * @return void
+	 */
+	public function rollback( array $backup ) {
+
+		$steps_db = $this->get_steps_db();
+		$meta_db  = get_db( 'stepmeta' );
+
+		// steps added since, their meta goes with them
+		foreach ( $steps_db->query( [ 'funnel_id' => $this->get_id() ] ) as $row ) {
+			if ( ! isset( $backup[ absint( $row->ID ) ] ) ) {
+				$steps_db->delete( absint( $row->ID ) );
+			}
+		}
+
+		foreach ( $backup as $step_id => $step ) {
+
+			// the row's values are already as they're stored
+			$steps_db->update( $step_id, $step['row'] );
+
+			$meta = $meta_db->get_meta( $step_id ) ?: [];
+
+			foreach ( array_keys( $meta ) as $key ) {
+				$meta_db->delete_meta( $step_id, $key );
+			}
+
+			foreach ( $step['meta'] as $key => $values ) {
+				foreach ( (array) $values as $value ) {
+					$meta_db->add_meta( $step_id, $key, maybe_unserialize( $value ) );
+				}
+			}
+		}
+	}
+
 	public function is_editing() {
 
 		if ( ! empty( self::$editing[ $this->get_id() ] ) ) {

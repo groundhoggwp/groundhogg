@@ -47,6 +47,107 @@ class Step_Tree_Builder {
 	protected $deferred = [];
 
 	/**
+	 * The JSON Schema for a step node build() takes. Branches refer to it as `#/$defs/step_node`,
+	 * so the ability's input schema must define it there.
+	 *
+	 * WordPress' own validator (rest_validate_value_from_schema(), run by
+	 * WP_Ability::execute() on both input and output) doesn't resolve `$ref`
+	 * and requires a `type` on every schema it walks. So abilities inline the
+	 * top-level step nodes in full, and the recursive `$ref`s in `branches` carry
+	 * a `type` alongside - WordPress checks that much, while MCP clients
+	 * (JSON Schema 2020-12, where `$ref` siblings apply) get the full shape.
+	 *
+	 * @return array
+	 */
+	public static function node_schema(): array {
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'required'             => [ 'type' ],
+			'properties'           => [
+				'id' => [
+					'type'        => 'string',
+					'description' => __( 'A local key for this step, unique within this call - e.g. "welcome_email". Only needed if another step references it (task_completed\'s `tasks`, send_email\'s `reply_in_thread`). Not stored - the real, persisted step id is returned in the response instead.', 'groundhogg' ),
+				],
+				'type' => [
+					'type'        => 'string',
+					'enum'        => Step_Type_Schema::supported_types(),
+					'description' => __( 'See groundhogg/list-step-types for what each type does and its exact `settings` shape (pass expand: ["settings_schema"], narrowed via `types` to just what you need).', 'groundhogg' ),
+				],
+				'title' => [
+					'type'        => 'string',
+					'description' => __( 'Internal admin title for this step. Defaults to the step type\'s own name (e.g. "Send Email") if omitted.', 'groundhogg' ),
+				],
+				'settings' => [
+					'type'                 => 'object',
+					'additionalProperties' => true,
+					'description'          => __( 'This step\'s configuration - see groundhogg/list-step-types\' settings_schema for the exact shape per type. See this ability\'s own description for what is and isn\'t validated here.', 'groundhogg' ),
+				],
+				'branches' => [
+					'type'                 => 'object',
+					'additionalProperties' => [
+						'type'  => 'array',
+						'items' => [
+							'type' => 'object',
+							'$ref' => '#/$defs/step_node',
+						],
+					],
+					'description'          => __( 'Only for branching logic types (currently just if_else - branch_keys ["yes","no"]). Maps each branch key to the ordered list of step nodes that branch contains.', 'groundhogg' ),
+				],
+			],
+		];
+	}
+
+	/**
+	 * The JSON Schema for a step node build() returns. Branches refer to it as `#/$defs/step_node_out`,
+	 * so the ability's output schema must define it there. See node_schema().
+	 *
+	 * @return array
+	 */
+	public static function node_out_schema(): array {
+		return [
+			'type'       => 'object',
+			'properties' => [
+				'id' => [
+					'type'        => 'integer',
+					'description' => __( 'The real, persisted step ID.', 'groundhogg' ),
+				],
+				'local_id' => [
+					'type'        => 'string',
+					'description' => __( 'Only present if the input node had its own `id`. Echoed back for reference.', 'groundhogg' ),
+				],
+				'type' => [
+					'type' => 'string',
+				],
+				'type_name' => [
+					'type' => 'string',
+				],
+				'group' => [
+					'type' => 'string',
+					'enum' => [ 'benchmark', 'action', 'logic' ],
+				],
+				'title' => [
+					'type' => 'string',
+				],
+				'settings' => [
+					'type'        => 'object',
+					'description' => __( 'Echoes back the input node\'s own `settings`, as given (not Groundhogg\'s internal stored shape, where the two differ - e.g. if_else\'s include_condition/exclude_condition rather than its internal include_filters/exclude_filters).', 'groundhogg' ),
+				],
+				'branches' => [
+					'type'                 => 'object',
+					'additionalProperties' => [
+						'type'  => 'array',
+						'items' => [
+							'type' => 'object',
+							'$ref' => '#/$defs/step_node_out',
+						],
+					],
+				],
+			],
+		];
+	}
+
+	/**
 	 * @param Funnel $funnel   the funnel to add the steps to
 	 * @param array  $declared steps that can already be referenced by a local id,
 	 *                         local id => [ 'id' => real step ID, 'type' => step type ]
@@ -63,6 +164,19 @@ class Step_Tree_Builder {
 	 */
 	public function get_declared(): array {
 		return $this->declared;
+	}
+
+	/**
+	 * Let a step be referenced by a key
+	 *
+	 * @param string $key
+	 * @param int    $step_id
+	 * @param string $type the step type
+	 *
+	 * @return void
+	 */
+	public function declare( string $key, int $step_id, string $type ) {
+		$this->declared[ sanitize_key( $key ) ] = [ 'id' => $step_id, 'type' => $type ];
 	}
 
 	/**

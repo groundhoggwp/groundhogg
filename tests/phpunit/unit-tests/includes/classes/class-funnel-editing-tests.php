@@ -174,6 +174,26 @@ class Funnel_Editing_Tests extends GH_UnitTestCase {
 		$this->assertEquals( 'deleted', ( new Step( $added->get_id() ) )->step_status );
 	}
 
+	public function test_rollback_is_exact() {
+
+		foreach ( [ 'active', 'inactive' ] as $status ) {
+
+			[ $funnel, $steps ] = $this->make_funnel( $status );
+
+			$backup = $funnel->backup();
+
+			$steps[0]->update( [ 'step_title' => 'changed' ] );
+			$steps[0]->update_meta( 'delay_amount', 5 );
+			$steps[0]->update_meta( 'a_new_setting', 'new' ); // not in the backup, restore() would keep it
+			$steps[1]->delete();
+			$this->add_inactive_step( $funnel );
+
+			$funnel->rollback( $backup );
+
+			$this->assertEquals( $backup, $funnel->backup(), $status );
+		}
+	}
+
 	public function test_snapshot_and_restore_leave_editing_mode() {
 		[ $funnel ] = $this->make_funnel();
 

@@ -44,9 +44,15 @@ class Get_Flow extends Ability {
 	 */
 	const BENCHMARK_BRANCH = 'then';
 
-	protected function get_args(): array {
+	/**
+	 * The JSON Schema for a step node in the tree. Branches refer to it as `#/$defs/step_node`,
+	 * see flow_schema().
+	 *
+	 * @return array
+	 */
+	public static function node_schema(): array {
 
-		$step_node_schema = [
+		return [
 			'type'       => 'object',
 			'properties' => [
 				'id' => [
@@ -110,6 +116,9 @@ class Get_Flow extends Ability {
 				],
 			],
 		];
+	}
+
+	protected function get_args(): array {
 
 		return [
 			'label'       => __( 'Get Flow', 'groundhogg' ),
@@ -133,44 +142,56 @@ class Get_Flow extends Ability {
 				],
 			],
 
-			'output_schema' => [
-				'type'       => 'object',
-				'$defs'      => [
-					'step_node' => $step_node_schema,
+			'output_schema' => self::flow_schema(),
+		];
+	}
+
+	/**
+	 * The JSON Schema for what describe() returns
+	 *
+	 * @return array
+	 */
+	public static function flow_schema(): array {
+
+		$step_node_schema = self::node_schema();
+
+		return [
+			'type'       => 'object',
+			'$defs'      => [
+				'step_node' => $step_node_schema,
+			],
+			'properties' => [
+				'id' => [
+					'type' => 'integer',
 				],
-				'properties' => [
-					'id' => [
-						'type' => 'integer',
-					],
-					'title' => [
-						'type' => 'string',
-					],
-					'status' => [
-						'type' => 'string',
-					],
-					'view' => [
-						'type' => 'string',
-					],
-					'admin_link' => [
-						'type' => 'string',
-					],
-					'has_unpublished_changes' => [
-						'type'        => 'boolean',
-						'description' => __( 'The flow is active and has changes (including deleted steps) contacts don\'t go through yet. Published with the flow editor\'s Update button.', 'groundhogg' ),
-					],
-					'revision' => [
-						'type'        => 'string',
-						'description' => __( 'Changes whenever any step in the draft changes. Compare to tell if the flow was edited since it was read.', 'groundhogg' ),
-					],
-					'steps' => [
-						'type'  => 'array',
-						'items' => $step_node_schema,
-					],
-					'unplaced_steps' => [
-						'type'        => 'array',
-						'description' => __( 'Steps whose branch doesn\'t belong to any step in the flow, so they can\'t be reached. Usually empty.', 'groundhogg' ),
-						'items'       => $step_node_schema,
-					],
+				'title' => [
+					'type' => 'string',
+				],
+				'status' => [
+					'type' => 'string',
+				],
+				'view' => [
+					'type' => 'string',
+				],
+				'admin_link' => [
+					'type' => 'string',
+				],
+				'has_unpublished_changes' => [
+					'type'        => 'boolean',
+					'description' => __( 'The flow is active and has changes (including deleted steps) contacts don\'t go through yet. Published with the flow editor\'s Update button.', 'groundhogg' ),
+				],
+				'revision' => [
+					'type'        => 'string',
+					'description' => __( 'Changes whenever any step in the draft changes. Compare to tell if the flow was edited since it was read.', 'groundhogg' ),
+				],
+				'steps' => [
+					'type'  => 'array',
+					'items' => $step_node_schema,
+				],
+				'unplaced_steps' => [
+					'type'        => 'array',
+					'description' => __( 'Steps whose branch doesn\'t belong to any step in the flow, so they can\'t be reached. Usually empty.', 'groundhogg' ),
+					'items'       => $step_node_schema,
 				],
 			],
 		];
@@ -184,14 +205,36 @@ class Get_Flow extends Ability {
 			return new WP_Error( 'groundhogg_flow_not_found', __( 'Flow not found.', 'groundhogg' ) );
 		}
 
-		$view = ( $input['view'] ?? 'draft' ) === 'live' ? 'live' : 'draft';
+		return self::describe( $funnel, ( $input['view'] ?? 'draft' ) === 'live' ? 'live' : 'draft' );
+	}
+
+	/**
+	 * Changes whenever any step in the draft changes
+	 *
+	 * @param Funnel $funnel
+	 *
+	 * @return string
+	 */
+	public static function revision( Funnel $funnel ): string {
+		return md5( wp_json_encode( $funnel->snapshot() ) );
+	}
+
+	/**
+	 * The flow as a tree of step nodes, see flow_schema()
+	 *
+	 * @param Funnel $funnel
+	 * @param string $view 'draft' or 'live'
+	 *
+	 * @return array
+	 */
+	public static function describe( Funnel $funnel, string $view = 'draft' ): array {
 
 		if ( $view === 'live' ) {
-			return $this->get_flow( $funnel, $view );
+			return self::get_flow( $funnel, $view );
 		}
 
 		return $funnel->while_editing( function () use ( $funnel, $view ) {
-			return $this->get_flow( $funnel, $view );
+			return self::get_flow( $funnel, $view );
 		} );
 	}
 
@@ -201,7 +244,7 @@ class Get_Flow extends Ability {
 	 *
 	 * @return array
 	 */
-	protected function get_flow( Funnel $funnel, string $view ) {
+	protected static function get_flow( Funnel $funnel, string $view ) {
 
 		$steps = $funnel->get_steps();
 
@@ -214,14 +257,14 @@ class Get_Flow extends Ability {
 			$by_branch[ $step->branch ][] = $step;
 		}
 
-		$tree = $this->build_branch( 'main', $by_branch, $has_drafts );
+		$tree = self::build_branch( 'main', $by_branch, $has_drafts );
 
 		// anything left wasn't reached from the main branch
 		$unplaced = [];
 
 		foreach ( $by_branch as $branch_steps ) {
 			foreach ( $branch_steps as $step ) {
-				$unplaced[] = $this->step_node( $step, [], $has_drafts );
+				$unplaced[] = self::step_node( $step, [], $has_drafts );
 			}
 		}
 
@@ -232,7 +275,7 @@ class Get_Flow extends Ability {
 			'view'                    => $view,
 			'admin_link'              => $funnel->admin_link(),
 			'has_unpublished_changes' => $has_drafts && ( $funnel->has_changes() || ! empty( $funnel->get_deleted_steps() ) ),
-			'revision'                => md5( wp_json_encode( $funnel->snapshot() ) ),
+			'revision'                => self::revision( $funnel ),
 			'steps'                   => $tree,
 			'unplaced_steps'          => $unplaced,
 		];
@@ -247,7 +290,7 @@ class Get_Flow extends Ability {
 	 *
 	 * @return array
 	 */
-	protected function build_branch( string $branch, array &$by_branch, bool $has_drafts ) {
+	protected static function build_branch( string $branch, array &$by_branch, bool $has_drafts ) {
 
 		if ( empty( $by_branch[ $branch ] ) ) {
 			return [];
@@ -262,11 +305,11 @@ class Get_Flow extends Ability {
 
 			$branches = [];
 
-			foreach ( $this->get_branch_keys( $step, $by_branch ) as $key => $sub_branch ) {
-				$branches[ $key ] = $this->build_branch( $sub_branch, $by_branch, $has_drafts );
+			foreach ( self::get_branch_keys( $step, $by_branch ) as $key => $sub_branch ) {
+				$branches[ $key ] = self::build_branch( $sub_branch, $by_branch, $has_drafts );
 			}
 
-			$nodes[] = $this->step_node( $step, $branches, $has_drafts );
+			$nodes[] = self::step_node( $step, $branches, $has_drafts );
 		}
 
 		return $nodes;
@@ -280,7 +323,7 @@ class Get_Flow extends Ability {
 	 *
 	 * @return string[] branch key => stored branch string
 	 */
-	protected function get_branch_keys( Step $step, array $by_branch ) {
+	protected static function get_branch_keys( Step $step, array $by_branch ) {
 
 		if ( $step->is_benchmark() ) {
 			return isset( $by_branch[ "$step->ID" ] ) ? [ self::BENCHMARK_BRANCH => "$step->ID" ] : [];
@@ -316,7 +359,7 @@ class Get_Flow extends Ability {
 	 *
 	 * @return array
 	 */
-	protected function step_node( Step $step, array $branches, bool $has_drafts ) {
+	protected static function step_node( Step $step, array $branches, bool $has_drafts ) {
 
 		$settings = Step_Type_Schema::export_settings( $step );
 
