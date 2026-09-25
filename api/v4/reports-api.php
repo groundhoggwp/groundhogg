@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Filters;
+use Groundhogg\DB\Query\Query;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Reports;
 use Groundhogg\Tag;
@@ -334,7 +335,7 @@ class Reports_Api extends Base_Api {
 		$reports = get_option( 'gh_custom_reports', [] );
 
 		foreach ( $reports as &$report ) {
-			$report['data'] = $this->get_report_data( $report );
+			$report['data'] = Query::with_cache( Reports::CACHE_SECONDS, fn() => $this->get_report_data( $report ) );
 		}
 
 		return self::SUCCESS_RESPONSE( [
@@ -357,7 +358,7 @@ class Reports_Api extends Base_Api {
 			return $report['id'] == $request->get_param( 'id' );
 		} );
 
-		$report['data'] = $this->get_report_data( $report );
+		$report['data'] = Query::with_cache( Reports::CACHE_SECONDS, fn() => $this->get_report_data( $report ) );
 
 		return self::SUCCESS_RESPONSE( [
 			'item' => $report

@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\DB\Query\Query;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_country;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Optin_Status;
 use Groundhogg\Reporting\New_Reports\Chart_Contacts_By_Region;
@@ -52,6 +53,11 @@ use Groundhogg\Reporting\New_Reports\Total_Spam_Contacts;
 use Groundhogg\Reporting\New_Reports\Total_Unsubscribed_Contacts;
 
 class Reports {
+
+	/**
+	 * How long report queries may be served from the cache, regardless of changes to the tables they read
+	 */
+	const CACHE_SECONDS = 5 * MINUTE_IN_SECONDS;
 
 	/**
 	 * @var int
@@ -366,7 +372,8 @@ class Reports {
 			return false;
 		}
 
-		return call_user_func( $this->reports[ $report_id ]['callback'] );
+		// Reports are viewed repeatedly and don't need to be up to the second
+		return Query::with_cache( self::CACHE_SECONDS, $this->reports[ $report_id ]['callback'] );
 	}
 
 	/**

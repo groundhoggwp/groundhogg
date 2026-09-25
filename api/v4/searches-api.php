@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Contact_Query;
+use Groundhogg\Reports;
 use Groundhogg\Saved_Searches;
 use function Groundhogg\sanitize_query_url_params;
 
@@ -73,7 +74,8 @@ class Searches_Api extends Base_Api {
 		if ( $request->has_param( 'counts' ) && $request->get_param( 'counts' ) ) {
 			foreach ( $searches as &$search ) {
 //				$time            = new Micro_Time_Tracker();
-				$query           = new Contact_Query( $search['query'] );
+				// Counts are reloaded with every dashboard view, they don't need to be up to the second
+				$query           = new Contact_Query( array_merge( (array) $search['query'], [ 'cache' => Reports::CACHE_SECONDS ] ) );
 				$search['count'] = $query->count();
 //				$search['time']  = $time->time_elapsed_rounded();
 			}
