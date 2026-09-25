@@ -36,7 +36,7 @@ class Activate_Flow extends Ability {
 
 		return [
 			'label'       => __( 'Activate Flow', 'groundhogg' ),
-			'description' => __( 'Activate a flow so contacts can start entering it and groundhogg/add-to-flow can enqueue contacts into it. A flow with no steps cannot be activated. Already-active is treated as success.', 'groundhogg' ),
+			'description' => __( 'Activate a flow so contacts can start entering it and groundhogg/add-to-flow can enqueue contacts into it. A flow with no steps cannot be activated. Already-active is treated as success. Steps deleted while the flow was inactive are removed now, and contacts paused at them are cancelled unless deleted_steps moves them to another action.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -48,6 +48,7 @@ class Activate_Flow extends Ability {
 						'minimum'     => 1,
 						'description' => __( 'The flow to activate - see groundhogg/list-flows.', 'groundhogg' ),
 					],
+					'deleted_steps' => Flow_Changes::deleted_steps_schema(),
 				],
 			],
 
@@ -70,6 +71,7 @@ class Activate_Flow extends Ability {
 						'type'        => 'boolean',
 						'description' => __( 'True if the flow was already active and nothing changed.', 'groundhogg' ),
 					],
+					'deleted_steps' => Flow_Changes::outcomes_schema(),
 				],
 			],
 		];
@@ -90,14 +92,34 @@ class Activate_Flow extends Ability {
 				'status'             => $funnel->get_status(),
 				'admin_link'         => $funnel->admin_link(),
 				'was_already_active' => true,
+				'deleted_steps'      => [],
 			];
 		}
 
-		if ( empty( $funnel->get_steps() ) ) {
+		// steps deleted while inactive are still there until activating, so don't count them
+		$has_steps = $funnel->while_editing( function () use ( $funnel ) {
+			return ! empty( $funnel->get_steps() );
+		} );
+
+		if ( ! $has_steps ) {
 			return new WP_Error( 'groundhogg_flow_no_steps', __( 'This flow has no steps yet - add at least one before activating it. See groundhogg/create-flow or the flow editor in wp-admin.', 'groundhogg' ) );
 		}
 
-		$funnel->update( [ 'status' => 'active' ] );
+		$choices = Flow_Changes::get_choices( $funnel, (array) ( $input['deleted_steps'] ?? [] ) );
+
+		if ( is_wp_error( $choices ) ) {
+			return $choices;
+		}
+
+		$outcomes = Flow_Changes::outcomes( $funnel, $choices );
+
+		// like the flow editor's Activate, before the status change unpauses the events left
+		Flow_Changes::remove_deleted_steps( $funnel, $choices );
+
+		$funnel->update( [
+			'status'       => 'active',
+			'last_updated' => current_time( 'mysql' ),
+		] );
 
 		// Mirrors the REST update path's own action for other code hooking flow
 		// status changes (cache busting, integrations, etc.).
@@ -109,6 +131,7 @@ class Activate_Flow extends Ability {
 			'status'             => $funnel->get_status(),
 			'admin_link'         => $funnel->admin_link(),
 			'was_already_active' => false,
+			'deleted_steps'      => $outcomes,
 		];
 	}
 }

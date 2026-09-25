@@ -274,7 +274,7 @@ class Get_Flow extends Ability {
 			'status'                  => $funnel->get_status(),
 			'view'                    => $view,
 			'admin_link'              => $funnel->admin_link(),
-			'has_unpublished_changes' => $has_drafts && ( $funnel->has_changes() || ! empty( $funnel->get_deleted_steps() ) ),
+			'has_unpublished_changes' => $has_drafts && Flow_Changes::has_unpublished_changes( $funnel ),
 			'revision'                => self::revision( $funnel ),
 			'steps'                   => $tree,
 			'unplaced_steps'          => $unplaced,
