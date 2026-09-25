@@ -7181,6 +7181,8 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 		],
 		'post_types'     => $post_types,
 		'senderProfiles' => get_sender_profiles(),
+		// whether there's an inbox to send replies to, for the setting of an email that does
+		'inboxActive'    => \Groundhogg\Classes\Inbox::is_active(),
 	], $extra );
 
 	wp_add_inline_script( 'groundhogg-email-block-editor', 'const _BlockEditor = ' . wp_json_encode( $localized ), 'before' );

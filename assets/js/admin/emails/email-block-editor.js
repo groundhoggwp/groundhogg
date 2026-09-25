@@ -102,6 +102,7 @@
     blockDefaults = {},
     imageSizes = [],
     senderProfiles = {},
+    inboxActive = false,
   } = _BlockEditor
 
   const { TokenList } = Groundhogg
@@ -4585,8 +4586,12 @@
   const BasicEmailControls = () => {
     let {
       reply_to_override = '',
+      reply_to_messages = false,
       browser_view = false,
     } = getEmailMeta()
+
+    // it's only what an email says when there's an inbox, the address is used until then
+    const savesReplies = inboxActive && Boolean(reply_to_messages)
 
     let {
       from_profile = 'default',
@@ -4644,7 +4649,20 @@
                 updatePreview()
               },
             })),
-          Control({
+          // replies can be saved as messages, when there's an inbox to send them to
+          inboxActive ? Control({
+              label  : 'Save replies as messages',
+              tooltip: 'Replies go to your Groundhogg inbox, and are saved in the Messages of the contact that replied. The reply-to address is not used.',
+            },
+            Toggle({
+              id      : 'reply-to-messages',
+              checked : Boolean(reply_to_messages),
+              onChange: e => updateSettings({
+                reply_to_messages: e.target.checked,
+                reRender         : true,
+              }),
+            })) : null,
+          savesReplies ? null : Control({
               label  : 'Send replies to...',
               stacked: true,
             },

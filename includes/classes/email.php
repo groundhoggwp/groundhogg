@@ -3,6 +3,8 @@
 namespace Groundhogg;
 
 use Groundhogg\Api\V4\Unsubscribe_Api;
+use Groundhogg\Classes\Inbox;
+use Groundhogg\Classes\Message;
 use Groundhogg\DB\Email_Meta;
 use Groundhogg\DB\Emails;
 use WP_Error;
@@ -1148,11 +1150,40 @@ class Email extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Whether the replies to this email are saved as messages of the contact. It's a setting of the email, and the
+	 * filter is for a site that wants it for all of them, or for some. It's only when there's an inbox that's on,
+	 * without one the replies go where they always did.
+	 *
+	 * @return bool
+	 */
+	public function replies_to_messages() {
+
+		/**
+		 * Whether replies to an email go to the inbox of the site, to be saved as messages
+		 *
+		 * @param bool  $replies_to_messages the setting of the email
+		 * @param Email $email
+		 */
+		return (bool) apply_filters( 'groundhogg/email/reply_to_messages', (bool) $this->get_meta( 'reply_to_messages' ), $this );
+	}
+
+	/**
 	 * The reply-to address
 	 *
 	 * @return string
 	 */
 	public function get_reply_to_address() {
+
+		// an address of the inbox that's for a reply to this email, it's a new one each time it's sent
+		if ( $this->replies_to_messages() ) {
+
+			$reply_to = Inbox::reply_to( Message::generate_message_id() );
+
+			if ( $reply_to ) {
+				return $reply_to;
+			}
+		}
+
 		return $this->get_meta( 'reply_to_override' ) ? do_replacements( $this->get_meta( 'reply_to_override' ), $this->get_contact() ) : $this->get_from_email();
 	}
 
@@ -1598,6 +1629,7 @@ class Email extends Base_Object_With_Meta {
 			case 'blocks':
 			case 'use_default_from':
 			case 'browser_view':
+			case 'reply_to_messages':
 				$value = boolval( $value );
 				break;
 			case 'reply_to_override':
