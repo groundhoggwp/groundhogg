@@ -1889,7 +1889,7 @@
 
         Groundhogg.components.Tour([
           {
-            prompt  : `This is step flow. Your flows are made up of a series of steps. Steps can be <span class="gh-text orange">triggers</span>, <span class="gh-text green">actions</span>, or <span class="gh-text purple">logic</span>.`,
+            prompt  : `This is where you'll build your flow. Every flow is made up of a series of steps. Steps can be <span class="gh-text orange">triggers</span>, <span class="gh-text green">actions</span>, or <span class="gh-text purple">logic</span>.`,
             position: 'right',
             target  : '#step-sortable',
             onInit  : ({
@@ -1914,7 +1914,7 @@
             target  : '.steps-select .gh-input-group.full-width',
           },
           {
-            prompt  : `<span class="gh-text orange">Triggers</span> (Goals/Benchmarks) are used to start flows and move contacts through flows when they meet the configured criteria.`,
+            prompt  : `<span class="gh-text orange">Triggers</span> start flows, and move contacts forward when they do something you're watching for, like filling out a form or making a purchase.`,
             position: 'below',
             target  : 'button.step-filter[data-group="benchmark"]',
             onBefore: ({ target }) => target.click(),
@@ -2200,9 +2200,9 @@
         }
 
         if (Funnel.steps.length > 0) {
-          // existing funnel, ask if they want the new tour
+          // existing funnel, offer the tour in a scratch funnel
           confirmationModal({
-            alert      : `<p>👋 Funnels are now <b>Flows</b> and have changed <b>a lot</b> in 4.0!</p><p>Would you like a tour of the new features?</p>`,
+            alert      : `<p>👋 New to building flows?</p><p>Would you like a quick tour of the flow editor? We'll open a blank practice flow so this one isn't changed.</p>`,
             confirmText: 'Start tour!',
             closeText  : 'No thanks',
             onConfirm  : () => {
@@ -2229,7 +2229,7 @@
 
         // this is a scratch funnel, lets ask if they want to tour
         confirmationModal({
-          alert      : `<p>👋 Flows allow you to automate the customer journey. Would you like a tour?</p>`,
+          alert      : `<p>👋 Flows let you automate your customer journey, from the first touchpoint to the sale and beyond.</p><p>Would you like a quick tour of how to build one?</p>`,
           confirmText: 'Start tour!',
           closeText  : 'No thanks',
           onConfirm  : () => {
