@@ -109,16 +109,21 @@ class Settings {
 			'label' => __( 'Policies', 'groundhogg' ),
 		] );
 
+		// these are output as links in emails, forms and the preferences center, so only urls are kept
 		$this->add_setting( 'privacy_policy', [
-			'group'       => 'policies',
-			'type'        => 'string',
-			'description' => __( 'Link to the site\'s privacy policy, used in emails and preference/consent forms.', 'groundhogg' ),
+			'group'             => 'policies',
+			'type'              => 'string',
+			'schema'            => [ 'format' => 'uri' ],
+			'sanitize_callback' => 'esc_url_raw',
+			'description'       => __( 'Link to the site\'s privacy policy, used in emails and preference/consent forms.', 'groundhogg' ),
 		] );
 
 		$this->add_setting( 'terms', [
-			'group'       => 'policies',
-			'type'        => 'string',
-			'description' => __( 'Link to the site\'s terms & conditions, used in emails and preference/consent forms.', 'groundhogg' ),
+			'group'             => 'policies',
+			'type'              => 'string',
+			'schema'            => [ 'format' => 'uri' ],
+			'sanitize_callback' => 'esc_url_raw',
+			'description'       => __( 'Link to the site\'s terms & conditions, used in emails and preference/consent forms.', 'groundhogg' ),
 		] );
 
 		$this->add_group( 'double_optin', [
@@ -196,6 +201,24 @@ class Settings {
 			'type'        => 'boolean',
 			'default'     => false,
 			'description' => __( 'Whether the guided setup wizard has been completed.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'telemetry', [
+			'label' => __( 'Telemetry', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'opted_in_stats_collection', [
+			'group'       => 'telemetry',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Whether weekly usage stats (counts of active flows, new contacts and broadcasts, installed add-ons, and software versions) are sent to Groundhogg Inc., along with telemetry_email.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'telemetry_email', [
+			'group'             => 'telemetry',
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_email',
+			'description'       => __( 'Email address that telemetry is sent with. Falls back to the site admin email when empty.', 'groundhogg' ),
 		] );
 
 		$this->add_setting( 'is_send_time_optimization_enabled', [

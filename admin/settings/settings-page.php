@@ -821,9 +821,9 @@ class Settings_Page extends Admin_Page {
 			'gh_opted_in_stats_collection'           => [
 				'id'      => 'gh_opted_in_stats_collection',
 				'section' => 'danger_zone',
-				'label'   => _x( 'Opt-in to anonymous usage tracking.', 'settings', 'groundhogg' ),
-				/* translators: %s: the plugin/brand name */
-				'desc'    => sprintf( _x( 'Help us make %s better by providing anonymous usage information about your site.', 'settings', 'groundhogg' ), white_labeled_name() ),
+				'label'   => _x( 'Share usage data', 'settings', 'groundhogg' ),
+				/* translators: %1$s: the plugin/brand name */
+				'desc'    => sprintf( _x( 'Help us make %1$s better. Once a week, sends the number of active flows, new contacts and broadcasts, which add-ons are installed, and the versions of %1$s, WordPress and PHP, along with your email address. Never your contacts or what\'s in your emails.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable' , 'groundhogg' ),
