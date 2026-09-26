@@ -8,6 +8,10 @@ use Groundhogg\Steps\Premium\Trait_Premium_Step;
 
 class Logic_Jump extends Logic {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'next' ];
+	}
+
 	use Trait_Premium_Step;
 	public function get_name() {
 		return esc_html_x( 'Reroute', 'step_name', 'groundhogg' );

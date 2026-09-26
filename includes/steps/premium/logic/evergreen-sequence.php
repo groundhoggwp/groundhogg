@@ -9,6 +9,10 @@ use Groundhogg\Steps\Premium\Trait_Premium_Step;
 
 class Evergreen_Sequence extends Branch_Logic {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'timers' ];
+	}
+
 	use Trait_Premium_Step;
 
 	protected function settings_should_ignore_morph() {

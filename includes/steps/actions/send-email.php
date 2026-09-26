@@ -36,6 +36,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Send_Email extends Action {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'reply_in_thread' ];
+	}
+
 	const TYPE = 'send_email';
 
 	/**

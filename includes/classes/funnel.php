@@ -281,6 +281,102 @@ class Funnel extends Base_Object_With_Meta {
 	}
 
 	/**
+	 * Which steps point at which of this funnel's steps in their settings (Funnel_Step::get_step_references()),
+	 * including add to flow steps in other funnels that add contacts at one of them.
+	 * Uses the steps as get_steps() sees them, so the draft while editing.
+	 *
+	 * @return array step ID => IDs of the steps pointing at it
+	 */
+	public function get_step_references_map(): array {
+
+		$steps    = $this->get_steps();
+		$step_ids = array_map( 'absint', wp_list_pluck( $steps, 'ID' ) );
+		$map      = [];
+
+		$add = function ( Step $from ) use ( &$map, $step_ids ) {
+			foreach ( $from->get_step_element()->get_step_references( $from ) as $id ) {
+				if ( in_array( $id, $step_ids, true ) ) {
+					$map[ $id ][] = $from->get_id();
+				}
+			}
+		};
+
+		foreach ( $steps as $step ) {
+			$add( $step );
+		}
+
+		// add to flow steps elsewhere that add contacts at a step in this funnel
+		foreach ( $this->get_steps_db()->query( [ 'step_type' => 'add_to_flow', 'step_status' => [ '!=', 'archived' ] ] ) as $row ) {
+
+			$step = new Step( $row );
+			$step->merge_changes();
+
+			if ( $step->get_funnel_id() === $this->get_id() || $step->step_status === 'deleted' ) {
+				continue;
+			}
+
+			$add( $step );
+		}
+
+		return array_map( function ( $ids ) {
+			return array_values( array_unique( $ids ) );
+		}, $map );
+	}
+
+	/**
+	 * Steps can't be deleted while other steps point at them. Checks the steps about to be deleted,
+	 * including the steps in their branches, ignoring steps pointing at them that are being deleted too.
+	 *
+	 * @param int[] $step_ids the steps being deleted, with the steps in their branches
+	 *
+	 * @return true|\WP_Error an error naming the steps pointing at them
+	 */
+	public function can_delete_steps( array $step_ids ) {
+
+		$step_ids = wp_parse_id_list( $step_ids );
+		$map      = $this->get_step_references_map();
+		$blocked  = [];
+
+		foreach ( $step_ids as $step_id ) {
+
+			$referencing = array_diff( $map[ $step_id ] ?? [], $step_ids );
+
+			if ( ! empty( $referencing ) ) {
+				$blocked[ $step_id ] = array_values( $referencing );
+			}
+		}
+
+		if ( empty( $blocked ) ) {
+			return true;
+		}
+
+		$lines = [];
+
+		foreach ( $blocked as $step_id => $referencing ) {
+			$lines[] = sprintf(
+				/* translators: 1: the step being deleted, 2: the steps pointing at it */
+				__( '"%1$s" is used by %2$s.', 'groundhogg' ),
+				wp_strip_all_tags( ( new Step( $step_id ) )->get_title() ),
+				implode( ', ', array_map( function ( $id ) {
+					$step = new Step( $id );
+
+					return sprintf( '"%s"', wp_strip_all_tags( $step->get_title() ) ) . ( $step->get_funnel_id() !== $this->get_id() ? sprintf(
+						/* translators: %s: the flow the step is in */
+							__( ' in the flow "%s"', 'groundhogg' ),
+							$step->get_funnel()->get_title()
+						) : '' );
+				}, $referencing ) )
+			);
+		}
+
+		return new \WP_Error(
+			'step_referenced',
+			__( 'Steps other steps point at can\'t be deleted. Change those steps first.', 'groundhogg' ) . ' ' . implode( ' ', $lines ),
+			[ 'referenced_by' => $blocked ]
+		);
+	}
+
+	/**
 	 * How many contacts have waiting or paused events at a step
 	 *
 	 * @param Step $step

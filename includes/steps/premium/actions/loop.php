@@ -7,6 +7,10 @@ use Groundhogg\Steps\Premium\Trait_Premium_Step;
 
 class Loop extends Action {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'next' ];
+	}
+
 	use Trait_Premium_Step;
 
 	public function get_name() {

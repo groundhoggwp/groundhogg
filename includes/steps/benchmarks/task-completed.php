@@ -15,6 +15,10 @@ use function Groundhogg\orList;
 
 class Task_Completed extends Benchmark {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'tasks' ];
+	}
+
 	protected function get_complete_hooks() {
 		return [
 			'groundhogg/task/contact/completed' => 1

@@ -53,6 +53,48 @@
   const getFunnel = () => FunnelsStore.get(Funnel.id)
 
   /**
+   * The plain text title of a step in the flow
+   *
+   * @param stepId int
+   * @return string
+   */
+  const getStepTitle = stepId => document.querySelector(`#step-${ stepId } .step-title, #step-${ stepId } .title`)?.textContent.trim() ?? `#${ stepId }`
+
+  /**
+   * Steps other steps point at in their settings can't be deleted, explain which steps use them
+   *
+   * @param blocked {{stepId: int, by: {ID: int, title: string}[]}[]} the steps that can't be deleted, and the steps using them
+   */
+  const cantDeleteUsedSteps = blocked => {
+    Modal({
+      width: '500px',
+    }, ({ close }) => Div({
+      className: 'display-flex column gap-20',
+    }, [
+      Div({ className: 'gh-header modal-header' }, [
+        H3({}, __('This step is being used', 'groundhogg')),
+        Button({
+          className: 'gh-button icon secondary text',
+          onClick  : close,
+        }, Dashicon('no-alt')),
+      ]),
+      Pg({}, __('Other steps point at it in their settings, so it can\'t be deleted. Change those steps first.', 'groundhogg')),
+      ...blocked.map(({
+        stepId,
+        by,
+      }) => Pg({}, sprintf(__('%1$s is used by %2$s', 'groundhogg'), `<b>${ escHTML(getStepTitle(stepId)) }</b>`,
+        by.map(ref => `<b>${ escHTML(ref.title) }</b>`).join(', '))),
+      ),
+      Div({ className: 'display-flex flex-end' }, [
+        Button({
+          className: 'gh-button primary',
+          onClick  : close,
+        }, __('OK', 'groundhogg')),
+      ]),
+    ]))
+  }
+
+  /**
    * Ask what to do with contacts waiting at deleted steps before the changes go live
    *
    * @param pendingDeletes {{steps: Object[], targets: Object[]}} deleted steps with waiting contacts, and actions they can be moved to
@@ -1378,6 +1420,7 @@
 
           this.steps = response.data.funnel.steps
           this.pending_deletes = response.data.pending_deletes
+          this.step_references = response.data.step_references
 
           if (!restore) {
             this.addCurrentStepsToUndoRedoHistory()
@@ -1632,6 +1675,19 @@
         let sortable = getSortableEl(step)
         let $sortable = $(sortable)
 
+        // the steps in its branches are deleted with it, steps pointing at those are fine if they're deleted too
+        const deleting = [...new Set([id, ...$sortable.find('.step[data-id]').map((i, el) => el.dataset.id).get()].map(Number))]
+
+        const blocked = deleting.map(stepId => ( {
+          stepId,
+          by: ( this.step_references?.[stepId] ?? [] ).filter(ref => !deleting.includes(Number(ref.ID))),
+        } )).filter(({ by }) => by.length)
+
+        if (blocked.length) {
+          cantDeleteUsedSteps(blocked)
+          return
+        }
+
         const deleteStep = () => {
           if (this.isEditing(id)) {
             this.startEditing(null)
@@ -1645,6 +1701,14 @@
               moreData: formData => {
                 formData.append('_delete_step', id)
               },
+            }).then(response => {
+              // steps changed since the page loaded and it's used now, the step is put back
+              if (response?.data?.err) {
+                dialog({
+                  message: response.data.err,
+                  type   : 'error',
+                })
+              }
             })
           })
         }

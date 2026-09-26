@@ -289,6 +289,23 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 	}
 
+	/**
+	 * The IDs of the steps in this step's branches, and in their branches, which are deleted along with it
+	 *
+	 * @return int[]
+	 */
+	public function get_descendant_ids() {
+
+		$ids = [];
+
+		foreach ( $this->get_sub_steps() as $sub_step ) {
+			$ids[] = $sub_step->get_id();
+			array_push( $ids, ...$sub_step->get_descendant_ids() );
+		}
+
+		return $ids;
+	}
+
 	public function set_slug() {
 
 		$title_no_html = sanitize_text_field( $this->get_step_title() );
