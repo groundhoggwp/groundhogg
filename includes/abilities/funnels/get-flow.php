@@ -45,6 +45,13 @@ class Get_Flow extends Ability {
 	const BENCHMARK_BRANCH = 'then';
 
 	/**
+	 * Which steps point at which while a flow is described, see Funnel::get_step_references_map()
+	 *
+	 * @var array
+	 */
+	protected static $references = [];
+
+	/**
 	 * The JSON Schema for a step node in the tree. Branches refer to it as `#/definitions/step_node`,
 	 * see flow_schema().
 	 *
@@ -102,6 +109,11 @@ class Get_Flow extends Ability {
 				'waiting_contacts' => [
 					'type'        => 'integer',
 					'description' => __( 'Contacts currently waiting at this step, or paused at it while the flow is inactive.', 'groundhogg' ),
+				],
+				'referenced_by' => [
+					'type'        => 'array',
+					'items'       => [ 'type' => 'integer' ],
+					'description' => __( 'IDs of the steps that point at this one in their settings (a jump, a reply in thread, a task to complete, add to flow from another flow...). It can\'t be deleted until they\'re changed or deleted too.', 'groundhogg' ),
 				],
 				'branches' => [
 					'type'                 => 'object',
@@ -248,6 +260,8 @@ class Get_Flow extends Ability {
 
 		$steps = $funnel->get_steps();
 
+		self::$references = $funnel->get_step_references_map();
+
 		// the draft of an active flow can differ from what's live
 		$has_drafts = $view === 'draft' && $funnel->is_active();
 
@@ -372,6 +386,7 @@ class Get_Flow extends Ability {
 			'buildable'        => $settings !== null,
 			'is_locked'        => $step->is_locked(),
 			'waiting_contacts' => $step->get_funnel()->count_pending_events( $step ),
+			'referenced_by'    => self::$references[ $step->get_id() ] ?? [],
 		];
 
 		if ( $settings !== null ) {

@@ -247,6 +247,7 @@ class Funnels_Page extends Admin_Page {
 					'scratchFunnelURL'    => action_url( 'start_from_scratch' ),
 					'is_editor'           => true,
 					'pending_deletes'     => $this->get_pending_deletes( $funnel ),
+					'step_references'     => $this->get_step_references( $funnel ),
 				] );
 
 				wp_add_inline_script( 'groundhogg-admin-funnel-editor', "var Funnel = " . wp_json_encode( $data ), 'before' );
@@ -694,6 +695,7 @@ class Funnels_Page extends Admin_Page {
 			'settings'        => $funnel->step_settings( false ),
 			'funnel'          => $funnel,
 			'pending_deletes' => $this->get_pending_deletes( $funnel ),
+			'step_references' => $this->get_step_references( $funnel ),
 		];
 
 		if ( is_wp_error( $result ) ) {
@@ -751,6 +753,37 @@ class Funnels_Page extends Admin_Page {
 				];
 			}, $targets ),
 		];
+	}
+
+	/**
+	 * Which steps point at which, so the editor can stop steps that are used from being deleted
+	 *
+	 * @param Funnel $funnel
+	 *
+	 * @return array step ID => [ [ 'ID' => int, 'title' => string ], ... ] the steps pointing at it
+	 */
+	protected function get_step_references( Funnel $funnel ) {
+
+		$map = $funnel->while_editing( function () use ( $funnel ) {
+			return $funnel->get_step_references_map();
+		} );
+
+		return array_map( function ( $ids ) use ( $funnel ) {
+			return array_map( function ( $id ) use ( $funnel ) {
+				$step  = new Step( $id );
+				$title = wp_strip_all_tags( $step->get_title() );
+
+				if ( $step->get_funnel_id() !== $funnel->get_id() ) {
+					/* translators: 1: the step, 2: the flow it's in */
+					$title = sprintf( __( '%1$s (in %2$s)', 'groundhogg' ), $title, $step->get_funnel()->get_title() );
+				}
+
+				return [
+					'ID'    => $id,
+					'title' => $title,
+				];
+			}, $ids );
+		}, $map );
 	}
 
 	/**
@@ -815,6 +848,16 @@ class Funnels_Page extends Admin_Page {
 
 			if ( ! $step->exists() ) {
 				wp_send_json_error();
+			}
+
+			// the steps in its branches are deleted too
+			$can_delete = $funnel->while_editing( function () use ( $funnel, $step ) {
+				return $funnel->can_delete_steps( array_merge( [ $step->get_id() ], $step->get_descendant_ids() ) );
+			} );
+
+			// the editor checks first, but other steps may have changed since, nothing else is saved so the step comes back
+			if ( is_wp_error( $can_delete ) ) {
+				return $can_delete;
 			}
 
 			// soft delete, it can still be undone, and contacts waiting at it are handled on Update or Activate

@@ -147,7 +147,7 @@ class Edit_Flow extends Ability {
 								'op'            => [
 									'type'        => 'string',
 									'enum'        => [ 'add', 'update', 'move', 'delete' ],
-									'description' => __( '"add" needs `at` and `steps`. "update" needs `step` and any of `title`, `settings`, and the benchmark flags. "move" needs `step` and `at`, a step moves with everything in its branches. "delete" needs `step`, and also deletes everything in its branches.', 'groundhogg' ),
+									'description' => __( '"add" needs `at` and `steps`. "update" needs `step` and any of `title`, `settings`, and the benchmark flags. "move" needs `step` and `at`, a step moves with everything in its branches. "delete" needs `step`, and also deletes everything in its branches. A step other steps point at in their settings (referenced_by in groundhogg/get-flow) can\'t be deleted until those steps are changed or deleted too.', 'groundhogg' ),
 								],
 								'step'          => $ref_schema,
 								'at'            => $position_schema,
@@ -163,7 +163,7 @@ class Edit_Flow extends Ability {
 								'settings'      => [
 									'type'                 => 'object',
 									'additionalProperties' => true,
-									'description'          => __( 'For "update": only the settings to change, the rest are kept. Same shape as groundhogg/list-step-types describes. For if_else, include_condition replaces the include_filters groundhogg/get-flow returned, and exclude_condition the exclude_filters.', 'groundhogg' ),
+									'description'          => __( 'For "update": only the settings to change, the rest are kept. Same shape as groundhogg/list-step-types describes. For if_else, include_condition replaces the include_filters groundhogg/get-flow returned, and exclude_condition the exclude_filters. A `branches` map (split_path, weighted_distribution) is merged branch by branch: give only the branches to change, the same condition/filters rule applies inside each, and null removes a branch (only if it has no steps).', 'groundhogg' ),
 								],
 								'is_entry'      => [
 									'type' => 'boolean',
@@ -435,15 +435,21 @@ class Edit_Flow extends Ability {
 				return new WP_Error( 'groundhogg_step_not_editable', sprintf( __( 'The settings of "%s" steps can\'t be changed here, use the flow editor.', 'groundhogg' ), $type ) );
 			}
 
-			// a condition replaces the stored filters for that side
-			foreach ( [ 'include', 'exclude' ] as $which ) {
-				if ( isset( $input[ "{$which}_condition" ] ) ) {
-					unset( $current[ "{$which}_filters" ] );
-				}
+			$merged = $this->merge_settings( $current, $input );
+
+			// a branch that goes away can't take its steps with it
+			$removed = $this->get_removed_branches_with_steps( $step, $merged );
+
+			if ( ! empty( $removed ) ) {
+				return new WP_Error(
+					'groundhogg_branch_has_steps',
+					/* translators: %s: the branch keys */
+					sprintf( __( 'These branches still have steps, move or delete them first: %s.', 'groundhogg' ), implode( ', ', $removed ) )
+				);
 			}
 
 			// resolve the whole settings, so settings that are resolved together (web_form's form) keep what isn't changed
-			$resolved = Step_Type_Schema::resolve_settings( $type, array_merge( $current, $input ), $this->builder->get_declared() );
+			$resolved = Step_Type_Schema::resolve_settings( $type, $merged, $this->builder->get_declared() );
 
 			if ( is_wp_error( $resolved ) ) {
 				return $resolved;
@@ -492,6 +498,88 @@ class Edit_Flow extends Ability {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Merge the settings to change into a step's current settings.
+	 * A `branches` map (split_path, weighted_distribution) is merged branch by branch, so only the branches given
+	 * change, and null removes a branch. A condition replaces the stored filters for its side, for if_else and
+	 * for each branch.
+	 *
+	 * @param array $current from Step_Type_Schema::export_settings()
+	 * @param array $input   the settings to change
+	 *
+	 * @return array
+	 */
+	protected function merge_settings( array $current, array $input ): array {
+
+		foreach ( [ 'include', 'exclude' ] as $which ) {
+			if ( isset( $input[ "{$which}_condition" ] ) ) {
+				unset( $current[ "{$which}_filters" ] );
+			}
+		}
+
+		if ( isset( $input['branches'] ) && is_array( $input['branches'] ) && is_array( $current['branches'] ?? null ) ) {
+
+			$branches = $current['branches'];
+
+			foreach ( $input['branches'] as $key => $branch ) {
+
+				if ( $branch === null ) {
+					unset( $branches[ $key ] );
+					continue;
+				}
+
+				$branches[ $key ] = is_array( $branch ) && is_array( $branches[ $key ] ?? null )
+					? $this->merge_settings( $branches[ $key ], $branch )
+					: $branch;
+			}
+
+			$input['branches'] = $branches;
+		}
+
+		return array_merge( $current, $input );
+	}
+
+	/**
+	 * Branches of a step that would go away with new settings, but still have steps
+	 *
+	 * @param Step  $step
+	 * @param array $settings the new settings
+	 *
+	 * @return string[] the branch keys
+	 */
+	protected function get_removed_branches_with_steps( Step $step, array $settings ): array {
+
+		if ( ! $step->is_branch_logic() ) {
+			return [];
+		}
+
+		$keys = Step_Type_Schema::branch_keys( $step->get_type(), $settings );
+
+		// branches of types that aren't described can't be checked
+		if ( empty( $keys ) ) {
+			return [];
+		}
+
+		$removed = [];
+
+		foreach ( $this->branches as $branch => $ids ) {
+
+			$branch = (string) $branch;
+
+			if ( empty( $ids ) || ! str_starts_with( $branch, "$step->ID-" ) ) {
+				continue;
+			}
+
+			$key = substr( $branch, strlen( "$step->ID-" ) );
+
+			if ( ! in_array( $key, $keys, true ) ) {
+				$removed[] = $key;
+			}
+		}
+
+		return $removed;
 	}
 
 	/**
@@ -553,6 +641,13 @@ class Edit_Flow extends Ability {
 			if ( $id !== $step->get_id() && ( new Step( $id ) )->is_locked() ) {
 				return new WP_Error( 'groundhogg_step_locked', __( 'A step in its branches is locked.', 'groundhogg' ) );
 			}
+		}
+
+		// steps other steps point at can't be deleted, see referenced_by in groundhogg/get-flow
+		$can_delete = $this->funnel->can_delete_steps( $ids );
+
+		if ( is_wp_error( $can_delete ) ) {
+			return $can_delete;
 		}
 
 		// the step types' own delete handlers cascade through the stored branches, so they must be up to date

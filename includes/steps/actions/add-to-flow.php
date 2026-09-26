@@ -29,6 +29,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Add_To_Flow extends Action {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'step_id' ];
+	}
+
 	/**
 	 * @return string
 	 */

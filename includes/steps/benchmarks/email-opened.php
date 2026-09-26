@@ -16,6 +16,10 @@ use function Groundhogg\orList;
 
 class Email_Opened extends Benchmark {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'email_steps' ];
+	}
+
 	public function is_legacy() {
 		return true;
 	}

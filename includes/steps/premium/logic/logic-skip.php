@@ -9,6 +9,10 @@ use Groundhogg\Steps\Trait_Legacy;
 
 class Logic_Skip extends Logic {
 
+	protected function get_step_reference_settings(): array {
+		return [ 'next' ];
+	}
+
 	use Trait_Premium_Step;
 	use Trait_Legacy;
 

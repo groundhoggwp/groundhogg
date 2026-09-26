@@ -489,6 +489,34 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
+	 * The settings that hold the IDs of other steps, like a step to jump to or reply in the thread of.
+	 * Steps they point at can't be deleted while they do, see Step::get_referencing_steps().
+	 *
+	 * @return string[] setting names
+	 */
+	protected function get_step_reference_settings(): array {
+		return [];
+	}
+
+	/**
+	 * The IDs of the other steps a step's settings point at
+	 *
+	 * @param Step $step
+	 *
+	 * @return int[]
+	 */
+	public function get_step_references( Step $step ): array {
+
+		$ids = [];
+
+		foreach ( $this->get_step_reference_settings() as $setting ) {
+			array_push( $ids, ...wp_parse_id_list( $step->get_meta( $setting ) ) );
+		}
+
+		return array_values( array_unique( array_diff( $ids, [ $step->get_id() ] ) ) );
+	}
+
+	/**
 	 * @return string
 	 */
 	public function get_help_article() {
