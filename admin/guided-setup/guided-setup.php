@@ -572,10 +572,10 @@ class Guided_Setup extends Admin_Page {
 				'dashboard'  => admin_page_url( 'groundhogg' ),
 				'import'     => current_user_can( 'import_contacts' ) ? admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] ) : false,
 				'flow'       => current_user_can( 'add_funnels' ) ? admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ) : false,
-				'broadcast'  => current_user_can( 'schedule_broadcasts' ) ? admin_page_url( 'gh_broadcasts', [ 'action' => 'add' ] ) : false,
 				'settings'   => admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
 				'pricing'    => 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=link&utm_campaign=guided_setup&utm_content=license',
 				'licenses'   => 'https://groundhogg.io/account/licenses/',
+				'ai'         => 'https://groundhogg.io/doc/working-with-the-abilities-api-mcp/?utm_source=plugin&utm_medium=link&utm_campaign=guided_setup&utm_content=ai',
 			],
 		];
 

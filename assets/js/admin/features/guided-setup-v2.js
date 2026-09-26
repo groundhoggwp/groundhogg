@@ -995,12 +995,16 @@
         description: __('Welcome new subscribers with emails that send automatically.', 'groundhogg'),
         action     : LinkButton(links.flow, __('Create a flow', 'groundhogg')),
       }) : null,
-      links.broadcast ? Card({
-        icon       : 'email-alt',
-        title      : __('Send a broadcast', 'groundhogg'),
-        description: __('Email your list an announcement or a newsletter.', 'groundhogg'),
-        action     : LinkButton(links.broadcast, __('Send a broadcast', 'groundhogg')),
-      }) : null,
+      Card({
+        icon       : 'lightbulb',
+        title      : __('Get started with AI', 'groundhogg'),
+        description: __('Connect Claude or another AI assistant, and have it build flows, write emails and find contacts for you.', 'groundhogg'),
+        action     : An({
+          href     : links.ai,
+          target   : '_blank',
+          className: 'gh-button secondary',
+        }, __('Connect an AI assistant', 'groundhogg')),
+      }),
       Setup.team ? Card({
         icon       : 'groups',
         title      : __('Invite your team', 'groundhogg'),
