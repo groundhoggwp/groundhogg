@@ -271,7 +271,7 @@ class Funnels_Page extends Admin_Page {
 
 				use_edit_lock( $funnel );
 
-				do_action( 'groundhogg/admin/funnels/editor_scripts' );
+				do_action( 'groundhogg/admin/funnels/editor_scripts', $funnel );
 
 				break;
 			case 'add':
@@ -696,6 +696,10 @@ class Funnels_Page extends Admin_Page {
 			'funnel'          => $funnel,
 			'pending_deletes' => $this->get_pending_deletes( $funnel ),
 			'step_references' => $this->get_step_references( $funnel ),
+			// whether there's anything to publish, for the Publish Changes button
+			'has_changes'     => $funnel->while_editing( function () use ( $funnel ) {
+				return $funnel->has_changes();
+			} ),
 		];
 
 		if ( is_wp_error( $result ) ) {

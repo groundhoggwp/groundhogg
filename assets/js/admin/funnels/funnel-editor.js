@@ -1385,10 +1385,24 @@
           $('body').addClass('auto-saving')
         }
 
-        // Update the JS meta changes first
-        if (Object.keys(this.metaUpdates).length) {
-          formData.append('metaUpdates', JSON.stringify(this.metaUpdates))
-          this.metaUpdates = {} // clear the meta updates only after update was confirmed...
+        // Update the JS meta changes first, restoring a previous state doesn't save them
+        const sentMetaUpdates = restore ? {} : this.metaUpdates
+
+        if (Object.keys(sentMetaUpdates).length) {
+          formData.append('metaUpdates', JSON.stringify(sentMetaUpdates))
+        }
+
+        // edits made while this saves are sent next time
+        this.metaUpdates = {}
+
+        // the save failed or was refused, so send the meta updates again next time, newer edits win
+        const keepMetaUpdates = () => {
+          Object.entries(sentMetaUpdates).forEach(([stepId, meta]) => {
+            this.metaUpdates[stepId] = {
+              ...meta,
+              ...( this.metaUpdates[stepId] ?? {} ),
+            }
+          })
         }
 
         // add additional data to the formData if required
@@ -1421,6 +1435,10 @@
           this.steps = response.data.funnel.steps
           this.pending_deletes = response.data.pending_deletes
           this.step_references = response.data.step_references
+
+          if (response.data.err) {
+            keepMetaUpdates()
+          }
 
           if (!restore) {
             this.addCurrentStepsToUndoRedoHistory()
@@ -1485,14 +1503,14 @@
               this.stepSettingsCallbacks()
             }
 
-            // re-enable publish button
-            document.getElementById('funnel-update').disabled = false
+            // publish button is enabled when there's something to publish
+            document.getElementById('funnel-update').disabled = !response.data.has_changes
 
             return response
           }
 
-          // disable publish button, changes are published
-          document.getElementById('funnel-update').disabled = true
+          // disabled once the changes are published
+          document.getElementById('funnel-update').disabled = !response.data.has_changes
 
           $(document).trigger('saved')
 
@@ -1512,6 +1530,13 @@
             message: __('Flow saved!', 'groundhogg'),
           })
         }).catch(err => {
+
+          // otherwise quiet saves wait for this one forever
+          this.saving = false
+          $('body').removeClass('saving auto-saving')
+
+          keepMetaUpdates()
+
           dialog({
             message: __('Something went wrong updating the flow. Your changes could not be saved.', 'groundhogg'),
             type   : 'error',
@@ -3437,7 +3462,7 @@
 
     // Jump
     try {
-      document.querySelectorAll('.step-branch .step.logic_jump:not(.broken)').forEach(step => {
+      document.querySelectorAll('.step-branch .step.logic_jump:not(.loop_broken)').forEach(step => {
 
         // the step-branch.benchmarks container
         let stepId = step.dataset.id

@@ -4,6 +4,7 @@ namespace Groundhogg\Abilities\Funnels;
 
 use Groundhogg\Abilities\Schemas\Step_Type_Schema;
 use Groundhogg\Funnel;
+use Groundhogg\Plugin;
 use Groundhogg\Step;
 use WP_Error;
 
@@ -186,6 +187,30 @@ class Step_Tree_Builder {
 	}
 
 	/**
+	 * The `initial` values in a step type's settings schema, which the flow editor gives new steps
+	 *
+	 * @param string $type
+	 *
+	 * @return array setting => value
+	 */
+	public static function get_initial_settings( string $type ): array {
+
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $type ) ) {
+			return [];
+		}
+
+		$initial = [];
+
+		foreach ( Plugin::instance()->step_manager->get_element( $type )->get_settings_schema() as $setting => $schema ) {
+			if ( isset( $schema['initial'] ) ) {
+				$initial[ $setting ] = $schema['initial'];
+			}
+		}
+
+		return $initial;
+	}
+
+	/**
 	 * Write the settings that had to wait for the final step order.
 	 * Call after Funnel::set_step_levels().
 	 *
@@ -282,7 +307,8 @@ class Step_Tree_Builder {
 				'step_group'  => $info['group'],
 				'step_status' => 'inactive', // like steps added in the flow editor, activating or committing the funnel makes them active
 				'branch'      => $branch,
-				'meta'        => $resolved['settings'],
+				// start from the schema's initial values, like steps added in the flow editor
+				'meta'        => array_merge( self::get_initial_settings( $type ), $resolved['settings'] ),
 			] );
 
 			if ( ! $step ) {

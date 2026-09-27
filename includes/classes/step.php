@@ -1255,7 +1255,8 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function check_trigger_frequency( Contact $contact ) {
 
-		$rule = $this->get_meta( '_frequency_rule' );
+		// set by the trigger frequency settings in the flow editor
+		$rule = $this->get_meta( '_trigger_frequency' );
 
 		$query = new Table_Query( 'events' );
 		$query->where()
@@ -1281,10 +1282,10 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 				$x_days  = absint( $this->get_meta( '_trigger_frequency_x_days' ) );
 
 				if ( $range === 'x_days' ) {
-					Filters::timestamp( 'timestamp', [
+					Filters::timestamp( 'time', [
 						'date_range' => 'x_days',
 						'days'       => $x_days
-					], $query->where );
+					], $query->where() );
 				}
 
 				// no need to get more events than the limit, if there are more, we're for sure over
@@ -1381,6 +1382,11 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 		// logic steps can't be enqueued, only their children or what they point to can be enqueued...
 		if ( $step->is_logic() ) {
 			$step = $step->get_next_action( $contact );
+
+			// nothing to do after it, like an empty branch at the end of the flow
+			if ( ! is_a( $step, Step::class ) ) {
+				return false;
+			}
 		}
 
 		$step = self::_maybe_filter_step_before_enqueuing( $step, $contact, $args );
@@ -2163,12 +2169,39 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
-	 * If the steps are currently being imported...
+	 * How many imports are running, see start_importing()
 	 *
-	 * @return int|null
+	 * @var int
+	 */
+	protected static $importing = 0;
+
+	/**
+	 * Steps are being imported, so their settings use the schema's import sanitizers.
+	 * Every call must be paired with stop_importing().
+	 *
+	 * @return void
+	 */
+	public static function start_importing() {
+		self::$importing ++;
+	}
+
+	/**
+	 * Undo start_importing()
+	 *
+	 * @return void
+	 */
+	public static function stop_importing() {
+		self::$importing = max( 0, self::$importing - 1 );
+	}
+
+	/**
+	 * If the steps are currently being imported...
+	 * Only while Funnel::import() creates the steps, not for the rest of the request.
+	 *
+	 * @return bool
 	 */
 	public static function is_importing() {
-		return did_action( 'groundhogg/funnel/import/before' );
+		return self::$importing > 0;
 	}
 
 	/**

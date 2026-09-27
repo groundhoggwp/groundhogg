@@ -783,14 +783,14 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		$this->before_step_warnings() ?>
         <div class="step-warnings">
 			<?php foreach ( $step->get_errors() as $error ): ?>
-                <div id="<?php $error->get_error_code() ?>"
+                <div data-error-code="<?php echo esc_attr( $error->get_error_code() ) ?>"
                      class="notice notice-warning is-dismissible">
 	                <?php echo wp_kses_post( wpautop( $error->get_error_message() ) ); ?>
                 </div>
 			<?php endforeach; ?>
 			<?php foreach ( $this->get_errors() as $error ): ?>
 
-                <div id="<?php $error->get_error_code() ?>"
+                <div data-error-code="<?php echo esc_attr( $error->get_error_code() ) ?>"
                      class="notice notice-warning is-dismissible">
 	                <?php echo wp_kses_post( wpautop( $error->get_error_message() ) ); ?>
                 </div>
