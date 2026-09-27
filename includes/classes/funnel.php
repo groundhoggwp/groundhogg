@@ -590,12 +590,16 @@ class Funnel extends Base_Object_With_Meta {
 
 	/**
 	 * Merge step changes into the real data and meta
+	 *
+	 * @param array $deleted_step_choices see resolve_deleted_step_events()
+	 *
+	 * @return bool false if the funnel isn't active, so there was nothing to commit
 	 */
 	public function commit( array $deleted_step_choices = [] ) {
 
 		// can't commit if not active...
 		if ( ! $this->is_active() ) {
-			return;
+			return false;
 		}
 
 		// before deleted steps are removed, which also removes their events
@@ -609,6 +613,8 @@ class Funnel extends Base_Object_With_Meta {
 		}
 
 		$this->update_step_status();
+
+		return true;
 	}
 
 	/**
@@ -1168,7 +1174,7 @@ class Funnel extends Base_Object_With_Meta {
 	public function has_changes() {
 		return array_any( $this->get_steps(), function ( Step $step ) {
 			return $step->has_changes() || in_array( $step->step_status, [ 'inactive', 'deleted' ] );
-		} );
+		} ) || ! empty( $this->get_deleted_steps() ); // while editing get_steps() leaves out deleted steps
 	}
 
 	protected function sanitize_meta( $key, $value ) {
@@ -1244,38 +1250,47 @@ class Funnel extends Base_Object_With_Meta {
 		 */
 		$steps = [];
 
-		foreach ( $this->steps as $i => $_step ) {
+		// settings use their import sanitizers while the steps are imported
+		Step::start_importing();
 
-			$_step = (object) $_step;
+		try {
 
-			$data                = (array) $_step->data;
-			$data['funnel_id']   = $this->get_id();
-			$data['step_status'] = 'inactive'; // force status to inactive
+			foreach ( $this->steps as $i => $_step ) {
 
-			$step = new Step();
-			$step->create( $data );
+				$_step = (object) $_step;
 
-			$metadata   = json_decode( json_encode( $_step->meta ), true );
-			$importdata = json_decode( json_encode( $_step->export ), true );
+				$step_data                = (array) $_step->data;
+				$step_data['funnel_id']   = $this->get_id();
+				$step_data['step_status'] = 'inactive'; // force status to inactive
 
-			$step->update_meta( $metadata );
-			$step->import( $importdata );
+				$step = new Step();
+				$step->create( $step_data );
 
-			// Save the original ID from the donor funnel
-			$step->update_meta( 'imported_step_id', $_step->ID );
+				$metadata   = json_decode( json_encode( $_step->meta ), true );
+				$importdata = json_decode( json_encode( $_step->export ), true );
 
-			$steps[ $i ] = $step;
+				$step->update_meta( $metadata );
+				$step->import( $importdata );
+
+				// Save the original ID from the donor funnel
+				$step->update_meta( 'imported_step_id', $_step->ID );
+
+				$steps[ $i ] = $step;
+			}
+
+			// Re-run through the steps and perform cleanup actions...
+			foreach ( $steps as $step ) {
+				$step->post_import();
+			}
+
+		} finally {
+			Step::stop_importing();
 		}
 
-		// Re-run through the steps and perform cleanup actions...
+		// don't need imported_step_id forever, just get rid of it, only for these steps in case another import is running
 		foreach ( $steps as $step ) {
-			$step->post_import();
+			$step->delete_meta( 'imported_step_id' );
 		}
-
-		// don't need imported_step_id forever, just get rid of it
-		get_db( 'stepmeta' )->delete( [
-			'meta_key' => 'imported_step_id'
-		] );
 
 		do_action( 'groundhogg/funnel/import/after', $this, $data );
 

@@ -162,7 +162,7 @@ class Flow_Changes {
 		}
 
 		return $funnel->while_editing( function () use ( $funnel ) {
-			return $funnel->has_changes() || ! empty( $funnel->get_deleted_steps() );
+			return $funnel->has_changes();
 		} );
 	}
 

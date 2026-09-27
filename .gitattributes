@@ -6,6 +6,7 @@
 /vendor export-ignore
 /bin export-ignore
 /tests export-ignore
+/docs export-ignore
 
 # Files
 /.babelrc export-ignore
