@@ -1274,6 +1274,25 @@
 
         clearTimeout(pending.timer)
         pending.timer = setTimeout(() => this.flushSettings(step.ID), 400)
+
+        // the title the step type's JS gives the settings in its panel, until the server's are back
+        if (this.stepTypes[step.data.step_type]?.title) {
+
+          const panel = document.getElementById(`settings-${ step.ID }`)
+
+          if (panel) {
+            const form = FlowStore.formToSettings($(panel).find(':input').serializeArray(), step.ID)
+            ;['step_title', 'is_entry', 'is_conversion', 'can_passthru'].forEach(key => delete form[key])
+            step.meta = {
+              ...step.meta,
+              ...form,
+              ...meta,
+            }
+          }
+
+          this.drawCanvas()
+          drawLogicLines()
+        }
       },
 
       /**
@@ -2665,13 +2684,8 @@
           ..._meta,
         }
 
+        // which shows the title the step type's JS gives it, see previewOf()
         this.saveSettings(step.ID, { meta: _meta })
-
-        // the title the step type's JS gives it, see previewOf()
-        if (this.stepTypes[step.data.step_type]?.title) {
-          this.drawCanvas()
-          drawLogicLines()
-        }
 
         return step
       },

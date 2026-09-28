@@ -73,25 +73,74 @@ class Step_Titles_Tests extends GH_UnitTestCase {
 		$cases[] = [ 'type' => 'add_to_flow', 'meta' => [] ];
 		$cases[] = [ 'type' => 'add_to_flow', 'meta' => [ 'funnel_id' => $flow->get_id() ] ];
 
+		$cases[] = [ 'type' => 'create_task', 'meta' => [] ];
+		$cases[] = [ 'type' => 'create_task', 'meta' => [ 'summary' => 'Call them' ] ];
+
+		$cases[] = [ 'type' => 'admin_notification', 'meta' => [ 'send_to' => [ '{email}' ] ] ];
+		$cases[] = [ 'type' => 'admin_notification', 'meta' => [ 'send_to' => [ '{owner_email}', 'sales@example.com' ] ] ];
+		$cases[] = [ 'type' => 'admin_notification', 'meta' => [ 'send_to' => '{email}, {owner_email}, a@example.com' ] ];
+
+		$cases[] = [ 'type' => 'web_form', 'meta' => [ 'form_name' => 'Contact us' ] ];
+
+		$cases[] = [ 'type' => 'email_confirmed', 'meta' => [] ];
+
+		$funnel = new Funnel( [ 'title' => 'titles', 'status' => 'inactive' ] );
+
+		// tasks completed are tasks earlier in the same flow
+		$task = function ( $summary ) use ( $funnel ) {
+			return $funnel->add_step( [
+				'step_type'  => 'create_task',
+				'step_group' => Step::ACTION,
+				'meta'       => $summary ? [ 'summary' => $summary ] : [],
+			] );
+		};
+
+		$tasks = [ $task( 'Call them' ), $task( 'Send the quote' ), $task( '' ) ];
+
 		$names = [
 			'tag'    => [],
 			'email'  => [ $email->get_id() => $email->get_title() ],
 			'funnel' => [ $flow->get_id() => $flow->get_title() ],
+			'task'   => [],
 		];
+
+		foreach ( $tasks as $task_step ) {
+			$names['task'][ $task_step->get_id() ] = (string) $task_step->get_meta( 'summary' );
+		}
+
+		foreach ( [ [ 0 ], [ 0, 1 ], [ 0, 1, 2 ] ] as $picked ) {
+			foreach ( [ 'any', 'all' ] as $condition ) {
+				$cases[] = [
+					'type' => 'task_completed',
+					'meta' => [
+						'tasks'     => array_map( function ( $i ) use ( $tasks ) {
+							return $tasks[ $i ]->get_id();
+						}, $picked ),
+						'condition' => $condition,
+					],
+				];
+			}
+		}
+
+		$cases[] = [ 'type' => 'task_completed', 'meta' => [ 'tasks' => [] ] ];
 
 		foreach ( $tags as $id ) {
 			$names['tag'][ $id ] = get_db( 'tags' )->get( $id )->tag_name;
 		}
-
-		$funnel = new Funnel( [ 'title' => 'titles', 'status' => 'inactive' ] );
 
 		foreach ( $cases as &$case ) {
 
 			$step = $funnel->add_step( [
 				'step_type'  => $case['type'],
 				'step_group' => Step::ACTION,
-				'meta'       => $case['meta'],
 			] );
+
+			// as stored, saving some settings checks them against the step order
+			foreach ( $case['meta'] as $key => $value ) {
+				get_db( 'stepmeta' )->update_meta( $step->get_id(), $key, $value );
+			}
+
+			$step = new Step( $step->get_id() );
 
 			$element = $step->get_step_element();
 			$element->set_current_step( $step );

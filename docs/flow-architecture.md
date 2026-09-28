@@ -904,8 +904,12 @@ Everything is optional, and what a type leaves out comes from the server:
 
 Ported so far (`funnel-steps.js`): `delay_timer` (settings; its title is `delay_preview`, which its JS writes, so
 the JS is the source), `apply_tag`, `remove_tag`, `tag_applied`, `tag_removed` (settings, title), `if_else`
-(settings, title, branches), `add_to_flow` (settings, title), `send_email` (title only, its panel is still drawn by
-`onActive`). Their titles are in `step-titles.js` (`Groundhogg.StepTitles`, DOM-free), which match
+(settings, title, branches), `add_to_flow` (settings, title), and titles only for `send_email` (its panel is still
+drawn by `onActive`), `create_task`, `admin_notification`, `web_form` (TinyMCE and the FormBuilder need the
+`step-active` event), `email_confirmed` and `task_completed` (from the task steps in the store). For types with a
+JS title, `saveSettings()` copies the panel's pending fields into the step's settings so the title can use them.
+Left to the server: `account_created` (role names), `optin_status_changed` (preference names), and the types
+without a generated title. Their titles are in `step-titles.js` (`Groundhogg.StepTitles`, DOM-free), which match
 `generate_step_title()`: `tests/js/step-titles.test.js` checks them against cases PHPUnit's `Step_Titles_Tests`
 writes to `tests/js/fixtures/titles.json`. Titles that need a name that isn't loaded (a tag, an email, a flow) are
 undefined.

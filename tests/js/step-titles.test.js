@@ -17,6 +17,7 @@ const names = {
   tag   : lookup(fixture.names.tag),
   email : lookup(fixture.names.email),
   funnel: lookup(fixture.names.funnel),
+  task  : lookup(fixture.names.task),
 }
 
 fixture.cases.forEach(({

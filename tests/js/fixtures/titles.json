@@ -1,17 +1,22 @@
 {
     "names": {
         "tag": {
-            "164": "Customer",
-            "165": "Lead",
-            "166": "Tom & Jerry",
-            "167": "VIP",
-            "168": "Newsletter"
+            "205": "Customer",
+            "206": "Lead",
+            "207": "Tom & Jerry",
+            "208": "VIP",
+            "209": "Newsletter"
         },
         "email": {
-            "73": "Welcome &"
+            "87": "Welcome &"
         },
         "funnel": {
             "2": "Onboarding & more"
+        },
+        "task": {
+            "231": "Call them",
+            "232": "Send the quote",
+            "233": ""
         }
     },
     "cases": [
@@ -26,7 +31,7 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    164
+                    205
                 ]
             },
             "title": "Apply <b>Customer</b>"
@@ -35,8 +40,8 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    164,
-                    165
+                    205,
+                    206
                 ]
             },
             "title": "Apply <b>Customer</b> and <b>Lead</b>"
@@ -45,9 +50,9 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166
+                    205,
+                    206,
+                    207
                 ]
             },
             "title": "Apply <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
@@ -56,11 +61,11 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166,
-                    167,
-                    168
+                    205,
+                    206,
+                    207,
+                    208,
+                    209
                 ]
             },
             "title": "Apply <b>5</b> tags"
@@ -76,7 +81,7 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    164
+                    205
                 ]
             },
             "title": "Remove <b>Customer</b>"
@@ -85,8 +90,8 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    164,
-                    165
+                    205,
+                    206
                 ]
             },
             "title": "Remove <b>Customer</b> and <b>Lead</b>"
@@ -95,9 +100,9 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166
+                    205,
+                    206,
+                    207
                 ]
             },
             "title": "Remove <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
@@ -106,11 +111,11 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166,
-                    167,
-                    168
+                    205,
+                    206,
+                    207,
+                    208,
+                    209
                 ]
             },
             "title": "Remove <b>5</b> tags"
@@ -135,7 +140,7 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164
+                    205
                 ],
                 "condition": "any"
             },
@@ -145,7 +150,7 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164
+                    205
                 ],
                 "condition": "all"
             },
@@ -155,8 +160,8 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164,
-                    165
+                    205,
+                    206
                 ],
                 "condition": "any"
             },
@@ -166,8 +171,8 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164,
-                    165
+                    205,
+                    206
                 ],
                 "condition": "all"
             },
@@ -177,9 +182,9 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166
+                    205,
+                    206,
+                    207
                 ],
                 "condition": "any"
             },
@@ -189,9 +194,9 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166
+                    205,
+                    206,
+                    207
                 ],
                 "condition": "all"
             },
@@ -201,11 +206,11 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166,
-                    167,
-                    168
+                    205,
+                    206,
+                    207,
+                    208,
+                    209
                 ],
                 "condition": "any"
             },
@@ -215,11 +220,11 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166,
-                    167,
-                    168
+                    205,
+                    206,
+                    207,
+                    208,
+                    209
                 ],
                 "condition": "all"
             },
@@ -245,7 +250,7 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164
+                    205
                 ],
                 "condition": "any"
             },
@@ -255,7 +260,7 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164
+                    205
                 ],
                 "condition": "all"
             },
@@ -265,8 +270,8 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164,
-                    165
+                    205,
+                    206
                 ],
                 "condition": "any"
             },
@@ -276,8 +281,8 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164,
-                    165
+                    205,
+                    206
                 ],
                 "condition": "all"
             },
@@ -287,9 +292,9 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166
+                    205,
+                    206,
+                    207
                 ],
                 "condition": "any"
             },
@@ -299,9 +304,9 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166
+                    205,
+                    206,
+                    207
                 ],
                 "condition": "all"
             },
@@ -311,11 +316,11 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166,
-                    167,
-                    168
+                    205,
+                    206,
+                    207,
+                    208,
+                    209
                 ],
                 "condition": "any"
             },
@@ -325,11 +330,11 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    164,
-                    165,
-                    166,
-                    167,
-                    168
+                    205,
+                    206,
+                    207,
+                    208,
+                    209
                 ],
                 "condition": "all"
             },
@@ -370,7 +375,7 @@
         {
             "type": "send_email",
             "meta": {
-                "email_id": 73
+                "email_id": 87
             },
             "title": "Send <b>Welcome &amp;</b>"
         },
@@ -385,6 +390,129 @@
                 "funnel_id": 2
             },
             "title": "Add to <b>Onboarding &amp; more</b>"
+        },
+        {
+            "type": "create_task",
+            "meta": [],
+            "title": "Create a new task"
+        },
+        {
+            "type": "create_task",
+            "meta": {
+                "summary": "Call them"
+            },
+            "title": "Create task <b>Call them</b>"
+        },
+        {
+            "type": "admin_notification",
+            "meta": {
+                "send_to": [
+                    "{email}"
+                ]
+            },
+            "title": "Notify <b>the contact</b>"
+        },
+        {
+            "type": "admin_notification",
+            "meta": {
+                "send_to": [
+                    "{owner_email}",
+                    "sales@example.com"
+                ]
+            },
+            "title": "Notify <b>the contact owner</b> and <code>sales@example.com</code>"
+        },
+        {
+            "type": "admin_notification",
+            "meta": {
+                "send_to": "{email}, {owner_email}, a@example.com"
+            },
+            "title": "Notify <b>the contact</b>, <b>the contact owner</b> and <code>a@example.com</code>"
+        },
+        {
+            "type": "web_form",
+            "meta": {
+                "form_name": "Contact us"
+            },
+            "title": "Submits <b>Contact us</b>"
+        },
+        {
+            "type": "email_confirmed",
+            "meta": [],
+            "title": "Opt-in status is <b>Confirmed</b>"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    231
+                ],
+                "condition": "any"
+            },
+            "title": "When <b>Call them</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    231
+                ],
+                "condition": "all"
+            },
+            "title": "When <b>Call them</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    231,
+                    232
+                ],
+                "condition": "any"
+            },
+            "title": "When <b>Call them</b> or <b>Send the quote</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    231,
+                    232
+                ],
+                "condition": "all"
+            },
+            "title": "When <b>Call them</b> and <b>Send the quote</b> are completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    231,
+                    232,
+                    233
+                ],
+                "condition": "any"
+            },
+            "title": "When <b>Call them</b>, <b>Send the quote</b> or <b>New Task</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    231,
+                    232,
+                    233
+                ],
+                "condition": "all"
+            },
+            "title": "When <b>Call them</b>, <b>Send the quote</b> and <b>New Task</b> are completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": []
+            },
+            "title": "A task is completed"
         }
     ]
 }

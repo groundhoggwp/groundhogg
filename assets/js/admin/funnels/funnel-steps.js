@@ -1555,6 +1555,23 @@
     title: ({ meta }) => StepTitles.send_email(meta, titleNames),
   })
 
+  // task steps in this flow, for the task completed trigger
+  titleNames.task = id => {
+    const step = Funnel.getStep(id)
+    return step ? step.meta.summary ?? '' : undefined
+  }
+
+  // their settings are drawn by PHP, and the step-active event for their editors
+  ;[
+    'create_task',
+    'admin_notification',
+    'web_form',
+    'email_confirmed',
+    'task_completed',
+  ].forEach(type => Funnel.registerStepType(type, {
+    title: ({ meta }) => StepTitles[type](meta, titleNames),
+  }))
+
   Groundhogg.components.TagPicker = TagPicker
 
 } )(jQuery)

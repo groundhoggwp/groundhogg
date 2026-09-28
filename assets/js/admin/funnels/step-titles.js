@@ -180,6 +180,53 @@
         return title === undefined ? undefined : sprintf(__('Send %s', 'groundhogg'), bold(escHTML(title)))
       },
 
+      create_task: ({ summary }) => summary ? sprintf('Create task %s', bold(summary)) : 'Create a new task',
+
+      admin_notification: ({ send_to = [] }) => {
+
+        // like wp_parse_list()
+        const list = Array.isArray(send_to) ? send_to : String(send_to).split(/[\s,]+/).filter(Boolean)
+
+        return 'Notify ' + andList(list.map(email => {
+          switch (email) {
+            case '{email}':
+              return bold('the contact')
+            case '{owner_email}':
+              return bold('the contact owner')
+            default:
+              return `<code>${ email }</code>`
+          }
+        }))
+      },
+
+      web_form: ({ form_name = '' }) => sprintf(__('Submits %s', 'groundhogg'), bold(form_name)),
+
+      email_confirmed: () => 'Opt-in status is <b>Confirmed</b>',
+
+      task_completed: ({
+        tasks = [],
+        condition = 'any',
+      }, names = {}) => {
+
+        const ids = Array.isArray(tasks) ? tasks : []
+
+        if (!ids.length) {
+          return 'A task is completed'
+        }
+
+        const summaries = ids.map(id => names.task?.(parseInt(id)))
+
+        if (summaries.some(summary => summary === undefined)) {
+          return undefined
+        }
+
+        const bolded = summaries.map(summary => bold(summary || 'New Task'))
+
+        return bolded.length > 1 && condition === 'all'
+          ? sprintf('When %s are completed', andList(bolded))
+          : sprintf('When %s is completed', orList(bolded))
+      },
+
       add_to_flow: ({ funnel_id }, names = {}) => {
 
         if (!parseInt(funnel_id)) {
