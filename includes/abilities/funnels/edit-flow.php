@@ -108,11 +108,25 @@ class Edit_Flow extends Ability {
 							'properties'           => [
 								'op'            => [
 									'type'        => 'string',
-									'enum'        => [ 'add', 'update', 'move', 'delete' ],
-									'description' => __( '"add" needs `at` and `steps`. "update" needs `step` and any of `title`, `settings`, and the benchmark flags. "move" needs `step` and `at`, a step moves with everything in its branches. "delete" needs `step`, and also deletes everything in its branches. A step other steps point at in their settings (referenced_by in groundhogg/get-flow) can\'t be deleted until those steps are changed or deleted too.', 'groundhogg' ),
+									'enum'        => [ 'add', 'update', 'move', 'delete', 'duplicate', 'lock', 'unlock' ],
+									'description' => __( '"add" needs `at` and `steps`. "update" needs `step` and any of `title`, `settings`, and the benchmark flags. "move" needs `step` and `at`, a step moves with everything in its branches. "delete" needs `step`, and also deletes everything in its branches. A step other steps point at in their settings (referenced_by in groundhogg/get-flow) can\'t be deleted until those steps are changed or deleted too. "duplicate" needs `step`, which can be in another flow if `at` says where to put the copy, puts the copy right after it unless `at` says where, and copies the steps in its branches unless `include_branches` is false; give the copy a local `id` to refer to it later in the call. "lock" and "unlock" need `step`; a locked step can\'t be updated, moved, or deleted until it\'s unlocked.', 'groundhogg' ),
 								],
-								'step'          => $ref_schema,
-								'at'            => $position_schema,
+								'step'             => $ref_schema,
+								'at'               => $position_schema,
+								'id'               => [
+									'type'        => 'string',
+									'description' => __( 'For "duplicate": a local id for the copy, so later operations can refer to it.', 'groundhogg' ),
+								],
+								'include_branches' => [
+									'type'        => 'boolean',
+									'default'     => true,
+									'description' => __( 'For "duplicate": whether to copy the steps in its branches too.', 'groundhogg' ),
+								],
+								'options'          => [
+									'type'                 => 'object',
+									'additionalProperties' => true,
+									'description'          => __( 'For "duplicate": choices the step type takes when duplicated, like {"__duplicate_email": true} to make a copy of a send_email step\'s email instead of sharing it.', 'groundhogg' ),
+								],
 								'steps'         => [
 									'type'        => 'array',
 									'minItems'    => 1,
@@ -154,7 +168,7 @@ class Edit_Flow extends Ability {
 					'flow'          => array_diff_key( $flow_schema, [ 'definitions' => true ] ),
 					'added'         => [
 						'type'        => 'array',
-						'description' => __( 'The steps each "add" created, in the order of the operations.', 'groundhogg' ),
+						'description' => __( 'The steps each "add" and "duplicate" created, in the order of the operations.', 'groundhogg' ),
 						'items'       => [
 							'type'  => 'array',
 							'items' => Step_Tree_Builder::node_out_schema(),

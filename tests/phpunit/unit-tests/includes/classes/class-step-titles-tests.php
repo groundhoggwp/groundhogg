@@ -149,9 +149,59 @@ class Step_Titles_Tests extends GH_UnitTestCase {
 		}
 
 		return [
-			'names' => $names,
-			'cases' => $cases,
+			'names'    => $names,
+			'cases'    => $cases,
+			'branches' => $this->branch_cases( $funnel ),
 		];
+	}
+
+	/**
+	 * The branches of the premium branching logic types, which Pro extends, for StepTitles.branches
+	 *
+	 * @param Funnel $funnel
+	 *
+	 * @return array[]
+	 */
+	protected function branch_cases( Funnel $funnel ) {
+
+		$cases = [
+			[ 'type' => 'split_path', 'meta' => [ 'branches' => [] ] ],
+			[ 'type' => 'split_path', 'meta' => [ 'branches' => [ 'vip' => [ 'name' => 'VIP & friends' ], 'rest' => [ 'name' => '' ], 'more' => [] ] ] ],
+			[ 'type' => 'weighted_distribution', 'meta' => [ 'branches' => [ 'x1' => [ 'weight' => '60' ], 'x2' => [ 'weight' => '40' ] ] ] ],
+			[ 'type' => 'weighted_distribution', 'meta' => [ 'branches' => [ 'x1' => [ 'weight' => '3' ], 'x2' => [ 'weight' => '1' ], 'x3' => [] ] ] ],
+			[ 'type' => 'split_test', 'meta' => [ 'weight' => 30 ] ],
+			[ 'type' => 'split_test', 'meta' => [ 'weight' => 50, 'winner' => 'b' ] ],
+		];
+
+		foreach ( $cases as &$case ) {
+
+			$step = $funnel->add_step( [
+				'step_type'  => $case['type'],
+				'step_group' => Step::LOGIC,
+			] );
+
+			// the winner is a whole branch, like 12-b
+			if ( isset( $case['meta']['winner'] ) ) {
+				$case['meta']['winner'] = "{$step->get_id()}-{$case['meta']['winner']}";
+			}
+
+			foreach ( $case['meta'] as $key => $value ) {
+				get_db( 'stepmeta' )->update_meta( $step->get_id(), $key, $value );
+			}
+
+			$step = new Step( $step->get_id() );
+
+			$case['id']       = $step->get_id();
+			$case['branches'] = array_map( function ( $branch ) use ( $step ) {
+				return [
+					'key'     => substr( $branch['id'], strlen( "{$step->get_id()}-" ) ),
+					'name'    => $branch['name'],
+					'classes' => $branch['classes'],
+				];
+			}, $step->get_step_element()->get_canvas_data( $step )['branches'] ?? [] );
+		}
+
+		return $cases;
 	}
 
 	public function test_the_server_titles_match_the_js_fixtures() {
@@ -171,6 +221,7 @@ class Step_Titles_Tests extends GH_UnitTestCase {
 		$saved = json_decode( file_get_contents( $file ), true );
 
 		// IDs differ between runs, the titles don't
+		$this->assertSame( wp_list_pluck( $saved['branches'], 'branches' ), wp_list_pluck( $fixture['branches'], 'branches' ), 'The server draws different branches than the JS fixtures, run with GH_UPDATE_JS_FIXTURES=1 and check tests/js' );
 		$this->assertSame( wp_list_pluck( $saved['cases'], 'title' ), wp_list_pluck( $fixture['cases'], 'title' ), 'The server generates different titles than the JS fixtures, run with GH_UPDATE_JS_FIXTURES=1 and check tests/js' );
 	}
 }

@@ -93,9 +93,9 @@
       }
 
       /**
-       * The branches a logic step has, the server's, or the preview's until the server says
+       * The branches a logic step has, the preview's while a change is saved, otherwise the server's
        */
-      const branchesOf = step => canvasOf(step).branches ?? previewOf(step)?.branches?.map(({
+      const branchesOf = step => previewOf(step)?.branches?.map(({
         key,
         name,
         classes = '',
@@ -103,7 +103,7 @@
         id: `${ step.ID }-${ key }`,
         name,
         classes,
-      } ))
+      } )) ?? canvasOf(step).branches
 
       const AddStepButton = ({
         id,

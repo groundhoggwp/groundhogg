@@ -35,3 +35,14 @@ test('titles that need names that aren\'t loaded are left to the server', () => 
   assert.equal(StepTitles.apply_tag(tagged.meta, { tag: () => undefined }), undefined)
   assert.equal(StepTitles.send_email({ email_id: 5 }, {}), undefined)
 })
+
+fixture.branches.forEach(({
+  type,
+  id,
+  meta,
+  branches,
+}, i) => {
+  test(`${ type } #${ i } has the server's branches`, () => {
+    assert.deepEqual(StepTitles.branches[type](meta, id), branches)
+  })
+})

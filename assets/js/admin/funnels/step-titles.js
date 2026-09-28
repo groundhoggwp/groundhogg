@@ -130,10 +130,88 @@
       return condition === 'all' ? sprintf(all, andList(bolded)) : sprintf(one, orList(bolded))
     }
 
+    // like int_to_letters(), 0 is A, 26 is AA
+    const intToLetters = num => {
+      let letters = ''
+      while (num >= 0) {
+        letters = String.fromCharCode(65 + ( num % 26 )) + letters
+        num = Math.floor(num / 26) - 1
+      }
+      return letters
+    }
+
+    const branchMap = branches => branches && typeof branches === 'object' && !Array.isArray(branches) ? branches : {}
+
+    // like isset_not_empty()
+    const filled = value => value !== undefined && value !== null && value !== '' && value !== 0 && value !== '0' && value !== false && !( Array.isArray(value) && !value.length )
+
+    /**
+     * The branches of the premium branching logic types, the same as their get_branches(), get_branch_name(), and
+     * get_branch_classes() in includes/steps/premium/logic, which Pro's step types extend
+     *
+     * @return { key, name, classes }[]
+     */
+    const branches = {
+
+      split_path: ({ branches }) => [
+        ...Object.keys(branchMap(branches)).map((key, i) => ( {
+          key,
+          name   : filled(branchMap(branches)[key]?.name) ? branchMap(branches)[key].name : intToLetters(i),
+          classes: '',
+        } )),
+        {
+          key    : 'else',
+          name   : 'Else',
+          classes: '',
+        },
+      ],
+
+      weighted_distribution: ({ branches }) => {
+
+        const map = branchMap(branches)
+        const total = Object.values(map).reduce((sum, branch) => sum + ( parseFloat(branch?.weight) || 0 ), 0)
+
+        return Object.keys(map).map((key, i) => {
+
+          const weight = filled(map[key]?.weight) ? map[key].weight : ''
+          const name = `${ intToLetters(i) } (${ weight })`
+
+          return {
+            key,
+            name   : total === 100 ? `${ name }%` : name,
+            classes: '',
+          }
+        })
+      },
+
+      split_test: ({
+        winner = '',
+        weight = 0,
+      }, id) => ['a', 'b'].map(key => {
+
+        if (filled(winner)) {
+          const won = `${ id }-${ key }` === winner
+          return {
+            key,
+            name   : won ? __('Winner (100%)', 'groundhogg') : __('Loser (0%)', 'groundhogg'),
+            classes: won ? 'green' : 'red',
+          }
+        }
+
+        return {
+          key,
+          name   : `${ key.toUpperCase() } (${ key === 'a' ? weight : 100 - weight }%)`,
+          classes: '',
+        }
+      }),
+    }
+
     return {
 
       andList,
       orList,
+      intToLetters,
+      branches,
 
       apply_tag: tagTitle({
         none: __('Apply tags', 'groundhogg'),

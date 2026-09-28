@@ -298,46 +298,6 @@
       }
     }
 
-    const createPlaceholderEl = (data) => {
-
-      let {
-        step_group,
-        step_type,
-      } = data
-
-      let placeholder = Div({
-        className: `step step-placeholder ${ step_group } ${ step_type }`,
-      }, [
-        Input({
-          type : 'hidden',
-          name : 'step_ids[]',
-          value: JSON.stringify(data),
-        }),
-        Div({ className: 'hndle' }, [
-          // icon
-          Div({ className: 'hndle-icon' }, Groundhogg.rawStepTypes[step_type].svg),
-          Div({}, [
-            // title,
-            Span({ className: 'step-title loading-dots' }, _x('Loading', 'as in waiting to for something to load', 'groundhogg')),
-            // name
-            Span({ className: 'step-name' }, Groundhogg.rawStepTypes[step_type].name),
-          ]),
-        ]),
-      ])
-
-      if (step_group !== 'benchmark') {
-        placeholder = Div({ className: `sortable-item ${ step_group } ${ step_type }` }, [
-          Div({}), // for space
-          Div({ className: 'flow-line' }),
-          placeholder,
-          Div({ className: 'flow-line' }),
-        ])
-      }
-
-      return placeholder
-
-    }
-
     /**
      * A step ID from the DOM, steps that aren't saved yet have a temporary one
      */
@@ -864,10 +824,16 @@
       },
 
       /**
-       * Draw the settings of step types that have JS for them, where their PHP settings() would be
+       * Draw the settings of the step being edited, if its type has JS for them, where its PHP settings() would be.
+       * Only that step's, like onActive, the other panels keep the server's.
        */
       mountSettings () {
-        document.querySelectorAll('.step-settings .step-type-settings:not([data-mounted])').forEach(el => {
+
+        if (!this.editing) {
+          return
+        }
+
+        document.querySelectorAll(`#settings-${ this.editing } .step-type-settings:not([data-mounted])`).forEach(el => {
 
           const step = this.getStep(el.closest('.step.settings')?.dataset.id)
           const handler = this.stepTypes[step?.data.step_type]
@@ -885,6 +851,23 @@
             console.error(err)
           }
         })
+      },
+
+      /**
+       * Put the server's settings back in a step's panel once it's not being edited, so its fields are there for
+       * the form's saves like every other panel's
+       *
+       * @param stepId
+       */
+      unmountSettings (stepId) {
+
+        if (!document.querySelector(`#settings-${ stepId } .step-type-settings[data-mounted]`)) {
+          return
+        }
+
+        delete this.drawnIslands[stepId]
+
+        this.drawPanels()
       },
 
       history: FlowStore.createHistory(),
@@ -961,8 +944,10 @@
        */
       replay (operations) {
 
+        const inverse = []
+
         try {
-          operations.forEach(operation => this.store.apply(operation))
+          operations.forEach(operation => inverse.unshift(...this.store.apply(operation)))
         }
         catch (err) {
           // like a step it refers to being changed since
@@ -980,14 +965,26 @@
 
         this.queue.push(operations)
         this.redraw()
+
+        return inverse
       },
 
+      /**
+       * Undoing records what redoing it takes, the inverse of the undo as it was applied, and the other way around.
+       * Like undoing a duplicate, which deletes the copy and the steps in its branches, so redoing restores them all.
+       */
       undo () {
-        this.replay(this.history.undo())
+        const inverse = this.replay(this.history.undo())
+        if (inverse?.length) {
+          this.history.entries[this.history.pointer].redo = inverse
+        }
       },
 
       redo () {
-        this.replay(this.history.redo())
+        const inverse = this.replay(this.history.redo())
+        if (inverse?.length) {
+          this.history.entries[this.history.pointer - 1].undo = inverse
+        }
       },
 
       /**
@@ -1275,8 +1272,10 @@
         clearTimeout(pending.timer)
         pending.timer = setTimeout(() => this.flushSettings(step.ID), 400)
 
-        // the title the step type's JS gives the settings in its panel, until the server's are back
-        if (this.stepTypes[step.data.step_type]?.title) {
+        // what the step type's JS shows for the settings in its panel, until the server's are back, see previewOf()
+        const handler = this.stepTypes[step.data.step_type]
+
+        if (handler?.title || handler?.validate || handler?.branches) {
 
           const panel = document.getElementById(`settings-${ step.ID }`)
 
@@ -1611,25 +1610,26 @@
               return
             }
 
-            const targetId = this.targetAdd.id
+            const at = addButtonPosition(this.targetAdd)
 
-            this.save({
-              quiet : true,
-              // once what's queued is saved, so the canvas won't be redrawn over the placeholder
-              before: () => {
+            if (!at || !json.copy) {
+              return
+            }
 
-                const target = document.getElementById(targetId)
-
-                target?.insertAdjacentElement('beforebegin', createPlaceholderEl({
-                  copy      : json.copy,
-                  step_group: json.group,
-                  step_type : json.type,
-                  branch    : target.closest('.step-branch').dataset.branch,
-                }))
+            // the step can be in another flow, see Flow_Operations::duplicate()
+            this.perform([
+              {
+                op              : 'duplicate',
+                step            : toId(json.copy),
+                at,
+                id              : FlowStore.newTempId(),
+                include_branches: true,
+                // what to show until the server's copy arrives, when it's from another flow
+                type            : json.type,
               },
-            }).then(() => {
-              this.targetAdd = null
-            })
+            ])
+
+            this.targetAdd = null
 
           }
           if (e.key === 'm' && ( e.ctrlKey || e.metaKey ) && this.editing) {
@@ -1877,25 +1877,14 @@
 <p>Any pending events will be paused. They will be resumed immediately when the flow is reactivated.</p>
 <p>Unsaved changes will be discarded. To preserve any changes, update the flow first, then deactivate.</p>`,
             confirmText: __('Deactivate'),
-            onConfirm  : () => {
-              this.save({
-                quiet   : false,
-                moreData: formData => formData.append('_deactivate', true),
-              })
-            },
+            onConfirm  : () => this.flowAction('deactivate'),
           })
         })
 
         $('#funnel-update').on('click', e => {
 
           const label = e.currentTarget.textContent.trim()
-          const update = () => confirmDeletedSteps(this.pending_deletes, label, choices => this.save({
-            quiet   : false,
-            moreData: formData => {
-              formData.append('_commit', true)
-              formData.append('_deleted_steps', JSON.stringify(choices))
-            },
-          }))
+          const update = () => this.whenSaved().then(() => confirmDeletedSteps(this.pending_deletes, label, choices => this.flowAction('publish', choices)))
 
           // errors
           if (document.getElementById('step-flow').querySelector('.has-errors')) {
@@ -1918,13 +1907,7 @@
         $('#funnel-activate').on('click', e => {
 
           const label = e.currentTarget.textContent.trim()
-          const activate = () => confirmDeletedSteps(this.pending_deletes, label, choices => this.save({
-            quiet   : false,
-            moreData: formData => {
-              formData.append('_activate', true)
-              formData.append('_deleted_steps', JSON.stringify(choices))
-            },
-          }))
+          const activate = () => this.whenSaved().then(() => confirmDeletedSteps(this.pending_deletes, label, choices => this.flowAction('activate', choices)))
 
           // errors
           if (document.getElementById('step-flow').querySelector('.has-errors')) {
@@ -2102,13 +2085,7 @@
                 onSelect: e => {
                   dangerConfirmationModal({
                     alert    : '<p>Are you sure you want to revert your changes?</p><p>Your flow will be restored to the most recent save point.</p>',
-                    onConfirm: () => {
-                      this.save({
-                        moreData: formData => {
-                          formData.append('_uncommit', 1)
-                        },
-                      }).then(() => UndoRedoManager.clear())
-                    },
+                    onConfirm: () => this.flowAction('revert'),
                   })
                 },
               },
@@ -2157,7 +2134,83 @@
         // settings changes go first
         this.flushAllSettings()
 
-        return this.queue.exclusive(() => this.postForm(args))
+        // adding their own fields to the form, which only the form's save takes, see Funnels_Page::process_edit()
+        if (args.moreData || args.before) {
+          return this.queue.exclusive(() => this.postForm(args))
+        }
+
+        // step type JS that changes its panel's fields, like adding a hidden input, and saves
+        if (this.editing) {
+          this.saveSettings(this.editing)
+          this.flushSettings(this.editing)
+        }
+
+        return this.queue.flush()
+      },
+
+      /**
+       * Once everything queued is saved, like before publishing, so the deleted steps contacts are waiting at are up
+       * to date
+       *
+       * @return Promise
+       */
+      whenSaved () {
+        this.flushAllSettings()
+        return this.queue.flush()
+      },
+
+      /**
+       * Publish, activate, deactivate, or revert the flow, see Funnels_Page::ajax_flow_action()
+       *
+       * @param action string publish, activate, deactivate, or revert
+       * @param choices Object deleted step ID => { action: cancel|move, to }, see confirmDeletedSteps()
+       * @return Promise
+       */
+      flowAction (action, choices = {}) {
+
+        this.flushAllSettings()
+
+        $('body').addClass('saving')
+
+        return this.queue.exclusive(() => ajax({
+          action       : 'gh_flow_action',
+          funnel       : this.id,
+          flow_action  : action,
+          deleted_steps: JSON.stringify(Object.entries(choices).map(([step, choice]) => ( {
+            step: parseInt(step),
+            ...choice,
+          } ))),
+        })).catch(() => ( {
+          success: false,
+          data   : {},
+        } )).then(response => {
+
+          $('body').removeClass('saving')
+
+          if (!response.success) {
+            dialog({
+              message: response.data?.message ?? __('Something went wrong updating the flow. Your changes could not be saved.', 'groundhogg'),
+              type   : 'error',
+            })
+            return response
+          }
+
+          // deleted steps are removed for real now, so they can't be restored
+          UndoRedoManager.clear()
+          this.store.trash = {}
+
+          this.applyState(response.data, { quiet: false })
+
+          $(document).trigger('saved')
+
+          this.stepSettingsCallbacks()
+
+          dialog({
+            message: __('Flow saved!', 'groundhogg'),
+          })
+
+          return response
+        })
       },
 
       /**
@@ -2548,12 +2601,12 @@
        * @param id int
        */
       lockStep: function (id) {
-        this.save({
-          quiet   : true,
-          moreData: formData => {
-            formData.append('_lock_step', id)
+        this.perform([
+          {
+            op  : 'lock',
+            step: toId(id),
           },
-        })
+        ])
       },
 
       /**
@@ -2562,12 +2615,12 @@
        * @param id int
        */
       unlockStep: function (id) {
-        this.save({
-          quiet   : true,
-          moreData: formData => {
-            formData.append('_unlock_step', id)
+        this.perform([
+          {
+            op  : 'unlock',
+            step: toId(id),
           },
-        })
+        ])
       },
 
       /**
@@ -2623,28 +2676,18 @@
           }
         }
 
-        return await this.save({
-          quiet   : true,
-          // once what's queued is saved, so the step has its real ID and the canvas won't be redrawn over the placeholder
-          before  : () => {
+        const { __ignore_inner = false, ...options } = extra
 
-            const realId = this.realIds[step.ID] ?? step.ID
-
-            document.getElementById(`step-${ realId }`)?.closest('.sortable-item').insertAdjacentElement('afterend', createPlaceholderEl({
-              duplicate : realId,
-              step_type : step.data.step_type,
-              step_group: step.data.step_group,
-            }))
+        // the copy goes right after it, see Flow_Operations::duplicate()
+        this.perform([
+          {
+            op              : 'duplicate',
+            step            : step.ID,
+            id              : FlowStore.newTempId(),
+            include_branches: !__ignore_inner,
+            options,
           },
-          moreData: formData => {
-
-            Object.keys(extra).forEach(key => {
-              formData.append(key, extra[key])
-            })
-
-          },
-        })
-
+        ])
       },
 
       getStep (id) {
@@ -2719,6 +2762,8 @@
           return
         }
 
+        const previous = this.editing
+
         // deactivate the current step
         if (this.editing) {
           try {
@@ -2741,6 +2786,13 @@
           document.getElementById(`settings-${ this.editing }`).classList.add('editing')
 
           this.stepSettingsCallbacks()
+        }
+
+        if (previous) {
+          this.unmountSettings(previous)
+        }
+
+        if (this.editing) {
 
           setTimeout(() => {
             scrollIntoViewIfNeeded(document.getElementById(`step-${ this.editing }`), document.querySelector(`.fixed-inside`))
@@ -2759,6 +2811,7 @@
 
         // drawn by the step type's JS instead, see registerStepType()
         if (this.stepTypes[type]?.settings) {
+          this.mountSettings()
           $(document).trigger('gh-init-pickers')
           $(document).trigger('step-active')
           return
@@ -3086,8 +3139,8 @@
                 let title = fd.get('funnel_title')
 
                 $('.title-view').find('.title').text(title)
-                $('#title').val(title)
-                Funnel.saveQuietly()
+                // saved through REST, see the form's change handler
+                $('#title').val(title).trigger('change')
                 close()
               },
             }, [

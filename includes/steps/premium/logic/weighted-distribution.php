@@ -66,7 +66,7 @@ class Weighted_Distribution extends Split_Path {
 
 		$branches = $this->get_setting( 'branches' );
 
-		$total_weight = array_sum( wp_list_pluck( $branches, 'weight' ) );
+		$total_weight = array_sum( array_column( $branches, 'weight' ) ); // branches without a weight don't count
 
 		$random     = wp_rand( 1, $total_weight ); // Generate a random number between 1 and 100
 		$cumulative = 0;
@@ -120,7 +120,7 @@ class Weighted_Distribution extends Split_Path {
 
 		$branches = $this->get_setting( 'branches' );
 
-		$total_weight = array_sum( wp_list_pluck( $branches, 'weight' ) );
+		$total_weight = array_sum( array_column( $branches, 'weight' ) ); // branches without a weight don't count
 
 		$i = 0;
 

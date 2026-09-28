@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Funnels;
 
+use Groundhogg\Abilities\Funnels\Flow_Changes;
 use Groundhogg\Abilities\Funnels\Flow_Operations;
 use Groundhogg\Abilities\Funnels\Get_Flow;
 use Groundhogg\Admin\Admin_Page;
@@ -70,6 +71,7 @@ class Funnels_Page extends Admin_Page {
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_save_funnel_via_ajax', [ $this, 'ajax_save_funnel' ] );
 		add_action( 'wp_ajax_gh_flow_operations', [ $this, 'ajax_flow_operations' ] );
+		add_action( 'wp_ajax_gh_flow_action', [ $this, 'ajax_flow_action' ] );
 		add_action( 'wp_ajax_gh_flow_simulate', [ $this, 'ajax_simulate' ] );
 
 		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [
@@ -799,6 +801,98 @@ class Funnels_Page extends Admin_Page {
 		wp_send_json_success( array_merge( [
 			'ids' => Flow_Operations::get_added_ids( $added ),
 		], $this->get_editor_state( $funnel, $editor->get_touched() ) ) );
+	}
+
+	/**
+	 * Publish, activate, deactivate, or revert the flow from the editor, which the abilities do too, see Flow_Changes.
+	 *
+	 * Posts `funnel`, `flow_action`, and `deleted_steps`, what to do with contacts waiting at deleted steps, like
+	 * the abilities take them: [ { step, action: cancel|move, to } ].
+	 * Responds with the editor's state, see get_editor_state(), or when refused the error's `code` and `message`.
+	 */
+	public function ajax_flow_action() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error( [ 'code' => 'invalid_nonce', 'message' => __( 'Your session expired, reload the page.', 'groundhogg' ) ] );
+		}
+
+		$funnel = new Funnel( absint( get_post_var( 'funnel' ) ) );
+
+		if ( ! $funnel->exists() || ! current_user_can( 'edit_funnel', $funnel->get_id() ) ) {
+			wp_send_json_error( [ 'code' => 'not_allowed', 'message' => __( 'You can\'t edit this flow.', 'groundhogg' ) ] );
+		}
+
+		$refuse = function ( WP_Error $error ) {
+			wp_send_json_error( [
+				'code'    => $error->get_error_code(),
+				'message' => $error->get_error_message(),
+			] );
+		};
+
+		$unlocked = Flow_Changes::check_lock( $funnel );
+
+		if ( is_wp_error( $unlocked ) ) {
+			$refuse( $unlocked );
+		}
+
+		$choices = $funnel->while_editing( function () use ( $funnel ) {
+			return Flow_Changes::get_choices( $funnel, (array) json_decode( get_post_var( 'deleted_steps', '[]' ), true ) );
+		} );
+
+		if ( is_wp_error( $choices ) ) {
+			$refuse( $choices );
+		}
+
+		switch ( get_post_var( 'flow_action' ) ) {
+
+			case 'publish':
+
+				if ( ! $funnel->is_active() ) {
+					$refuse( new WP_Error( 'not_active', __( 'Only active flows have changes to publish.', 'groundhogg' ) ) );
+				}
+
+				Flow_Changes::publish( $funnel, $choices );
+
+				break;
+
+			case 'activate':
+
+				// steps deleted while inactive can't be published, so their contacts are handled and they're removed now
+				Flow_Changes::remove_deleted_steps( $funnel, $choices );
+
+				$funnel->update( [
+					'status'       => 'active',
+					'last_updated' => current_time( 'mysql' ),
+				] );
+
+				break;
+
+			case 'deactivate':
+
+				// unpublished changes are discarded, like the editor always has
+				$funnel->uncommit();
+
+				$funnel->update( [
+					'status'       => 'inactive',
+					'last_updated' => current_time( 'mysql' ),
+				] );
+
+				break;
+
+			case 'revert':
+				$funnel->uncommit();
+				break;
+
+			default:
+				$refuse( new WP_Error( 'invalid_action', __( 'That\'s not something the flow can do.', 'groundhogg' ) ) );
+		}
+
+		/**
+		 * Runs after the funnel as been updated.
+		 */
+		do_action( 'groundhogg/admin/funnel/updated', $funnel );
+
+		wp_send_json_success( $this->get_editor_state( $funnel ) );
 	}
 
 	/**

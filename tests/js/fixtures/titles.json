@@ -1,22 +1,22 @@
 {
     "names": {
         "tag": {
-            "205": "Customer",
-            "206": "Lead",
-            "207": "Tom & Jerry",
-            "208": "VIP",
-            "209": "Newsletter"
+            "243": "Customer",
+            "244": "Lead",
+            "245": "Tom & Jerry",
+            "246": "VIP",
+            "247": "Newsletter"
         },
         "email": {
-            "87": "Welcome &"
+            "103": "Welcome &"
         },
         "funnel": {
             "2": "Onboarding & more"
         },
         "task": {
-            "231": "Call them",
-            "232": "Send the quote",
-            "233": ""
+            "342": "Call them",
+            "343": "Send the quote",
+            "344": ""
         }
     },
     "cases": [
@@ -31,7 +31,7 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    205
+                    243
                 ]
             },
             "title": "Apply <b>Customer</b>"
@@ -40,8 +40,8 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    205,
-                    206
+                    243,
+                    244
                 ]
             },
             "title": "Apply <b>Customer</b> and <b>Lead</b>"
@@ -50,9 +50,9 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207
+                    243,
+                    244,
+                    245
                 ]
             },
             "title": "Apply <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
@@ -61,11 +61,11 @@
             "type": "apply_tag",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207,
-                    208,
-                    209
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
                 ]
             },
             "title": "Apply <b>5</b> tags"
@@ -81,7 +81,7 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    205
+                    243
                 ]
             },
             "title": "Remove <b>Customer</b>"
@@ -90,8 +90,8 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    205,
-                    206
+                    243,
+                    244
                 ]
             },
             "title": "Remove <b>Customer</b> and <b>Lead</b>"
@@ -100,9 +100,9 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207
+                    243,
+                    244,
+                    245
                 ]
             },
             "title": "Remove <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
@@ -111,11 +111,11 @@
             "type": "remove_tag",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207,
-                    208,
-                    209
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
                 ]
             },
             "title": "Remove <b>5</b> tags"
@@ -140,7 +140,7 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205
+                    243
                 ],
                 "condition": "any"
             },
@@ -150,7 +150,7 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205
+                    243
                 ],
                 "condition": "all"
             },
@@ -160,8 +160,8 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205,
-                    206
+                    243,
+                    244
                 ],
                 "condition": "any"
             },
@@ -171,8 +171,8 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205,
-                    206
+                    243,
+                    244
                 ],
                 "condition": "all"
             },
@@ -182,9 +182,9 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207
+                    243,
+                    244,
+                    245
                 ],
                 "condition": "any"
             },
@@ -194,9 +194,9 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207
+                    243,
+                    244,
+                    245
                 ],
                 "condition": "all"
             },
@@ -206,11 +206,11 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207,
-                    208,
-                    209
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
                 ],
                 "condition": "any"
             },
@@ -220,11 +220,11 @@
             "type": "tag_applied",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207,
-                    208,
-                    209
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
                 ],
                 "condition": "all"
             },
@@ -250,7 +250,7 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205
+                    243
                 ],
                 "condition": "any"
             },
@@ -260,7 +260,7 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205
+                    243
                 ],
                 "condition": "all"
             },
@@ -270,8 +270,8 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205,
-                    206
+                    243,
+                    244
                 ],
                 "condition": "any"
             },
@@ -281,8 +281,8 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205,
-                    206
+                    243,
+                    244
                 ],
                 "condition": "all"
             },
@@ -292,9 +292,9 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207
+                    243,
+                    244,
+                    245
                 ],
                 "condition": "any"
             },
@@ -304,9 +304,9 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207
+                    243,
+                    244,
+                    245
                 ],
                 "condition": "all"
             },
@@ -316,11 +316,11 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207,
-                    208,
-                    209
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
                 ],
                 "condition": "any"
             },
@@ -330,11 +330,11 @@
             "type": "tag_removed",
             "meta": {
                 "tags": [
-                    205,
-                    206,
-                    207,
-                    208,
-                    209
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
                 ],
                 "condition": "all"
             },
@@ -375,7 +375,7 @@
         {
             "type": "send_email",
             "meta": {
-                "email_id": 87
+                "email_id": 103
             },
             "title": "Send <b>Welcome &amp;</b>"
         },
@@ -445,7 +445,7 @@
             "type": "task_completed",
             "meta": {
                 "tasks": [
-                    231
+                    342
                 ],
                 "condition": "any"
             },
@@ -455,7 +455,7 @@
             "type": "task_completed",
             "meta": {
                 "tasks": [
-                    231
+                    342
                 ],
                 "condition": "all"
             },
@@ -465,8 +465,8 @@
             "type": "task_completed",
             "meta": {
                 "tasks": [
-                    231,
-                    232
+                    342,
+                    343
                 ],
                 "condition": "any"
             },
@@ -476,8 +476,8 @@
             "type": "task_completed",
             "meta": {
                 "tasks": [
-                    231,
-                    232
+                    342,
+                    343
                 ],
                 "condition": "all"
             },
@@ -487,9 +487,9 @@
             "type": "task_completed",
             "meta": {
                 "tasks": [
-                    231,
-                    232,
-                    233
+                    342,
+                    343,
+                    344
                 ],
                 "condition": "any"
             },
@@ -499,9 +499,9 @@
             "type": "task_completed",
             "meta": {
                 "tasks": [
-                    231,
-                    232,
-                    233
+                    342,
+                    343,
+                    344
                 ],
                 "condition": "all"
             },
@@ -513,6 +513,156 @@
                 "tasks": []
             },
             "title": "A task is completed"
+        }
+    ],
+    "branches": [
+        {
+            "type": "split_path",
+            "meta": {
+                "branches": []
+            },
+            "id": 397,
+            "branches": [
+                {
+                    "key": "else",
+                    "name": "Else",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "split_path",
+            "meta": {
+                "branches": {
+                    "vip": {
+                        "name": "VIP & friends"
+                    },
+                    "rest": {
+                        "name": ""
+                    },
+                    "more": []
+                }
+            },
+            "id": 398,
+            "branches": [
+                {
+                    "key": "vip",
+                    "name": "VIP & friends",
+                    "classes": ""
+                },
+                {
+                    "key": "rest",
+                    "name": "B",
+                    "classes": ""
+                },
+                {
+                    "key": "more",
+                    "name": "C",
+                    "classes": ""
+                },
+                {
+                    "key": "else",
+                    "name": "Else",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "weighted_distribution",
+            "meta": {
+                "branches": {
+                    "x1": {
+                        "weight": "60"
+                    },
+                    "x2": {
+                        "weight": "40"
+                    }
+                }
+            },
+            "id": 399,
+            "branches": [
+                {
+                    "key": "x1",
+                    "name": "A (60)%",
+                    "classes": ""
+                },
+                {
+                    "key": "x2",
+                    "name": "B (40)%",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "weighted_distribution",
+            "meta": {
+                "branches": {
+                    "x1": {
+                        "weight": "3"
+                    },
+                    "x2": {
+                        "weight": "1"
+                    },
+                    "x3": []
+                }
+            },
+            "id": 400,
+            "branches": [
+                {
+                    "key": "x1",
+                    "name": "A (3)",
+                    "classes": ""
+                },
+                {
+                    "key": "x2",
+                    "name": "B (1)",
+                    "classes": ""
+                },
+                {
+                    "key": "x3",
+                    "name": "C ()",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "split_test",
+            "meta": {
+                "weight": 30
+            },
+            "id": 401,
+            "branches": [
+                {
+                    "key": "a",
+                    "name": "A (30%)",
+                    "classes": ""
+                },
+                {
+                    "key": "b",
+                    "name": "B (70%)",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "split_test",
+            "meta": {
+                "weight": 50,
+                "winner": "402-b"
+            },
+            "id": 402,
+            "branches": [
+                {
+                    "key": "a",
+                    "name": "Loser (0%)",
+                    "classes": "red"
+                },
+                {
+                    "key": "b",
+                    "name": "Winner (100%)",
+                    "classes": "green"
+                }
+            ]
         }
     ]
 }

@@ -315,6 +315,157 @@ class Flow_Operations_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( 'main-step-settings-panel', $steps['yes']->html_v2( false ) );
 	}
 
+	public function test_duplicating_copies_the_branches_after_the_step() {
+
+		[ $funnel, $steps ] = $this->flow();
+
+		$operations = new Flow_Operations( $funnel );
+
+		$added = $operations->apply_all_or_nothing( [
+			[ 'op' => 'duplicate', 'step' => $steps['if']->ID, 'id' => 'copy' ],
+			// the copy can be referred to by its local id
+			[ 'op' => 'move', 'step' => $steps['last']->ID, 'at' => [ 'after' => 'copy' ] ],
+		] );
+
+		$this->assertNotWPError( $added );
+
+		$copy = new Step( Flow_Operations::get_added_ids( $added )['copy'] );
+
+		$this->assertEquals( 'if_else', $copy->get_type() );
+		$this->assertEquals( 'inactive', $copy->step_status );
+		$this->assertContains( (int) $copy->ID, $operations->get_touched() );
+
+		$layout = $funnel->while_editing( function () use ( $funnel ) {
+			return array_map( function ( Step $step ) {
+				return [ $step->step_title, $step->branch ];
+			}, $funnel->get_steps() );
+		} );
+
+		// right after the original with its own copies of the branch steps, then the moved step
+		$this->assertEquals( [
+			[ 'first', 'main' ],
+			[ 'if', 'main' ],
+			[ 'yes', "{$steps['if']->ID}-yes" ],
+			[ 'no', "{$steps['if']->ID}-no" ],
+			[ 'if', 'main' ],
+			[ 'yes', "$copy->ID-yes" ],
+			[ 'no', "$copy->ID-no" ],
+			[ 'last', 'main' ],
+		], $layout );
+	}
+
+	public function test_duplicating_without_branches() {
+
+		[ $funnel, $steps ] = $this->flow();
+
+		$added = $this->apply( $funnel, [
+			[ 'op' => 'duplicate', 'step' => $steps['if']->ID, 'id' => 'copy', 'include_branches' => false, 'at' => [ 'branch' => 'main', 'position' => 'end' ] ],
+		], false );
+
+		$this->assertNotWPError( $added );
+
+		$copy = Flow_Operations::get_added_ids( $added )['copy'];
+
+		$in_branches = $funnel->while_editing( function () use ( $funnel, $copy ) {
+			return array_filter( $funnel->get_steps(), function ( Step $step ) use ( $copy ) {
+				return str_starts_with( $step->branch, "$copy-" );
+			} );
+		} );
+
+		$this->assertEmpty( $in_branches );
+		$this->assertEquals( $copy, $funnel->while_editing( function () use ( $funnel ) {
+			return array_values( array_filter( $funnel->get_steps(), function ( Step $step ) {
+				return $step->branch === 'main';
+			} ) )[3]->ID;
+		} ) );
+
+		// the request isn't left changed
+		$this->assertArrayNotHasKey( '__ignore_inner', $_POST );
+
+	}
+
+	public function test_step_types_get_their_duplicate_options() {
+
+		[ $funnel, $steps ] = $this->flow();
+
+		$type = Plugin::instance()->step_manager->get_element( 'delay_timer' );
+
+		// reads them the way a step type's duplicate() does, like send_email's __duplicate_email
+		$probe = new class extends \Groundhogg\Steps\Actions\Delay_Timer {
+			public static $choice;
+
+			public function duplicate( $new, $original ) {
+				self::$choice = \Groundhogg\get_post_var( 'my_choice' );
+			}
+		};
+
+		Plugin::instance()->step_manager->add_step( $probe );
+
+		$this->assertNotWPError( $this->apply( $funnel, [
+			[ 'op' => 'duplicate', 'step' => $steps['first']->ID, 'options' => [ 'my_choice' => 'yes please' ] ],
+		], false ) );
+
+		$this->assertEquals( 'yes please', $probe::$choice );
+
+		Plugin::instance()->step_manager->add_step( $type );
+	}
+
+	public function test_copying_a_step_from_another_flow() {
+
+		[ $from, $steps ] = $this->flow();
+		$to = new Funnel( [ 'title' => 'to', 'status' => 'inactive' ] );
+
+		// it needs to be told where
+		$this->assertWPError( $this->apply( $to, [ [ 'op' => 'duplicate', 'step' => $steps['if']->ID ] ], false ) );
+
+		$added = $this->apply( $to, [
+			[ 'op' => 'duplicate', 'step' => $steps['if']->ID, 'id' => 'pasted', 'at' => [ 'branch' => 'main', 'position' => 'end' ] ],
+		], false );
+
+		$this->assertNotWPError( $added );
+
+		$copy = new Step( Flow_Operations::get_added_ids( $added )['pasted'] );
+
+		$this->assertEquals( $to->get_id(), $copy->get_funnel_id() );
+		$this->assertEquals( 'main', $copy->branch );
+
+		// with its branches, in the new flow
+		$branch_steps = $to->while_editing( function () use ( $to, $copy ) {
+			return array_map( function ( Step $step ) {
+				return [ $step->step_title, $step->get_funnel_id() ];
+			}, array_values( array_filter( $to->get_steps(), function ( Step $step ) use ( $copy ) {
+				return str_starts_with( $step->branch, "$copy->ID-" );
+			} ) ) );
+		} );
+
+		$this->assertEquals( [ [ 'yes', $to->get_id() ], [ 'no', $to->get_id() ] ], $branch_steps );
+
+		// the original flow is untouched
+		$this->assertCount( 5, $from->get_steps() );
+	}
+
+	public function test_locking_steps() {
+
+		[ $funnel, $steps ] = $this->flow( 'active' );
+
+		$this->assertNotWPError( $this->apply( $funnel, [ [ 'op' => 'lock', 'step' => $steps['last']->ID ] ], false ) );
+
+		$this->assertTrue( ( new Step( $steps['last']->ID ) )->is_locked() );
+
+		// written directly, not a change to publish
+		$this->assertFalse( $funnel->while_editing( function () use ( $funnel ) {
+			return $funnel->has_changes();
+		} ) );
+
+		// locked steps can't be moved
+		$moved = $this->apply( $funnel, [ [ 'op' => 'move', 'step' => $steps['last']->ID, 'at' => [ 'branch' => 'main', 'position' => 'start' ] ] ], false );
+		$this->assertWPError( $moved );
+		$this->assertEquals( 'groundhogg_step_locked', $moved->get_error_code() );
+
+		$this->assertNotWPError( $this->apply( $funnel, [ [ 'op' => 'unlock', 'step' => $steps['last']->ID ] ], false ) );
+		$this->assertFalse( ( new Step( $steps['last']->ID ) )->is_locked() );
+	}
+
 	public function test_a_failed_operation_undoes_the_ones_before_it() {
 
 		[ $funnel, $steps ] = $this->flow();

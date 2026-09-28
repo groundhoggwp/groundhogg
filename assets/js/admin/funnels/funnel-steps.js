@@ -1555,6 +1555,15 @@
     title: ({ meta }) => StepTitles.send_email(meta, titleNames),
   })
 
+  // the branches of the premium branching types, which Pro extends, show while they're edited
+  ;[
+    'split_path',
+    'weighted_distribution',
+    'split_test',
+  ].forEach(type => Funnel.registerStepType(type, {
+    branches: step => StepTitles.branches[type](step.meta, step.ID),
+  }))
+
   // task steps in this flow, for the task completed trigger
   titleNames.task = id => {
     const step = Funnel.getStep(id)

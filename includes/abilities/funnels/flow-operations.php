@@ -6,6 +6,7 @@ use Groundhogg\Abilities\Schemas\Step_Type_Schema;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use Throwable;
+use function Groundhogg\get_db;
 use WP_Error;
 
 /**
@@ -179,6 +180,13 @@ class Flow_Operations {
 				case 'delete':
 					$result = $this->delete( $operation );
 					break;
+				case 'duplicate':
+					$result = $this->duplicate( $operation );
+					break;
+				case 'lock':
+				case 'unlock':
+					$result = $this->set_locked( $operation, $op === 'lock' );
+					break;
 				case 'restore':
 					// only the editor restores
 					if ( $this->editor ) {
@@ -199,12 +207,17 @@ class Flow_Operations {
 				);
 			}
 
+			if ( $op === 'duplicate' ) {
+				$added[]         = [ $result ];
+				$this->touched[] = $result['id'];
+			}
+
 			if ( $op === 'add' ) {
 				$added[] = $result;
 				array_push( $this->touched, ...array_values( self::get_added_ids( [ $result ] ) ), ...wp_list_pluck( $result, 'id' ) );
 			}
 
-			if ( $op === 'update' || $op === 'restore' ) {
+			if ( in_array( $op, [ 'update', 'restore', 'lock', 'unlock' ], true ) ) {
 				$touched = $this->resolve_step( $operation['step'] ?? null );
 				if ( ! is_wp_error( $touched ) ) {
 					$this->touched[] = $touched->get_id();
@@ -547,6 +560,167 @@ class Flow_Operations {
 			$this->deleted[ $id ] = $to_delete;
 			$this->unplace( $id );
 		}
+
+		return true;
+	}
+
+	/**
+	 * Duplicate a step, after it unless `at` says where, and the steps in its branches unless `include_branches` is
+	 * false. The copy is inactive, like new steps.
+	 *
+	 * Step types' duplicate() handlers read choices from the request, like the flow editor has always posted them:
+	 * `__ignore_inner`, which `include_branches` sets, and ones like send_email's `__duplicate_email`, which go in
+	 * `options`. They're set in $_POST while the step is duplicated.
+	 *
+	 * @param array $operation `step`, `at`, `id` a local id for the copy, `include_branches`, `options`
+	 *
+	 * @return array|WP_Error the copy, as a step node
+	 */
+	protected function duplicate( array $operation ) {
+
+		$step = $this->resolve_step( $operation['step'] ?? null );
+
+		// or a step in another flow, like pasting in the flow editor
+		if ( is_wp_error( $step ) ) {
+
+			$step = $this->resolve_other_flow_step( $operation );
+
+			if ( is_wp_error( $step ) ) {
+				return $step;
+			}
+		}
+
+		$local_id = isset( $operation['id'] ) && $operation['id'] !== '' ? sanitize_key( (string) $operation['id'] ) : '';
+
+		if ( $local_id && isset( $this->builder->get_declared()[ $local_id ] ) ) {
+			/* translators: %s: the local step id */
+			return new WP_Error( 'groundhogg_duplicate_step_id', sprintf( __( 'Step id "%s" is used more than once.', 'groundhogg' ), $local_id ) );
+		}
+
+		$at = $this->resolve_position( $operation['at'] ?? [ 'after' => $step->get_id() ] );
+
+		if ( is_wp_error( $at ) ) {
+			return $at;
+		}
+
+		// the step types' own duplicate handlers copy the stored branches, so they must be up to date
+		$this->write_layout();
+
+		$choices = array_filter( (array) ( $operation['options'] ?? [] ), 'is_scalar' );
+
+		if ( isset( $operation['include_branches'] ) && ! $operation['include_branches'] ) {
+			$choices['__ignore_inner'] = 1;
+		}
+
+		$posted = $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- put back below
+		$_POST  = array_merge( $posted, wp_slash( $choices ) );
+
+		try {
+			$copy = ( new Step( $step->get_id() ) )->duplicate( [
+				'step_status' => 'inactive',
+				'funnel_id'   => $this->funnel->get_id(),
+			] );
+		} finally {
+			$_POST = $posted;
+		}
+
+		if ( ! $copy || ! $copy->exists() ) {
+			return new WP_Error( 'groundhogg_step_not_created', __( 'The step could not be duplicated.', 'groundhogg' ) );
+		}
+
+		[ $branch, $index ] = $at;
+
+		array_splice( $this->branches[ $branch ], $index, 0, [ $copy->get_id() ] );
+		$this->step_branch[ $copy->get_id() ] = $branch;
+
+		$this->builder->declare( (string) $copy->get_id(), $copy->get_id(), $copy->get_type() );
+
+		if ( $local_id ) {
+			$this->builder->declare( $local_id, $copy->get_id(), $copy->get_type() );
+		}
+
+		// what its type copied into its branches
+		$this->place_copied_branches( $copy->get_id() );
+
+		$node = [
+			'id'        => $copy->get_id(),
+			'type'      => $copy->get_type(),
+			'type_name' => $copy->get_step_element()->get_name(),
+			'group'     => $copy->get_group(),
+			'title'     => wp_strip_all_tags( $copy->get_title() ),
+			'settings'  => [],
+		];
+
+		if ( $local_id ) {
+			$node['local_id'] = $local_id;
+		}
+
+		return $node;
+	}
+
+	/**
+	 * A step in another flow to copy into this one, which needs to be told where
+	 *
+	 * @param array $operation
+	 *
+	 * @return Step|WP_Error
+	 */
+	protected function resolve_other_flow_step( array $operation ) {
+
+		$step = new Step( absint( $operation['step'] ?? 0 ) );
+
+		if ( ! $step->exists() || in_array( $step->step_status, [ 'deleted', 'archived' ], true ) || ! current_user_can( 'edit_funnel', $step->get_funnel_id() ) ) {
+			/* translators: %s: the step reference */
+			return new WP_Error( 'groundhogg_step_not_found', sprintf( __( 'Step "%s" isn\'t in this flow, or one you can copy from.', 'groundhogg' ), $operation['step'] ?? '' ) );
+		}
+
+		if ( empty( $operation['at'] ) ) {
+			return new WP_Error( 'groundhogg_invalid_position', __( 'Copying a step from another flow needs `at`.', 'groundhogg' ) );
+		}
+
+		return $step;
+	}
+
+	/**
+	 * Add the steps a duplicate's type copied into its branches to the model, in their order
+	 *
+	 * @param int $owner the copy
+	 */
+	protected function place_copied_branches( int $owner ) {
+
+		$copied = array_filter( $this->funnel->get_steps(), function ( Step $step ) use ( $owner ) {
+			return $this->get_branch_owner( $step->branch ) === $owner && ! isset( $this->step_branch[ $step->get_id() ] );
+		} );
+
+		usort( $copied, function ( Step $a, Step $b ) {
+			return $a->get_order() - $b->get_order();
+		} );
+
+		foreach ( $copied as $step ) {
+			$this->place( $step->get_id(), $step->branch );
+			$this->builder->declare( (string) $step->get_id(), $step->get_id(), $step->get_type() );
+			$this->place_copied_branches( $step->get_id() );
+		}
+	}
+
+	/**
+	 * Lock or unlock a step, so it can't be moved, deleted, or changed by edit-flow until it's unlocked.
+	 * Written directly, like the flow editor always has, it's not a change to publish.
+	 *
+	 * @param array $operation `step`
+	 * @param bool  $locked
+	 *
+	 * @return true|WP_Error
+	 */
+	protected function set_locked( array $operation, bool $locked ) {
+
+		$step = $this->resolve_step( $operation['step'] ?? null );
+
+		if ( is_wp_error( $step ) ) {
+			return $step;
+		}
+
+		get_db( 'steps' )->update( $step->get_id(), [ 'is_locked' => (int) $locked ] );
 
 		return true;
 	}

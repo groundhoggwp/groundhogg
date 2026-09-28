@@ -336,3 +336,37 @@ test('a trigger\'s flags are part of what changed', () => {
   assert.equal(store.getStep(3).data.is_entry, 1)
   assert.deepEqual(undo, { op: 'update', step: 3, flags: { is_entry: false } })
 })
+
+test('duplicating puts a copy right after the step, with a temporary ID', () => {
+
+  const store = storeOf(load('branches'))
+  const email = byType(store, 'send_email')
+  const id = FlowStore.newTempId()
+
+  const [undo] = store.apply({ op: 'duplicate', step: email.ID, id, include_branches: true })
+
+  const siblings = store.branchSteps(email.data.branch)
+  const copy = store.getStep(id)
+
+  assert.equal(siblings.indexOf(copy), siblings.indexOf(store.getStep(email.ID)) + 1)
+  assert.equal(copy.data.step_type, 'send_email')
+  assert.equal(copy.data.step_status, 'inactive')
+  assert.deepEqual(undo, { op: 'delete', step: id })
+})
+
+test('locking shows on the card right away, and unlocking undoes it', () => {
+
+  const store = storeOf(load('simple'))
+  const step = store.steps.find(step => !parseInt(step.data.is_locked))
+
+  const [undo] = store.apply({ op: 'lock', step: step.ID })
+
+  assert.equal(step.data.is_locked, 1)
+  assert.ok(store.getCanvas(step.ID).classes.includes('locked'))
+  assert.equal(store.getCanvas(step.ID).locked, true)
+  assert.deepEqual(undo, { op: 'unlock', step: step.ID })
+
+  store.apply(undo)
+
+  assert.equal(store.getCanvas(step.ID).classes.includes('locked'), false)
+})

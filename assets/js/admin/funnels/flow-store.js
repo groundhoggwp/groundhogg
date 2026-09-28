@@ -655,30 +655,130 @@
       ]
     },
 
+    /**
+     * A copy of a step, right away, the server's copies of the steps in its branches arrive with its reply
+     */
+    apply_duplicate ({
+      step: id,
+      at,
+      id: copyId,
+      type,
+    }) {
+
+      const step = this.getStep(id)
+
+      // copying a step from another flow, what it is shows until the server's copy arrives
+      if (!step) {
+
+        if (!type || !at) {
+          throw new Error(`Step ${ id } isn't in the flow.`)
+        }
+
+        return this.apply_add({
+          at,
+          steps: [
+            {
+              type,
+              id: copyId,
+            },
+          ],
+        })
+      }
+
+      const copy = {
+        ...clone(step),
+        ID         : copyId,
+        is_starting: false,
+      }
+
+      copy.data.step_status = 'inactive'
+
+      const {
+        branch,
+        index,
+      } = this.resolvePosition(at ?? { after: step.ID })
+
+      this.steps = [...this.steps, copy]
+      this.place([copy], branch, index)
+
+      return [
+        {
+          op  : 'delete',
+          step: copyId,
+        },
+      ]
+    },
+
+    apply_lock ({ step: id }) {
+      return this.setLocked(id, true)
+    },
+
+    apply_unlock ({ step: id }) {
+      return this.setLocked(id, false)
+    },
+
+    /**
+     * Lock or unlock a step, with its card's lock showing right away
+     */
+    setLocked (id, locked) {
+
+      const step = this.getStep(id)
+
+      if (!step) {
+        throw new Error(`Step ${ id } isn't in the flow.`)
+      }
+
+      const was = Boolean(parseInt(step.data.is_locked))
+
+      step.data.is_locked = locked ? 1 : 0
+
+      const canvas = this.getCanvas(step.ID)
+
+      if (canvas) {
+        this.canvas = {
+          ...this.canvas,
+          [step.ID]: {
+            ...canvas,
+            locked,
+            classes: [...( canvas.classes ?? [] ).filter(name => name !== 'locked'), ...( locked ? ['locked'] : [] )],
+          },
+        }
+      }
+
+      return [
+        {
+          op  : was ? 'lock' : 'unlock',
+          step: step.ID,
+        },
+      ]
+    },
+
     apply_restore ({
       step: id,
       at,
       steps: ids = [],
     }) {
 
-      const root = this.trash[id]
+      // applied again when the server's steps are loaded while it's waiting to be sent, so the deleted steps are kept
+      // in the trash, and ones that are back already aren't added twice
+      const bring = stepId => this.getStep(stepId) ?? ( this.trash[stepId] ? clone(this.trash[stepId]) : null )
+
+      const root = bring(id)
 
       if (!root) {
         throw new Error(`Step ${ id } wasn't deleted here.`)
       }
 
-      const rest = ids.map(stepId => this.trash[stepId]).filter(Boolean)
+      const rest = ids.map(bring).filter(Boolean)
 
       const {
         branch,
         index,
-      } = this.resolvePosition(at)
+      } = this.resolvePosition(at, root.ID)
 
-      this.steps = [...this.steps, root, ...rest]
+      this.steps = [...this.steps.filter(step => ![root, ...rest].some(back => back.ID == step.ID)), root, ...rest]
 
-      this.place([root], branch, index);
-
-      [root, ...rest].forEach(step => delete this.trash[step.ID])
+      this.place([root], branch, index)
 
       return [
         {
