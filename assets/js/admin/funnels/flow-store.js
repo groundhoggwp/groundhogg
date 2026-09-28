@@ -384,16 +384,19 @@
    * @param steps Object[] the steps, as Funnel::get_steps() in editing mode sends them
    * @param canvas Object step ID => what the server says about drawing it, see Funnel_Step::get_canvas_data()
    * @param stepTypes Object type => { name, group }, for steps added here
+   * @param defaults function( type ) the settings steps added here start with
    */
   const createStore = ({
     steps = [],
     canvas = {},
     stepTypes = {},
+    defaults = () => ( {} ),
   } = {}) => ( {
 
     steps,
     canvas,
     stepTypes,
+    defaults,
 
     // deleted steps, so they can be restored, step ID => step
     trash: {},
@@ -578,7 +581,7 @@
           is_conversion: 0,
           can_passthru : 0,
         },
-        meta       : {},
+        meta       : clone(this.defaults(type) ?? {}),
         is_starting: false,
         is_entry   : false,
       } ))

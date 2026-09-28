@@ -1,0 +1,390 @@
+{
+    "names": {
+        "tag": {
+            "164": "Customer",
+            "165": "Lead",
+            "166": "Tom & Jerry",
+            "167": "VIP",
+            "168": "Newsletter"
+        },
+        "email": {
+            "73": "Welcome &"
+        },
+        "funnel": {
+            "2": "Onboarding & more"
+        }
+    },
+    "cases": [
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": []
+            },
+            "title": "Apply tags"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    164
+                ]
+            },
+            "title": "Apply <b>Customer</b>"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    164,
+                    165
+                ]
+            },
+            "title": "Apply <b>Customer</b> and <b>Lead</b>"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166
+                ]
+            },
+            "title": "Apply <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166,
+                    167,
+                    168
+                ]
+            },
+            "title": "Apply <b>5</b> tags"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": []
+            },
+            "title": "Remove tags"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    164
+                ]
+            },
+            "title": "Remove <b>Customer</b>"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    164,
+                    165
+                ]
+            },
+            "title": "Remove <b>Customer</b> and <b>Lead</b>"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166
+                ]
+            },
+            "title": "Remove <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166,
+                    167,
+                    168
+                ]
+            },
+            "title": "Remove <b>5</b> tags"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [],
+                "condition": "any"
+            },
+            "title": "A tag is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [],
+                "condition": "all"
+            },
+            "title": "A tag is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164,
+                    165
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> or <b>Lead</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164,
+                    165
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> and <b>Lead</b> are applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> or <b>Tom & Jerry</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b> are applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166,
+                    167,
+                    168
+                ],
+                "condition": "any"
+            },
+            "title": "Any of <b>5</b> tags are applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166,
+                    167,
+                    168
+                ],
+                "condition": "all"
+            },
+            "title": "<b>5</b> tags are applied"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [],
+                "condition": "any"
+            },
+            "title": "A tag is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [],
+                "condition": "all"
+            },
+            "title": "A tag is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164,
+                    165
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> or <b>Lead</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164,
+                    165
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> and <b>Lead</b> are removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> or <b>Tom & Jerry</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b> are removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166,
+                    167,
+                    168
+                ],
+                "condition": "any"
+            },
+            "title": "Any of <b>5</b> tags are removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    164,
+                    165,
+                    166,
+                    167,
+                    168
+                ],
+                "condition": "all"
+            },
+            "title": "<b>5</b> tags are removed"
+        },
+        {
+            "type": "if_else",
+            "meta": [],
+            "title": ""
+        },
+        {
+            "type": "if_else",
+            "meta": {
+                "include_display": "Has tag <b>Customer</b>"
+            },
+            "title": "Has tag <b>Customer</b>"
+        },
+        {
+            "type": "if_else",
+            "meta": {
+                "exclude_display": "Has tag <b>Lead</b>"
+            },
+            "title": "Has tag <b>Lead</b>"
+        },
+        {
+            "type": "if_else",
+            "meta": {
+                "include_display": "Has tag <b>Customer</b>",
+                "exclude_display": "Has tag <b>Lead</b>"
+            },
+            "title": "Has tag <b>Customer</b> AND NOT Has tag <b>Lead</b>"
+        },
+        {
+            "type": "send_email",
+            "meta": [],
+            "title": "Send an email"
+        },
+        {
+            "type": "send_email",
+            "meta": {
+                "email_id": 73
+            },
+            "title": "Send <b>Welcome &amp;</b>"
+        },
+        {
+            "type": "add_to_flow",
+            "meta": [],
+            "title": "Add to flow"
+        },
+        {
+            "type": "add_to_flow",
+            "meta": {
+                "funnel_id": 2
+            },
+            "title": "Add to <b>Onboarding &amp; more</b>"
+        }
+    ]
+}

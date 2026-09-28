@@ -53,6 +53,8 @@
      * @param editing bool whether the flow is being edited, which adds the buttons for adding and changing steps
      * @param reporting bool whether to add the places the reporting page puts each step's stats
      * @param debug bool whether to add each step's ID and position
+     * @param previewOf function( step ) what to show instead of the server's while a change is saved: { title,
+     *                  errors: [{ code, message }], branches: [{ key, name, classes }] }, each optional, or null
      * @return Array
      */
     const render = ({
@@ -60,9 +62,48 @@
       editing = true,
       reporting = false,
       debug = false,
+      previewOf = () => null,
     }) => {
 
       const canvasOf = step => store.getCanvas(step.ID) ?? {}
+
+      /**
+       * The classes on a step's card, with the warnings the preview has instead of the server's
+       */
+      const classesOf = (step, canvas, preview) => {
+
+        const classes = canvas.classes ?? [
+          step.data.step_group,
+          step.data.step_type,
+          step.data.step_status,
+          // steps just added in the editor don't have the server's yet
+          'pending',
+        ]
+
+        if (!preview?.errors) {
+          return classes
+        }
+
+        const serverCodes = ( canvas.errors ?? [] ).map(error => error.code)
+
+        return [
+          ...classes.filter(name => name !== 'has-errors' && !serverCodes.includes(name)),
+          ...( preview.errors.length ? ['has-errors', ...preview.errors.map(error => error.code)] : [] ),
+        ]
+      }
+
+      /**
+       * The branches a logic step has, the server's, or the preview's until the server says
+       */
+      const branchesOf = step => canvasOf(step).branches ?? previewOf(step)?.branches?.map(({
+        key,
+        name,
+        classes = '',
+      }) => ( {
+        id: `${ step.ID }-${ key }`,
+        name,
+        classes,
+      } ))
 
       const AddStepButton = ({
         id,
@@ -100,6 +141,7 @@
       const Card = step => {
 
         const canvas = canvasOf(step)
+        const preview = previewOf(step)
         const {
           step_type,
           step_group,
@@ -122,16 +164,7 @@
           dataType : step_type,
           dataGroup: step_group,
           dataLevel: step_level,
-          className: [
-            'step',
-            // steps just added in the editor don't have the server's yet
-            ...( canvas.classes ?? [
-              step_group,
-              step_type,
-              step_status,
-              'pending',
-            ] ),
-          ].join(' '),
+          className: ['step', ...classesOf(step, canvas, preview)].join(' '),
           tabindex : 0,
         }, [
           h('input', {
@@ -170,7 +203,7 @@
               src      : icon || defaultIcon,
             }),
             h('div', {}, [
-              h('span', { className: 'step-title' }, canvas.title ?? escHTML(step_title)),
+              h('span', { className: 'step-title' }, preview?.title ?? canvas.title ?? escHTML(step_title)),
               h('span', { className: 'step-name' }, name),
             ]),
           ]),
@@ -208,7 +241,7 @@
        */
       const BranchLogicItem = step => {
 
-        const branches = canvasOf(step).branches ?? []
+        const branches = branchesOf(step) ?? []
         const known = branches.map(branch => branch.id)
 
         const unused = [...new Set(store.subSteps(step).map(sub => sub.data.branch))].
@@ -306,7 +339,7 @@
       }
 
       const Item = step => {
-        switch (canvasOf(step).layout) {
+        switch (canvasOf(step).layout ?? ( branchesOf(step) ? 'branches' : 'default' )) {
           case 'html':
             return canvasOf(step).html
           case 'stop':

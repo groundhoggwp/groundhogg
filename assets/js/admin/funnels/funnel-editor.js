@@ -70,18 +70,21 @@
    * @param editing bool
    * @param reporting bool
    * @param debug bool
+   * @param previewOf function see flow-canvas.js
    */
   const drawCanvas = ({
     store,
     editing = true,
     reporting = false,
     debug = false,
+    previewOf = () => null,
   }) => {
     morphdom(document.getElementById('step-sortable'), Div({}, flowCanvas.render({
       store,
       editing,
       reporting,
       debug,
+      previewOf,
     })), {
       childrenOnly     : true,
       onBeforeElUpdated: function (fromEl, toEl) {
@@ -790,7 +793,99 @@
         steps    : Funnel.steps,
         canvas   : Funnel.canvas,
         stepTypes: Groundhogg.rawStepTypes,
+        defaults : type => Funnel.stepTypes[type]?.defaults,
       }),
+
+      // step types' JS, see registerStepType()
+      stepTypes: {},
+
+      /**
+       * Give a step type JS that draws its settings and shows its title, warnings, and branches right away.
+       * Everything is optional, what's left out comes from the server. The server's title and warnings replace the
+       * ones shown here once a change is saved.
+       *
+       * @param type string
+       * @param handler Object
+       *   settings( step, update ) the settings, drawn where the step type's PHP settings() would be, call
+       *                            update( { setting: value } ) to change them
+       *   title( step )            the title, or undefined to keep the last one
+       *   validate( step )         warnings, [ { code, message } ]
+       *   branches( step )         a logic step's branches, [ { key, name, classes } ]
+       *   defaults                 the settings new steps start with
+       *   onDuplicate( step )      extra fields to post when the step is duplicated, or a promise of them
+       */
+      registerStepType (type, handler) {
+        this.stepTypes[type] = handler
+      },
+
+      /**
+       * What a step type's JS shows instead of the server's while a step's change is being saved
+       *
+       * @param step Object
+       * @return Object|null
+       */
+      previewOf (step) {
+
+        const handler = this.stepTypes[step.data.step_type]
+
+        if (!handler || !( FlowStore.isTempId(step.ID) || this.hasPendingSettings(step.ID) )) {
+          return null
+        }
+
+        const preview = {}
+
+        try {
+          if (handler.title) {
+            // an empty title isn't used, like on the server
+            preview.title = handler.title(step) || undefined
+          }
+          if (handler.validate) {
+            preview.errors = handler.validate(step)
+          }
+          if (handler.branches) {
+            preview.branches = handler.branches(step)
+          }
+        }
+        catch (err) {
+          console.warn(err)
+        }
+
+        return preview
+      },
+
+      /**
+       * Change a step's settings from its type's JS, see registerStepType()
+       *
+       * @param stepId
+       * @param patch Object setting => value
+       */
+      updateSettings (stepId, patch) {
+        this.updateStepMeta(patch, stepId)
+      },
+
+      /**
+       * Draw the settings of step types that have JS for them, where their PHP settings() would be
+       */
+      mountSettings () {
+        document.querySelectorAll('.step-settings .step-type-settings:not([data-mounted])').forEach(el => {
+
+          const step = this.getStep(el.closest('.step.settings')?.dataset.id)
+          const handler = this.stepTypes[step?.data.step_type]
+
+          if (!handler?.settings) {
+            return
+          }
+
+          el.dataset.mounted = '1'
+
+          try {
+            el.replaceChildren(handler.settings(step, patch => this.updateSettings(step.ID, patch)))
+          }
+          catch (err) {
+            console.error(err)
+          }
+        })
+      },
 
       history: FlowStore.createHistory(),
 
@@ -799,8 +894,9 @@
        */
       drawCanvas () {
         drawCanvas({
-          store: this.store,
-          debug: Boolean(this.debug),
+          store    : this.store,
+          debug    : Boolean(this.debug),
+          previewOf: step => this.previewOf(step),
         })
 
         // the add button that's highlighted
@@ -1139,6 +1235,8 @@
             return node
           },
         })
+
+        this.mountSettings()
       },
 
       /**
@@ -2492,7 +2590,13 @@
 
         }
 
-        if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onDuplicate')) {
+        if (this.stepTypes[type]?.onDuplicate) {
+          extra = {
+            ...extra,
+            ...await this.stepTypes[type].onDuplicate(step),
+          }
+        }
+        else if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onDuplicate')) {
           let _extra = await new Promise((res, rej) => this.stepCallbacks[type].onDuplicate(step, res, rej))
           extra = {
             ...extra,
@@ -2563,6 +2667,12 @@
 
         this.saveSettings(step.ID, { meta: _meta })
 
+        // the title the step type's JS gives it, see previewOf()
+        if (this.stepTypes[step.data.step_type]?.title) {
+          this.drawCanvas()
+          drawLogicLines()
+        }
+
         return step
       },
 
@@ -2632,6 +2742,13 @@
         }
 
         const type = step.data.step_type
+
+        // drawn by the step type's JS instead, see registerStepType()
+        if (this.stepTypes[type]?.settings) {
+          $(document).trigger('gh-init-pickers')
+          $(document).trigger('step-active')
+          return
+        }
 
         if (this.stepCallbacks.hasOwnProperty(type) && this.stepCallbacks[type].hasOwnProperty('onActive')) {
           this.stepCallbacks[type].onActive({

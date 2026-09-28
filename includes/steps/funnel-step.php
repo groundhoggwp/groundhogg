@@ -940,9 +940,9 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 						] ) );
 					}
 
-					$this->settings( $step )
-
+					// where the step type's JS draws its settings, if it has any, see Funnel.registerStepType()
 					?>
+                    <div class="step-type-settings"><?php $this->settings( $step ) ?></div>
                 </div>
             </div>
 			<?php

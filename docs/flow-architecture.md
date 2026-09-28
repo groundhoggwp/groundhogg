@@ -886,10 +886,34 @@ and redraws right away (`redraw()`: `drawCanvas()`, `makeSortable()`, `drawLogic
 - **Other:** the "More" menu (export, share, reports, add contacts through `FunnelScheduler`, screenshot
   and full-screen modes, shortcuts, "Revert changes" = `_uncommit`), and the tour.
 
+### Step type JS: `Funnel.registerStepType( type, handler )` (since 5.0)
+
+Everything is optional, and what a type leaves out comes from the server:
+
+- **`settings( step, update )`** returns the type's settings UI (MakeEl), drawn in the panel's
+  `.step-type-settings` (where PHP `settings()` prints, the rest of the island stays: the header, the custom name
+  field, and the `settings/before|after` hooks). `update( { setting: value } )` = `updateStepMeta()`, so it's saved
+  with the panel's fields. Mounted by `mountSettings()` after each `drawPanels()`, into elements without
+  `data-mounted`, so it's drawn again when a new island replaces it, or after undo. A type with `settings()` doesn't
+  get `onActive`. Re-render with MakeEl's `morph` (return one element or a `Fragment` from a function child).
+- **`title( step )`**, **`validate( step )`** (`[ { code, message } ]`) and **`branches( step )`**
+  (`[ { key, name, classes } ]`) are shown on the canvas only while the step is new or has unsent settings changes
+  (`previewOf()`); once saved the server's win. An empty or undefined title keeps the last one.
+- **`defaults`**: settings steps added in the editor start with, until the server's arrive.
+- **`onDuplicate( step )`**: extra fields to post when duplicating, or a promise of them.
+
+Ported so far (`funnel-steps.js`): `delay_timer` (settings; its title is `delay_preview`, which its JS writes, so
+the JS is the source), `apply_tag`, `remove_tag`, `tag_applied`, `tag_removed` (settings, title), `if_else`
+(settings, title, branches), `add_to_flow` (settings, title), `send_email` (title only, its panel is still drawn by
+`onActive`). Their titles are in `step-titles.js` (`Groundhogg.StepTitles`, DOM-free), which match
+`generate_step_title()`: `tests/js/step-titles.test.js` checks them against cases PHPUnit's `Step_Titles_Tests`
+writes to `tests/js/fixtures/titles.json`. Titles that need a name that isn't loaded (a tag, an email, a flow) are
+undefined.
+
 ### Step type JS: `Funnel.registerStepCallbacks( type, callbacks )`
 
-This is the only registration API; it **replaces** any earlier registration for the type. Only two
-callbacks are ever called:
+The older API, still supported for types that don't have `registerStepType()` settings; it **replaces** any
+earlier registration for the type. Only two callbacks are ever called:
 
 - **`onActive( step )`** runs when the step's panel opens (hash `#<id>`), after every explicit save, and
   after an undo/redo restore. `step` is `{ ID, data, meta, export, is_starting, is_entry,

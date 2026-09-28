@@ -418,8 +418,14 @@ class Scripts {
 			'groundhogg-admin-funnel-scheduler',
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-step-titles', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/step-titles' . $dot_min . '.js', [
+			'wp-i18n',
+			'groundhogg-admin',
+		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-funnel-steps', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/funnel-steps' . $dot_min . '.js', [
-			'groundhogg-admin-funnel-editor'
+			'groundhogg-admin-funnel-editor',
+			'groundhogg-admin-step-titles',
 		] );
 
 		wp_register_script( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'js/admin/forms/form-builder' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
