@@ -124,10 +124,12 @@
           dataLevel: step_level,
           className: [
             'step',
+            // steps just added in the editor don't have the server's yet
             ...( canvas.classes ?? [
               step_group,
               step_type,
               step_status,
+              'pending',
             ] ),
           ].join(' '),
           tabindex : 0,

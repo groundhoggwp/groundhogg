@@ -926,6 +926,15 @@ button.button.save-button {
 #step-flow .fixed-inside .step-branches .split-branch.red > .logic-line.line-above > .path-indicator {
   background-color: rgb(233, 31, 79);
 }
+#step-flow .fixed-inside .step-branches .split-branch.unused-branch > .logic-line.line-above {
+  border-style: dashed;
+}
+#step-flow .fixed-inside .step-branches .split-branch.unused-branch > .logic-line.line-above > .logic-line {
+  border-style: dashed;
+}
+#step-flow .fixed-inside .step-branches .split-branch.unused-branch > .logic-line.line-above > .path-indicator {
+  background-color: rgb(233, 31, 79);
+}
 #step-flow .fixed-inside .step-branches .split-branch > .logic-line {
   border-color: rgb(108, 25, 173);
 }
@@ -1307,6 +1316,10 @@ button.button.save-button {
 }
 #step-flow .step.locked .delete-step {
   display: none;
+}
+#step-flow .step.pending {
+  opacity: 0.6;
+  pointer-events: none;
 }
 #step-flow .step:not(.locked) .unlock-step {
   display: none;

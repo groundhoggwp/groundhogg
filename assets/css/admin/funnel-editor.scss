@@ -1921,6 +1921,12 @@ button.button.save-button {
       }
     }
 
+    // added in the editor, until the server saves it
+    &.pending {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
     &:not(.locked) {
       .unlock-step {
         display: none;
