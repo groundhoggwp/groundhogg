@@ -63,6 +63,47 @@ class Funnel extends Base_Object_With_Meta {
 		return $html;
 	}
 
+	/**
+	 * What the flow editor's JS needs to draw each step on the canvas, keyed by step ID
+	 *
+	 * @return array[]
+	 */
+	public function get_canvas_data() {
+
+		$canvas = [];
+
+		foreach ( $this->get_steps() as $step ) {
+			$element = $step->get_step_element();
+			$element->validate_settings( $step );
+			$canvas[ $step->get_id() ] = $element->get_canvas_data( $step );
+		}
+
+		return $canvas;
+	}
+
+	/**
+	 * The step types' parts of the settings panels, which the flow editor draws the rest of, keyed by step ID
+	 *
+	 * @param int[]|null $ids only these steps, or all of them
+	 *
+	 * @return array[] see Funnel_Step::get_settings_island()
+	 */
+	public function get_settings_islands( ?array $ids = null ) {
+
+		$islands = [];
+
+		foreach ( $this->get_steps() as $step ) {
+
+			if ( $ids !== null && ! in_array( $step->get_id(), $ids ) ) {
+				continue;
+			}
+
+			$islands[ $step->get_id() ] = $step->get_step_element()->get_settings_island( $step );
+		}
+
+		return $islands;
+	}
+
 	public function step_settings( $echo = true ) {
 
 		$steps = $this->get_steps();

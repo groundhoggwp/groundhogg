@@ -1327,6 +1327,21 @@ button.button.save-button {
           }
         }
 
+        // a branch the logic step no longer has, but that still has steps
+        &.unused-branch {
+          > .logic-line.line-above {
+            border-style: dashed;
+
+            > .logic-line {
+              border-style: dashed;
+            }
+
+            > .path-indicator {
+              background-color: $error-red;
+            }
+          }
+        }
+
         > .logic-line {
           border-color: $secondary-purple;
 
@@ -1904,6 +1919,12 @@ button.button.save-button {
       .delete-step {
         display: none;
       }
+    }
+
+    // added in the editor, until the server saves it
+    &.pending {
+      opacity: 0.6;
+      pointer-events: none;
     }
 
     &:not(.locked) {

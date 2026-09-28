@@ -2,6 +2,9 @@
 
 namespace Groundhogg\Admin\Funnels;
 
+use Groundhogg\Abilities\Funnels\Flow_Changes;
+use Groundhogg\Abilities\Funnels\Flow_Operations;
+use Groundhogg\Abilities\Funnels\Get_Flow;
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Campaign;
 use Groundhogg\DB\Query\Table_Query;
@@ -67,6 +70,8 @@ class Funnels_Page extends Admin_Page {
 
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_gh_save_funnel_via_ajax', [ $this, 'ajax_save_funnel' ] );
+		add_action( 'wp_ajax_gh_flow_operations', [ $this, 'ajax_flow_operations' ] );
+		add_action( 'wp_ajax_gh_flow_action', [ $this, 'ajax_flow_action' ] );
 		add_action( 'wp_ajax_gh_flow_simulate', [ $this, 'ajax_simulate' ] );
 
 		add_action( 'wp_ajax_gh_funnel_editor_full_screen_preference', [
@@ -248,6 +253,17 @@ class Funnels_Page extends Admin_Page {
 					'is_editor'           => true,
 					'pending_deletes'     => $this->get_pending_deletes( $funnel ),
 					'step_references'     => $this->get_step_references( $funnel ),
+					// the editor draws the canvas from these, see flow-canvas.js
+					'canvas'              => $funnel->while_editing( function () use ( $funnel ) {
+						return $funnel->get_canvas_data();
+					} ),
+					'debug'               => WP_DEBUG,
+					'islands'             => (object) $funnel->while_editing( function () use ( $funnel ) {
+						return $funnel->get_settings_islands();
+					} ),
+					'revision'            => $funnel->while_editing( function () use ( $funnel ) {
+						return Get_Flow::revision( $funnel );
+					} ),
 				] );
 
 				wp_add_inline_script( 'groundhogg-admin-funnel-editor', "var Funnel = " . wp_json_encode( $data ), 'before' );
@@ -269,7 +285,8 @@ class Funnels_Page extends Admin_Page {
 
 				enqueue_email_block_editor_assets();
 
-				use_edit_lock( $funnel );
+				// only one person can edit a flow at a time
+				use_edit_lock( $funnel, false );
 
 				do_action( 'groundhogg/admin/funnels/editor_scripts', $funnel );
 
@@ -682,6 +699,17 @@ class Funnels_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
+		// someone else is editing the flow
+		$locked_by = check_lock( $this->get_current_funnel() );
+
+		if ( $locked_by ) {
+			wp_send_json_error( new \WP_Error( 'flow_locked', sprintf(
+			/* translators: %s: the name of the user editing the flow */
+				__( '%s is editing this flow, so your changes can\'t be saved.', 'groundhogg' ),
+				get_userdata( $locked_by )->display_name
+			) ) );
+		}
+
 		$result = $this->process_edit();
 
 		$funnel = $this->get_current_funnel();
@@ -690,17 +718,7 @@ class Funnels_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
-		$response = [
-			'sortable'        => $funnel->step_flow( false ),
-			'settings'        => $funnel->step_settings( false ),
-			'funnel'          => $funnel,
-			'pending_deletes' => $this->get_pending_deletes( $funnel ),
-			'step_references' => $this->get_step_references( $funnel ),
-			// whether there's anything to publish, for the Publish Changes button
-			'has_changes'     => $funnel->while_editing( function () use ( $funnel ) {
-				return $funnel->has_changes();
-			} ),
-		];
+		$response = $this->get_editor_state( $funnel );
 
 		if ( is_wp_error( $result ) ) {
 			$response['err'] = $result->get_error_messages();
@@ -712,6 +730,198 @@ class Funnels_Page extends Admin_Page {
 
 		$this->send_ajax_response( $response );
 
+	}
+
+	/**
+	 * Apply operations from the flow editor, in groundhogg/edit-flow's format, see Flow_Operations.
+	 * The editor changes its step store first and sends the operations in the background, see flow-store.js.
+	 *
+	 * Posts `funnel`, `operations` as JSON, and `revision`, the revision the editor last saw.
+	 * Responds with the IDs of the steps added by their local ids, and the editor's state, see get_editor_state().
+	 * When refused, responds with the error's `code` and `message`, and the `state` to go back to.
+	 */
+	public function ajax_flow_operations() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error( [ 'code' => 'invalid_nonce', 'message' => __( 'Your session expired, reload the page.', 'groundhogg' ) ] );
+		}
+
+		$funnel = new Funnel( absint( get_post_var( 'funnel' ) ) );
+
+		if ( ! $funnel->exists() || ! current_user_can( 'edit_funnel', $funnel->get_id() ) ) {
+			wp_send_json_error( [ 'code' => 'not_allowed', 'message' => __( 'You can\'t edit this flow.', 'groundhogg' ) ] );
+		}
+
+		$refuse = function ( WP_Error $error ) use ( $funnel ) {
+			wp_send_json_error( [
+				'code'    => $error->get_error_code(),
+				'message' => $error->get_error_message(),
+				'state'   => $this->get_editor_state( $funnel ),
+			] );
+		};
+
+		// someone else is editing the flow
+		$locked_by = check_lock( $funnel );
+
+		if ( $locked_by ) {
+			$refuse( new WP_Error( 'flow_locked', sprintf(
+			/* translators: %s: the name of the user editing the flow */
+				__( '%s is editing this flow, so your changes can\'t be saved.', 'groundhogg' ),
+				get_userdata( $locked_by )->display_name
+			) ) );
+		}
+
+		// changed since the editor last saw it, like in another tab
+		$revision = $funnel->while_editing( function () use ( $funnel ) {
+			return Get_Flow::revision( $funnel );
+		} );
+
+		if ( get_post_var( 'revision' ) && get_post_var( 'revision' ) !== $revision ) {
+			$refuse( new WP_Error( 'flow_changed', __( 'The flow was changed somewhere else, like in another tab. It\'s been reloaded.', 'groundhogg' ) ) );
+		}
+
+		$operations = json_decode( get_post_var( 'operations', '[]' ), true );
+
+		if ( ! is_array( $operations ) || empty( $operations ) ) {
+			$refuse( new WP_Error( 'no_operations', __( 'Nothing to save.', 'groundhogg' ) ) );
+		}
+
+		$editor = new Flow_Operations( $funnel, true );
+		$added  = $editor->apply_all_or_nothing( $operations );
+
+		if ( is_wp_error( $added ) ) {
+			$refuse( $added );
+		}
+
+		/**
+		 * Runs after the funnel as been updated.
+		 */
+		do_action( 'groundhogg/admin/funnel/updated', $funnel );
+
+		wp_send_json_success( array_merge( [
+			'ids' => Flow_Operations::get_added_ids( $added ),
+		], $this->get_editor_state( $funnel, $editor->get_touched() ) ) );
+	}
+
+	/**
+	 * Publish, activate, deactivate, or revert the flow from the editor, which the abilities do too, see Flow_Changes.
+	 *
+	 * Posts `funnel`, `flow_action`, and `deleted_steps`, what to do with contacts waiting at deleted steps, like
+	 * the abilities take them: [ { step, action: cancel|move, to } ].
+	 * Responds with the editor's state, see get_editor_state(), or when refused the error's `code` and `message`.
+	 */
+	public function ajax_flow_action() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error( [ 'code' => 'invalid_nonce', 'message' => __( 'Your session expired, reload the page.', 'groundhogg' ) ] );
+		}
+
+		$funnel = new Funnel( absint( get_post_var( 'funnel' ) ) );
+
+		if ( ! $funnel->exists() || ! current_user_can( 'edit_funnel', $funnel->get_id() ) ) {
+			wp_send_json_error( [ 'code' => 'not_allowed', 'message' => __( 'You can\'t edit this flow.', 'groundhogg' ) ] );
+		}
+
+		$refuse = function ( WP_Error $error ) {
+			wp_send_json_error( [
+				'code'    => $error->get_error_code(),
+				'message' => $error->get_error_message(),
+			] );
+		};
+
+		$unlocked = Flow_Changes::check_lock( $funnel );
+
+		if ( is_wp_error( $unlocked ) ) {
+			$refuse( $unlocked );
+		}
+
+		$choices = $funnel->while_editing( function () use ( $funnel ) {
+			return Flow_Changes::get_choices( $funnel, (array) json_decode( get_post_var( 'deleted_steps', '[]' ), true ) );
+		} );
+
+		if ( is_wp_error( $choices ) ) {
+			$refuse( $choices );
+		}
+
+		switch ( get_post_var( 'flow_action' ) ) {
+
+			case 'publish':
+
+				if ( ! $funnel->is_active() ) {
+					$refuse( new WP_Error( 'not_active', __( 'Only active flows have changes to publish.', 'groundhogg' ) ) );
+				}
+
+				Flow_Changes::publish( $funnel, $choices );
+
+				break;
+
+			case 'activate':
+
+				// steps deleted while inactive can't be published, so their contacts are handled and they're removed now
+				Flow_Changes::remove_deleted_steps( $funnel, $choices );
+
+				$funnel->update( [
+					'status'       => 'active',
+					'last_updated' => current_time( 'mysql' ),
+				] );
+
+				break;
+
+			case 'deactivate':
+
+				// unpublished changes are discarded, like the editor always has
+				$funnel->uncommit();
+
+				$funnel->update( [
+					'status'       => 'inactive',
+					'last_updated' => current_time( 'mysql' ),
+				] );
+
+				break;
+
+			case 'revert':
+				$funnel->uncommit();
+				break;
+
+			default:
+				$refuse( new WP_Error( 'invalid_action', __( 'That\'s not something the flow can do.', 'groundhogg' ) ) );
+		}
+
+		/**
+		 * Runs after the funnel as been updated.
+		 */
+		do_action( 'groundhogg/admin/funnel/updated', $funnel );
+
+		wp_send_json_success( $this->get_editor_state( $funnel ) );
+	}
+
+	/**
+	 * What the editor redraws the flow from after a save, see funnel-editor.js
+	 *
+	 * @param Funnel     $funnel
+	 * @param int[]|null $island_ids the steps whose settings panels changed, or all of them
+	 *
+	 * @return array
+	 */
+	public function get_editor_state( Funnel $funnel, ?array $island_ids = null ) {
+
+		return $funnel->while_editing( function () use ( $funnel, $island_ids ) {
+
+			return [
+				// the editor draws the canvas from these, see flow-canvas.js
+				'canvas'          => $funnel->get_canvas_data(),
+				// and the step types' parts of the settings panels
+				'islands'         => (object) $funnel->get_settings_islands( $island_ids ),
+				// encoded while editing, so the steps are the draft
+				'funnel'          => json_decode( wp_json_encode( $funnel ), true ),
+				'pending_deletes' => $this->get_pending_deletes( $funnel ),
+				'step_references' => $this->get_step_references( $funnel ),
+				// whether there's anything to publish, for the Publish Changes button
+				'has_changes'     => $funnel->has_changes(),
+				// changes when the steps do, the editor sends it back to catch changes made somewhere else
+				'revision'        => Get_Flow::revision( $funnel ),
+			];
+		} );
 	}
 
 	/**

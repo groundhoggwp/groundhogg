@@ -597,8 +597,11 @@ There are three paths, all ending in `Step::update_meta()`:
 
 ### Undo/redo vs rollback
 
-- **`snapshot()` / `restore( $snapshot )`**: the editor's undo format, `[ { ID, data, meta } ]` as the
-  editor sees the steps. `restore()`:
+- **The editor's undo** (since 5.0) is operations, see 9: each edit records the operations that reverse it, and
+  undoing sends those like any other edit. Undoing a delete is Flow_Operations' `restore`, which is why deletes
+  stay soft until publishing.
+- **`snapshot()` / `restore( $snapshot )`**: the editor's old undo format, `[ { ID, data, meta } ]` as the
+  editor sees the steps. `snapshot()` is still what `Get_Flow::revision()` hashes. `restore()`:
   - soft-deletes steps not in the snapshot;
   - `update()`s the rest back to their data (staged on active flows);
   - `update_meta()`s their meta.
@@ -638,7 +641,16 @@ There are three paths, all ending in `Step::update_meta()`:
 
 ### Locking
 
-- `is_locked` is written directly by the editor's `_lock_step` / `_unlock_step`, bypassing staging.
+- **Edit lock (the whole flow):** `includes/edit-lock.php`, the same system WP uses for posts. Opening the
+  editor calls `use_edit_lock( $funnel, false )`: a `_edit_lock` funnel meta of `"<time>:<user>"`, refreshed by
+  the heartbeat every 30s, valid for 150s (`wp_check_post_lock_window`). There's no take-over: anyone else gets
+  a modal that only lets them exit. The editor releases it on `pagehide` (`sendBeacon` to
+  `wp_ajax_groundhogg_remove_lock`, only the holder can). While another user holds it, the editor's save and
+  the `edit-flow`, `publish-flow-changes`, `discard-flow-changes`, `activate-flow` and `deactivate-flow`
+  abilities are refused (`flow_locked` / `groundhogg_flow_locked`, via `Flow_Changes::check_lock()`). The
+  same user in another tab, or an agent acting as them, isn't locked out.
+- **Step locks:** `is_locked` is written directly, bypassing staging, by the `lock` / `unlock` operations (the
+  editor and `edit-flow`) and the old form save's `_lock_step` / `_unlock_step`.
 - Locked steps can't be dragged (`.locked` cancels sortable), and `edit-flow` refuses to update, move or
   delete them.
 - `Step::is_locked()` is filterable (`groundhogg/step/is_locked`).
@@ -647,14 +659,47 @@ There are three paths, all ending in `Step::update_meta()`:
 
 ## 8. The editor save protocol (server)
 
-The editor posts to `admin-ajax.php?action=gh_save_funnel_via_ajax` (`?auto-save=1` or `?explicit-save=1`).
-`Funnels_Page::ajax_save_funnel()` calls `verify_action()`, then `process_edit()`, and responds
-`{ sortable, settings, funnel, pending_deletes, step_references, has_changes, err? }`. The REST `/funnels/{id}/commit`
-route is **not** used by the editor.
+The editor saves two ways (the REST `/funnels/{id}/commit` route is **not** used by it):
+
+- **Operations** (since 5.0): adding, moving, deleting, and undo/redo post `admin-ajax.php?action=gh_flow_operations`
+  (`Funnels_Page::ajax_flow_operations()`) with `funnel`, `revision`, and `operations`, a JSON list in
+  `groundhogg/edit-flow`'s format. See below.
+- **Flow actions** (`gh_flow_action`, `Funnels_Page::ajax_flow_action()`): `flow_action` publish, activate,
+  deactivate, or revert, with `deleted_steps` choices in the abilities' format (`Flow_Changes::get_choices()`).
+  Publish and activate use `Flow_Changes::publish()` / `remove_deleted_steps()`, like the abilities; deactivate and
+  revert `uncommit()`.
+- **The form** (`gh_save_funnel_via_ajax`, `?auto-save=1` or `?explicit-save=1`): the editor no longer uses it.
+  `Funnel.save()` only posts it when a caller adds its own fields (`moreData`), for third-party JS.
+  `Funnels_Page::ajax_save_funnel()` calls `verify_action()`, then `process_edit()`.
+
+Both respond with `Funnels_Page::get_editor_state()`, encoded while editing: `{ canvas, settings, funnel,
+pending_deletes, step_references, has_changes, revision }`, plus `err?` from the form, and `ids` from operations.
+
+**Operations (`ajax_flow_operations()`):**
+
+- checks the admin ajax nonce and `edit_funnel`;
+- refuses when another user holds the edit lock (`flow_locked`), or when `revision` isn't the flow's current
+  `Get_Flow::revision()` (`flow_changed`, it was changed in another tab or by an agent);
+- applies the operations with `new Flow_Operations( $funnel, true )` → `apply_all_or_nothing()`: in editing mode,
+  inside `backup()` / `rollback()`, so a refused batch changes nothing;
+- responds `{ ids: { localId: realId }, ...state }`, or when refused `success: false` with `{ code, message, state }`.
+
+**`Flow_Operations`** (`includes/abilities/funnels/flow-operations.php`) is the engine `edit-flow` used to have
+inline; the ability now calls it without editor mode. Editor mode adds:
+
+- `add` of **any registered type** (`Step_Tree_Builder::allow_any_type()`), not only the ones described for the
+  abilities; those get their initial settings and can't be given settings or branches. Premium placeholders are
+  refused.
+- `update` with `meta` (setting → value, `null` deletes) and/or a raw `title`: set as stored, no save handlers,
+  and allowed on locked steps. For undo/redo.
+- `restore` `{ step, at, steps: [ids deleted with it] }`: un-deletes soft-deleted steps (the row's `deleted` →
+  `inactive`, or the staged delete is dropped on active steps) and places them.
+- `write_layout()` numbers steps with one count across branches, so sibling branches don't tie and
+  `set_step_levels()` walks them in a stable order.
 
 **`process_edit()`, in order:**
 
-1. **`_restore`** (undo/redo): `$funnel->restore( json )` and return.
+1. **`_restore`** (the old undo/redo, no longer used by the editor): `$funnel->restore( json )` and return.
 2. **`_delete_step`**:
    - `can_delete_steps( [ step, ...descendants ] )` inside `while_editing()`;
    - if blocked, return the `WP_Error` and save nothing else (the response re-renders the step);
@@ -679,7 +724,11 @@ route is **not** used by the editor.
 
 **Response helpers:**
 
-- `step_flow()`: main-branch cards, running `validate_settings()`.
+- `get_canvas_data()`: `{ stepId: Funnel_Step::get_canvas_data() }`, running `validate_settings()` first. The
+  editor draws the canvas from it (see 9). `step_flow()` still renders the old server markup, which the canvas
+  fixtures compare against, but nothing in the editor uses it.
+- **Edit lock:** the request is refused with `wp_send_json_error( WP_Error( 'flow_locked' ) )` when another user
+  holds the flow's edit lock (`check_lock()`, see 7).
 - `step_settings()`: settings panels, **sorted by ID** so morphdom positions stay stable.
 - `get_pending_deletes()`: `{ steps: [ { ID, title, contacts, next } ], targets: [ { ID, title } ] }`.
 - `get_step_references()`: `{ stepId: [ { ID, title } ] }`, with titles suffixed "(in <flow>)" for other
@@ -687,7 +736,7 @@ route is **not** used by the editor.
 
 Page load (`Funnels_Page::scripts()`) prints the same data as the inline global
 `var Funnel = { ...get_as_array(), id, save_text, export_url, is_active, funnelTourDismissed,
-scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fires
+scratchFunnelURL, is_editor: true, pending_deletes, step_references, canvas, debug, revision }`, then fires
 `groundhogg/admin/funnels/editor_scripts` with the `Funnel`.
 
 ---
@@ -697,7 +746,9 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
 ### Scripts
 
 - Handles are registered in `includes/scripts.php` `register_admin_scripts()`:
-  - `groundhogg-admin-funnel-editor` (`funnel-editor.js`), which depends on jquery, groundhogg-admin,
+  - `groundhogg-admin-flow-store` (`flow-store.js`) and `groundhogg-admin-flow-canvas` (`flow-canvas.js`),
+    which draw the canvas;
+  - `groundhogg-admin-funnel-editor` (`funnel-editor.js`), which depends on jquery, the flow canvas, groundhogg-admin,
     -element, -functions, -form-builder-v2, email block editor, `groundhogg-admin-flow-logic-lines`,
     `groundhogg-admin-flow-simulator` and `groundhogg-admin-funnel-scheduler`;
   - `groundhogg-admin-funnel-steps` (`funnel-steps.js`), which depends on the editor.
@@ -717,7 +768,10 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
 
 **State:**
 
-- `steps`: `[ { ID, data, meta, … } ]`, refreshed from every save response;
+- `store` (`FlowStore.createStore()`), the steps and canvas data everything draws from. `steps` is a getter for
+  `store.steps`: `[ { ID, data, meta, … } ]`, replaced from every save response;
+- `queue` (`FlowStore.createQueue()`), `history` (`FlowStore.createHistory()`), `revision`, `realIds`
+  (temporary ID → real ID), `metaBefore` (settings `updateStepMeta()` changed, before they changed, for undo);
 - `pending_deletes`, `step_references`;
 - `stepCallbacks`, `metaUpdates`;
 - `editing` (the step ID whose panel is open);
@@ -736,11 +790,41 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
 
 `#step-settings-inner[data-view]` switches the panels in CSS.
 
-**`save( args )`**:
+**Editing through the store (since 5.0):** `perform( operations )` applies `groundhogg/edit-flow` operations to
+the store (`store.apply()`, which returns their inverses), records `{ undo, redo }` in the history, queues them,
+and redraws right away (`redraw()`: `drawCanvas()`, `makeSortable()`, `drawLogicLines()`).
 
-- Args: `{ quiet = true, moreData( formData ), restore = '', shouldMorphSettings = true }`; `save( true )`
+- **Store operations** (`flow-store.js`, DOM-free): `add` (steps get a temporary `tmp_…` ID, no dashes, so
+  branch strings like `tmp_x-yes` still parse), `move` (refused into its own branches), `delete` (the steps go to
+  `store.trash`), `restore`, and `update` (`meta`, `title`). `relayout()` re-derives order, levels, and
+  `is_starting` with the JS `set_step_levels()`.
+- **The queue** sends one `gh_flow_operations` request at a time; operations made meanwhile go in the next. On
+  success the temporary IDs are replaced in the history, the trash, and waiting operations, and `applyState()`
+  loads the server's state and re-applies the operations still waiting. On `flow_changed` the batch is re-applied
+  on the server's state and sent again (up to twice). Other refusals load the returned state, clear the history,
+  and show the message. Requests that don't get through are retried with backoff ("Changes not saved yet").
+- **Undo/redo** replay the recorded operations the same way. Once an added step is saved, redoing its add becomes
+  a `restore` of the same step.
+- `applyState( data, { quiet, shouldMorphSettings, loaded } )` is shared by both saves.
+
+**`save( args )`**: sends pending settings changes, then
+
+- with `moreData` (or `before`), posts the form like the old editor, for third-party JS that adds its own fields;
+- otherwise saves the open step's panel through an `update` operation, for step type JS that changes its panel's
+  fields and calls `Funnel.save()` (Pro's A/B test and branch editors, the webhook listener, EDD's and Woo's
+  legacy triggers), and resolves once it's saved.
+
+`flowAction( action, choices )` does publish, activate, deactivate, and revert, after what's queued
+(`whenSaved()`, so `pending_deletes` is current for the choices), and clears the history.
+
+**The form's save** (`postForm()`):
+
+- Args: `{ quiet = true, moreData( formData ), before(), shouldMorphSettings = true }`; `save( true )`
   means quiet.
-- A quiet save while another is in flight re-queues through `saveQuietly` (debounced 750ms).
+- It runs through `queue.exclusive()`, after anything queued before it, and `before()` runs right before posting
+  (duplicate and paste insert their placeholders there, so a redraw can't wipe them).
+- Changes the server makes from the posted settings are diffed (`store.changesSince()`) into a history entry, so
+  settings edits can be undone too; `metaBefore` supplies what `updateStepMeta()` values were.
 - It calls `updateBranches()` (copies each step's containing `.step-branch[data-branch]` into its hidden
   `steps[ID][branch]` input), then builds `FormData( #funnel-form )`:
   - every `step_ids[]` (existing IDs, or JSON placeholders for new, copied or duplicated steps);
@@ -750,12 +834,12 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
   - `metaUpdates` is taken for this request and reset, so edits made while it's in flight go in the next
     save. If the request fails or the response has `err`, the sent updates are put back (newer edits win)
     and go out with the next save.
-- `restore` replaces the payload with just `_restore`; pending `metaUpdates` are dropped with it.
-- **Response handling:**
-  - updates `steps`, `pending_deletes`, `step_references`;
-  - pushes undo history (unless restoring);
-  - morphdoms `#step-sortable` with `sortable` (unless dragging; keeps `.editing`), then `makeSortable()`;
-  - morphdoms `.step-settings` with `settings`. **On quiet non-restore saves it skips any element matching
+- **Response handling** (`applyState()`):
+  - updates `pending_deletes`, `step_references`, `revision`;
+  - loads `funnel.steps` and `canvas` into `Funnel.store` and redraws the canvas (unless dragging; keeps
+    `.editing` and the highlighted add button), then `makeSortable()`;
+  - a refused request (`success: false`, e.g. `flow_locked`) shows its message and keeps the `metaUpdates`;
+  - morphdoms `.step-settings` with `settings`. **On quiet saves it skips any element matching
     `.editing .ignore-morph`**, so the panel being edited isn't wiped.
   - `drawLogicLines()`;
   - "Publish Changes" (`#funnel-update`) is enabled when `response.data.has_changes`;
@@ -763,41 +847,52 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
   - **quiet saves:** trigger `auto-save` and `gh-init-pickers`, and don't show `err`. Callers that need
     errors must check `response.data.err` themselves, as delete does.
   - a failed request resets `saving` (otherwise quiet saves would wait for it forever) and shows an error.
-- **Autosave:** any `change` on `#funnel-form` → `saveQuietly()`, except `step_notes`, which goes through
-  `updateStepMeta`. Inputs with `.no-morph` skip the settings morph.
+- **Settings save through operations (since 5.0):** a `change` in a step's panel → `saveSettings( id )`, and
+  `updateStepMeta( meta, id )` → `saveSettings( id, { meta } )`. After 400ms without more changes,
+  `flushSettings()` sends `{ op: 'update', step, form, meta, flags }`: `form` is every `steps[ID][…]` field in the
+  panel (`FlowStore.formToSettings( $(panel).find(':input').serializeArray(), id )`), which the server saves with
+  `Step::save( $form )` after writing `meta`, keeping the step's branch (see 8). `meta` and `flags` apply to the
+  store right away. `step_notes` is `meta`. The flow title saves through REST (`FunnelsStore.patch()`).
+  - The step before its first unsent change is kept in `settingsBefore`, and once saved
+    (`recordSettingsChanges()`) the difference, including the regenerated title, becomes a history entry of
+    stored-value updates (`FlowStore.stepChanges()`).
+  - Inputs with `.no-morph` don't redraw the step type's settings after (`skipIslandMorph`).
+  - `save()` (the form) sends pending settings first (`flushAllSettings()`).
 
 **Undo/redo:**
 
-- `UndoRedoManager` keeps 50 states. Each state is `JSON.stringify( steps.map( { ID, data, meta } ) )`,
-  pushed after every non-restore save.
-- Undo posts `_restore` → server `Funnel::restore()`.
-- An explicit save (Publish/Activate) clears the history. That's when soft deletes become final.
+- `UndoRedoManager` is the buttons over `Funnel.history` (50 entries), see above.
+- An explicit save (Publish/Activate) and Revert clear the history. That's when soft deletes become final.
 
 **Canvas interactions:**
 
 - **Adding.** Clicking a `button.add-step` sets `addEl` (`.here`) and opens `#add/<group>`. Picking a tile
-  inserts `createPlaceholderEl( { step_type, step_group, branch } )` (a `.step-placeholder` holding a JSON
-  `step_ids[]` value) before `addEl`, then `save( true )`.
+  performs an `add` at `addButtonPosition( addEl )`: `before-<id>` / `before-group-<id>` → `{ before }`,
+  `add-to-group-after-<id>` → `{ after }`, `in-branch-<branch>` / `end-inside-<id>` → the branch's end,
+  `end-funnel` → the end of main.
 - **Drag and drop:**
   - jQuery UI `.step-branch` sortables (`connectWith: '.step-branch'`, `cancel: '.locked'`,
     `distance: 100`);
-  - picker tiles are draggables connected to them;
-  - `stop` → `saveQuietly()`, which picks up the new order and branches.
+  - picker tiles are draggables connected to them; `receive` performs an `add` where the tile was dropped;
+  - `stop` performs a `move` to `domPosition( item )` (after the previous `.sortable-item`, else before the
+    next, else the branch's start); dragging an OR group moves each of its triggers. The redraw undoes whatever
+    the drag did to the DOM.
 - **Keyboard:**
   - Ctrl/Cmd+C copies `{ copy: editingId }`;
-  - Ctrl/Cmd+V pastes a copy placeholder at `targetAdd`;
-  - Ctrl/Cmd+M toggles move mode (the next `add-step` click moves the step there).
+  - Ctrl/Cmd+V pastes the copied step at `targetAdd` with a `duplicate` operation, it can be from another flow;
+  - Ctrl/Cmd+M toggles move mode (the next `add-step` click performs a `move` there).
 - **Delete** (`deleteStep( id )`):
   - `deleting` = the step plus every `.step[data-id]` inside its `.sortable-item`;
   - **blocked** if `step_references` shows a user not in `deleting` → the `cantDeleteUsedSteps()` modal;
   - branch logic or benchmarks with inner steps get a danger confirm;
-  - then fade out, `save( { quiet: true, moreData: _delete_step } )`, and show `err` if the server refused
-    (the step reappears from the morph).
+  - then fade out and perform a `delete`; if the server refuses, the step comes back with its state.
 - **Duplicate** (`duplicateStep( id )`):
-  - asks whether to include sub-steps (`__ignore_inner`);
-  - runs the type's `onDuplicate( step, res, rej )` for extra post fields (e.g. `__duplicate_email`);
-  - inserts `{ duplicate: id }`.
-- **Lock / unlock** → `_lock_step` / `_unlock_step`.
+  - asks whether to include sub-steps (`include_branches`);
+  - runs the type's `onDuplicate()` for extra choices (e.g. `__duplicate_email`), which become `options`;
+  - performs a `duplicate` operation; the store puts a copy of the step right after it, the server's copies of
+    the steps in its branches arrive with the reply. Undo deletes them all, redo restores them with their IDs.
+- **Lock / unlock** → `lock` / `unlock` operations; the card's lock shows right away.
+- **Undo/redo** record what the other takes as the inverse of the operations as they were applied.
 - **Publish / Activate / Deactivate:**
   - if `#step-flow .has-errors` exists, a confirm ("Some of your steps have issues") comes first;
   - then `confirmDeletedSteps( pending_deletes, … )`: one row per deleted step with waiting contacts,
@@ -808,10 +903,51 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
 - **Other:** the "More" menu (export, share, reports, add contacts through `FunnelScheduler`, screenshot
   and full-screen modes, shortcuts, "Revert changes" = `_uncommit`), and the tour.
 
+### Step type JS: `Funnel.registerStepType( type, handler )` (since 5.0)
+
+Everything is optional, and what a type leaves out comes from the server:
+
+- **`settings( step, update )`** returns the type's settings UI (MakeEl), drawn in the panel's
+  `.step-type-settings` (where PHP `settings()` prints, the rest of the island stays: the header, the custom name
+  field, and the `settings/before|after` hooks). `update( { setting: value } )` = `updateStepMeta()`, so it's saved
+  with the panel's fields. Only the step being edited is mounted (`mountSettings()`, from `stepSettingsCallbacks()`
+  and `drawPanels()`, into elements without `data-mounted`), like `onActive`; it's drawn again when a new island
+  replaces it, or after undo. Leaving the step (`unmountSettings()`) puts the server's island back, so the other
+  panels keep the PHP fields the form's saves post. A type with `settings()` doesn't
+  get `onActive`. Re-render with MakeEl's `morph` (return one element or a `Fragment` from a function child).
+- **`title( step )`**, **`validate( step )`** (`[ { code, message } ]`) and **`branches( step )`**
+  (`[ { key, name, classes } ]`) are shown on the canvas only while the step is new or has unsent settings changes
+  (`previewOf()`); once saved the server's win. An empty or undefined title keeps the last one.
+- **`defaults`**: settings steps added in the editor start with, until the server's arrive.
+- **`onDuplicate( step )`**: extra fields to post when duplicating, or a promise of them.
+
+Ported so far (`funnel-steps.js`): `delay_timer` (settings; its title is `delay_preview`, which its JS writes, so
+the JS is the source), `apply_tag`, `remove_tag`, `tag_applied`, `tag_removed` (settings, title), `if_else`
+(settings, title, branches), `add_to_flow` (settings, title), and titles only for `send_email` (its panel is still
+drawn by `onActive`), `create_task`, `admin_notification`, `web_form` (TinyMCE and the FormBuilder need the
+`step-active` event), `email_confirmed` and `task_completed` (from the task steps in the store). For types with a
+JS title, `saveSettings()` copies the panel's pending fields into the step's settings so the title can use them.
+Left to the server: `account_created` (role names), `optin_status_changed` (preference names), and the types
+without a generated title.
+
+The premium branching types (`split_path`, `weighted_distribution`, `split_test`) register `branches()` in core,
+because their branches are defined by the premium base classes Pro's classes extend, so the canvas shows branches
+added, renamed, or removed in Pro's branch editors right away. `StepTitles.branches` is checked against their
+`get_canvas_data()` with the `branches` cases in `titles.json`.
+
+**Add-on compatibility (checked for 5.0):** Pro, SMS, EDD, WooCommerce, Pipeline, and Logic only use
+`registerStepCallbacks()`, `updateStepMeta()`, `getActiveStep()`, `Funnel.steps`, the `step-active` event,
+`Funnel.save()` (Pro's A/B test and branch deletes, EDD's and Woo's legacy triggers, which now wait their turn in
+the queue), and the `sortable/labels|classes` hooks (Logic). None change the canvas markup, so none need changes.
+Types whose picker is printed by `after_settings()` (`send_email`, SMS's `send_sms`) keep their `onActive` panels. Their titles are in `step-titles.js` (`Groundhogg.StepTitles`, DOM-free), which match
+`generate_step_title()`: `tests/js/step-titles.test.js` checks them against cases PHPUnit's `Step_Titles_Tests`
+writes to `tests/js/fixtures/titles.json`. Titles that need a name that isn't loaded (a tag, an email, a flow) are
+undefined.
+
 ### Step type JS: `Funnel.registerStepCallbacks( type, callbacks )`
 
-This is the only registration API; it **replaces** any earlier registration for the type. Only two
-callbacks are ever called:
+The older API, still supported for types that don't have `registerStepType()` settings; it **replaces** any
+earlier registration for the type. Only two callbacks are ever called:
 
 - **`onActive( step )`** runs when the step's panel opens (hash `#<id>`), after every explicit save, and
   after an undo/redo restore. `step` is `{ ID, data, meta, export, is_starting, is_entry,
@@ -865,7 +1001,28 @@ To reuse another type's callbacks, spread them: `{ ...Funnel.stepCallbacks.if_el
 
 ### DOM contract (server-rendered, relied on by the JS)
 
-**Canvas** (`Funnel::step_flow()` → `Step::sortable_item()` → element `sortable_item()`):
+**The canvas is drawn in JS** (since 5.0): `flow-store.js` (`Groundhogg.FlowStore`) holds the steps and the
+server's canvas data, and `flow-canvas.js` (`Groundhogg.FlowCanvas`) draws them with MakeEl. Both are DOM-free
+UMD modules so Node can load them for tests. The markup is the same the server rendered with `sortable_item()`
+(below), so drag and drop, the old save path, the logic lines and step type JS keep working.
+
+- **Canvas data** (`Funnel_Step::get_canvas_data( $step )`, per step): `layout` (`default`, `benchmark`,
+  `branches`, `stop`, `html`), `branch_logic`, `title` (`get_title()`), `classes` (the filtered card classes,
+  `get_sortable_classes()`), `notes` (HTML), `entry`, `conversion`, `locked`, `errors [{code, message}]`,
+  `labels` (`labels()` output), `extra_labels` (`groundhogg/steps/sortable/labels`), `inside` (the
+  `…/sortable/inside` actions), plus `name`/`icon`/`svg` for unregistered types. `Branch_Logic` adds
+  `branches [{id, name, classes}]`.
+- **Step types that override `sortable_item()`** (`uses_custom_sortable_item()`, by reflection) get `layout:
+  html` and their server markup in `html`, inserted as-is. Pro's `logic_jump`/`logic_loop` overrides only call
+  the parent, and Pro's `logic_stop` is drawn by the `stop` layout; the premium stubs say so.
+- Steps in a branch a logic step no longer has are drawn in an extra `.split-branch.unused-branch` column
+  instead of being hidden.
+- `Groundhogg.drawFlow( { steps, canvas }, { reporting } )` draws a flow that isn't being edited; the reporting
+  page (`funnel-flow-preview.php`) uses it with the `.step-reporting` stat slots.
+- In debug mode the editor compares `store.levelDifferences()` (a JS port of `set_step_levels()`) with the
+  server's values and warns in the console.
+
+**Canvas markup** (what `Step::sortable_item()` → element `sortable_item()` rendered, and the JS reproduces):
 
 - **`div.sortable-item.<group>`**, containing:
   - `button.add-step.add-action` (before),
@@ -892,7 +1049,17 @@ To reuse another type's callbacks, spread them: `{ ...Funnel.stepCallbacks.if_el
   `add-step` inside, and `.logic-line.line-below`.
 - `#step-sortable.step-branch[data-branch=main]` is the root.
 
-**Settings** (`Funnel::step_settings()` → `html_v2()`):
+**Settings panels are drawn in JS** (since 5.0), `drawPanels()` → `SettingsPanel( step )`, with the same markup
+`html_v2()` renders, which stays for the server. The step type's part, its **island**, is HTML from
+`Funnel_Step::get_settings_island( $step )`: `{ html, before_notes, ignore_morph }`, everything inside
+`.step-edit.panels` plus what `before_step_notes()` prints. The page gets every island (`Funnel.islands`), a form
+save sends them all again, and an operations reply only the ones for steps it added or changed
+(`Flow_Operations::get_touched()`). An island is only redrawn when a new one arrives (`drawnIslands`), and not while
+its settings have unsent changes, and focused fields aren't touched. The trigger flags are rendered as the same
+named checkboxes, so every save posts them. After undo/redo (`forcePanels`) everything is redrawn and
+`stepSettingsCallbacks()` runs again.
+
+**Settings markup** (`html_v2()`, and `SettingsPanel()`):
 
 - `#settings-<ID>.step.<group>.<type>.settings` contains `.step-warnings` (from `validate_settings()`
   errors) and `.step-flex`.
@@ -1084,6 +1251,12 @@ These are enforced by `class-abilities-schema-tests.php`:
     - the title only changes when `title` is given (it's re-applied after `after_save()`'s generated title).
   - `move { step, at }`: carries the step's branches; can't move into its own branches.
   - `delete { step }`: soft; cascades; checks `can_delete_steps()`.
+  - `duplicate { step, at?, id?, include_branches?, options? }`: the copy goes right after the step unless `at`
+    says where; the step can be in another flow the user can edit (pasting), which needs `at`; `Step::duplicate()` does the copying, with the step types' own `duplicate()` handlers, which read
+    choices from the request: `include_branches: false` sets `__ignore_inner`, and `options` (like
+    `__duplicate_email`) are set in `$_POST` while it runs. The copies in its branches are placed in the model
+    after it. `id` is a local id for later operations.
+  - `lock { step }` / `unlock { step }`: written directly to `is_locked`, not staged.
 - **Positions:** `{ after }`, `{ before }`, `{ branch_of, branch, position: start | end }` (branch keys
   are the type's, `then` for benchmarks), or `{ branch: 'main', position }`.
 - **Step references** in ops and settings are a real ID, or the local id of a step added earlier in the
@@ -1326,12 +1499,20 @@ false).
   - `class-step-references-tests.php`;
   - `class-step-trigger-frequency-tests.php`, `class-flow-fixes-tests.php` (commit, import, logic enqueue,
     initial settings, warnings);
-  - `includes/abilities/class-{step-tree-builder,get-flow,edit-flow,flow-changes}-tests.php`;
+  - `includes/abilities/class-{step-tree-builder,get-flow,edit-flow,flow-changes,flow-operations}-tests.php`;
   - `includes/class-abilities-schema-tests.php` (every ability schema is typed and its `$ref`s resolve,
     also after `wp_prepare_json_schema_for_client()`).
 - **PHPUnit, Pro:** `tests/phpunit/unit-tests/test-flow-logic-abilities.php` (Multi Branch round trip,
   branch merge, references). Pro's bootstrap finds core through `GROUNDHOGG_CORE_DIR`; point it at a core
   worktree to test both together.
+- **JS:** `npm run test:js` (Node's built-in runner, nothing to install) runs `tests/js/*.test.js`:
+  - `flow-canvas.test.js` draws each fixture flow with the JS canvas and compares it, token by token, with the
+    server's `step_flow()` markup;
+  - `flow-store.test.js` checks the JS levels match `set_step_levels()`.
+  - `flow-operations.test.js` covers the store's operations and their inverses, temporary IDs, the save queue,
+    and the history.
+  - The fixtures in `tests/js/fixtures/canvas/` are written by the PHPUnit `Flow_Canvas_Tests` with
+    `GH_UPDATE_JS_FIXTURES=1`; without it that test fails when the server's markup no longer matches them.
 - **Local test environment** (WP test lib, polyfills, php-test.ini, the `WP_PHP_BINARY` quirk, fresh-DB
   checks): see the Claude memory note `phpunit-test-workflow`. Always check a fresh database as well as a
   reused one; installer and role caching bugs only show on the first run.

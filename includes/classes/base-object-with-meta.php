@@ -323,7 +323,7 @@ abstract class Base_Object_With_Meta extends Base_Object {
 
 		// copy associations (to handle campaigns and stuff)
 		// todo only handles relationships where $this is primary
-		$related = $this->get_related_objects( $new );
+		$related = $this->get_related_objects();
 		foreach ( $related as $relative ) {
 			$new->create_relationship( $relative );
 		}

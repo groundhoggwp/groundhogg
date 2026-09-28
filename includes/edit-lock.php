@@ -84,6 +84,8 @@ function use_edit_lock( Base_Object_With_Meta $object, $can_take_over = true ) {
 		// Otherwise set the lock
 		$new_lock          = set_lock( $object );
 		$lock_data['lock'] = implode( ':', $new_lock );
+		// to release the lock when the editor closes
+		$lock_data['remove_nonce'] = wp_create_nonce( 'groundhogg_remove_lock' );
 	}
 
 	wp_enqueue_script( 'groundhogg-admin-edit-lock' );
@@ -209,6 +211,40 @@ function maybe_refresh_lock( array $response, array $data, $screen_id ) {
 	$response['groundhogg-refresh-lock'] = $send;
 
 	return $response;
+}
+
+add_action( 'wp_ajax_groundhogg_remove_lock', __NAMESPACE__ . '\ajax_remove_lock' );
+
+/**
+ * Release the lock when the editor closes, so others don't have to wait for it to expire
+ *
+ * @return void
+ */
+function ajax_remove_lock() {
+
+	$id   = absint( get_post_var( 'id' ) );
+	$type = sanitize_key( get_post_var( 'type' ) );
+
+	if ( ! $id || ! $type || ! wp_verify_nonce( get_post_var( '_wpnonce' ), 'groundhogg_remove_lock' ) || ! current_user_can( "edit_$type", $id ) ) {
+		wp_send_json_error();
+	}
+
+	$object = create_object_from_type( $id, $type );
+
+	if ( ! $object || ! $object->exists() ) {
+		wp_send_json_error();
+	}
+
+	$lock = explode( ':', (string) $object->get_meta( '_edit_lock' ) );
+
+	// only the user holding the lock can release it
+	if ( absint( $lock[1] ?? 0 ) !== get_current_user_id() ) {
+		wp_send_json_error();
+	}
+
+	$object->delete_meta( '_edit_lock' );
+
+	wp_send_json_success();
 }
 
 add_action( 'groundhogg/set_lock', __NAMESPACE__ . '\lock_emails_when_editing_funnel' );

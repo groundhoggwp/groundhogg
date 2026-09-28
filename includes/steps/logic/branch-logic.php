@@ -244,4 +244,33 @@ abstract class Branch_Logic extends Logic {
 		return '';
 	}
 
+	/**
+	 * Include the branches the editor draws as columns
+	 *
+	 * @param Step $step
+	 *
+	 * @return array
+	 */
+	public function get_canvas_data( Step $step ) {
+
+		$data = parent::get_canvas_data( $step );
+
+		if ( $data['layout'] === 'html' ) {
+			return $data;
+		}
+
+		$this->set_current_step( $step );
+
+		$data['layout']   = 'branches';
+		$data['branches'] = array_map( function ( $branch ) {
+			return [
+				'id'      => $branch,
+				'name'    => $this->get_branch_name( $branch ),
+				'classes' => $this->get_branch_classes( $branch ),
+			];
+		}, array_values( $this->get_branches() ) );
+
+		return $data;
+	}
+
 }

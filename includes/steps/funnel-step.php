@@ -575,7 +575,14 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		] ) );
 	}
 
-	protected function __sortable_item( Step $step ) {
+	/**
+	 * The classes on the step's card in the flow editor
+	 *
+	 * @param Step $step
+	 *
+	 * @return string[]
+	 */
+	protected function get_sortable_classes( Step $step ) {
 
 		$classes = [
 			$step->get_group(),
@@ -612,7 +619,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'entry';
 		}
 
-		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
+		return apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
+	}
+
+	protected function __sortable_item( Step $step ) {
+
+		$classes = $this->get_sortable_classes( $step );
 
 		?>
         <div
@@ -751,6 +763,97 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		?></div><?php
 	}
 
+	/**
+	 * Whether the step type draws its own markup on the canvas by overriding sortable_item()
+	 * Those steps are drawn from the server's HTML, the rest are drawn by the editor's JS
+	 *
+	 * @return bool
+	 */
+	public function uses_custom_sortable_item(): bool {
+
+		$declared_by = ( new \ReflectionMethod( $this, 'sortable_item' ) )->getDeclaringClass()->getName();
+
+		// namespaces aren't case-sensitive and some are declared in lower case
+		return ! in_array( strtolower( $declared_by ), array_map( 'strtolower', [
+			Funnel_Step::class,
+			Benchmarks\Benchmark::class,
+			Logic\Branch_Logic::class,
+		] ), true );
+	}
+
+	/**
+	 * Output of a callback that echoes
+	 *
+	 * @param callable $callback
+	 *
+	 * @return string
+	 */
+	protected function capture_output( callable $callback ) {
+		ob_start();
+		$callback();
+
+		return trim( ob_get_clean() );
+	}
+
+	/**
+	 * What the flow editor's JS needs to draw the step on the canvas, see flow-canvas.js
+	 * Settings are validated first so the errors are included
+	 *
+	 * @param Step $step
+	 *
+	 * @return array
+	 */
+	public function get_canvas_data( Step $step ) {
+
+		$this->set_current_step( $step );
+
+		$errors = array_merge( $step->get_errors(), $this->get_errors() );
+
+		$data = [
+			'layout'       => $step->is_benchmark() ? 'benchmark' : 'default',
+			'branch_logic' => $step->is_branch_logic(),
+			'title'        => $this->get_title( $step ),
+			'classes'      => array_values( $this->get_sortable_classes( $step ) ),
+			'notes'        => markdown2html( $step->get_meta( 'step_notes' ), true ),
+			'entry'        => $step->is_entry(),
+			'conversion'   => $step->is_conversion(),
+			'locked'       => $step->is_locked(),
+			'errors'       => array_map( function ( \WP_Error $error ) {
+				return [
+					'code'    => $error->get_error_code(),
+					'message' => $error->get_error_message(),
+				];
+			}, $errors ),
+			// what the step type and add-ons print on the card, labels() goes before the built-in labels and the hook after
+			'labels'       => $this->capture_output( function () {
+				$this->labels();
+			} ),
+			'extra_labels' => $this->capture_output( function () use ( $step ) {
+				do_action( 'groundhogg/steps/sortable/labels', $step, $this );
+			} ),
+			'inside'       => $this->capture_output( function () use ( $step ) {
+				do_action( 'groundhogg/steps/sortable/inside', $step, $this );
+				do_action( "groundhogg/steps/{$this->get_type()}/sortable/inside", $step );
+			} ),
+		];
+
+		// the editor's step types don't include unregistered ones
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $step->get_type() ) ) {
+			$data['name'] = $this->get_name();
+			$data['icon'] = $this->get_icon() ?: $this->get_default_icon();
+			$data['svg']  = $this->icon_is_svg() ? $this->get_icon_svg() : '';
+		}
+
+		if ( $this->uses_custom_sortable_item() ) {
+			$data['layout'] = 'html';
+			$data['html']   = $step->sortable_item( false );
+		}
+
+		$this->set_current_step( $step );
+
+		return $data;
+	}
+
 	protected function before_step_notes( Step $step ) {
 	}
 
@@ -805,6 +908,69 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
+	 * The step type's part of its settings panel, which the flow editor draws the rest of, see flow-panels in
+	 * funnel-editor.js. Inputs are named with setting_name_prefix(), and saved through Step::save() with what's posted.
+	 *
+	 * @param Step $step
+	 *
+	 * @return array `html` the settings, `before_notes` what goes above the notes, and `ignore_morph` whether the
+	 *               settings shouldn't be redrawn while they're being edited, see settings_should_ignore_morph()
+	 */
+	public function get_settings_island( Step $step ) {
+
+		$this->set_current_step( $step );
+
+		$html = $this->capture_output( function () use ( $step ) {
+
+			$this->before_settings( $step );
+
+			?>
+            <div class="gh-panel main-step-settings-panel">
+                <div class="gh-panel-header">
+                    <h2><?php printf( '%s Settings', esc_html( $this->get_name() ) ) ?></h2>
+                </div>
+                <div class="custom-settings"><?php
+
+					// instead of having it as part of the step container, just show it as an input field...
+					if ( force_custom_step_names() || $this->generate_step_title( $step ) === false ) {
+						html( 'p', [], 'Give this step an internal name...' );
+						html( html()->input( [
+							'name'  => $this->setting_name_prefix( 'step_title' ),
+							'value' => $step->step_title
+						] ) );
+					}
+
+					// where the step type's JS draws its settings, if it has any, see Funnel.registerStepType()
+					?>
+                    <div class="step-type-settings"><?php $this->settings( $step ) ?></div>
+                </div>
+            </div>
+			<?php
+
+			$this->after_settings( $step );
+
+			do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step );
+			do_action( 'groundhogg/steps/settings/before', $this );
+			do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step );
+			do_action( 'groundhogg/steps/settings/after', $this );
+		} );
+
+		$this->set_current_step( $step );
+
+		$before_notes = $this->capture_output( function () use ( $step ) {
+			$this->before_step_notes( $step );
+		} );
+
+		$this->set_current_step( $step );
+
+		return [
+			'html'         => $html,
+			'before_notes' => $before_notes,
+			'ignore_morph' => $this->settings_should_ignore_morph(),
+		];
+	}
+
+	/**
 	 * @param $step Step
 	 */
 	public function html_v2( $step ) {
@@ -829,39 +995,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			<?php $this->__step_warnings( $step ); ?>
             <!-- SETTINGS -->
             <div class="step-flex">
-                <div class="step-edit panels <?php echo $this->settings_should_ignore_morph() ? 'ignore-morph' : '' ?>">
-					<?php $this->before_settings( $step ); ?>
-                    <div class="gh-panel main-step-settings-panel">
-                        <div class="gh-panel-header">
-                            <h2><?php printf( '%s Settings', esc_html( $this->get_name() ) ) ?></h2>
-                        </div>
-                        <div class="custom-settings"><?php
-
-							// instead of having it as part of the step container, just show it as an input field...
-							if ( force_custom_step_names() || $this->generate_step_title( $step ) === false ) {
-								// todo internal name settings
-								html( 'p', [], 'Give this step an internal name...' );
-								html( html()->input( [
-									'name'  => $this->setting_name_prefix( 'step_title' ),
-									'value' => $step->step_title
-								] ) );
-							}
-
-							$this->settings( $step )
-
-							?>
-                        </div>
-                    </div>
-
-					<?php $this->after_settings( $step ); ?>
-
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
-					<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
-					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
+				<?php $island = $this->get_settings_island( $step ); ?>
+                <div class="step-edit panels <?php echo $island['ignore_morph'] ? 'ignore-morph' : '' ?>">
+					<?php echo $island['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the step type's settings ?>
                 </div>
                 <div class="step-notes">
-					<?php $this->before_step_notes( $step ); ?>
+					<?php echo $island['before_notes']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the step type's output ?>
 					<?php if ( $step->is_benchmark() ): ?>
                         <div class="gh-panel benchmark-settings">
                             <div class="gh-panel-header">

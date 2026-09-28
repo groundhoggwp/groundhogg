@@ -1,0 +1,668 @@
+{
+    "names": {
+        "tag": {
+            "243": "Customer",
+            "244": "Lead",
+            "245": "Tom & Jerry",
+            "246": "VIP",
+            "247": "Newsletter"
+        },
+        "email": {
+            "103": "Welcome &"
+        },
+        "funnel": {
+            "2": "Onboarding & more"
+        },
+        "task": {
+            "342": "Call them",
+            "343": "Send the quote",
+            "344": ""
+        }
+    },
+    "cases": [
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": []
+            },
+            "title": "Apply tags"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    243
+                ]
+            },
+            "title": "Apply <b>Customer</b>"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    243,
+                    244
+                ]
+            },
+            "title": "Apply <b>Customer</b> and <b>Lead</b>"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245
+                ]
+            },
+            "title": "Apply <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
+        },
+        {
+            "type": "apply_tag",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
+                ]
+            },
+            "title": "Apply <b>5</b> tags"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": []
+            },
+            "title": "Remove tags"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    243
+                ]
+            },
+            "title": "Remove <b>Customer</b>"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    243,
+                    244
+                ]
+            },
+            "title": "Remove <b>Customer</b> and <b>Lead</b>"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245
+                ]
+            },
+            "title": "Remove <b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b>"
+        },
+        {
+            "type": "remove_tag",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
+                ]
+            },
+            "title": "Remove <b>5</b> tags"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [],
+                "condition": "any"
+            },
+            "title": "A tag is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [],
+                "condition": "all"
+            },
+            "title": "A tag is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243,
+                    244
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> or <b>Lead</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243,
+                    244
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> and <b>Lead</b> are applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> or <b>Tom & Jerry</b> is applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b> are applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
+                ],
+                "condition": "any"
+            },
+            "title": "Any of <b>5</b> tags are applied"
+        },
+        {
+            "type": "tag_applied",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
+                ],
+                "condition": "all"
+            },
+            "title": "<b>5</b> tags are applied"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [],
+                "condition": "any"
+            },
+            "title": "A tag is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [],
+                "condition": "all"
+            },
+            "title": "A tag is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243,
+                    244
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b> or <b>Lead</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243,
+                    244
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b> and <b>Lead</b> are removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245
+                ],
+                "condition": "any"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> or <b>Tom & Jerry</b> is removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245
+                ],
+                "condition": "all"
+            },
+            "title": "<b>Customer</b>, <b>Lead</b> and <b>Tom & Jerry</b> are removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
+                ],
+                "condition": "any"
+            },
+            "title": "Any of <b>5</b> tags are removed"
+        },
+        {
+            "type": "tag_removed",
+            "meta": {
+                "tags": [
+                    243,
+                    244,
+                    245,
+                    246,
+                    247
+                ],
+                "condition": "all"
+            },
+            "title": "<b>5</b> tags are removed"
+        },
+        {
+            "type": "if_else",
+            "meta": [],
+            "title": ""
+        },
+        {
+            "type": "if_else",
+            "meta": {
+                "include_display": "Has tag <b>Customer</b>"
+            },
+            "title": "Has tag <b>Customer</b>"
+        },
+        {
+            "type": "if_else",
+            "meta": {
+                "exclude_display": "Has tag <b>Lead</b>"
+            },
+            "title": "Has tag <b>Lead</b>"
+        },
+        {
+            "type": "if_else",
+            "meta": {
+                "include_display": "Has tag <b>Customer</b>",
+                "exclude_display": "Has tag <b>Lead</b>"
+            },
+            "title": "Has tag <b>Customer</b> AND NOT Has tag <b>Lead</b>"
+        },
+        {
+            "type": "send_email",
+            "meta": [],
+            "title": "Send an email"
+        },
+        {
+            "type": "send_email",
+            "meta": {
+                "email_id": 103
+            },
+            "title": "Send <b>Welcome &amp;</b>"
+        },
+        {
+            "type": "add_to_flow",
+            "meta": [],
+            "title": "Add to flow"
+        },
+        {
+            "type": "add_to_flow",
+            "meta": {
+                "funnel_id": 2
+            },
+            "title": "Add to <b>Onboarding &amp; more</b>"
+        },
+        {
+            "type": "create_task",
+            "meta": [],
+            "title": "Create a new task"
+        },
+        {
+            "type": "create_task",
+            "meta": {
+                "summary": "Call them"
+            },
+            "title": "Create task <b>Call them</b>"
+        },
+        {
+            "type": "admin_notification",
+            "meta": {
+                "send_to": [
+                    "{email}"
+                ]
+            },
+            "title": "Notify <b>the contact</b>"
+        },
+        {
+            "type": "admin_notification",
+            "meta": {
+                "send_to": [
+                    "{owner_email}",
+                    "sales@example.com"
+                ]
+            },
+            "title": "Notify <b>the contact owner</b> and <code>sales@example.com</code>"
+        },
+        {
+            "type": "admin_notification",
+            "meta": {
+                "send_to": "{email}, {owner_email}, a@example.com"
+            },
+            "title": "Notify <b>the contact</b>, <b>the contact owner</b> and <code>a@example.com</code>"
+        },
+        {
+            "type": "web_form",
+            "meta": {
+                "form_name": "Contact us"
+            },
+            "title": "Submits <b>Contact us</b>"
+        },
+        {
+            "type": "email_confirmed",
+            "meta": [],
+            "title": "Opt-in status is <b>Confirmed</b>"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    342
+                ],
+                "condition": "any"
+            },
+            "title": "When <b>Call them</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    342
+                ],
+                "condition": "all"
+            },
+            "title": "When <b>Call them</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    342,
+                    343
+                ],
+                "condition": "any"
+            },
+            "title": "When <b>Call them</b> or <b>Send the quote</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    342,
+                    343
+                ],
+                "condition": "all"
+            },
+            "title": "When <b>Call them</b> and <b>Send the quote</b> are completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    342,
+                    343,
+                    344
+                ],
+                "condition": "any"
+            },
+            "title": "When <b>Call them</b>, <b>Send the quote</b> or <b>New Task</b> is completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": [
+                    342,
+                    343,
+                    344
+                ],
+                "condition": "all"
+            },
+            "title": "When <b>Call them</b>, <b>Send the quote</b> and <b>New Task</b> are completed"
+        },
+        {
+            "type": "task_completed",
+            "meta": {
+                "tasks": []
+            },
+            "title": "A task is completed"
+        }
+    ],
+    "branches": [
+        {
+            "type": "split_path",
+            "meta": {
+                "branches": []
+            },
+            "id": 397,
+            "branches": [
+                {
+                    "key": "else",
+                    "name": "Else",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "split_path",
+            "meta": {
+                "branches": {
+                    "vip": {
+                        "name": "VIP & friends"
+                    },
+                    "rest": {
+                        "name": ""
+                    },
+                    "more": []
+                }
+            },
+            "id": 398,
+            "branches": [
+                {
+                    "key": "vip",
+                    "name": "VIP & friends",
+                    "classes": ""
+                },
+                {
+                    "key": "rest",
+                    "name": "B",
+                    "classes": ""
+                },
+                {
+                    "key": "more",
+                    "name": "C",
+                    "classes": ""
+                },
+                {
+                    "key": "else",
+                    "name": "Else",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "weighted_distribution",
+            "meta": {
+                "branches": {
+                    "x1": {
+                        "weight": "60"
+                    },
+                    "x2": {
+                        "weight": "40"
+                    }
+                }
+            },
+            "id": 399,
+            "branches": [
+                {
+                    "key": "x1",
+                    "name": "A (60)%",
+                    "classes": ""
+                },
+                {
+                    "key": "x2",
+                    "name": "B (40)%",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "weighted_distribution",
+            "meta": {
+                "branches": {
+                    "x1": {
+                        "weight": "3"
+                    },
+                    "x2": {
+                        "weight": "1"
+                    },
+                    "x3": []
+                }
+            },
+            "id": 400,
+            "branches": [
+                {
+                    "key": "x1",
+                    "name": "A (3)",
+                    "classes": ""
+                },
+                {
+                    "key": "x2",
+                    "name": "B (1)",
+                    "classes": ""
+                },
+                {
+                    "key": "x3",
+                    "name": "C ()",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "split_test",
+            "meta": {
+                "weight": 30
+            },
+            "id": 401,
+            "branches": [
+                {
+                    "key": "a",
+                    "name": "A (30%)",
+                    "classes": ""
+                },
+                {
+                    "key": "b",
+                    "name": "B (70%)",
+                    "classes": ""
+                }
+            ]
+        },
+        {
+            "type": "split_test",
+            "meta": {
+                "weight": 50,
+                "winner": "402-b"
+            },
+            "id": 402,
+            "branches": [
+                {
+                    "key": "a",
+                    "name": "Loser (0%)",
+                    "classes": "red"
+                },
+                {
+                    "key": "b",
+                    "name": "Winner (100%)",
+                    "classes": "green"
+                }
+            ]
+        }
+    ]
+}

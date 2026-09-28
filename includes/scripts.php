@@ -395,9 +395,18 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-flow-simulator', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/simulator' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
 		wp_register_script( 'groundhogg-admin-flow-logic-lines', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/logic-lines' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
+		// after groundhogg-admin, which (re)defines the Groundhogg global these add to
+		wp_register_script( 'groundhogg-admin-flow-store', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/flow-store' . $dot_min . '.js', [
+			'groundhogg-admin',
+		], GROUNDHOGG_VERSION, true );
+		wp_register_script( 'groundhogg-admin-flow-canvas', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/flow-canvas' . $dot_min . '.js', [
+			'groundhogg-admin-flow-store',
+		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-admin-funnel-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/funnel-editor' . $dot_min . '.js', [
 			'jquery',
+			'groundhogg-make-el',
+			'groundhogg-admin-flow-canvas',
 //			'groundhogg-leader-line',
 			'groundhogg-admin',
 			'groundhogg-admin-element',
@@ -409,8 +418,14 @@ class Scripts {
 			'groundhogg-admin-funnel-scheduler',
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-step-titles', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/step-titles' . $dot_min . '.js', [
+			'wp-i18n',
+			'groundhogg-admin',
+		], GROUNDHOGG_VERSION, true );
+
 		wp_register_script( 'groundhogg-admin-funnel-steps', GROUNDHOGG_ASSETS_URL . 'js/admin/funnels/funnel-steps' . $dot_min . '.js', [
-			'groundhogg-admin-funnel-editor'
+			'groundhogg-admin-funnel-editor',
+			'groundhogg-admin-step-titles',
 		] );
 
 		wp_register_script( 'groundhogg-admin-form-builder', GROUNDHOGG_ASSETS_URL . 'js/admin/forms/form-builder' . $dot_min . '.js', [ 'jquery' ], GROUNDHOGG_VERSION, true );
