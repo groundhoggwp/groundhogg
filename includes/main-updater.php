@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Background\Add_Activity_Indexes;
 use Groundhogg\Background\Iterate_Over_List;
 use Groundhogg\Background\Migrate_Composed_Emails;
 use Groundhogg\DB\Query\Table_Query;
@@ -369,6 +370,16 @@ class Main_Updater extends Old_Updater {
 					get_db( 'messages' )->create_table();
 
 					Background_Tasks::add( new Migrate_Composed_Emails() );
+				},
+			],
+			'4.9.0.1' => [
+				'automatic'   => true,
+				'description' => __( 'Add indexes to the activity table for faster reports and segments.', 'groundhogg' ),
+				'callback'    => function () {
+					if ( ! db()->activity->has_performance_indexes() ) {
+						// building an index on a large activity table can take minutes, so do it online in the background
+						Background_Tasks::add( new Add_Activity_Indexes() );
+					}
 				},
 			],
 		];

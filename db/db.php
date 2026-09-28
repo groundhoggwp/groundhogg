@@ -2341,6 +2341,63 @@ abstract class DB {
 	}
 
 	/**
+	 * Whether the table has an index with the given name
+	 *
+	 * @param string $name
+	 *
+	 * @return bool
+	 */
+	public function index_exists( string $name ) {
+		global $wpdb;
+
+		return ! empty( $wpdb->get_results( $wpdb->prepare( "SHOW INDEX FROM {$this->table_name} WHERE Key_name = %s", $name ) ) );
+	}
+
+	/**
+	 * Add an index without blocking writes to the table while it builds, for tables that can be large.
+	 * Falls back to a plain ALTER on servers without online DDL (MySQL < 5.6).
+	 *
+	 * @param string $name
+	 * @param array  $columns
+	 *
+	 * @return bool whether the index exists afterward
+	 */
+	public function add_index_online( string $name, array $columns ) {
+
+		if ( $this->index_exists( $name ) ) {
+			return true;
+		}
+
+		global $wpdb;
+
+		$columns = implode( ',', $columns );
+
+		$suppress = $wpdb->suppress_errors();
+		$result   = $wpdb->query( "ALTER TABLE {$this->table_name} ADD INDEX $name ($columns), ALGORITHM=INPLACE, LOCK=NONE" );
+		$wpdb->suppress_errors( $suppress );
+
+		if ( $result === false ) {
+			$wpdb->query( "ALTER TABLE {$this->table_name} ADD INDEX $name ($columns)" );
+		}
+
+		return $this->index_exists( $name );
+	}
+
+	/**
+	 * Whether an ALTER TABLE on this table is currently running, like an index build from another request
+	 *
+	 * @return bool
+	 */
+	public function is_being_altered() {
+		global $wpdb;
+
+		return (bool) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM information_schema.PROCESSLIST WHERE ID != CONNECTION_ID() AND INFO LIKE %s",
+			'ALTER TABLE ' . $wpdb->esc_like( $this->table_name ) . ' %'
+		) );
+	}
+
+	/**
 	 * Empty the table
 	 */
 	public function truncate() {

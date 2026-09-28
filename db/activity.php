@@ -28,6 +28,22 @@ class Activity extends DB {
 	use IP_Address;
 
 	/**
+	 * Indexes for looking up activity by type or per contact over time, name => columns
+	 * They cover the common query shapes, so those never read the table rows. contact_time_idx replaces contact_idx.
+	 */
+	const PERFORMANCE_INDEXES = [
+		'type_time_contact_idx' => [ 'activity_type', 'timestamp', 'contact_id' ],
+		'contact_time_idx'      => [ 'contact_id', 'timestamp', 'activity_type', 'email_id', 'step_id' ],
+	];
+
+	/**
+	 * When true, create_table() leaves the indexes of an existing table as they were before PERFORMANCE_INDEXES
+	 *
+	 * @var bool
+	 */
+	protected bool $keep_legacy_indexes = false;
+
+	/**
 	 * Get the DB suffix
 	 *
 	 * @return string
@@ -51,7 +67,7 @@ class Activity extends DB {
 	 * @return mixed
 	 */
 	public function get_db_version() {
-		return '2.1';
+		return '2.2';
 	}
 
 	/**
@@ -241,6 +257,64 @@ class Activity extends DB {
 	}
 
 	/**
+	 * Whether the table has all the PERFORMANCE_INDEXES
+	 *
+	 * @return bool
+	 */
+	public function has_performance_indexes() {
+		foreach ( array_keys( self::PERFORMANCE_INDEXES ) as $index ) {
+			if ( ! $this->index_exists( $index ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Add the next missing index from PERFORMANCE_INDEXES without locking the table,
+	 * then drop contact_idx once contact_time_idx has replaced it.
+	 * Only one index per call, because each can take minutes on a large table.
+	 *
+	 * @return bool|\WP_Error true when there is nothing left to do, WP_Error if an index could not be added
+	 */
+	public function add_next_performance_index() {
+
+		foreach ( self::PERFORMANCE_INDEXES as $index => $columns ) {
+			if ( ! $this->index_exists( $index ) ) {
+
+				if ( ! $this->add_index_online( $index, $columns ) ) {
+					global $wpdb;
+
+					return new \WP_Error( 'index_not_added', $wpdb->last_error );
+				}
+
+				return false;
+			}
+		}
+
+		if ( $this->index_exists( 'contact_idx' ) ) {
+			$this->drop_index( 'contact_idx' ); // a prefix of contact_time_idx
+		}
+
+		return true;
+	}
+
+	/**
+	 * An existing table gets PERFORMANCE_INDEXES from the Add_Activity_Indexes background task, which adds them online,
+	 * rather than from dbDelta, whose ALTER can hold up the request for minutes on a large table.
+	 *
+	 * @return void
+	 */
+	public function create_table() {
+		$this->keep_legacy_indexes = $this->installed() && ! $this->has_performance_indexes();
+
+		parent::create_table();
+
+		$this->keep_legacy_indexes = false;
+	}
+
+	/**
 	 * Create the table
 	 *
 	 * @access  public
@@ -249,6 +323,18 @@ class Activity extends DB {
 	public function create_table_sql_command() {
 
 		$charset_collate = $this->get_charset_collate();
+
+		$indexes = [];
+
+		if ( $this->keep_legacy_indexes ) {
+			$indexes[] = 'KEY contact_idx (contact_id)';
+		} else {
+			foreach ( self::PERFORMANCE_INDEXES as $index => $columns ) {
+				$indexes[] = sprintf( 'KEY %s (%s)', $index, implode( ',', $columns ) );
+			}
+		}
+
+		$indexes = implode( ",\n        ", $indexes ); // dbDelta reads one definition per line
 
 		return "CREATE TABLE " . $this->table_name . " (
         ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -266,7 +352,7 @@ class Activity extends DB {
         user_agent bigint(20) unsigned NOT NULL,
         PRIMARY KEY (ID),
         KEY event_idx (event_id),
-        KEY contact_idx (contact_id),
+        $indexes,
         KEY time_idx (timestamp),
         KEY funnel_step_email_idx (funnel_id,step_id,email_id)
 		) $charset_collate;";
