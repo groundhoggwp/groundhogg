@@ -232,6 +232,149 @@
 
   const clone = value => JSON.parse(JSON.stringify(value))
 
+  const FLAGS = ['is_entry', 'is_conversion', 'can_passthru']
+
+  /**
+   * How a step's settings, title, and benchmark flags changed, as the updates to go from one to the other and back
+   *
+   * @param old Object the step before
+   * @param step Object the step after
+   * @return {{undo: Object, redo: Object}|null} null if nothing changed
+   */
+  const stepChanges = (old, step) => {
+
+    const was = {
+      op  : 'update',
+      step: step.ID,
+    }
+
+    const now = {
+      op  : 'update',
+      step: step.ID,
+    }
+
+    const keys = [...new Set([...Object.keys(old.meta ?? {}), ...Object.keys(step.meta ?? {})])]
+
+    keys.forEach(key => {
+
+      const before = old.meta?.[key] ?? null
+      const after = step.meta?.[key] ?? null
+
+      if (JSON.stringify(before) === JSON.stringify(after)) {
+        return
+      }
+
+      was.meta = {
+        ...was.meta,
+        [key]: before,
+      }
+
+      now.meta = {
+        ...now.meta,
+        [key]: after,
+      }
+    })
+
+    if (old.data.step_title !== step.data.step_title) {
+      was.title = old.data.step_title
+      now.title = step.data.step_title
+    }
+
+    FLAGS.forEach(flag => {
+
+      const before = Boolean(parseInt(old.data[flag] ?? 0))
+      const after = Boolean(parseInt(step.data[flag] ?? 0))
+
+      if (before !== after) {
+        was.flags = {
+          ...was.flags,
+          [flag]: before,
+        }
+        now.flags = {
+          ...now.flags,
+          [flag]: after,
+        }
+      }
+    })
+
+    if (!was.meta && was.title === undefined && !was.flags) {
+      return null
+    }
+
+    return {
+      undo: was,
+      redo: now,
+    }
+  }
+
+  /**
+   * A step's settings from its settings panel's fields, named like steps[ID][setting] or steps[ID][setting][key][],
+   * in the shape PHP would get them in $_POST['steps'][ID]
+   *
+   * @param fields {name, value}[] like jQuery's serializeArray()
+   * @param id the step
+   * @return Object
+   */
+  const formToSettings = (fields, id) => {
+
+    const prefix = `steps[${ id }]`
+    const settings = {}
+
+    fields.forEach(({
+      name,
+      value,
+    }) => {
+
+      if (!name.startsWith(`${ prefix }[`)) {
+        return
+      }
+
+      const keys = name.slice(prefix.length).match(/\[[^\]]*\]/g).map(key => key.slice(1, -1))
+
+      let target = settings
+
+      keys.forEach((key, i) => {
+
+        const last = i === keys.length - 1
+
+        // steps[ID][tags][] appends
+        if (key === '') {
+          key = Object.keys(target).length
+        }
+
+        if (last) {
+          target[key] = value
+          return
+        }
+
+        if (typeof target[key] !== 'object' || target[key] === null) {
+          target[key] = {}
+        }
+
+        target = target[key]
+      })
+    })
+
+    // objects keyed 0, 1, 2 were lists
+    const lists = value => {
+
+      if (!value || typeof value !== 'object') {
+        return value
+      }
+
+      const keys = Object.keys(value)
+      const entries = keys.map(key => [key, lists(value[key])])
+
+      if (keys.length && keys.every((key, i) => key === String(i))) {
+        return entries.map(([, item]) => item)
+      }
+
+      return Object.fromEntries(entries)
+    }
+
+    return lists(settings)
+  }
+
   /**
    * A store for one flow
    *
@@ -546,6 +689,7 @@
       step: id,
       meta,
       title,
+      flags,
     }) {
 
       const step = this.getStep(id)
@@ -581,6 +725,14 @@
       if (title !== undefined) {
         inverse.title = step.data.step_title
         step.data.step_title = title
+      }
+
+      if (flags) {
+        inverse.flags = {}
+        Object.entries(flags).forEach(([flag, value]) => {
+          inverse.flags[flag] = Boolean(parseInt(step.data[flag] ?? 0))
+          step.data[flag] = value ? 1 : 0
+        })
       }
 
       return [inverse]
@@ -638,46 +790,11 @@
           return
         }
 
-        const was = {
-          op  : 'update',
-          step: step.ID,
-        }
+        const changes = stepChanges(old, step)
 
-        const now = {
-          op  : 'update',
-          step: step.ID,
-        }
-
-        const keys = [...new Set([...Object.keys(old.meta ?? {}), ...Object.keys(step.meta ?? {})])]
-
-        keys.forEach(key => {
-
-          const before = old.meta?.[key] ?? null
-          const after = step.meta?.[key] ?? null
-
-          if (JSON.stringify(before) === JSON.stringify(after)) {
-            return
-          }
-
-          was.meta = {
-            ...was.meta,
-            [key]: before,
-          }
-
-          now.meta = {
-            ...now.meta,
-            [key]: after,
-          }
-        })
-
-        if (old.data.step_title !== step.data.step_title) {
-          was.title = old.data.step_title
-          now.title = step.data.step_title
-        }
-
-        if (was.meta || was.title !== undefined) {
-          undo.push(was)
-          redo.push(now)
+        if (changes) {
+          undo.push(changes.undo)
+          redo.push(changes.redo)
         }
       })
 
@@ -940,6 +1057,8 @@
     branchPosition,
     positionBranch,
     rewriteIds,
+    stepChanges,
+    formToSettings,
     createStore,
     createQueue,
     createHistory,

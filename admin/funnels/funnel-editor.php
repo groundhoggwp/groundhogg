@@ -247,7 +247,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
                     </div>
                 </div>
                 <div class="step-settings <?php echo force_custom_step_names() ? 'custom-step-names' : 'generated-step-names' ?>">
-					<?php $funnel->step_settings() ?>
+					<?php // drawn by funnel-editor.js ?>
                 </div>
                 <div id="flow-simulator">
                     Simulator here!

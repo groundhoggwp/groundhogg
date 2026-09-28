@@ -296,3 +296,43 @@ test('other saves wait for what\'s queued before them', async () => {
 
   assert.deepEqual(order, ['operations', 'form'])
 })
+
+test('a settings panel\'s fields become the settings PHP would get', () => {
+
+  const fields = [
+    { name: 'steps[5][subject]', value: 'Hi' },
+    { name: 'steps[5][send_to][]', value: 'owner' },
+    { name: 'steps[5][send_to][]', value: 'admin' },
+    { name: 'steps[5][delay][amount]', value: '3' },
+    { name: 'steps[5][delay][type]', value: 'days' },
+    { name: 'steps[6][subject]', value: 'another step' },
+    { name: 'step_notes', value: 'not a setting' },
+  ]
+
+  assert.deepEqual(FlowStore.formToSettings(fields, 5), {
+    subject: 'Hi',
+    send_to: ['owner', 'admin'],
+    delay  : { amount: '3', type: 'days' },
+  })
+
+  assert.deepEqual(FlowStore.formToSettings([], 5), {})
+})
+
+test('a trigger\'s flags are part of what changed', () => {
+
+  const before = { ID: 3, data: { step_title: 'a', is_entry: '0', is_conversion: '1' }, meta: { x: 1 } }
+  const after = { ID: 3, data: { step_title: 'a', is_entry: 1, is_conversion: '1' }, meta: { x: 1 } }
+
+  assert.deepEqual(FlowStore.stepChanges(before, after), {
+    undo: { op: 'update', step: 3, flags: { is_entry: false } },
+    redo: { op: 'update', step: 3, flags: { is_entry: true } },
+  })
+
+  assert.equal(FlowStore.stepChanges(before, before), null)
+
+  // and applying them sets them
+  const store = FlowStore.createStore({ steps: [JSON.parse(JSON.stringify(before))] })
+  const [undo] = store.apply({ op: 'update', step: 3, flags: { is_entry: true } })
+  assert.equal(store.getStep(3).data.is_entry, 1)
+  assert.deepEqual(undo, { op: 'update', step: 3, flags: { is_entry: false } })
+})

@@ -908,6 +908,69 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
+	 * The step type's part of its settings panel, which the flow editor draws the rest of, see flow-panels in
+	 * funnel-editor.js. Inputs are named with setting_name_prefix(), and saved through Step::save() with what's posted.
+	 *
+	 * @param Step $step
+	 *
+	 * @return array `html` the settings, `before_notes` what goes above the notes, and `ignore_morph` whether the
+	 *               settings shouldn't be redrawn while they're being edited, see settings_should_ignore_morph()
+	 */
+	public function get_settings_island( Step $step ) {
+
+		$this->set_current_step( $step );
+
+		$html = $this->capture_output( function () use ( $step ) {
+
+			$this->before_settings( $step );
+
+			?>
+            <div class="gh-panel main-step-settings-panel">
+                <div class="gh-panel-header">
+                    <h2><?php printf( '%s Settings', esc_html( $this->get_name() ) ) ?></h2>
+                </div>
+                <div class="custom-settings"><?php
+
+					// instead of having it as part of the step container, just show it as an input field...
+					if ( force_custom_step_names() || $this->generate_step_title( $step ) === false ) {
+						html( 'p', [], 'Give this step an internal name...' );
+						html( html()->input( [
+							'name'  => $this->setting_name_prefix( 'step_title' ),
+							'value' => $step->step_title
+						] ) );
+					}
+
+					$this->settings( $step )
+
+					?>
+                </div>
+            </div>
+			<?php
+
+			$this->after_settings( $step );
+
+			do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step );
+			do_action( 'groundhogg/steps/settings/before', $this );
+			do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step );
+			do_action( 'groundhogg/steps/settings/after', $this );
+		} );
+
+		$this->set_current_step( $step );
+
+		$before_notes = $this->capture_output( function () use ( $step ) {
+			$this->before_step_notes( $step );
+		} );
+
+		$this->set_current_step( $step );
+
+		return [
+			'html'         => $html,
+			'before_notes' => $before_notes,
+			'ignore_morph' => $this->settings_should_ignore_morph(),
+		];
+	}
+
+	/**
 	 * @param $step Step
 	 */
 	public function html_v2( $step ) {
@@ -932,39 +995,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			<?php $this->__step_warnings( $step ); ?>
             <!-- SETTINGS -->
             <div class="step-flex">
-                <div class="step-edit panels <?php echo $this->settings_should_ignore_morph() ? 'ignore-morph' : '' ?>">
-					<?php $this->before_settings( $step ); ?>
-                    <div class="gh-panel main-step-settings-panel">
-                        <div class="gh-panel-header">
-                            <h2><?php printf( '%s Settings', esc_html( $this->get_name() ) ) ?></h2>
-                        </div>
-                        <div class="custom-settings"><?php
-
-							// instead of having it as part of the step container, just show it as an input field...
-							if ( force_custom_step_names() || $this->generate_step_title( $step ) === false ) {
-								// todo internal name settings
-								html( 'p', [], 'Give this step an internal name...' );
-								html( html()->input( [
-									'name'  => $this->setting_name_prefix( 'step_title' ),
-									'value' => $step->step_title
-								] ) );
-							}
-
-							$this->settings( $step )
-
-							?>
-                        </div>
-                    </div>
-
-					<?php $this->after_settings( $step ); ?>
-
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/before", $step ); ?>
-					<?php do_action( 'groundhogg/steps/settings/before', $this ); ?>
-					<?php do_action( "groundhogg/steps/{$this->get_type()}/settings/after", $step ); ?>
-					<?php do_action( 'groundhogg/steps/settings/after', $this ); ?>
+				<?php $island = $this->get_settings_island( $step ); ?>
+                <div class="step-edit panels <?php echo $island['ignore_morph'] ? 'ignore-morph' : '' ?>">
+					<?php echo $island['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the step type's settings ?>
                 </div>
                 <div class="step-notes">
-					<?php $this->before_step_notes( $step ); ?>
+					<?php echo $island['before_notes']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the step type's output ?>
 					<?php if ( $step->is_benchmark() ): ?>
                         <div class="gh-panel benchmark-settings">
                             <div class="gh-panel-header">

@@ -832,8 +832,17 @@ and redraws right away (`redraw()`: `drawCanvas()`, `makeSortable()`, `drawLogic
   - **quiet saves:** trigger `auto-save` and `gh-init-pickers`, and don't show `err`. Callers that need
     errors must check `response.data.err` themselves, as delete does.
   - a failed request resets `saving` (otherwise quiet saves would wait for it forever) and shows an error.
-- **Autosave:** any `change` on `#funnel-form` → `saveQuietly()`, except `step_notes`, which goes through
-  `updateStepMeta`. Inputs with `.no-morph` skip the settings morph.
+- **Settings save through operations (since 5.0):** a `change` in a step's panel → `saveSettings( id )`, and
+  `updateStepMeta( meta, id )` → `saveSettings( id, { meta } )`. After 400ms without more changes,
+  `flushSettings()` sends `{ op: 'update', step, form, meta, flags }`: `form` is every `steps[ID][…]` field in the
+  panel (`FlowStore.formToSettings( $(panel).find(':input').serializeArray(), id )`), which the server saves with
+  `Step::save( $form )` after writing `meta`, keeping the step's branch (see 8). `meta` and `flags` apply to the
+  store right away. `step_notes` is `meta`. The flow title saves through REST (`FunnelsStore.patch()`).
+  - The step before its first unsent change is kept in `settingsBefore`, and once saved
+    (`recordSettingsChanges()`) the difference, including the regenerated title, becomes a history entry of
+    stored-value updates (`FlowStore.stepChanges()`).
+  - Inputs with `.no-morph` don't redraw the step type's settings after (`skipIslandMorph`).
+  - `save()` (the form) sends pending settings first (`flushAllSettings()`).
 
 **Undo/redo:**
 
@@ -982,7 +991,17 @@ UMD modules so Node can load them for tests. The markup is the same the server r
   `add-step` inside, and `.logic-line.line-below`.
 - `#step-sortable.step-branch[data-branch=main]` is the root.
 
-**Settings** (`Funnel::step_settings()` → `html_v2()`):
+**Settings panels are drawn in JS** (since 5.0), `drawPanels()` → `SettingsPanel( step )`, with the same markup
+`html_v2()` renders, which stays for the server. The step type's part, its **island**, is HTML from
+`Funnel_Step::get_settings_island( $step )`: `{ html, before_notes, ignore_morph }`, everything inside
+`.step-edit.panels` plus what `before_step_notes()` prints. The page gets every island (`Funnel.islands`), a form
+save sends them all again, and an operations reply only the ones for steps it added or changed
+(`Flow_Operations::get_touched()`). An island is only redrawn when a new one arrives (`drawnIslands`), and not while
+its settings have unsent changes, and focused fields aren't touched. The trigger flags are rendered as the same
+named checkboxes, so every save posts them. After undo/redo (`forcePanels`) everything is redrawn and
+`stepSettingsCallbacks()` runs again.
+
+**Settings markup** (`html_v2()`, and `SettingsPanel()`):
 
 - `#settings-<ID>.step.<group>.<type>.settings` contains `.step-warnings` (from `validate_settings()`
   errors) and `.step-flex`.

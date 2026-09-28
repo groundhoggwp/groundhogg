@@ -235,6 +235,86 @@ class Flow_Operations_Tests extends GH_UnitTestCase {
 		], false ) );
 	}
 
+	public function test_the_editor_saves_a_settings_panel_like_a_form_post() {
+
+		[ $funnel, $steps ] = $this->flow();
+
+		$yes = $steps['yes'];
+		$tag = \Groundhogg\get_db( 'tags' )->add( [ 'tag_name' => 'From the panel' ] );
+
+		$operations = new Flow_Operations( $funnel, true );
+
+		$this->assertNotWPError( $operations->apply_all_or_nothing( [
+			[
+				'op'   => 'update',
+				'step' => $yes->ID,
+				// what the panel posts, without a branch, see flow-store.js formToSettings()
+				'form' => [ 'tags' => [ (string) $tag ] ],
+				'meta' => [ 'step_notes' => 'from JS' ],
+			],
+		] ) );
+
+		$saved = new Step( $yes->ID );
+
+		// saved by the step type
+		$this->assertEquals( [ $tag ], wp_parse_id_list( $saved->get_meta( 'tags' ) ) );
+		$this->assertEquals( 'from JS', $saved->get_meta( 'step_notes' ) );
+
+		// it stays in its branch, saving would otherwise put it in main
+		$this->assertEquals( "{$steps['if']->ID}-yes", $saved->branch );
+
+		// its panel is sent back
+		$this->assertEquals( [ $yes->ID ], $operations->get_touched() );
+	}
+
+	public function test_the_editor_sets_trigger_flags_as_they_are_stored() {
+
+		$funnel = new Funnel( [ 'title' => 'flags', 'status' => 'inactive' ] );
+
+		$trigger = $funnel->add_step( [
+			'step_type'  => 'tag_applied',
+			'step_group' => Step::BENCHMARK,
+			'step_order' => 2,
+		] );
+
+		$funnel->set_step_levels();
+
+		$this->assertNotWPError( $this->apply( $funnel, [
+			[ 'op' => 'update', 'step' => $trigger->ID, 'flags' => [ 'is_conversion' => true, 'is_entry' => true, 'not_a_flag' => true ] ],
+		] ) );
+
+		$trigger = new Step( $trigger->ID );
+
+		$this->assertTrue( $trigger->is_conversion() );
+		$this->assertTrue( $trigger->is_entry() );
+	}
+
+	public function test_settings_islands() {
+
+		[ $funnel, $steps ] = $this->flow();
+
+		$islands = $funnel->while_editing( function () use ( $funnel ) {
+			return $funnel->get_settings_islands( [ 0 ] );
+		} );
+
+		$this->assertEmpty( $islands );
+
+		$islands = $funnel->while_editing( function () use ( $funnel ) {
+			return $funnel->get_settings_islands();
+		} );
+
+		$this->assertCount( 5, $islands );
+
+		$island = $islands[ $steps['yes']->ID ];
+
+		$this->assertStringContainsString( 'main-step-settings-panel', $island['html'] );
+		$this->assertStringContainsString( "step_{$steps['yes']->ID}_tags", $island['html'] );
+		$this->assertTrue( $island['ignore_morph'] );
+
+		// the server's panel still has it, fields can have random IDs so they're not compared
+		$this->assertStringContainsString( 'main-step-settings-panel', $steps['yes']->html_v2( false ) );
+	}
+
 	public function test_a_failed_operation_undoes_the_ones_before_it() {
 
 		[ $funnel, $steps ] = $this->flow();

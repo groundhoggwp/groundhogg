@@ -439,6 +439,107 @@
     }
 
     /**
+     * A trigger's flag, a checkbox named like the rest of its settings, so it's posted with them
+     */
+    const TriggerToggle = ({
+      step,
+      flag,
+      label,
+      yesNo = false,
+    }) => Div({ className: 'display-flex align-center gap-5' }, [
+      MakeEl.Label({ for: `step_${ step.ID }_${ flag }` }, label),
+      MakeEl.Label({ className: 'gh-switch' }, [
+        Input({
+          type   : 'checkbox',
+          id     : `step_${ step.ID }_${ flag }`,
+          name   : `steps[${ step.ID }][${ flag }]`,
+          value  : 1,
+          checked: Boolean(parseInt(step.data[flag] ?? 0)),
+        }),
+        Span({ className: 'slider' }),
+        Span({ className: 'on' }, yesNo ? __('Yes', 'groundhogg') : __('On', 'groundhogg')),
+        Span({ className: 'off' }, yesNo ? __('No', 'groundhogg') : __('Off', 'groundhogg')),
+      ]),
+    ])
+
+    const TriggerSettings = step => Div({ className: 'gh-panel benchmark-settings' }, [
+      Div({ className: 'gh-panel-header' }, MakeEl.H2({}, __('Trigger Settings', 'groundhogg'))),
+      Div({ className: 'inside display-flex gap-20 column' }, [
+        step.is_starting ? null : TriggerToggle({
+          step,
+          flag : 'is_entry',
+          label: __('Allow contacts to enter the flow at this step?', 'groundhogg'),
+          yesNo: true,
+        }),
+        step.is_starting ? null : TriggerToggle({
+          step,
+          flag : 'can_passthru',
+          label: __('Allow contacts to pass through this trigger', 'groundhogg'),
+          yesNo: true,
+        }),
+        TriggerToggle({
+          step,
+          flag : 'is_conversion',
+          label: __('Track conversion when triggered', 'groundhogg'),
+        }),
+        // see TriggerFrequencySettings()
+        Div({
+          id       : `trigger-frequency-settings-${ step.ID }`,
+          className: 'ignore-morph',
+        }),
+      ]),
+    ])
+
+    /**
+     * A step's settings panel. The step type's part, its island, is HTML from the server, see
+     * Funnel_Step::get_settings_island(), and is only replaced when the server sends a new one.
+     *
+     * @param step Object
+     */
+    const SettingsPanel = step => {
+
+      const canvas = Funnel.store.getCanvas(step.ID) ?? {}
+      const island = Funnel.islands[step.ID]
+      const drawn = Funnel.drawnIslands[step.ID] === island && document.getElementById(`settings-${ step.ID }`)
+
+      const {
+        step_type,
+        step_group,
+      } = step.data
+
+      return Div({
+        id       : `settings-${ step.ID }`,
+        dataId   : step.ID,
+        dataType : step_type,
+        className: `step ${ step_group } ${ step_type } settings ${ canvas.locked ? 'locked' : '' }`,
+      }, [
+        Div({ className: 'step-locked' }, Dashicon('lock')),
+        Div({ className: 'step-warnings' }, ( canvas.errors ?? [] ).map(error => Div({
+          className    : 'notice notice-warning is-dismissible',
+          dataErrorCode: error.code,
+        }, `<p>${ error.message }</p>`))),
+        Div({ className: 'step-flex' }, [
+          Div({
+            className : `step-edit panels ${ island?.ignore_morph ? 'ignore-morph' : '' }`,
+            dataIsland: drawn ? 'same' : 'new',
+          }, drawn ? '' : island?.html ?? `<p class="loading-dots">${ _x('Loading', 'as in waiting to for something to load', 'groundhogg') }</p>`),
+          Div({ className: 'step-notes' }, [
+            island?.before_notes || null,
+            step_group === 'benchmark' ? TriggerSettings(step) : null,
+            Textarea({
+              id         : `step_${ step.ID }_step-notes`,
+              name       : 'step_notes',
+              className  : 'step-notes-textarea full-width',
+              rows       : 7,
+              value      : step.meta.step_notes ?? '',
+              placeholder: __('You can use this area to store custom notes about the step. Accepts HTML and basic markdown.', 'groundhogg'),
+            }),
+          ]),
+        ]),
+      ])
+    }
+
+    /**
      * The undo and redo buttons, over Funnel.history
      */
     const UndoRedoManager = {
@@ -778,6 +879,9 @@
           return
         }
 
+        // the panels show what was put back, even the one being edited
+        this.forcePanels = true
+
         this.queue.push(operations)
         this.redraw()
       },
@@ -813,7 +917,7 @@
        *
        * @param data Object
        */
-      operationsSaved (data) {
+      operationsSaved (data, operations = []) {
 
         const ids = data.ids ?? {}
 
@@ -824,7 +928,11 @@
 
         this.conflicts = 0
 
-        this.applyState(data)
+        const saved = operations.filter(operation => operation.op === 'update' && operation.form).map(operation => operation.step)
+
+        this.applyState(data, {
+          loaded: () => this.recordSettingsChanges(saved),
+        })
 
         $('body').removeClass('auto-saving')
       },
@@ -850,7 +958,10 @@
         // the history can have changes that were refused
         UndoRedoManager.clear()
 
+        operations.filter(operation => operation.form).forEach(operation => delete this.settingsBefore[operation.step])
+
         if (data.state) {
+          this.forcePanels = true
           this.applyState(data.state)
         }
 
@@ -889,6 +1000,8 @@
         this.step_references = data.step_references
         this.revision = data.revision
 
+        Object.assign(this.islands, data.islands ?? {})
+
         this.store.load({
           steps : data.funnel.steps,
           canvas: data.canvas,
@@ -916,27 +1029,19 @@
 
         this.redraw()
 
-        if (shouldMorphSettings) {
-          morphdom(document.querySelector('.step-settings'), Div({}, data.settings), {
-            childrenOnly     : true,
-            onBeforeElUpdated: function (fromEl, toEl) {
+        const force = this.forcePanels
+        this.forcePanels = false
 
-              if (fromEl.tagName === 'TEXTAREA' && toEl.tagName === 'TEXTAREA') {
-                toEl.style.height = fromEl.style.height
-              }
-
-              // preserve the editing class
-              if (fromEl.classList.contains('editing')) {
-                toEl.classList.add('editing')
-              }
-
-              if (quiet && fromEl.matches('.editing .ignore-morph')) {
-                return false // don't morph the currently edited step to avoid glitchiness
-              }
-
-              return true
-            },
+        if (shouldMorphSettings || force) {
+          this.drawPanels({
+            quiet,
+            force,
           })
+        }
+
+        // what was put back is in the panel being edited, set up its settings again
+        if (force) {
+          this.stepSettingsCallbacks()
         }
 
         // publish button is enabled when there's something to publish
@@ -949,6 +1054,223 @@
           $(document).trigger('auto-save')
           $(document).trigger('gh-init-pickers') // re-init pickers that would have been removed
         }
+      },
+
+      // the step types' parts of the settings panels, step ID => { html, before_notes, ignore_morph }
+      islands: Funnel.islands ?? {},
+
+      // the islands in the panels now, step ID => island
+      drawnIslands: {},
+
+      // settings being changed that aren't sent yet, step ID => { meta, morph, timer }
+      pendingSettings: {},
+
+      // the steps before their settings changed, for undo, step ID => step
+      settingsBefore: {},
+
+      // steps whose settings were changed with an input that doesn't redraw them, see .no-morph
+      skipIslandMorph: {},
+
+      /**
+       * Draw the settings panels, see SettingsPanel()
+       *
+       * @param quiet bool the step being edited keeps what doesn't redraw while it's being edited, see .ignore-morph
+       * @param force bool redraw everything, like after undo
+       */
+      drawPanels ({
+        quiet = true,
+        force = false,
+      } = {}) {
+
+        const steps = this.store.steps.filter(step => !FlowStore.isTempId(step.ID)).sort((a, b) => a.ID - b.ID)
+
+        const islandOf = el => el.closest('.step.settings')?.dataset.id
+
+        morphdom(document.querySelector('.step-settings'), Div({}, steps.map(step => SettingsPanel(step))), {
+          childrenOnly     : true,
+          onBeforeElUpdated: (fromEl, toEl) => {
+
+            // what's being typed in
+            if (fromEl === document.activeElement && !force) {
+              return false
+            }
+
+            if (fromEl.tagName === 'TEXTAREA' && toEl.tagName === 'TEXTAREA') {
+              toEl.style.height = fromEl.style.height
+            }
+
+            // preserve the editing class
+            if (fromEl.classList.contains('editing')) {
+              toEl.classList.add('editing')
+            }
+
+            if (fromEl.matches('.step-edit.panels')) {
+
+              const id = islandOf(fromEl)
+
+              // the server didn't send new settings
+              if (toEl.dataset.island === 'same') {
+                return false
+              }
+
+              // changed since, or changed with an input that doesn't redraw them
+              if (!force && ( this.hasPendingSettings(id) || this.skipIslandMorph[id] )) {
+                delete this.skipIslandMorph[id]
+                this.drawnIslands[id] = this.islands[id]
+                return false
+              }
+            }
+
+            // don't morph the currently edited step to avoid glitchiness
+            if (!force && quiet && fromEl.matches('.editing .ignore-morph')) {
+              return false
+            }
+
+            if (fromEl.matches('.step-edit.panels')) {
+              this.drawnIslands[islandOf(fromEl)] = this.islands[islandOf(fromEl)]
+            }
+
+            return true
+          },
+          onNodeAdded      : node => {
+            if (node.matches?.('.step.settings')) {
+              this.drawnIslands[node.dataset.id] = this.islands[node.dataset.id]
+            }
+            return node
+          },
+        })
+      },
+
+      /**
+       * Save a step's settings, what its panel posts and any settings set by its JS, like the editor always has.
+       * Waits a moment for more changes, then sends an update operation, see Flow_Operations::set_stored().
+       *
+       * @param stepId
+       * @param meta Object settings set by JS, see updateStepMeta()
+       * @param morph bool whether the step type's settings are redrawn after
+       */
+      saveSettings (stepId, {
+        meta = {},
+        morph = true,
+      } = {}) {
+
+        const step = this.getStep(stepId)
+
+        if (!step || FlowStore.isTempId(step.ID)) {
+          return
+        }
+
+        this.settingsBefore[step.ID] ??= JSON.parse(JSON.stringify(step))
+
+        const pending = this.pendingSettings[step.ID] ??= {
+          meta : {},
+          morph: true,
+        }
+
+        pending.meta = {
+          ...pending.meta,
+          ...meta,
+        }
+
+        pending.morph = pending.morph && morph
+
+        clearTimeout(pending.timer)
+        pending.timer = setTimeout(() => this.flushSettings(step.ID), 400)
+      },
+
+      /**
+       * Send a step's settings changes now
+       *
+       * @param stepId
+       */
+      flushSettings (stepId) {
+
+        const pending = this.pendingSettings[stepId]
+
+        if (!pending) {
+          return
+        }
+
+        clearTimeout(pending.timer)
+        delete this.pendingSettings[stepId]
+
+        const step = this.getStep(stepId)
+
+        if (!step) {
+          return
+        }
+
+        const operation = {
+          op  : 'update',
+          step: step.ID,
+        }
+
+        if (Object.keys(pending.meta).length) {
+          operation.meta = pending.meta
+        }
+
+        const panel = document.getElementById(`settings-${ step.ID }`)
+
+        if (panel) {
+          operation.form = FlowStore.formToSettings($(panel).find(':input').serializeArray(), step.ID)
+
+          if (step.data.step_group === 'benchmark') {
+            operation.flags = Object.fromEntries(['is_entry', 'is_conversion', 'can_passthru'].map(flag => [flag, Boolean(operation.form[flag])]))
+          }
+        }
+
+        if (!pending.morph) {
+          this.skipIslandMorph[step.ID] = true
+        }
+
+        // the settings set by JS and the flags show right away
+        try {
+          this.store.apply(operation)
+        }
+        catch (err) {
+          console.warn(err)
+        }
+
+        this.queue.push([operation])
+      },
+
+      flushAllSettings () {
+        Object.keys(this.pendingSettings).forEach(id => this.flushSettings(id))
+      },
+
+      hasPendingSettings (stepId) {
+        const isFor = operation => operation.op === 'update' && operation.form && operation.step == stepId
+        return Boolean(this.pendingSettings[stepId]) || this.queue.outbox.some(isFor) || this.queue.sending.some(isFor)
+      },
+
+      /**
+       * Once settings changes are saved, what the server made of them can be undone
+       *
+       * @param ids the steps saved
+       */
+      recordSettingsChanges (ids) {
+
+        ids.forEach(id => {
+
+          const before = this.settingsBefore[id]
+          const step = this.getStep(id)
+
+          // more changes are on their way, they're recorded together
+          if (!before || !step || this.hasPendingSettings(id)) {
+            return
+          }
+
+          delete this.settingsBefore[id]
+
+          const changes = FlowStore.stepChanges(before, step)
+
+          if (changes) {
+            this.history.record({
+              undo: [changes.undo],
+              redo: [changes.redo],
+            })
+          }
+        })
       },
 
       sortables      : null,
@@ -1383,15 +1705,32 @@
         })
 
         $form.on('change', e => {
-          if (e.target.matches('textarea[name=step_notes]')) {
-            this.updateStepMeta({
-              step_notes: e.target.value,
+
+          // the flow's title
+          if (e.target.matches('#title')) {
+            FunnelsStore.patch(this.id, {
+              data: {
+                title: e.target.value,
+              },
             })
             return
           }
 
-          this.saveQuietly({
-            shouldMorphSettings: !e.target.matches('.no-morph'),
+          const panel = e.target.closest('.step-settings .step.settings')
+
+          if (!panel) {
+            return
+          }
+
+          if (e.target.matches('textarea[name=step_notes]')) {
+            this.updateStepMeta({
+              step_notes: e.target.value,
+            }, panel.dataset.id)
+            return
+          }
+
+          this.saveSettings(panel.dataset.id, {
+            morph: !e.target.matches('.no-morph'),
           })
         })
 
@@ -1698,6 +2037,9 @@
           }
         }
 
+        // settings changes go first
+        this.flushAllSettings()
+
         return this.queue.exclusive(() => this.postForm(args))
       },
 
@@ -1763,25 +2105,8 @@
           moreData(formData)
         }
 
-        // what the steps were, so the changes the server makes from the settings can be undone
-        // settings from updateStepMeta() are already on the steps, so put back what they were
+        // what the steps were, so the changes the server makes can be undone, like duplicating
         const before_ = JSON.parse(JSON.stringify(this.store.steps))
-
-        Object.entries(this.metaBefore).forEach(([stepId, meta]) => {
-          const step = before_.find(step => step.ID == stepId)
-          Object.entries(meta).forEach(([key, value]) => {
-            if (!step) {
-              return
-            }
-            if (value === null) {
-              delete step.meta[key]
-              return
-            }
-            step.meta[key] = value
-          })
-        })
-
-        this.metaBefore = {}
 
         return await ajax(formData, {
           url: `${ ajaxurl }?${ quiet ? 'auto-save' : 'explicit-save' }=1`,
@@ -2214,9 +2539,6 @@
 
       metaUpdates: {},
 
-      // settings from updateStepMeta() before they changed, step ID => { key => value }
-      metaBefore: {},
-
       // the real IDs of steps added in the editor, temporary ID => real ID
       realIds: {},
 
@@ -2231,26 +2553,15 @@
           step = this.getActiveStep()
         }
 
-        // what they were, for undo, see postForm()
-        this.metaBefore[step.ID] ??= {}
-
-        Object.keys(_meta).forEach(key => {
-          if (!this.metaBefore[step.ID].hasOwnProperty(key)) {
-            this.metaBefore[step.ID][key] = step.meta.hasOwnProperty(key) ? JSON.parse(JSON.stringify(step.meta[key])) : null
-          }
-        })
+        // what it was, for undo
+        this.settingsBefore[step.ID] ??= JSON.parse(JSON.stringify(step))
 
         step.meta = {
           ...step.meta,
           ..._meta,
         }
 
-        this.metaUpdates[step.ID] = {
-          ...this.metaUpdates[step.ID],
-          ..._meta,
-        }
-
-        this.saveQuietly()
+        this.saveSettings(step.ID, { meta: _meta })
 
         return step
       },
@@ -2604,13 +2915,14 @@
     // edits are saved in the background, one request at a time
     Funnel.queue = FlowStore.createQueue({
       send     : operations => Funnel.sendOperations(operations),
-      onSaved  : data => Funnel.operationsSaved(data),
+      onSaved  : (data, operations) => Funnel.operationsSaved(data, operations),
       onRefused: (data, operations) => Funnel.operationsRefused(data, operations),
       onRetry  : (error, attempt) => Funnel.operationsRetrying(error, attempt),
     })
 
     $(function () {
       Funnel.drawCanvas()
+      Funnel.drawPanels()
       drawLogicLines()
       Funnel.init().then(() => {
 
@@ -2716,7 +3028,7 @@
 
     window.addEventListener('beforeunload', e => {
 
-      if (Object.keys(Funnel.metaUpdates).length || Funnel.queue.isBusy()) {
+      if (Object.keys(Funnel.metaUpdates).length || Object.keys(Funnel.pendingSettings).length || Funnel.queue.isBusy()) {
         e.preventDefault()
         let msg = __('You have unsaved changes, are you sure you want to leave?', 'groundhogg')
         e.returnValue = msg

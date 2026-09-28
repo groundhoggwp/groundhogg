@@ -256,6 +256,9 @@ class Funnels_Page extends Admin_Page {
 						return $funnel->get_canvas_data();
 					} ),
 					'debug'               => WP_DEBUG,
+					'islands'             => (object) $funnel->while_editing( function () use ( $funnel ) {
+						return $funnel->get_settings_islands();
+					} ),
 					'revision'            => $funnel->while_editing( function () use ( $funnel ) {
 						return Get_Flow::revision( $funnel );
 					} ),
@@ -781,7 +784,8 @@ class Funnels_Page extends Admin_Page {
 			$refuse( new WP_Error( 'no_operations', __( 'Nothing to save.', 'groundhogg' ) ) );
 		}
 
-		$added = ( new Flow_Operations( $funnel, true ) )->apply_all_or_nothing( $operations );
+		$editor = new Flow_Operations( $funnel, true );
+		$added  = $editor->apply_all_or_nothing( $operations );
 
 		if ( is_wp_error( $added ) ) {
 			$refuse( $added );
@@ -794,24 +798,26 @@ class Funnels_Page extends Admin_Page {
 
 		wp_send_json_success( array_merge( [
 			'ids' => Flow_Operations::get_added_ids( $added ),
-		], $this->get_editor_state( $funnel ) ) );
+		], $this->get_editor_state( $funnel, $editor->get_touched() ) ) );
 	}
 
 	/**
 	 * What the editor redraws the flow from after a save, see funnel-editor.js
 	 *
-	 * @param Funnel $funnel
+	 * @param Funnel     $funnel
+	 * @param int[]|null $island_ids the steps whose settings panels changed, or all of them
 	 *
 	 * @return array
 	 */
-	public function get_editor_state( Funnel $funnel ) {
+	public function get_editor_state( Funnel $funnel, ?array $island_ids = null ) {
 
-		return $funnel->while_editing( function () use ( $funnel ) {
+		return $funnel->while_editing( function () use ( $funnel, $island_ids ) {
 
 			return [
 				// the editor draws the canvas from these, see flow-canvas.js
 				'canvas'          => $funnel->get_canvas_data(),
-				'settings'        => $funnel->step_settings( false ),
+				// and the step types' parts of the settings panels
+				'islands'         => (object) $funnel->get_settings_islands( $island_ids ),
 				// encoded while editing, so the steps are the draft
 				'funnel'          => json_decode( wp_json_encode( $funnel ), true ),
 				'pending_deletes' => $this->get_pending_deletes( $funnel ),

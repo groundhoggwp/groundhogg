@@ -74,6 +74,13 @@ class Flow_Operations {
 	protected $deleted = [];
 
 	/**
+	 * Steps added or changed by the operations, whose settings panels the editor redraws
+	 *
+	 * @var int[]
+	 */
+	protected $touched = [];
+
+	/**
 	 * @param Funnel $funnel
 	 * @param bool   $editor whether the operations come from the flow editor
 	 */
@@ -89,6 +96,15 @@ class Flow_Operations {
 	 */
 	public function get_deleted(): array {
 		return $this->deleted;
+	}
+
+	/**
+	 * Steps added or changed by the operations
+	 *
+	 * @return int[]
+	 */
+	public function get_touched(): array {
+		return array_values( array_unique( $this->touched ) );
 	}
 
 	/**
@@ -133,6 +149,7 @@ class Flow_Operations {
 		$this->step_branch = [];
 		$this->deferred    = [];
 		$this->deleted     = [];
+		$this->touched     = [];
 
 		$this->builder = new Step_Tree_Builder( $funnel );
 		$this->builder->allow_any_type( $this->editor );
@@ -184,6 +201,14 @@ class Flow_Operations {
 
 			if ( $op === 'add' ) {
 				$added[] = $result;
+				array_push( $this->touched, ...array_values( self::get_added_ids( [ $result ] ) ), ...wp_list_pluck( $result, 'id' ) );
+			}
+
+			if ( $op === 'update' || $op === 'restore' ) {
+				$touched = $this->resolve_step( $operation['step'] ?? null );
+				if ( ! is_wp_error( $touched ) ) {
+					$this->touched[] = $touched->get_id();
+				}
 			}
 		}
 
@@ -266,7 +291,7 @@ class Flow_Operations {
 	protected function update( array $operation ) {
 
 		// the editor sets settings as they're stored, like undoing an edit, and the settings of locked steps can change
-		if ( $this->editor && ( isset( $operation['meta'] ) || ( isset( $operation['title'] ) && ! isset( $operation['settings'] ) ) ) ) {
+		if ( $this->editor && ( isset( $operation['meta'] ) || isset( $operation['form'] ) || isset( $operation['flags'] ) || ( isset( $operation['title'] ) && ! isset( $operation['settings'] ) ) ) ) {
 			return $this->set_stored( $operation );
 		}
 
@@ -527,10 +552,17 @@ class Flow_Operations {
 	}
 
 	/**
-	 * Set a step's settings and title as they're stored, without the step type's save handlers.
-	 * For the editor's undo and redo, which put back exactly what was there.
+	 * The flow editor's settings changes, which aren't described like the abilities' settings:
 	 *
-	 * @param array $operation `meta` setting => value, null deletes it, and `title`
+	 * - `meta` setting => value, null deletes it. Set as stored, like the editor's updateStepMeta() and undo.
+	 * - `form` the step's settings as its panel posts them, saved through Step::save() like the editor always has,
+	 *   after `meta`. The step stays in its branch.
+	 * - `flags` the benchmark flags as stored, for undo.
+	 * - `title` as stored, for undo.
+	 *
+	 * The settings of locked steps can change.
+	 *
+	 * @param array $operation
 	 *
 	 * @return true|WP_Error
 	 */
@@ -552,6 +584,21 @@ class Flow_Operations {
 			}
 
 			$step->update_meta( $key, $value );
+		}
+
+		if ( isset( $operation['form'] ) && is_array( $operation['form'] ) ) {
+
+			$step = new Step( $step->get_id() );
+
+			// saving takes the branch from what's posted, but moving is done with operations
+			$step->merge_changes();
+			$step->save( array_merge( $operation['form'], [ 'branch' => $step->branch ] ) );
+
+			$step = new Step( $step->get_id() );
+		}
+
+		if ( isset( $operation['flags'] ) && $step->is_benchmark() ) {
+			$step->update( array_map( 'boolval', array_intersect_key( (array) $operation['flags'], array_flip( [ 'is_entry', 'is_conversion', 'can_passthru' ] ) ) ) );
 		}
 
 		if ( isset( $operation['title'] ) ) {
