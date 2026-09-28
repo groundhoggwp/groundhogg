@@ -95,6 +95,24 @@
     TakeOverDialog( lock_error )
   })
 
+  // release the lock when the editor closes, so others don't have to wait for it to expire
+  window.addEventListener('pagehide', () => {
+
+    const { id, type, lock = '', lock_error = null, remove_nonce = '' } = GhLockData
+
+    if (lock_error || !lock || !remove_nonce) {
+      return
+    }
+
+    const data = new FormData()
+    data.append('action', 'groundhogg_remove_lock')
+    data.append('id', id)
+    data.append('type', type)
+    data.append('_wpnonce', remove_nonce)
+
+    navigator.sendBeacon(ajaxurl, data)
+  })
+
   // refresh the lock
   $(document).on('heartbeat-send.groundhogg-refresh-lock', function (event, data) {
 

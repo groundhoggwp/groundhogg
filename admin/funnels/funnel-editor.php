@@ -208,10 +208,11 @@ function render_draggable_step_grid( $steps, $groups = true ) {
     <div id="funnel-builder">
         <div id="step-flow">
             <div class="fixed-inside">
+                <?php // drawn by flow-canvas.js ?>
                 <div id="step-sortable"
                      class="step-branch"
                      data-branch="main"
-                ><?php $funnel->step_flow(); ?></div>
+                ></div>
             </div>
         </div>
         <div id="step-settings-container" class="slide-out">

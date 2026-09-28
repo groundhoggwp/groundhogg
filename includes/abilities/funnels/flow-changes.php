@@ -17,6 +17,28 @@ use WP_Error;
 class Flow_Changes {
 
 	/**
+	 * Flows being edited by someone else in the flow editor can't be changed until they're done
+	 *
+	 * @param Funnel $funnel
+	 *
+	 * @return true|WP_Error
+	 */
+	public static function check_lock( Funnel $funnel ) {
+
+		$locked_by = \Groundhogg\check_lock( $funnel );
+
+		if ( ! $locked_by ) {
+			return true;
+		}
+
+		return new WP_Error( 'groundhogg_flow_locked', sprintf(
+		/* translators: %s: the name of the user editing the flow */
+			__( '%s is editing this flow in the flow editor, so it can\'t be changed until they\'re done.', 'groundhogg' ),
+			get_userdata( $locked_by )->display_name
+		) );
+	}
+
+	/**
 	 * The JSON Schema for the choices about contacts waiting at deleted steps
 	 *
 	 * @return array

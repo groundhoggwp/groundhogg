@@ -1327,6 +1327,21 @@ button.button.save-button {
           }
         }
 
+        // a branch the logic step no longer has, but that still has steps
+        &.unused-branch {
+          > .logic-line.line-above {
+            border-style: dashed;
+
+            > .logic-line {
+              border-style: dashed;
+            }
+
+            > .path-indicator {
+              background-color: $error-red;
+            }
+          }
+        }
+
         > .logic-line {
           border-color: $secondary-purple;
 

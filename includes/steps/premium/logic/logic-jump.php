@@ -32,4 +32,13 @@ class Logic_Jump extends Logic {
 	public function get_logic_action( Contact $contact ) {
 		return false;
 	}
+
+	/**
+	 * Pro's sortable_item() only calls the parent's, so the editor can draw the step
+	 *
+	 * @return bool
+	 */
+	public function uses_custom_sortable_item(): bool {
+		return false;
+	}
 }

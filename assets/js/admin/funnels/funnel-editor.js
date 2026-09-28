@@ -52,6 +52,72 @@
 
   const getFunnel = () => FunnelsStore.get(Funnel.id)
 
+  const {
+    FlowStore,
+    FlowCanvas,
+  } = Groundhogg
+
+  const flowCanvas = FlowCanvas.createCanvas({
+    h          : MakeEl.makeEl,
+    stepTypes  : Groundhogg.rawStepTypes,
+    defaultIcon: `${ Groundhogg.assets.images }funnel-icons/no-icon.png`,
+  })
+
+  /**
+   * Draw a flow's steps into #step-sortable from a store
+   *
+   * @param store Object see FlowStore.createStore()
+   * @param editing bool
+   * @param reporting bool
+   * @param debug bool
+   */
+  const drawCanvas = ({
+    store,
+    editing = true,
+    reporting = false,
+    debug = false,
+  }) => {
+    morphdom(document.getElementById('step-sortable'), Div({}, flowCanvas.render({
+      store,
+      editing,
+      reporting,
+      debug,
+    })), {
+      childrenOnly     : true,
+      onBeforeElUpdated: function (fromEl, toEl) {
+
+        // preserve the editing class
+        if (fromEl.classList.contains('editing')) {
+          toEl.classList.add('editing')
+        }
+
+        return true
+      },
+    })
+  }
+
+  /**
+   * Draw a flow that isn't being edited, like on the reporting page
+   *
+   * @param steps Object[]
+   * @param canvas Object see Funnel::get_canvas_data()
+   * @param reporting bool whether to add the places the flow report puts each step's stats
+   */
+  Groundhogg.drawFlow = ({
+    steps = [],
+    canvas = {},
+  }, { reporting = false } = {}) => {
+    drawCanvas({
+      store  : FlowStore.createStore({
+        steps,
+        canvas,
+      }),
+      editing: false,
+      reporting,
+    })
+    drawLogicLines()
+  }
+
   /**
    * The plain text title of a step in the flow
    *
@@ -575,6 +641,30 @@
     const morphSettings = () => morphdom(document.getElementById('flow-settings'), FlowSettings())
 
     $.extend(Funnel, {
+
+      // the canvas is drawn from this, see flow-store.js
+      store: FlowStore.createStore({
+        steps : Funnel.steps,
+        canvas: Funnel.canvas,
+      }),
+
+      /**
+       * Redraw the canvas from the store
+       */
+      drawCanvas () {
+        drawCanvas({
+          store: this.store,
+          debug: Boolean(this.debug),
+        })
+
+        // the order and levels are derived from the branches in JS too, catch it drifting from Funnel::set_step_levels()
+        if (this.debug) {
+          const differences = this.store.levelDifferences()
+          if (differences.length) {
+            console.warn('The flow store derives different step levels than the server', differences)
+          }
+        }
+      },
 
       sortables      : null,
       editing        : false,
@@ -1429,12 +1519,32 @@
           url: `${ ajaxurl }?${ quiet ? 'auto-save' : 'explicit-save' }=1`,
         }).then(response => {
 
+          // refused, like when someone else is editing the flow
+          if (!response.success) {
+            this.saving = false
+            $('body').removeClass('saving auto-saving')
+
+            keepMetaUpdates()
+
+            dialog({
+              message: response.data?.[0]?.message ?? __('Something went wrong updating the flow. Your changes could not be saved.', 'groundhogg'),
+              type   : 'error',
+            })
+
+            return response
+          }
+
           // make sure the status is available to the parent funnel form element
           document.getElementById('funnel-form').dataset.status = response.data.funnel.data.status
 
           this.steps = response.data.funnel.steps
           this.pending_deletes = response.data.pending_deletes
           this.step_references = response.data.step_references
+
+          this.store.load({
+            steps : this.steps,
+            canvas: response.data.canvas,
+          })
 
           if (response.data.err) {
             keepMetaUpdates()
@@ -1445,19 +1555,7 @@
           }
 
           if (!this.dragging) {
-            morphdom(document.getElementById('step-sortable'), Div({}, response.data.sortable), {
-              childrenOnly     : true,
-              onBeforeElUpdated: function (fromEl, toEl) {
-
-                // preserve the editing class
-                if (fromEl.classList.contains('editing')) {
-                  toEl.classList.add('editing')
-                }
-
-                return true
-              },
-            })
-
+            this.drawCanvas()
             this.makeSortable()
           }
 
@@ -2231,6 +2329,7 @@
     })
 
     $(function () {
+      Funnel.drawCanvas()
       drawLogicLines()
       Funnel.init().then(() => {
 

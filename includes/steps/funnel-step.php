@@ -575,7 +575,14 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 		] ) );
 	}
 
-	protected function __sortable_item( Step $step ) {
+	/**
+	 * The classes on the step's card in the flow editor
+	 *
+	 * @param Step $step
+	 *
+	 * @return string[]
+	 */
+	protected function get_sortable_classes( Step $step ) {
 
 		$classes = [
 			$step->get_group(),
@@ -612,7 +619,12 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			$classes[] = 'entry';
 		}
 
-		$classes = apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
+		return apply_filters( 'groundhogg/steps/sortable/classes', $classes, $step, $this );
+	}
+
+	protected function __sortable_item( Step $step ) {
+
+		$classes = $this->get_sortable_classes( $step );
 
 		?>
         <div
@@ -749,6 +761,97 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
         <div class="flow-line"></div><?php
 
 		?></div><?php
+	}
+
+	/**
+	 * Whether the step type draws its own markup on the canvas by overriding sortable_item()
+	 * Those steps are drawn from the server's HTML, the rest are drawn by the editor's JS
+	 *
+	 * @return bool
+	 */
+	public function uses_custom_sortable_item(): bool {
+
+		$declared_by = ( new \ReflectionMethod( $this, 'sortable_item' ) )->getDeclaringClass()->getName();
+
+		// namespaces aren't case-sensitive and some are declared in lower case
+		return ! in_array( strtolower( $declared_by ), array_map( 'strtolower', [
+			Funnel_Step::class,
+			Benchmarks\Benchmark::class,
+			Logic\Branch_Logic::class,
+		] ), true );
+	}
+
+	/**
+	 * Output of a callback that echoes
+	 *
+	 * @param callable $callback
+	 *
+	 * @return string
+	 */
+	protected function capture_output( callable $callback ) {
+		ob_start();
+		$callback();
+
+		return trim( ob_get_clean() );
+	}
+
+	/**
+	 * What the flow editor's JS needs to draw the step on the canvas, see flow-canvas.js
+	 * Settings are validated first so the errors are included
+	 *
+	 * @param Step $step
+	 *
+	 * @return array
+	 */
+	public function get_canvas_data( Step $step ) {
+
+		$this->set_current_step( $step );
+
+		$errors = array_merge( $step->get_errors(), $this->get_errors() );
+
+		$data = [
+			'layout'       => $step->is_benchmark() ? 'benchmark' : 'default',
+			'branch_logic' => $step->is_branch_logic(),
+			'title'        => $this->get_title( $step ),
+			'classes'      => array_values( $this->get_sortable_classes( $step ) ),
+			'notes'        => markdown2html( $step->get_meta( 'step_notes' ), true ),
+			'entry'        => $step->is_entry(),
+			'conversion'   => $step->is_conversion(),
+			'locked'       => $step->is_locked(),
+			'errors'       => array_map( function ( \WP_Error $error ) {
+				return [
+					'code'    => $error->get_error_code(),
+					'message' => $error->get_error_message(),
+				];
+			}, $errors ),
+			// what the step type and add-ons print on the card, labels() goes before the built-in labels and the hook after
+			'labels'       => $this->capture_output( function () {
+				$this->labels();
+			} ),
+			'extra_labels' => $this->capture_output( function () use ( $step ) {
+				do_action( 'groundhogg/steps/sortable/labels', $step, $this );
+			} ),
+			'inside'       => $this->capture_output( function () use ( $step ) {
+				do_action( 'groundhogg/steps/sortable/inside', $step, $this );
+				do_action( "groundhogg/steps/{$this->get_type()}/sortable/inside", $step );
+			} ),
+		];
+
+		// the editor's step types don't include unregistered ones
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $step->get_type() ) ) {
+			$data['name'] = $this->get_name();
+			$data['icon'] = $this->get_icon() ?: $this->get_default_icon();
+			$data['svg']  = $this->icon_is_svg() ? $this->get_icon_svg() : '';
+		}
+
+		if ( $this->uses_custom_sortable_item() ) {
+			$data['layout'] = 'html';
+			$data['html']   = $step->sortable_item( false );
+		}
+
+		$this->set_current_step( $step );
+
+		return $data;
 	}
 
 	protected function before_step_notes( Step $step ) {

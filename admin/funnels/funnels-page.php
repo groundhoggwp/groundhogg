@@ -248,6 +248,11 @@ class Funnels_Page extends Admin_Page {
 					'is_editor'           => true,
 					'pending_deletes'     => $this->get_pending_deletes( $funnel ),
 					'step_references'     => $this->get_step_references( $funnel ),
+					// the editor draws the canvas from these, see flow-canvas.js
+					'canvas'              => $funnel->while_editing( function () use ( $funnel ) {
+						return $funnel->get_canvas_data();
+					} ),
+					'debug'               => WP_DEBUG,
 				] );
 
 				wp_add_inline_script( 'groundhogg-admin-funnel-editor', "var Funnel = " . wp_json_encode( $data ), 'before' );
@@ -269,7 +274,8 @@ class Funnels_Page extends Admin_Page {
 
 				enqueue_email_block_editor_assets();
 
-				use_edit_lock( $funnel );
+				// only one person can edit a flow at a time
+				use_edit_lock( $funnel, false );
 
 				do_action( 'groundhogg/admin/funnels/editor_scripts', $funnel );
 
@@ -682,6 +688,17 @@ class Funnels_Page extends Admin_Page {
 			wp_send_json_error();
 		}
 
+		// someone else is editing the flow
+		$locked_by = check_lock( $this->get_current_funnel() );
+
+		if ( $locked_by ) {
+			wp_send_json_error( new \WP_Error( 'flow_locked', sprintf(
+			/* translators: %s: the name of the user editing the flow */
+				__( '%s is editing this flow, so your changes can\'t be saved.', 'groundhogg' ),
+				get_userdata( $locked_by )->display_name
+			) ) );
+		}
+
 		$result = $this->process_edit();
 
 		$funnel = $this->get_current_funnel();
@@ -691,7 +708,10 @@ class Funnels_Page extends Admin_Page {
 		}
 
 		$response = [
-			'sortable'        => $funnel->step_flow( false ),
+			// the editor draws the canvas from these, see flow-canvas.js
+			'canvas'          => $funnel->while_editing( function () use ( $funnel ) {
+				return $funnel->get_canvas_data();
+			} ),
 			'settings'        => $funnel->step_settings( false ),
 			'funnel'          => $funnel,
 			'pending_deletes' => $this->get_pending_deletes( $funnel ),

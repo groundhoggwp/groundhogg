@@ -85,6 +85,12 @@ class Activate_Flow extends Ability {
 			return new WP_Error( 'groundhogg_flow_not_found', __( 'Flow not found.', 'groundhogg' ) );
 		}
 
+		$unlocked = Flow_Changes::check_lock( $funnel );
+
+		if ( is_wp_error( $unlocked ) ) {
+			return $unlocked;
+		}
+
 		if ( $funnel->is_active() ) {
 			return [
 				'id'                 => $funnel->get_id(),

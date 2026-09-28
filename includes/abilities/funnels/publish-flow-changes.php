@@ -73,6 +73,12 @@ class Publish_Flow_Changes extends Ability {
 			return new WP_Error( 'groundhogg_flow_not_found', __( 'Flow not found.', 'groundhogg' ) );
 		}
 
+		$unlocked = Flow_Changes::check_lock( $funnel );
+
+		if ( is_wp_error( $unlocked ) ) {
+			return $unlocked;
+		}
+
 		if ( ! $funnel->is_active() ) {
 			return new WP_Error( 'groundhogg_flow_not_active', __( 'Only active flows have changes to publish. Edits to an inactive flow are already saved, use groundhogg/activate-flow to make it live.', 'groundhogg' ) );
 		}

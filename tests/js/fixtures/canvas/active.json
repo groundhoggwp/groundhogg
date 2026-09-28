@@ -1,0 +1,257 @@
+{
+    "html": "            <div class=\"sortable-item benchmarks starting\">            <div class=\"step-branch benchmarks\" data-branch=\"main\">\r\n\t\t\t        <div class=\"sortable-item benchmark\" data-type=\"tag_applied\" data-group=\"benchmark\">\r\n\t\t\t        <div\r\n                id=\"step-26\"\r\n                data-id=\"26\"\r\n                data-type=\"tag_applied\"\r\n                data-group=\"benchmark\"\r\n                data-level=\"1\"\r\n                class=\"step benchmark tag_applied active has-errors no_tags\" tabindex=\"0\">\r\n            <input type=\"hidden\" name=\"step_ids[]\" value=\"26\">\r\n            <input type=\"hidden\" id=\"step_26_branch\" name=\"steps[26][branch]\" value=\"main\">\r\n            <div class=\"step-labels display-flex gap-10\">\r\n\t\t\t\t            </div>\r\n\t\t\t\t\t\t\t\t\t                <div class=\"actions has-box-shadow\">\r\n                    <!-- LOCK -->\r\n                    <button title=\"Lock\" type=\"button\" class=\"gh-button secondary text icon lock-step\">\r\n                        <span class=\"dashicons dashicons-lock\"></span>\r\n                        <div class=\"gh-tooltip top\">Lock</div>\r\n                    </button>\r\n                    <!-- UNLOCK -->\r\n                    <button title=\"Unlock\" type=\"button\" class=\"gh-button secondary text icon unlock-step\">\r\n                        <span class=\"dashicons dashicons-unlock\"></span>\r\n                        <div class=\"gh-tooltip top\">Unlock</div>\r\n                    </button>\r\n                    <!-- DUPLICATE -->\r\n                    <button title=\"Duplicate\" type=\"button\" class=\"gh-button secondary text icon duplicate-step\">\r\n                        <span class=\"dashicons dashicons-admin-page\"></span>\r\n                        <div class=\"gh-tooltip top\">Duplicate</div>\r\n                    </button>\r\n                    <!-- DELETE -->\r\n                    <button title=\"Delete\" type=\"button\" class=\"gh-button danger text icon delete-step\">\r\n                        <span class=\"dashicons dashicons-trash\"></span>\r\n                        <div class=\"gh-tooltip top\">Delete</div>\r\n                    </button>\r\n                </div>\r\n\t\t\t            <div class=\"hndle\">\r\n\t\t\t\t<div class=\"hndle-icon\"></div>                <div>\r\n\t\t\t\t\t<span class=\"step-title\">A tag is applied</span><span class=\"step-name\">Tag Applied</span>                </div>\r\n            </div>\r\n\t\t\t        </div>\r\n\t\t\t\t\t        </div>\r\n\t\t<button type=\"button\" id=\"add-to-group-after-26\" class=\"add-step add-benchmark\" value=\"\"><span class=\"dashicons dashicons-plus-alt2\"></span><div class=\"gh-tooltip top\">Add trigger</div></button></div></div>        <div class=\"sortable-item action\"><button type=\"button\" id=\"before-27\" class=\"add-step add-action\" value=\"\"><span class=\"dashicons dashicons-plus-alt2\"></span><div class=\"gh-tooltip top\">Add action</div></button>        <div class=\"flow-line\"></div>        <div\r\n                id=\"step-27\"\r\n                data-id=\"27\"\r\n                data-type=\"delay_timer\"\r\n                data-group=\"action\"\r\n                data-level=\"2\"\r\n                class=\"step action delay_timer active has-changes\" tabindex=\"0\">\r\n            <input type=\"hidden\" name=\"step_ids[]\" value=\"27\">\r\n            <input type=\"hidden\" id=\"step_27_branch\" name=\"steps[27][branch]\" value=\"main\">\r\n            <div class=\"step-labels display-flex gap-10\">\r\n\t\t\t\t            </div>\r\n\t\t\t\t\t\t\t\t\t                <div class=\"actions has-box-shadow\">\r\n                    <!-- LOCK -->\r\n                    <button title=\"Lock\" type=\"button\" class=\"gh-button secondary text icon lock-step\">\r\n                        <span class=\"dashicons dashicons-lock\"></span>\r\n                        <div class=\"gh-tooltip top\">Lock</div>\r\n                    </button>\r\n                    <!-- UNLOCK -->\r\n                    <button title=\"Unlock\" type=\"button\" class=\"gh-button secondary text icon unlock-step\">\r\n                        <span class=\"dashicons dashicons-unlock\"></span>\r\n                        <div class=\"gh-tooltip top\">Unlock</div>\r\n                    </button>\r\n                    <!-- DUPLICATE -->\r\n                    <button title=\"Duplicate\" type=\"button\" class=\"gh-button secondary text icon duplicate-step\">\r\n                        <span class=\"dashicons dashicons-admin-page\"></span>\r\n                        <div class=\"gh-tooltip top\">Duplicate</div>\r\n                    </button>\r\n                    <!-- DELETE -->\r\n                    <button title=\"Delete\" type=\"button\" class=\"gh-button danger text icon delete-step\">\r\n                        <span class=\"dashicons dashicons-trash\"></span>\r\n                        <div class=\"gh-tooltip top\">Delete</div>\r\n                    </button>\r\n                </div>\r\n\t\t\t            <div class=\"hndle\">\r\n\t\t\t\t<div class=\"hndle-icon\"></div>                <div>\r\n\t\t\t\t\t<span class=\"step-title\">Wait at least <b>3 days</b> and then run at any time</span><span class=\"step-name\">Delay Timer</span>                </div>\r\n            </div>\r\n\t\t\t        </div>\r\n\t\t        <div class=\"flow-line\"></div></div>        <div class=\"sortable-item action\"><button type=\"button\" id=\"before-28\" class=\"add-step add-action\" value=\"\"><span class=\"dashicons dashicons-plus-alt2\"></span><div class=\"gh-tooltip top\">Add action</div></button>        <div class=\"flow-line\"></div>        <div\r\n                id=\"step-28\"\r\n                data-id=\"28\"\r\n                data-type=\"apply_tag\"\r\n                data-group=\"action\"\r\n                data-level=\"3\"\r\n                class=\"step action apply_tag active has-errors no_tags\" tabindex=\"0\">\r\n            <input type=\"hidden\" name=\"step_ids[]\" value=\"28\">\r\n            <input type=\"hidden\" id=\"step_28_branch\" name=\"steps[28][branch]\" value=\"main\">\r\n            <div class=\"step-labels display-flex gap-10\">\r\n\t\t\t\t            </div>\r\n\t\t\t\t\t\t\t\t\t                <div class=\"actions has-box-shadow\">\r\n                    <!-- LOCK -->\r\n                    <button title=\"Lock\" type=\"button\" class=\"gh-button secondary text icon lock-step\">\r\n                        <span class=\"dashicons dashicons-lock\"></span>\r\n                        <div class=\"gh-tooltip top\">Lock</div>\r\n                    </button>\r\n                    <!-- UNLOCK -->\r\n                    <button title=\"Unlock\" type=\"button\" class=\"gh-button secondary text icon unlock-step\">\r\n                        <span class=\"dashicons dashicons-unlock\"></span>\r\n                        <div class=\"gh-tooltip top\">Unlock</div>\r\n                    </button>\r\n                    <!-- DUPLICATE -->\r\n                    <button title=\"Duplicate\" type=\"button\" class=\"gh-button secondary text icon duplicate-step\">\r\n                        <span class=\"dashicons dashicons-admin-page\"></span>\r\n                        <div class=\"gh-tooltip top\">Duplicate</div>\r\n                    </button>\r\n                    <!-- DELETE -->\r\n                    <button title=\"Delete\" type=\"button\" class=\"gh-button danger text icon delete-step\">\r\n                        <span class=\"dashicons dashicons-trash\"></span>\r\n                        <div class=\"gh-tooltip top\">Delete</div>\r\n                    </button>\r\n                </div>\r\n\t\t\t            <div class=\"hndle\">\r\n\t\t\t\t<div class=\"hndle-icon\"></div>                <div>\r\n\t\t\t\t\t<span class=\"step-title\">Apply tags</span><span class=\"step-name\">Apply Tag</span>                </div>\r\n            </div>\r\n\t\t\t        </div>\r\n\t\t        <div class=\"flow-line\"></div></div>        <div class=\"sortable-item action\"><button type=\"button\" id=\"before-29\" class=\"add-step add-action\" value=\"\"><span class=\"dashicons dashicons-plus-alt2\"></span><div class=\"gh-tooltip top\">Add action</div></button>        <div class=\"flow-line\"></div>        <div\r\n                id=\"step-29\"\r\n                data-id=\"29\"\r\n                data-type=\"remove_tag\"\r\n                data-group=\"action\"\r\n                data-level=\"4\"\r\n                class=\"step action remove_tag inactive has-errors no_tags\" tabindex=\"0\">\r\n            <input type=\"hidden\" name=\"step_ids[]\" value=\"29\">\r\n            <input type=\"hidden\" id=\"step_29_branch\" name=\"steps[29][branch]\" value=\"main\">\r\n            <div class=\"step-labels display-flex gap-10\">\r\n\t\t\t\t            </div>\r\n\t\t\t\t\t\t\t\t\t                <div class=\"actions has-box-shadow\">\r\n                    <!-- LOCK -->\r\n                    <button title=\"Lock\" type=\"button\" class=\"gh-button secondary text icon lock-step\">\r\n                        <span class=\"dashicons dashicons-lock\"></span>\r\n                        <div class=\"gh-tooltip top\">Lock</div>\r\n                    </button>\r\n                    <!-- UNLOCK -->\r\n                    <button title=\"Unlock\" type=\"button\" class=\"gh-button secondary text icon unlock-step\">\r\n                        <span class=\"dashicons dashicons-unlock\"></span>\r\n                        <div class=\"gh-tooltip top\">Unlock</div>\r\n                    </button>\r\n                    <!-- DUPLICATE -->\r\n                    <button title=\"Duplicate\" type=\"button\" class=\"gh-button secondary text icon duplicate-step\">\r\n                        <span class=\"dashicons dashicons-admin-page\"></span>\r\n                        <div class=\"gh-tooltip top\">Duplicate</div>\r\n                    </button>\r\n                    <!-- DELETE -->\r\n                    <button title=\"Delete\" type=\"button\" class=\"gh-button danger text icon delete-step\">\r\n                        <span class=\"dashicons dashicons-trash\"></span>\r\n                        <div class=\"gh-tooltip top\">Delete</div>\r\n                    </button>\r\n                </div>\r\n\t\t\t            <div class=\"hndle\">\r\n\t\t\t\t<div class=\"hndle-icon\"></div>                <div>\r\n\t\t\t\t\t<span class=\"step-title\">Remove tags</span><span class=\"step-name\">Remove Tag</span>                </div>\r\n            </div>\r\n\t\t\t        </div>\r\n\t\t        <div class=\"flow-line\"></div></div>",
+    "steps": [
+        {
+            "ID": 26,
+            "data": {
+                "funnel_id": 6,
+                "step_title": "tag_applied",
+                "step_status": "active",
+                "step_type": "tag_applied",
+                "step_group": "benchmark",
+                "step_order": 1,
+                "step_level": 1,
+                "step_slug": "26-tag_applied",
+                "is_entry": "0",
+                "is_conversion": "0",
+                "is_locked": false,
+                "can_passthru": "0",
+                "branch": "main",
+                "branch_path": "main",
+                "ancestors": "",
+                "changes": [],
+                "date_activated": "0000-00-00 00:00:00",
+                "date_committed": "2026-09-28 14:35:55",
+                "ID": 26
+            },
+            "meta": [],
+            "export": {
+                "tags": []
+            },
+            "is_starting": true,
+            "is_entry": false
+        },
+        {
+            "ID": 27,
+            "data": {
+                "funnel_id": 6,
+                "step_title": "Wait longer",
+                "step_status": "active",
+                "step_type": "delay_timer",
+                "step_group": "action",
+                "step_order": 2,
+                "step_level": 2,
+                "step_slug": "27-delay_timer",
+                "is_entry": "0",
+                "is_conversion": "0",
+                "is_locked": false,
+                "can_passthru": "0",
+                "branch": "main",
+                "branch_path": "main",
+                "ancestors": "",
+                "changes": {
+                    "step_title": "Wait longer"
+                },
+                "date_activated": "0000-00-00 00:00:00",
+                "date_committed": "2026-09-28 14:35:55",
+                "ID": 27
+            },
+            "meta": [],
+            "export": [],
+            "is_starting": false,
+            "is_entry": false
+        },
+        {
+            "ID": 28,
+            "data": {
+                "funnel_id": 6,
+                "step_title": "apply_tag",
+                "step_status": "active",
+                "step_type": "apply_tag",
+                "step_group": "action",
+                "step_order": 3,
+                "step_level": 3,
+                "step_slug": "28-apply_tag",
+                "is_entry": "0",
+                "is_conversion": "0",
+                "is_locked": false,
+                "can_passthru": "0",
+                "branch": "main",
+                "branch_path": "main",
+                "ancestors": "",
+                "changes": [],
+                "date_activated": "0000-00-00 00:00:00",
+                "date_committed": "2026-09-28 14:35:55",
+                "ID": 28
+            },
+            "meta": [],
+            "export": {
+                "tags": []
+            },
+            "is_starting": false,
+            "is_entry": false
+        },
+        {
+            "ID": 29,
+            "data": {
+                "funnel_id": 6,
+                "step_title": "remove_tag",
+                "step_status": "inactive",
+                "step_type": "remove_tag",
+                "step_group": "action",
+                "step_order": 4,
+                "step_level": 4,
+                "step_slug": "29-remove_tag",
+                "is_entry": "0",
+                "is_conversion": "0",
+                "is_locked": false,
+                "can_passthru": "0",
+                "branch": "main",
+                "branch_path": "main",
+                "ancestors": "",
+                "changes": [],
+                "date_activated": "0000-00-00 00:00:00",
+                "date_committed": "0000-00-00 00:00:00",
+                "ID": 29
+            },
+            "meta": [],
+            "export": {
+                "tags": []
+            },
+            "is_starting": false,
+            "is_entry": false
+        }
+    ],
+    "canvas": {
+        "26": {
+            "layout": "benchmark",
+            "branch_logic": false,
+            "title": "A tag is applied",
+            "classes": [
+                "benchmark",
+                "tag_applied",
+                "active",
+                "has-errors",
+                "no_tags"
+            ],
+            "notes": "",
+            "entry": false,
+            "conversion": false,
+            "locked": false,
+            "errors": [
+                {
+                    "code": "no_tags",
+                    "message": "No tags have been selected."
+                }
+            ],
+            "labels": "",
+            "extra_labels": "",
+            "inside": ""
+        },
+        "27": {
+            "layout": "default",
+            "branch_logic": false,
+            "title": "Wait at least <b>3 days</b> and then run at any time",
+            "classes": [
+                "action",
+                "delay_timer",
+                "active",
+                "has-changes"
+            ],
+            "notes": "",
+            "entry": false,
+            "conversion": false,
+            "locked": false,
+            "errors": [],
+            "labels": "",
+            "extra_labels": "",
+            "inside": ""
+        },
+        "28": {
+            "layout": "default",
+            "branch_logic": false,
+            "title": "Apply tags",
+            "classes": [
+                "action",
+                "apply_tag",
+                "active",
+                "has-errors",
+                "no_tags"
+            ],
+            "notes": "",
+            "entry": false,
+            "conversion": false,
+            "locked": false,
+            "errors": [
+                {
+                    "code": "no_tags",
+                    "message": "No tags have been selected."
+                }
+            ],
+            "labels": "",
+            "extra_labels": "",
+            "inside": ""
+        },
+        "29": {
+            "layout": "default",
+            "branch_logic": false,
+            "title": "Remove tags",
+            "classes": [
+                "action",
+                "remove_tag",
+                "inactive",
+                "has-errors",
+                "no_tags"
+            ],
+            "notes": "",
+            "entry": false,
+            "conversion": false,
+            "locked": false,
+            "errors": [
+                {
+                    "code": "no_tags",
+                    "message": "No tags have been selected."
+                }
+            ],
+            "labels": "",
+            "extra_labels": "",
+            "inside": ""
+        }
+    },
+    "step_types": {
+        "apply_tag": {
+            "icon": "http://example.org/wp-content/plugins/C:/Users/adria/PhpstormProjects/groundhogg/.claude/worktrees/gallant-colden-529d62/assets/images/funnel-icons/crm/apply-tag.svg",
+            "svg": false,
+            "name": "Apply Tag",
+            "type": "apply_tag",
+            "group": "action",
+            "context": null
+        },
+        "remove_tag": {
+            "icon": "http://example.org/wp-content/plugins/C:/Users/adria/PhpstormProjects/groundhogg/.claude/worktrees/gallant-colden-529d62/assets/images/funnel-icons/crm/remove-tag.svg",
+            "svg": false,
+            "name": "Remove Tag",
+            "type": "remove_tag",
+            "group": "action",
+            "context": null
+        },
+        "delay_timer": {
+            "icon": "http://example.org/wp-content/plugins/C:/Users/adria/PhpstormProjects/groundhogg/.claude/worktrees/gallant-colden-529d62/assets/images/funnel-icons/delay/delay-timer.svg",
+            "svg": false,
+            "name": "Delay Timer",
+            "type": "delay_timer",
+            "group": "action",
+            "context": null
+        },
+        "tag_applied": {
+            "icon": "http://example.org/wp-content/plugins/C:/Users/adria/PhpstormProjects/groundhogg/.claude/worktrees/gallant-colden-529d62/assets/images/funnel-icons/crm/tag-applied.svg",
+            "svg": false,
+            "name": "Tag Applied",
+            "type": "tag_applied",
+            "group": "benchmark",
+            "context": null
+        }
+    },
+    "default_icon": "http://example.org/wp-content/plugins/C:/Users/adria/PhpstormProjects/groundhogg/.claude/worktrees/gallant-colden-529d62/assets/images/funnel-icons/no-icon.png",
+    "debug": false
+}

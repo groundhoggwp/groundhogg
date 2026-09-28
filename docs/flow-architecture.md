@@ -638,7 +638,15 @@ There are three paths, all ending in `Step::update_meta()`:
 
 ### Locking
 
-- `is_locked` is written directly by the editor's `_lock_step` / `_unlock_step`, bypassing staging.
+- **Edit lock (the whole flow):** `includes/edit-lock.php`, the same system WP uses for posts. Opening the
+  editor calls `use_edit_lock( $funnel, false )`: a `_edit_lock` funnel meta of `"<time>:<user>"`, refreshed by
+  the heartbeat every 30s, valid for 150s (`wp_check_post_lock_window`). There's no take-over: anyone else gets
+  a modal that only lets them exit. The editor releases it on `pagehide` (`sendBeacon` to
+  `wp_ajax_groundhogg_remove_lock`, only the holder can). While another user holds it, the editor's save and
+  the `edit-flow`, `publish-flow-changes`, `discard-flow-changes`, `activate-flow` and `deactivate-flow`
+  abilities are refused (`flow_locked` / `groundhogg_flow_locked`, via `Flow_Changes::check_lock()`). The
+  same user in another tab, or an agent acting as them, isn't locked out.
+- **Step locks:** `is_locked` is written directly by the editor's `_lock_step` / `_unlock_step`, bypassing staging.
 - Locked steps can't be dragged (`.locked` cancels sortable), and `edit-flow` refuses to update, move or
   delete them.
 - `Step::is_locked()` is filterable (`groundhogg/step/is_locked`).
@@ -649,7 +657,7 @@ There are three paths, all ending in `Step::update_meta()`:
 
 The editor posts to `admin-ajax.php?action=gh_save_funnel_via_ajax` (`?auto-save=1` or `?explicit-save=1`).
 `Funnels_Page::ajax_save_funnel()` calls `verify_action()`, then `process_edit()`, and responds
-`{ sortable, settings, funnel, pending_deletes, step_references, has_changes, err? }`. The REST `/funnels/{id}/commit`
+`{ canvas, settings, funnel, pending_deletes, step_references, has_changes, err? }`. The REST `/funnels/{id}/commit`
 route is **not** used by the editor.
 
 **`process_edit()`, in order:**
@@ -679,7 +687,11 @@ route is **not** used by the editor.
 
 **Response helpers:**
 
-- `step_flow()`: main-branch cards, running `validate_settings()`.
+- `get_canvas_data()`: `{ stepId: Funnel_Step::get_canvas_data() }`, running `validate_settings()` first. The
+  editor draws the canvas from it (see 9). `step_flow()` still renders the old server markup, which the canvas
+  fixtures compare against, but nothing in the editor uses it.
+- **Edit lock:** the request is refused with `wp_send_json_error( WP_Error( 'flow_locked' ) )` when another user
+  holds the flow's edit lock (`check_lock()`, see 7).
 - `step_settings()`: settings panels, **sorted by ID** so morphdom positions stay stable.
 - `get_pending_deletes()`: `{ steps: [ { ID, title, contacts, next } ], targets: [ { ID, title } ] }`.
 - `get_step_references()`: `{ stepId: [ { ID, title } ] }`, with titles suffixed "(in <flow>)" for other
@@ -687,7 +699,7 @@ route is **not** used by the editor.
 
 Page load (`Funnels_Page::scripts()`) prints the same data as the inline global
 `var Funnel = { ...get_as_array(), id, save_text, export_url, is_active, funnelTourDismissed,
-scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fires
+scratchFunnelURL, is_editor: true, pending_deletes, step_references, canvas, debug }`, then fires
 `groundhogg/admin/funnels/editor_scripts` with the `Funnel`.
 
 ---
@@ -697,7 +709,9 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
 ### Scripts
 
 - Handles are registered in `includes/scripts.php` `register_admin_scripts()`:
-  - `groundhogg-admin-funnel-editor` (`funnel-editor.js`), which depends on jquery, groundhogg-admin,
+  - `groundhogg-admin-flow-store` (`flow-store.js`) and `groundhogg-admin-flow-canvas` (`flow-canvas.js`),
+    which draw the canvas;
+  - `groundhogg-admin-funnel-editor` (`funnel-editor.js`), which depends on jquery, the flow canvas, groundhogg-admin,
     -element, -functions, -form-builder-v2, email block editor, `groundhogg-admin-flow-logic-lines`,
     `groundhogg-admin-flow-simulator` and `groundhogg-admin-funnel-scheduler`;
   - `groundhogg-admin-funnel-steps` (`funnel-steps.js`), which depends on the editor.
@@ -754,7 +768,9 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references }`, then fir
 - **Response handling:**
   - updates `steps`, `pending_deletes`, `step_references`;
   - pushes undo history (unless restoring);
-  - morphdoms `#step-sortable` with `sortable` (unless dragging; keeps `.editing`), then `makeSortable()`;
+  - loads `funnel.steps` and `canvas` into `Funnel.store` and redraws the canvas with `drawCanvas()` (unless
+    dragging; keeps `.editing`), then `makeSortable()`;
+  - a refused request (`success: false`, e.g. `flow_locked`) shows its message and keeps the `metaUpdates`;
   - morphdoms `.step-settings` with `settings`. **On quiet non-restore saves it skips any element matching
     `.editing .ignore-morph`**, so the panel being edited isn't wiped.
   - `drawLogicLines()`;
@@ -865,7 +881,28 @@ To reuse another type's callbacks, spread them: `{ ...Funnel.stepCallbacks.if_el
 
 ### DOM contract (server-rendered, relied on by the JS)
 
-**Canvas** (`Funnel::step_flow()` → `Step::sortable_item()` → element `sortable_item()`):
+**The canvas is drawn in JS** (since 5.0): `flow-store.js` (`Groundhogg.FlowStore`) holds the steps and the
+server's canvas data, and `flow-canvas.js` (`Groundhogg.FlowCanvas`) draws them with MakeEl. Both are DOM-free
+UMD modules so Node can load them for tests. The markup is the same the server rendered with `sortable_item()`
+(below), so drag and drop, the old save path, the logic lines and step type JS keep working.
+
+- **Canvas data** (`Funnel_Step::get_canvas_data( $step )`, per step): `layout` (`default`, `benchmark`,
+  `branches`, `stop`, `html`), `branch_logic`, `title` (`get_title()`), `classes` (the filtered card classes,
+  `get_sortable_classes()`), `notes` (HTML), `entry`, `conversion`, `locked`, `errors [{code, message}]`,
+  `labels` (`labels()` output), `extra_labels` (`groundhogg/steps/sortable/labels`), `inside` (the
+  `…/sortable/inside` actions), plus `name`/`icon`/`svg` for unregistered types. `Branch_Logic` adds
+  `branches [{id, name, classes}]`.
+- **Step types that override `sortable_item()`** (`uses_custom_sortable_item()`, by reflection) get `layout:
+  html` and their server markup in `html`, inserted as-is. Pro's `logic_jump`/`logic_loop` overrides only call
+  the parent, and Pro's `logic_stop` is drawn by the `stop` layout; the premium stubs say so.
+- Steps in a branch a logic step no longer has are drawn in an extra `.split-branch.unused-branch` column
+  instead of being hidden.
+- `Groundhogg.drawFlow( { steps, canvas }, { reporting } )` draws a flow that isn't being edited; the reporting
+  page (`funnel-flow-preview.php`) uses it with the `.step-reporting` stat slots.
+- In debug mode the editor compares `store.levelDifferences()` (a JS port of `set_step_levels()`) with the
+  server's values and warns in the console.
+
+**Canvas markup** (what `Step::sortable_item()` → element `sortable_item()` rendered, and the JS reproduces):
 
 - **`div.sortable-item.<group>`**, containing:
   - `button.add-step.add-action` (before),
@@ -1332,6 +1369,12 @@ false).
 - **PHPUnit, Pro:** `tests/phpunit/unit-tests/test-flow-logic-abilities.php` (Multi Branch round trip,
   branch merge, references). Pro's bootstrap finds core through `GROUNDHOGG_CORE_DIR`; point it at a core
   worktree to test both together.
+- **JS:** `npm run test:js` (Node's built-in runner, nothing to install) runs `tests/js/*.test.js`:
+  - `flow-canvas.test.js` draws each fixture flow with the JS canvas and compares it, token by token, with the
+    server's `step_flow()` markup;
+  - `flow-store.test.js` checks the JS levels match `set_step_levels()`.
+  - The fixtures in `tests/js/fixtures/canvas/` are written by the PHPUnit `Flow_Canvas_Tests` with
+    `GH_UPDATE_JS_FIXTURES=1`; without it that test fails when the server's markup no longer matches them.
 - **Local test environment** (WP test lib, polyfills, php-test.ini, the `WP_PHP_BINARY` quirk, fresh-DB
   checks): see the Claude memory note `phpunit-test-workflow`. Always check a fresh database as well as a
   reused one; installer and role caching bugs only show on the first run.

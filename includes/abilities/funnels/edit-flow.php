@@ -224,6 +224,12 @@ class Edit_Flow extends Ability {
 			return new WP_Error( 'groundhogg_flow_not_found', __( 'Flow not found.', 'groundhogg' ) );
 		}
 
+		$unlocked = Flow_Changes::check_lock( $funnel );
+
+		if ( is_wp_error( $unlocked ) ) {
+			return $unlocked;
+		}
+
 		if ( $funnel->get_status() === 'archived' ) {
 			return new WP_Error( 'groundhogg_flow_archived', __( 'Archived flows can\'t be edited, restore it first.', 'groundhogg' ) );
 		}
