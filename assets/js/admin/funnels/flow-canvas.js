@@ -34,12 +34,14 @@
    * @param h function( tag, attributes, children ) makes an element
    * @param stepTypes Object type => { name, icon, svg }, Groundhogg.rawStepTypes
    * @param defaultIcon string the icon URL for step types without one
+   * @param sanitize function( html ) makes HTML that people wrote, like step notes, safe to put in the page
    * @return {{render: (function(Object): Array)}}
    */
   const createCanvas = ({
     h,
     stepTypes = {},
     defaultIcon = '',
+    sanitize = html => html,
   }) => {
 
     const Dashicon = icon => h('span', { className: `dashicons dashicons-${ icon }` }, '')
@@ -183,7 +185,7 @@
             debug ? h('div', { className: 'step-label' }, `Pos: ${ step_order },${ step_level }`) : null,
             canvas.labels || null,
             canvas.notes ? h('span', { className: 'dashicons dashicons-admin-comments' }, [
-              h('span', { className: 'gh-tooltip right' }, canvas.notes),
+              h('span', { className: 'gh-tooltip right' }, sanitize(canvas.notes)),
             ]) : null,
             canvas.entry ? Dashicon('migrate') : null,
             canvas.conversion ? Dashicon('flag') : null,

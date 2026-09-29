@@ -41,6 +41,8 @@
     loadingModal,
     modal,
     escHTML,
+    sanitizeHTML,
+    safeURL,
   } = Groundhogg.element
 
   const {
@@ -57,10 +59,53 @@
     FlowCanvas,
   } = Groundhogg
 
+  // what markdown2html() makes of step notes, and the basic formatting written in them
+  const NOTES_TAGS = {
+    p     : [],
+    div   : [],
+    br    : [],
+    strong: [],
+    b     : [],
+    em    : [],
+    i     : [],
+    u     : [],
+    code  : [],
+    h1    : [],
+    h2    : [],
+    h3    : [],
+    h4    : [],
+    h5    : [],
+    h6    : [],
+    ul    : ['class'],
+    ol    : [],
+    li    : [],
+    a     : ['href'],
+    img   : ['src', 'alt'],
+  }
+
+  /**
+   * Step notes as HTML that's safe to put in the page, see sanitizeHTML()
+   * It doesn't check the values of attributes, so links and images only keep safe URLs
+   *
+   * @param html string the notes, from markdown2html()
+   * @return string
+   */
+  const notesHTML = html => {
+
+    const template = document.createElement('template')
+    template.innerHTML = sanitizeHTML(String(html ?? ''), NOTES_TAGS)
+
+    template.content.querySelectorAll('a[href]').forEach(el => el.setAttribute('href', safeURL(el.getAttribute('href'))))
+    template.content.querySelectorAll('img[src]').forEach(el => el.setAttribute('src', safeURL(el.getAttribute('src'), '')))
+
+    return template.innerHTML
+  }
+
   const flowCanvas = FlowCanvas.createCanvas({
     h          : MakeEl.makeEl,
     stepTypes  : Groundhogg.rawStepTypes,
     defaultIcon: `${ Groundhogg.assets.images }funnel-icons/no-icon.png`,
+    sanitize   : notesHTML,
   })
 
   /**
