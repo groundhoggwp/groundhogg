@@ -29,8 +29,25 @@
     simulating: false,
     scrollLog : true,
     contactId : null,
+    missingContact: false,
     dry       : true,
   })
+
+  // the request for the selected contact, so redraws while it loads don't ask again
+  let fetchingContact = null
+
+  /**
+   * The selected contact couldn't be loaded, like when it was deleted, so ask for another one
+   */
+  const forgetContact = () => {
+    fetchingContact = null
+    localStorage.removeItem('gh-simulate-contact-id')
+    State.set({
+      contactId     : null,
+      missingContact: true,
+    })
+    morph()
+  }
 
   let contactId = localStorage.getItem('gh-simulate-contact-id')
 
@@ -65,7 +82,7 @@
         })
 
         // fetch the contact from the API in the event that it's properties or tags were updated.
-        Groundhogg.stores.contacts.fetchItem(State.contactId).then(morph)
+        Groundhogg.stores.contacts.fetchItem(State.contactId).then(morph).catch(forgetContact)
 
         morph()
         return
@@ -182,7 +199,8 @@
     onSelect: contact => {
       localStorage.setItem('gh-simulate-contact-id', contact.ID)
       State.set({
-        contactId: contact.ID,
+        contactId     : contact.ID,
+        missingContact: false,
       })
       morph()
     },
@@ -233,16 +251,29 @@
           ToolTip('View profile', 'top'),
         ]),
       ]),
-    }) : Button({
-      id     : 'select-contact-for-simulator',
-      onClick: handleChangeContact,
-    }, 'Select a contact'),
+    }) : Div({
+      className: 'display-flex column gap-10 align-left',
+    }, [
+      State.missingContact ? Pg({}, __('The contact you were simulating with can\'t be found, it may have been deleted.', 'groundhogg')) : null,
+      Button({
+        id       : 'select-contact-for-simulator',
+        className: 'gh-button secondary',
+        onClick  : handleChangeContact,
+      }, __('Select a contact', 'groundhogg')),
+    ]),
   ])
 
   const FlowSimulator = () => {
 
     if (State.contactId && !Groundhogg.stores.contacts.has(State.contactId)) {
-      Groundhogg.stores.contacts.maybeFetchItem(State.contactId).then(morph)
+
+      if (!fetchingContact) {
+        fetchingContact = Groundhogg.stores.contacts.maybeFetchItem(State.contactId).then(() => {
+          fetchingContact = null
+          morph()
+        }).catch(forgetContact)
+      }
+
       return Div({ id: 'flow-simulator' }, [
         Div({
           className: 'skeleton-loading',
