@@ -29,7 +29,6 @@
     simulating: false,
     scrollLog : true,
     contactId : null,
-    missingContact: false,
     dry       : true,
   })
 
@@ -43,8 +42,7 @@
     fetchingContact = null
     localStorage.removeItem('gh-simulate-contact-id')
     State.set({
-      contactId     : null,
-      missingContact: true,
+      contactId: null,
     })
     morph()
   }
@@ -199,8 +197,7 @@
     onSelect: contact => {
       localStorage.setItem('gh-simulate-contact-id', contact.ID)
       State.set({
-        contactId     : contact.ID,
-        missingContact: false,
+        contactId: contact.ID,
       })
       morph()
     },
@@ -252,14 +249,16 @@
         ]),
       ]),
     }) : Div({
-      className: 'display-flex column gap-10 align-left',
+      className: 'inside display-flex space-between align-center gap-10',
     }, [
-      State.missingContact ? Pg({}, __('The contact you were simulating with can\'t be found, it may have been deleted.', 'groundhogg')) : null,
+      Pg({
+        className: 'no-margin-top no-margin-bottom',
+      }, __('Select a contact to simulate with', 'groundhogg')),
       Button({
         id       : 'select-contact-for-simulator',
         className: 'gh-button secondary',
         onClick  : handleChangeContact,
-      }, __('Select a contact', 'groundhogg')),
+      }, __('Select', 'groundhogg')),
     ]),
   ])
 
