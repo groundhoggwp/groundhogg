@@ -680,6 +680,11 @@ h2.nav-tab-wrapper.gh {
   }
 }
 
+// the notice that replies aren't coming in, wherever Messages shows it
+.messages-inbox-notice {
+  margin: 0 0 12px;
+}
+
 // a filter that is on or off, the one that's on is bold
 .pill.clickable {
   cursor: pointer;

@@ -1294,7 +1294,13 @@
         morph()
       }
 
+      // nothing arrives to be unread while this is true, so "caught up" would be misleading
+      const { active = false, has_license = false } = Groundhogg.filters.messages_inbox || {}
+      const receiving = active && has_license
+
       return Fragment([
+        Groundhogg.MessagesInboxNotice(),
+
         Div({ className: 'unread-messages-toolbar display-flex gap-10 align-center' }, [
           // pills, the one that's on is bold. Like the ones for tasks
           ...[ [ 'mine', __('Mine', 'groundhogg') ], [ 'all', __('All', 'groundhogg') ] ].map(([ scope, text ]) => Span({
@@ -1322,7 +1328,7 @@
           className     : 'display-grid gap-10',
         }, [ 'full', 'full', 'full' ]) : Div({ className: 'unread-messages-list' }, [
           ...State.items.map(Row),
-          State.items.length === 0 ? Pg({ className: 'unread-messages-empty' }, __('You\'re all caught up! 🥳', 'groundhogg')) : null,
+          State.items.length === 0 && receiving ? Pg({ className: 'unread-messages-empty' }, __('You\'re all caught up! 🥳', 'groundhogg')) : null,
           State.has_more ? Pg({ className: 'unread-messages-more' }, __('And more...', 'groundhogg')) : null,
         ]),
       ])

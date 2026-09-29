@@ -684,6 +684,12 @@ class Scripts {
 				'countries'                    => utils()->location->get_countries_list(),
 				'gh_contact_custom_properties' => Properties::instance()->get_all(),
 				'unsubReasons'                 => get_unsub_reasons(),
+				// whether a reply from a contact comes back into Messages by itself, see Inbox::is_active(). The messages
+				// component shows a notice when it doesn't, has_license is the same check the settings page uses
+				'messages_inbox'               => [
+					'active'      => \Groundhogg\Classes\Inbox::is_active(),
+					'has_license' => (bool) \Groundhogg\Classes\Inbox_Client::license_key(),
+				],
 			],
 			'managed_page'     => [
 				'root' => managed_page_url()

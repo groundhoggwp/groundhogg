@@ -83,6 +83,45 @@
   }
 
   /**
+   * A reply from a contact doesn't come back into Messages by itself unless incoming messages are turned on for
+   * this site and the license is active, see Inbox::is_active(). This says so, with a link to fix it for
+   * whoever can, so someone doesn't wait for a reply that was never going to show up here.
+   *
+   * @returns {*} null when replies come back on their own
+   */
+  const InboxNotice = () => {
+
+    const { active = false, has_license = false } = Groundhogg.filters.messages_inbox || {}
+
+    if (active && has_license) {
+      return null
+    }
+
+    const { userHasCap } = Groundhogg.user
+
+    // whichever of the two it is, that's what's stopping replies from being received
+    const [ can, tab, linkText, text ] = active
+      ? [
+        userHasCap('manage_gh_licenses'), 'extensions',
+        __('Activate your license', 'groundhogg'),
+        /* translators: %s: a "Activate your license" link, or "Ask an administrator" */
+        __('Your Groundhogg license is inactive, so replies from contacts aren’t being received. %s to start getting them again.', 'groundhogg'),
+      ]
+      : [
+        userHasCap('manage_options'), 'email',
+        __('Turn on incoming messages', 'groundhogg'),
+        /* translators: %s: a "Turn on incoming messages" link, or "Ask an administrator" */
+        __('Replies from contacts aren’t added here on their own yet. %s to receive them automatically.', 'groundhogg'),
+      ]
+
+    return Div({
+      className: 'notice notice-warning inline messages-inbox-notice',
+    }, Pg({}, can
+      ? sprintf(text, `<a href="${ adminPageURL('gh_settings', { tab }) }">${ linkText }</a>`)
+      : sprintf(text, __('Ask an administrator', 'groundhogg'))))
+  }
+
+  /**
    * Wrap a message body so it renders sensibly in an isolated iframe.
    * Plain text bodies (typically replies) get their whitespace preserved.
    *
@@ -518,6 +557,9 @@
       return Fragment([
         title ? H3({}, title) : null,
 
+        // it's only contacts that reply, and only their replies that come in on their own
+        object_type === 'contact' ? InboxNotice() : null,
+
         // Toolbar
         Div({
           className: 'messages-header display-flex gap-5 align-center flex-wrap',
@@ -641,6 +683,9 @@
   }
 
   Groundhogg.MessagesSidebar = MessagesSidebar
+
+  // shared with the dashboard's Replies widget, so it says the same thing about why a reply hasn't shown up
+  Groundhogg.MessagesInboxNotice = InboxNotice
 
   Groundhogg.messageViewer = (selector, props = {}) => {
     let el = document.querySelector(selector)

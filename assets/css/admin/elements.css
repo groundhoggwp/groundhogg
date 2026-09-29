@@ -511,6 +511,10 @@ h2.nav-tab-wrapper.gh button .dashicons {
   border-top: 1px solid var(--gh-dark-15);
 }
 
+.messages-inbox-notice {
+  margin: 0 0 12px;
+}
+
 .pill.clickable {
   cursor: pointer;
   user-select: none;
