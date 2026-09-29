@@ -100,6 +100,103 @@
   }
 
   /**
+   * The add steps panel, triggers then actions then logic, each by sub group
+   * Clicking and dragging the steps is handled by the editor, see makeSortable()
+   *
+   * @param sub_groups Object[] { id, name }
+   * @param types Object[] { type, name, description, group, sub_group, premium }, see Funnels_Page::get_step_picker()
+   * @param group string the group being shown, or all
+   * @param search string what's being searched for
+   * @param onFilter function when a group's button is clicked, with the group
+   * @param onSearch function when the search changes, with the search
+   */
+  const StepPicker = ({
+    sub_groups = [],
+    types = [],
+  }, {
+    group: currentGroup = 'all',
+    search = '',
+    onFilter,
+    onSearch,
+  }) => {
+
+    const filters = [
+      ['benchmark', __('Triggers', 'groundhogg')],
+      ['action', __('Actions', 'groundhogg')],
+      ['logic', __('Logic', 'groundhogg')],
+      ['all', __('All', 'groundhogg')],
+    ]
+
+    const StepType = ({ type, name, description, group, premium }, subGroupName) => {
+
+      const { icon = '', svg = '' } = Groundhogg.rawStepTypes[type] ?? {}
+
+      return Div({
+        className   : 'select-step visible',
+        dataId      : type,
+        dataGroup   : group,
+        dataKeywords: [name, subGroupName].join(','),
+      }, [
+        Div({ className: 'gh-tooltip top' }, escHTML(description)),
+        Div({
+          id       : type,
+          className: `step-element step-draggable ${ premium ? 'premium' : '' }`,
+          dataType : type,
+          dataName : name,
+          dataGroup: group,
+        }, [
+          Div({ className: 'step-icon' }, icon.endsWith('.svg') ? svg : Img({
+            src: icon,
+            alt: name,
+          })),
+          Pg({}, escHTML(name)),
+        ]),
+      ])
+    }
+
+    // each group lists its types by sub group, a sub group can be in more than one group
+    const grid = ['benchmark', 'action', 'logic'].flatMap(group => sub_groups.map(({ id, name }) => {
+
+      const inSubGroup = types.filter(type => type.group === group && type.sub_group === id)
+
+      if (!inSubGroup.length) {
+        return null
+      }
+
+      return Div({ className: 'sub-group' }, [
+        Span({ className: 'sub-group-label' }, escHTML(name)),
+        ...inSubGroup.map(type => StepType(type, name)),
+      ])
+    }))
+
+    return Div({ className: 'steps-select' }, [
+      Div({ className: 'display-flex gap-10 stretch space-below-10' }, [
+        Div({
+          className: 'gh-input-group full-width',
+          style    : { backgroundColor: '#fff' },
+        }, filters.map(([group, label]) => Button({
+          type     : 'button',
+          className: `gh-button step-filter full-width ${ group === currentGroup ? 'current' : '' }`,
+          dataGroup: group,
+          onClick  : e => {
+            if (!e.currentTarget.classList.contains('current')) {
+              onFilter(group)
+            }
+          },
+        }, label))),
+        Div({ className: 'step-search-wrap' }, Input({
+          id         : 'step-search',
+          type       : 'search',
+          placeholder: __('Search for a step...', 'groundhogg'),
+          value      : search,
+          onInput    : e => onSearch(e.target.value),
+        })),
+      ]),
+      Div({ className: 'steps-grid' }, grid),
+    ])
+  }
+
+  /**
    * Draw a flow that isn't being edited, like on the reporting page
    *
    * @param steps Object[]
@@ -1391,8 +1488,11 @@
 
       sortables      : null,
       editing        : false,
-      addCurrentGroup: 'all',
-      addSearch      : '',
+      // the add steps panel's group, and its search while the panel is open
+      picker         : Groundhogg.createState({
+        group : 'all',
+        search: '',
+      }),
       addEl          : null,
       targetStep     : null,
       targetAdd      : null,
@@ -1418,12 +1518,7 @@
         {
           match  : /^add$/,
           handler: function (matches) {
-            if (this.addCurrentGroup) {
-              window.location.hash = `add/${ this.addCurrentGroup }`
-            }
-            else {
-              window.location.hash = `add/all`
-            }
+            window.location.hash = `add/${ this.picker.group }`
           },
         },
         {
@@ -1432,9 +1527,8 @@
             this.showSettings()
             this.showAddStep()
 
-            this.addCurrentGroup = matches[1]
+            this.picker.set({ group: matches[1] })
 
-            this.clearSearch()
             this.setCurrentGroupButtonToCurrent()
             this.filterStepTypes()
 
@@ -1466,13 +1560,14 @@
         },
       ],
 
-      clearSearch () {
-        this.addSearch = ''
-        $('#step-search').val('')
-      },
-
       handleHashChange () {
         const hash = window.location.hash.substring(1)
+
+        // the search stays while switching groups, but not once the panel closes
+        if (!hash.startsWith('add') && this.picker.search) {
+          this.clearSearch()
+        }
+
         for (const view of this.views) {
           const result = view.match.exec(hash)
           if (result) {
@@ -1483,22 +1578,52 @@
         }
       },
 
+      clearSearch () {
+        this.picker.set({ search: '' })
+
+        const input = document.getElementById('step-search')
+
+        if (input) {
+          input.value = ''
+        }
+
+        this.filterStepTypes()
+      },
+
       filterStepTypes () {
-        $(`.select-step`).addClass('visible')
 
-        // filter by addGroup
-        if (this.addCurrentGroup !== 'all') {
-          $(`.select-step:not(:has([data-group="${ this.addCurrentGroup }" i]))`).removeClass('visible')
-        }
+        const { group, search: _search } = this.picker
+        const search = _search.trim().toLowerCase()
 
-        if (this.addSearch) {
-          $(`.select-step:not([data-keywords*="${ this.addSearch }" i])`).removeClass('visible')
-        }
+        document.querySelectorAll('#add-steps .select-step').forEach(el => {
+
+          const inGroup = group === 'all' || el.dataset.group === group
+          const matches = !search || el.dataset.keywords.toLowerCase().includes(search)
+
+          el.classList.toggle('visible', inGroup && matches)
+        })
       },
 
       setCurrentGroupButtonToCurrent () {
-        $('button.step-filter').removeClass('current')
-        $(`button.step-filter[data-group="${ this.addCurrentGroup }"]`).addClass('current')
+        document.querySelectorAll('#add-steps button.step-filter').forEach(button => {
+          button.classList.toggle('current', button.dataset.group === this.picker.group)
+        })
+      },
+
+      /**
+       * Draw the add steps panel, see StepPicker()
+       */
+      drawStepPicker () {
+        document.getElementById('add-steps').replaceChildren(StepPicker(this.step_picker ?? {}, {
+          ...this.picker.get(),
+          onFilter: group => {
+            window.location.hash = `add/${ group }`
+          },
+          onSearch: search => {
+            this.picker.set({ search })
+            this.filterStepTypes()
+          },
+        }))
       },
 
       /**
@@ -1514,6 +1639,8 @@
 
         let $document = $(document)
         let $form = $('#funnel-form')
+
+        this.drawStepPicker()
 
         let preloaders = [
           FunnelsStore.maybeFetchItem(this.id),
@@ -1684,15 +1811,6 @@
           }
         })
 
-        $document.on('click', 'button.step-filter:not(.current)', e => {
-          window.location.hash = `add/${ e.currentTarget.dataset.group }`
-        })
-
-        $('#step-search').on('input', e => {
-          this.addSearch = e.target.value
-          this.filterStepTypes()
-        })
-
         $document.on('mousedown', '.step-element.premium', e => {
 
           ModalFrame({},
@@ -1758,7 +1876,7 @@
             window.location.hash = `add/action`
           }
           else {
-            window.location.hash = `add/${ this.addCurrentGroup }`
+            window.location.hash = `add/${ this.picker.group }`
           }
         })
 

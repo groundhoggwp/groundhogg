@@ -3,8 +3,6 @@
 namespace Groundhogg\Admin\Funnels;
 
 use Groundhogg\Funnel;
-use Groundhogg\Plugin;
-use Groundhogg\Steps\Funnel_Step;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\dashicon;
 use function Groundhogg\dashicon_e;
@@ -12,8 +10,6 @@ use function Groundhogg\force_custom_step_names;
 use function Groundhogg\get_request_var;
 use function Groundhogg\header_icon;
 use function Groundhogg\html;
-use function Groundhogg\is_option_enabled;
-use function Groundhogg\is_pro_features_active;
 
 /**
  * Edit Funnel
@@ -43,78 +39,6 @@ if ( ! $funnel->exists() ) {
 	<?php
 
 	return;
-}
-
-/**
- * @param $steps Funnel_Step[]
- *
- * @return void
- */
-function render_draggable_step_grid( $steps, $groups = true ) {
-
-	$sub_groups = Plugin::instance()->step_manager->sub_groups;
-
-	foreach ( $sub_groups as $sub_group_id => $name ) {
-
-		$_steps = array_filter( $steps, function ( $step ) use ( $sub_group_id ) {
-			return $step->get_sub_group() === $sub_group_id;
-		} );
-
-		if ( empty( $_steps ) ) {
-			continue;
-		}
-
-		if ( $groups ):
-			?>
-            <div class="sub-group">
-            <span class="sub-group-label">
-			<?php echo esc_html( $name ); ?>
-            </span><?php
-		endif;
-
-		foreach ( $_steps as $step ):
-
-			if ( $step->is_legacy() && ! is_option_enabled( 'gh_show_legacy_steps' ) ) {
-				continue;
-			}
-
-			$classes = [
-				'step-element step-draggable'
-			];
-
-			if ( $step->is_premium() && ! is_pro_features_active() ) {
-				$classes[] = 'premium';
-			}
-
-			$keywords = [
-				$step->get_name(),
-				$name,
-			];
-
-			?>
-        <div class="select-step visible" data-id="<?php echo esc_attr( $step->get_type() ); ?>" data-keywords="<?php echo esc_attr( implode( ',', $keywords ) ); ?>">
-            <div class="gh-tooltip top"><?php echo esc_html( $step->get_description() ); ?></div>
-            <div id='<?php echo esc_attr( $step->get_type() ); ?>'
-                 data-type="<?php echo esc_attr( $step->get_type() ); ?>"
-                 data-name="<?php echo esc_attr( $step->get_name() ); ?>"
-                 data-group="<?php echo esc_attr( $step->get_group() ); ?>"
-                 class="<?php echo esc_attr( implode( ' ', $classes ) ) ?>">
-                <div class="step-icon">
-	                <?php if ( $step->icon_is_svg() ):
-		                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- this is an SVG
-		                echo $step->get_icon_svg();
-	                else: ?>
-                        <img src="<?php echo esc_url( $step->get_icon() ); ?>" alt="<?php echo esc_attr( $step->get_name() ); ?>">
-					<?php endif; ?>
-                </div>
-                <p><?php echo esc_html( $step->get_name() ) ?></p></div>
-            </div><?php
-		endforeach;
-
-		if ( $groups ):
-			?></div><?php
-		endif;
-	}
 }
 
 ?>
@@ -222,29 +146,7 @@ function render_draggable_step_grid( $steps, $groups = true ) {
             </button>
             <div id="step-settings-inner" data-view="settings">
                 <div id="add-steps">
-                    <div class="steps-select">
-                        <div class="display-flex gap-10 stretch space-below-10">
-                            <div class="gh-input-group full-width" style="background-color: #fff;">
-                                <button class="gh-button step-filter full-width" data-group="benchmark"><?php esc_html_e( 'Triggers', 'groundhogg' ); ?></button>
-                                <button class="gh-button step-filter full-width" data-group="action"><?php esc_html_e( 'Actions', 'groundhogg' ); ?></button>
-                                <button class="gh-button step-filter full-width" data-group="logic"><?php esc_html_e( 'Logic', 'groundhogg' ); ?></button>
-                                <button class="gh-button step-filter full-width current" data-group="all"><?php esc_html_e( 'All', 'groundhogg' ); ?></button>
-                            </div>
-                            <div class="step-search-wrap">
-                                <input id="step-search" name="step-search" type="search" placeholder="<?php esc_attr_e( 'Search for a step...', 'groundhogg' ); ?>"/>
-                            </div>
-                        </div>
-                        <div class="steps-grid">
-							<?php
-
-							render_draggable_step_grid( Plugin::instance()->step_manager->get_benchmarks() );
-
-							render_draggable_step_grid( Plugin::instance()->step_manager->get_actions() );
-
-							render_draggable_step_grid( Plugin::instance()->step_manager->get_logic() );
-							?>
-                        </div>
-                    </div>
+					<?php // drawn by funnel-editor.js ?>
                 </div>
                 <div class="step-settings <?php echo force_custom_step_names() ? 'custom-step-names' : 'generated-step-names' ?>">
 					<?php // drawn by funnel-editor.js ?>

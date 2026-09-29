@@ -33,6 +33,8 @@ use function Groundhogg\get_sanitized_FILE;
 use function Groundhogg\get_upload_wp_error;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
+use function Groundhogg\is_option_enabled;
+use function Groundhogg\is_pro_features_active;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\map_to_class;
 use function Groundhogg\notices;
@@ -264,6 +266,7 @@ class Funnels_Page extends Admin_Page {
 					'revision'            => $funnel->while_editing( function () use ( $funnel ) {
 						return Get_Flow::revision( $funnel );
 					} ),
+					'step_picker'         => $this->get_step_picker(),
 				] );
 
 				wp_add_inline_script( 'groundhogg-admin-funnel-editor', "var Funnel = " . wp_json_encode( $data ), 'before' );
@@ -966,6 +969,50 @@ class Funnels_Page extends Admin_Page {
 					'title' => $target->get_title(),
 				];
 			}, $targets ),
+		];
+	}
+
+	/**
+	 * The step types the editor's add steps panel shows, triggers then actions then logic, by sub group
+	 * Their icons are in Groundhogg.rawStepTypes
+	 *
+	 * @return array
+	 */
+	protected function get_step_picker() {
+
+		$step_manager = Plugin::instance()->step_manager;
+
+		$sub_groups = [];
+
+		foreach ( $step_manager->sub_groups as $id => $name ) {
+			$sub_groups[] = [
+				'id'   => $id,
+				'name' => wp_specialchars_decode( $name, ENT_QUOTES ),
+			];
+		}
+
+		$types = [];
+
+		foreach ( array_merge( $step_manager->get_benchmarks(), $step_manager->get_actions(), $step_manager->get_logic() ) as $step ) {
+
+			if ( $step->is_legacy() && ! is_option_enabled( 'gh_show_legacy_steps' ) ) {
+				continue;
+			}
+
+			// names and descriptions are mostly escaped already, the editor escapes them
+			$types[] = [
+				'type'        => $step->get_type(),
+				'name'        => wp_specialchars_decode( $step->get_name(), ENT_QUOTES ),
+				'description' => wp_specialchars_decode( $step->get_description(), ENT_QUOTES ),
+				'group'       => $step->get_group(),
+				'sub_group'   => $step->get_sub_group(),
+				'premium'     => $step->is_premium() && ! is_pro_features_active(),
+			];
+		}
+
+		return [
+			'sub_groups' => $sub_groups,
+			'types'      => $types,
 		];
 	}
 
