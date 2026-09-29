@@ -597,7 +597,7 @@ There are three paths, all ending in `Step::update_meta()`:
 
 ### Undo/redo vs rollback
 
-- **The editor's undo** (since 5.0) is operations, see 9: each edit records the operations that reverse it, and
+- **The editor's undo** (since 4.9) is operations, see 9: each edit records the operations that reverse it, and
   undoing sends those like any other edit. Undoing a delete is Flow_Operations' `restore`, which is why deletes
   stay soft until publishing.
 - **`snapshot()` / `restore( $snapshot )`**: the editor's old undo format, `[ { ID, data, meta } ]` as the
@@ -661,7 +661,7 @@ There are three paths, all ending in `Step::update_meta()`:
 
 The editor saves two ways (the REST `/funnels/{id}/commit` route is **not** used by it):
 
-- **Operations** (since 5.0): adding, moving, deleting, and undo/redo post `admin-ajax.php?action=gh_flow_operations`
+- **Operations** (since 4.9): adding, moving, deleting, and undo/redo post `admin-ajax.php?action=gh_flow_operations`
   (`Funnels_Page::ajax_flow_operations()`) with `funnel`, `revision`, and `operations`, a JSON list in
   `groundhogg/edit-flow`'s format. See below.
 - **Flow actions** (`gh_flow_action`, `Funnels_Page::ajax_flow_action()`): `flow_action` publish, activate,
@@ -790,7 +790,7 @@ scratchFunnelURL, is_editor: true, pending_deletes, step_references, canvas, deb
 
 `#step-settings-inner[data-view]` switches the panels in CSS.
 
-**Editing through the store (since 5.0):** `perform( operations )` applies `groundhogg/edit-flow` operations to
+**Editing through the store (since 4.9):** `perform( operations )` applies `groundhogg/edit-flow` operations to
 the store (`store.apply()`, which returns their inverses), records `{ undo, redo }` in the history, queues them,
 and redraws right away (`redraw()`: `drawCanvas()`, `makeSortable()`, `drawLogicLines()`).
 
@@ -847,7 +847,7 @@ and redraws right away (`redraw()`: `drawCanvas()`, `makeSortable()`, `drawLogic
   - **quiet saves:** trigger `auto-save` and `gh-init-pickers`, and don't show `err`. Callers that need
     errors must check `response.data.err` themselves, as delete does.
   - a failed request resets `saving` (otherwise quiet saves would wait for it forever) and shows an error.
-- **Settings save through operations (since 5.0):** a `change` in a step's panel → `saveSettings( id )`, and
+- **Settings save through operations (since 4.9):** a `change` in a step's panel → `saveSettings( id )`, and
   `updateStepMeta( meta, id )` → `saveSettings( id, { meta } )`. After 400ms without more changes,
   `flushSettings()` sends `{ op: 'update', step, form, meta, flags }`: `form` is every `steps[ID][…]` field in the
   panel (`FlowStore.formToSettings( $(panel).find(':input').serializeArray(), id )`), which the server saves with
@@ -903,7 +903,7 @@ and redraws right away (`redraw()`: `drawCanvas()`, `makeSortable()`, `drawLogic
 - **Other:** the "More" menu (export, share, reports, add contacts through `FunnelScheduler`, screenshot
   and full-screen modes, shortcuts, "Revert changes" = `_uncommit`), and the tour.
 
-### Step type JS: `Funnel.registerStepType( type, handler )` (since 5.0)
+### Step type JS: `Funnel.registerStepType( type, handler )` (since 4.9)
 
 Everything is optional, and what a type leaves out comes from the server:
 
@@ -935,7 +935,7 @@ because their branches are defined by the premium base classes Pro's classes ext
 added, renamed, or removed in Pro's branch editors right away. `StepTitles.branches` is checked against their
 `get_canvas_data()` with the `branches` cases in `titles.json`.
 
-**Add-on compatibility (checked for 5.0):** Pro, SMS, EDD, WooCommerce, Pipeline, and Logic only use
+**Add-on compatibility (checked for 4.9):** Pro, SMS, EDD, WooCommerce, Pipeline, and Logic only use
 `registerStepCallbacks()`, `updateStepMeta()`, `getActiveStep()`, `Funnel.steps`, the `step-active` event,
 `Funnel.save()` (Pro's A/B test and branch deletes, EDD's and Woo's legacy triggers, which now wait their turn in
 the queue), and the `sortable/labels|classes` hooks (Logic). None change the canvas markup, so none need changes.
@@ -1001,7 +1001,7 @@ To reuse another type's callbacks, spread them: `{ ...Funnel.stepCallbacks.if_el
 
 ### DOM contract (server-rendered, relied on by the JS)
 
-**The canvas is drawn in JS** (since 5.0): `flow-store.js` (`Groundhogg.FlowStore`) holds the steps and the
+**The canvas is drawn in JS** (since 4.9): `flow-store.js` (`Groundhogg.FlowStore`) holds the steps and the
 server's canvas data, and `flow-canvas.js` (`Groundhogg.FlowCanvas`) draws them with MakeEl. Both are DOM-free
 UMD modules so Node can load them for tests. The markup is the same the server rendered with `sortable_item()`
 (below), so drag and drop, the old save path, the logic lines and step type JS keep working.
@@ -1049,7 +1049,7 @@ UMD modules so Node can load them for tests. The markup is the same the server r
   `add-step` inside, and `.logic-line.line-below`.
 - `#step-sortable.step-branch[data-branch=main]` is the root.
 
-**Settings panels are drawn in JS** (since 5.0), `drawPanels()` → `SettingsPanel( step )`, with the same markup
+**Settings panels are drawn in JS** (since 4.9), `drawPanels()` → `SettingsPanel( step )`, with the same markup
 `html_v2()` renders, which stays for the server. The step type's part, its **island**, is HTML from
 `Funnel_Step::get_settings_island( $step )`: `{ html, before_notes, ignore_morph }`, everything inside
 `.step-edit.panels` plus what `before_step_notes()` prints. The page gets every island (`Funnel.islands`), a form
