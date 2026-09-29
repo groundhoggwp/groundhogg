@@ -5,6 +5,7 @@ use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use Groundhogg\Steps\Actions\Action;
+use function Groundhogg\is_pro_features_active;
 
 /**
  * What the flow editor can do with Flow_Operations that groundhogg/edit-flow can't:
@@ -139,7 +140,7 @@ class Flow_Operations_Tests extends GH_UnitTestCase {
 
 	public function test_premium_placeholders_cant_be_added() {
 
-		if ( ! Plugin::instance()->step_manager->type_is_registered( 'logic_stop' ) || ! Plugin::instance()->step_manager->get_element( 'logic_stop' )->is_premium() ) {
+		if ( is_pro_features_active() ) {
 			$this->markTestSkipped( 'Pro is active' );
 		}
 

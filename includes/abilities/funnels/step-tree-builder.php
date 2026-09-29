@@ -7,6 +7,7 @@ use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use WP_Error;
+use function Groundhogg\is_pro_features_active;
 
 /**
  * Creates real steps in a funnel from a tree of step nodes, the shape groundhogg/create-flow takes as `steps`.
@@ -265,8 +266,8 @@ class Step_Tree_Builder {
 
 		$type = $node['type'] ?? '';
 
-		// premium placeholders can't be added without Pro
-		if ( ! Plugin::instance()->step_manager->type_is_registered( $type ) || Plugin::instance()->step_manager->get_element( $type )->is_premium() ) {
+		// premium placeholders can't be added without Pro, Pro's steps extend them so they're still premium
+		if ( ! Plugin::instance()->step_manager->type_is_registered( $type ) || ( Plugin::instance()->step_manager->get_element( $type )->is_premium() && ! is_pro_features_active() ) ) {
 			/* translators: %s: the step type */
 			return new WP_Error( 'groundhogg_invalid_step_type', sprintf( __( '"%s" is not a step type that can be added.', 'groundhogg' ), $type ) );
 		}
