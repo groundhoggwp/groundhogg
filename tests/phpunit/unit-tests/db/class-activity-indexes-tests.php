@@ -1,13 +1,15 @@
 <?php
 
 use Groundhogg\Background\Add_Activity_Indexes;
+use Groundhogg\Background\Migrate_Composed_Emails;
+use Groundhogg\Classes\Background_Task;
 use Groundhogg\Background_Tasks;
 use Groundhogg\DB\Activity;
 use Groundhogg\Plugin;
 use function Groundhogg\db;
 
 /**
- * The activity table's indexes for type and per-contact-over-time lookups, on install and through the 4.9.0.1 update
+ * The activity table's indexes for type and per-contact-over-time lookups, on install and through the 4.9 update
  */
 class Activity_Indexes_Tests extends GH_UnitTestCase {
 
@@ -25,7 +27,7 @@ class Activity_Indexes_Tests extends GH_UnitTestCase {
 	}
 
 	/**
-	 * Put the table back how it was before 4.9.0.1
+	 * Put the table back how it was before 4.9
 	 */
 	protected function make_legacy_table() {
 		foreach ( array_keys( Activity::PERFORMANCE_INDEXES ) as $index ) {
@@ -36,6 +38,28 @@ class Activity_Indexes_Tests extends GH_UnitTestCase {
 
 		$this->assertFalse( $this->activity()->has_performance_indexes() );
 		$this->assertTrue( $this->activity()->index_exists( 'contact_idx' ) );
+	}
+
+	/**
+	 * The background tasks of a class queued since the given task, the update might queue more than one
+	 *
+	 * @param int    $since_id
+	 * @param string $class
+	 *
+	 * @return array
+	 */
+	protected function get_tasks_added_since( int $since_id, string $class ): array {
+		$tasks = [];
+
+		for ( $id = $since_id + 1; $id <= Background_Tasks::get_last_added_task_id(); $id ++ ) {
+			$task = ( new Background_Task( $id ) )->getTask();
+
+			if ( $task instanceof $class ) {
+				$tasks[] = $task;
+			}
+		}
+
+		return $tasks;
 	}
 
 	protected function assertHasPerformanceIndexes() {
@@ -81,17 +105,19 @@ class Activity_Indexes_Tests extends GH_UnitTestCase {
 		$this->make_legacy_table();
 
 		$updater = Plugin::instance()->updater;
-		$updater->forget_version_update( '4.9.0.1' );
+		$updater->forget_version_update( '4.9' );
 		delete_transient( 'gh_main_doing_updates' );
 
-		$this->assertContains( '4.9.0.1', $updater->get_automatic_updates_to_do() );
+		$this->assertContains( '4.9', $updater->get_automatic_updates_to_do() );
+
+		$before = Background_Tasks::get_last_added_task_id();
 
 		$updater->do_automatic_updates();
 
-		$this->assertTrue( $updater->did_update( '4.9.0.1' ) );
+		$this->assertTrue( $updater->did_update( '4.9' ) );
 		$this->assertFalse( $this->activity()->has_performance_indexes(), 'the update only queues the task' );
 
-		$task = Background_Tasks::get_last_added_task()->getTask();
+		$task = $this->get_tasks_added_since( $before, Add_Activity_Indexes::class )[0] ?? null;
 		$this->assertInstanceOf( Add_Activity_Indexes::class, $task );
 
 		// run the task itself rather than Background_Task::process(), which counts toward Limits' static processed actions that Event_Queue_Tests asserts on
@@ -107,14 +133,16 @@ class Activity_Indexes_Tests extends GH_UnitTestCase {
 
 	public function test_update_does_nothing_when_indexes_exist() {
 		$updater = Plugin::instance()->updater;
-		$updater->forget_version_update( '4.9.0.1' );
+		$updater->forget_version_update( '4.9' );
 		delete_transient( 'gh_main_doing_updates' );
 
 		$before = Background_Tasks::get_last_added_task_id();
 
 		$updater->do_automatic_updates();
 
-		$this->assertTrue( $updater->did_update( '4.9.0.1' ) );
-		$this->assertSame( $before, Background_Tasks::get_last_added_task_id() );
+		$this->assertTrue( $updater->did_update( '4.9' ) );
+
+		$this->assertEmpty( $this->get_tasks_added_since( $before, Add_Activity_Indexes::class ) );
+		$this->assertNotEmpty( $this->get_tasks_added_since( $before, Migrate_Composed_Emails::class ), 'the composed emails are still moved' );
 	}
 }

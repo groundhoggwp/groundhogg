@@ -365,21 +365,17 @@ class Main_Updater extends Old_Updater {
 			],
 			'4.9' => [
 				'automatic'   => true,
-				'description' => __( 'Add the messages table and move composed emails from activity to messages.', 'groundhogg' ),
+				'description' => __( 'Add the messages table, move composed emails from activity to messages, and add indexes to the activity table for faster reports and segments.', 'groundhogg' ),
 				'callback'    => function () {
 					get_db( 'messages' )->create_table();
 
-					Background_Tasks::add( new Migrate_Composed_Emails() );
-				},
-			],
-			'4.9.0.1' => [
-				'automatic'   => true,
-				'description' => __( 'Add indexes to the activity table for faster reports and segments.', 'groundhogg' ),
-				'callback'    => function () {
 					if ( ! db()->activity->has_performance_indexes() ) {
 						// building an index on a large activity table can take minutes, so do it online in the background
 						Background_Tasks::add( new Add_Activity_Indexes() );
 					}
+
+					// queued after the indexes so that finding the composed emails benefits from them
+					Background_Tasks::add( new Migrate_Composed_Emails() );
 				},
 			],
 		];

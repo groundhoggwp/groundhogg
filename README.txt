@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.8.3
+Stable tag: 4.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -391,47 +391,56 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.9 =
+= 4.9 (2026-09-28) =
 * ADDED Receive replies in Groundhogg. Turn on Incoming Messages in Settings > Email (needs an active Groundhogg license), then switch on "Save replies as messages" in an email's settings, and replies to it are saved to the contact who replied instead of going to your own mailbox. You can also BCC your site's private inbox address to keep a copy of emails you send from your own mailbox.
-* ADDED A Messages tab in the contact record shows your conversation with each contact, the emails you've sent them and their replies, laid out like a chat. Emails you composed to contacts before this update are moved into it in the background.
-* ADDED A "Replies" dashboard widget lists contacts who've replied and haven't been read yet. Open a conversation right from the dashboard to read it, reply, or mark it read or unread.
-* ADDED When you publish changes to a flow or activate it, you choose what happens to contacts waiting at steps you deleted: cancel their events, or move them to another step. Before, they were silently removed from the flow. Deleted steps that contacts have already been through are archived, so their history and reports still work.
-* ADDED "Get Flow", "Edit Flow", "Publish Flow Changes" and "Discard Flow Changes" abilities, so an AI assistant can read an existing flow and add, change, move, duplicate, lock or delete its steps. Changes to an active flow are staged until they're published, the same as in the flow editor.
-* ADDED Segments used by the abilities can target contacts by behavior: email opens and clicks, page visits, form submissions, flow conversions, and other activity. They can also exclude another segment, and contact searches link to the matching contacts in the Contacts page.
+ * A Messages tab in the contact record shows your conversation with each contact, the emails you've sent them and their replies, laid out like a chat. Emails you composed to contacts before this update are moved into it in the background.
+ * A "Replies" dashboard widget lists contacts who've replied and haven't been read yet. Open a conversation right from the dashboard to read it, reply, or mark it read or unread.
+ * When composing an email to a contact, choose who it's from out of your sender profiles.
 * ADDED A new, shorter guided setup that gets your site ready to send: your business and who emails come from (with details filled in from WooCommerce or Easy Digital Downloads), privacy, your license, receiving replies, and updates. The last step helps you get started with AI, invite your team, and add your site's users as contacts.
+* ADDED Flow abilities for AI assistants.
+ * "Get Flow", "Edit Flow", "Publish Flow Changes" and "Discard Flow Changes" abilities, so an AI assistant can read an existing flow and add, change, move, duplicate, lock or delete its steps. Changes to an active flow are staged until they're published, the same as in the flow editor.
+ * Segments used by the abilities can target contacts by behavior: email opens and clicks, page visits, form submissions, flow conversions, and other activity. They can also exclude another segment, and contact searches link to the matching contacts in the Contacts page.
+* ADDED When you publish changes to a flow or activate it, you choose what happens to contacts waiting at steps you deleted: cancel their events, or move them to another step. Before, they were silently removed from the flow. Deleted steps that contacts have already been through are archived, so their history and reports still work.
 * TWEAKED The flow editor has been rebuilt to be much faster. Adding, moving, deleting and changing steps shows right away and saves in the background, and undo and redo now cover step settings, duplicated steps and pasted steps too.
-* TWEAKED Only one person can edit a flow at a time, so two people can't overwrite each other's changes. The flow is unlocked as soon as its editor is closed.
-* TWEAKED Duplicating a step with branches, like a Yes/No, copies the steps in its branches too, and steps copied from one flow can be pasted into another.
-* TWEAKED Steps that other steps rely on, like the step a Reroute goes to or the step another flow's "Add to Flow" starts at, can't be deleted until those steps are changed.
-* TWEAKED The search in the flow editor's add steps panel stays while you switch between Triggers, Actions and Logic.
-* TWEAKED The flow editor tour is written for people new to Groundhogg.
-* TWEAKED Faster segments, reports, and contact timelines that filter activity by type or by contact and date, thanks to new indexes on the activity table. Existing sites get them from a background task after updating.
-* TWEAKED Reports and contact counts are cached, so dashboards and reports load faster.
-* TWEAKED When composing an email to a contact, choose who it's from out of your sender profiles.
+ * Only one person can edit a flow at a time, so two people can't overwrite each other's changes. The flow is unlocked as soon as its editor is closed.
+ * Duplicating a step with branches, like a Yes/No, copies the steps in its branches too, and steps copied from one flow can be pasted into another.
+ * Steps that other steps rely on, like the step a Reroute goes to or the step another flow's "Add to Flow" starts at, can't be deleted until those steps are changed.
+ * The search in the add steps panel stays while you switch between Triggers, Actions and Logic.
+ * The flow editor tour is written for people new to Groundhogg.
+* TWEAKED Faster reports, segments and contact timelines.
+ * Segments, reports, and contact timelines that filter activity by type or by contact and date are faster, thanks to new indexes on the activity table. Existing sites get them from a background task after updating.
+ * Reports and contact counts are cached, so dashboards and reports load faster.
 * TWEAKED Number filters in contact searches understand numbers formatted for your locale, and the flow, step and email filters can match more than one at a time.
-* TWEAKED The telemetry setting explains exactly what's shared when it's turned on.
-* TWEAKED Groundhogg's capabilities are grouped under "Groundhogg" in the User Role Editor plugin.
-* TWEAKED Dashboard notices and the template library load from Groundhogg's CDN, with the original servers as a fallback.
-* FIXED A trigger's "Can be triggered" limit, like "At most once per contact" or "Up to X times per contact in X days", was never enforced.
-* FIXED When a trigger fired more than once at the same time, for example tagging several contacts at once, contacts after the first could get the first contact's details in the flow.
-* FIXED Delay timers set to run on the last day of the month never ran, dates that don't exist like April 31 ran on the next month, runs on the 29th to the 31st could skip a month, and long delays could ignore which days they were allowed to run on.
-* FIXED Delay timers in flows built with the abilities were titled "Wait 3 days" whatever they were set to.
-* FIXED Unsaved step settings were lost when the flow editor couldn't save, and autosave stopped after a failed save.
-* FIXED The Publish Changes button stayed off when the only change to a flow was deleting steps, and deactivating a flow brought back steps deleted while it was inactive.
-* FIXED The flow simulator stayed stuck loading when the contact it last simulated with had been deleted. Now it asks you to select a contact.
+* TWEAKED Settings and integrations.
+ * The telemetry setting explains exactly what's shared when it's turned on.
+ * Groundhogg's capabilities are grouped under "Groundhogg" in the User Role Editor plugin.
+ * Dashboard notices and the template library load from Groundhogg's CDN, with the original servers as a fallback.
+* FIXED Flow triggers and timing.
+ * A trigger's "Can be triggered" limit, like "At most once per contact" or "Up to X times per contact in X days", was never enforced.
+ * When a trigger fired more than once at the same time, for example tagging several contacts at once, contacts after the first could get the first contact's details in the flow.
+ * Delay timers set to run on the last day of the month never ran, dates that don't exist like April 31 ran on the next month, runs on the 29th to the 31st could skip a month, and long delays could ignore which days they were allowed to run on.
+ * Delay timers in flows built with the abilities were titled "Wait 3 days" whatever they were set to.
+* FIXED Flow editor and simulator issues.
+ * Unsaved step settings were lost when the flow editor couldn't save, and autosave stopped after a failed save.
+ * The Publish Changes button stayed off when the only change to a flow was deleting steps, and deactivating a flow brought back steps deleted while it was inactive.
+ * The flow simulator stayed stuck loading when the contact it last simulated with had been deleted. Now it asks you to select a contact.
+ * The REST API's commit route for flows always returned an error, and importing a flow could interfere with flows imported before it.
 * FIXED Contact searches and counts could show out-of-date results right after a tag, activity or custom field changed, and a search combining two flow activity filters ignored the step and date range of the second one.
-* FIXED The open tracking pixel was missing from HTML emails that weren't a full HTML document.
-* FIXED Contacts that arrived from a link in a tracked email weren't recognized as who they are, so merge tags like {user.*} were blocked for them.
+* FIXED Email tracking and contact identification.
+ * The open tracking pixel was missing from HTML emails that weren't a full HTML document.
+ * Contacts that arrived from a link in a tracked email weren't recognized as who they are, so merge tags like {user.*} were blocked for them.
 * FIXED Activating a license from the guided setup or the troubleshooter failed, and the old guided setup never saved its privacy and sender settings.
-* FIXED The REST API's commit route for flows always returned an error, and importing a flow could interfere with flows imported before it.
-* SECURITY An account could get administrator access by posing as the Groundhogg support user when an admin turned on support access.
-* SECURITY Contacts created by a form submission are no longer treated as verified visitors, since anyone can submit a form.
-* SECURITY The privacy policy and terms links in settings are only saved as real links.
-* DEV The flow editor's canvas, settings panels and add steps panel are drawn in JavaScript, and edits are saved as operations through the `gh_flow_operations` and `gh_flow_action` ajax actions. Step types can register JavaScript settings, titles and branch previews with `Funnel.registerStepType()`. `Funnel_Step::save()`, `get_posted_data()`, `setting_name_prefix()` and `setting_id_prefix()` work as before. See docs/flow-architecture.md.
-* DEV `Step::save()` takes the settings to save, and `Step::update_settings()` changes some of them.
-* DEV Queries take a `cache` var, `false` to skip the cache or a number of seconds that results can be stale for, and the `groundhogg/query/table_cache_group` filter lets queries on other plugins' tables be cached. `Table_Query::where()` and `Where::subWhere()` accept a callback.
+* SECURITY Access and verification hardening.
+ * An account could get administrator access by posing as the Groundhogg support user when an admin turned on support access.
+ * Contacts created by a form submission are no longer treated as verified visitors, since anyone can submit a form.
+ * The privacy policy and terms links in settings are only saved as real links.
+* DEV The flow editor's canvas, settings panels and add steps panel are drawn in JavaScript, and edits are saved as operations through the `gh_flow_operations` and `gh_flow_action` ajax actions.
+ * Step types can register JavaScript settings, titles and branch previews with `Funnel.registerStepType()`. `Funnel_Step::save()`, `get_posted_data()`, `setting_name_prefix()` and `setting_id_prefix()` work as before. See docs/flow-architecture.md.
+ * `Step::save()` takes the settings to save, and `Step::update_settings()` changes some of them.
+* DEV Query caching and the activity table.
+ * Queries take a `cache` var, `false` to skip the cache or a number of seconds that results can be stale for, and the `groundhogg/query/table_cache_group` filter lets queries on other plugins' tables be cached. `Table_Query::where()` and `Where::subWhere()` accept a callback.
+ * The activity table has two new indexes, `type_time_contact_idx` (activity_type, timestamp, contact_id) and `contact_time_idx` (contact_id, timestamp, activity_type, email_id, step_id), which replaces `contact_idx`. New `DB::index_exists()`, `DB::add_index_online()` and `DB::is_being_altered()` methods.
 * DEV New `groundhogg/email/reply_to_messages` and `groundhogg/inbox/address_prefix` filters, and `gh/v4/messages/unread` and `gh/v4/messages/read` REST endpoints.
-* DEV The activity table has two new indexes, `type_time_contact_idx` (activity_type, timestamp, contact_id) and `contact_time_idx` (contact_id, timestamp, activity_type, email_id, step_id), which replaces `contact_idx`. New `DB::index_exists()`, `DB::add_index_online()` and `DB::is_being_altered()` methods.
 * DEV The `Legacy_Contact_Query` class, deprecated since 3.2, has been removed.
 
 = 4.8.3 (2026-09-18) =
