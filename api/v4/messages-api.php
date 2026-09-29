@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Broadcast;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Classes\Inbound_Signature;
 use Groundhogg\Classes\Inbox;
 use Groundhogg\Classes\Message;
@@ -16,6 +17,8 @@ use WP_REST_Server;
 use function Groundhogg\create_object_from_type;
 use function Groundhogg\do_replacements;
 use function Groundhogg\get_db;
+use function Groundhogg\get_team_ids;
+use function Groundhogg\isset_not_empty;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -75,6 +78,142 @@ class Messages_Api extends Base_Object_Api {
 				'permission_callback' => [ $this, 'receive_permissions_callback' ],
 			],
 		] );
+	}
+
+	/**
+	 * The columns that a list of messages can be filtered by, exactly. Nothing else in the request is a filter, the
+	 * generic read takes any column, any function and any where, and counts what the user can't see.
+	 */
+	const FILTERABLE_COLUMNS = [
+		'ID',
+		'object_type',
+		'object_id',
+		'user_id',
+		'direction',
+		'status',
+		'is_read',
+		'message_id',
+		'in_reply_to',
+		'thread_id',
+	];
+
+	/**
+	 * Messages, of the contacts that the user can see. The counts are of those too, so that the total, and `count`,
+	 * can't be used to find out about messages on contacts that they can't: whether a contact has replied, or
+	 * with `search`, what is in what they wrote.
+	 *
+	 * Query: the columns in FILTERABLE_COLUMNS, `include` (ids), `search`, `before` and `after` (dates in UTC),
+	 * `orderby` (ID or date_created), `order`, `limit` (100 at the most), `offset`, `count` (only the total), and
+	 * `found_rows` (on by default).
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function read( WP_REST_Request $request ) {
+
+		$params = $request->get_params();
+
+		$query = new Table_Query( 'messages' );
+
+		foreach ( self::FILTERABLE_COLUMNS as $column ) {
+
+			if ( ! isset( $params[ $column ] ) || ! is_scalar( $params[ $column ] ) || $params[ $column ] === '' ) {
+				continue;
+			}
+
+			$query->where()->equals( $column, $params[ $column ] );
+		}
+
+		if ( ! empty( $params['include'] ) ) {
+			$query->where()->in( 'ID', array_map( 'absint', wp_parse_list( $params['include'] ) ) );
+		}
+
+		if ( isset( $params['search'] ) && is_scalar( $params['search'] ) && $params['search'] !== '' ) {
+			$query->search( (string) $params['search'], get_db( 'messages' )->get_searchable_columns() );
+		}
+
+		foreach ( [ 'before' => 'lessThanEqualTo', 'after' => 'greaterThanEqualTo' ] as $key => $compare ) {
+
+			$time = isset( $params[ $key ] ) && is_scalar( $params[ $key ] ) ? strtotime( (string) $params[ $key ] . ' UTC' ) : false;
+
+			if ( $time ) {
+				$query->where()->$compare( 'date_created', gmdate( 'Y-m-d H:i:s', $time ) );
+			}
+		}
+
+		if ( ! $this->scope_to_visible_contacts( $query ) ) {
+			return self::SUCCESS_RESPONSE( isset_not_empty( $params, 'count' ) ? [ 'total_items' => 0 ] : [ 'total_items' => 0, 'items' => [] ] );
+		}
+
+		if ( isset_not_empty( $params, 'count' ) ) {
+			return self::SUCCESS_RESPONSE( [ 'total_items' => $query->count() ] );
+		}
+
+		$orderby = ( $params['orderby'] ?? '' ) === 'date_created' ? 'date_created' : 'ID';
+		$order   = strtoupper( (string) ( $params['order'] ?? 'DESC' ) ) === 'ASC' ? 'ASC' : 'DESC';
+
+		$query->setOrderby( [ $orderby, $order ] );
+		$query->setLimit( min( 100, max( 1, absint( $params['limit'] ?? 25 ) ) ) );
+		$query->setOffset( absint( $params['offset'] ?? 0 ) );
+
+		$found_rows = ! array_key_exists( 'found_rows', $params ) || filter_var( $params['found_rows'], FILTER_VALIDATE_BOOLEAN );
+		$query->setFoundRows( $found_rows );
+
+		$rows  = $query->get_results();
+		$total = $found_rows ? $query->get_found_rows() : count( $rows );
+
+		// what is counted is what the user can see, this is for what the scope doesn't say, like the object it's on
+		$items = array_values( array_filter(
+			array_map( [ $this, 'map_raw_object_to_class' ], $rows ),
+			[ $this, 'current_user_can_read' ]
+		) );
+
+		return self::SUCCESS_RESPONSE( [
+			'total_items' => $total,
+			'items'       => $items,
+		] );
+	}
+
+	/**
+	 * Limit a query of messages to those on contacts that the user can see, by who owns them, the same rules as
+	 * view_contact in Main_Roles::map_meta_cap(): their own, and someone else's when they can view others'
+	 * contacts and the owner is in their team, if they have one.
+	 *
+	 * @param Table_Query $query
+	 *
+	 * @return bool false if there's nothing that they can see
+	 */
+	protected function scope_to_visible_contacts( Table_Query $query ) {
+
+		$user_id = get_current_user_id();
+
+		if ( ! $user_id ) {
+			return false;
+		}
+
+		$owners = [ $user_id ];
+
+		if ( current_user_can( 'view_others_contacts' ) ) {
+
+			$team = get_team_ids( $user_id );
+
+			// with no team they can see every contact
+			if ( empty( $team ) ) {
+				return true;
+			}
+
+			$owners = array_unique( array_merge( $owners, array_map( 'absint', $team ) ) );
+		}
+
+		$contacts = new Table_Query( 'contacts' );
+		$contacts->setSelect( 'ID' );
+		$contacts->where()->in( 'owner_id', $owners );
+
+		$query->where()->equals( 'object_type', 'contact' );
+		$query->where()->in( 'object_id', $contacts );
+
+		return true;
 	}
 
 	/**
