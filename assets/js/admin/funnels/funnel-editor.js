@@ -638,6 +638,10 @@
               rows       : 7,
               value      : step.meta.step_notes ?? '',
               placeholder: __('You can use this area to store custom notes about the step. Accepts HTML and basic markdown.', 'groundhogg'),
+              // saved a moment after typing stops, see saveSettings()
+              onInput    : e => Funnel.updateStepMeta({
+                step_notes: e.target.value,
+              }, step.ID),
             }),
           ]),
         ]),
@@ -2002,10 +2006,8 @@
             return
           }
 
+          // saved as they're typed, see SettingsPanel()
           if (e.target.matches('textarea[name=step_notes]')) {
-            this.updateStepMeta({
-              step_notes: e.target.value,
-            }, panel.dataset.id)
             return
           }
 
