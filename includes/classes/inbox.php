@@ -28,6 +28,13 @@ class Inbox {
 	const ENDPOINT_OPTION      = 'gh_inbox_endpoint';
 	const TOKEN_KEY_OPTION     = 'gh_inbox_token_key';
 	const LAST_RECEIVED_OPTION = 'gh_inbox_last_received';
+	const TERMS_OPTION         = 'gh_inbox_terms';
+
+	/**
+	 * The version of the terms that are agreed to. When they change in a way that has to be agreed to again, this is
+	 * raised, and the agreement of a smaller number doesn't count.
+	 */
+	const TERMS_VERSION = 1;
 
 	// 10 bytes of each, as 16 characters of base32
 	const TOKEN_LENGTH = 32;
@@ -48,6 +55,45 @@ class Inbox {
 	 */
 	public static function is_provisioned() {
 		return self::id() !== '' && self::address() !== '' && self::reply_address() !== '';
+	}
+
+	/**
+	 * Whether the terms for receiving messages have been agreed to, at the version there is now. Setting the inbox up
+	 * again, or turning it off and on, doesn't ask again, only a new version of the terms does.
+	 *
+	 * @return bool
+	 */
+	public static function terms_accepted() {
+
+		$terms = get_option( self::TERMS_OPTION );
+
+		return is_array( $terms ) && (int) ( $terms['version'] ?? 0 ) >= self::TERMS_VERSION;
+	}
+
+	/**
+	 * Keep who agreed to the terms, and when
+	 *
+	 * @param int $user_id defaults to the current user
+	 */
+	public static function accept_terms( $user_id = 0 ) {
+		update_option( self::TERMS_OPTION, [
+			'version' => self::TERMS_VERSION,
+			'user_id' => (int) ( $user_id ?: get_current_user_id() ),
+			'time'    => time(),
+		], false );
+	}
+
+	/**
+	 * The page with the terms that are agreed to.
+	 *
+	 * @return string
+	 */
+	public static function terms_url() {
+
+		/**
+		 * @param string $url
+		 */
+		return (string) apply_filters( 'groundhogg/inbox/terms_url', 'https://groundhogg.io/terms-and-conditions/' );
 	}
 
 	/**

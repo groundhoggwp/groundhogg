@@ -26,6 +26,7 @@
     Pg,
     Button,
     Table,
+    Input,
     Tr,
     Th,
     Td,
@@ -78,6 +79,9 @@
       last_received   : 0,
       reply_to_enabled: true,
       has_license     : false,
+      terms_accepted  : true, // until the server says otherwise, so it doesn't flash a checkbox
+      terms_url       : '',
+      agreed          : false, // ticked, and not yet sent
     })
 
     let morph
@@ -119,7 +123,7 @@
     const call = route => {
       State.set({ loading: true, error: '' })
       morph()
-      return settle(post(`${ ROUTE }/${ route }`, {}))
+      return settle(post(`${ ROUTE }/${ route }`, route === 'enable' && State.agreed ? { accept_terms: true } : {}))
     }
 
     const confirmThen = (message, route) => dangerConfirmationModal({
@@ -176,6 +180,33 @@
         style    : { margin: '0 0 15px' },
       }, Pg({}, State.error)) : null
 
+      // Setting the inbox up sends email through Groundhogg's servers, so the terms are agreed to first. It's asked once.
+      const needsTerms = !State.terms_accepted
+      const canSetUp = !needsTerms || State.agreed
+
+      const Terms = () => needsTerms ? Div({
+        className: 'display-flex gap-10 align-start',
+        style    : { margin: '0 0 15px' },
+      }, [
+        Input({
+          type    : 'checkbox',
+          id      : 'incoming-messages-terms',
+          checked : State.agreed,
+          disabled: State.loading,
+          style   : { marginTop: '3px' },
+          onChange: e => {
+            State.set({ agreed: e.target.checked })
+            morph()
+          },
+        }),
+        makeEl('label', { htmlFor: 'incoming-messages-terms' },
+          sprintf(
+            /* translators: %s: a link to the terms and conditions */
+            __('I agree to the %s, and I understand that email sent to my inbox address is received by Groundhogg’s Messages service and passed on to my site.', 'groundhogg'),
+            `<a href="${ State.terms_url }" target="_blank" rel="noopener">${ __('Terms & Conditions', 'groundhogg') }</a>`,
+          )),
+      ]) : null
+
       // the same wording as Inbox_Client::enable()'s no_license error, for when this is reached some other way
       const licenseNeededText = __('A Groundhogg license is needed to receive messages. Activate your license on the Licenses tab.', 'groundhogg')
 
@@ -194,10 +225,11 @@
           errorNotice,
           Status('tag', __('Off', 'groundhogg'), __('Incoming messages are off.', 'groundhogg')),
           Pg({ className: 'description' }, __('Turning them on gives your site a private address to send mail to. Your site has to be reachable over HTTPS, so that the messages can be delivered to it.', 'groundhogg')),
+          Terms(),
           Button({
             type     : 'button',
             className: `gh-button primary ${ State.loading ? 'loading-dots' : '' }`,
-            disabled : State.loading,
+            disabled : State.loading || !canSetUp,
             onClick  : () => call('enable'),
           }, __('Turn on incoming messages', 'groundhogg')),
         ])
@@ -212,11 +244,12 @@
             className: 'notice notice-warning inline',
           }, Pg({}, __('This site has the settings of an inbox that was set up for a different site, and is probably a copy of it, like a staging site. Messages are not received here, and replies are not sent to that inbox, so that they do not end up in the wrong place.', 'groundhogg'))),
           !has_license ? Pg({}, licenseNeededText) : null,
+          has_license ? Div({ style: { marginTop: '15px' } }, Terms()) : null,
           Actions(
             has_license ? Button({
               type     : 'button',
               className: `gh-button primary ${ State.loading ? 'loading-dots' : '' }`,
-              disabled : State.loading,
+              disabled : State.loading || !canSetUp,
               onClick  : () => call('enable'),
             }, __('Set up an inbox for this site', 'groundhogg')) : null,
             Button({
@@ -262,6 +295,9 @@
           ]),
         ]),
 
+        // an inbox from before there were terms to agree to, it's asked when it's set up again
+        needsTerms ? Div({ style: { marginTop: '15px' } }, Terms()) : null,
+
         Actions(
           Button({
             type     : 'button',
@@ -272,7 +308,7 @@
           has_license ? Button({
             type     : 'button',
             className: 'gh-button secondary text',
-            disabled : State.loading,
+            disabled : State.loading || !canSetUp,
             onClick  : () => call('enable'),
           }, __('Set up again', 'groundhogg')) : null,
           Button({

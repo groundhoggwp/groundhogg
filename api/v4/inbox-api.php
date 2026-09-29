@@ -70,6 +70,8 @@ class Inbox_Api extends Base_Api {
 			'last_received'    => Inbox::last_received(),
 			'reply_to_enabled' => (bool) apply_filters( 'groundhogg/message/reply_to_enabled', true, '' ),
 			'has_license'      => (bool) Inbox_Client::license_key(),
+			'terms_accepted'   => Inbox::terms_accepted(),
+			'terms_url'        => Inbox::terms_url(),
 		];
 	}
 
@@ -98,6 +100,18 @@ class Inbox_Api extends Base_Api {
 	}
 
 	public function enable( WP_REST_Request $request ) {
+
+		// The terms are agreed to once, by whoever turns it on first. A request that says it has, and hasn't been asked
+		// before, is the agreement, and one that doesn't is refused before anything is sent to the relay.
+		if ( ! Inbox::terms_accepted() ) {
+
+			if ( ! filter_var( $request->get_param( 'accept_terms' ), FILTER_VALIDATE_BOOLEAN ) ) {
+				return self::ERROR_400( 'terms_not_accepted', __( 'You need to agree to the terms to receive messages.', 'groundhogg' ) );
+			}
+
+			Inbox::accept_terms();
+		}
+
 		return self::respond( Inbox_Client::enable() );
 	}
 

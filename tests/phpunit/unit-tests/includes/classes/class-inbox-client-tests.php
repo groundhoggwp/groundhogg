@@ -60,6 +60,7 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 		Inbox::clear();
 		delete_option( Inbox::TOKEN_KEY_OPTION );
 		delete_option( Inbox::LAST_RECEIVED_OPTION );
+		delete_option( Inbox::TERMS_OPTION );
 		wp_set_current_user( 0 );
 		parent::tearDown();
 	}
@@ -878,9 +879,15 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 	 * ------------------------------------------------------------------- */
 
 	/** @return array the decoded response body */
-	protected function api( string $method, string $route ) {
+	protected function api( string $method, string $route, array $params = [] ) {
 
-		$response = rest_do_request( new WP_REST_Request( $method, '/gh/v4/inbox' . $route ) );
+		$request = new WP_REST_Request( $method, '/gh/v4/inbox' . $route );
+
+		foreach ( $params as $key => $value ) {
+			$request->set_param( $key, $value );
+		}
+
+		$response = rest_do_request( $request );
 
 		return [ $response->get_status(), $response->get_data() ];
 	}
@@ -917,7 +924,7 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 
 		$this->be_an_administrator();
 
-		[ $status, $data ] = $this->api( 'POST', '/enable' );
+		[ $status, $data ] = $this->api( 'POST', '/enable', [ 'accept_terms' => true ] );
 
 		$this->assertSame( 200, $status );
 		$this->assertTrue( $data['provisioned'] );
@@ -932,13 +939,91 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 		$this->assertSame( $data['address'], $again['address'] );
 	}
 
+	public function test_the_terms_have_to_be_agreed_to_before_the_inbox_is_set_up() {
+
+		$this->be_an_administrator();
+
+		[ $status, $data ] = $this->api( 'GET', '' );
+		$this->assertFalse( $data['terms_accepted'] );
+		$this->assertStringStartsWith( 'https://', $data['terms_url'] );
+
+		// not sent, or not agreed to
+		foreach ( [ [], [ 'accept_terms' => false ], [ 'accept_terms' => 'false' ], [ 'accept_terms' => '0' ] ] as $params ) {
+
+			[ $status, $data ] = $this->api( 'POST', '/enable', $params );
+
+			$this->assertSame( 400, $status, wp_json_encode( $params ) );
+			$this->assertSame( 'terms_not_accepted', $data['code'] );
+		}
+
+		$this->assertSame( [], $this->requests, 'nothing was sent to the relay' );
+		$this->assertFalse( Inbox::is_provisioned() );
+		$this->assertFalse( Inbox::terms_accepted() );
+	}
+
+	public function test_agreeing_to_the_terms_is_kept_with_who_and_when_and_is_not_asked_again() {
+
+		$this->be_an_administrator();
+		$user_id = get_current_user_id();
+
+		[ $status ] = $this->api( 'POST', '/enable', [ 'accept_terms' => true ] );
+
+		$this->assertSame( 200, $status );
+		$this->assertTrue( Inbox::terms_accepted() );
+
+		$terms = get_option( Inbox::TERMS_OPTION );
+		$this->assertSame( Inbox::TERMS_VERSION, $terms['version'] );
+		$this->assertSame( $user_id, $terms['user_id'] );
+		$this->assertEqualsWithDelta( time(), $terms['time'], 10 );
+
+		// setting it up again, or turning it off and on, is without saying so again
+		[ $status ] = $this->api( 'POST', '/enable' );
+		$this->assertSame( 200, $status );
+
+		$this->api( 'POST', '/disable' );
+		[ $status ] = $this->api( 'POST', '/enable' );
+		$this->assertSame( 200, $status );
+
+		[ , $data ] = $this->api( 'GET', '' );
+		$this->assertTrue( $data['terms_accepted'] );
+	}
+
+	public function test_terms_of_an_older_version_are_asked_again() {
+
+		$this->be_an_administrator();
+
+		update_option( Inbox::TERMS_OPTION, [ 'version' => Inbox::TERMS_VERSION - 1, 'user_id' => 1, 'time' => time() ] );
+		$this->assertFalse( Inbox::terms_accepted() );
+
+		[ $status, $data ] = $this->api( 'POST', '/enable' );
+		$this->assertSame( 400, $status );
+		$this->assertSame( 'terms_not_accepted', $data['code'] );
+
+		[ $status ] = $this->api( 'POST', '/enable', [ 'accept_terms' => true ] );
+		$this->assertSame( 200, $status );
+		$this->assertTrue( Inbox::terms_accepted() );
+	}
+
+	public function test_agreeing_is_kept_when_the_relay_says_no_since_they_did_agree() {
+
+		$this->be_an_administrator();
+
+		$this->behaviour['error'] = [ 422, [ 'code' => 'handshake_failed', 'reason' => 'timeout' ] ];
+
+		[ $status ] = $this->api( 'POST', '/enable', [ 'accept_terms' => true ] );
+
+		$this->assertNotSame( 200, $status );
+		$this->assertTrue( Inbox::terms_accepted(), 'it is not asked for again on the next try' );
+		$this->assertFalse( Inbox::is_provisioned() );
+	}
+
 	public function test_a_failure_to_enable_is_reported_with_its_reason_and_nothing_is_set_up() {
 
 		$this->be_an_administrator();
 
 		$this->behaviour['license'] = 'invalid';
 
-		[ $status, $data ] = $this->api( 'POST', '/enable' );
+		[ $status, $data ] = $this->api( 'POST', '/enable', [ 'accept_terms' => true ] );
 
 		$this->assertNotSame( 200, $status );
 		$this->assertSame( 'invalid_license', $data['code'] );

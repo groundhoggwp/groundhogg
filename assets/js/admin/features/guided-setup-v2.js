@@ -116,6 +116,7 @@
     licensed      : Setup.hasLicense,
     license       : '',
     inbox         : null,
+    agreed        : false,
     synced        : false,
     finished      : false,
     telemetry     : false,
@@ -775,7 +776,7 @@
     })
     render()
 
-    post(`${ routes.v4.inbox }/enable`, {}).then(inbox => {
+    post(`${ routes.v4.inbox }/enable`, State.agreed ? { accept_terms: true } : {}).then(inbox => {
       State.set({
         inbox,
         loading: false,
@@ -815,17 +816,38 @@
       ]
     }
 
+    // asked once, the same as in the settings. Not again if it was agreed to there
+    const needsTerms = inbox.terms_accepted === false
+
     return [
       H1({}, __('Get replies in Groundhogg', 'groundhogg')),
       Pg({ className: 'gs-lead' }, __('When a contact replies to an email you sent from Groundhogg, the reply lands on their contact record. You and your team can read it and answer it without leaving WordPress.', 'groundhogg')),
 
       !Setup.site.is_https ? Div({ className: 'notice notice-warning inline gs-notice' }, Pg({}, __('Your site is not on HTTPS, so replies can\'t be delivered to it yet. You can turn this on later in the email settings.', 'groundhogg'))) : null,
 
+      needsTerms ? Div({ className: 'gs-choices' }, Label({ className: 'gs-choice' }, [
+        Input({
+          type    : 'checkbox',
+          id      : 'gs-inbox-terms',
+          checked : State.agreed,
+          disabled: State.loading,
+          onChange: e => {
+            State.set({ agreed: e.target.checked })
+            render()
+          },
+        }),
+        Div({}, sprintf(
+          /* translators: %s: a link to the terms and conditions */
+          __('I agree to the %s, and I understand that email sent to my inbox address is received by Groundhogg’s Messages service and passed on to my site.', 'groundhogg'),
+          `<a href="${ inbox.terms_url }" target="_blank" rel="noopener">${ __('Terms & Conditions', 'groundhogg') }</a>`,
+        )),
+      ])) : null,
+
       Div({ className: 'gs-center' }, [
         Button({
           type     : 'button',
           className: `gh-button primary medium ${ State.loading ? 'loading-dots' : '' }`,
-          disabled : State.loading,
+          disabled : State.loading || ( needsTerms && !State.agreed ),
           onClick  : enableInbox,
         }, __('Turn on replies', 'groundhogg')),
         Pg({ className: 'description' }, State.loading
