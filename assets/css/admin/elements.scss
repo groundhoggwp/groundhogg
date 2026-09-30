@@ -3750,6 +3750,17 @@ button:has(.gh-dropdown-menu) {
       line-height: var(--gh-option-line-height);
     }
 
+    .gh-picker-group-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--gh-dark-50, #646970);
+      padding: 6px calc(var(--gh-item-padding) * 2) 2px;
+      cursor: default;
+      user-select: none;
+    }
+
     .gh-picker-option {
       cursor: pointer;
       font-size: 14px;

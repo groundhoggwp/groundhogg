@@ -1353,18 +1353,20 @@
      *
      * @param id
      * @param text
+     * @param selectedText what shows once it's selected, if it should be different from what shows in the dropdown
      * @param index
      * @returns {*}
      */
     const itemPickerItem = ({
       id,
       text,
+      selectedText,
     }, index) => {
       return Div({
         className: `gh-picker-item ${ isValidSelection(id) ? '' : 'is-invalid' }`,
         id       : `item-${ id }-${ index }`,
       }, [
-        Span({ className: 'gh-picker-item-text' }, text),
+        Span({ className: 'gh-picker-item-text' }, selectedText ?? text),
         selected.length > 1 || clearable ? Span({
           id       : `delete-${ id }-${ index }`,
           className: 'gh-picker-item-delete',
@@ -1400,7 +1402,34 @@
       }, text)
     }
 
-    const selectableOptions = () => state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id))
+    /**
+     * Options may be flat, with an optional `group` label like <optgroup>,
+     * or nested as { text: 'Group', options: [ ... ] }. Flatten the nested form.
+     *
+     * @param options
+     * @returns {*[]}
+     */
+    const flattenOptions = options => ( options || [] ).flatMap(opt => Array.isArray(opt.options)
+                                                                          ? opt.options.map(child => ( { group: opt.text ?? opt.label, ...child } ))
+                                                                          : [opt] )
+
+    /**
+     * Unselected options, clustered by group (in order of first appearance)
+     * so that the rendered order always matches the keyboard navigation order.
+     *
+     * @returns {*[]}
+     */
+    const selectableOptions = () => {
+      let options = state.options.filter(opt => !selected.some(_opt => opt.id == _opt.id))
+
+      if (!options.some(opt => opt.group)) {
+        return options
+      }
+
+      let groups = [...new Set(options.map(opt => opt.group || ''))]
+
+      return groups.flatMap(group => options.filter(opt => ( opt.group || '' ) === group))
+    }
 
     /**
      * The item picker options
@@ -1503,7 +1532,15 @@
         state.searching ? Div({ className: 'gh-picker-no-options' }, Ellipses(wp.i18n.__('Searching'))) : null,
 
         // The actual options
-        ...options.map((opt, i) => itemPickerOption(opt, i)),
+        ...options.flatMap((opt, i) => {
+          let group = opt.group || ''
+          let previous = i > 0 ? ( options[i - 1].group || '' ) : ''
+
+          // Heading whenever a new group starts, like <optgroup label>
+          return group && group !== previous
+                 ? [Div({ className: 'gh-picker-group-label' }, group), itemPickerOption(opt, i)]
+                 : [itemPickerOption(opt, i)]
+        }),
 
         // If there are no options
         options.length || state.searching ? null : Div({ className: 'gh-picker-no-options' }, 'No results found.'),
@@ -1538,7 +1575,7 @@
           setState({
             searching: false,
             optionsIndex: -1,
-            options,
+            options  : flattenOptions(options),
           }, 'options fetched')
         })
       }, 500)
@@ -1609,7 +1646,7 @@
           let index
 
           if (e.key === 'ArrowDown') {
-            index = Math.min(state.options.length, state.optionsIndex + 1)
+            index = Math.min(selectableOptions().length - 1, state.optionsIndex + 1)
           }
 
           if (e.key === 'ArrowUp') {
