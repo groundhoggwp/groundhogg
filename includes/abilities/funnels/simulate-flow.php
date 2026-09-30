@@ -28,6 +28,6 @@ class Simulate_Flow extends Abstract_Simulate_Flow {
 	}
 
 	protected function get_description(): string {
-		return __( 'Trace what would happen to a real contact starting from a given step in a flow - which branches they\'d take, roughly when timers would resolve - without enqueuing any real events or sending anything. Always a dry run. See groundhogg/live-simulate-flow to actually run it for real, and groundhogg/list-flows (expand: ["steps"]) to find a step_id to start from.', 'groundhogg' );
+		return __( 'Trace what would happen to a real contact starting from a given step in a flow - which branches they\'d take, roughly when timers would resolve - without enqueuing any real events or sending anything. Always a dry run. Traces the published flow by default; pass view: "draft" to trace it with its unpublished changes instead. See groundhogg/live-simulate-flow to actually run it for real, and groundhogg/list-flows (expand: ["steps"]) to find a step_id to start from.', 'groundhogg' );
 	}
 }

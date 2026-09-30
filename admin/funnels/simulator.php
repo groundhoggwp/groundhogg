@@ -217,6 +217,12 @@ class Simulator {
 
 		self::$is_dry_run = $dryRun;
 
+		// Static, so they'd otherwise carry over from a previous run in the same process - which is more than one
+		// per request for WP-CLI, tests, or an ability called more than once. The loop limit counts self::$flow too.
+		self::$flow       = [];
+		self::$options    = [];
+		self::$event_args = [];
+
 		if ( ! $step->exists() ) {
 
 			if ( wp_doing_ajax() ) {

@@ -71,12 +71,23 @@ abstract class Abstract_Simulate_Flow extends Ability {
 						'type'        => 'integer',
 						'description' => __( 'Which step of the flow to start tracing from. Required rather than defaulting to the flow\'s first step, since a flow can have more than one independent trigger.', 'groundhogg' ),
 					],
+					'view'       => [
+						'type'        => 'string',
+						'enum'        => [ 'live', 'draft' ],
+						'default'     => 'live',
+						'description' => __( '"live" (default) runs the published flow, exactly what contacts go through. "draft" runs the flow with its unpublished changes - new steps, edited settings, moved steps, and without steps deleted in the draft - so a change can be tested before it is published. Only differs for active flows with unpublished changes (see has_unpublished_changes in groundhogg/get-flow). With a live run, "draft" really executes the draft\'s steps against the contact.', 'groundhogg' ),
+					],
 				],
 			],
 
 			'output_schema' => [
 				'type'       => 'object',
 				'properties' => [
+					'view'              => [
+						'type'        => 'string',
+						'enum'        => [ 'live', 'draft' ],
+						'description' => __( 'Which version of the flow was traced.', 'groundhogg' ),
+					],
 					'trace'             => [
 						'type'        => 'array',
 						'description' => __( 'One entry per step visited, in order.', 'groundhogg' ),
@@ -137,15 +148,47 @@ abstract class Abstract_Simulate_Flow extends Ability {
 			return new WP_Error( 'groundhogg_invalid_step', __( 'No step with that id exists in this flow.', 'groundhogg' ) );
 		}
 
-		$result = Simulator::simulate( $start, $contact, $this->is_dry_run() );
+		$view = ( $input['view'] ?? 'live' ) === 'draft' ? 'draft' : 'live';
 
-		if ( is_wp_error( $result ) ) {
-			return $result;
+		// Funnel::get_steps() only includes unpublished changes in editing mode, and the Simulator walks
+		// whatever get_steps() returns - so this is all it takes to trace the draft instead of the live flow
+		$output = $view === 'draft'
+			? $funnel->while_editing( fn() => $this->trace( $funnel, $contact, $start ) )
+			: $this->trace( $funnel, $contact, $start );
+
+		if ( is_wp_error( $output ) ) {
+			return $output;
 		}
+
+		return array_merge( [ 'view' => $view ], $output );
+	}
+
+	/**
+	 * Run the Simulator over whichever version of the flow get_steps() currently returns, and shape the result
+	 *
+	 * @param Funnel  $funnel
+	 * @param Contact $contact
+	 * @param Step    $start
+	 *
+	 * @return array|WP_Error
+	 */
+	protected function trace( Funnel $funnel, Contact $contact, Step $start ) {
 
 		$steps_by_id = [];
 		foreach ( $funnel->get_steps() as $step ) {
 			$steps_by_id[ $step->get_id() ] = $step;
+		}
+
+		// The Simulator silently ends with an empty trace when the start step isn't in the steps it walks - e.g. a
+		// step added in the draft traced against the live flow, or one deleted in the draft traced against the draft
+		if ( ! isset( $steps_by_id[ $start->get_id() ] ) ) {
+			return new WP_Error( 'groundhogg_step_not_in_view', __( 'That step is not part of this version of the flow. A step added in the draft only exists in the "draft" view, and a step deleted in the draft only exists in the "live" view.', 'groundhogg' ) );
+		}
+
+		$result = Simulator::simulate( $start, $contact, $this->is_dry_run() );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
 
 		$trace = [];

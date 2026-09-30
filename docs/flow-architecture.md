@@ -1378,6 +1378,13 @@ It walks the flow **in memory** from a step:
   a real event row is created and the element's `run()` is called.
 - It stops at a non-passthru benchmark and returns the trigger options to pick from.
 
+**Live vs draft.** It walks whatever `Funnel::get_steps()` returns (see 7), so the version depends on editing mode:
+the editor's ▶ button (editor referer) traces the draft, and the abilities take `view: "live"` (default, the
+published flow) or `"draft"` (staged changes merged, like `get-flow`'s `view`), which wraps the run in
+`while_editing()`. `live-simulate-flow` with `view: "draft"` really executes unpublished steps and records events
+against them. A start step that isn't in the chosen version is refused (`groundhogg_step_not_in_view`) rather than
+giving an empty trace. Static state (`$flow`, `$options`, `$event_args`) is reset at the start of each run.
+
 It does **not** use the queue, `can_complete()`, or trigger frequency. `Simulator::is_simulating()` and
 `get_event_arg()` let elements behave accordingly (`Step::is_simulating()` is a stub that always returns
 false).

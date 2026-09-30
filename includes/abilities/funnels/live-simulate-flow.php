@@ -32,6 +32,6 @@ class Live_Simulate_Flow extends Abstract_Simulate_Flow {
 	}
 
 	protected function get_description(): string {
-		return __( 'Actually run a flow for a real contact starting from a given step - real events are created and real actions (send_email, apply_tag, ...) actually execute against the real contact. This is NOT a preview - it really happens. Use groundhogg/simulate-flow first to see what would happen before running this. See groundhogg/list-flows (expand: ["steps"]) to find a step_id to start from.', 'groundhogg' );
+		return __( 'Actually run a flow for a real contact starting from a given step - real events are created and real actions (send_email, apply_tag, ...) actually execute against the real contact. This is NOT a preview - it really happens. Runs the published flow by default; pass view: "draft" to run it with its unpublished changes instead, to test them before publishing (unpublished steps are really executed too, and events are recorded against them). Use groundhogg/simulate-flow first to see what would happen before running this. See groundhogg/list-flows (expand: ["steps"]) to find a step_id to start from.', 'groundhogg' );
 	}
 }
