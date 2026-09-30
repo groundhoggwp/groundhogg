@@ -173,6 +173,18 @@ class Query_Table extends Ability {
 		];
 	}
 
+	/**
+	 * Column names are compared against the table's own, which aren't all lowercase (`ID`) - so unlike
+	 * sanitize_key() this keeps the case
+	 *
+	 * @param mixed $column
+	 *
+	 * @return string
+	 */
+	protected function sanitize_column( $column ): string {
+		return preg_replace( '/[^A-Za-z0-9_]/', '', (string) $column );
+	}
+
 	public function __invoke( $input ) {
 
 		$table = $input['table'] ?? '';
@@ -193,7 +205,7 @@ class Query_Table extends Ability {
 
 		if ( ! empty( $input['select'] ) && is_array( $input['select'] ) ) {
 
-			$select = array_values( array_intersect( array_map( 'sanitize_key', $input['select'] ), $allowed_columns ) );
+			$select = array_values( array_intersect( array_map( [ $this, 'sanitize_column' ], $input['select'] ), $allowed_columns ) );
 
 			if ( empty( $select ) ) {
 				return new WP_Error( 'groundhogg_invalid_select', __( 'None of the given "select" columns exist on this table. See groundhogg/describe-table.', 'groundhogg' ) );
@@ -205,7 +217,7 @@ class Query_Table extends Ability {
 		foreach ( (array) ( $input['where'] ?? [] ) as $condition ) {
 
 			$condition = (array) $condition;
-			$column    = isset( $condition['column'] ) ? sanitize_key( $condition['column'] ) : '';
+			$column    = isset( $condition['column'] ) ? $this->sanitize_column( $condition['column'] ) : '';
 
 			if ( ! $column || ! in_array( $column, $allowed_columns, true ) ) {
 				return new WP_Error(
@@ -238,7 +250,7 @@ class Query_Table extends Ability {
 
 		if ( ! empty( $input['orderby'] ) ) {
 
-			$requested = sanitize_key( $input['orderby'] );
+			$requested = $this->sanitize_column( $input['orderby'] );
 
 			if ( ! in_array( $requested, $allowed_columns, true ) ) {
 				return new WP_Error(

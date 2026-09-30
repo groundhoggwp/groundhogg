@@ -231,6 +231,11 @@ class Update_Email_Template extends Ability {
 			$meta_updates['backgroundRepeat'] = sanitize_text_field( $template_settings['background_repeat'] );
 		}
 
+		// Nothing else maintains it, and a change to only the meta or campaigns still changes the email
+		if ( ! empty( $data ) || ! empty( $meta_updates ) || isset( $input['campaigns'] ) ) {
+			$data['last_updated'] = current_time( 'mysql' );
+		}
+
 		if ( ! empty( $data ) ) {
 			$email->update( $data );
 		}
