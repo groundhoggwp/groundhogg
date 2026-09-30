@@ -5,6 +5,10 @@ JavaScript, and edits are saved as operations instead of posting the whole form.
 working unchanged, but some patterns don't. This guide is for a session working in one add-on repo: what to
 check, how to fix it, and how to verify it.
 
+Besides fixing what's broken, **every step type is ported to the current APIs**: its settings to
+`get_settings_schema()` (checklist 1) and its editor JS to `Funnel.registerStepType()` (checklist 4), unless
+there's a reason not to, which the plan should say.
+
 **Read first:** core's `docs/flow-architecture.md`, sections 4-5 (step types and settings), 7 (editing model),
 9 (the editor frontend) and 10 (the add-on checklist). This guide only covers what's different in 4.9.
 
@@ -52,15 +56,22 @@ check, how to fix it, and how to verify it.
 Work through these for every step type the add-on registers (`register_funnel_steps()` /
 `groundhogg/steps/init`).
 
-### 1. Settings reach the server
+### 1. Settings reach the server, and are described by a schema
 
 - **Check:** every setting is an input **inside the step's panel**, named with `$this->setting_name_prefix( 'x' )`
-  (`steps[ID][x]`), or written from JS with `Funnel.updateStepMeta( { x }, ID )` / `updateStep()`.
+  (`steps[ID][x]`), or written from JS with `Funnel.updateStepMeta( { x }, ID )` / `update()`.
 - **Check:** `save( $step )` and any `sanitize` callbacks read settings with `$this->get_posted_data( 'x' )`, never
   from `$_POST`, `$_REQUEST`, `get_post_var()` or `get_request_var()`, and never read other steps' fields or
   `funnel_title`.
-- **Fix:** replace direct request reads with `get_posted_data()`. Better still, move the step to
-  `get_settings_schema()` (a `sanitize` + `default` per setting) and drop the custom `save()`.
+- **Port:** replace a custom `save( $step )` with `get_settings_schema()`:
+  - every setting gets a `sanitize` callback and a `default`, plus `initial` where a new step needs a value, and
+    `if_undefined` for checkboxes that aren't posted when off (architecture doc, section 5);
+  - **keep the stored meta keys and the sanitized values exactly as `save()` stored them**, so existing flows,
+    import/export, and the runtime code that reads them keep working. Don't rename keys or change their types;
+  - anything in `save()` that isn't sanitizing (creating related objects, side effects) moves to
+    `after_save( $step )`, which must call `parent::after_save( $step )` (it fires
+    `groundhogg/steps/save/after` and saves the generated title);
+  - if a step type can't be expressed as a schema, keep `save()`, use `get_posted_data()`, and say why in the plan.
 
 ### 2. No inline scripts in settings output
 
@@ -82,17 +93,34 @@ Work through these for every step type the add-on registers (`register_funnel_st
   Prefer `Funnel.updateStepMeta( { key: value }, ID )` and let it save itself; use `Funnel.save( { moreData } )`
   only as a last resort.
 
-### 4. Editor JS
+### 4. Editor JS, ported to `Funnel.registerStepType()`
 
-- `registerStepCallbacks( type, { onActive, onDuplicate } )` still works: `onActive` runs when the step's panel
-  opens, after explicit saves, and after undo/redo.
+- **Port:** settings drawn by `registerStepCallbacks( type, { onActive } )`, by `step-active` listeners, or by
+  pickers the JS mounts over PHP placeholders move to:
+
+  ```js
+  Funnel.registerStepType( 'my_type', {
+    settings: ( step, update ) => /* MakeEl UI, update( { key: value } ) saves it */,
+    title   : step => /* the same text generate_step_title() makes, or undefined */,
+    defaults: { /* what a new step starts with, like the schema's initial values */ },
+    onDuplicate: step => /* extra choices when duplicating, optional */,
+  } )
+  ```
+
+  - `settings()` is drawn into the panel's `.step-type-settings`, where PHP `settings()` prints, and only for the
+    step being edited. Leaving the step puts the server's HTML back, so `settings()` in PHP should still output
+    the inputs (or placeholders) it does now.
+  - `title()` shows on the canvas while a change saves; once the server replies, its title wins. **It must match
+    `generate_step_title()`**. Return undefined when it needs data that isn't loaded, like a name for an ID.
+  - Types that branch (`Branch_Logic`) can add `branches( step )`, and `validate( step )` shows warnings early.
+  - See core's `assets/js/admin/funnels/funnel-steps.js` (`delay_timer`, `apply_tag`, `if_else`, `add_to_flow`)
+    for examples, and `step-titles.js` for titles.
+- **Can stay on `onActive`:** types whose UI needs the old panel lifecycle, like a picker printed by
+  `after_settings()` (core's `send_email`, SMS's `send_sms`), TinyMCE editors, or the form builder. Say which
+  and why in the plan.
 - Don't reach into the canvas DOM (`#step-sortable`, `.sortable-item`) or build canvas markup; the canvas is
   redrawn from data on every change. Use the PHP hooks `groundhogg/steps/sortable/classes|labels|inside`.
 - Anything that referenced `Groundhogg.funnelEditor` (the old v2 editor API) is dead; core no longer defines it.
-- Optional upgrade: `Funnel.registerStepType( type, { settings( step, update ), title( step ) } )` draws the
-  settings with MakeEl into `.step-type-settings` and shows the title on the canvas while a change saves. See
-  core's `funnel-steps.js` (`delay_timer`, `apply_tag`, `if_else`) for examples. Only the step being edited is
-  mounted.
 - Anything the JS puts into the page as HTML from settings or user input must be escaped (`escHTML`) or passed
   through `Groundhogg.element.sanitizeHTML()`. MakeEl parses string children as HTML.
 
@@ -146,7 +174,9 @@ Work through these for every step type the add-on registers (`register_funnel_st
 - Use the `groundhogg-addon-phpunit` skill to set up or run the add-on's PHPUnit suite against core.
 - Worth adding for each step type:
   - it can be added through `Flow_Operations` in editor mode;
-  - saving settings through `Step::save( [ … ] )` stores what `get_posted_data()` should see;
+  - **before porting**, a test that saves representative settings through `Step::save( [ … ] )` and checks the
+    stored meta; after porting to the schema, the same test must still pass unchanged;
+  - `generate_step_title()` for a few settings, so the JS `title()` can be checked against it;
   - a contact runs through it (`process_events( [ $contact ] )`), like core's
     `tests/phpunit/unit-tests/includes/classes/class-flow-execution-tests.php`.
 
@@ -166,7 +196,8 @@ On the dev site, for each step type:
 ## Scan results (2026-09-30)
 
 An automated scan of the repos in `PhpstormProjects` that register step types. Treat it as a starting point;
-the scan matches patterns and doesn't prove anything works.
+the scan matches patterns and doesn't prove anything works. Every add-on also gets the ports in checklist 1 and
+4; the Action column is only what's specific to it.
 
 | Add-on | Found | Action |
 |---|---|---|
@@ -178,7 +209,7 @@ the scan matches patterns and doesn't prove anything works.
 | **groundhogg-twilio** | `registerStepCallbacks` for its two WhatsApp steps; `send-whatsapp-template.php` has a legacy `save()`; the opt-in lookup queries steps but checks `is_active()` | Expected to work; verify. |
 | **groundhogg-birthday** | Cron queries steps with `step_status => active`; legacy `save()` | Fine; verify the step saves. |
 | **groundhogg-zapier** | Legacy `save()` with `get_posted_data()`; its `get_request_var()` is in a separate test ajax action | Expected to work; verify. |
-| **affwp, contracts, facebook-conversions-api, formidable, givewp, gravity, helpscout, rsp, thrivecart, wpforms** | Legacy `save( $step )` using `get_posted_data()`; no `$_POST` reads found | Expected to work; verify each step type saves, and consider moving to `get_settings_schema()`. |
+| **affwp, contracts, facebook-conversions-api, formidable, givewp, gravity, helpscout, rsp, thrivecart, wpforms** | Legacy `save( $step )` using `get_posted_data()`; no `$_POST` reads found | Expected to work as is; port the `save()` methods to `get_settings_schema()`. |
 | **cf7, fluent-forms, forminator, ninja, weforms, wp-simple-pay, appointments** | No risky patterns found | Verify each step type saves. |
 | **bookings, learndash, lifterlms, memberpress, presto-player, sheets, traffic-filter** | They register steps, but the scan didn't match their step classes | Audit by hand with the checklist. |
 
