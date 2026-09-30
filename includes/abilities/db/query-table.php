@@ -26,6 +26,13 @@ use function Groundhogg\get_db;
  * their own author-only scoping when the caller lacks view_others_notes/tasks,
  * same as everywhere else those classes are used - moot for an actual admin.)
  *
+ * `contacts` is the exception to "any table in ALLOWED_TABLES can be queried":
+ * Contacts::query() runs through Contact_Query, which has its own query vars
+ * and ignores the generic `where`/`select`/`found_rows` this builds - so a
+ * filtered query would silently return every contact, with a wrong total. It's
+ * refused with a pointer to groundhogg/search-contacts instead (describe-table
+ * still describes its columns, the contactmeta table is unaffected).
+ *
  * `table` is restricted to a fixed whitelist (ALLOWED_TABLES) of Groundhogg's
  * own core CRM tables. Deliberately excluded:
  * - Any WordPress core table (users, usermeta, options, ...) - out of scope for
@@ -80,7 +87,7 @@ class Query_Table extends Ability {
 					'table' => [
 						'type'        => 'string',
 						'enum'        => self::ALLOWED_TABLES,
-						'description' => __( 'Which table to query - see groundhogg/describe-table.', 'groundhogg' ),
+						'description' => __( 'Which table to query - see groundhogg/describe-table. Not "contacts" - use groundhogg/search-contacts for that, it understands contact filters that this ability doesn\'t.', 'groundhogg' ),
 					],
 					'select' => [
 						'type'        => 'array',
@@ -191,6 +198,13 @@ class Query_Table extends Ability {
 
 		if ( ! in_array( $table, self::ALLOWED_TABLES, true ) ) {
 			return new WP_Error( 'groundhogg_table_not_allowed', __( 'That table is not queryable through this ability.', 'groundhogg' ) );
+		}
+
+		if ( $table === 'contacts' ) {
+			return new WP_Error(
+				'groundhogg_use_search_contacts',
+				__( 'The contacts table can\'t be queried with this ability - its filters aren\'t applied there. Use groundhogg/search-contacts instead (or groundhogg/query-table on "contactmeta" for custom field values).', 'groundhogg' )
+			);
 		}
 
 		$db = get_db( $table );
