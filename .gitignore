@@ -8,3 +8,4 @@
 /.php-cs-fixer.cache
 /.php-cs-fixer.dist.php
 /composer.lock
+/.phpunit.result.cache
