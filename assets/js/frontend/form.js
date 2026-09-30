@@ -39,17 +39,26 @@
   let formSubmitted = new CustomEvent('ghformsubmitted')
 
   const apiPostFormData = async (url, data, opts = {}) => {
-    const response = await fetch(url, {
+
+    const post = (headers = {}) => fetch(url, {
       method: 'POST',
       credentials: 'same-origin',
-      headers: {
-        'X-WP-Nonce': _wprest,
-      },
+      headers,
       body: data,
       ...opts,
+    }).then(r => r.json())
+
+    const result = await post({
+      'X-WP-Nonce': _wprest,
     })
 
-    return response.json()
+    // Full page caching can serve a page with an expired nonce, which WordPress rejects even for logged-out visitors.
+    // Form submissions are public, so retry as an unauthenticated request rather than losing the submission.
+    if (result.code === 'rest_cookie_invalid_nonce') {
+      return post()
+    }
+
+    return result
   }
 
   function inIframe () {

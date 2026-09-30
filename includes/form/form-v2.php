@@ -2300,6 +2300,13 @@ class Form_v2 extends Step {
 			return false;
 		}
 
+		// throttle before doing any real work
+		if ( $this->is_rate_limited() ) {
+			$this->add_error( 'rate_limited', __( 'Too many submissions. Please wait a few minutes and try again.', 'groundhogg' ) );
+
+			return false;
+		}
+
 		$posted_data = new Posted_Data();
 
 		// Ensure array and not stdClass
@@ -2469,6 +2476,60 @@ class Form_v2 extends Step {
 		}
 
 		return $contact;
+	}
+
+	/**
+	 * Records a submission attempt from the current IP and checks whether it has exceeded the limit for this form.
+	 * Uses a fixed window counter stored in a transient, so it is approximate when an object cache is not in use.
+	 *
+	 * @return bool
+	 */
+	public function is_rate_limited() {
+
+		// internal submissions are trusted
+		if ( current_user_can( 'add_contacts' ) ) {
+			return false;
+		}
+
+		/**
+		 * Filter the max number of submission attempts per IP address, per form, per window. 0 disables rate limiting.
+		 *
+		 * @param int       $limit
+		 * @param Form_v2   $form
+		 */
+		$limit = absint( apply_filters( 'groundhogg/form/v2/rate_limit', 20, $this ) );
+
+		/**
+		 * Filter the length of the rate limit window in seconds
+		 *
+		 * @param int       $window
+		 * @param Form_v2   $form
+		 */
+		$window = absint( apply_filters( 'groundhogg/form/v2/rate_limit_window', 10 * MINUTE_IN_SECONDS, $this ) );
+
+		$ip = get_current_ip_address();
+
+		// fail open if there's nothing reliable to key on
+		if ( ! $limit || ! $window || ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+			return false;
+		}
+
+		$key   = sprintf( 'gh_form_rl_%d_%s', $this->get_id(), md5( $ip ) );
+		$now   = time();
+		$state = get_transient( $key );
+
+		if ( ! is_array( $state ) || $state['expires'] <= $now ) {
+			$state = [
+				'count'   => 0,
+				'expires' => $now + $window,
+			];
+		}
+
+		$state['count'] ++;
+
+		set_transient( $key, $state, max( 1, $state['expires'] - $now ) );
+
+		return $state['count'] > $limit;
 	}
 
 	/**

@@ -62,6 +62,10 @@ class Forms_Api extends Base_Api {
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
+				// Intentionally public: anyone may submit a form, so there is no authenticated action to protect
+				// with a nonce or capability check. A nonce for logged-out visitors is identical for everyone and
+				// breaks on cached pages, so it wouldn't add protection. Abuse is handled in Form_v2::submit()
+				// via rate limiting, reCAPTCHA/Turnstile, and the spam/blacklist checks.
 				'permission_callback' => '__return_true',
 				'callback'            => [ $this, 'submit' ],
 			]
