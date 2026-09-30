@@ -587,7 +587,7 @@
             repeats_until,
             repeats_until_date,
             repeats_until_occurrences,
-            use_optimized_send_time,
+            use_optimized_send_time: false, // temporarily disabled, ignores any saved default
             ...args
           }).then(r => {
 
@@ -1045,7 +1045,8 @@
               }),
             }),
           ]) : null,
-          getState().when === 'later' && isEmailObject() ? RequiresPro(Div({
+          // Send time optimization is temporarily disabled
+          /*getState().when === 'later' && isEmailObject() ? RequiresPro(Div({
             className: 'display-flex gap-10 align-center',
           }, [
             `<label for="use-optimized-send-time"><p>${ __('Use send time optimization?', 'groundhogg') }</p></label>`,
@@ -1085,7 +1086,7 @@
           ]), {
             pillText: __('Advanced Feature', 'groundhogg'),
             toolTipText: __('This feature requires the Advanced <br>Features add-on to be installed.', 'groundhogg'),
-          } ) : null,
+          } ) : null,*/
           '<div><hr></div>',
           Div({
             className: 'display-flex gap-10 align-center',
@@ -1544,7 +1545,8 @@
       })
     })
 
-    Groundhogg.stores.options.fetch( [ 'gh_is_send_time_optimization_enabled' ] )
+    // Send time optimization is temporarily disabled
+    // Groundhogg.stores.options.fetch( [ 'gh_is_send_time_optimization_enabled' ] )
 
     return BroadcastScheduler()
   }
