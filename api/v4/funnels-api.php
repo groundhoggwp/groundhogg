@@ -9,6 +9,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Steps\Benchmarks\Form_Integration;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -225,24 +226,33 @@ class Funnels_Api extends Base_Object_Api {
 	}
 
 	/**
-	 * Get the field mapping data for a form integration step
+	 * Get the data a form integration step's settings need: the forms to choose from, or with a form_id, the
+	 * fields in that form to map to contact fields.
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request `type` the step type, `form_id` optional
+	 *
+	 * @return \WP_Error|\WP_REST_Response `forms` [ { id, text } ] without a form_id, otherwise `fields` [ { id, label } ]
 	 */
 	public function form_integration( \WP_REST_Request $request ) {
 
-		$type = $request->get_param( 'type' );
+		$type = sanitize_key( $request->get_param( 'type' ) );
 
-		$step = Plugin::instance()->step_manager->elements[ $type ];
+		$step = Plugin::instance()->step_manager->get_element( $type );
 
-		if ( ! method_exists( $step, 'get_forms_for_api' ) ) {
-			return self::ERROR_401();
+		if ( ! $step instanceof Form_Integration ) {
+			return self::ERROR_404( 'invalid_type', 'Not a form integration step type.' );
 		}
 
-		$forms = $step->get_forms_for_api();
+		$form_id = $request->get_param( 'form_id' );
+
+		if ( $form_id !== null && $form_id !== '' ) {
+			return self::SUCCESS_RESPONSE( [
+				'fields' => $step->get_fields_for_api( sanitize_text_field( $form_id ) ),
+			] );
+		}
 
 		return self::SUCCESS_RESPONSE( [
-			'forms' => $forms,
+			'forms' => $step->get_forms_for_api(),
 		] );
 	}
 

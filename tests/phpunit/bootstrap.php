@@ -60,6 +60,7 @@ function _load_framework_additions() {
 	require __DIR__ . '/framework/class-gh-unittest-id-generator.php';
 	require __DIR__ . '/framework/class-gh-unittest-time-generator.php';
 	require __DIR__ . '/framework/class-gh-unittestcase.php';
+	require __DIR__ . '/framework/class-gh-test-form-integration-step.php';
 }
 
 _load_framework_additions();

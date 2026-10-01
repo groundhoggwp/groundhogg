@@ -177,6 +177,13 @@ A step type is only buildable by `create-flow` / `edit-flow` / `get-flow` once i
 itself must already be registered with the step manager (`groundhogg/steps/init`). `extend()` refuses, with
 `_doing_it_wrong()`, a type that isn't, or one already supported.
 
+**Form integrations need nothing.** Every registered type that extends `Benchmarks\Form_Integration` (CF7, Gravity,
+WPForms...) is opted in by core after this action fires, with `form_id` and `field_map` settings, a resolver that
+checks the form, the field ids and the contact fields exist, and an exporter. Their forms and fields come from the
+class's `get_forms_for_select_2()`, `get_form_fields()` and `normalize_field()`, which callers list with
+`groundhogg/get-form-integration-fields`. An add-on that calls `extend()` for its own form integration first is left
+alone.
+
 ```php
 Step_Type_Schema::extend(
 	'my_type',
