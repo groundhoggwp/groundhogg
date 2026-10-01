@@ -3466,11 +3466,12 @@
 
   }
 
-  function areNumbersClose (num1, num2, tolerancePercent) {
-    const average = ( Math.abs(num1) + Math.abs(num2) ) / 2
-    const tolerance = ( tolerancePercent / 100 ) * average
-    return Math.abs(num1 - num2) <= tolerance
-  }
+  /**
+   * Whether two coordinates are within a few px of each other.
+   * Keep the tolerance absolute: a percentage of a viewport coordinate grows with the scroll
+   * position and swallows real offsets of 10px+, which straightens lines that should curve.
+   */
+  const areCoordsAligned = ( num1, num2, tolerancePx = 2 ) => Math.abs(num1 - num2) <= tolerancePx
 
   const getSortableEl = el => {
     if (el.matches('.sortable-item')) {
@@ -3707,7 +3708,7 @@
         line2.style.height = `${ lineHeight }px`
 
         // center
-        if (areNumbersClose(stepCenter, rowCenter, 1)) {
+        if (areCoordsAligned(stepCenter, rowCenter)) {
           line1.style.left = `calc(50% - ${ offset }px)`
           line1.style.width = 0
           line1.style.bottom = 0
@@ -3770,7 +3771,7 @@
         line4.style.height = `${ lineHeight }px`
 
         // center
-        if (areNumbersClose(stepCenter, rowCenter, 1)) {
+        if (areCoordsAligned(stepCenter, rowCenter)) {
           line3.style.left = `calc(50% - ${ offset }px)`
           line3.style.width = 0
           line3.style.top = 0
@@ -3824,7 +3825,7 @@
         }
 
         // center
-        if (areNumbersClose(branchCenter, stepCenter, 1)) {
+        if (areCoordsAligned(branchCenter, stepCenter)) {
           line.classList.add('middle')
           lineHeight = branchPos.top - stepPos.bottom
           line.style.left = 'calc(50% - 1px)'
@@ -3927,7 +3928,7 @@
         clearLineStyle(line2)
 
         // center
-        if (areNumbersClose(stepCenter, branchCenter, 1)) {
+        if (areCoordsAligned(stepCenter, branchCenter)) {
           line1.style.left = 'calc(50% - 1px)'
           line1.style.bottom = `-${ lineHeight * 2 }px`
           line1.style.height = `${ lineHeight * 2 }px`
@@ -4460,7 +4461,7 @@
       let toPos = to.getBoundingClientRect()
 
       // check if inline
-      if ( areNumbersClose( centerPointPos( from ), centerPointPos( to ), 1 ) ) {
+      if ( areCoordsAligned( centerPointPos( from ), centerPointPos( to ) ) ) {
 
         if ( fromPos.top < toPos.top ) {
           skipLine( from, to )
