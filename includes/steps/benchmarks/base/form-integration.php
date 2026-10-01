@@ -6,10 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Step;
 use function Groundhogg\after_form_submit_handler;
 use function Groundhogg\bold_it;
-use function Groundhogg\code_it;
 use function Groundhogg\generate_contact_with_map;
-use function Groundhogg\get_array_var;
-use function Groundhogg\get_mappable_fields;
 use function Groundhogg\html;
 use function Groundhogg\sanitize_field_map;
 
@@ -21,38 +18,31 @@ use function Groundhogg\sanitize_field_map;
  */
 abstract class Form_Integration extends Benchmark {
 
-	protected function settings_should_ignore_morph() {
-		return false;
-	}
-
 	public function get_sub_group() {
 		return 'forms';
 	}
 
 	/**
-	 * Output the settings for the step, dropdown of all available contact forms...
+	 * The form picker and the field map are drawn by the flow editor's JS, see registerFormIntegrationType() in
+	 * funnel-steps.js. Nothing here is named as a setting, so a save doesn't post stale values over the JS's.
 	 *
 	 * @param $step Step
 	 */
 	public function settings( $step ) {
-
 		html( 'p', [], esc_html__( 'Run when this form is submitted...', 'groundhogg' ) );
+		html( 'div', [ 'id' => $this->setting_id_prefix( 'form_integration' ) ] );
+	}
 
-		html( html()->select2( [
-			'id'       => $this->setting_id_prefix( 'form_id' ),
-			'name'     => $this->setting_name_prefix( 'form_id' ),
-			'data'     => $this->get_forms_for_select_2(),
-			'selected' => $this->get_setting( 'form_id' ),
-		] ) );
-
-		html( 'p', [], esc_html__( 'Then map the form fields to contact fields...', 'groundhogg' ) );
-
-		html( 'div', [
-			'class' => 'field-map-wrapper',
-			'id'    => $this->setting_id_prefix( 'field_map' )
-		], $this->field_map_table( $this->get_setting( 'form_id' ) ) );
-
-		html( 'p' );
+	/**
+	 * Tell the flow editor's JS that this step type picks a form and maps its fields.
+	 *
+	 * @return array
+	 */
+	#[\ReturnTypeWillChange]
+	public function jsonSerialize() {
+		return array_merge( parent::jsonSerialize(), [
+			'form_integration' => true,
+		] );
 	}
 
 	/**
@@ -82,59 +72,58 @@ abstract class Form_Integration extends Benchmark {
 	abstract protected function normalize_field( $key, $field );
 
 	/**
-	 * @param $form_id
+	 * The forms to choose from, for the flow editor's form picker.
 	 *
-	 * @return string
+	 * @return array[] [ { id, text } ]
 	 */
-	protected function field_map_table( $form_id ) {
+	public function get_forms_for_api() {
 
-		$field_map = $this->get_setting( 'field_map' );
-		$fields    = $this->get_form_fields( $form_id );
+		$forms = [];
 
-		if ( ! $fields ) {
-			return esc_html__( 'Please select a valid form and update first.', 'groundhogg' );
+		foreach ( (array) $this->get_forms_for_select_2() as $id => $label ) {
+			$forms[] = [
+				'id'   => (string) $id,
+				'text' => html_entity_decode( wp_strip_all_tags( (string) $label ), ENT_QUOTES ),
+			];
 		}
 
-		$rows = [];
+		return $forms;
+	}
 
-		foreach ( $fields as $key => $field ) {
+	/**
+	 * The fields of a form that can be mapped, for the flow editor's field map.
+	 *
+	 * @param $form_id
+	 *
+	 * @return array[] [ { id, label } ] where id is the key of the field in the posted data
+	 */
+	public function get_fields_for_api( $form_id ) {
+
+		$fields = [];
+
+		foreach ( (array) $this->get_form_fields( $form_id ) as $key => $field ) {
 
 			$row = $this->normalize_field( $key, $field );
 
 			// If there is no row Id we cannot serve the field
-			if ( ! $row['id'] ) {
+			if ( empty( $row['id'] ) ) {
 				continue;
 			}
 
-			$rows[] = [
-				code_it( $row['id'] ),
-				$row['label'],
-				html()->dropdown( [
-					'option_none' => '-----',
-					'class'       => 'no-morph',
-					'options'     => get_mappable_fields(),
-					'selected'    => get_array_var( $field_map, $row['id'] ),
-					'name'        => $this->setting_name_prefix( 'field_map' ) . sprintf( '[%s]', $row['id'] ),
-				] )
-			];
+			$id = (string) $row['id'];
 
+			// two fields with the same id are the same value in the posted data, so only the first can be mapped
+			if ( isset( $fields[ $id ] ) ) {
+				continue;
+			}
+
+			$fields[ $id ] = [
+				'id'    => $id,
+				'label' => html_entity_decode( wp_strip_all_tags( (string) ( $row['label'] ?? $id ) ), ENT_QUOTES ),
+			];
 		}
 
-		ob_start();
-
-		html()->list_table(
-			[
-				'class' => 'field-map'
-			],
-			[
-				esc_html__( 'Field ID', 'groundhogg' ),
-				esc_html__( 'Field Label', 'groundhogg' ),
-				esc_html__( 'Map To', 'groundhogg' ),
-			],
-			$rows, false
-		);
-
-		return ob_get_clean();
+		return array_values( $fields );
 	}
 
 	public function validate_settings( Step $step ) {

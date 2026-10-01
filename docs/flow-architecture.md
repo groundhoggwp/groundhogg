@@ -930,6 +930,21 @@ JS title, `saveSettings()` copies the panel's pending fields into the step's set
 Left to the server: `account_created` (role names), `optin_status_changed` (preference names), and the types
 without a generated title.
 
+**Form integrations** (the add-ons that extend `Benchmarks\Form_Integration`: CF7, Gravity, Ninja, Forminator,
+Formidable, Fluent Forms, WPForms, WeForms) are drawn by one handler, `registerFormIntegrationType()` in
+`funnel-steps.js`, for every type whose `rawStepTypes` entry has `form_integration: true`
+(`Form_Integration::jsonSerialize()`), so the add-ons need nothing. It's a form picker, then a table of the form's
+fields with a `MappingPicker` each (`Groundhogg.components.MappingPicker`, reusable: it picks one of
+`Groundhogg.fields.mappable`). The forms and fields come from `GET /funnels/form-integration?type=` (the forms, as
+`{ id, text }`) and `?type=&form_id=` (the fields, as `{ id, label }`), which call the public
+`get_forms_for_api()` and `get_fields_for_api( $form_id )` on the base class. Those wrap each add-on's own
+`get_forms_for_select_2()`, `get_form_fields()` and `normalize_field()`, so those stay the add-on's contract and are
+called with no current step. The answers are cached until the page reloads. Changing the form keeps only the
+mappings whose field is also in the new form; mappings that aren't in the selected form show as "Not in this form" so
+they can be cleared. `validate()` mirrors `validate_settings()`. There's no JS title, the server's
+`generate_step_title()` wins once saved. The base `settings()` prints a placeholder with nothing named, and
+`settings_should_ignore_morph()` is the default (true).
+
 The premium branching types (`split_path`, `weighted_distribution`, `split_test`) register `branches()` in core,
 because their branches are defined by the premium base classes Pro's classes extend, so the canvas shows branches
 added, renamed, or removed in Pro's branch editors right away. `StepTitles.branches` is checked against their
@@ -1074,7 +1089,7 @@ named checkboxes, so every save posts them. After undo/redo (`forcePanels`) ever
   - **true** (default): the panel of the step being edited isn't re-rendered by quiet saves. Use this when
     JS owns the UI.
   - **false**: the PHP output must refresh after each autosave (e.g. `admin_notification`,
-    `form-integration`, `evergreen_sequence`, several Pro types).
+    `evergreen_sequence`, several Pro types).
 - `.editing` is on both `#step-<ID>` and `#settings-<ID>` for the open step.
 
 **Logic lines:**
@@ -1144,6 +1159,7 @@ is an `Ability` subclass with `NAME`, `CAPABILITY` and annotations. `WP_Ability:
 |---|---|
 | `list-flows` | list/search; `expand: [ 'steps' ]` gives a flat step list |
 | `list-step-types` | step types, `buildable` flag, per-type `settings_schema`, `branch_keys` |
+| `get-form-integration-fields` | the forms of a form integration step type, and with `form_id` its fields and the contact fields they map to |
 | `create-flow` | builds a new **inactive** flow from a step tree, all or nothing (deletes the flow on failure) |
 | `get-flow` | one flow as a tree in create-flow's shape (below) |
 | `edit-flow` | add/update/move/delete operations, all or nothing (below) |
@@ -1188,6 +1204,13 @@ is an `Ability` subclass with `NAME`, `CAPABILITY` and annotations. `WP_Ability:
     and optionally `'deferred_settings'`;
   - `$exporter`: `callable( array $settings, Step $step ): array`. It gets the meta narrowed to the schema's
     keys. Omit it if the stored meta is already in the settings shape.
+- **Form integrations are opted in by core**, `Step_Type_Schema::extend_form_integrations()`, which
+  `Abilities::register_schemas()` runs after the `register_step_types` action, for every registered
+  `Form_Integration` type that isn't already supported. Settings: `form_id` (required) and `field_map` (form field
+  id → contact field). The resolver refuses a form that doesn't exist, field ids that aren't in the form, and values
+  that aren't mappable contact fields; `edit-flow` merges settings shallowly, so changing `form_id` means sending the
+  `field_map` again. The ability `get-form-integration-fields` (`step_type`, optional `form_id`) lists the forms, and
+  the form's fields and the mappable contact fields.
 - **Pro's opt-ins** (groundhogg-pro `Abilities\Step_Types`, registered on `groundhogg/steps/init` priority
   20, to be moved to `groundhogg/abilities/register_step_types`): its actions and benchmarks, plus `split_path`, `split_test`, `weighted_distribution` and
   `evergreen_sequence`.
@@ -1334,7 +1357,8 @@ These are enforced by `class-abilities-schema-tests.php`:
     active). Not used by the editor.
   - `POST /funnels/{id}/start` (`start_flows`): add one contact (`edit_contact`) or a query (sync with a
     `limit`, else a background task, optionally scheduled); `step_id` defaults to the first action.
-  - `GET /funnels/form-integration?type=`.
+  - `GET /funnels/form-integration?type=` (the forms of a `Form_Integration` step type, 404 for any other type)
+    and `?type=&form_id=` (that form's mappable fields).
   - `update_single` also syncs `campaigns`.
 - **`gh/v4/steps`**: CRUD, plus `POST /steps/html`, which renders `html_v2()` for a `Temp_Step`.
 - **Permissions**: `view_funnels` / `export_funnels` / template site for reading, `edit_funnels`,

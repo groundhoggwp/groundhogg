@@ -15,7 +15,13 @@
     icons,
     moreMenu,
     dangerConfirmationModal,
+    escHTML,
   } = Groundhogg.element
+
+  const {
+    get,
+    routes,
+  } = Groundhogg.api
 
   const { createFilters } = Groundhogg.filters.functions
   const {
@@ -49,7 +55,13 @@
     Input,
     Select,
     Label,
-    Skeleton
+    Skeleton,
+    Table,
+    THead,
+    TBody,
+    Tr,
+    Th,
+    Td,
   } = MakeEl
 
   const {
@@ -1581,6 +1593,293 @@
     title: ({ meta }) => StepTitles[type](meta, titleNames),
   }))
 
+  // the fields a value can be mapped to, in their groups
+  const mappableOptions = () => Object.entries(Groundhogg.fields.mappable).map(([group, fields]) => ( {
+    text   : group,
+    options: Object.entries(fields).map(([id, text]) => ( {
+      id,
+      text        : escHTML(text),
+      // labels like "Line 1" need their group to make sense once they're chosen
+      selectedText: `${ escHTML(group) }: ${ escHTML(text) }`,
+    } )),
+  } ))
+
+  // finds a mappable field by its name in any group
+  const mappableField = key => mappableOptions().flatMap(({ options }) => options).find(({ id }) => id === key)
+
+  /**
+   * Picks the contact field something is mapped to
+   *
+   * @param id string
+   * @param selected string the contact field it's mapped to, if it is
+   * @param onChange function called with the contact field, or an empty string when it's not mapped
+   */
+  const MappingPicker = ({
+    id,
+    selected = '',
+    onChange,
+  }) => ItemPicker({
+    id,
+    multiple    : false,
+    noneSelected: __('Do not map', 'groundhogg'),
+    selected    : mappableField(selected) ?? [],
+    fetchOptions: async search => mappableOptions().map(({
+      text,
+      options,
+    }) => ( {
+      text,
+      options: options.filter(option => option.text.toLowerCase().includes(escHTML(search).toLowerCase())),
+    } )).filter(({ options }) => options.length),
+    onChange    : item => onChange(item ? item.id : ''),
+  })
+
+  // what the server says about a form integration's forms and fields is the same until the page is reloaded
+  const formIntegrationRequests = {}
+
+  /**
+   * Ask the server for the forms a form integration step type can pick, or the fields of one of them. Asking again
+   * gives the same request, which is loaded once it has an answer.
+   *
+   * @param type string the step type
+   * @param formId number|undefined a form to get the fields of, otherwise the forms are
+   * @return {{loaded: boolean, value: Array, promise: Promise}}
+   */
+  const formIntegrationData = (type, formId) => {
+
+    const key = formId ? `${ type }:${ formId }` : type
+
+    if (!formIntegrationRequests[key]) {
+
+      const request = {
+        loaded : false,
+        value  : [],
+        promise: null,
+      }
+
+      request.promise = get(`${ routes.v4.funnels }/form-integration`, formId ? {
+        type,
+        form_id: formId,
+      } : { type }).then(r => {
+        request.loaded = true
+        request.value = ( formId ? r.fields : r.forms ) ?? []
+        return request.value
+      }).catch(err => {
+        // so it's asked again
+        delete formIntegrationRequests[key]
+        throw err
+      })
+
+      formIntegrationRequests[key] = request
+    }
+
+    return formIntegrationRequests[key]
+  }
+
+  // the field map is an empty array, not an object, when it's empty
+  const fieldMapOf = map => map && typeof map === 'object' && !Array.isArray(map) ? { ...map } : {}
+
+  /**
+   * A form integration step type picks the form it runs for, then maps the form's fields to contact fields. Which
+   * types are form integrations comes from the server, see Form_Integration::jsonSerialize()
+   *
+   * @param type string
+   */
+  const registerFormIntegrationType = type => Funnel.registerStepType(type, {
+    defaults: {
+      form_id  : 0,
+      field_map: {},
+    },
+    // the same warnings the server adds to the step, see Form_Integration::validate_settings()
+    validate: ({ meta }) => {
+
+      const mapped = Object.values(fieldMapOf(meta.field_map))
+
+      if (!mapped.length) {
+        return [
+          {
+            code   : 'invalid_field_map',
+            message: __('Map your form fields to capture submissions.', 'groundhogg'),
+          },
+        ]
+      }
+
+      if (!mapped.includes('email')) {
+        return [
+          {
+            code   : 'missing_email_field',
+            message: __('There is no email address field mapped, submissions may not be captured correctly.', 'groundhogg'),
+          },
+        ]
+      }
+
+      return []
+    },
+    settings: ({
+      ID,
+      meta,
+    }, update) => {
+
+      let form_id = parseInt(meta.form_id) || 0
+      const field_map = fieldMapOf(meta.field_map)
+      let error = ''
+      let waiting = false
+
+      return Div({
+        id       : `step_${ ID }_form_integration`,
+        className: 'display-flex column gap-10',
+      }, morph => {
+
+        if (error) {
+          return Fragment([
+            Pg({}, error),
+            Button({
+              className: 'gh-button secondary',
+              onClick  : () => {
+                error = ''
+                morph()
+              },
+            }, __('Try again', 'groundhogg')),
+          ])
+        }
+
+        const formsRequest = formIntegrationData(type)
+        const fieldsRequest = form_id ? formIntegrationData(type, form_id) : null
+        const pending = [formsRequest, fieldsRequest].filter(request => request && !request.loaded)
+
+        if (pending.length) {
+
+          if (!waiting) {
+            waiting = true
+            Promise.all(pending.map(request => request.promise)).then(() => {
+              waiting = false
+              morph()
+            }).catch(err => {
+              waiting = false
+              error = err.message || __('The forms could not be loaded.', 'groundhogg')
+              morph()
+            })
+          }
+
+          return Skeleton({}, ['full'])
+        }
+
+        const forms = formsRequest.value
+        const fields = fieldsRequest ? fieldsRequest.value : []
+        const form = forms.find(({ id }) => id == form_id)
+
+        // what's mapped, that isn't in the form, so it can be cleared
+        const unknown = Object.keys(field_map).filter(key => !fields.some(({ id }) => id === key))
+
+        const rows = [
+          ...fields,
+          ...unknown.map(key => ( {
+            id   : key,
+            label: __('Not in this form', 'groundhogg'),
+          } )),
+        ]
+
+        return Fragment([
+          Pg({}, __('Run when this form is submitted...', 'groundhogg')),
+          ItemPicker({
+            id          : `step_${ ID }_form_id`,
+            noneSelected: __('Select a form...', 'groundhogg'),
+            placeholder : __('Search forms...', 'groundhogg'),
+            multiple    : false,
+            selected    : form_id ? {
+              id  : form_id,
+              text: escHTML(form ? form.text : sprintf(__('Form %d (not found)', 'groundhogg'), form_id)),
+            } : [],
+            fetchOptions: async search => forms.filter(({ text }) => text.toLowerCase().includes(search.toLowerCase())).map(({
+              id,
+              text,
+            }) => ( {
+              id,
+              text: escHTML(text),
+            } )),
+            onChange    : item => {
+
+              const id = item ? parseInt(item.id) : 0
+
+              if (id === form_id) {
+                return
+              }
+
+              form_id = id
+
+              if (!form_id) {
+                Object.keys(field_map).forEach(key => delete field_map[key])
+                update({
+                  form_id,
+                  field_map: { ...field_map },
+                })
+                morph()
+                return
+              }
+
+              update({ form_id })
+
+              // the fields of the form it was don't apply to this one, but the ones that are in both still do
+              formIntegrationData(type, id).promise.then(newFields => {
+
+                if (form_id !== id) {
+                  return
+                }
+
+                Object.keys(field_map).filter(key => !newFields.some(field => field.id === key)).forEach(key => delete field_map[key])
+                update({ field_map: { ...field_map } })
+                morph()
+              }).catch(() => {})
+
+              morph()
+            },
+          }),
+          Pg({}, __('Then map the form fields to contact fields...', 'groundhogg')),
+          rows.length ? Table({
+            id       : `step_${ ID }_field_map`,
+            className: 'field-map widefat striped',
+            style    : {
+              tableLayout: 'fixed',
+              width      : '100%',
+            },
+          }, [
+            THead({}, Tr({}, [
+              Th({ style: { width: '30%' } }, __('Field ID', 'groundhogg')),
+              Th({ style: { width: '30%' } }, __('Field Label', 'groundhogg')),
+              Th({ style: { width: '40%' } }, __('Map To', 'groundhogg')),
+            ])),
+            TBody({}, rows.map(({
+              id,
+              label,
+            }) => Tr({}, [
+              Td({ style: { verticalAlign: 'top' } }, `<code style="word-break:break-all">${ escHTML(id) }</code>`),
+              Td({ style: { verticalAlign: 'top' } }, escHTML(label)),
+              Td({ style: { verticalAlign: 'top' } }, MappingPicker({
+                id      : `step_${ ID }_map_${ id }`,
+                selected: field_map[id] ?? '',
+                onChange: field => {
+
+                  if (field) {
+                    field_map[id] = field
+                  }
+                  else {
+                    delete field_map[id]
+                  }
+
+                  update({ field_map: { ...field_map } })
+                },
+              })),
+            ]))),
+          ]) : Pg({}, form_id ? __('This form has no fields that can be mapped.', 'groundhogg') : __('Select a form to map its fields.', 'groundhogg')),
+        ])
+      })
+    },
+  })
+
+  Object.values(Groundhogg.rawStepTypes).
+    filter(({ form_integration }) => form_integration).
+    forEach(({ type }) => registerFormIntegrationType(type))
+
   Groundhogg.components.TagPicker = TagPicker
+  Groundhogg.components.MappingPicker = MappingPicker
 
 } )(jQuery)

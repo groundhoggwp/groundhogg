@@ -230,7 +230,7 @@ the scan matches patterns and doesn't prove anything works. Every add-on also ge
 | **groundhogg-birthday** | Cron queries steps with `step_status => active`; legacy `save()` | Fine; verify the step saves. |
 | **groundhogg-zapier** | Legacy `save()` with `get_posted_data()`; its `get_request_var()` is in a separate test ajax action | Expected to work; verify. |
 | **affwp, contracts, facebook-conversions-api, formidable, givewp, gravity, helpscout, rsp, thrivecart, wpforms** | Legacy `save( $step )` using `get_posted_data()`; no `$_POST` reads found | Expected to work as is; port the `save()` methods to `get_settings_schema()`. |
-| **cf7, fluent-forms, forminator, ninja, weforms, wp-simple-pay, appointments** | No risky patterns found | Verify each step type saves. |
+| **cf7, fluent-forms, forminator, ninja, weforms, wp-simple-pay, appointments** | No risky patterns found | Verify each step type saves. For the form integrations (all but wp-simple-pay and appointments), core's JS now draws the form picker and field map for every type extending `Form_Integration`, so they need no change. Keep `get_forms_for_select_2()`, `get_form_fields()` and `normalize_field()`, which the editor calls with no current step and so can't read the step's settings. |
 | **bookings, learndash, lifterlms, memberpress, presto-player, sheets, traffic-filter** | They register steps, but the scan didn't match their step classes | Audit by hand with the checklist. |
 
 ---
