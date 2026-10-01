@@ -400,8 +400,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * ADDED Flow abilities for AI assistants.
  * "Get Flow", "Edit Flow", "Publish Flow Changes" and "Discard Flow Changes" abilities, so an AI assistant can read an existing flow and add, change, move, duplicate, lock or delete its steps. Changes to an active flow are staged until they're published, the same as in the flow editor.
  * Segments used by the abilities can target contacts by behavior: email opens and clicks, page visits, form submissions, flow conversions, and other activity. They can also exclude another segment, and contact searches link to the matching contacts in the Contacts page.
+ * The simulate abilities can run against a flow's unpublished changes, so a change can be tested before it's published.
 * ADDED When you publish changes to a flow or activate it, you choose what happens to contacts waiting at steps you deleted: cancel their events, or move them to another step. Before, they were silently removed from the flow. Deleted steps that contacts have already been through are archived, so their history and reports still work.
 * TWEAKED The flow editor has been rebuilt to be much faster. Adding, moving, deleting and changing steps shows right away and saves in the background, and undo and redo now cover step settings, duplicated steps and pasted steps too.
+* TWEAKED If a flow or an email is changed from somewhere else while you have it open in the editor, the editor tells you and offers to reload.
+* TWEAKED Public form submissions are limited to 20 per form, per IP address, every 10 minutes. People who can add contacts aren't limited.
+* TWEAKED The send time optimization option is hidden in the broadcast scheduler for now.
  * Only one person can edit a flow at a time, so two people can't overwrite each other's changes. The flow is unlocked as soon as its editor is closed.
  * Duplicating a step with branches, like a Yes/No, copies the steps in its branches too, and steps copied from one flow can be pasted into another.
  * Steps that other steps rely on, like the step a Reroute goes to or the step another flow's "Add to Flow" starts at, can't be deleted until those steps are changed.
@@ -425,11 +429,15 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  * The Publish Changes button stayed off when the only change to a flow was deleting steps, and deactivating a flow brought back steps deleted while it was inactive.
  * The flow simulator stayed stuck loading when the contact it last simulated with had been deleted. Now it asks you to select a contact.
  * The REST API's commit route for flows always returned an error, and importing a flow could interfere with flows imported before it.
+ * Branch, trigger and jump lines that should curve were drawn straight when the editor was scrolled.
 * FIXED Contact searches and counts could show out-of-date results right after a tag, activity or custom field changed, and a search combining two flow activity filters ignored the step and date range of the second one.
 * FIXED Email tracking and contact identification.
  * The open tracking pixel was missing from HTML emails that weren't a full HTML document.
  * Contacts that arrived from a link in a tracked email weren't recognized as who they are, so merge tags like {user.*} were blocked for them.
 * FIXED Activating a license from the guided setup or the troubleshooter failed, and the old guided setup never saved its privacy and sender settings.
+* FIXED Forms on pages served by a full page cache could fail to submit because of an out of date nonce.
+* FIXED Triggers that pass a WooCommerce order to a flow logged an "Order properties should not be accessed directly" notice on every paid order.
+* FIXED The query table ability returned every contact, with the wrong total, when it was given filters. It now points to the search contacts ability instead.
 * SECURITY Access and verification hardening.
  * An account could get administrator access by posing as the Groundhogg support user when an admin turned on support access.
  * Contacts created by a form submission are no longer treated as verified visitors, since anyone can submit a form.
@@ -441,6 +449,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  * Queries take a `cache` var, `false` to skip the cache or a number of seconds that results can be stale for, and the `groundhogg/query/table_cache_group` filter lets queries on other plugins' tables be cached. `Table_Query::where()` and `Where::subWhere()` accept a callback.
  * The activity table has two new indexes, `type_time_contact_idx` (activity_type, timestamp, contact_id) and `contact_time_idx` (contact_id, timestamp, activity_type, email_id, step_id), which replaces `contact_idx`. New `DB::index_exists()`, `DB::add_index_online()` and `DB::is_being_altered()` methods.
 * DEV New `groundhogg/email/reply_to_messages` and `groundhogg/inbox/address_prefix` filters, and `gh/v4/messages/unread` and `gh/v4/messages/read` REST endpoints.
+* DEV Add-ons register their abilities on ordered actions: `groundhogg/abilities/register_schema_extensions`, `groundhogg/abilities/register_step_types`, `groundhogg/abilities/register_categories` and `groundhogg/abilities/register_abilities`, so step types see the schema extensions of every add-on. See docs/abilities-registration.md.
+* DEV New `groundhogg/form/v2/rate_limit` and `groundhogg/form/v2/rate_limit_window` filters for the form submission limit, `0` turns it off.
 * DEV The `Legacy_Contact_Query` class, deprecated since 3.2, has been removed.
 
 = 4.8.3 (2026-09-18) =
