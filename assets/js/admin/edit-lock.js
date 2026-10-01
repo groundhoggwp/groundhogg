@@ -93,6 +93,7 @@
   const currentVersion = () => typeof GhLockData.getVersion === 'function' ? GhLockData.getVersion() : GhLockData.version
 
   let changedShown = false
+  let hasBaseline = false
 
   /**
    * Says that something else changed the object while it's open, like an ability, see maybe_refresh_lock()
@@ -140,6 +141,10 @@
     const { lock_error = null } = GhLockData
 
     if ( ! lock_error ){
+      // the version to compare with, see maybeShowChanged()
+      if ( GhLockData.version !== undefined ) {
+        window.wp.heartbeat.connectNow()
+      }
       return
     }
 
@@ -227,8 +232,10 @@
 
     const known = currentVersion()
 
-    // after a save of its own, the server's version is the page's
-    if ( !known ) {
+    // after a save of its own, the server's version is the page's. So is the first heartbeat's, unless an editor keeps
+    // the version up to date itself: the one printed with the page can differ, like for the email editor's email
+    if ( !known || ( !hasBaseline && typeof GhLockData.getVersion !== 'function' ) ) {
+      hasBaseline = true
       GhLockData.version = version
       return
     }
