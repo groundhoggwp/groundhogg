@@ -73,3 +73,33 @@ test('branch steps are ordered by step_order', () => {
 
   assert.deepEqual(FlowStore.branchSteps(steps, 'main').map(step => step.ID), [2, 3, 1])
 })
+
+// the title a card shows while a change to its step is being saved
+
+const titled = ({ meta }) => `Apply <b>${ meta.tags.length }</b> tags`
+const tagStep = { ID: 5, meta: { tags: [1, 2] } }
+
+test('a step titled from its settings previews its JS title', () => {
+  assert.equal(FlowStore.previewTitle({ title: titled, step: tagStep }), 'Apply <b>2</b> tags')
+})
+
+test('an empty JS title keeps the title the card has', () => {
+  assert.equal(FlowStore.previewTitle({ title: () => '', step: tagStep }), undefined)
+  assert.equal(FlowStore.previewTitle({ step: tagStep }), undefined)
+})
+
+test('a named step previews the name in its internal name field, not a generated title', () => {
+  assert.equal(FlowStore.previewTitle({ title: titled, step: tagStep, customNames: true, internalName: ' Tag the VIPs ' }), 'Tag the VIPs')
+})
+
+test('the internal name is shown as text', () => {
+  assert.equal(FlowStore.previewTitle({ step: tagStep, internalName: 'Tags <script>x</script> & more' }), 'Tags &lt;script&gt;x&lt;/script&gt; &amp; more')
+})
+
+test('an empty internal name keeps the title the card has', () => {
+  assert.equal(FlowStore.previewTitle({ title: titled, step: tagStep, customNames: true, internalName: '  ' }), undefined)
+})
+
+test('with custom names a step without a panel yet, like a new one, keeps the title the card has', () => {
+  assert.equal(FlowStore.previewTitle({ title: titled, step: tagStep, customNames: true }), undefined)
+})
