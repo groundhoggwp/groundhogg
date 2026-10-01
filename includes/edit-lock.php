@@ -231,13 +231,16 @@ function maybe_refresh_lock( array $response, array $data, $screen_id ) {
  */
 function get_edit_version( Base_Object_With_Meta $object ) {
 
-	$meta = array_filter( $object->get_meta(), function ( $key ) {
+	// as stored, the object may have more, like empty values for meta it asked for that isn't set
+	$stored = create_object_from_type( $object->get_id(), $object->_get_object_type() ) ?: $object;
+
+	$meta = array_filter( $stored->get_meta(), function ( $key ) {
 		return ! str_starts_with( (string) $key, '_' );
 	}, ARRAY_FILTER_USE_KEY );
 
 	ksort( $meta );
 
-	$version = md5( wp_json_encode( [ $object->get_data(), $meta ] ) );
+	$version = md5( wp_json_encode( [ $stored->get_data(), $meta ] ) );
 
 	/**
 	 * The version of an object being edited, see get_edit_version()

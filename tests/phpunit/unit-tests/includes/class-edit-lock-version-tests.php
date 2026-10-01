@@ -52,6 +52,22 @@ class Edit_Lock_Version_Tests extends GH_UnitTestCase {
 		$this->assertNotEquals( $version, get_edit_version( new Email( $email->get_id() ) ) );
 	}
 
+	public function test_an_emails_version_is_the_same_however_it_was_loaded() {
+
+		$email = new Email( [ 'title' => 'Loaded', 'subject' => 'Hello' ] );
+
+		// the editor page asks for settings the email doesn't have, which the object keeps as empty values
+		$page = new Email( $email->get_id() );
+		$page->get_meta( 'not_set' );
+		$page->enable_test_mode();
+
+		$this->assertEquals( get_edit_version( new Email( $email->get_id() ) ), get_edit_version( $page ) );
+
+		// what the heartbeat gets
+		$sent = $this->heartbeat( $email, 'old' );
+		$this->assertEquals( get_edit_version( $page ), $sent['version'] );
+	}
+
 	public function test_a_flows_version_is_its_draft_revision() {
 
 		$funnel = new Funnel( [ 'title' => 'Version', 'status' => 'active' ] );
