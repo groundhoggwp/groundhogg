@@ -930,6 +930,21 @@ JS title, `saveSettings()` copies the panel's pending fields into the step's set
 Left to the server: `account_created` (role names), `optin_status_changed` (preference names), and the types
 without a generated title.
 
+**Form integrations** (the add-ons that extend `Benchmarks\Form_Integration`: CF7, Gravity, Ninja, Forminator,
+Formidable, Fluent Forms, WPForms, WeForms) are drawn by one handler, `registerFormIntegrationType()` in
+`funnel-steps.js`, for every type whose `rawStepTypes` entry has `form_integration: true`
+(`Form_Integration::jsonSerialize()`), so the add-ons need nothing. It's a form picker, then a table of the form's
+fields with a `MappingPicker` each (`Groundhogg.components.MappingPicker`, reusable: it picks one of
+`Groundhogg.fields.mappable`). The forms and fields come from `GET /funnels/form-integration?type=` (the forms, as
+`{ id, text }`) and `?type=&form_id=` (the fields, as `{ id, label }`), which call the public
+`get_forms_for_api()` and `get_fields_for_api( $form_id )` on the base class. Those wrap each add-on's own
+`get_forms_for_select_2()`, `get_form_fields()` and `normalize_field()`, so those stay the add-on's contract and are
+called with no current step. The answers are cached until the page reloads. Changing the form keeps only the
+mappings whose field is also in the new form; mappings that aren't in the selected form show as "Not in this form" so
+they can be cleared. `validate()` mirrors `validate_settings()`. There's no JS title, the server's
+`generate_step_title()` wins once saved. The base `settings()` prints a placeholder with nothing named, and
+`settings_should_ignore_morph()` is the default (true).
+
 The premium branching types (`split_path`, `weighted_distribution`, `split_test`) register `branches()` in core,
 because their branches are defined by the premium base classes Pro's classes extend, so the canvas shows branches
 added, renamed, or removed in Pro's branch editors right away. `StepTitles.branches` is checked against their
@@ -1074,7 +1089,7 @@ named checkboxes, so every save posts them. After undo/redo (`forcePanels`) ever
   - **true** (default): the panel of the step being edited isn't re-rendered by quiet saves. Use this when
     JS owns the UI.
   - **false**: the PHP output must refresh after each autosave (e.g. `admin_notification`,
-    `form-integration`, `evergreen_sequence`, several Pro types).
+    `evergreen_sequence`, several Pro types).
 - `.editing` is on both `#step-<ID>` and `#settings-<ID>` for the open step.
 
 **Logic lines:**
@@ -1334,7 +1349,8 @@ These are enforced by `class-abilities-schema-tests.php`:
     active). Not used by the editor.
   - `POST /funnels/{id}/start` (`start_flows`): add one contact (`edit_contact`) or a query (sync with a
     `limit`, else a background task, optionally scheduled); `step_id` defaults to the first action.
-  - `GET /funnels/form-integration?type=`.
+  - `GET /funnels/form-integration?type=` (the forms of a `Form_Integration` step type, 404 for any other type)
+    and `?type=&form_id=` (that form's mappable fields).
   - `update_single` also syncs `campaigns`.
 - **`gh/v4/steps`**: CRUD, plus `POST /steps/html`, which renders `html_v2()` for a `Temp_Step`.
 - **Permissions**: `view_funnels` / `export_funnels` / template site for reading, `edit_funnels`,
