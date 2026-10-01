@@ -932,19 +932,20 @@
        */
       previewOf (step) {
 
-        const handler = this.stepTypes[step.data.step_type]
-
-        if (!handler || !( FlowStore.isTempId(step.ID) || this.hasPendingSettings(step.ID) )) {
+        if (!( FlowStore.isTempId(step.ID) || this.hasPendingSettings(step.ID) )) {
           return null
         }
 
+        const handler = this.stepTypes[step.data.step_type] ?? {}
         const preview = {}
 
         try {
-          if (handler.title) {
-            // an empty title isn't used, like on the server
-            preview.title = handler.title(step) || undefined
-          }
+          preview.title = FlowStore.previewTitle({
+            title       : handler.title,
+            step,
+            customNames : this.customStepNames(),
+            internalName: this.internalNameOf(step.ID),
+          })
           if (handler.validate) {
             preview.errors = handler.validate(step)
           }
@@ -957,6 +958,26 @@
         }
 
         return preview
+      },
+
+      /**
+       * Whether steps are named rather than titled from their settings, see force_custom_step_names()
+       *
+       * @return bool
+       */
+      customStepNames () {
+        return document.querySelector('.step-settings')?.classList.contains('custom-step-names') ?? false
+      },
+
+      /**
+       * What's in a step's "internal name" field, which its panel has when it's named rather than titled from its
+       * settings, see Funnel_Step::get_settings_island()
+       *
+       * @param stepId
+       * @return string|undefined
+       */
+      internalNameOf (stepId) {
+        return document.querySelector(`#settings-${ stepId } [name="steps[${ stepId }][step_title]"]`)?.value
       },
 
       /**
@@ -1418,10 +1439,11 @@
         clearTimeout(pending.timer)
         pending.timer = setTimeout(() => this.flushSettings(step.ID), 400)
 
-        // what the step type's JS shows for the settings in its panel, until the server's are back, see previewOf()
+        // what the step type's JS shows for the settings in its panel, or its internal name, until the server's are
+        // back, see previewOf()
         const handler = this.stepTypes[step.data.step_type]
 
-        if (handler?.title || handler?.validate || handler?.branches) {
+        if (handler?.title || handler?.validate || handler?.branches || this.internalNameOf(step.ID) !== undefined) {
 
           const panel = document.getElementById(`settings-${ step.ID }`)
 

@@ -933,7 +933,7 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 
 					// instead of having it as part of the step container, just show it as an input field...
 					if ( force_custom_step_names() || $this->generate_step_title( $step ) === false ) {
-						html( 'p', [], 'Give this step an internal name...' );
+						html( 'p', [], esc_html__( 'Give this step an internal name...', 'groundhogg' ) );
 						html( html()->input( [
 							'name'  => $this->setting_name_prefix( 'step_title' ),
 							'value' => $step->step_title

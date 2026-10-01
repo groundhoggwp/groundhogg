@@ -307,6 +307,45 @@
     }
   }
 
+  // like esc_html()
+  const escHTML = text => String(text).
+    replace(/&/g, '&amp;').
+    replace(/</g, '&lt;').
+    replace(/>/g, '&gt;').
+    replace(/"/g, '&quot;').
+    replace(/'/g, '&#039;')
+
+  /**
+   * The title a step's card shows while a change to it is being saved, see previewOf() in funnel-editor.js
+   *
+   * A step that's named rather than titled from its settings, when force_custom_step_names() or its type has no
+   * generated title, shows the name in its panel's "internal name" field, and never a generated title.
+   *
+   * @param title function( step ) the step type's JS title, if it has one
+   * @param step Object
+   * @param customNames bool whether steps are named rather than titled from their settings
+   * @param internalName string|undefined what's in the step's "internal name" field, when its panel has one
+   * @return string|undefined HTML, or undefined to keep the title the card has
+   */
+  const previewTitle = ({
+    title,
+    step,
+    customNames = false,
+    internalName,
+  }) => {
+
+    if (typeof internalName === 'string') {
+      return escHTML(internalName.trim()) || undefined
+    }
+
+    if (customNames || typeof title !== 'function') {
+      return undefined
+    }
+
+    // an empty title isn't used, like on the server
+    return title(step) || undefined
+  }
+
   /**
    * A step's settings from its settings panel's fields, named like steps[ID][setting] or steps[ID][setting][key][],
    * in the shape PHP would get them in $_POST['steps'][ID]
@@ -1161,6 +1200,7 @@
     positionBranch,
     rewriteIds,
     stepChanges,
+    previewTitle,
     formToSettings,
     createStore,
     createQueue,
