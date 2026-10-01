@@ -102,19 +102,21 @@ abstract class Benchmark extends Funnel_Step {
 
 			if ( is_object( $value ) ) {
 				try {
-					if ( property_exists( $value, 'ID' ) ) {
-						$args[ $key ] = $value->ID;
-						continue;
-					}
-
-					if ( property_exists( $value, 'id' ) ) {
-						$args[ $key ] = $value->id;
-						continue;
-					}
-
-					if ( method_exists( $value, 'get_id' ) ) {
+					// Prefer the object's own accessor, direct property reads on things like WC_Order are flagged as incorrect usage.
+					// method_exists() rules out __call() catch-alls (WP_User::__call() returns false for any name), is_callable() rules out non-public methods
+					if ( method_exists( $value, 'get_id' ) && is_callable( [ $value, 'get_id' ] ) ) {
 						$args[ $key ] = $value->get_id();
 						continue;
+					}
+
+					// get_object_vars() called from here only returns public properties, and never triggers __get
+					$public_vars = get_object_vars( $value );
+
+					foreach ( [ 'ID', 'id' ] as $property ) {
+						if ( array_key_exists( $property, $public_vars ) ) {
+							$args[ $key ] = $public_vars[ $property ];
+							continue 2;
+						}
 					}
 				} catch ( \Throwable $e ) {
 					// Skip this value if accessing properties or methods fails
