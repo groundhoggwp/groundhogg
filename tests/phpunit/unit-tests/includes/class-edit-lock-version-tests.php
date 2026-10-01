@@ -94,6 +94,23 @@ class Edit_Lock_Version_Tests extends GH_UnitTestCase {
 		$this->assertEquals( get_edit_version( new Email( $email->get_id() ) ), $sent['version'] );
 	}
 
+	public function test_the_heartbeat_sends_a_flows_revision() {
+
+		$funnel = new Funnel( [ 'title' => 'Heartbeat', 'status' => 'inactive' ] );
+
+		$funnel->add_step( [
+			'step_type'  => 'delay_timer',
+			'step_group' => Step::ACTION,
+		] );
+
+		// the heartbeat makes the object from its type, which isn't a Funnel
+		$sent = $this->heartbeat( $funnel, 'old' );
+
+		$this->assertEquals( $funnel->while_editing( function () use ( $funnel ) {
+			return Get_Flow::revision( $funnel );
+		} ), $sent['version'] );
+	}
+
 	public function test_the_heartbeat_doesnt_send_the_version_to_someone_else_while_its_locked() {
 
 		$email = new Email( [ 'title' => 'Locked', 'subject' => 'Hello' ] );

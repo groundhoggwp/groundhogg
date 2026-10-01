@@ -283,12 +283,15 @@ add_filter( 'groundhogg/edit_lock/funnel/version', __NAMESPACE__ . '\funnel_edit
 /**
  * A flow's version is its draft's revision, which the flow editor keeps up to date with its own saves
  *
- * @param string $version
- * @param Funnel $funnel
+ * @param string                $version
+ * @param Base_Object_With_Meta $object the funnel, which isn't a Funnel when it's from create_object_from_type()
  *
  * @return string
  */
-function funnel_edit_version( $version, $funnel ) {
+function funnel_edit_version( $version, $object ) {
+
+	$funnel = $object instanceof Funnel ? $object : new Funnel( $object->get_id() );
+
 	return $funnel->while_editing( function () use ( $funnel ) {
 		return Abilities\Funnels\Get_Flow::revision( $funnel );
 	} );
