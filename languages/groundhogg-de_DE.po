@@ -313,7 +313,7 @@ msgstr "%s bearbeitet gerade"
 
 #. translators: %s: User's display name.
 #: includes/edit-lock.php:69
-#: includes/edit-lock.php:197
+#: includes/edit-lock.php:200
 #, php-format
 msgid "%s is currently editing."
 msgstr "%s bearbeitet gerade."
@@ -2327,7 +2327,7 @@ msgstr "Datum des Uploads"
 #: admin/contacts/parts/contact-editor.php:239
 #: includes/form/fields/birthday.php:126
 #: includes/form/form-v2.php:1282
-#: assets/js/admin/features/send-broadcast.js:1216
+#: assets/js/admin/features/send-broadcast.js:1217
 msgid "Day"
 msgid_plural "Days"
 msgstr[0] "Tag"
@@ -2337,7 +2337,7 @@ msgstr[1] "Tage"
 #: admin/events/manage.php:315
 #: admin/events/manage.php:393
 #: includes/steps/actions/create-task.php:117
-#: assets/js/admin/features/send-broadcast.js:1164
+#: assets/js/admin/features/send-broadcast.js:1165
 #: assets/js/admin/funnels/funnel-steps.js:85
 msgid "Days"
 msgstr "Tage"
@@ -3114,7 +3114,6 @@ msgstr "Papierkorb leeren"
 #: admin/settings/settings-page.php:1734
 #: admin/settings/settings-page.php:1777
 #: includes/steps/benchmarks/form-filled.php:685
-#: assets/js/admin/features/send-broadcast.js:1063
 msgid "Enable"
 msgstr "Aktivieren"
 
@@ -3490,7 +3489,7 @@ msgstr "Planung abschließen"
 
 #: includes/steps/actions/delay-timer.php:239
 #: includes/steps/benchmarks/form-filled.php:555
-#: assets/js/admin/features/send-broadcast.js:1269
+#: assets/js/admin/features/send-broadcast.js:1270
 #: assets/js/admin/funnels/funnel-steps.js:93
 msgid "First"
 msgstr "Vorname"
@@ -4300,7 +4299,7 @@ msgstr "Label"
 
 #: includes/steps/actions/delay-timer.php:243
 #: includes/steps/benchmarks/form-filled.php:559
-#: assets/js/admin/features/send-broadcast.js:1273
+#: assets/js/admin/features/send-broadcast.js:1274
 #: assets/js/admin/filters/contacts.js:2485
 #: assets/js/admin/funnels/funnel-steps.js:97
 msgid "Last"
@@ -4762,7 +4761,7 @@ msgstr "Mobiltelefonnummer"
 #: admin/contacts/parts/contact-editor.php:230
 #: includes/form/fields/birthday.php:114
 #: includes/form/form-v2.php:1272
-#: assets/js/admin/features/send-broadcast.js:1218
+#: assets/js/admin/features/send-broadcast.js:1219
 msgid "Month"
 msgid_plural "Months"
 msgstr[0] "Monat"
@@ -4916,9 +4915,8 @@ msgstr "Nächster Versand"
 #: includes/functions.php:2378
 #: includes/utils/html.php:1659
 #: assets/js/admin/features/send-broadcast.js:1042
-#: assets/js/admin/features/send-broadcast.js:1056
-#: assets/js/admin/features/send-broadcast.js:1098
-#: assets/js/admin/features/send-broadcast.js:1187
+#: assets/js/admin/features/send-broadcast.js:1099
+#: assets/js/admin/features/send-broadcast.js:1188
 #: assets/js/admin/filters/contacts.js:2807
 #: assets/js/admin/funnels/funnel-editor.js:566
 msgid "No"
@@ -5037,7 +5035,7 @@ msgid "Older than"
 msgstr "Älter als"
 
 #: includes/utils/html.php:1622
-#: assets/js/admin/features/send-broadcast.js:1329
+#: assets/js/admin/features/send-broadcast.js:1330
 #: assets/js/admin/funnels/funnel-editor.js:565
 #: assets/js/admin/settings/incoming-messages.js:267
 msgid "On"
@@ -7819,7 +7817,7 @@ msgstr "Diese E-Mail wurde gesendet mit"
 msgid "This email was sent with %s"
 msgstr "Diese E-Mail wurde mit %s gesendet"
 
-#: includes/form/form-v2.php:2335
+#: includes/form/form-v2.php:2342
 msgid "This field is required"
 msgstr "Dieses Feld ist erforderlich"
 
@@ -8206,7 +8204,7 @@ msgstr "Teilnehmer abmelden"
 msgid "Un-Marketable"
 msgstr "Nicht vermarktungsfähi"
 
-#: includes/form/form-v2.php:2398
+#: includes/form/form-v2.php:2405
 #: includes/form/submission-handler.php:314
 #: includes/form/submission-handler.php:319
 msgid "Unable to create contact record."
@@ -8216,7 +8214,7 @@ msgstr "Kontaktdatensatz konnte nicht erstellt werden."
 msgid "Unable to install gh-cron.php file. Please install is manually."
 msgstr "Die gh-cron.php-Datei kann nicht installiert werden. Bitte installieren Sie sie manuell."
 
-#: includes/form/form-v2.php:2379
+#: includes/form/form-v2.php:2386
 msgid "Unable to process submission."
 msgstr "Einsendung konnte nicht verarbeitet werden."
 
@@ -8979,7 +8977,7 @@ msgstr "WP Benutzer"
 #: admin/contacts/parts/contact-editor.php:221
 #: includes/form/fields/birthday.php:102
 #: includes/form/form-v2.php:1262
-#: assets/js/admin/features/send-broadcast.js:1219
+#: assets/js/admin/features/send-broadcast.js:1220
 msgid "Year"
 msgid_plural "Years"
 msgstr[0] "Jahr"
@@ -9003,9 +9001,8 @@ msgstr "Jahre"
 #: includes/steps/benchmarks/form-filled.php:1080
 #: includes/utils/html.php:1658
 #: assets/js/admin/features/send-broadcast.js:1041
-#: assets/js/admin/features/send-broadcast.js:1055
-#: assets/js/admin/features/send-broadcast.js:1097
-#: assets/js/admin/features/send-broadcast.js:1186
+#: assets/js/admin/features/send-broadcast.js:1098
+#: assets/js/admin/features/send-broadcast.js:1187
 #: assets/js/admin/filters/contacts.js:2806
 #: assets/js/admin/funnels/funnel-editor.js:565
 msgid "Yes"
@@ -9274,8 +9271,8 @@ msgstr "Ihre Anmeldung wurde erhalten!"
 msgid "Your submission has been received."
 msgstr "Ihre Anmeldung wurde erhalten."
 
-#: api/v4/forms-api.php:96
-#: api/v4/forms-api.php:187
+#: api/v4/forms-api.php:100
+#: api/v4/forms-api.php:191
 msgid "Your submission has errors."
 msgstr "Ihre Einreichung enthält Fehler."
 
@@ -9407,7 +9404,7 @@ msgstr "Springt zum Timer mit dem nächstgelegenen Datum."
 msgid "Randomly send contacts down different branches with some bias."
 msgstr "Sende Kontakte zufällig mit einer gewissen Gewichtung durch verschiedene Zweige."
 
-#: api/v4/forms-api.php:129
+#: api/v4/forms-api.php:133
 #, fuzzy
 msgid "Please wait a moment..."
 msgstr "Bitte warten Sie einen Moment …"
@@ -9513,8 +9510,8 @@ msgid "Email Opened"
 msgstr ""
 
 #: includes/steps/benchmarks/form-filled.php:895
-#: assets/js/admin/emails/email-block-editor.js:4282
-#: assets/js/admin/emails/email-block-editor.js:4400
+#: assets/js/admin/emails/email-block-editor.js:4288
+#: assets/js/admin/emails/email-block-editor.js:4406
 #: assets/js/admin/filters/contacts.js:2083
 #: assets/js/admin/filters/contacts.js:2534
 #: assets/js/admin/filters/contacts.js:2690
@@ -12097,30 +12094,30 @@ msgstr ""
 msgid "Hide All"
 msgstr ""
 
-#: assets/js/admin/edit-lock.js:37
+#: assets/js/admin/edit-lock.js:38
 msgid "Someone else is editing this asset."
 msgstr ""
 
 #. translators: %s: the name of a user
-#: assets/js/admin/edit-lock.js:44
+#: assets/js/admin/edit-lock.js:45
 #, js-format
 msgid "%s is currently working on this asset, which means you cannot make any changes, unless you take over."
 msgstr ""
 
-#: assets/js/admin/edit-lock.js:45
+#: assets/js/admin/edit-lock.js:46
 msgid "If you take over, the other user will lose editing control of this asset."
 msgstr ""
 
-#: assets/js/admin/edit-lock.js:54
+#: assets/js/admin/edit-lock.js:55
 msgid "Take over"
 msgstr ""
 
-#: assets/js/admin/edit-lock.js:69
+#: assets/js/admin/edit-lock.js:70
 msgid "Someone else has taken over this asset."
 msgstr ""
 
 #. translators: %s: the name of a user
-#: assets/js/admin/edit-lock.js:76
+#: assets/js/admin/edit-lock.js:77
 #, js-format
 msgid "%s now has editing control of this asset."
 msgstr ""
@@ -12173,143 +12170,143 @@ msgctxt "email log headers"
 msgid "Headers"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1812
+#: assets/js/admin/emails/email-block-editor.js:1818
 msgid "None"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1813
-#: assets/js/admin/emails/email-block-editor.js:8995
+#: assets/js/admin/emails/email-block-editor.js:1819
+#: assets/js/admin/emails/email-block-editor.js:9001
 msgid "Solid"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1814
-#: assets/js/admin/emails/email-block-editor.js:8996
+#: assets/js/admin/emails/email-block-editor.js:1820
+#: assets/js/admin/emails/email-block-editor.js:9002
 msgid "Dashed"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1815
-#: assets/js/admin/emails/email-block-editor.js:8997
+#: assets/js/admin/emails/email-block-editor.js:1821
+#: assets/js/admin/emails/email-block-editor.js:9003
 msgid "Dotted"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1816
-#: assets/js/admin/emails/email-block-editor.js:8998
+#: assets/js/admin/emails/email-block-editor.js:1822
+#: assets/js/admin/emails/email-block-editor.js:9004
 msgid "Double"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1817
-#: assets/js/admin/emails/email-block-editor.js:8999
+#: assets/js/admin/emails/email-block-editor.js:1823
+#: assets/js/admin/emails/email-block-editor.js:9005
 msgid "Ridge"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1818
-#: assets/js/admin/emails/email-block-editor.js:9000
+#: assets/js/admin/emails/email-block-editor.js:1824
+#: assets/js/admin/emails/email-block-editor.js:9006
 msgid "Groove"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1819
+#: assets/js/admin/emails/email-block-editor.js:1825
 msgid "Inset"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1820
+#: assets/js/admin/emails/email-block-editor.js:1826
 msgid "Outset"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:1828
-#: assets/js/admin/emails/email-block-editor.js:7646
+#: assets/js/admin/emails/email-block-editor.js:1834
+#: assets/js/admin/emails/email-block-editor.js:7652
 msgid "Color"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:4278
-#: assets/js/admin/emails/email-block-editor.js:4396
+#: assets/js/admin/emails/email-block-editor.js:4284
+#: assets/js/admin/emails/email-block-editor.js:4402
 #: assets/js/admin/filters/contacts.js:2070
 #: assets/js/admin/funnels/funnel-editor.js:839
 msgctxt "as in a metadata field key"
 msgid "Key"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:4307
+#: assets/js/admin/emails/email-block-editor.js:4313
 msgid "Automatically add UTM parameters to links in your email. <a href=\"https://groundhogg.io/doc/utm-parameters/\">About UTM</a>."
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:4310
+#: assets/js/admin/emails/email-block-editor.js:4316
 msgid "Replacements are currently <b>NOT</b> supported. Empty values are ignored."
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5288
+#: assets/js/admin/emails/email-block-editor.js:5294
 msgid "Subject:"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5305
+#: assets/js/admin/emails/email-block-editor.js:5311
 msgid "Preview:"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5896
+#: assets/js/admin/emails/email-block-editor.js:5902
 msgid "Embed"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5903
+#: assets/js/admin/emails/email-block-editor.js:5909
 msgid "Embed with iFrame"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5915
+#: assets/js/admin/emails/email-block-editor.js:5921
 msgid "Formatting and styling will be <b>exactly</b> as shown. The content will not be indexed by search engines."
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5919
+#: assets/js/admin/emails/email-block-editor.js:5925
 msgid "Embed with HTML"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5931
+#: assets/js/admin/emails/email-block-editor.js:5937
 msgid "Theme styles <b>may</b> impact the design and layout. The content will be indexed by search engines."
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:5940
+#: assets/js/admin/emails/email-block-editor.js:5946
 msgid "Convert to post"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:6046
+#: assets/js/admin/emails/email-block-editor.js:6052
 msgid "Discard changes"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:7444
+#: assets/js/admin/emails/email-block-editor.js:7450
 msgid "Font Family"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:7467
+#: assets/js/admin/emails/email-block-editor.js:7473
 msgid "Font Size"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:7480
+#: assets/js/admin/emails/email-block-editor.js:7486
 msgid "Line Height"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:7494
+#: assets/js/admin/emails/email-block-editor.js:7500
 msgid "Font Weight"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:7510
+#: assets/js/admin/emails/email-block-editor.js:7516
 msgid "Font Style"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:7526
+#: assets/js/admin/emails/email-block-editor.js:7532
 msgid "Transform"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:8246
+#: assets/js/admin/emails/email-block-editor.js:8252
 msgid "Button Color"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:11595
-#: assets/js/admin/funnels/funnel-editor.js:3382
+#: assets/js/admin/emails/email-block-editor.js:11601
+#: assets/js/admin/funnels/funnel-editor.js:3388
 msgid "You have unsaved changes, are you sure you want to leave?"
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:11779
+#: assets/js/admin/emails/email-block-editor.js:11785
 msgid "Most recent blog posts."
 msgstr ""
 
-#: assets/js/admin/emails/email-block-editor.js:11859
+#: assets/js/admin/emails/email-block-editor.js:11865
 msgid "The target audience of this email is marketers."
 msgstr ""
 
@@ -12762,8 +12759,8 @@ msgstr ""
 
 #: includes/steps/actions/delay-timer.php:229
 #: assets/js/admin/features/send-broadcast.js:118
-#: assets/js/admin/features/send-broadcast.js:1232
-#: assets/js/admin/features/send-broadcast.js:1283
+#: assets/js/admin/features/send-broadcast.js:1233
+#: assets/js/admin/features/send-broadcast.js:1284
 #: assets/js/admin/filters/contacts.js:2419
 #: assets/js/admin/funnels/funnel-steps.js:100
 msgid "Monday"
@@ -12771,8 +12768,8 @@ msgstr ""
 
 #: includes/steps/actions/delay-timer.php:230
 #: assets/js/admin/features/send-broadcast.js:119
-#: assets/js/admin/features/send-broadcast.js:1233
-#: assets/js/admin/features/send-broadcast.js:1284
+#: assets/js/admin/features/send-broadcast.js:1234
+#: assets/js/admin/features/send-broadcast.js:1285
 #: assets/js/admin/filters/contacts.js:2420
 #: assets/js/admin/funnels/funnel-steps.js:101
 msgid "Tuesday"
@@ -12780,8 +12777,8 @@ msgstr ""
 
 #: includes/steps/actions/delay-timer.php:231
 #: assets/js/admin/features/send-broadcast.js:120
-#: assets/js/admin/features/send-broadcast.js:1234
-#: assets/js/admin/features/send-broadcast.js:1285
+#: assets/js/admin/features/send-broadcast.js:1235
+#: assets/js/admin/features/send-broadcast.js:1286
 #: assets/js/admin/filters/contacts.js:2421
 #: assets/js/admin/funnels/funnel-steps.js:102
 msgid "Wednesday"
@@ -12789,8 +12786,8 @@ msgstr ""
 
 #: includes/steps/actions/delay-timer.php:232
 #: assets/js/admin/features/send-broadcast.js:121
-#: assets/js/admin/features/send-broadcast.js:1235
-#: assets/js/admin/features/send-broadcast.js:1286
+#: assets/js/admin/features/send-broadcast.js:1236
+#: assets/js/admin/features/send-broadcast.js:1287
 #: assets/js/admin/filters/contacts.js:2422
 #: assets/js/admin/funnels/funnel-steps.js:103
 msgid "Thursday"
@@ -12798,8 +12795,8 @@ msgstr ""
 
 #: includes/steps/actions/delay-timer.php:233
 #: assets/js/admin/features/send-broadcast.js:122
-#: assets/js/admin/features/send-broadcast.js:1236
-#: assets/js/admin/features/send-broadcast.js:1287
+#: assets/js/admin/features/send-broadcast.js:1237
+#: assets/js/admin/features/send-broadcast.js:1288
 #: assets/js/admin/filters/contacts.js:2423
 #: assets/js/admin/funnels/funnel-steps.js:104
 msgid "Friday"
@@ -12807,8 +12804,8 @@ msgstr ""
 
 #: includes/steps/actions/delay-timer.php:234
 #: assets/js/admin/features/send-broadcast.js:123
-#: assets/js/admin/features/send-broadcast.js:1237
-#: assets/js/admin/features/send-broadcast.js:1288
+#: assets/js/admin/features/send-broadcast.js:1238
+#: assets/js/admin/features/send-broadcast.js:1289
 #: assets/js/admin/filters/contacts.js:2424
 #: assets/js/admin/funnels/funnel-steps.js:105
 msgid "Saturday"
@@ -12816,8 +12813,8 @@ msgstr ""
 
 #: includes/steps/actions/delay-timer.php:235
 #: assets/js/admin/features/send-broadcast.js:124
-#: assets/js/admin/features/send-broadcast.js:1238
-#: assets/js/admin/features/send-broadcast.js:1289
+#: assets/js/admin/features/send-broadcast.js:1239
+#: assets/js/admin/features/send-broadcast.js:1290
 #: assets/js/admin/filters/contacts.js:2418
 #: assets/js/admin/funnels/funnel-steps.js:106
 msgid "Sunday"
@@ -12971,7 +12968,7 @@ msgstr ""
 #: assets/js/admin/features/send-broadcast.js:699
 #: assets/js/admin/features/send-broadcast.js:771
 #: assets/js/admin/features/send-broadcast.js:906
-#: assets/js/admin/features/send-broadcast.js:1391
+#: assets/js/admin/features/send-broadcast.js:1392
 #, js-format
 msgid "%s →"
 msgstr ""
@@ -13046,138 +13043,118 @@ msgstr ""
 msgid "Send in the contact's local time?"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1051
-msgid "Use send time optimization?"
-msgstr ""
-
-#: assets/js/admin/features/send-broadcast.js:1062
-msgid "Using send time optimization will require additional storage for tracking.<br/>Would you like to enable this feature? <a target=\"_blank\" href=\"https://groundhogg.io/doc/send-time-optimization/\">More details.</a>"
-msgstr ""
-
-#: assets/js/admin/features/send-broadcast.js:1084
-msgid "Schedules each email based on contacts' past <br>behaviour to maximize opens and clicks. <a target=\"_blank\" href=\"https://groundhogg.io/doc/send-time-optimization/\">Read more...</a>"
-msgstr ""
-
-#: assets/js/admin/features/send-broadcast.js:1086
-msgid "Advanced Feature"
-msgstr ""
-
-#: assets/js/admin/features/send-broadcast.js:1087
-msgid "This feature requires the Advanced <br>Features add-on to be installed."
-msgstr ""
-
-#: assets/js/admin/features/send-broadcast.js:1093
+#: assets/js/admin/features/send-broadcast.js:1094
 msgid "Send in batches?"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1113
+#: assets/js/admin/features/send-broadcast.js:1114
 msgid "Send"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1132
+#: assets/js/admin/features/send-broadcast.js:1133
 msgid "emails every"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1162
+#: assets/js/admin/features/send-broadcast.js:1163
 #: assets/js/admin/funnels/funnel-steps.js:83
 msgid "Minutes"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1163
+#: assets/js/admin/features/send-broadcast.js:1164
 #: assets/js/admin/funnels/funnel-steps.js:84
 msgid "Hours"
 msgstr ""
 
 #. translators: 1: estimated duration, 2: number of contacts.
-#: assets/js/admin/features/send-broadcast.js:1173
+#: assets/js/admin/features/send-broadcast.js:1174
 #, js-format
 msgid "It will take at least %1$s to send to %2$s contacts."
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1175
+#: assets/js/admin/features/send-broadcast.js:1176
 #: assets/js/admin/funnels/funnel-scheduler.js:504
 msgid "Estimating"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1182
+#: assets/js/admin/features/send-broadcast.js:1183
 msgid "Recurring broadcast?"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1199
+#: assets/js/admin/features/send-broadcast.js:1200
 msgid "Repeats every"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1217
+#: assets/js/admin/features/send-broadcast.js:1218
 msgid "Week"
 msgid_plural "Weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/js/admin/features/send-broadcast.js:1249
+#: assets/js/admin/features/send-broadcast.js:1250
 #: assets/js/admin/filters/contacts.js:2488
 msgid "Day of Month"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1250
+#: assets/js/admin/features/send-broadcast.js:1251
 #: assets/js/admin/filters/contacts.js:2427
 msgid "Day of Week"
 msgstr ""
 
 #: includes/steps/actions/delay-timer.php:240
-#: assets/js/admin/features/send-broadcast.js:1270
+#: assets/js/admin/features/send-broadcast.js:1271
 #: assets/js/admin/funnels/funnel-steps.js:94
 msgid "Second"
 msgstr ""
 
 #: includes/steps/actions/delay-timer.php:241
-#: assets/js/admin/features/send-broadcast.js:1271
+#: assets/js/admin/features/send-broadcast.js:1272
 #: assets/js/admin/funnels/funnel-steps.js:95
 msgid "Third"
 msgstr ""
 
 #: includes/steps/actions/delay-timer.php:242
-#: assets/js/admin/features/send-broadcast.js:1272
+#: assets/js/admin/features/send-broadcast.js:1273
 #: assets/js/admin/funnels/funnel-steps.js:96
 msgid "Fourth"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1297
+#: assets/js/admin/features/send-broadcast.js:1298
 msgid "Ends"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1313
+#: assets/js/admin/features/send-broadcast.js:1314
 msgid "Never"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1356
+#: assets/js/admin/features/send-broadcast.js:1357
 msgid "After"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1372
+#: assets/js/admin/features/send-broadcast.js:1373
 msgid "occurrences"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1392
-#: assets/js/admin/features/send-broadcast.js:1398
+#: assets/js/admin/features/send-broadcast.js:1393
+#: assets/js/admin/features/send-broadcast.js:1399
 #: assets/js/admin/funnels/funnel-scheduler.js:519
 msgid "Review"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1406
+#: assets/js/admin/features/send-broadcast.js:1407
 msgid "Scheduled"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1411
+#: assets/js/admin/features/send-broadcast.js:1412
 msgid "🎉 Your broadcast is being scheduled in the background!"
 msgstr ""
 
 #. translators: %s: navigation action label.
-#: assets/js/admin/features/send-broadcast.js:1429
+#: assets/js/admin/features/send-broadcast.js:1430
 #, js-format
 msgid "← %s"
 msgstr ""
 
-#: assets/js/admin/features/send-broadcast.js:1430
+#: assets/js/admin/features/send-broadcast.js:1431
 msgid "Schedule another broadcast"
 msgstr ""
 
@@ -14973,31 +14950,31 @@ msgstr ""
 msgid "No matching fields..."
 msgstr ""
 
-#: assets/js/admin/funnels/funnel-editor.js:2158
+#: assets/js/admin/funnels/funnel-editor.js:2164
 msgid "Add contacts to this flow"
 msgstr ""
 
-#: assets/js/admin/funnels/funnel-editor.js:2374
-#: assets/js/admin/funnels/funnel-editor.js:2504
+#: assets/js/admin/funnels/funnel-editor.js:2380
+#: assets/js/admin/funnels/funnel-editor.js:2510
 msgid "Flow saved!"
 msgstr ""
 
 #: assets/js/admin/funnels/funnel-editor.js:1208
-#: assets/js/admin/funnels/funnel-editor.js:2357
-#: assets/js/admin/funnels/funnel-editor.js:2459
-#: assets/js/admin/funnels/funnel-editor.js:2517
+#: assets/js/admin/funnels/funnel-editor.js:2363
+#: assets/js/admin/funnels/funnel-editor.js:2465
+#: assets/js/admin/funnels/funnel-editor.js:2523
 msgid "Something went wrong updating the flow. Your changes could not be saved."
 msgstr ""
 
-#: assets/js/admin/funnels/funnel-editor.js:2817
+#: assets/js/admin/funnels/funnel-editor.js:2823
 msgid "Do you also want to duplicate the sub steps as well?"
 msgstr ""
 
-#: assets/js/admin/funnels/funnel-editor.js:2818
+#: assets/js/admin/funnels/funnel-editor.js:2824
 msgid "Yes, duplicate all sub steps!"
 msgstr ""
 
-#: assets/js/admin/funnels/funnel-editor.js:2819
+#: assets/js/admin/funnels/funnel-editor.js:2825
 msgid "No, just this step."
 msgstr ""
 
@@ -15530,43 +15507,43 @@ msgctxt "api"
 msgid "You do not have access to this %s."
 msgstr ""
 
-#: includes/abilities/abilities.php:220
+#: includes/abilities/abilities.php:318
 msgid "Groundhogg Contacts"
 msgstr ""
 
-#: includes/abilities/abilities.php:221
+#: includes/abilities/abilities.php:319
 msgid "Find, inspect, and manage contacts in Groundhogg."
 msgstr ""
 
-#: includes/abilities/abilities.php:225
+#: includes/abilities/abilities.php:323
 msgid "Groundhogg Tags"
 msgstr ""
 
-#: includes/abilities/abilities.php:226
+#: includes/abilities/abilities.php:324
 msgid "Find and manage Groundhogg tags."
 msgstr ""
 
-#: includes/abilities/abilities.php:235
+#: includes/abilities/abilities.php:333
 msgid "Groundhogg Flows"
 msgstr ""
 
-#: includes/abilities/abilities.php:236
+#: includes/abilities/abilities.php:334
 msgid "Find Groundhogg flows and add contacts to them."
 msgstr ""
 
-#: includes/abilities/abilities.php:240
+#: includes/abilities/abilities.php:338
 msgid "Groundhogg Email"
 msgstr ""
 
-#: includes/abilities/abilities.php:241
+#: includes/abilities/abilities.php:339
 msgid "Find, inspect, and manage Groundhogg emails."
 msgstr ""
 
-#: includes/abilities/abilities.php:245
+#: includes/abilities/abilities.php:343
 msgid "Groundhogg Broadcasts"
 msgstr ""
 
-#: includes/abilities/abilities.php:246
+#: includes/abilities/abilities.php:344
 msgid "Schedule Groundhogg email broadcasts and review their performance."
 msgstr ""
 
@@ -16433,76 +16410,76 @@ msgstr ""
 msgid "The site timezone name or offset (e.g. \"America/New_York\")."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:255
+#: includes/abilities/schemas/segment-schema.php:257
 msgid "Free-text search matched against the contact's name and email address."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:260
+#: includes/abilities/schemas/segment-schema.php:262
 msgid "Only these contact IDs."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:265
+#: includes/abilities/schemas/segment-schema.php:267
 msgid "Never these contact IDs."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:270
+#: includes/abilities/schemas/segment-schema.php:272
 msgid "Contacts with at least one of these tags (or all, with tags_include_needs_all). Tag names, slugs, or IDs - resolved automatically; a name matching no tag is an error, never a new tag."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:275
+#: includes/abilities/schemas/segment-schema.php:277
 msgid "Require ALL of tags_include rather than any one."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:280
+#: includes/abilities/schemas/segment-schema.php:282
 msgid "Exclude contacts with any of these tags (or only when they have all, with tags_exclude_needs_all). Unknown names are ignored here."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:285
+#: includes/abilities/schemas/segment-schema.php:287
 msgid "Only exclude a contact that has ALL of tags_exclude."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:290
+#: includes/abilities/schemas/segment-schema.php:292
 msgid "Only contacts with one of these opt-in statuses (raw int or string label)."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:295
+#: includes/abilities/schemas/segment-schema.php:297
 msgid "Exclude contacts with one of these opt-in statuses."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:299
+#: includes/abilities/schemas/segment-schema.php:301
 msgid "true = only marketable contacts, false = only non-marketable. Omit for both."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:304
+#: includes/abilities/schemas/segment-schema.php:306
 msgid "Only contacts owned by one of these WordPress user IDs - see groundhogg/list-owners."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:309
+#: includes/abilities/schemas/segment-schema.php:311
 msgid "Only contacts linked to one of these WordPress user IDs."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:314
+#: includes/abilities/schemas/segment-schema.php:316
 msgid "Exclude contacts linked to one of these WordPress user IDs."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:318
+#: includes/abilities/schemas/segment-schema.php:320
 msgid "true = only contacts with a linked WordPress user, false = only those without."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:323
+#: includes/abilities/schemas/segment-schema.php:325
 msgid "Only contacts created on or after this date (Y-m-d)."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:328
+#: includes/abilities/schemas/segment-schema.php:330
 msgid "Only contacts created on or before this date (Y-m-d)."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:332
+#: includes/abilities/schemas/segment-schema.php:334
 msgid "ID of a saved search to merge in - see groundhogg/list-saved-searches. Other params still apply on top."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:761
-#: includes/abilities/schemas/segment-schema.php:1049
+#: includes/abilities/schemas/segment-schema.php:763
+#: includes/abilities/schemas/segment-schema.php:1051
 msgid "None of the tags in tags_include match an existing tag."
 msgstr ""
 
@@ -16979,57 +16956,51 @@ msgstr ""
 msgid "Empty"
 msgstr ""
 
-#. translators: %s: an action name
-#: includes/abilities/abilities.php:190
-#, php-format
-msgid "Too late to register: WordPress only accepts registrations while the %s action runs. Call this on plugins_loaded or earlier."
-msgstr ""
-
-#: includes/abilities/abilities.php:230
+#: includes/abilities/abilities.php:328
 msgid "Groundhogg Campaigns"
 msgstr ""
 
-#: includes/abilities/abilities.php:231
+#: includes/abilities/abilities.php:329
 msgid "Find Groundhogg campaigns, used to group flows, broadcasts, and emails."
 msgstr ""
 
-#: includes/abilities/abilities.php:250
+#: includes/abilities/abilities.php:348
 msgid "Groundhogg Reports"
 msgstr ""
 
-#: includes/abilities/abilities.php:251
+#: includes/abilities/abilities.php:349
 msgid "Pull Groundhogg's built-in and custom reports."
 msgstr ""
 
-#: includes/abilities/abilities.php:255
+#: includes/abilities/abilities.php:353
 msgid "Groundhogg Database"
 msgstr ""
 
-#: includes/abilities/abilities.php:256
+#: includes/abilities/abilities.php:354
 msgid "Direct, read-only access to Groundhogg's own database tables. Administrators only."
 msgstr ""
 
-#: includes/abilities/abilities.php:260
+#: includes/abilities/abilities.php:358
 msgid "Groundhogg Utilities"
 msgstr ""
 
-#: includes/abilities/abilities.php:261
+#: includes/abilities/abilities.php:359
 msgid "General-purpose utilities that support the other categories but aren't specific to any one of them."
 msgstr ""
 
-#: includes/abilities/abilities.php:265
+#: includes/abilities/abilities.php:363
 msgid "Groundhogg Extensions"
 msgstr ""
 
-#: includes/abilities/abilities.php:266
+#: includes/abilities/abilities.php:364
 msgid "Manage Groundhogg add-on extensions and their licenses."
 msgstr ""
 
-#: includes/abilities/abilities.php:270
+#: includes/abilities/abilities.php:368
 msgid "Groundhogg Settings"
 msgstr ""
 
-#: includes/abilities/abilities.php:271
+#: includes/abilities/abilities.php:369
 msgid "List and update Groundhogg settings that have been registered for ability access."
 msgstr ""
 
@@ -17285,78 +17256,74 @@ msgstr ""
 msgid "Columns query-table's `search` param matches against."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:72
+#: includes/abilities/db/query-table.php:79
 msgid "Query Table"
 msgstr ""
 
-#: includes/abilities/db/query-table.php:73
+#: includes/abilities/db/query-table.php:80
 msgid "Run a read-only, filtered query against one of Groundhogg's own database tables - for ad-hoc analysis the other abilities don't cover. See groundhogg/describe-table for a table's columns first."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:83
-msgid "Which table to query - see groundhogg/describe-table."
-msgstr ""
-
-#: includes/abilities/db/query-table.php:88
+#: includes/abilities/db/query-table.php:95
 msgid "Columns to return. Omit for every column."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:92
+#: includes/abilities/db/query-table.php:99
 msgid "Conditions, ANDed together."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:100
+#: includes/abilities/db/query-table.php:107
 msgid "Must be a real column on the chosen table."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:104
+#: includes/abilities/db/query-table.php:111
 msgid "Value to compare against. Omit for compare \"empty\"/\"not_empty\". An array of values for \"in\"/\"not_in\"."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:122
+#: includes/abilities/db/query-table.php:129
 msgid "Free-text search against the table's own searchable (text) columns - see groundhogg/describe-table's searchable_columns."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:126
+#: includes/abilities/db/query-table.php:133
 msgid "Column to sort by. Must be a real column. Defaults to the table's primary key."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:138
+#: includes/abilities/db/query-table.php:145
 msgid "Maximum rows to return (max 100, always enforced server-side). total_items is unaffected."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:156
+#: includes/abilities/db/query-table.php:163
 msgid "Total rows matching where/search, ignoring limit/offset."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:161
+#: includes/abilities/db/query-table.php:168
 msgid "The columns actually present on each item (all of them, or just `select` if given)."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:169
+#: includes/abilities/db/query-table.php:176
 msgid "Raw rows, values as stored (not type-cast or relabeled)."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:181
+#: includes/abilities/db/query-table.php:200
 msgid "That table is not queryable through this ability."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:187
+#: includes/abilities/db/query-table.php:213
 msgid "That table is not registered on this site."
 msgstr ""
 
-#: includes/abilities/db/query-table.php:199
+#: includes/abilities/db/query-table.php:225
 msgid "None of the given \"select\" columns exist on this table. See groundhogg/describe-table."
 msgstr ""
 
 #. translators: 1: the invalid column name, 2: the table name
-#: includes/abilities/db/query-table.php:215
+#: includes/abilities/db/query-table.php:241
 #, php-format
 msgid "\"%1$s\" is not a column on \"%2$s\". See groundhogg/describe-table."
 msgstr ""
 
 #. translators: 1: the invalid column name, 2: the table name
-#: includes/abilities/db/query-table.php:248
+#: includes/abilities/db/query-table.php:274
 #, php-format
 msgid "\"%1$s\" is not a column on \"%2$s\"."
 msgstr ""
@@ -17603,27 +17570,27 @@ msgstr ""
 msgid "Which step of the flow to start tracing from. Required rather than defaulting to the flow's first step, since a flow can have more than one independent trigger."
 msgstr ""
 
-#: includes/abilities/funnels/abstract-simulate-flow.php:82
+#: includes/abilities/funnels/abstract-simulate-flow.php:93
 msgid "One entry per step visited, in order."
 msgstr ""
 
-#: includes/abilities/funnels/abstract-simulate-flow.php:95
+#: includes/abilities/funnels/abstract-simulate-flow.php:106
 msgid "Human-readable narration for this step - e.g. which branch matched, or the resolved wait-until time."
 msgstr ""
 
-#: includes/abilities/funnels/abstract-simulate-flow.php:106
+#: includes/abilities/funnels/abstract-simulate-flow.php:117
 msgid "Only present when stopped_reason is \"ambiguous_trigger\" - candidate trigger steps the trace could not automatically choose between, since which one a real contact would enter through can't be evaluated for a hypothetical walk-through."
 msgstr ""
 
-#: includes/abilities/funnels/abstract-simulate-flow.php:125
+#: includes/abilities/funnels/abstract-simulate-flow.php:136
 msgid "No flow exists with that id."
 msgstr ""
 
-#: includes/abilities/funnels/abstract-simulate-flow.php:131
+#: includes/abilities/funnels/abstract-simulate-flow.php:142
 msgid "No contact exists with that id."
 msgstr ""
 
-#: includes/abilities/funnels/abstract-simulate-flow.php:137
+#: includes/abilities/funnels/abstract-simulate-flow.php:148
 msgid "No step with that id exists in this flow."
 msgstr ""
 
@@ -18036,10 +18003,6 @@ msgstr ""
 msgid "Live Simulate Flow"
 msgstr ""
 
-#: includes/abilities/funnels/live-simulate-flow.php:35
-msgid "Actually run a flow for a real contact starting from a given step - real events are created and real actions (send_email, apply_tag, ...) actually execute against the real contact. This is NOT a preview - it really happens. Use groundhogg/simulate-flow first to see what would happen before running this. See groundhogg/list-flows (expand: [\"steps\"]) to find a step_id to start from."
-msgstr ""
-
 #: includes/abilities/funnels/publish-flow-changes.php:33
 msgid "Publish Flow Changes"
 msgstr ""
@@ -18066,10 +18029,6 @@ msgstr ""
 
 #: includes/abilities/funnels/simulate-flow.php:27
 msgid "Simulate Flow"
-msgstr ""
-
-#: includes/abilities/funnels/simulate-flow.php:31
-msgid "Trace what would happen to a real contact starting from a given step in a flow - which branches they'd take, roughly when timers would resolve - without enqueuing any real events or sending anything. Always a dry run. See groundhogg/live-simulate-flow to actually run it for real, and groundhogg/list-flows (expand: [\"steps\"]) to find a step_id to start from."
 msgstr ""
 
 #: includes/abilities/funnels/step-tree-builder.php:97
@@ -18314,349 +18273,349 @@ msgstr ""
 msgid "Number of decimal places allowed. Only meaningful for number fields."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:336
+#: includes/abilities/schemas/segment-schema.php:338
 msgid "Filter by contact meta / custom field values - see groundhogg/list-custom-fields for keys. Conditions combine per meta_relation."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:344
+#: includes/abilities/schemas/segment-schema.php:346
 msgid "The meta/custom-field key, e.g. \"cancel_reason\"."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:348
+#: includes/abilities/schemas/segment-schema.php:350
 msgid "Value to compare against. Omit for compare \"empty\" or \"not_empty\". An array of values for \"in\" / \"not_in\"."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:354
+#: includes/abilities/schemas/segment-schema.php:356
 msgid "How to compare. \"contains\"/\"starts_with\"/\"ends_with\" are substring matches; \"in\"/\"not_in\" expect value to be an array."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:363
+#: includes/abilities/schemas/segment-schema.php:365
 msgid "How multiple `meta` conditions combine with each other. Doesn't affect how `meta` combines with the other segment params, which are always ANDed in."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:368
+#: includes/abilities/schemas/segment-schema.php:370
 msgid "Contacts who opened or clicked emails, from flows and broadcasts alike. Pass an empty object for \"opened any email at least once\". For contacts who did NOT, put this inside exclude_segment."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:374
+#: includes/abilities/schemas/segment-schema.php:376
 msgid "Count email opens, or link clicks in emails."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:379
+#: includes/abilities/schemas/segment-schema.php:381
 msgid "Only count activity on these email IDs - see groundhogg/list-email-templates. Omit for any email."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:381
+#: includes/abilities/schemas/segment-schema.php:383
 msgid "At least this many opens or clicks in total, across all matching emails. Default 1."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:388
+#: includes/abilities/schemas/segment-schema.php:390
 msgid "Contacts who visited tracked pages on this site. Pass an empty object for \"visited any page\". For contacts who did NOT, put this inside exclude_segment."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:392
+#: includes/abilities/schemas/segment-schema.php:394
 msgid "The page path, e.g. \"/pricing/\". A full URL also works, only its path is used. Omit for any page."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:398
+#: includes/abilities/schemas/segment-schema.php:400
 msgid "How path is matched. Paths are stored as visited, usually with a trailing slash, so \"equals\" needs the exact form."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:400
+#: includes/abilities/schemas/segment-schema.php:402
 msgid "At least this many visits to a single matching page (not summed across different pages - use min_distinct_pages for that). Default 1."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:404
+#: includes/abilities/schemas/segment-schema.php:406
 msgid "At least this many different matching pages visited, e.g. 3 with path \"/blog/\" for \"read 3 or more blog posts\". When given without min_count, visit counts per page are not checked."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:412
+#: includes/abilities/schemas/segment-schema.php:414
 msgid "Contacts who submitted Groundhogg forms. Pass an empty object for \"submitted any form\". For contacts who did NOT, put this inside exclude_segment."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:417
+#: includes/abilities/schemas/segment-schema.php:419
 msgid "Only these forms, by the step ID of each form's \"form_fill\" step - see groundhogg/list-flows with expand [\"steps\"]. Omit for any form."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:425
+#: includes/abilities/schemas/segment-schema.php:427
 msgid "Contacts who reached a step marked as a conversion in a flow. Pass an empty object for \"converted in any flow\". For contacts who did NOT, put this inside exclude_segment."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:430
+#: includes/abilities/schemas/segment-schema.php:432
 msgid "Only conversions in these flow IDs - see groundhogg/list-flows. Omit for any flow."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:435
+#: includes/abilities/schemas/segment-schema.php:437
 msgid "Only conversions at these step IDs - steps with is_conversion in groundhogg/list-flows with expand [\"steps\"]. Combined with funnel_ids, both must match. Omit for any conversion step."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:444
+#: includes/abilities/schemas/segment-schema.php:446
 msgid "Contacts with activity of a given type in their activity log. For contacts WITHOUT it, put this inside exclude_segment."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:448
+#: includes/abilities/schemas/segment-schema.php:450
 msgid "The activity type, e.g. \"wp_login\", \"wp_logout\", \"email_opened\", \"email_link_click\", \"unsubscribed\", or a type recorded by an integration."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:450
+#: includes/abilities/schemas/segment-schema.php:452
 msgid "At least this many activities of this type. Default 1."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:466
+#: includes/abilities/schemas/segment-schema.php:468
 msgid "Only count what happened in the last N days, measured back from whenever the segment is evaluated, so stored segments keep rolling forward. Omit for any time."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:578
+#: includes/abilities/schemas/segment-schema.php:580
 msgid "activity.type is required."
 msgstr ""
 
-#: includes/abilities/schemas/segment-schema.php:668
+#: includes/abilities/schemas/segment-schema.php:670
 msgid "Exclude contacts matching this nested segment definition - same shape as this schema itself (minus exclude_segment; nesting only goes one level deep). Combined with `AND NOT (...)` against the rest of this segment."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:393
+#: includes/abilities/schemas/step-type-schema.php:395
 msgid "WordPress role slugs (e.g. \"subscriber\", \"administrator\", or a custom role) - only accounts created with one of these roles trigger this. Empty/omitted matches any role."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:405
+#: includes/abilities/schemas/step-type-schema.php:407
 msgid "Where the tracking link redirects the contact after they click it."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:410
+#: includes/abilities/schemas/step-type-schema.php:412
 msgid "Only trigger when at least one (or all, with condition) of these tags is applied."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:412
+#: includes/abilities/schemas/step-type-schema.php:414
 msgid "Only trigger when at least one (or all, with condition) of these tags is removed."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:427
+#: includes/abilities/schemas/step-type-schema.php:429
 msgid "Only trigger when changing FROM one of these opt-in statuses. Empty/omitted matches any prior status."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:432
+#: includes/abilities/schemas/step-type-schema.php:434
 msgid "Only trigger when changing TO one of these opt-in statuses. Empty/omitted matches any new status."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:444
+#: includes/abilities/schemas/step-type-schema.php:446
 msgid "The local `id` (see create-flow's step node `id`) of one or more create_task action steps earlier in this flow - only completing one of THOSE specific tasks triggers this. Empty/omitted matches completing any task. Each referenced step must already appear earlier in the flow and must be a create_task step."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:450
+#: includes/abilities/schemas/step-type-schema.php:452
 msgid "\"any\" = triggers once any one of `tasks` is completed; \"all\" = only once every one of them has been."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:462
+#: includes/abilities/schemas/step-type-schema.php:464
 msgid "ID of an existing, ready-to-send Groundhogg email - see groundhogg/list-email-templates. Must already exist; create-flow does not create emails."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:467
+#: includes/abilities/schemas/step-type-schema.php:469
 msgid "Skip sending if the contact has already confirmed their email address (opt-in confirmed)."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:471
+#: includes/abilities/schemas/step-type-schema.php:473
 msgid "The local `id` of an earlier send_email action step in this flow - threads this email's reply under that one. Omit for no threading."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:484
+#: includes/abilities/schemas/step-type-schema.php:486
 msgid "Recipients: literal email addresses, or the special tokens \"{owner_email}\" (the contact's owner) / \"{email}\" (the contact themselves)."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:489
+#: includes/abilities/schemas/step-type-schema.php:491
 msgid "Whose address the \"reply-to\" header uses. \"custom\" requires `reply_to`."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:493
+#: includes/abilities/schemas/step-type-schema.php:495
 msgid "Email address or a merge-tag token - only used when reply_to_type is \"custom\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:498
+#: includes/abilities/schemas/step-type-schema.php:500
 msgid "Hide the \"view contact\"/\"edit\" admin links normally appended to this notification."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:505
+#: includes/abilities/schemas/step-type-schema.php:507
 msgid "The notification body (HTML allowed)."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:510
+#: includes/abilities/schemas/step-type-schema.php:512
 msgid "Tag names, slugs, or IDs to apply. Resolved to existing tags only - a name matching no tag is an error, never a new tag."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:512
+#: includes/abilities/schemas/step-type-schema.php:514
 msgid "Tag names, slugs, or IDs to remove. Resolved to existing tags only - a name matching no tag is an error, never a new tag."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:549
+#: includes/abilities/schemas/step-type-schema.php:551
 msgid "Time of day the task is due, H:i:s."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:560
+#: includes/abilities/schemas/step-type-schema.php:562
 msgid "How long after this step runs the task is due, in delay_unit units."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:565
+#: includes/abilities/schemas/step-type-schema.php:567
 msgid "WordPress user ID to assign the task to. 0 (default) assigns it to the contact's owner."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:588
+#: includes/abilities/schemas/step-type-schema.php:590
 msgid "Restrict which days the delay is allowed to land on, beyond the raw delay_amount/delay_type."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:594
+#: includes/abilities/schemas/step-type-schema.php:596
 msgid "Whether to also restrict to a specific time of day (run_time) or window (run_time/run_time_to)."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:599
+#: includes/abilities/schemas/step-type-schema.php:601
 msgid "H:i:s - used when run_when is \"later\" or \"between\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:604
+#: includes/abilities/schemas/step-type-schema.php:606
 msgid "H:i:s - only used when run_when is \"between\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:609
+#: includes/abilities/schemas/step-type-schema.php:611
 msgid "Evaluate run_time/run_time_to in the contact's own timezone rather than the site's."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:615
+#: includes/abilities/schemas/step-type-schema.php:617
 msgid "Only used when run_on_type is \"day_of_week\" - e.g. \"first\" + run_on_dow to mean \"the first Monday of the month\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:633
+#: includes/abilities/schemas/step-type-schema.php:635
 msgid "Only used when run_on_type is \"day_of_month\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:645
+#: includes/abilities/schemas/step-type-schema.php:647
 msgid "ID of an existing flow to add the contact to - see groundhogg/list-flows. Must already exist; create-flow does not create the target flow."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:649
+#: includes/abilities/schemas/step-type-schema.php:651
 msgid "Enter the contact at this step instead of flow_id's first action step. Must belong to flow_id - see groundhogg/list-flows with expand \"steps\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:742
+#: includes/abilities/schemas/step-type-schema.php:744
 msgid "None of the tags given match an existing tag."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:757
+#: includes/abilities/schemas/step-type-schema.php:759
 msgid "send_email's email_id does not match an existing email. Find one with groundhogg/list-email-templates."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:807
+#: includes/abilities/schemas/step-type-schema.php:809
 msgid "add_to_flow's flow_id does not match an existing flow. Find one with groundhogg/list-flows."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:818
+#: includes/abilities/schemas/step-type-schema.php:820
 msgid "add_to_flow's step_id does not belong to flow_id."
 msgstr ""
 
 #. Translators: %1$s the condition setting, %2$s the filters setting.
-#: includes/abilities/schemas/step-type-schema.php:838
+#: includes/abilities/schemas/step-type-schema.php:840
 #, php-format
 msgid "Pass either %1$s or %2$s, not both."
 msgstr ""
 
 #. Translators: %s is the referenced local step id.
-#: includes/abilities/schemas/step-type-schema.php:974
+#: includes/abilities/schemas/step-type-schema.php:976
 #, php-format
 msgid "\"%s\" doesn't refer to an earlier step in this flow. It must be declared (via that step's own `id`) before the step that references it."
 msgstr ""
 
 #. Translators: %1$s local id, %2$s its actual type, %3$s expected type.
-#: includes/abilities/schemas/step-type-schema.php:983
+#: includes/abilities/schemas/step-type-schema.php:985
 #, php-format
 msgid "\"%1$s\" refers to a %2$s step, but a %3$s step was expected here."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1040
+#: includes/abilities/schemas/step-type-schema.php:1042
 msgid "\"any\" = at least one of `tags`; \"all\" = every one of them."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1087
+#: includes/abilities/schemas/step-type-schema.php:1089
 msgid "Contacts matching this segment (same params as groundhogg/search-contacts) go down the \"yes\" branch. Omit/empty on both include_condition and exclude_condition sends everyone down \"yes\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1090
+#: includes/abilities/schemas/step-type-schema.php:1092
 msgid "Contacts matching this segment are excluded from \"yes\" (sent down \"no\") even if they matched include_condition."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1093
+#: includes/abilities/schemas/step-type-schema.php:1095
 msgid "Instead of include_condition: the stored filters, exactly as groundhogg/get-flow returns them. Pass them back unchanged to keep conditions built in the flow editor."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1096
+#: includes/abilities/schemas/step-type-schema.php:1098
 msgid "Instead of exclude_condition: the stored filters, exactly as groundhogg/get-flow returns them."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1132
+#: includes/abilities/schemas/step-type-schema.php:1134
 msgid "A unique key for this field within the form, e.g. \"email-1\". Auto-generated if omitted."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1140
+#: includes/abilities/schemas/step-type-schema.php:1142
 msgid "Meta/property key the submitted value is stored under. Several types force their own fixed name regardless of this: first -> first_name, last -> last_name, email -> email, phone -> {phone_type}_phone, and the address fields line1/line2/city/state/zip_code/country each use their own name."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1147
+#: includes/abilities/schemas/step-type-schema.php:1149
 msgid "Default/static value. Supports merge tags."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1172
+#: includes/abilities/schemas/step-type-schema.php:1174
 msgid "Hours after which to auto-redact this value from stored submissions (0 = never). Only meaningful on types text/hidden/url/date/datetime/time/number/textarea/custom_field."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1178
+#: includes/abilities/schemas/step-type-schema.php:1180
 msgid "Only for type \"phone\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1182
+#: includes/abilities/schemas/step-type-schema.php:1184
 msgid "Only for type \"dropdown\"/\"radio\"/\"checkboxes\". Each entry is [value, comma-separated tag names/slugs/IDs to apply if this option is selected - may be an empty string for none]."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1193
+#: includes/abilities/schemas/step-type-schema.php:1195
 msgid "Only for type \"dropdown\" - allow selecting more than one option."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1198
+#: includes/abilities/schemas/step-type-schema.php:1200
 msgid "Only for type \"checkbox\" - default checked state."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1203
+#: includes/abilities/schemas/step-type-schema.php:1205
 msgid "Only for type \"checkbox\" - tag names/slugs/IDs applied to the contact if checked on submit."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1208
+#: includes/abilities/schemas/step-type-schema.php:1210
 msgid "Only for type \"file\" - allowed extensions without the dot, e.g. \"pdf\", \"jpg\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1212
+#: includes/abilities/schemas/step-type-schema.php:1214
 msgid "Only for type \"custom_field\" - the custom field's id or name (see groundhogg/list-custom-fields). The field then behaves as whichever type that custom field is defined as."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1216
+#: includes/abilities/schemas/step-type-schema.php:1218
 msgid "Only for type \"html\" - the literal HTML block to display (no submission behavior)."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1220
+#: includes/abilities/schemas/step-type-schema.php:1222
 msgid "Only for the button object (form.button) - its label. Distinct from `label`."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1264
+#: includes/abilities/schemas/step-type-schema.php:1266
 msgid "The form's input fields, in display order."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1267
+#: includes/abilities/schemas/step-type-schema.php:1269
 msgid "The submit button. `type` should be \"button\"; its label is `text`, not `label`."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1286
+#: includes/abilities/schemas/step-type-schema.php:1288
 msgid "Hex color, e.g. \"#4064e6\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1293
+#: includes/abilities/schemas/step-type-schema.php:1295
 msgid "Shown when after_submit is \"success_message\"."
 msgstr ""
 
-#: includes/abilities/schemas/step-type-schema.php:1298
+#: includes/abilities/schemas/step-type-schema.php:1300
 msgid "Redirect target when after_submit is \"success_page\"."
 msgstr ""
 
@@ -18762,7 +18721,7 @@ msgid "True if this created a brand-new tag; false if an existing tag with the s
 msgstr ""
 
 #. Translators: %s is the expand/property key (e.g. "ltv").
-#: includes/abilities/traits/extensible-schema.php:137
+#: includes/abilities/traits/extensible-schema.php:138
 #, php-format
 msgid "Only present when \"%s\" is passed in expand. "
 msgstr ""
@@ -19967,38 +19926,38 @@ msgstr ""
 msgid "Select a contact to simulate with"
 msgstr ""
 
-#: assets/js/admin/make-el.js:2168
+#: assets/js/admin/make-el.js:2205
 msgctxt "calendar navigation"
 msgid "Previous year"
 msgstr ""
 
-#: assets/js/admin/make-el.js:2181
+#: assets/js/admin/make-el.js:2218
 msgctxt "calendar navigation"
 msgid "Next year"
 msgstr ""
 
 #. translators: %d: the number of additional events hidden within a calendar day
-#: assets/js/admin/make-el.js:2311
+#: assets/js/admin/make-el.js:2348
 #, js-format
 msgid "+ %d more"
 msgstr ""
 
-#: assets/js/admin/make-el.js:2328
+#: assets/js/admin/make-el.js:2365
 msgctxt "calendar navigation"
 msgid "Previous month"
 msgstr ""
 
-#: assets/js/admin/make-el.js:2338
+#: assets/js/admin/make-el.js:2375
 msgctxt "calendar navigation"
 msgid "Today"
 msgstr ""
 
-#: assets/js/admin/make-el.js:2342
+#: assets/js/admin/make-el.js:2379
 msgctxt "calendar navigation"
 msgid "Next month"
 msgstr ""
 
-#: assets/js/admin/make-el.js:2350
+#: assets/js/admin/make-el.js:2387
 msgctxt "calendar navigation"
 msgid "Jump to a month"
 msgstr ""
@@ -20203,4 +20162,58 @@ msgstr ""
 
 #: assets/js/admin/settings/incoming-messages.js:320
 msgid "Turn off incoming messages"
+msgstr ""
+
+#. translators: %s: an action name
+#: includes/abilities/abilities.php:288
+#, php-format
+msgid "Too late to register: WordPress only accepts registrations while the %s action runs. Register on the groundhogg/abilities/register_categories or groundhogg/abilities/register_abilities action, or call this on plugins_loaded."
+msgstr ""
+
+#: includes/abilities/db/query-table.php:90
+msgid "Which table to query - see groundhogg/describe-table. Not \"contacts\" - use groundhogg/search-contacts for that, it understands contact filters that this ability doesn't."
+msgstr ""
+
+#: includes/abilities/db/query-table.php:206
+msgid "The contacts table can't be queried with this ability - its filters aren't applied there. Use groundhogg/search-contacts instead (or groundhogg/query-table on \"contactmeta\" for custom field values)."
+msgstr ""
+
+#: includes/abilities/funnels/abstract-simulate-flow.php:78
+msgid "\"live\" (default) runs the published flow, exactly what contacts go through. \"draft\" runs the flow with its unpublished changes - new steps, edited settings, moved steps, and without steps deleted in the draft - so a change can be tested before it is published. Only differs for active flows with unpublished changes (see has_unpublished_changes in groundhogg/get-flow). With a live run, \"draft\" really executes the draft's steps against the contact."
+msgstr ""
+
+#: includes/abilities/funnels/abstract-simulate-flow.php:89
+msgid "Which version of the flow was traced."
+msgstr ""
+
+#: includes/abilities/funnels/abstract-simulate-flow.php:185
+msgid "That step is not part of this version of the flow. A step added in the draft only exists in the \"draft\" view, and a step deleted in the draft only exists in the \"live\" view."
+msgstr ""
+
+#: includes/abilities/funnels/live-simulate-flow.php:35
+msgid "Actually run a flow for a real contact starting from a given step - real events are created and real actions (send_email, apply_tag, ...) actually execute against the real contact. This is NOT a preview - it really happens. Runs the published flow by default; pass view: \"draft\" to run it with its unpublished changes instead, to test them before publishing (unpublished steps are really executed too, and events are recorded against them). Use groundhogg/simulate-flow first to see what would happen before running this. See groundhogg/list-flows (expand: [\"steps\"]) to find a step_id to start from."
+msgstr ""
+
+#: includes/abilities/funnels/simulate-flow.php:31
+msgid "Trace what would happen to a real contact starting from a given step in a flow - which branches they'd take, roughly when timers would resolve - without enqueuing any real events or sending anything. Always a dry run. Traces the published flow by default; pass view: \"draft\" to trace it with its unpublished changes instead. See groundhogg/live-simulate-flow to actually run it for real, and groundhogg/list-flows (expand: [\"steps\"]) to find a step_id to start from."
+msgstr ""
+
+#: includes/edit-lock.php:265
+msgid "Changes have been made to this flow. Reload the page to see them."
+msgstr ""
+
+#: includes/edit-lock.php:268
+msgid "Changes have been made to this email. Reload the page to see them."
+msgstr ""
+
+#: includes/edit-lock.php:271
+msgid "Changes have been made since this page was opened. Reload the page to see them."
+msgstr ""
+
+#: includes/form/form-v2.php:2305
+msgid "Too many submissions. Please wait a few minutes and try again."
+msgstr ""
+
+#: assets/js/admin/edit-lock.js:121
+msgid "Reload"
 msgstr ""
