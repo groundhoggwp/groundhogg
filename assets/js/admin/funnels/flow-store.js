@@ -307,14 +307,6 @@
     }
   }
 
-  // like esc_html()
-  const escHTML = text => String(text).
-    replace(/&/g, '&amp;').
-    replace(/</g, '&lt;').
-    replace(/>/g, '&gt;').
-    replace(/"/g, '&quot;').
-    replace(/'/g, '&#039;')
-
   /**
    * The title a step's card shows while a change to it is being saved, see previewOf() in funnel-editor.js
    *
@@ -324,7 +316,8 @@
    * @param title function( step ) the step type's JS title, if it has one
    * @param step Object
    * @param customNames bool whether steps are named rather than titled from their settings
-   * @param internalName string|undefined what's in the step's "internal name" field, when its panel has one
+   * @param internalName string|undefined what's in the step's "internal name" field, when its panel has one, as safe
+   *                     HTML: the caller keeps only the tags the server keeps in a step title
    * @return string|undefined HTML, or undefined to keep the title the card has
    */
   const previewTitle = ({
@@ -335,7 +328,7 @@
   }) => {
 
     if (typeof internalName === 'string') {
-      return escHTML(internalName.trim()) || undefined
+      return internalName.trim() || undefined
     }
 
     if (customNames || typeof title !== 'function') {

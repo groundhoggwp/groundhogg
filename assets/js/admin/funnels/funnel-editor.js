@@ -59,6 +59,9 @@
     FlowCanvas,
   } = Groundhogg
 
+  // the formatting a step title can have, see Step::sanitize_columns()
+  const STEP_TITLE_TAGS = { b: [], strong: [], u: [], i: [], em: [], code: [] }
+
   // what markdown2html() makes of step notes, and the basic formatting written in them
   const NOTES_TAGS = {
     p     : [],
@@ -977,7 +980,10 @@
        * @return string|undefined
        */
       internalNameOf (stepId) {
-        return document.querySelector(`#settings-${ stepId } [name="steps[${ stepId }][step_title]"]`)?.value
+        const name = document.querySelector(`#settings-${ stepId } [name="steps[${ stepId }][step_title]"]`)?.value
+
+        // the formatting the server keeps in a step title, see Step::sanitize_columns()
+        return name === undefined ? undefined : sanitizeHTML(name, STEP_TITLE_TAGS)
       },
 
       /**
