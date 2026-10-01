@@ -1159,6 +1159,7 @@ is an `Ability` subclass with `NAME`, `CAPABILITY` and annotations. `WP_Ability:
 |---|---|
 | `list-flows` | list/search; `expand: [ 'steps' ]` gives a flat step list |
 | `list-step-types` | step types, `buildable` flag, per-type `settings_schema`, `branch_keys` |
+| `get-form-integration-fields` | the forms of a form integration step type, and with `form_id` its fields and the contact fields they map to |
 | `create-flow` | builds a new **inactive** flow from a step tree, all or nothing (deletes the flow on failure) |
 | `get-flow` | one flow as a tree in create-flow's shape (below) |
 | `edit-flow` | add/update/move/delete operations, all or nothing (below) |
@@ -1203,6 +1204,13 @@ is an `Ability` subclass with `NAME`, `CAPABILITY` and annotations. `WP_Ability:
     and optionally `'deferred_settings'`;
   - `$exporter`: `callable( array $settings, Step $step ): array`. It gets the meta narrowed to the schema's
     keys. Omit it if the stored meta is already in the settings shape.
+- **Form integrations are opted in by core**, `Step_Type_Schema::extend_form_integrations()`, which
+  `Abilities::register_schemas()` runs after the `register_step_types` action, for every registered
+  `Form_Integration` type that isn't already supported. Settings: `form_id` (required) and `field_map` (form field
+  id → contact field). The resolver refuses a form that doesn't exist, field ids that aren't in the form, and values
+  that aren't mappable contact fields; `edit-flow` merges settings shallowly, so changing `form_id` means sending the
+  `field_map` again. The ability `get-form-integration-fields` (`step_type`, optional `form_id`) lists the forms, and
+  the form's fields and the mappable contact fields.
 - **Pro's opt-ins** (groundhogg-pro `Abilities\Step_Types`, registered on `groundhogg/steps/init` priority
   20, to be moved to `groundhogg/abilities/register_step_types`): its actions and benchmarks, plus `split_path`, `split_test`, `weighted_distribution` and
   `evergreen_sequence`.

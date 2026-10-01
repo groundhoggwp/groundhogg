@@ -33,6 +33,7 @@ use Groundhogg\Abilities\Funnels\Deactivate_Flow;
 use Groundhogg\Abilities\Funnels\Discard_Flow_Changes;
 use Groundhogg\Abilities\Funnels\Edit_Flow;
 use Groundhogg\Abilities\Funnels\Get_Flow;
+use Groundhogg\Abilities\Funnels\Get_Form_Integration_Fields;
 use Groundhogg\Abilities\Funnels\List_Flows;
 use Groundhogg\Abilities\Funnels\List_Step_Types;
 use Groundhogg\Abilities\Funnels\Live_Simulate_Flow;
@@ -46,6 +47,7 @@ use Groundhogg\Abilities\Emails\List_Sender_Profiles;
 use Groundhogg\Abilities\Emails\Send_Composed_Email;
 use Groundhogg\Abilities\Emails\Send_Email_Template;
 use Groundhogg\Abilities\Emails\Update_Email_Template;
+use Groundhogg\Abilities\Schemas\Step_Type_Schema;
 use Groundhogg\Abilities\Reports\Get_Reports;
 use Groundhogg\Abilities\Reports\List_Report_Types;
 use Groundhogg\Abilities\Settings\List_Settings;
@@ -211,6 +213,9 @@ class Abilities {
 		 * Every schema extension is in by now, and every step type is registered with the step manager.
 		 */
 		do_action( 'groundhogg/abilities/register_step_types' );
+
+		// after the add-ons', so one that opts its own form integration in is respected
+		Step_Type_Schema::extend_form_integrations();
 	}
 
 	/**
@@ -414,6 +419,7 @@ class Abilities {
 			List_Flows::class,
 			Get_Flow::class,
 			List_Step_Types::class,
+			Get_Form_Integration_Fields::class,
 			Create_Flow::class,
 			Edit_Flow::class,
 			Publish_Flow_Changes::class,

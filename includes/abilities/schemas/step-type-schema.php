@@ -7,7 +7,9 @@ use Groundhogg\Email;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
+use Groundhogg\Steps\Benchmarks\Form_Integration;
 use WP_Error;
+use function Groundhogg\get_mappable_fields;
 use function Groundhogg\parse_tag_list;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -274,6 +276,113 @@ class Step_Type_Schema {
 			'branch_keys'     => $branch_keys,
 			'resolver'        => $resolver,
 			'exporter'        => $exporter,
+		];
+	}
+
+	/**
+	 * Opt in every registered form integration step type (the add-ons that extend Form_Integration) that an add-on
+	 * hasn't opted in itself. They all have the same settings, a form and a map of its fields to contact fields, and
+	 * the add-on already says how to list its forms and fields, so none of them need to do anything.
+	 *
+	 * Runs after groundhogg/abilities/register_step_types, see Abilities::register_schemas().
+	 *
+	 * @return void
+	 */
+	public static function extend_form_integrations() {
+
+		foreach ( Plugin::instance()->step_manager->get_elements() as $type => $element ) {
+
+			if ( ! $element instanceof Form_Integration || in_array( $type, self::supported_types(), true ) ) {
+				continue;
+			}
+
+			self::extend(
+				$type,
+				self::form_integration_settings_schema( $element ),
+				[],
+				fn( array $settings ) => self::resolve_form_integration_settings( $element, $settings ),
+				// meta comes back from the database as strings
+				fn( array $settings ) => array_merge( $settings, array_filter( [ 'form_id' => absint( $settings['form_id'] ?? 0 ) ] ) )
+			);
+		}
+	}
+
+	/**
+	 * The settings of a form integration step type.
+	 *
+	 * @param Form_Integration $element
+	 *
+	 * @return array
+	 */
+	private static function form_integration_settings_schema( Form_Integration $element ): array {
+
+		$contact_fields = array_keys( array_reduce( get_mappable_fields(), 'array_merge', [] ) );
+
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'required'             => [ 'form_id' ],
+			'properties'           => [
+				'form_id'   => [
+					'type'        => 'integer',
+					/* translators: 1: the step type's name, like Contact Form 7, 2: the ability */
+					'description' => sprintf( __( 'The ID of the %1$s form that triggers this step when it is submitted. Use groundhogg/get-form-integration-fields to list them.', 'groundhogg' ), $element->get_name() ),
+				],
+				'field_map' => [
+					'type'                 => 'object',
+					'description'          => __( 'Maps fields in the form to the contact field their value is saved to. The keys are the field ids, which groundhogg/get-form-integration-fields lists for the form. Map an email address field to "email", submissions can only be matched to a contact with one.', 'groundhogg' ),
+					'additionalProperties' => [
+						'type' => 'string',
+						'enum' => $contact_fields,
+					],
+				],
+			],
+		];
+	}
+
+	/**
+	 * Check a form integration's form and fields exist, so a typo isn't saved as a step that never runs.
+	 *
+	 * @param Form_Integration $element
+	 * @param array            $settings
+	 *
+	 * @return array|WP_Error
+	 */
+	private static function resolve_form_integration_settings( Form_Integration $element, array $settings ) {
+
+		$form_id = absint( $settings['form_id'] ?? 0 );
+
+		if ( ! $form_id ) {
+			return new WP_Error( 'groundhogg_form_integration_no_form', __( 'form_id is required.', 'groundhogg' ) );
+		}
+
+		if ( ! in_array( (string) $form_id, wp_list_pluck( $element->get_forms_for_api(), 'id' ), true ) ) {
+			/* translators: 1: the form ID, 2: the step type's name */
+			return new WP_Error( 'groundhogg_form_integration_form_not_found', sprintf( __( 'There is no form %1$d in %2$s. Use groundhogg/get-form-integration-fields to list the forms.', 'groundhogg' ), $form_id, $element->get_name() ) );
+		}
+
+		$field_map = (array) ( $settings['field_map'] ?? [] );
+		$unknown   = array_diff( array_map( 'strval', array_keys( $field_map ) ), wp_list_pluck( $element->get_fields_for_api( $form_id ), 'id' ) );
+
+		if ( ! empty( $unknown ) ) {
+			/* translators: 1: the field ids, 2: the form ID */
+			return new WP_Error( 'groundhogg_form_integration_unknown_fields', sprintf( __( 'These field_map keys are not fields of form %2$d: %1$s. Use groundhogg/get-form-integration-fields to list the fields, and send the whole field_map again if the form changed.', 'groundhogg' ), implode( ', ', $unknown ), $form_id ) );
+		}
+
+		// the sanitizer would drop what isn't a contact field, and the field would quietly not be mapped
+		$contact_fields = array_keys( array_reduce( get_mappable_fields(), 'array_merge', [] ) );
+		$invalid        = array_filter( $field_map, fn( $value ) => ! is_string( $value ) || ! in_array( $value, $contact_fields, true ) );
+
+		if ( ! empty( $invalid ) ) {
+			/* translators: %s: the values */
+			return new WP_Error( 'groundhogg_form_integration_unknown_contact_fields', sprintf( __( 'These field_map values are not contact fields: %s. Use groundhogg/get-form-integration-fields with a form_id to list them.', 'groundhogg' ), implode( ', ', array_unique( array_map( 'wp_json_encode', $invalid ) ) ) ) );
+		}
+
+		return [
+			'settings' => [
+				'form_id'   => $form_id,
+				'field_map' => $field_map,
+			],
 		];
 	}
 
