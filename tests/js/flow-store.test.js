@@ -92,8 +92,8 @@ test('a named step previews the name in its internal name field, not a generated
   assert.equal(FlowStore.previewTitle({ title: titled, step: tagStep, customNames: true, internalName: ' Tag the VIPs ' }), 'Tag the VIPs')
 })
 
-test('the internal name is shown as text', () => {
-  assert.equal(FlowStore.previewTitle({ step: tagStep, internalName: 'Tags <script>x</script> & more' }), 'Tags &lt;script&gt;x&lt;/script&gt; &amp; more')
+test('the internal name keeps its formatting, the editor sanitizes it like the server', () => {
+  assert.equal(FlowStore.previewTitle({ step: tagStep, internalName: 'Apply <b>VIP</b>' }), 'Apply <b>VIP</b>')
 })
 
 test('an empty internal name keeps the title the card has', () => {
