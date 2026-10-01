@@ -809,10 +809,16 @@
 
     }
 
+    // so the edit lock's heartbeat doesn't take this save for someone else's change, while it's sent and after,
+    // see edit-lock.js
+    window.GhLockData?.resync?.()
+
     return EmailsStore.patch(State.email.ID, State.changes).then(email => {
       dialog({
         message: 'Email updated!',
       })
+
+      window.GhLockData?.resync?.()
 
       setState({
         email,

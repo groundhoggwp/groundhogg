@@ -1691,6 +1691,12 @@
 
         this.drawStepPicker()
 
+        // the edit lock's heartbeat tells when something else changed the flow, like an ability, see edit-lock.js
+        if (window.GhLockData) {
+          GhLockData.getVersion = () => this.revision
+          GhLockData.isBusy = () => this.saving || this.queue.isBusy() || Object.keys(this.pendingSettings).length > 0
+        }
+
         let preloaders = [
           FunnelsStore.maybeFetchItem(this.id),
         ]
