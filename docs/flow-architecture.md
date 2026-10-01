@@ -1118,11 +1118,14 @@ Publish/Activate.
    - enqueue it in `funnel_editor_scripts()`;
    - in it, `Funnel.registerStepCallbacks( 'my_type', { onActive( { ID, meta, updateStep } ) { … } } )`.
 4. **Icon**: an SVG; `get_icon()` can point anywhere.
-5. **Abilities** (optional, to make it buildable and editable by agents), on `groundhogg/steps/init`
-   **priority 20** (after registration):
+5. **Abilities** (optional, to make it buildable and editable by agents), on
+   `groundhogg/abilities/register_step_types` (after registration, and after every add-on's
+   `register_schema_extensions`, see section 16):
 
    ```php
-   Step_Type_Schema::extend( 'my_type', $json_schema_for_settings, $branch_keys, $resolver, $exporter );
+   add_action( 'groundhogg/abilities/register_step_types', function () {
+   	Step_Type_Schema::extend( 'my_type', $json_schema_for_settings, $branch_keys, $resolver, $exporter );
+   } );
    ```
 
    See 11 for each parameter.
@@ -1186,7 +1189,7 @@ is an `Ability` subclass with `NAME`, `CAPABILITY` and annotations. `WP_Ability:
   - `$exporter`: `callable( array $settings, Step $step ): array`. It gets the meta narrowed to the schema's
     keys. Omit it if the stored meta is already in the settings shape.
 - **Pro's opt-ins** (groundhogg-pro `Abilities\Step_Types`, registered on `groundhogg/steps/init` priority
-  20): its actions and benchmarks, plus `split_path`, `split_test`, `weighted_distribution` and
+  20, to be moved to `groundhogg/abilities/register_step_types`): its actions and benchmarks, plus `split_path`, `split_test`, `weighted_distribution` and
   `evergreen_sequence`.
   - `split_path`'s resolver accepts a branch's `include_condition` / `exclude_condition` **or** its stored
     `include_filters` / `exclude_filters`.
@@ -1395,8 +1398,12 @@ false).
 
 **Registration and scripts:**
 
-- `groundhogg/steps/init` (action, `$manager`): register step types. Priority 20 for
-  `Step_Type_Schema::extend()`.
+- `groundhogg/steps/init` (action, `$manager`): register step types.
+- Abilities, each fired once and in this order from inside WordPress's own registry actions (see the
+  `Abilities` class docblock): `groundhogg/abilities/register_schema_extensions` (`Segment_Schema::extend()`,
+  `Contact_Schema::extend()`), `groundhogg/abilities/register_step_types` (`Step_Type_Schema::extend()`, after every
+  schema extension), `groundhogg/abilities/register_categories` and `groundhogg/abilities/register_abilities`
+  (`Abilities::add_category()` / `add_ability()`, after core's own). Guide: `abilities-registration.md`.
 - `groundhogg/scripts/after_register_admin_scripts`, `groundhogg/admin/funnels/editor_scripts`,
   `groundhogg_enqueue_step_type_assets`.
 

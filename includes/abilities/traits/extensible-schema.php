@@ -55,9 +55,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *         'number'
  *     );
  *
- * Call extend() once (e.g. on `init`, after confirming both Groundhogg and
- * whatever the callback depends on are active) - before any ability builds its
- * input/output schema.
+ * Call extend() once, on the `groundhogg/abilities/register_schema_extensions`
+ * action (every plugin has loaded by then, so check whatever the callback depends
+ * on is active) - which is before any ability builds its input/output schema.
+ * See docs/abilities-registration.md.
  *
  * For anything extend() can't express (a nested object, an enum, multiple
  * related properties from one computation), the three filters it's built on are

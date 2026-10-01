@@ -159,11 +159,31 @@ Work through these for every step type the add-on registers (`register_funnel_st
 
 ### 9. Abilities (optional, recommended)
 
-- To let agents build and edit the add-on's steps with `create-flow` / `edit-flow`, describe them on
-  `groundhogg/steps/init` **priority 20**:
+- Register everything for abilities on the four actions core fires, in this order, once each. Don't pick an
+  `init` priority or `groundhogg/steps/init` priority to get the order right; it's not reliable, because WordPress
+  builds the abilities registries the first time something asks for one, and an ability builds its schema from
+  what's registered at that moment.
+
+  | Action | Register here |
+  | --- | --- |
+  | `groundhogg/abilities/register_schema_extensions` | `Segment_Schema::extend()`, `Contact_Schema::extend()` and other additions to shared schemas |
+  | `groundhogg/abilities/register_step_types` | `Step_Type_Schema::extend()` |
+  | `groundhogg/abilities/register_categories` | `Abilities::add_category()` |
+  | `groundhogg/abilities/register_abilities` | `Abilities::add_ability()` |
+
+  The full guide, with what each one takes and the pitfalls, is `abilities-registration.md`.
+
+  The first two run before anything is registered with WordPress, and step types come after every schema
+  extension, so a step type's schema can use `Segment_Schema::properties()` and include what other add-ons
+  (EDD, WooCommerce, ...) added to it. The plugins you depend on have loaded by then, so there's no need to wait
+  for a late `init` priority.
+
+- To let agents build and edit the add-on's steps with `create-flow` / `edit-flow`, describe them:
 
   ```php
-  Step_Type_Schema::extend( 'my_type', $settings_json_schema, $branch_keys, $resolver, $exporter );
+  add_action( 'groundhogg/abilities/register_step_types', function () {
+  	Step_Type_Schema::extend( 'my_type', $settings_json_schema, $branch_keys, $resolver, $exporter );
+  } );
   ```
 
   Every sub-schema needs a `type`, and use `definitions`, not `$defs` (architecture doc, section 11). Types

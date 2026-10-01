@@ -108,8 +108,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *         true // this alone counts as naming a deliberate audience - see has_audience()
  *     );
  *
- * Call this once (e.g. on `init`, after confirming both Groundhogg and the
- * dependency it needs are active) - before any ability builds its input schema.
+ * Call this once, on the `groundhogg/abilities/register_schema_extensions`
+ * action (every plugin has loaded by then, so check the dependency it needs is
+ * active) - which is before any ability builds its input schema, and before step
+ * types that embed properties() are described. See docs/abilities-registration.md.
  *
  * For query logic no Filters condition type can express at all (a join, a raw
  * where condition, a custom select), reach for to_contact_query()'s live

@@ -77,8 +77,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *         }
  *     );
  *
- * Call this once (e.g. on `init`, after both Groundhogg and the add-on's own
- * step type registration have run) - before any ability builds its schema.
+ * Call this once, on the `groundhogg/abilities/register_step_types` action. That
+ * is after the add-on's own step type registration has run and after every
+ * Segment_Schema/Contact_Schema extension is in, and before any ability builds its
+ * schema. See docs/abilities-registration.md.
  *
  * A branch-logic type whose branch keys are defined *per step instance* (by
  * that step's own `settings`, not fixed for the whole type - e.g. a
