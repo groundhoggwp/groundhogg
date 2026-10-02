@@ -176,15 +176,12 @@ class Messages_Api extends Base_Object_Api {
 	}
 
 	/**
-	 * Limit a query of messages to those on contacts that the user can see, by who owns them, the same rules as
-	 * view_contact in Main_Roles::map_meta_cap(): their own, and someone else's when they can view others'
-	 * contacts and the owner is in their team, if they have one.
+	 * The owners of the contacts that the user can see, the same rules as view_contact in Main_Roles::map_meta_cap():
+	 * their own, and someone else's when they can view others' contacts and the owner is in their team, if they have one.
 	 *
-	 * @param Table_Query $query
-	 *
-	 * @return bool false if there's nothing that they can see
+	 * @return int[]|null|false the IDs of the owners, null when they can see every contact, false when there's no user
 	 */
-	protected function scope_to_visible_contacts( Table_Query $query ) {
+	protected function visible_owner_ids() {
 
 		$user_id = get_current_user_id();
 
@@ -200,10 +197,33 @@ class Messages_Api extends Base_Object_Api {
 
 			// with no team they can see every contact
 			if ( empty( $team ) ) {
-				return true;
+				return null;
 			}
 
 			$owners = array_unique( array_merge( $owners, array_map( 'absint', $team ) ) );
+		}
+
+		return array_values( $owners );
+	}
+
+	/**
+	 * Limit a query of messages to those on contacts that the user can see, by who owns them, see visible_owner_ids()
+	 *
+	 * @param Table_Query $query
+	 *
+	 * @return bool false if there's nothing that they can see
+	 */
+	protected function scope_to_visible_contacts( Table_Query $query ) {
+
+		$owners = $this->visible_owner_ids();
+
+		if ( $owners === false ) {
+			return false;
+		}
+
+		// every contact
+		if ( $owners === null ) {
+			return true;
 		}
 
 		$contacts = new Table_Query( 'contacts' );
@@ -237,62 +257,86 @@ class Messages_Api extends Base_Object_Api {
 		$messages = get_db( 'messages' )->get_table_name();
 		$contacts = get_db( 'contacts' )->get_table_name();
 
-		$join = '';
-		$args = [];
+		// Whose contacts, before the limit, so that it's what the user can see that is counted. The contact has to exist,
+		// what's left of a deleted one isn't a reply that anyone can read.
+		$owners = $scope === 'mine' ? [ get_current_user_id() ] : $this->visible_owner_ids();
 
-		if ( $scope === 'mine' ) {
-			$join   = "INNER JOIN $contacts c ON c.ID = m.object_id AND c.owner_id = %d";
-			$args[] = get_current_user_id();
+		if ( $owners === false || $owners === [ 0 ] ) {
+			return self::SUCCESS_RESPONSE( [
+				'items'    => [],
+				'has_more' => false,
+				'scope'    => $scope,
+			] );
 		}
 
-		// More than the limit are read, because what can't be seen by the user is left out afterwards
-		$args[] = $limit * 3;
+		$args = [];
+		$join = "INNER JOIN $contacts c ON c.ID = m.object_id";
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names
-		$rows = $wpdb->get_results( $wpdb->prepare(
-			"SELECT m.object_id, COUNT(*) AS unread, MAX(m.ID) AS latest_id
-			FROM $messages m $join
-			WHERE m.object_type = 'contact' AND m.direction = 'inbound' AND m.is_read = 0
-			GROUP BY m.object_id
-			ORDER BY latest_id DESC
-			LIMIT %d",
-			$args
-		) );
-		// phpcs:enable
+		// null is every contact
+		if ( $owners !== null ) {
+			$join .= ' AND c.owner_id IN (' . implode( ',', array_fill( 0, count( $owners ), '%d' ) ) . ')';
+			$args  = array_map( 'absint', $owners );
+		}
 
 		$items    = [];
 		$has_more = false;
+		$offset   = 0;
+		$batch    = $limit + 1; // one more than is wanted says that there's more
 
-		foreach ( $rows as $row ) {
+		// What's in the query is what the user can see of the contact, but the message has its own say, so it's paged
+		// until there's enough that can be seen, or there's no more, and not a set number of them and then what's seen of those
+		for ( $page = 0; $page < 20 && ! $has_more; $page ++ ) {
 
-			$latest = new Message( (int) $row->latest_id );
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names
+			$rows = $wpdb->get_results( $wpdb->prepare(
+				"SELECT m.object_id, COUNT(*) AS unread, MAX(m.ID) AS latest_id
+				FROM $messages m $join
+				WHERE m.object_type = 'contact' AND m.direction = 'inbound' AND m.is_read = 0
+				GROUP BY m.object_id
+				ORDER BY latest_id DESC
+				LIMIT %d OFFSET %d",
+				array_merge( $args, [ $batch, $offset ] )
+			) );
+			// phpcs:enable
 
-			if ( ! $latest->exists() || ! current_user_can( 'view_message', $latest ) ) {
-				continue;
+			foreach ( $rows as $row ) {
+
+				$latest = new Message( (int) $row->latest_id );
+
+				if ( ! $latest->exists() || ! current_user_can( 'view_message', $latest ) ) {
+					continue;
+				}
+
+				if ( count( $items ) >= $limit ) {
+					$has_more = true;
+					break;
+				}
+
+				$contact = $latest->get_associated_object();
+
+				$array = $latest->get_as_array();
+				unset( $array['data']['content'] ); // it's for the preview, and what it says is loaded when it's opened
+
+				$items[] = [
+					'object_type' => 'contact',
+					'object_id'   => (int) $row->object_id,
+					'unread'      => (int) $row->unread,
+					'contact'     => [
+						'ID'     => (int) $row->object_id,
+						'name'   => $contact->get_full_name() ?: $contact->get_email(),
+						'email'  => $contact->get_email(),
+						'avatar' => $contact->get_profile_picture( 96 ),
+					],
+					'latest'      => $array,
+				];
 			}
 
-			if ( count( $items ) >= $limit ) {
-				$has_more = true;
+			// that was all of them
+			if ( count( $rows ) < $batch ) {
 				break;
 			}
 
-			$contact = $latest->get_associated_object();
-
-			$array = $latest->get_as_array();
-			unset( $array['data']['content'] ); // it's for the preview, and what it says is loaded when it's opened
-
-			$items[] = [
-				'object_type' => 'contact',
-				'object_id'   => (int) $row->object_id,
-				'unread'      => (int) $row->unread,
-				'contact'     => [
-					'ID'     => (int) $row->object_id,
-					'name'   => $contact->get_full_name() ?: $contact->get_email(),
-					'email'  => $contact->get_email(),
-					'avatar' => $contact->get_profile_picture( 96 ),
-				],
-				'latest'      => $array,
-			];
+			$offset += $batch;
 		}
 
 		return self::SUCCESS_RESPONSE( [

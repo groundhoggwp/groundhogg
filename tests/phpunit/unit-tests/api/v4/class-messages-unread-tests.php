@@ -204,6 +204,105 @@ class Messages_Unread_Tests extends GH_UnitTestCase {
 		$this->assertEqualsCanonicalizing( [ $mine->get_id(), $theirs->get_id() ], array_keys( $this->unread( [ $mine, $theirs ], [ 'scope' => 'all' ] ) ) );
 	}
 
+	/**
+	 * The raw response, for what `only` leaves out: whether there's more
+	 */
+	protected function unread_response( array $params = [] ) {
+
+		$request = new WP_REST_Request( 'GET', '/gh/v4/messages/unread' );
+		$request->set_query_params( $params );
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 200, $response->get_status(), wp_json_encode( $response->get_data() ) );
+
+		return $response->get_data();
+	}
+
+	/**
+	 * Everything that has been received and not read, and was received last, is someone else's. Reading more than the
+	 * limit and leaving out what can't be seen used to leave nothing, and say there was nothing more.
+	 */
+	public function test_all_is_not_emptied_by_newer_replies_on_contacts_that_the_user_can_not_see() {
+
+		$rep   = $this->create_rep();
+		$other = $this->create_rep();
+
+		$mine = $this->create_contact( 'mine', [ 'owner_id' => $rep ] );
+		$this->create_message( $mine, 'inbound', '-1 day' );
+
+		// more of them than are looked at for each of what is asked for
+		foreach ( [ 'a', 'b', 'c', 'd', 'e' ] as $i => $local ) {
+			$this->create_message( $this->create_contact( 'theirs-' . $local, [ 'owner_id' => $other ] ), 'inbound', '-' . ( $i + 1 ) . ' hours' );
+		}
+
+		wp_set_current_user( $rep );
+
+		$data = $this->unread_response( [ 'scope' => 'all', 'limit' => 1 ] );
+
+		$this->assertSame( [ $mine->get_id() ], array_column( $data['items'], 'object_id' ) );
+		$this->assertFalse( $data['has_more'] );
+	}
+
+	public function test_there_is_more_when_there_are_more_that_the_user_can_see_than_were_asked_for() {
+
+		$rep   = $this->create_rep();
+		$other = $this->create_rep();
+
+		$first  = $this->create_contact( 'first', [ 'owner_id' => $rep ] );
+		$second = $this->create_contact( 'second', [ 'owner_id' => $rep ] );
+		$third  = $this->create_contact( 'third', [ 'owner_id' => $rep ] );
+
+		$this->create_message( $first, 'inbound', '-5 hours' );
+		$this->create_message( $second, 'inbound', '-4 hours' );
+		$this->create_message( $third, 'inbound', '-3 hours' );
+
+		// and what they can't see is newer than all of it
+		foreach ( [ 'a', 'b', 'c', 'd' ] as $i => $local ) {
+			$this->create_message( $this->create_contact( 'theirs-' . $local, [ 'owner_id' => $other ] ), 'inbound', '-' . ( $i + 1 ) . ' minutes' );
+		}
+
+		wp_set_current_user( $rep );
+
+		$data = $this->unread_response( [ 'scope' => 'all', 'limit' => 2 ] );
+
+		$this->assertSame( [ $third->get_id(), $second->get_id() ], array_column( $data['items'], 'object_id' ) );
+		$this->assertTrue( $data['has_more'] );
+
+		$data = $this->unread_response( [ 'scope' => 'all', 'limit' => 3 ] );
+
+		$this->assertSame( [ $third->get_id(), $second->get_id(), $first->get_id() ], array_column( $data['items'], 'object_id' ) );
+		$this->assertFalse( $data['has_more'], 'there is no more, only what they can not see' );
+	}
+
+	public function test_replies_that_are_left_after_their_contact_was_deleted_are_not_in_the_way() {
+
+		global $wpdb;
+
+		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
+
+		$real = $this->create_contact( 'real' );
+		$this->create_message( $real, 'inbound', '-2 days' );
+
+		$gone = [];
+
+		foreach ( [ 'a', 'b', 'c', 'd' ] as $i => $local ) {
+			$contact = $this->create_contact( 'gone-' . $local );
+			$this->create_message( $contact, 'inbound', '-' . ( $i + 1 ) . ' hours' );
+			$gone[] = $contact->get_id();
+		}
+
+		// what's left of contacts that were deleted before the messages were deleted with them
+		$wpdb->query( 'DELETE FROM ' . \Groundhogg\get_db( 'contacts' )->get_table_name() . ' WHERE ID IN (' . implode( ',', $gone ) . ')' );
+		\Groundhogg\get_db( 'contacts' )->cache_set_last_changed();
+
+		wp_set_current_user( $admin );
+
+		$items = $this->unread( [ $real ], [ 'scope' => 'all', 'limit' => 1 ] );
+
+		$this->assertSame( [ $real->get_id() ], array_keys( $items ) );
+	}
+
 	public function test_there_is_nothing_in_the_list_for_someone_that_can_not_view_contacts() {
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
