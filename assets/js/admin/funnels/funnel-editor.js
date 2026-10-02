@@ -599,6 +599,26 @@
     ])
 
     /**
+     * The name of a step that's named rather than titled from its settings, see Funnel_Step::get_canvas_data(). It's
+     * saved with the panel's other fields as the step's title, and shown on its card as it's typed, see previewOf()
+     *
+     * @param step Object
+     */
+    const StepNameSettings = step => Div({ className: 'gh-panel step-name-settings' }, [
+      Div({ className: 'inside display-flex column gap-10' }, [
+        MakeEl.Label({ for: `step_${ step.ID }_step_title` }, __('Give this step an internal name...', 'groundhogg')),
+        Input({
+          id       : `step_${ step.ID }_step_title`,
+          name     : `steps[${ step.ID }][step_title]`,
+          className: 'full-width',
+          value    : step.data.step_title ?? '',
+          // saved a moment after typing stops, like other settings
+          onInput  : () => Funnel.saveSettings(step.ID),
+        }),
+      ]),
+    ])
+
+    /**
      * A step's settings panel. The step type's part, its island, is HTML from the server, see
      * Funnel_Step::get_settings_island(), and is only replaced when the server sends a new one.
      *
@@ -627,10 +647,13 @@
           dataErrorCode: error.code,
         }, `<p>${ error.message }</p>`))),
         Div({ className: 'step-flex' }, [
-          Div({
-            className : `step-edit panels ${ island?.ignore_morph ? 'ignore-morph' : '' }`,
-            dataIsland: drawn ? 'same' : 'new',
-          }, drawn ? '' : island?.html ?? `<p class="loading-dots">${ _x('Loading', 'as in waiting to for something to load', 'groundhogg') }</p>`),
+          Div({ className: 'step-main' }, [
+            canvas.named ? StepNameSettings(step) : null,
+            Div({
+              className : `step-edit panels ${ island?.ignore_morph ? 'ignore-morph' : '' }`,
+              dataIsland: drawn ? 'same' : 'new',
+            }, drawn ? '' : island?.html ?? `<p class="loading-dots">${ _x('Loading', 'as in waiting to for something to load', 'groundhogg') }</p>`),
+          ]),
           Div({ className: 'step-notes' }, [
             island?.before_notes || null,
             step_group === 'benchmark' ? TriggerSettings(step) : null,

@@ -239,6 +239,35 @@ class Flow_Canvas_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( '<strong>a bit</strong>', $canvas[ $timer->ID ]['notes'] );
 	}
 
+	public function test_named_steps_are_flagged_for_the_editor() {
+
+		$funnel = new Funnel( [ 'title' => 'named', 'status' => 'inactive' ] );
+
+		$titled = $funnel->add_step( [ 'step_type' => 'apply_tag', 'step_group' => Step::ACTION, 'step_title' => 'Tags' ] );
+		$note   = $funnel->add_step( [ 'step_type' => 'apply_note', 'step_group' => Step::ACTION, 'step_title' => 'A note' ] );
+
+		$canvas = function () use ( $funnel ) {
+			return $funnel->while_editing( function () use ( $funnel ) {
+				return $funnel->get_canvas_data();
+			} );
+		};
+
+		// apply_note has no generated title, so it's always named
+		$this->assertFalse( $canvas()[ $titled->ID ]['named'] );
+		$this->assertTrue( $canvas()[ $note->ID ]['named'] );
+
+		update_option( 'gh_force_custom_step_names', 'on' );
+
+		$this->assertTrue( $canvas()[ $titled->ID ]['named'] );
+		$this->assertTrue( $canvas()[ $note->ID ]['named'] );
+
+		// the editor draws the name's field, the settings from the server don't have it
+		$island = $titled->get_step_element()->get_settings_island( $titled );
+		$this->assertStringNotContainsString( "steps[{$titled->ID}][step_title]", $island['html'] );
+
+		delete_option( 'gh_force_custom_step_names' );
+	}
+
 	public function test_hooks_print_on_the_card() {
 
 		$funnel = $this->simple_flow();
