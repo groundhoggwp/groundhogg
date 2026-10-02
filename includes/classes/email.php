@@ -1354,6 +1354,25 @@ class Email extends Base_Object_With_Meta {
 		is_sending( true );
 		the_email( $this );
 
+		// Every way out of sending has to turn the flag back off. It gates things like minting auto-login
+		// keys, so it must not be left on by an early return (undeliverable, not ready...) or an exception.
+		try {
+			return $this->send_to( $contact_id_or_email, $event );
+		} finally {
+			is_sending( false );
+		}
+	}
+
+	/**
+	 * The body of send(), which is what keeps is_sending() honest around it
+	 *
+	 * @param $contact_id_or_email Contact|int|string
+	 * @param $event               Event|int|null
+	 *
+	 * @return bool|WP_Error
+	 */
+	private function send_to( $contact_id_or_email, $event = null ) {
+
 		// Clear any old previous errors.
 		$this->clear_errors();
 
