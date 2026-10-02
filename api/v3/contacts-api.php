@@ -13,7 +13,7 @@ use function Groundhogg\current_user_is;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_contactdata;
 use Groundhogg\Plugin;
-use function Groundhogg\get_db;
+use function Groundhogg\is_email_address_in_use;
 use function Groundhogg\sort_by_string_in_array;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -386,13 +386,26 @@ class Contacts_Api extends Base {
 
 		$args = map_deep( $args, 'sanitize_text_field' );
 
-		$contact_id = get_db( 'contacts' )->add( $args );
+		// These are handled separately, they're not contact columns
+		unset( $args['meta'], $args['tags'] );
 
-		if ( ! $contact_id ) {
-			return self::ERROR_400( 'error', 'Unable to add contact.' );
+		// A contact with this email is updated rather than duplicated
+		if ( is_email_address_in_use( $args['email'] ) ) {
+
+			$contact = new Contact( $args['email'] );
+
+			if ( ! current_user_can( 'edit_contact', $contact ) ) {
+				return self::ERROR_INVALID_PERMISSIONS();
+			}
+
+			$contact->update( $args );
+		} else {
+			$contact = new Contact( $args );
 		}
 
-		$contact = get_contactdata( $contact_id );
+		if ( ! $contact->exists() ) {
+			return self::ERROR_400( 'error', 'Unable to add contact.' );
+		}
 
 		// Add any meta data
 		foreach ( $meta as $key => $value ) {
@@ -404,10 +417,9 @@ class Contacts_Api extends Base {
 			$contact->add_tag( $tags );
 		}
 
-		$contact = $this->get_contact_for_rest_response( $contact_id );
-
+		// Not re-fetched with get_contactdata(), that can hand back a copy cached before the update
 		return self::SUCCESS_RESPONSE( [
-			'contact' => $contact
+			'contact' => $contact->get_as_array()
 		], _x( 'Contact added successfully.', 'api', 'groundhogg' ) );
 
 	}
@@ -442,7 +454,7 @@ class Contacts_Api extends Base {
 			return self::ERROR_400( 'invalid_email', _x( 'Please provide a valid email address.', 'api', 'groundhogg' ) );
 		}
 
-		if ( isset( $args['email'] ) && $args['email'] !== $contact->get_email() && get_db( 'contacts' )->exists( $args['email'] ) ) {
+		if ( isset( $args['email'] ) && $args['email'] !== $contact->get_email() && is_email_address_in_use( $args['email'] ) ) {
 			return self::ERROR_400( 'email_in_use', _x( 'This email address already belongs to another contact.', 'api', 'groundhogg' ) );
 		}
 
