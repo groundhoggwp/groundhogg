@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\DB\Email_Log;
 use Groundhogg\Queue\Event_Queue;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -129,7 +130,8 @@ class Email_Logger {
 			self::$log_item->update( $log_data );
 		} else {
 			self::$log_item_id = get_db( 'email_log' )->add( $log_data );
-			self::$log_item    = new Email_Log_Item( self::$log_item_id );
+			// whoever is sending still has to be able to pick up the log they just wrote, even a sensitive one
+			self::$log_item    = Email_Log::as_system( fn() => new Email_Log_Item( self::$log_item_id ) );
 		}
 
 		do_action( 'groundhogg/email_logger/after_create_log', self::$log_item, $this );

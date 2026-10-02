@@ -103,9 +103,9 @@ class Email_Log extends DB {
 	 * @return object|void
 	 */
 	public function get( $row_id ) {
-		$obj = parent::get( $row_id );
+		$obj = $this->maybe_unserialize( parent::get( $row_id ) );
 
-		return $this->maybe_unserialize( $obj );
+		return $this->is_hidden( $obj ) ? null : $obj;
 	}
 
 	/**
@@ -117,23 +117,70 @@ class Email_Log extends DB {
 	 * @return object
 	 */
 	public function get_by( $column, $row_id ) {
-		$obj = parent::get_by( $column, $row_id );
+		$obj = $this->maybe_unserialize( parent::get_by( $column, $row_id ) );
 
-		return $this->maybe_unserialize( $obj );
+		return $this->is_hidden( $obj ) ? null : $obj;
+	}
+
+	/**
+	 * How many times we're inside of as_system()
+	 *
+	 * @var int
+	 */
+	protected static $system_depth = 0;
+
+	/**
+	 * Run something that has to read its own logs whoever happens to be logged in, e.g. the logger
+	 * picking up the log it just wrote while a sales rep is sending an email.
+	 *
+	 * @param callable $callback
+	 *
+	 * @return mixed
+	 */
+	public static function as_system( callable $callback ) {
+
+		self::$system_depth ++;
+
+		try {
+			return $callback();
+		} finally {
+			self::$system_depth --;
+		}
+	}
+
+	/**
+	 * Sensitive logs (password resets, auto-login links) are only for super admins. Requests with no
+	 * logged in user (cron, CLI) are internal and not restricted, they can't get at the data anyway.
+	 *
+	 * @return bool
+	 */
+	protected function hides_sensitive_logs() {
+		return ! self::$system_depth && is_user_logged_in() && ! is_super_admin();
+	}
+
+	/**
+	 * @param object|null $log
+	 *
+	 * @return bool whether the current user is not allowed to see this log
+	 */
+	protected function is_hidden( $log ) {
+		return is_object( $log ) && ! empty( $log->is_sensitive ) && $this->hides_sensitive_logs();
 	}
 
 	public function query( $data = [], $ORDER_BY = '', $from_cache = true ) {
 
-		// Don't allow low level people to see sensitive email logs
-		if ( ! is_super_admin() ) {
-			$data['is_sensitive'] = 0;
+		// Don't allow low level people to see sensitive email logs. This has to be a compare array,
+		// a plain 0 is "empty" and the query parser skips those, which left this restriction doing nothing.
+		if ( $this->hides_sensitive_logs() ) {
+			$data['is_sensitive'] = [ 'compare' => '=', 'val' => 0 ];
 		}
 
 		return parent::query( $data, $ORDER_BY, $from_cache );
 	}
 
 	/**
-	 * Wrapper to add maybe unserialize
+	 * The restriction is added to the query vars so it is part of the cache key, otherwise results
+	 * cached by a super admin would be served to everyone else.
 	 *
 	 * @param array $query_vars
 	 * @param bool  $from_cache
@@ -141,6 +188,11 @@ class Email_Log extends DB {
 	 * @return array[]|int|object[]
 	 */
 	public function advanced_query( $query_vars = [], $from_cache = true ) {
+
+		if ( $this->hides_sensitive_logs() ) {
+			$query_vars['_hide_sensitive'] = true;
+		}
+
 		$objs = parent::advanced_query( $query_vars, $from_cache );
 
 		if ( is_array( $objs ) ) {
@@ -148,6 +200,29 @@ class Email_Log extends DB {
 		}
 
 		return $objs;
+	}
+
+	/**
+	 * AND the sensitive restriction around whatever where clause was asked for, so a where of its
+	 * own (including one with an OR relationship) can't get around it.
+	 *
+	 * @param array $query_vars
+	 *
+	 * @return string
+	 */
+	public function get_sql( $query_vars = [] ) {
+
+		$query_vars = $this->parse_query_vars( $query_vars );
+
+		if ( ! empty( $query_vars['_hide_sensitive'] ) || $this->hides_sensitive_logs() ) {
+			$query_vars['where'] = [
+				'relationship' => 'AND',
+				$query_vars['where'],
+				[ 'col' => 'is_sensitive', 'val' => 0, 'compare' => '=' ],
+			];
+		}
+
+		return parent::get_sql( $query_vars );
 	}
 
 	/**

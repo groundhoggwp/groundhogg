@@ -2286,12 +2286,18 @@ class Replacements implements \JsonSerializable {
 			return $redirect_to;
 		}
 
-		if ( is_sending() ) {
-			// Temporarily force the email to be sent to the user's email address instead
-			the_email()->contact->email = the_email()->contact->get_userdata()->user_email;
-		}
+		// A key that signs in as a user is only ever minted while Email::send() is building an email for
+		// that same contact, which is also what forces the email to go to the user's own address. Anywhere
+		// else (notes, pages, previews, composed emails with other recipients) the key would be readable
+		// by whoever can see that content, and composed emails never set the_email() at all.
+		$email = the_email();
 
-		$link_url = maybe_permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
+		if ( is_sending() && $email && is_a_contact( $email->contact ) && $email->contact->get_id() === $this->get_current_contact()->get_id() ) {
+			// Temporarily force the email to be sent to the user's email address instead
+			$email->contact->email = $email->contact->get_userdata()->user_email;
+
+			$link_url = maybe_permissions_key_url( $link_url, $this->get_current_contact(), 'auto_login', DAY_IN_SECONDS, true );
+		}
 
 		if ( $redirect_to && is_string( $redirect_to ) ) {
 			$link_url = add_query_arg( [

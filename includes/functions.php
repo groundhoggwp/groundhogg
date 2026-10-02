@@ -5165,6 +5165,10 @@ function generate_permissions_key( $contact = false, $usage = 'preferences', $ex
 
 	// use it instead of creating a new one
 	if ( $found ) {
+
+		// The redactor is reset for every event, so a key served from the cache has to be registered again
+		add_redaction( $key );
+
 		return $key;
 	}
 
@@ -5294,7 +5298,8 @@ function check_permissions_key( $key, $contact = false, $usage = 'preferences' )
  */
 function maybe_permissions_key_url( $url, $contact, $usage = 'preferences', $expiration = WEEK_IN_SECONDS, $delete_after_use = false ) {
 
-	if ( is_sending() || current_contact_and_logged_in_user_match() ) {
+	// Outside of sending, the key is only for the visitor's own contact, not for any contact being rendered
+	if ( is_sending() || ( current_contact_and_logged_in_user_match() && is_a_contact( $contact ) && $contact->get_id() === get_contactdata()->get_id() ) ) {
 
 		Email_Logger::email_is_sensitive();
 
@@ -5562,6 +5567,37 @@ function current_contact_and_logged_in_user_match() {
 	}
 
 	return contact_and_user_match( get_contactdata(), wp_get_current_user() );
+}
+
+/**
+ * Whether the current request is allowed to link a contact record to the given WP user.
+ *
+ * A linked contact is what the auto-login route signs in as, so this is an account-level
+ * permission and not just a contact one. Allowed when unlinking, when there is no logged-in
+ * user (cron, CLI, registration hooks), when linking to yourself, or when you can edit that user.
+ *
+ * @param int $user_id
+ *
+ * @return bool
+ */
+function can_link_contact_to_user( $user_id ) {
+
+	$user_id = absint( $user_id );
+
+	// Unlinking
+	if ( ! $user_id ) {
+		return true;
+	}
+
+	if ( ! get_userdata( $user_id ) ) {
+		return false;
+	}
+
+	$can = ! is_user_logged_in()
+	       || get_current_user_id() === $user_id
+	       || current_user_can( 'edit_user', $user_id );
+
+	return (bool) apply_filters( 'groundhogg/contact/can_link_to_user', $can, $user_id );
 }
 
 /**

@@ -842,6 +842,14 @@ class Contact extends Base_Object_With_Meta {
 			}
 		}
 
+		unset( $value );
+
+		// Linking a contact to a WP user decides whose account its auto-login links sign in as,
+		// so it can't be left to anyone who is merely allowed to edit contacts.
+		if ( isset( $data['user_id'] ) && ! can_link_contact_to_user( $data['user_id'] ) ) {
+			unset( $data['user_id'] );
+		}
+
 		return $data;
 	}
 
