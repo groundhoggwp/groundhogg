@@ -280,8 +280,12 @@
         include_automated: State.automated,
       }
 
+      // what's older than the oldest item, by time and then by which it is, a page of one second would otherwise never move on
       if (!reset && State.items.length) {
-        query.before = State.items[0].timestamp
+        const oldest = State.items[0]
+        query.before = oldest.timestamp
+        query.before_kind = oldest.kind
+        query.before_id = oldest.ID
       }
 
       if (State.direction) {
@@ -296,7 +300,7 @@
 
       return Groundhogg.api.get(`${ Groundhogg.api.routes.v4.messages }/feed`, query).then(r => {
 
-        // `before` is inclusive so the boundary item can come back again
+        // the oldest item is where the next page starts after, but what's already here is left out in case it's sent again
         let known = new Set(reset ? [] : State.items.map(i => i.key))
         let items = r.items.filter(i => !known.has(i.key)).reverse()
 

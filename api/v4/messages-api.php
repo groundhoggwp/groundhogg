@@ -593,9 +593,12 @@ class Messages_Api extends Base_Object_Api {
 	 *
 	 * Messages (composed emails and replies) are always included. Completed broadcast and flow emails
 	 * can be merged in with include_automated. Those are not stored as messages, they are read from
-	 * the events table. Pages are cursor based on time, `before` is a unix timestamp (inclusive) and
-	 * the response gives the `next_before` to use for the following page, that way the two sources
-	 * page together correctly.
+	 * the events table. Pages are cursor based, newest first by time, then messages before automated emails,
+	 * then the highest ID. The cursor is the last item of the page: `before` is its unix timestamp,
+	 * `before_kind` is its kind (message or event) and `before_id` is its ID, and the next page is what's
+	 * older than it, so a page that's all the same second still moves on. With only `before`, it's what's at
+	 * that time or older. The response gives the cursor of the following page in `next`, that way the two
+	 * sources page together correctly.
 	 *
 	 * @param WP_REST_Request $request
 	 *
@@ -618,6 +621,10 @@ class Messages_Api extends Base_Object_Api {
 
 		$limit     = min( max( absint( $request->get_param( 'limit' ) ?: 25 ), 1 ), 100 );
 		$before    = absint( $request->get_param( 'before' ) ) ?: time() + DAY_IN_SECONDS;
+		$cursor    = [
+			'kind' => in_array( $request->get_param( 'before_kind' ), [ 'message', 'event' ], true ) ? $request->get_param( 'before_kind' ) : '',
+			'id'   => absint( $request->get_param( 'before_id' ) ),
+		];
 		$direction = in_array( $request->get_param( 'direction' ), [ 'inbound', 'outbound' ], true ) ? $request->get_param( 'direction' ) : '';
 		$search    = sanitize_text_field( $request->get_param( 'search' ) ?: '' );
 
@@ -628,36 +635,57 @@ class Messages_Api extends Base_Object_Api {
 		             && ! $search
 		             && current_user_can( 'view_contact', $object );
 
-		$messages = $this->query_messages( $object_type, $object_id, $before, $limit, $direction, $search );
-		$events   = $automated ? $this->query_automated_emails( $object, $before, $limit ) : [];
+		$messages = $this->query_messages( $object_type, $object_id, $before, $limit, $direction, $search, $cursor );
+		$events   = $automated ? $this->query_automated_emails( $object, $before, $limit, $cursor ) : [];
 
 		$fetched_full_page = count( $messages ) >= $limit || count( $events ) >= $limit;
 
 		$items = array_merge( $messages, $events );
 
-		usort( $items, fn( $a, $b ) => [ $b['timestamp'], $b['ID'] ] <=> [ $a['timestamp'], $a['ID'] ] );
+		// the order the pages are in, a message is before an automated email at the same time, IDs of the two aren't comparable
+		usort( $items, fn( $a, $b ) => [ $b['timestamp'], (int) ( $b['kind'] === 'message' ), $b['ID'] ] <=> [ $a['timestamp'], (int) ( $a['kind'] === 'message' ), $a['ID'] ] );
 
 		$has_more = count( $items ) > $limit || $fetched_full_page;
 		$items    = array_slice( $items, 0, $limit );
+		$last     = $items ? end( $items ) : null;
 
 		return self::SUCCESS_RESPONSE( [
 			'items'       => $items,
 			'has_more'    => $has_more,
-			'next_before' => $items ? end( $items )['timestamp'] : null,
+			'next_before' => $last ? $last['timestamp'] : null,
+			'next'        => $last ? [
+				'before'      => $last['timestamp'],
+				'before_kind' => $last['kind'],
+				'before_id'   => $last['ID'],
+			] : null,
 		] );
 	}
 
 	/**
 	 * @return array[]
 	 */
-	protected function query_messages( $object_type, $object_id, $before, $limit, $direction, $search ) {
+	protected function query_messages( $object_type, $object_id, $before, $limit, $direction, $search, array $cursor = [] ) {
 
 		global $wpdb;
 
 		$table = get_db( 'messages' )->get_table_name();
 
-		$where = [ 'object_type = %s', 'object_id = %d', 'date_created <= %s' ];
-		$args  = [ $object_type, $object_id, gmdate( 'Y-m-d H:i:s', $before ) ];
+		$time  = gmdate( 'Y-m-d H:i:s', $before );
+		$where = [ 'object_type = %s', 'object_id = %d' ];
+		$args  = [ $object_type, $object_id ];
+
+		if ( ( $cursor['kind'] ?? '' ) === 'message' && ! empty( $cursor['id'] ) ) {
+			// what's after that message, at the same time the ones with a lower ID
+			$where[] = '( date_created < %s OR ( date_created = %s AND ID < %d ) )';
+			array_push( $args, $time, $time, $cursor['id'] );
+		} else if ( ( $cursor['kind'] ?? '' ) === 'event' && ! empty( $cursor['id'] ) ) {
+			// messages are before the automated emails of the same time, so the ones at that time were already in a page
+			$where[] = 'date_created < %s';
+			$args[]  = $time;
+		} else {
+			$where[] = 'date_created <= %s';
+			$args[]  = $time;
+		}
 
 		if ( $direction ) {
 			$where[] = 'direction = %s';
@@ -706,9 +734,17 @@ class Messages_Api extends Base_Object_Api {
 	 *
 	 * @return array[]
 	 */
-	protected function query_automated_emails( $contact, $before, $limit ) {
+	protected function query_automated_emails( $contact, $before, $limit, array $cursor = [] ) {
 
 		global $wpdb;
+
+		// older than the item the page starts after: after an automated email, the ones at the same time with a lower ID,
+		// after a message, the ones at the same time, they come after messages
+		if ( ( $cursor['kind'] ?? '' ) === 'event' && ! empty( $cursor['id'] ) ) {
+			$older = $wpdb->prepare( '( e.time < %d OR ( e.time = %d AND e.ID < %d ) )', $before, $before, $cursor['id'] );
+		} else {
+			$older = $wpdb->prepare( 'e.time <= %d', $before );
+		}
 
 		$events_table     = get_db( 'events' )->get_table_name();
 		$steps_table      = get_db( 'steps' )->get_table_name();
@@ -721,11 +757,11 @@ class Messages_Api extends Base_Object_Api {
 			FROM $events_table e
 			LEFT JOIN $steps_table s ON e.event_type = %d AND e.step_id = s.ID
 			LEFT JOIN $broadcasts_table b ON e.event_type = %d AND e.step_id = b.ID
-			WHERE e.contact_id = %d AND e.status = %s AND e.time <= %d
+			WHERE e.contact_id = %d AND e.status = %s AND $older
 			AND ( ( e.event_type = %d AND s.step_type = %s ) OR ( e.event_type = %d AND b.object_type = %s ) )
 			ORDER BY e.time DESC, e.ID DESC LIMIT %d",
 			Event::FUNNEL, Event::BROADCAST,
-			$contact->get_id(), Event::COMPLETE, $before,
+			$contact->get_id(), Event::COMPLETE,
 			Event::FUNNEL, Send_Email::TYPE, Event::BROADCAST, 'email',
 			$limit
 		);
