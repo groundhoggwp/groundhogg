@@ -2080,13 +2080,16 @@
             })
           }
 
+          // A safety stop for when the contact has no usable creation date, at the longest step that's decades
+          const MAX_EMPTY_SLICES = 40
+
           const loadEarlier = () => {
 
             let sliceBefore = windowAfter
             let sliceAfter = windowAfter - ( loadEarlierStep * 86400 )
             windowAfter = sliceAfter
 
-            fetchActivity({ before: sliceBefore, after: sliceAfter }).then(response => {
+            return fetchActivity({ before: sliceBefore, after: sliceAfter }).then(response => {
 
               let got = [ 'submissions', 'activity', 'events', 'page_visits', 'messages' ].
                 reduce((n, k) => n + ( Array.isArray(response[k]) ? response[k].length : 0 ), 0)
@@ -2096,15 +2099,24 @@
                 loadEarlierStep = LOAD_EARLIER_DAYS
               }
               else {
-                // skip dormant stretches faster; give up after a few empty slices in a row
+                // skip dormant stretches faster
                 emptyStreak++
                 loadEarlierStep = Math.min(loadEarlierStep * 2, 730)
               }
 
-              if (windowAfter <= contactCreatedUnix || emptyStreak >= 3) {
+              if (windowAfter <= contactCreatedUnix || emptyStreak >= MAX_EMPTY_SLICES) {
                 atStartOfHistory = true
               }
 
+              // Nothing in that stretch, so keep looking further back until there's something, or it's before the
+              // contact was created, instead of showing nothing and leaving it for the next click
+              if (!got && !atStartOfHistory) {
+                return loadEarlier()
+              }
+
+              renderLoadEarlier()
+            }).catch(() => {
+              // put the button back so it can be tried again
               renderLoadEarlier()
             })
           }
@@ -2113,8 +2125,9 @@
 
             const $container = $('#timeline-load-earlier')
 
+            // nothing earlier to load, say so instead of the button just going away
             if (atStartOfHistory) {
-              $container.empty()
+              $container.html(`<span id="timeline-start" class="description">${ __('Beginning of contact history', 'groundhogg') }</span>`)
               return
             }
 
