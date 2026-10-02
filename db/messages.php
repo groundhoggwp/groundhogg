@@ -45,6 +45,27 @@ class Messages extends DB {
 		add_action( 'groundhogg/owner_deleted', [ $this, 'owner_deleted' ], 10, 2 );
 		add_action( 'groundhogg/contact/merged', [ $this, 'objects_merged' ], 10, 2 );
 		add_action( 'groundhogg/object_merged', [ $this, 'objects_merged' ], 10, 2 );
+		add_action( 'groundhogg/db/post_delete/contact', [ $this, 'contact_deleted' ] );
+	}
+
+	/**
+	 * Delete the messages of a contact that was just deleted, they're about the contact and have no use without them.
+	 * A contact that was merged into another has already had its messages moved by then, see objects_merged().
+	 *
+	 * @param int|array $id the ID of the contact, the conditions when it wasn't deleted by ID
+	 *
+	 * @return false|int
+	 */
+	public function contact_deleted( $id ) {
+
+		if ( ! is_numeric( $id ) ) {
+			return false;
+		}
+
+		return $this->bulk_delete( [
+			'object_type' => 'contact',
+			'object_id'   => absint( $id ),
+		] );
 	}
 
 	/**

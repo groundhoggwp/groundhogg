@@ -357,6 +357,13 @@ class Main_Roles extends Roles {
 				// a message is only as visible as the object it's attached to
 				$associated = $message->get_associated_object();
 
+				// What it's attached to is gone, so there's nothing to see it through, and what's left of it isn't for anyone.
+				// A type with no table, like one of a deactivated add-on, isn't resolved at all, and falls through as before.
+				if ( is_object( $associated ) && method_exists( $associated, 'exists' ) && ! $associated->exists() ) {
+					$caps = [ 'do_not_allow' ];
+					break;
+				}
+
 				if ( is_object( $associated ) && method_exists( $associated, 'exists' ) && $associated->exists() ) {
 
 					$associated_type = $associated->_get_object_type();

@@ -641,4 +641,67 @@ class Message_Ingest_Tests extends GH_UnitTestCase {
 		$this->assertFalse( user_can( $owner_id, 'add_messages' ) );
 		$this->assertFalse( user_can( $owner_id, 'edit_messages' ) );
 	}
+
+	/* ---------------------------------------------------------------------
+	 * what's left when the contact is gone
+	 * ------------------------------------------------------------------- */
+
+	public function test_deleting_a_contact_deletes_their_messages_and_only_theirs() {
+
+		$gone  = $this->create_contact( $this->addr( 'gone' ) );
+		$stays = $this->create_contact( $this->addr( 'stays' ) );
+
+		$this->create_sent( $gone, $this->mid( 'gone-1' ) );
+		$this->create_sent( $gone, $this->mid( 'gone-2' ) );
+		$this->create_sent( $stays, $this->mid( 'stays-1' ) );
+
+		$this->assertSame( 2, $this->message_count( $gone ) );
+
+		$gone_id = $gone->get_id();
+		$this->assertTrue( \Groundhogg\get_db( 'contacts' )->delete( $gone_id ) );
+
+		$this->assertSame( 0, \Groundhogg\get_db( 'messages' )->count( [ 'object_type' => 'contact', 'object_id' => $gone_id ] ) );
+		$this->assertSame( 1, $this->message_count( $stays ) );
+	}
+
+	public function test_the_messages_of_a_contact_that_is_merged_move_to_the_one_it_is_merged_into() {
+
+		$keep  = $this->create_contact( $this->addr( 'keep' ) );
+		$other = $this->create_contact( $this->addr( 'other' ) );
+
+		$this->create_sent( $keep, $this->mid( 'keep-1' ) );
+		$this->create_sent( $other, $this->mid( 'other-1' ) );
+
+		$other_id = $other->get_id();
+		$this->assertTrue( $keep->merge( $other ) );
+
+		$this->assertSame( 2, $this->message_count( $keep ), 'the merge keeps them, the delete that follows only takes what is left' );
+		$this->assertSame( 0, \Groundhogg\get_db( 'messages' )->count( [ 'object_type' => 'contact', 'object_id' => $other_id ] ) );
+	}
+
+	public function test_a_message_whose_contact_is_gone_is_not_readable_by_anyone() {
+
+		global $wpdb;
+
+		$owner_id = self::factory()->user->create( [ 'role' => 'sales_rep' ] );
+		$admin_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		$contact  = $this->create_contact( $this->addr( 'orphan' ), [ 'owner_id' => $owner_id ] );
+		$message  = $this->create_sent( $contact, $this->mid( 'orphan-1' ) );
+
+		$this->assertTrue( user_can( $owner_id, 'view_message', $message ) );
+		$this->assertTrue( user_can( $admin_id, 'view_message', $message ) );
+
+		// leave the message behind, like one from before messages were deleted with their contact
+		$wpdb->delete( \Groundhogg\get_db( 'contacts' )->get_table_name(), [ 'ID' => $contact->get_id() ] );
+		\Groundhogg\get_db( 'contacts' )->cache_set_last_changed();
+
+		$orphan = new Message( $message->get_id() );
+
+		$this->assertTrue( $orphan->exists() );
+
+		foreach ( [ $owner_id, $admin_id ] as $user_id ) {
+			$this->assertFalse( user_can( $user_id, 'view_message', $orphan ), 'view' );
+			$this->assertFalse( user_can( $user_id, 'delete_message', $orphan ), 'delete' );
+		}
+	}
 }
