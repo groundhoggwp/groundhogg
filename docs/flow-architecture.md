@@ -1079,9 +1079,12 @@ named checkboxes, so every save posts them. After undo/redo (`forcePanels`) ever
 - `#settings-<ID>.step.<group>.<type>.settings` contains `.step-warnings` (from `validate_settings()`
   errors) and `.step-flex`.
 - `.step-flex` holds:
+  - **`.step-main`** (drawn by `SettingsPanel()`): for a step that's named rather than titled from its settings
+    (canvas data `named`: custom names are forced or no title is generated), the `.step-name-settings` panel with
+    its `steps[ID][step_title]` input, saved with the panel's other fields and previewed on the card as it's
+    typed (`previewOf()`); then
   - **`.step-edit.panels`**, which gets `ignore-morph` when `settings_should_ignore_morph()` is true, the
-    default. Inside it: `.main-step-settings-panel .custom-settings` (the `step_title` input when custom
-    names are forced or no title is generated, then `settings( $step )`), and the
+    default. Inside it: `.main-step-settings-panel .custom-settings` (`settings( $step )`), and the
     `groundhogg/steps/{type}/settings/before|after` and `groundhogg/steps/settings/before|after` actions.
   - **`.step-notes`**: for benchmarks, a panel with `is_entry` / `can_passthru` (not on starting ones),
     `is_conversion`, and `#trigger-frequency-settings-<ID>`; then the `step_notes` textarea.

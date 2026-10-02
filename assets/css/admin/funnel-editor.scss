@@ -780,6 +780,16 @@ body.gh-screenshot-mode {
           display: flex;
           gap: 30px;
 
+          // the step's name, if it has one, and the step type's settings
+          .step-main {
+            width: 100%;
+            flex-grow: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+          }
+
           .step-notes {
             display: flex;
             flex-direction: column;

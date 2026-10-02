@@ -813,6 +813,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 			'layout'       => $step->is_benchmark() ? 'benchmark' : 'default',
 			'branch_logic' => $step->is_branch_logic(),
 			'title'        => $this->get_title( $step ),
+			// given a name in its settings rather than titled from them, the editor shows a field for it
+			'named'        => force_custom_step_names() || $this->generate_step_title( $step ) === false,
 			'classes'      => array_values( $this->get_sortable_classes( $step ) ),
 			'notes'        => markdown2html( $step->get_meta( 'step_notes' ), true ),
 			'entry'        => $step->is_entry(),
@@ -931,14 +933,8 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
                 </div>
                 <div class="custom-settings"><?php
 
-					// instead of having it as part of the step container, just show it as an input field...
-					if ( force_custom_step_names() || $this->generate_step_title( $step ) === false ) {
-						html( 'p', [], esc_html__( 'Give this step an internal name...', 'groundhogg' ) );
-						html( html()->input( [
-							'name'  => $this->setting_name_prefix( 'step_title' ),
-							'value' => $step->step_title
-						] ) );
-					}
+					// the step's name, when it's named rather than titled from its settings, is drawn by the editor,
+					// see get_canvas_data() and SettingsPanel() in funnel-editor.js
 
 					// where the step type's JS draws its settings, if it has any, see Funnel.registerStepType()
 					?>
