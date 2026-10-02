@@ -1063,10 +1063,19 @@ class Funnels_Page extends Admin_Page {
 		$choices = array_map_keys( $choices, 'absint' );
 
 		return array_map( function ( $choice ) {
-			return [
+
+			$result = [
 				'action' => one_of( get_array_var( $choice, 'action' ), [ 'cancel', 'move' ] ),
 				'to'     => absint( get_array_var( $choice, 'to' ) ),
 			];
+
+			$time = Flow_Changes::parse_run_time( get_array_var( $choice, 'date' ), get_array_var( $choice, 'time' ) );
+
+			if ( $result['action'] === 'move' && $time && ! is_wp_error( $time ) ) {
+				$result['time'] = $time;
+			}
+
+			return $result;
 		}, array_filter( $choices, 'is_array' ) );
 	}
 

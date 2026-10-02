@@ -148,6 +148,68 @@ class Flow_Changes_Tests extends GH_UnitTestCase {
 		$this->assertEquals( 1, $this->queued_at( $ids['c'] ) );
 	}
 
+	public function test_publish_can_move_contacts_to_a_set_date_and_time() {
+		$ids = $this->create_flow();
+		$this->wait_at( $ids['flow'], $ids['b'] );
+		$this->stage_changes( $ids );
+
+		$out = $this->execute( 'groundhogg/publish-flow-changes', [
+			'flow_id'       => $ids['flow'],
+			'deleted_steps' => [ [ 'step' => $ids['b'], 'action' => 'move', 'to' => $ids['c'], 'date' => '2031-04-05', 'time' => '09:30' ] ],
+		] );
+
+		$this->assertNotWPError( $out );
+
+		// the site's timezone, not UTC
+		$expected = ( new DateTime( '2031-04-05 09:30:00', wp_timezone() ) )->getTimestamp();
+
+		$this->assertEquals( $expected, $out['deleted_steps'][0]['run_at'] );
+		$this->assertEquals( 1, $this->queued_at( $ids['c'] ) );
+
+		$moved = event_queue_db()->query( [ 'step_id' => $ids['c'], 'status' => Event::WAITING ] );
+		$this->assertCount( 1, $moved );
+		$this->assertEquals( $expected, (int) $moved[0]->time );
+	}
+
+	public function test_moved_contacts_run_when_the_step_normally_runs_without_a_date_and_time() {
+		$ids = $this->create_flow();
+		$this->wait_at( $ids['flow'], $ids['b'] );
+		$this->stage_changes( $ids );
+
+		$out = $this->execute( 'groundhogg/publish-flow-changes', [
+			'flow_id'       => $ids['flow'],
+			// a date alone isn't a date and a time
+			'deleted_steps' => [ [ 'step' => $ids['b'], 'action' => 'move', 'to' => $ids['c'], 'date' => '2031-04-05' ] ],
+		] );
+
+		$this->assertNotWPError( $out );
+		$this->assertArrayNotHasKey( 'run_at', $out['deleted_steps'][0] );
+		$this->assertEquals( 1, $this->queued_at( $ids['c'] ) );
+
+		$moved = event_queue_db()->query( [ 'step_id' => $ids['c'], 'status' => Event::WAITING ] );
+		$this->assertLessThan( 2031, (int) gmdate( 'Y', (int) $moved[0]->time ) );
+	}
+
+	public function test_a_date_and_time_that_are_not_valid_are_refused() {
+		$ids = $this->create_flow();
+		$this->stage_changes( $ids );
+
+		foreach ( [
+			[ 'date' => 'tomorrow', 'time' => '09:30' ],
+			[ 'date' => '2031-04-05', 'time' => 'noon' ],
+			[ 'date' => '2031-04-05', 'time' => '9:30 PM' ],
+		] as $when ) {
+			$out = $this->execute( 'groundhogg/publish-flow-changes', [
+				'flow_id'       => $ids['flow'],
+				'deleted_steps' => [ array_merge( [ 'step' => $ids['b'], 'action' => 'move', 'to' => $ids['c'] ], $when ) ],
+			] );
+
+			$this->assertWPError( $out, wp_json_encode( $when ) );
+		}
+
+		$this->assertEquals( [ 'a', 'b', 'c' ], $this->titles( $ids['flow'], 'live' ) );
+	}
+
 	public function test_publish_refuses_bad_choices_and_publishes_nothing() {
 		$ids = $this->create_flow();
 		$this->stage_changes( $ids );

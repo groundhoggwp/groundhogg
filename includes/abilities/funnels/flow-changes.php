@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Abilities\Funnels;
 
+use Groundhogg\Utils\DateTimeHelper;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use WP_Error;
@@ -64,6 +65,14 @@ class Flow_Changes {
 						'type'        => 'integer',
 						'description' => __( 'For "move": an action step in the flow that isn\'t deleted.', 'groundhogg' ),
 					],
+					'date'   => [
+						'type'        => 'string',
+						'description' => __( 'For "move", with time: the date, Y-m-d in the site\'s timezone, that the contacts run at the step they\'re moved to. Without date and time they run when the step would normally run, as of now.', 'groundhogg' ),
+					],
+					'time'   => [
+						'type'        => 'string',
+						'description' => __( 'For "move", with date: the time of day, H:i or H:i:s in the site\'s timezone.', 'groundhogg' ),
+					],
 				],
 			],
 		];
@@ -89,6 +98,10 @@ class Flow_Changes {
 						'enum' => [ 'cancel', 'move' ],
 					],
 					'moved_to'         => [ 'type' => 'integer' ],
+					'run_at'           => [
+						'type'        => 'integer',
+						'description' => __( 'For "move": the Unix timestamp that contacts were set to run at, when one was given.', 'groundhogg' ),
+					],
 				],
 			],
 		];
@@ -100,7 +113,7 @@ class Flow_Changes {
 	 * @param Funnel $funnel
 	 * @param array  $deleted_steps
 	 *
-	 * @return array|WP_Error step ID => [ 'action' => 'cancel'|'move', 'to' => step ID ]
+	 * @return array|WP_Error step ID => [ 'action' => 'cancel'|'move', 'to' => step ID, 'time' => timestamp, when it was given ]
 	 */
 	public static function get_choices( Funnel $funnel, array $deleted_steps ) {
 
@@ -127,9 +140,53 @@ class Flow_Changes {
 			}
 
 			$choices[ $step_id ] = [ 'action' => $action, 'to' => $to ];
+
+			if ( $action === 'move' ) {
+
+				$time = self::parse_run_time( $choice['date'] ?? '', $choice['time'] ?? '' );
+
+				if ( is_wp_error( $time ) ) {
+					return $time;
+				}
+
+				if ( $time ) {
+					$choices[ $step_id ]['time'] = $time;
+				}
+			}
 		}
 
 		return $choices;
+	}
+
+	/**
+	 * When contacts that are moved are to run, as a date and a time of day in the site's timezone, like when contacts are
+	 * added to a flow later
+	 *
+	 * @param mixed $date Y-m-d
+	 * @param mixed $time H:i or H:i:s
+	 *
+	 * @return int|WP_Error the timestamp, 0 when there isn't a date and a time, they run when the step they're moved to normally would
+	 */
+	public static function parse_run_time( $date, $time ) {
+
+		$date = is_scalar( $date ) ? trim( sanitize_text_field( (string) $date ) ) : '';
+		$time = is_scalar( $time ) ? trim( sanitize_text_field( (string) $time ) ) : '';
+
+		if ( $date === '' || $time === '' ) {
+			return 0;
+		}
+
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) || ! preg_match( '/^\d{1,2}:\d{2}(:\d{2})?$/', $time ) ) {
+			return new WP_Error( 'groundhogg_invalid_run_time', __( 'The date to run moved contacts must be Y-m-d, and the time H:i or H:i:s.', 'groundhogg' ) );
+		}
+
+		try {
+			$when = new DateTimeHelper( "$date $time", wp_timezone() );
+		} catch ( \Exception $e ) {
+			return new WP_Error( 'groundhogg_invalid_run_time', $e->getMessage() );
+		}
+
+		return $when->getTimestamp();
 	}
 
 	/**
@@ -162,6 +219,10 @@ class Flow_Changes {
 
 			if ( $choice['action'] === 'move' ) {
 				$outcome['moved_to'] = $choice['to'];
+
+				if ( ! empty( $choice['time'] ) ) {
+					$outcome['run_at'] = (int) $choice['time'];
+				}
 			}
 
 			$outcomes[] = $outcome;

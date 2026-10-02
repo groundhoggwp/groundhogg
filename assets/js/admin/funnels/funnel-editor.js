@@ -313,7 +313,7 @@
    *
    * @param pendingDeletes {{steps: Object[], targets: Object[]}} deleted steps with waiting contacts, and actions they can be moved to
    * @param confirmText string the label of the button that was clicked, like Publish Changes or Activate
-   * @param onConfirm function receives the choices, step ID => { action, to }
+   * @param onConfirm function receives the choices, step ID => { action, to, date, time }, the date and time when a move is to run at one
    */
   const confirmDeletedSteps = (pendingDeletes, confirmText, onConfirm) => {
 
@@ -327,11 +327,19 @@
       return
     }
 
+    // moved contacts run when the step they're moved to normally runs, unless they're told when, which starts as tomorrow morning
+    const pad = n => String(n).padStart(2, '0')
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    const tomorrowDate = `${ tomorrow.getFullYear() }-${ pad(tomorrow.getMonth() + 1) }-${ pad(tomorrow.getDate()) }`
+
     // cancel by default
     const choices = Object.fromEntries(steps.map(step => [
       step.ID, {
         action: 'cancel',
         to    : step.next || targets[0]?.ID || 0,
+        later : false,
+        date  : tomorrowDate,
+        time  : '09:00',
       },
     ]))
 
@@ -391,6 +399,51 @@
             },
           }) : null,
         ]),
+        // when they run at the step, like when contacts are added to a flow later
+        choices[step.ID].action === 'move' ? Div({
+          className: 'display-flex gap-10 align-center',
+        }, [
+          Select({
+            id      : `deleted-step-when-${ step.ID }`,
+            options : [
+              {
+                value: 'normal',
+                text : __('When that step normally runs', 'groundhogg'),
+              },
+              {
+                value: 'later',
+                text : __('On a date and time...', 'groundhogg'),
+              },
+            ],
+            selected: choices[step.ID].later ? 'later' : 'normal',
+            onChange: e => {
+              choices[step.ID].later = e.target.value === 'later'
+              morph()
+            },
+          }),
+          choices[step.ID].later ? Div({
+            className: 'gh-input-group',
+          }, [
+            Input({
+              type    : 'date',
+              id      : `deleted-step-date-${ step.ID }`,
+              name    : 'date',
+              value   : choices[step.ID].date,
+              onChange: e => {
+                choices[step.ID].date = e.target.value
+              },
+            }),
+            Input({
+              type    : 'time',
+              id      : `deleted-step-time-${ step.ID }`,
+              name    : 'time',
+              value   : choices[step.ID].time,
+              onChange: e => {
+                choices[step.ID].time = e.target.value
+              },
+            }),
+          ]) : null,
+        ]) : null,
       ])),
       Div({
         className: 'display-flex flex-end gap-10',
@@ -404,7 +457,26 @@
           className: 'gh-button primary',
           onClick  : e => {
             close()
-            onConfirm(choices)
+
+            // only what the server takes, the date and time only when they were chosen, in the site's timezone like the flow scheduler
+            onConfirm(Object.fromEntries(Object.entries(choices).map(([id, {
+              action,
+              to,
+              later,
+              date,
+              time,
+            }]) => [
+              id,
+              action === 'move' && later && date && time ? {
+                action,
+                to,
+                date,
+                time,
+              } : {
+                action,
+                to,
+              },
+            ])))
           },
         }, confirmText),
       ]),
