@@ -2063,8 +2063,9 @@
             return
           }
 
-          // saved as they're typed, see SettingsPanel()
-          if (e.target.matches('textarea[name=step_notes]')) {
+          // saved as they're typed, see SettingsPanel() and StepNameSettings(), saving again when they lose focus
+          // could undo an undo that came in between
+          if (e.target.matches('textarea[name=step_notes], .step-name-settings input')) {
             return
           }
 
