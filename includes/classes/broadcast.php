@@ -349,22 +349,24 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			}
 		}
 
+		$where = [
+			'step_id'    => $this->get_id(),
+			'funnel_id'  => Broadcast::FUNNEL_ID,
+			'event_type' => Event::BROADCAST
+		];
+
 		// Cancel events in the event queue
 		get_db( 'event_queue' )->mass_update(
 			[
 				'status' => Event::CANCELLED
 			],
-			[
-				'step_id'    => $this->get_id(),
-				'funnel_id'  => Broadcast::FUNNEL_ID,
-				'event_type' => Event::BROADCAST
-			]
+			$where
 		);
 
-		// Move them to the history table
-		get_db( 'event_queue' )->move_events_to_history( [
+		// Move them to the history table, only this broadcast's, not every cancelled event in the queue
+		get_db( 'event_queue' )->move_events_to_history( array_merge( $where, [
 			'status' => Event::CANCELLED,
-		] );
+		] ), 'AND' );
 
 		// Set status to cancelled finally
 		$this->update( [ 'status' => 'cancelled' ] );
