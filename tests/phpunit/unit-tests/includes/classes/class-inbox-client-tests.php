@@ -43,6 +43,7 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 		$this->behaviour        = [ 'license' => 'valid', 'handshake' => 'ok', 'unreachable' => false, 'error' => null ];
 
 		Inbox::clear();
+		Inbound_Signature::ensure(); // a site that has the inbox has the secret
 		delete_option( Inbox::TOKEN_KEY_OPTION );
 
 		add_filter( 'groundhogg/inbox/api_url', fn() => self::RELAY );

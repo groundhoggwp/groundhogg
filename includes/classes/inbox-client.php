@@ -80,8 +80,9 @@ class Inbox_Client {
 			return new WP_Error( 'no_license', __( 'A Groundhogg license is needed to receive messages. Activate your license on the Licenses tab.', 'groundhogg' ) );
 		}
 
-		// The relay checks that the site has the secret before it gives the addresses
-		$secret = Inbound_Signature::generate();
+		// The relay checks that the site has the secret before it gives the addresses. A secret that's defined in
+		// wp-config.php is the only one the site can have, so that's the one the relay is given
+		$secret = Inbound_Signature::is_constant() ? Inbound_Signature::secret() : Inbound_Signature::generate();
 		Inbound_Signature::set_pending( $secret );
 
 		$response = self::request( 'POST', '/v1/inboxes', [
@@ -136,6 +137,10 @@ class Inbox_Client {
 
 		if ( is_wp_error( $check ) ) {
 			return $check;
+		}
+
+		if ( $rotate_secret && Inbound_Signature::is_constant() ) {
+			return new WP_Error( 'secret_defined', __( 'The secret is defined in wp-config.php, so it can\'t be replaced from here. Change GH_INBOUND_SECRET there and set up the inbox again.', 'groundhogg' ) );
 		}
 
 		$changes = [ 'endpoint' => Inbox::endpoint() ];

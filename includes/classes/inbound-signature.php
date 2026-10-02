@@ -23,18 +23,14 @@ class Inbound_Signature {
 	const TOLERANCE = 300; // seconds
 
 	/**
-	 * The secret, which is generated the first time it's needed.
-	 * Define GH_INBOUND_SECRET in wp-config.php to set it there instead.
+	 * The secret. This only reads it, verifying a request must never create one, a secret that was made while checking a
+	 * request is one that nothing else has. Define GH_INBOUND_SECRET in wp-config.php to set it there instead.
 	 *
-	 * @return string
+	 * @return string empty if the site doesn't have one, see ensure()
 	 */
 	public static function secret() {
 
-		$secret = get_option( self::OPTION );
-
-		if ( ! $secret ) {
-			$secret = self::regenerate();
-		}
+		$secret = (string) get_option( self::OPTION, '' );
 
 		/**
 		 * Filter the secret that inbound messages are signed with
@@ -42,6 +38,31 @@ class Inbound_Signature {
 		 * @param string $secret
 		 */
 		return (string) apply_filters( 'groundhogg/message/inbound/secret', $secret );
+	}
+
+	/**
+	 * The secret, generated if the site doesn't have one. For setting things up, never for checking a request.
+	 *
+	 * @return string empty if it's defined in wp-config.php as something that isn't a secret
+	 */
+	public static function ensure() {
+
+		$secret = self::secret();
+
+		if ( $secret !== '' ) {
+			return $secret;
+		}
+
+		return (string) self::regenerate();
+	}
+
+	/**
+	 * Whether the secret is defined in wp-config.php, in which case it's the only secret, and the option isn't written
+	 *
+	 * @return bool
+	 */
+	public static function is_constant() {
+		return defined( 'GH_INBOUND_SECRET' ) && (string) GH_INBOUND_SECRET !== '';
 	}
 
 	/**
@@ -86,6 +107,13 @@ class Inbound_Signature {
 			return false;
 		}
 
+		// the constant is the secret, a second one in the option would never be returned, and the pending one would stay accepted
+		if ( self::is_constant() ) {
+			self::clear_pending();
+
+			return false;
+		}
+
 		update_option( self::OPTION, $pending, false );
 		self::clear_pending();
 
@@ -96,9 +124,13 @@ class Inbound_Signature {
 	 * Replace the secret with a new one. Anything sending messages to the site has to be given it, so this is
 	 * for a secret that hasn't been given to anything yet, the relay is given a new one with Inbox_Client.
 	 *
-	 * @return string the new secret
+	 * @return string|false the new secret, false if it's defined in wp-config.php, that one is the secret
 	 */
 	public static function regenerate() {
+
+		if ( self::is_constant() ) {
+			return false;
+		}
 
 		$secret = self::generate();
 		update_option( self::OPTION, $secret, false );

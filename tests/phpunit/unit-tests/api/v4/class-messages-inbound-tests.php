@@ -23,6 +23,7 @@ class Messages_Inbound_Tests extends GH_UnitTestCase {
 		parent::setUp();
 		$this->run_id = uniqid();
 		wp_set_current_user( 0 ); // it's not for logged in users
+		Inbound_Signature::ensure(); // a site that receives messages has the secret, checking a request doesn't make one
 	}
 
 	public function tearDown(): void {
@@ -174,9 +175,10 @@ class Messages_Inbound_Tests extends GH_UnitTestCase {
 
 		delete_option( Inbound_Signature::OPTION );
 
-		$secret = Inbound_Signature::secret();
+		$secret = Inbound_Signature::ensure();
 
 		$this->assertSame( 64, strlen( $secret ) );
+		$this->assertSame( $secret, Inbound_Signature::ensure() );
 		$this->assertSame( $secret, Inbound_Signature::secret() );
 
 		$new = Inbound_Signature::regenerate();
@@ -188,6 +190,26 @@ class Messages_Inbound_Tests extends GH_UnitTestCase {
 		$body = wp_json_encode( $this->payload() );
 		$this->assertWPError( Inbound_Signature::verify( Inbound_Signature::sign( $body, null, $secret ), $body ) );
 		$this->assertTrue( Inbound_Signature::verify( Inbound_Signature::sign( $body ), $body ) );
+	}
+
+	public function test_checking_a_signature_does_not_create_a_secret() {
+
+		delete_option( Inbound_Signature::OPTION );
+		Inbound_Signature::clear_pending();
+
+		$body = wp_json_encode( $this->payload() );
+
+		// signed with the secret that a request would be signed with by something that has none
+		$result = Inbound_Signature::verify( Inbound_Signature::sign( $body, null, 'not-the-secret' ), $body );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'invalid_signature', $result->get_error_code() );
+		$this->assertSame( '', Inbound_Signature::secret() );
+		$this->assertFalse( get_option( Inbound_Signature::OPTION ) );
+
+		// and a request signed with a key that is empty doesn't pass either
+		$time = time();
+		$this->assertWPError( Inbound_Signature::verify( 't=' . $time . ',v1=' . hash_hmac( 'sha256', $time . '.' . $body, '' ), $body ) );
 	}
 
 	/* ---------------------------------------------------------------------
