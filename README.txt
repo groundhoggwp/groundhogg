@@ -391,7 +391,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.9 (2026-09-28) =
+= 4.9 (2026-10-01) =
 * ADDED Receive replies in Groundhogg. Turn on Incoming Messages in Settings > Email (needs an active Groundhogg license), then switch on "Save replies as messages" in an email's settings, and replies to it are saved to the contact who replied instead of going to your own mailbox. You can also BCC your site's private inbox address to keep a copy of emails you send from your own mailbox.
  * A Messages tab in the contact record shows your conversation with each contact, the emails you've sent them and their replies, laid out like a chat. Emails you composed to contacts before this update are moved into it in the background.
  * A "Replies" dashboard widget lists contacts who've replied and haven't been read yet. Open a conversation right from the dashboard to read it, reply, or mark it read or unread.
