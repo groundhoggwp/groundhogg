@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.9
+Stable tag: 4.9.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -390,6 +390,15 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.9.1 (2026-10-02) =
+* SECURITY Hardened how contacts are linked to WordPress users and how sign-in links are created. Credit: Wordfence PRISM, via Wordfence.
+ * Linking a contact to a WordPress user now requires permission to edit that user.
+ * {auto_login_link} only creates a sign-in link in emails sent to the contact's own user account.
+ * Sign-in keys are always blacked out in the email log, and sensitive logs are now hidden from non-administrators.
+* FIXED {auto_login_link} caused a fatal error in emails composed to a contact.
+* FIXED The v3 REST API now checks permission to edit when creating a contact with an email address that already exists.
+* FIXED An email that failed to send left Groundhogg treating the rest of the request as if an email was still being sent.
 
 = 4.9 (2026-10-01) =
 * ADDED Receive replies in Groundhogg. Turn on Incoming Messages in Settings > Email (needs an active Groundhogg license), then switch on "Save replies as messages" in an email's settings, and replies to it are saved to the contact who replied instead of going to your own mailbox. You can also BCC your site's private inbox address to keep a copy of emails you send from your own mailbox.
