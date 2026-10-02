@@ -272,7 +272,7 @@ class License_Manager {
 	 * @var License[]
 	 */
 	static array $licenses;
-	static $storeUrl = "https://groundhogg.io/license-api/";
+	static $storeUrl = "https://my.groundhogg.io/license-api/";
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' license-manager';
 
 	public function __construct() {

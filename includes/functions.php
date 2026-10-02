@@ -3212,26 +3212,7 @@ function scheduled_time_column( $time = 0, $show_local_time = false, $contact = 
  * @return mixed|string
  */
 function get_store_products( $args = [] ) {
-	$args = wp_parse_args( $args, array(
-		//'category' => 'templates',
-		'category' => '',
-		'tag'      => '',
-		's'        => '',
-		'page'     => '',
-		'number'   => '-1'
-	) );
-
-	$url = 'https://groundhogg.io/edd-api/v2/products/';
-
-	$response = wp_remote_get( add_query_arg( $args, $url ) );
-
-	if ( is_wp_error( $response ) ) {
-		return $response->get_error_message();
-	}
-
-	$products = json_decode( wp_remote_retrieve_body( $response ) );
-
-	return $products;
+	return License_Manager::get_store_products( $args );
 }
 
 /**
