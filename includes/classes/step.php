@@ -1411,6 +1411,28 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
+		// Before anything is skipped, if there's no time to run it the contact doesn't get put in it, and what they're
+		// waiting for stays. It doesn't run at some other time, like a timer's date that it was set not to run on.
+		try {
+			$run_time = $step->get_run_time();
+		} catch ( \Exception $e ) {
+
+			db()->events->add( [
+				'time'           => time(),
+				'time_scheduled' => time(),
+				'funnel_id'      => $step->get_funnel_id(),
+				'step_id'        => $step->get_id(),
+				'contact_id'     => $contact->get_id(),
+				'event_type'     => Event::FUNNEL,
+				'status'         => Event::FAILED,
+				'error_code'     => 'no_run_time',
+				'error_message'  => $e->getMessage(),
+				'priority'       => 10,
+			] );
+
+			return false;
+		}
+
 		if ( $skip_enqueued ) {
 
 			// Update any events to skipped...
@@ -1432,7 +1454,7 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 
 		// Set up the new event args
 		$event = [
-			'time'       => $step->get_run_time(),
+			'time'       => $run_time,
 			'funnel_id'  => $step->get_funnel_id(),
 			'step_id'    => $step->get_id(),
 			'contact_id' => $contact->get_id(),

@@ -108,7 +108,11 @@ class Evergreen_Sequence extends Branch_Logic {
 				continue;
 			}
 
-			$diff = $timer->get_run_time() - time();
+			try {
+				$diff = $timer->get_run_time() - time();
+			} catch ( \Exception $e ) {
+				continue; // there's no time that it runs
+			}
 
 			if ( $diff < 0 ) {
 				continue;

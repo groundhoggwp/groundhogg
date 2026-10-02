@@ -481,13 +481,24 @@ class Funnel extends Base_Object_With_Meta {
 				'event_type' => Event::FUNNEL,
 			];
 
+			$run_time = false;
+
 			if ( get_array_var( $choice, 'action' ) === 'move' && isset( $targets[ $to ] ) ) {
+
+				try {
+					$run_time = $targets[ $to ]->get_run_time();
+				} catch ( \Exception $e ) {
+					// a step that has no time to run, like a timer set to run on a day that doesn't exist, isn't moved to, the events are cancelled
+				}
+			}
+
+			if ( $run_time !== false ) {
 
 				// paused events stay paused, they'll run at the new step when the funnel is activated
 				foreach ( [ Event::WAITING, Event::PAUSED ] as $status ) {
 					event_queue_db()->update( array_merge( $where, [ 'status' => $status ] ), [
 						'step_id' => $to,
-						'time'    => $targets[ $to ]->get_run_time(),
+						'time'    => $run_time,
 					] );
 				}
 

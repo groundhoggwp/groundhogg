@@ -321,9 +321,10 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 	}
 
 	/**
-	 * A date that never exists falls back to the delayed date rather than looping forever
+	 * A date that never exists doesn't fall back to the delayed date, that's a day that the timer was set not to run
+	 * on. It's looked for for 5 years, so that it doesn't loop forever, and then there's no time to run it.
 	 */
-	public function test_run_on_impossible_date() {
+	public function test_run_on_impossible_date_has_no_run_time() {
 		$timer = $this->make_timer( [
 			'delay_amount'      => 1,
 			'delay_type'        => 'days',
@@ -333,7 +334,82 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 			'run_on_months'     => [ 'february' ],
 		] );
 
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( '5 years' );
+
+		$this->run_date( $timer, '2026-03-12 10:00:00' );
+	}
+
+	/**
+	 * Nothing selected to run on isn't a restriction, it's any day, as it was before
+	 *
+	 * @dataProvider empty_selections
+	 */
+	public function test_nothing_selected_to_run_on_is_any_day( array $meta ) {
+		$timer = $this->make_timer( array_merge( [ 'delay_amount' => 1, 'delay_type' => 'days' ], $meta ) );
+
 		$this->assertEquals( '2026-03-13 10:00', $this->run_date( $timer, '2026-03-12 10:00:00' ) );
+	}
+
+	public function empty_selections() {
+		return [
+			'no days of the week'            => [ [ 'run_on_type' => 'day_of_week', 'run_on_dow' => [] ] ],
+			'no days of the month'           => [ [ 'run_on_type' => 'day_of_month', 'run_on_dom' => [] ] ],
+			'no months, by day of the week'  => [ [ 'run_on_type' => 'day_of_week', 'run_on_dow' => [ 'friday' ], 'run_on_month_type' => 'specific', 'run_on_months' => [] ] ],
+			'no months, by day of the month' => [ [ 'run_on_type' => 'day_of_month', 'run_on_dom' => [ 13 ], 'run_on_month_type' => 'specific', 'run_on_months' => [] ] ],
+		];
+	}
+
+	/**
+	 * Only the last day of the month, with nothing else, is a selection
+	 */
+	public function test_the_last_day_alone_is_a_selection() {
+		$timer = $this->make_timer( [
+			'delay_amount' => 1,
+			'delay_type'   => 'days',
+			'run_on_type'  => 'day_of_month',
+			'run_on_dom'   => [ 'last' ],
+		] );
+
+		$this->assertEquals( '2026-03-31 10:00', $this->run_date( $timer, '2026-03-12 10:00:00' ) );
+	}
+
+	/**
+	 * A contact isn't put in a timer that has no time to run, and what they were waiting for stays
+	 */
+	public function test_a_contact_is_not_enqueued_in_a_timer_with_no_run_time() {
+
+		$timer = $this->make_timer( [
+			'delay_amount'      => 1,
+			'delay_type'        => 'days',
+			'run_on_type'       => 'day_of_month',
+			'run_on_dom'        => [ 30 ],
+			'run_on_month_type' => 'specific',
+			'run_on_months'     => [ 'february' ],
+		] );
+
+		$contact = $this->factory()->contacts->create_and_get();
+
+		// something that they're waiting for in the same flow
+		$waiting = $this->factory()->event_queue->create( [
+			'funnel_id'  => $timer->get_funnel_id(),
+			'step_id'    => $timer->get_id() + 1000,
+			'contact_id' => $contact->get_id(),
+			'event_type' => \Groundhogg\Event::FUNNEL,
+			'status'     => \Groundhogg\Event::WAITING,
+		] );
+
+		$this->assertFalse( $timer->enqueue( $contact ) );
+
+		$this->assertSame( 0, \Groundhogg\get_db( 'event_queue' )->count( [ 'step_id' => $timer->get_id(), 'contact_id' => $contact->get_id() ] ) );
+		$this->assertSame( 'waiting', ( new \Groundhogg\Event_Queue_Item( $waiting ) )->status, 'not skipped' );
+
+		$failed = \Groundhogg\get_db( 'events' )->query( [ 'step_id' => $timer->get_id(), 'contact_id' => $contact->get_id() ] );
+
+		$this->assertCount( 1, $failed );
+		$this->assertSame( 'failed', $failed[0]->status );
+		$this->assertSame( 'no_run_time', $failed[0]->error_code );
+		$this->assertStringContainsString( '5 years', $failed[0]->error_message );
 	}
 
 	/**

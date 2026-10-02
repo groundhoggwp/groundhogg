@@ -312,9 +312,18 @@ class Simulator {
 
 			} else {
 
+				$no_run_time = false;
+
 				if ( $current->is_timer() ) {
-					$time = $current->get_run_time( $time );
-					self::log( "⌛ Wait until " . ( new DateTimeHelper( $time ) )->wpDateTimeFormat() );
+
+					try {
+						$time = $current->get_run_time( $time );
+						self::log( "⌛ Wait until " . ( new DateTimeHelper( $time ) )->wpDateTimeFormat() );
+					} catch ( \Exception $e ) {
+						// a contact isn't put in a timer that has no time to run, so the flow ends here for them
+						self::log( sprintf( "🛑 %s", $e->getMessage() ) );
+						$no_run_time = true;
+					}
 				} else if ( ! self::is_dry_run() ) {
 
 					$event = new Event();
@@ -359,7 +368,7 @@ class Simulator {
 
 				}
 
-				$next = self::getNext( $current );
+				$next = $no_run_time ? false : self::getNext( $current );
 			}
 
 			if ( $next && $next->is_benchmark() ) {

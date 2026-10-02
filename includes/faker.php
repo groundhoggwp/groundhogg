@@ -292,7 +292,11 @@ class Faker {
 					break;
 				case 'delay_timer':
 
-					$after_timer = $step->get_run_time( $date->getTimestamp() );
+					try {
+						$after_timer = $step->get_run_time( $date->getTimestamp() );
+					} catch ( \Exception $e ) {
+						break 2; // there's no time to run it, so it's where they stop
+					}
 
 					if ( $after_timer > time() ) {
 						break 2; // todo: Is there a better way to handle this than just bail?
