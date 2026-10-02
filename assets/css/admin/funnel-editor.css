@@ -537,6 +537,14 @@ body.gh-screenshot-mode #funnel-form #step-flow button.add-step {
   display: flex;
   gap: 30px;
 }
+#step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-main {
+  width: 100%;
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
 #step-settings-container #step-settings-inner .step-settings .step.editing .step-flex .step-notes {
   display: flex;
   flex-direction: column;
