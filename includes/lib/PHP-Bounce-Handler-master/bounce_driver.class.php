@@ -592,12 +592,14 @@ class BounceHandler {
 				// now this is wierd: plenty of times you see the status code is a permanent failure,
 				// but the diagnostic code is a temporary failure.  So we will assert the most general
 				// temporary failure in this case.
+				// Not when the status code of the report itself is a permanent failure (5.x.x), that's what the
+				// reporting server said about this recipient, and a diagnostic that sounds temporary doesn't change it.
 				$ddc       = '';
 				$judgement = '';
 				$ddc       = $this->decode_diagnostic_code( $temp['Diagnostic-code']['text'] );
 				$judgement = $this->get_action_from_status_code( $ddc );
 				if ( $judgement == 'transient' ) {
-					if ( stristr( $temp['Action'], 'failed' ) !== false ) {
+					if ( stristr( $temp['Action'], 'failed' ) !== false && ! preg_match( '/^\s*5\./', isset( $temp['Status'] ) ? $temp['Status'] : '' ) ) {
 						$temp['Action'] = 'transient';
 						$temp['Status'] = '4.3.0';
 					}
