@@ -548,8 +548,9 @@ class Delay_Timer extends Action {
 	/**
 	 * Move the date forward to the first day, starting with the date itself, that matches the run_on_* settings.
 	 * Walks the calendar a day at a time, skipping whole months that aren't selected, and keeps the time of day.
-	 * If no day matches within 5 years (e.g. the 30th of February) it throws, the contact isn't run on a day that the
-	 * timer was set not to run on. Days or months that are left empty aren't a restriction, that's any day or month.
+	 * If no day matches within 5 years it's the last day of the month for days of the month that no chosen month has,
+	 * the 30th of February is the 28th or the 29th. Nothing else is a day that a timer is run on when it's set not to,
+	 * so it throws. Days or months that are left empty aren't a restriction, that's any day or month.
 	 *
 	 * @param DateTimeHelper $date
 	 * @param array          $settings
@@ -650,6 +651,32 @@ class Delay_Timer extends Action {
 			}
 
 			$date->setDate( $year, $month, $day + 1 );
+		}
+
+		// Nothing matched, and for days of the month that's when every day chosen is after the last day of every month
+		// chosen, like the 30th of February. Only then is it the last day of the month, in the first month that it's not
+		// before the start, it's a month that was chosen and the closest day to what was chosen. Where there's a day that
+		// does match it's not used, the 31st doesn't run in April when it runs in May.
+		if ( $settings['run_on_type'] === 'day_of_month' ) {
+
+			$date->setTimestamp( $start );
+			[ $year, $month ] = array_map( 'intval', explode( '-', $date->format( 'Y-n' ) ) );
+
+			for ( $i = 0; $i < 60; $i ++ ) {
+
+				$date->setDate( $year, $month + $i, 1 );
+
+				if ( $months && ! in_array( strtolower( $date->format( 'F' ) ), $months ) ) {
+					continue;
+				}
+
+				$date->setDate( (int) $date->format( 'Y' ), (int) $date->format( 'n' ), (int) $date->format( 't' ) );
+				$date->setTime( ...$time );
+
+				if ( $date->getTimestamp() >= $start ) {
+					return;
+				}
+			}
 		}
 
 		throw new \RuntimeException( __( 'No day in the next 5 years matches the days and months that this delay timer is set to run on.', 'groundhogg' ) );

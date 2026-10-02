@@ -321,10 +321,10 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 	}
 
 	/**
-	 * A date that never exists doesn't fall back to the delayed date, that's a day that the timer was set not to run
-	 * on. It's looked for for 5 years, so that it doesn't loop forever, and then there's no time to run it.
+	 * The 30th of February is a day that no February has, and no other month is chosen, so it's the last day of February.
+	 * It's not the delayed date, a day that the timer was set not to run on, and it's not March, a month that wasn't chosen.
 	 */
-	public function test_run_on_impossible_date_has_no_run_time() {
+	public function test_run_on_impossible_date_is_the_last_day_of_the_month() {
 		$timer = $this->make_timer( [
 			'delay_amount'      => 1,
 			'delay_type'        => 'days',
@@ -334,10 +334,68 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 			'run_on_months'     => [ 'february' ],
 		] );
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( '5 years' );
+		$this->assertEquals( '2027-02-28 10:00', $this->run_date( $timer, '2026-03-12 10:00:00' ) );
 
-		$this->run_date( $timer, '2026-03-12 10:00:00' );
+		// 2028 has a 29th of February
+		$this->assertEquals( '2028-02-29 10:00', $this->run_date( $timer, '2027-03-12 10:00:00' ) );
+
+		// and it's this February when it's still to come
+		$this->assertEquals( '2026-02-28 10:00', $this->run_date( $timer, '2026-02-10 10:00:00' ) );
+	}
+
+	public function test_the_31st_of_a_month_with_30_days_is_its_last_day() {
+		$timer = $this->make_timer( [
+			'delay_amount'      => 1,
+			'delay_type'        => 'days',
+			'run_on_type'       => 'day_of_month',
+			'run_on_dom'        => [ 31 ],
+			'run_on_month_type' => 'specific',
+			'run_on_months'     => [ 'april', 'june' ],
+		] );
+
+		$this->assertEquals( '2026-04-30 10:00', $this->run_date( $timer, '2026-03-12 10:00:00' ) );
+		$this->assertEquals( '2026-06-30 10:00', $this->run_date( $timer, '2026-05-12 10:00:00' ) );
+	}
+
+	/**
+	 * Only when there's no other day. Where a day matches in a month that was chosen it's that day, and the months that
+	 * don't have the day are skipped, they're not the last day of the month
+	 */
+	public function test_the_last_day_of_the_month_is_only_when_there_is_no_other_day() {
+
+		// the 15th is a day that matches in February
+		$timer = $this->make_timer( [
+			'delay_amount'      => 1,
+			'delay_type'        => 'days',
+			'run_on_type'       => 'day_of_month',
+			'run_on_dom'        => [ 15, 30 ],
+			'run_on_month_type' => 'specific',
+			'run_on_months'     => [ 'february' ],
+		] );
+
+		$this->assertEquals( '2027-02-15 10:00', $this->run_date( $timer, '2026-03-12 10:00:00' ) );
+
+		// the 31st skips April, it runs in May
+		$timer = $this->make_timer( [
+			'delay_amount' => 1,
+			'delay_type'   => 'days',
+			'run_on_type'  => 'day_of_month',
+			'run_on_dom'   => [ 31 ],
+		] );
+
+		$this->assertEquals( '2026-05-31 10:00', $this->run_date( $timer, '2026-04-10 10:00:00' ) );
+
+		// the months that have it aren't passed over for one that doesn't
+		$timer = $this->make_timer( [
+			'delay_amount'      => 1,
+			'delay_type'        => 'days',
+			'run_on_type'       => 'day_of_month',
+			'run_on_dom'        => [ 31 ],
+			'run_on_month_type' => 'specific',
+			'run_on_months'     => [ 'april', 'may' ],
+		] );
+
+		$this->assertEquals( '2026-05-31 10:00', $this->run_date( $timer, '2026-03-12 10:00:00' ) );
 	}
 
 	/**
@@ -375,18 +433,22 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 	}
 
 	/**
-	 * A contact isn't put in a timer that has no time to run, and what they were waiting for stays
+	 * A contact isn't put in a step that has no time to run, and what they were waiting for stays. A timer only has none
+	 * when something goes wrong working it out, so it's made to.
 	 */
-	public function test_a_contact_is_not_enqueued_in_a_timer_with_no_run_time() {
+	public function test_a_contact_is_not_enqueued_in_a_step_with_no_run_time() {
 
-		$timer = $this->make_timer( [
-			'delay_amount'      => 1,
-			'delay_type'        => 'days',
-			'run_on_type'       => 'day_of_month',
-			'run_on_dom'        => [ 30 ],
-			'run_on_month_type' => 'specific',
-			'run_on_months'     => [ 'february' ],
-		] );
+		$timer = $this->make_timer( [ 'delay_amount' => 1, 'delay_type' => 'days' ] );
+
+		$broken = new class extends Delay_Timer {
+			public function calc_run_time( int $baseTimestamp, \Groundhogg\Step $step ): int {
+				throw new \RuntimeException( 'No time to run it' );
+			}
+		};
+
+		$property = new \ReflectionProperty( \Groundhogg\Step::class, 'stepElement' );
+		$property->setAccessible( true );
+		$property->setValue( $timer, $broken );
 
 		$contact = $this->factory()->contacts->create_and_get();
 
@@ -409,7 +471,7 @@ class Delay_Timer_Tests extends GH_UnitTestCase {
 		$this->assertCount( 1, $failed );
 		$this->assertSame( 'failed', $failed[0]->status );
 		$this->assertSame( 'no_run_time', $failed[0]->error_code );
-		$this->assertStringContainsString( '5 years', $failed[0]->error_message );
+		$this->assertSame( 'No time to run it', $failed[0]->error_message );
 	}
 
 	/**
