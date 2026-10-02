@@ -131,6 +131,104 @@ class Activity_Indexes_Tests extends GH_UnitTestCase {
 		$this->assertHasPerformanceIndexes();
 	}
 
+	/**
+	 * Make the online ALTER fail like it does on a server without online DDL, and keep the ALTERs that were sent
+	 *
+	 * @param array $alters filled with the ALTER TABLE queries that reach the database
+	 *
+	 * @return callable the filter, to remove
+	 */
+	protected function fail_online_alter( array &$alters ) {
+		$filter = function ( $query ) use ( &$alters ) {
+			if ( stripos( $query, 'ALTER TABLE ' . $this->activity()->table_name ) !== 0 ) {
+				return $query;
+			}
+
+			if ( stripos( $query, 'ALGORITHM=INPLACE' ) !== false ) {
+				$alters[] = $query;
+
+				return 'SELECT * FROM gh_table_that_does_not_exist';
+			}
+
+			$alters[] = $query;
+
+			return $query;
+		};
+
+		add_filter( 'query', $filter );
+
+		return $filter;
+	}
+
+	public function test_a_failed_online_build_does_not_fall_back_to_a_locking_alter() {
+		global $wpdb;
+
+		$this->make_legacy_table();
+
+		$alters = [];
+		$filter = $this->fail_online_alter( $alters );
+
+		$added = $this->activity()->add_index_online( 'contact_time_idx', Activity::PERFORMANCE_INDEXES['contact_time_idx'] );
+
+		remove_filter( 'query', $filter );
+
+		$this->assertFalse( $added );
+		$this->assertFalse( $this->activity()->index_exists( 'contact_time_idx' ) );
+		$this->assertCount( 1, $alters, 'only the online ALTER was tried' );
+		$this->assertStringContainsString( 'LOCK=NONE', $alters[0] );
+	}
+
+	public function test_the_task_tries_again_a_few_times_then_fails_with_the_database_error() {
+		$this->make_legacy_table();
+
+		$alters = [];
+		$filter = $this->fail_online_alter( $alters );
+
+		$task = new Add_Activity_Indexes();
+
+		try {
+			// not complete and not failed, null stops this pass and the task is picked up again on the next one
+			for ( $attempt = 1; $attempt < Add_Activity_Indexes::MAX_ATTEMPTS; $attempt ++ ) {
+				$this->assertNull( $task->process(), "attempt $attempt" );
+			}
+
+			$result = $task->process();
+		} finally {
+			remove_filter( 'query', $filter );
+		}
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'index_not_added', $result->get_error_code() );
+		$this->assertNotSame( '', $result->get_error_message(), 'the database error is kept' );
+		$this->assertCount( Add_Activity_Indexes::MAX_ATTEMPTS, $alters );
+		$this->assertFalse( $this->activity()->has_performance_indexes() );
+	}
+
+	public function test_the_task_counts_only_failures_in_a_row() {
+		$this->make_legacy_table();
+
+		$alters = [];
+		$filter = $this->fail_online_alter( $alters );
+
+		$task = new Add_Activity_Indexes();
+
+		$this->assertNull( $task->process() );
+		$this->assertNull( $task->process() );
+
+		remove_filter( 'query', $filter );
+
+		// it works this time, and the count starts over
+		$this->assertFalse( $task->process() );
+
+		$filter = $this->fail_online_alter( $alters );
+
+		for ( $attempt = 1; $attempt < Add_Activity_Indexes::MAX_ATTEMPTS; $attempt ++ ) {
+			$this->assertNull( $task->process(), "attempt $attempt" );
+		}
+
+		remove_filter( 'query', $filter );
+	}
+
 	public function test_update_does_nothing_when_indexes_exist() {
 		$updater = Plugin::instance()->updater;
 		$updater->forget_version_update( '4.9' );

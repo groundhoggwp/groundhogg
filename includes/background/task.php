@@ -11,7 +11,7 @@ abstract class Task implements \JsonSerializable {
 	/**
 	 * Process the task
 	 *
-	 * @return bool true for complete, false otherwise
+	 * @return bool|null|\WP_Error true for complete, false to carry on straight away, null to stop for now and be picked up again on the next pass, WP_Error to fail
 	 */
 	abstract public function process();
 

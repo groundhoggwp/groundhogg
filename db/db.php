@@ -2355,7 +2355,8 @@ abstract class DB {
 
 	/**
 	 * Add an index without blocking writes to the table while it builds, for tables that can be large.
-	 * Falls back to a plain ALTER on servers without online DDL (MySQL < 5.6).
+	 * If the server can't build it online, nothing is added, a plain ALTER would lock writes to the table for as long as
+	 * it takes. The error is left in $wpdb->last_error. A site that can't do online DDL needs to add the index by hand.
 	 *
 	 * @param string $name
 	 * @param array  $columns
@@ -2376,8 +2377,9 @@ abstract class DB {
 		$result   = $wpdb->query( "ALTER TABLE {$this->table_name} ADD INDEX $name ($columns), ALGORITHM=INPLACE, LOCK=NONE" );
 		$wpdb->suppress_errors( $suppress );
 
+		// don't look at the index here, that would replace the error
 		if ( $result === false ) {
-			$wpdb->query( "ALTER TABLE {$this->table_name} ADD INDEX $name ($columns)" );
+			return false;
 		}
 
 		return $this->index_exists( $name );
