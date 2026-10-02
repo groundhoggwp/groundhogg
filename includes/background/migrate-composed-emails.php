@@ -4,8 +4,8 @@ namespace Groundhogg\Background;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Message;
+use Groundhogg\Contact;
 use function Groundhogg\_nf;
-use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\percentage;
 use function Groundhogg\redact;
@@ -16,7 +16,8 @@ use function Groundhogg\redact;
  * Activity only ever stored the (redacted) subject and the email log ID, so the body is
  * recovered from the email log when the log entry still exists, otherwise the message is subject only.
  *
- * Each activity row is deleted once its message exists, so the task can be interrupted and resumed safely.
+ * Each activity row is deleted once its message exists, so the task can be interrupted and resumed safely. Rows that can't be
+ * migrated, with no contact or a contact that no longer exists, are left in the activity table.
  */
 class Migrate_Composed_Emails extends Task {
 
@@ -57,12 +58,21 @@ class Migrate_Composed_Emails extends Task {
 
 		foreach ( $rows as $row ) {
 
-			$activity = new Activity( $row );
-			$contact  = get_contactdata( $activity->contact_id );
+			$activity   = new Activity( $row );
+			$contact_id = absint( $activity->contact_id );
 
-			if ( ! $contact || ! $contact->exists() ) {
-				// orphaned, there's no one to associate the message with
-				$activity->delete();
+			// Not get_contactdata(), an empty ID there means whoever this request is about, the contact being processed from
+			// the queue or the tracked one, and this runs in the background at the end of whatever request is next
+			if ( ! $contact_id ) {
+				$this->skipped ++;
+				continue;
+			}
+
+			$contact = new Contact( $contact_id );
+
+			// orphaned, there's no one to associate the message with. It's left in place rather than deleted, it's all that's left of it
+			if ( ! $contact->exists() ) {
+				$this->skipped ++;
 				continue;
 			}
 
@@ -72,6 +82,20 @@ class Migrate_Composed_Emails extends Task {
 
 			if ( $log_id ) {
 				$log = get_db( 'email_log' )->get( $log_id );
+
+				// copied by a run that stopped before it deleted the activity
+				$copied = get_db( 'messages' )->query( [
+					'email_log_id' => $log_id,
+					'object_id'    => $contact_id,
+					'object_type'  => 'contact',
+					'limit'        => 1,
+				] );
+
+				if ( ! empty( $copied ) ) {
+					$activity->delete();
+					$this->migrated ++;
+					continue;
+				}
 			}
 
 			// never copy the body of a sensitive log out into a less restricted table
