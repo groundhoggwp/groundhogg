@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.9.1
+Stable tag: 4.9.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -390,6 +390,27 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.9.2 (2026-10-02) =
+* ADDED Handle Bounces Now in Settings > Email, for sites that receive bounces in an IMAP inbox. It checks the last 7 days of the inbox and shows how many emails it checked, how many contacts were marked as bounced, and what it decided for each recipient.
+* ADDED When contacts waiting at a deleted step are moved to another step, you can choose to run them when that step normally runs, or on a date and time.
+* SECURITY Messages are now deleted with their contact, and a message that is left without its contact can no longer be read by anyone. Messages left behind by contacts that were deleted before this update are no longer readable, but they aren't deleted.
+* SECURITY The secret that verifies incoming messages is no longer created while a request is being checked, and a secret defined with GH_INBOUND_SECRET is the only secret that's used.
+* FIXED Bounces in an IMAP inbox were missed when the email had been read, or was more than a day old.
+ * The bounce checker carries on from where it last got to instead of only looking at unread email from the last day.
+ * A failure with a temporary status (4.x.x), like a full mailbox, is never marked as a hard bounce, and the action in a bounce report is read in any case.
+ * A failure with a permanent status (5.x.x) is no longer changed into a temporary one because of what the mail server said about it.
+ * A bounce report without a recipient can no longer mark whichever contact is being processed as bounced.
+* FIXED Cancelling a broadcast, including when a segment filter fails while it's scheduling, no longer clears the cancelled events of other broadcasts and flows from the queue.
+* FIXED The Replies widget set to All said there was nothing to read when the newest replies were on contacts that you can't see.
+* FIXED A delay timer set to run on a day that none of its months have, like the 30th of February, ran on the delayed date. It now runs on the last day of the month. A step that has no time to run no longer has contacts put in it, and the reason is recorded as a failed event.
+* FIXED The 4.9 update added an email composed to a contact that no longer exists, or with no contact, to whichever contact was being tracked, and copied an email a second time if the update was interrupted.
+* FIXED Adding the activity table indexes in the 4.9 update locked the table when the server couldn't add them without blocking. It now tries again a few times, and reports the database's error if it can't. Sites that can't add indexes without blocking need to add them manually.
+* DEV Moved contacts take `date` and `time` in the deleted step choices of the flow abilities, and `Funnel::resolve_deleted_step_events()` takes a `time` timestamp for them. The outcomes include `run_at`.
+* DEV `Task::process()` can return null to stop for now and be picked up again on the next pass.
+* DEV New `groundhogg/bounce_checker/manual_days` and `groundhogg/bounce_checker/limit` filters, and `Bounce_Checker::classify()`.
+* DEV New `Inbound_Signature::ensure()`. `Inbound_Signature::secret()` only reads the secret.
+* UPDATED The license store URL, and the store products now come from `License_Manager`.
 
 = 4.9.1 (2026-10-02) =
 * SECURITY Hardened how contacts are linked to WordPress users and how sign-in links are created. Credit: Wordfence PRISM, via Wordfence.
