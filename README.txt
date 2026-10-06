@@ -391,7 +391,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.9.2 (2026-10-02) =
+= 4.9.2 (2026-10-06) =
 * ADDED Handle Bounces Now in Settings > Email, for sites that receive bounces in an IMAP inbox. It checks the last 7 days of the inbox and shows how many emails it checked, how many contacts were marked as bounced, and what it decided for each recipient.
 * ADDED When contacts waiting at a deleted step are moved to another step, you can choose to run them when that step normally runs, or on a date and time.
 * SECURITY Messages are now deleted with their contact, and a message that is left without its contact can no longer be read by anyone. Messages left behind by contacts that were deleted before this update are no longer readable, but they aren't deleted.
@@ -406,6 +406,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED A delay timer set to run on a day that none of its months have, like the 30th of February, ran on the delayed date. It now runs on the last day of the month. A step that has no time to run no longer has contacts put in it, and the reason is recorded as a failed event.
 * FIXED The 4.9 update added an email composed to a contact that no longer exists, or with no contact, to whichever contact was being tracked, and copied an email a second time if the update was interrupted.
 * FIXED Adding the activity table indexes in the 4.9 update locked the table when the server couldn't add them without blocking. It now tries again a few times, and reports the database's error if it can't. Sites that can't add indexes without blocking need to add them manually.
+* IMPROVED Load earlier activity in a contact's timeline keeps looking further back when a stretch of time has no activity, instead of showing nothing, and says "Beginning of contact history" when there is nothing more to load.
+* FIXED Load earlier messages got stuck in a conversation when a whole page of messages was written in the same second, like after emails composed before the 4.9 update were moved, or an import.
+* FIXED An undo or redo in the flow editor that failed partway left the flow showing only part of the change, and cleared the undo history. The flow is put back as it was, and the history is kept.
+* DEV The messages feed takes `before_kind` and `before_id` with `before`, and returns the cursor for the next page in `next`.
 * DEV Moved contacts take `date` and `time` in the deleted step choices of the flow abilities, and `Funnel::resolve_deleted_step_events()` takes a `time` timestamp for them. The outcomes include `run_at`.
 * DEV `Task::process()` can return null to stop for now and be picked up again on the next pass.
 * DEV New `groundhogg/bounce_checker/manual_days` and `groundhogg/bounce_checker/limit` filters, and `Bounce_Checker::classify()`.
