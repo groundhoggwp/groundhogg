@@ -444,6 +444,32 @@
       this.canvas = canvas
     },
 
+    /**
+     * What the steps are now, to put back with restore() when edits that are applied together don't all apply
+     *
+     * @return Object
+     */
+    snapshot () {
+      return {
+        steps : clone(this.steps),
+        canvas: clone(this.canvas),
+        trash : clone(this.trash),
+      }
+    },
+
+    /**
+     * @param snapshot Object from snapshot()
+     */
+    restore ({
+      steps,
+      canvas,
+      trash,
+    }) {
+      this.steps = steps
+      this.canvas = canvas
+      this.trash = trash
+    },
+
     getStep (id) {
       return this.steps.find(step => step.ID == id)
     },
@@ -1145,6 +1171,20 @@
 
     canRedo () {
       return this.pointer < this.entries.length
+    },
+
+    /**
+     * What undo() gave couldn't be applied, so the entry is still applied, and still what the next undo is
+     */
+    undoFailed () {
+      this.pointer = Math.min(this.pointer + 1, this.entries.length)
+    },
+
+    /**
+     * What redo() gave couldn't be applied, so the entry is still not applied, and still what the next redo is
+     */
+    redoFailed () {
+      this.pointer = Math.max(this.pointer - 1, 0)
     },
 
     /**

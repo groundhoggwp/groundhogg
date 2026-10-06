@@ -1214,12 +1214,15 @@
 
         const inverse = []
 
+        // they're applied together or not at all, the server never gets what's not applied, so what's here has to stay what it has
+        const snapshot = this.store.snapshot()
+
         try {
           operations.forEach(operation => inverse.unshift(...this.store.apply(operation)))
         }
         catch (err) {
           // like a step it refers to being changed since
-          this.history.clear()
+          this.store.restore(snapshot)
           dialog({
             message: err.message,
             type   : 'error',
@@ -1242,14 +1245,32 @@
        * Like undoing a duplicate, which deletes the copy and the steps in its branches, so redoing restores them all.
        */
       undo () {
-        const inverse = this.replay(this.history.undo())
+
+        const operations = this.history.undo()
+        const inverse = this.replay(operations)
+
+        // it didn't apply, so it's still applied
+        if (!inverse && operations.length) {
+          this.history.undoFailed()
+          return
+        }
+
         if (inverse?.length) {
           this.history.entries[this.history.pointer].redo = inverse
         }
       },
 
       redo () {
-        const inverse = this.replay(this.history.redo())
+
+        const operations = this.history.redo()
+        const inverse = this.replay(operations)
+
+        // it didn't apply, so it's still not applied
+        if (!inverse && operations.length) {
+          this.history.redoFailed()
+          return
+        }
+
         if (inverse?.length) {
           this.history.entries[this.history.pointer - 1].undo = inverse
         }

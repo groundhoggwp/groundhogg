@@ -370,3 +370,69 @@ test('locking shows on the card right away, and unlocking undoes it', () => {
 
   assert.equal(store.getCanvas(step.ID).classes.includes('locked'), false)
 })
+
+test('edits that don\'t all apply can be put back as they were', () => {
+
+  const store = storeOf(load('branches'))
+  const before = JSON.stringify([store.steps, store.canvas, store.trash])
+  const snapshot = store.snapshot()
+  const first = store.steps[0]
+
+  // the first applies, the second throws, like a step it names being gone
+  assert.throws(() => {
+    store.apply({ op: 'delete', step: first.ID })
+    store.apply({ op: 'nonsense' })
+  }, /nonsense/)
+
+  assert.notEqual(JSON.stringify([store.steps, store.canvas, store.trash]), before, 'the first one was applied')
+  assert.ok(store.trash[first.ID], 'and the step is in the trash')
+
+  store.restore(snapshot)
+
+  assert.equal(JSON.stringify([store.steps, store.canvas, store.trash]), before)
+  assert.ok(store.getStep(first.ID))
+  assert.equal(store.trash[first.ID], undefined)
+})
+
+test('what\'s put back is not the same objects, so edits after it don\'t reach the snapshot', () => {
+
+  const store = storeOf(load('branches'))
+  const snapshot = store.snapshot()
+
+  store.steps[0].data.step_title = 'Changed after the snapshot'
+
+  assert.notEqual(snapshot.steps[0].data.step_title, 'Changed after the snapshot')
+})
+
+test('an undo or redo that fails leaves the history where it was', () => {
+
+  const history = FlowStore.createHistory()
+
+  history.record({ undo: [{ n: 1 }], redo: [{ n: -1 }] })
+  history.record({ undo: [{ n: 2 }], redo: [{ n: -2 }] })
+
+  // undo couldn't be applied, so it's still applied and the next undo is the same one
+  assert.deepEqual(history.undo(), [{ n: 2 }])
+  history.undoFailed()
+
+  assert.equal(history.canRedo(), false)
+  assert.deepEqual(history.undo(), [{ n: 2 }])
+
+  // now it's undone, the redo couldn't be applied, and it's still there to redo
+  assert.deepEqual(history.redo(), [{ n: -2 }])
+  history.redoFailed()
+
+  assert.equal(history.canRedo(), true)
+  assert.deepEqual(history.redo(), [{ n: -2 }])
+  assert.equal(history.canUndo(), true)
+
+  // not past either end
+  history.undoFailed()
+  history.undoFailed()
+  history.redoFailed()
+  history.redoFailed()
+  history.redoFailed()
+  history.redoFailed()
+
+  assert.equal(history.pointer, 0)
+})
