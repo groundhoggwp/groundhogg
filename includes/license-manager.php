@@ -334,11 +334,7 @@ class License_Manager {
 	 */
 	public static function add_license( string $license_key, object $api_response ) {
 
-		$licenses = self::get_licenses();
-
-		if ( empty( $licenses ) ) {
-			$licenses = [];
-		}
+		self::get_licenses(); // make sure they're loaded before this one is added to them
 
 		$sanitized = self::sanitize_license_respones( $api_response );
 
@@ -346,7 +342,7 @@ class License_Manager {
 
 		self::save_licenses();
 
-		return $licenses[ $license_key ];
+		return self::$licenses[ $license_key ];
 	}
 
 	/**
