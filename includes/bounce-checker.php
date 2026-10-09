@@ -51,6 +51,12 @@ class Bounce_Checker {
 	const LAST_RUN_OPTION = 'gh_bounce_last_run';
 	const CURSOR_OPTION   = 'gh_bounce_checked_until';
 
+	/**
+	 * Whether the last cron run stopped at its limit with emails left to read, so the next one carries on from just after
+	 * where it stopped, and doesn't look back first
+	 */
+	const CAPPED_OPTION = 'gh_bounce_checked_capped';
+
 	const NONCE_ACTION = 'gh_handle_bounces_now';
 
 	/**
@@ -400,6 +406,63 @@ class Bounce_Checker {
 	}
 
 	/**
+	 * When to look for emails from
+	 *
+	 * A manual run looks back a set number of days. The cron job carries on from where it got to, a few hours before it so
+	 * that an email that was dated before one that arrived first isn't missed, or from 2 days ago the first time. After a run
+	 * that stopped at its limit there's no looking back, what's before where it stopped was all handled, and looking back
+	 * is what makes a run that's stopped at its limit read the same emails again, and never get any further.
+	 *
+	 * @param bool $manual
+	 * @param int  $started when the run started
+	 * @param int  $cursor  where the last cron run got to, 0 if it hasn't run
+	 * @param bool $capped  whether the last cron run stopped at its limit
+	 * @param int  $days    how far back a manual run looks
+	 *
+	 * @return int
+	 */
+	public static function start_time( bool $manual, int $started, int $cursor, bool $capped, int $days = 7 ) {
+
+		if ( $manual ) {
+			return $started - $days * DAY_IN_SECONDS;
+		}
+
+		if ( ! $cursor ) {
+			return $started - 2 * DAY_IN_SECONDS;
+		}
+
+		// the emails that were dated that second were all in the last run, see choose_emails()
+		return $capped ? $cursor + 1 : $cursor - self::CRON_OVERLAP;
+	}
+
+	/**
+	 * Which of the emails a run handles, the oldest first, so what's left for the next one is the newest
+	 *
+	 * When there are more than the limit it stops at the limit, and then carries on to the end of that second, so that what
+	 * the next run starts after is a whole second, and not part of one. A limit that can't be gone past, because that many were
+	 * written in the same second, would otherwise never be.
+	 *
+	 * @param array $emails message number => when it's dated, as a timestamp
+	 * @param int   $limit  0 for no limit
+	 *
+	 * @return array [ message number => dated, whether it stopped at the limit, the date of the last one handled ]
+	 */
+	public static function choose_emails( array $emails, int $limit ) {
+
+		asort( $emails );
+
+		if ( ! $limit || count( $emails ) <= $limit ) {
+			return [ $emails, false, $emails ? max( $emails ) : 0 ];
+		}
+
+		$last   = array_values( array_slice( $emails, 0, $limit, true ) )[ $limit - 1 ];
+		$chosen = array_filter( $emails, fn( $dated ) => $dated <= $last );
+
+		// all of them, when they were all of one second, and there's nothing left
+		return [ $chosen, count( $chosen ) < count( $emails ), $last ];
+	}
+
+	/**
 	 * Look at the emails in the bounce inbox, and handle the bounces in them
 	 *
 	 * @param bool $manual from the button on the settings page, which looks back a set number of days, not from where the cron job got to
@@ -436,6 +499,7 @@ class Bounce_Checker {
 
 		$started = time();
 		$cursor  = absint( get_option( self::CURSOR_OPTION ) );
+		$capped  = (bool) get_option( self::CAPPED_OPTION );
 
 		/**
 		 * How many days back Handle Bounces Now looks
@@ -452,8 +516,7 @@ class Bounce_Checker {
 		 */
 		$limit = absint( apply_filters( 'groundhogg/bounce_checker/limit', $manual ? 500 : 200, $manual ) );
 
-		// A manual run looks back a set time. The cron job carries on from where it got to, or from 2 days ago the first time
-		$since = $manual ? $started - $days * DAY_IN_SECONDS : ( $cursor ? $cursor - self::CRON_OVERLAP : $started - 2 * DAY_IN_SECONDS );
+		$since = self::start_time( $manual, $started, $cursor, $capped, $days );
 
 		$counts  = [ 'messages' => 0, 'hard' => 0, 'soft' => 0, 'already' => 0, 'not_found' => 0, 'skipped' => 0 ];
 		$details = [];
@@ -471,14 +534,10 @@ class Bounce_Checker {
 			}
 		}
 
-		asort( $emails ); // oldest first, so what's left over for next time is the newest
+		[ $emails, $hit_limit, $last_dated ] = self::choose_emails( $emails, $limit );
 
-		$next_cursor = $started;
-
-		if ( $limit && count( $emails ) > $limit ) {
-			$emails      = array_slice( $emails, 0, $limit, true );
-			$next_cursor = max( $emails );
-		}
+		// where it got to, the time it started when it was all of them, or the last of them when there are more
+		$next_cursor = $hit_limit ? $last_dated : $started;
 
 		$this->get_bounce_handler();
 
@@ -504,6 +563,7 @@ class Bounce_Checker {
 		// the cron job carries on from here next time, a manual run doesn't change where it is
 		if ( ! $manual ) {
 			update_option( self::CURSOR_OPTION, $next_cursor, false );
+			update_option( self::CAPPED_OPTION, $hit_limit, false );
 		}
 
 		$result = [

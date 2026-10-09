@@ -260,4 +260,169 @@ class Bounce_Checker_Tests extends GH_UnitTestCase {
 			$this->checker()->summarize( [ 'messages' => 12, 'hard' => 3, 'soft' => 2, 'already' => 1, 'not_found' => 4, 'skipped' => 5 ] )
 		);
 	}
+
+	/* ---------------------------------------------------------------------
+	 * which emails a cron run handles, and where the next one starts
+	 * ------------------------------------------------------------------- */
+
+	public function test_where_a_run_starts() {
+
+		$now = 1_800_000_000;
+
+		// the first time, 2 days back
+		$this->assertSame( $now - 2 * DAY_IN_SECONDS, Bounce_Checker::start_time( false, $now, 0, false ) );
+
+		// after a run that did all of them, a few hours before where it got to
+		$this->assertSame( $now - 100 - Bounce_Checker::CRON_OVERLAP, Bounce_Checker::start_time( false, $now, $now - 100, false ) );
+
+		// after a run that stopped at its limit, just after where it stopped, without looking back
+		$this->assertSame( $now - 100 + 1, Bounce_Checker::start_time( false, $now, $now - 100, true ) );
+
+		// a manual run is a set number of days, whatever the cron job did
+		$this->assertSame( $now - 7 * DAY_IN_SECONDS, Bounce_Checker::start_time( true, $now, $now - 100, true ) );
+		$this->assertSame( $now - 3 * DAY_IN_SECONDS, Bounce_Checker::start_time( true, $now, 0, false, 3 ) );
+	}
+
+	public function test_all_of_the_emails_when_there_are_not_more_than_the_limit() {
+
+		[ $chosen, $capped, $last ] = Bounce_Checker::choose_emails( [ 3 => 300, 1 => 100, 2 => 200 ], 3 );
+
+		$this->assertSame( [ 1 => 100, 2 => 200, 3 => 300 ], $chosen, 'the oldest first' );
+		$this->assertFalse( $capped );
+		$this->assertSame( 300, $last );
+
+		[ $chosen, $capped, $last ] = Bounce_Checker::choose_emails( [], 3 );
+
+		$this->assertSame( [], $chosen );
+		$this->assertFalse( $capped );
+		$this->assertSame( 0, $last );
+	}
+
+	public function test_the_oldest_up_to_the_limit_when_there_are_more() {
+
+		[ $chosen, $capped, $last ] = Bounce_Checker::choose_emails( [ 5 => 500, 1 => 100, 4 => 400, 2 => 200, 3 => 300 ], 3 );
+
+		$this->assertSame( [ 1 => 100, 2 => 200, 3 => 300 ], $chosen );
+		$this->assertTrue( $capped );
+		$this->assertSame( 300, $last );
+	}
+
+	public function test_the_last_second_is_finished_so_the_next_run_can_start_after_it() {
+
+		// the 3rd and 4th are dated the same second, so are both handled, and the next run starts after it
+		[ $chosen, $capped, $last ] = Bounce_Checker::choose_emails( [ 1 => 100, 2 => 200, 3 => 300, 4 => 300, 5 => 400 ], 3 );
+
+		$this->assertSame( [ 1 => 100, 2 => 200, 3 => 300, 4 => 300 ], $chosen );
+		$this->assertTrue( $capped );
+		$this->assertSame( 300, $last );
+
+		// and when it's the end of them, it isn't stopped
+		[ $chosen, $capped ] = Bounce_Checker::choose_emails( [ 1 => 100, 2 => 200, 3 => 300, 4 => 300 ], 3 );
+
+		$this->assertSame( [ 1 => 100, 2 => 200, 3 => 300, 4 => 300 ], $chosen );
+		$this->assertFalse( $capped, 'there was nothing after it' );
+	}
+
+	public function test_no_limit() {
+		[ $chosen, $capped ] = Bounce_Checker::choose_emails( [ 1 => 100, 2 => 200 ], 0 );
+
+		$this->assertCount( 2, $chosen );
+		$this->assertFalse( $capped );
+	}
+
+	/**
+	 * Runs of the cron job over a mailbox, the way run() does them: look from where the last one got to, handle up to the
+	 * limit, and keep where it got to
+	 *
+	 * @param array $inbox   message number => dated
+	 * @param int   $limit
+	 * @param int   $start   when the first run is
+	 * @param int   $runs
+	 *
+	 * @return array[] the message numbers each run handled
+	 */
+	protected function simulate_cron( array $inbox, int $limit, int $start, int $runs ) {
+
+		$cursor = 0;
+		$capped = false;
+		$handled = [];
+
+		for ( $i = 0; $i < $runs; $i ++ ) {
+
+			$started = $start + $i * HOUR_IN_SECONDS;
+			$since   = Bounce_Checker::start_time( false, $started, $cursor, $capped );
+
+			$emails = array_filter( $inbox, fn( $dated ) => $dated >= $since && $dated <= $started );
+
+			[ $chosen, $hit_limit, $last ] = Bounce_Checker::choose_emails( $emails, $limit );
+
+			$handled[] = array_keys( $chosen );
+			$cursor    = $hit_limit ? $last : $started;
+			$capped    = $hit_limit;
+		}
+
+		return $handled;
+	}
+
+	/**
+	 * More than the limit in the 6 hours before where a run got to made every run read the same emails
+	 */
+	public function test_the_cron_job_gets_through_more_emails_than_its_limit_in_6_hours() {
+
+		$start = 1_800_000_000;
+		$inbox = [];
+
+		// 450 emails in the hour before the first run, one every 8 seconds
+		for ( $n = 1; $n <= 450; $n ++ ) {
+			$inbox[ $n ] = $start - 3600 + $n * 8;
+		}
+
+		$runs = $this->simulate_cron( $inbox, 200, $start, 4 );
+
+		$this->assertCount( 200, $runs[0] );
+		$this->assertCount( 200, $runs[1] );
+		$this->assertCount( 50, $runs[2] );
+
+		// each email by itself while it catches up, none twice, none left out
+		$caught_up = array_merge( $runs[0], $runs[1], $runs[2] );
+
+		$this->assertSame( range( 1, 450 ), $caught_up );
+
+	}
+
+	public function test_the_cron_job_gets_through_more_emails_than_its_limit_in_one_second() {
+
+		$start = 1_800_000_000;
+
+		// 500 emails all dated the same second
+		$inbox = array_fill( 1, 500, $start - 600 );
+
+		$runs = $this->simulate_cron( $inbox, 200, $start, 3 );
+
+		// all of them in the first run, there's no way to stop part way through a second
+		$this->assertCount( 500, $runs[0] );
+
+		// so that run wasn't stopped, and the ones after it look back the overlap, like after any run that did them all,
+		// they don't get stuck on a limit that's smaller than a second of mail
+		$this->assertCount( 500, $runs[1] );
+		$this->assertCount( 500, $runs[2] );
+	}
+
+	public function test_the_cron_job_does_not_move_on_to_what_came_later_until_it_has_the_ones_before() {
+
+		$start = 1_800_000_000;
+
+		$inbox = [];
+		for ( $n = 1; $n <= 250; $n ++ ) {
+			$inbox[ $n ] = $start - 7200 + $n * 10;
+		}
+
+		// the one that arrives while it's catching up
+		$inbox[251] = $start + 30 * MINUTE_IN_SECONDS;
+
+		$runs = $this->simulate_cron( $inbox, 200, $start, 4 );
+
+		$this->assertSame( range( 1, 200 ), $runs[0] );
+		$this->assertContains( 251, array_merge( $runs[1], $runs[2], $runs[3] ), 'and it is handled when it gets to it' );
+	}
 }
