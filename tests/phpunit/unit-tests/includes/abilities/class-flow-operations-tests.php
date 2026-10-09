@@ -138,6 +138,93 @@ class Flow_Operations_Tests extends GH_UnitTestCase {
 		$this->assertWPError( $this->apply( $funnel, [ $operation ] ) );
 	}
 
+	/**
+	 * A branch logic type like split path, random distribution and split test: it draws its own branches, from its settings,
+	 * and isn't one of the types that are described for the abilities
+	 */
+	protected function register_three_way_split() {
+
+		Plugin::instance()->step_manager->add_step( new class extends \Groundhogg\Steps\Logic\If_Else {
+
+			public function get_type() {
+				return 'three_way_split';
+			}
+
+			public function get_branches() {
+
+				$branches = (array) $this->get_setting( 'branches', [ 'aa' => 1, 'bb' => 1, 'cc' => 1 ] );
+
+				return array_map( [ $this, 'maybe_prefix_branch' ], array_keys( $branches ) );
+			}
+		} );
+	}
+
+	public function test_the_editor_adds_to_an_empty_branch_of_a_branch_logic_type_that_is_not_described() {
+
+		$this->register_three_way_split();
+
+		$funnel = new Funnel( [ 'title' => 'operations', 'status' => 'inactive' ] );
+
+		$split = $funnel->add_step( [
+			'step_type'  => 'three_way_split',
+			'step_group' => Step::LOGIC,
+			'step_title' => 'split',
+			'branch'     => 'main',
+			'step_order' => 1,
+		] );
+
+		$this->assertSame( 'three_way_split', $split->get_type() );
+		$this->assertSame( [ "{$split->ID}-aa", "{$split->ID}-bb", "{$split->ID}-cc" ], $split->get_step_element()->get_branches() );
+
+		// nothing in any of the branches yet
+		foreach ( [ 'aa', 'bb', 'cc' ] as $key ) {
+
+			$added = $this->apply( $funnel, [
+				[ 'op' => 'add', 'at' => [ 'branch_of' => $split->ID, 'branch' => $key, 'position' => 'end' ], 'steps' => [ [ 'type' => 'delay_timer', 'id' => "tmp_$key" ] ] ],
+			] );
+
+			$this->assertNotWPError( $added, $key );
+
+			$step = new Step( Flow_Operations::get_added_ids( $added )["tmp_$key"] );
+
+			$this->assertSame( "{$split->ID}-$key", $step->branch );
+		}
+	}
+
+	public function test_the_editor_moves_a_step_into_an_empty_branch_of_a_branch_logic_type_that_is_not_described() {
+
+		$this->register_three_way_split();
+
+		$funnel = new Funnel( [ 'title' => 'operations', 'status' => 'inactive' ] );
+
+		$split = $funnel->add_step( [ 'step_type' => 'three_way_split', 'step_group' => Step::LOGIC, 'step_title' => 'split', 'branch' => 'main', 'step_order' => 1 ] );
+		$delay = $funnel->add_step( [ 'step_type' => 'delay_timer', 'step_group' => Step::ACTION, 'step_title' => 'delay', 'branch' => 'main', 'step_order' => 2 ] );
+
+		$moved = $this->apply( $funnel, [
+			[ 'op' => 'move', 'step' => $delay->ID, 'at' => [ 'branch_of' => $split->ID, 'branch' => 'bb', 'position' => 'end' ] ],
+		] );
+
+		$this->assertNotWPError( $moved );
+		$this->assertSame( "{$split->ID}-bb", ( new Step( $delay->ID ) )->branch );
+	}
+
+	public function test_a_branch_that_the_type_does_not_have_is_still_refused_and_the_error_lists_the_ones_it_has() {
+
+		$this->register_three_way_split();
+
+		$funnel = new Funnel( [ 'title' => 'operations', 'status' => 'inactive' ] );
+
+		$split = $funnel->add_step( [ 'step_type' => 'three_way_split', 'step_group' => Step::LOGIC, 'step_title' => 'split', 'branch' => 'main', 'step_order' => 1 ] );
+
+		$added = $this->apply( $funnel, [
+			[ 'op' => 'add', 'at' => [ 'branch_of' => $split->ID, 'branch' => 'zz', 'position' => 'end' ], 'steps' => [ [ 'type' => 'delay_timer' ] ] ],
+		] );
+
+		$this->assertWPError( $added );
+		$this->assertSame( 'groundhogg_invalid_branch_key', $added->get_error_code() );
+		$this->assertStringContainsString( 'aa, bb, cc', $added->get_error_message() );
+	}
+
 	public function test_premium_placeholders_cant_be_added() {
 
 		if ( is_pro_features_active() ) {

@@ -1027,8 +1027,21 @@ class Flow_Operations {
 
 		$keys = Step_Type_Schema::branch_keys( $owner->get_type(), (array) Step_Type_Schema::export_settings( $owner ) );
 
-		// branches that already have steps, for types that aren't described
-		foreach ( array_keys( $this->branches ) as $branch ) {
+		// The branches the step type draws itself, like the canvas does, they're in its settings. Without them the branches of
+		// a type that isn't described (split path, random distribution, split test) can't be added to until they have a step.
+		$element = $owner->get_step_element();
+		$drawn   = [];
+
+		if ( method_exists( $element, 'get_branches' ) ) {
+			try {
+				$drawn = array_map( 'strval', (array) $element->get_branches() );
+			} catch ( \Throwable $e ) {
+				// settings that it can't make branches from, it has the ones that are described and the ones with steps
+			}
+		}
+
+		// and branches that already have steps, for types that aren't described
+		foreach ( array_merge( $drawn, array_map( 'strval', array_keys( $this->branches ) ) ) as $branch ) {
 			$branch = (string) $branch;
 			if ( str_starts_with( $branch, "$owner->ID-" ) ) {
 				$keys[] = substr( $branch, strlen( "$owner->ID-" ) );
