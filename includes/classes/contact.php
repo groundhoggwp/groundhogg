@@ -1227,6 +1227,15 @@ class Contact extends Base_Object_With_Meta {
 		return md5( encrypt( $this->get_email() ) );
 	}
 
+	/**
+	 * The folder the files uploaded before 4.7.2 are in
+	 *
+	 * @return string
+	 */
+	public function get_legacy_upload_folder_basename() {
+		return $this->get_legacy_upload_basename_for( $this->get_email() );
+	}
+
 	public function get_uploads_folder_subdir() {
 		return 'uploads';
 	}

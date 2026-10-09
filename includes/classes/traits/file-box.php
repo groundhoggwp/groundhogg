@@ -3,6 +3,7 @@
 namespace Groundhogg\Classes\Traits;
 
 use WP_Error;
+use function Groundhogg\base64url_decode;
 use function Groundhogg\convert_to_local_time;
 use function Groundhogg\encrypt;
 use function Groundhogg\file_access_url;
@@ -111,9 +112,86 @@ trait File_Box {
 	}
 
 	/**
+	 * Before 4.7.2 encrypt() used base64 instead of base64url, so the folder names were different. For most values
+	 * (all but the ones where the base64 has no padding and no + or /) the folder name changed, and the files
+	 * uploaded before then ended up in a folder that isn't looked at anymore.
+	 *
+	 * @param string|int $value what the folder name is made from
+	 *
+	 * @return string the folder name 4.7.1 and earlier would have used, empty if it can't be worked out
+	 */
+	protected function get_legacy_upload_basename_for( $value ) {
+
+		$decoded = base64url_decode( (string) encrypt( $value ) );
+
+		if ( ! $decoded ) {
+			return '';
+		}
+
+		return md5( base64_encode( $decoded ) );
+	}
+
+	/**
+	 * The name of the folder this object's files were in before 4.7.2, but only if it's not the same as the current one
+	 *
+	 * @return string
+	 */
+	public function get_legacy_upload_folder_basename() {
+		return $this->get_legacy_upload_basename_for( $this->get_id() );
+	}
+
+	protected $checked_legacy_folder = '';
+
+	/**
+	 * Moves the files from the folder they were uploaded to before 4.7.2 into the folder they're looked for in now.
+	 * It's done when the files are asked for, so the sites don't need a big migration.
+	 *
+	 * @return bool whether any files were moved
+	 */
+	public function maybe_move_legacy_upload_folder() {
+
+		$legacy = $this->get_legacy_upload_folder_basename();
+
+		// the same folder, can't be worked out, or already looked at
+		if ( ! $legacy || $legacy === $this->get_upload_folder_basename() || $legacy === $this->checked_legacy_folder ) {
+			return false;
+		}
+
+		$this->checked_legacy_folder = $legacy;
+
+		$from = files()->get_uploads_dir( $this->get_uploads_folder_subdir(), $legacy );
+		$to   = files()->get_uploads_dir( $this->get_uploads_folder_subdir(), $this->get_upload_folder_basename() );
+
+		if ( ! $from || ! $to || ! is_dir( $from ) ) {
+			return false;
+		}
+
+		// nothing in the right folder yet, so the whole folder can be renamed
+		if ( ! file_exists( $to ) ) {
+			wp_mkdir_p( dirname( $to ) );
+
+			return @rename( $from, $to );
+		}
+
+		// there's files in both, don't overwrite anything
+		$moved = false;
+
+		foreach ( array_diff( scandir( $from ), [ '.', '..' ] ) as $name ) {
+			$moved = @rename( $from . '/' . $name, $to . '/' . wp_unique_filename( $to, $name ) ) || $moved;
+		}
+
+		@rmdir( $from );
+
+		return $moved;
+	}
+
+	/**
 	 * get the upload folder for this contact
 	 */
 	public function get_uploads_folder() {
+
+		$this->maybe_move_legacy_upload_folder();
+
 		$paths = [
 			'subdir' => sprintf( '/groundhogg/%s/%s', $this->get_uploads_folder_subdir(), $this->get_upload_folder_basename() ),
 			'path'   => files()->get_uploads_dir( $this->get_uploads_folder_subdir(), $this->get_upload_folder_basename() ),
