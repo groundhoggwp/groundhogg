@@ -50,6 +50,13 @@ class Inbox_Client {
 
 		$key = License_Manager::get_master_license();
 
+		// The master license can be one that has expired, when there isn't a valid one that gets more than one item. The
+		// relay doesn't take it, so it's the same as not having one, and the licenses that are valid are looked at.
+		// A key defined in wp-config.php isn't one of the licenses, there's nothing to check it with.
+		if ( $key && ! defined( 'GH_MASTER_LICENSE' ) && ! License_Manager::is_valid( (string) $key ) ) {
+			$key = false;
+		}
+
 		if ( ! $key ) {
 			foreach ( License_Manager::get_licenses() as $license_key => $license ) {
 				if ( $license->is_valid() ) {
