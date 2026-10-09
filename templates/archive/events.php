@@ -10,51 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'wp_head', function () {
-
-	?>
-    <style>
-
-        table.wp-list-table {
-
-            td:first-child {
-                width: 170px;
-                padding-left: 30px;
-                vertical-align: middle;
-            }
-        }
-
-        div.subject-and-preview {
-            display: grid;
-            gap: 0 5px;
-            grid-template-columns: min-content max-content;
-            grid-template-areas:
-    "avatar subject"
-    "avatar preview";
-
-            img.avatar {
-                grid-area: avatar;
-                float: left;
-                margin-right: 10px;
-                height: 35px;
-                width: 35px;
-                border-radius: 50%;
-            }
-
-            a.subject {
-                grid-area: subject;
-                font-size: 15px;
-                font-weight: 500;
-            }
-
-            span.preview {
-                grid-area: preview;
-            }
-        }
-    </style>
-	<?php
-
-} );
 
 include_once __DIR__ . '/../managed-page.php';
 

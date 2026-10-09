@@ -14,6 +14,8 @@ use function Groundhogg\html;
 		    'type'        => 'search',
 		    'name'        => 'filter',
 		    'id'          => 'search-input',
+		    'placeholder' => __( 'Search the archive', 'groundhogg' ),
+		    'aria-label'  => __( 'Search the archive', 'groundhogg' ),
 		    'value'       => sanitize_text_field( get_url_var( 'filter' ) ),
 	    ] ),
 	    html()->button( [

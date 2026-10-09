@@ -8,6 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'GROUNDHOGG_IS_BROWSER_VIEW', true );
 
+// it's filled in with the contact that's being tracked, so a page cache can't give it to someone else
+nocache_headers();
+
 include_once __DIR__ . '/../managed-page.php';
 
 $broadcast = the_thing( 'broadcast' );

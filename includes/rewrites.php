@@ -180,6 +180,22 @@ class Rewrites {
 		return new Template_Loader();
 	}
 
+	/**
+	 * Whether a broadcast is shown in the archive of a campaign: an email that's been sent, in the campaign. The same ones
+	 * that list_broadcasts_archive() lists.
+	 *
+	 * @param Broadcast $broadcast
+	 * @param Campaign  $campaign
+	 *
+	 * @return bool
+	 */
+	public static function is_in_campaign_archive( Broadcast $broadcast, Campaign $campaign ) {
+		return $broadcast->exists()
+		       && $broadcast->is_email()
+		       && $broadcast->is_sent()
+		       && $broadcast->is_related( $campaign );
+	}
+
 	public function get_404() {
 		global $wp_query;
 		$wp_query->set_404();
@@ -251,7 +267,7 @@ class Rewrites {
 
 					status_header( 404 );
 					$wp_query->set_404();
-					$template = get_query_template( '404' );
+					$template = get_query_template( '404' ) ?: get_index_template(); // a theme without a 404 template
 
 					break;
 				}
@@ -260,14 +276,24 @@ class Rewrites {
 
 				if ( $broadcast_id ) {
 					$broadcast = new Broadcast( $broadcast_id );
+
+					// Only what the archive lists. The ID is a number that counts up, and this is public, so without this any
+					// email broadcast of the site, unsent ones and ones of campaigns that are hidden, could be read.
+					if ( ! self::is_in_campaign_archive( $broadcast, $campaign ) ) {
+
+						status_header( 404 );
+						$wp_query->set_404();
+						$template = get_query_template( '404' ) ?: get_index_template();
+
+						break;
+					}
+
 					$GLOBALS['broadcast'] = $broadcast;
 
 					the_thing( 'broadcast', $broadcast );
 
-					if ( $broadcast->exists() ) {
-						$template = $template_loader->get_template_part( 'archive/broadcast', '', false );
-						break;
-					}
+					$template = $template_loader->get_template_part( 'archive/broadcast', '', false );
+					break;
 				}
 
 				$template = $template_loader->get_template_part( 'archive/campaign', '', false );

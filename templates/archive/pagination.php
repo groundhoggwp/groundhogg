@@ -53,6 +53,6 @@ if ( $total_pages > 1 ):
 endif;
 
 ?>
-<p>
-    <i><?php esc_html_e( 'Archived content may not reflect its original form as when initially sent. Not all emails are available in the archives. We do not guarantee the retention of any content for any amount of time.', 'groundhogg' ); ?></i>
+<p class="archive-disclaimer">
+    <?php esc_html_e( 'Archived content may not reflect its original form as when initially sent. Not all emails are available in the archives. We do not guarantee the retention of any content for any amount of time.', 'groundhogg' ); ?>
 </p>

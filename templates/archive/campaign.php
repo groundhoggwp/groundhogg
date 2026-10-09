@@ -8,51 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'wp_head', function () {
-
-	?>
-    <style>
-
-        table.wp-list-table {
-
-            td:first-child {
-                width: 170px;
-                padding-left: 30px;
-                vertical-align: middle;
-            }
-        }
-
-        div.subject-and-preview {
-            display: grid;
-            gap: 0 5px;
-            grid-template-columns: min-content max-content;
-            grid-template-areas:
-    "avatar subject"
-    "avatar preview";
-
-            img.avatar {
-                grid-area: avatar;
-                float: left;
-                margin-right: 10px;
-                height: 35px;
-                width: 35px;
-                border-radius: 50%;
-            }
-
-            a.subject {
-                grid-area: subject;
-                font-size: 15px;
-                font-weight: 500;
-            }
-
-            span.preview {
-                grid-area: preview;
-            }
-        }
-    </style>
-	<?php
-
-} );
 
 $campaign = the_thing( 'campaign' );
 
@@ -63,12 +18,14 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 
 ?>
     <div class="box">
-        <p>
-            <a href="<?php echo esc_url( managed_page_url( 'campaigns' ) ); ?>">&larr; <?php esc_html_e( 'All campaign archives', 'groundhogg' ); ?></a>
-        </p>
+        <a class="archive-back" href="<?php echo esc_url( managed_page_url( 'campaigns' ) ); ?>">&larr; <?php esc_html_e( 'All campaign archives', 'groundhogg' ); ?></a>
         <h1 class="no-margin-top"><?php
             /* translators: 1: campaign name */
 		    echo esc_html( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_name() ) );
+
+		    if ( ! $campaign->is_public() ) {
+			    ?><span class="archive-badge"><?php esc_html_e( 'Hidden', 'groundhogg' ); ?></span><?php
+		    }
             ?></h1>
 		<?php
 
@@ -76,12 +33,23 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 		$current_page = absint( get_url_var( '_page', 1 ) );
 		$search = sanitize_text_field( get_url_var( 'filter' ) );
 
-		$list = list_broadcasts_archive( [
-            'per_page' => $per_page,
-            'page' => $current_page,
-            'search' => $search,
-            'campaign' => $campaign,
-        ] );
+		// the people that manage campaigns can see one that's hidden, so they can see what it will be, and everyone else doesn't get here
+		if ( ! $campaign->is_public() ) {
+			?>
+            <p class="archive-notice"><?php esc_html_e( 'This campaign is hidden. Only people that can manage campaigns can see this archive.', 'groundhogg' ); ?></p>
+			<?php
+		}
+
+		try {
+			$list = list_broadcasts_archive( [
+				'per_page' => $per_page,
+				'page'     => $current_page,
+				'search'   => $search,
+				'campaign' => $campaign,
+			] );
+		} catch ( \Exception $e ) {
+			$list = [ 'items' => [], 'total_items' => 0, 'total_pages' => 0 ];
+		}
 
 		$items       = $list['items'];
 		$total_items = $list['total_items'];
@@ -129,7 +97,7 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 
 		if ( $search ):
 			?>
-            <p><?php
+            <p class="archive-count"><?php
 				printf(
 				    /* translators: 1: number of emails found, 2: search term */
                     esc_html( _n( 'We found %1$s email in this archive matching %2$s.', 'We found %1$s emails in this archive matching %2$s.', $total_items, 'groundhogg' ) ),
@@ -139,7 +107,7 @@ managed_page_head( sprintf( __( '%s Archive', 'groundhogg' ), $campaign->get_nam
 		    <?php
 		else:
 			?>
-            <p><?php
+            <p class="archive-count"><?php
 				printf(
 				        /* translators: 1: number of emails in the archive */
                         esc_html( _n( 'There is %s email in this archive.', 'There are %s emails in this archive.', $total_items, 'groundhogg' ) ),

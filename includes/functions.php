@@ -9985,7 +9985,8 @@ function list_broadcasts_archive( array $args ) {
 	    $campaign = new Campaign( $campaign );
     }
 
-    if ( ! $campaign->is_public() ){
+    // a campaign that's hidden is there for the people that manage campaigns, like the archive page lets them in
+    if ( ! $campaign->exists() || ( ! $campaign->is_public() && ! current_user_can( 'manage_campaigns' ) ) ){
         throw new \Exception( 'Campaign is not public' );
     }
 

@@ -347,3 +347,731 @@ form.list-search {
         content: '';
     }
 }
+
+/**
+ * The look of the managed pages: the preferences center, the archives, and the pages that tell you what happened.
+ * The colors are variables so they can be changed, and they follow the visitor's light or dark setting.
+ */
+html:has(body.managed-page) {
+    background-color: #f3f5f9;
+
+    @media (prefers-color-scheme: dark) {
+        background-color: #0e131b;
+    }
+}
+
+body.managed-page {
+
+    --mp-bg: #f3f5f9;
+    --mp-card: #ffffff;
+    --mp-text: #18212f;
+    --mp-muted: #64708a;
+    --mp-line: #e5e8ef;
+    --mp-hover: #f6f8fc;
+    --mp-accent: #c2610f;
+    --mp-link: #1d4ed8;
+    --mp-ink: #18212f;
+    --mp-ink-text: #ffffff;
+    --mp-danger: #dc2626;
+    --mp-danger-text: #ffffff;
+    --mp-notice-bg: #fff7ed;
+    --mp-notice-line: #fed7aa;
+    --mp-notice-text: #7c2d12;
+    --mp-success-bg: #ecfdf3;
+    --mp-success-line: #a6f4c5;
+    --mp-success-text: #05603a;
+    --mp-error-bg: #fef3f2;
+    --mp-error-line: #fecdca;
+    --mp-error-text: #912018;
+    --mp-info-bg: #eff6ff;
+    --mp-info-line: #bfdbfe;
+    --mp-info-text: #1e3a8a;
+    --mp-badge-bg: #fff1dc;
+    --mp-badge-text: #92400e;
+    --mp-focus: rgba(194, 97, 15, 0.16);
+
+    background-color: var(--mp-bg);
+    color: var(--mp-text);
+
+    @media (prefers-color-scheme: dark) {
+        --mp-bg: #0e131b;
+        --mp-card: #161d29;
+        --mp-text: #e8ecf3;
+        --mp-muted: #98a3b8;
+        --mp-line: #263042;
+        --mp-hover: #1b2433;
+        --mp-accent: #f0a15c;
+        --mp-link: #8ab4ff;
+        --mp-ink: #e8ecf3;
+        --mp-ink-text: #0e131b;
+        --mp-danger: #ef4444;
+        --mp-danger-text: #0e131b;
+        --mp-notice-bg: #2a1d10;
+        --mp-notice-line: #5a3a18;
+        --mp-notice-text: #f6d6b0;
+        --mp-success-bg: #0f2a1d;
+        --mp-success-line: #1f5a3c;
+        --mp-success-text: #a6f4c5;
+        --mp-error-bg: #2d1514;
+        --mp-error-line: #6b2723;
+        --mp-error-text: #fecdca;
+        --mp-info-bg: #12203a;
+        --mp-info-line: #254477;
+        --mp-info-text: #bfdbfe;
+        --mp-badge-bg: #3a2813;
+        --mp-badge-text: #f6c98f;
+        --mp-focus: rgba(240, 161, 92, 0.22);
+    }
+
+    #main {
+        background-color: var(--mp-bg);
+        max-width: 560px;
+        padding: 6vh 20px 40px;
+    }
+
+    // the cards
+    #main .box {
+        margin-top: 0;
+        margin-bottom: 16px;
+        padding: 32px;
+        border-radius: 20px;
+        border: 1px solid var(--mp-line);
+        background: var(--mp-card);
+        color: var(--mp-text);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 18px 40px -18px rgba(16, 24, 40, 0.18);
+
+        @media (max-width: 600px) {
+            padding: 22px 18px;
+            border-radius: 16px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0 0 8px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.015em;
+            color: var(--mp-text);
+        }
+
+        h1 {
+            font-size: clamp(26px, 4.4vw, 34px);
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 22px;
+        }
+
+        h3 {
+            font-size: 18px;
+        }
+
+        p {
+            margin: 0 0 14px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--mp-muted);
+        }
+
+        p b,
+        p strong {
+            color: var(--mp-text);
+            font-weight: 600;
+        }
+
+        // what follows a form in the same card, like the data actions after the consent form
+        > form + p {
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 1px solid var(--mp-line);
+        }
+
+        ul,
+        ol {
+            margin: 0 0 14px;
+            padding-left: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--mp-muted);
+        }
+
+        ul {
+            list-style: disc;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        a:not(.button) {
+            color: var(--mp-link);
+            text-underline-offset: 3px;
+
+            &:hover {
+                color: var(--mp-accent);
+            }
+        }
+
+        .contact-name {
+            border-bottom: 1px dotted var(--mp-muted);
+            color: var(--mp-text);
+        }
+
+        .optional {
+            font-weight: 400;
+            color: var(--mp-muted);
+        }
+    }
+
+    // forms
+    #main {
+
+        label {
+            display: block;
+            margin: 0 0 6px;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--mp-text);
+        }
+
+        label.gh-checkbox-label,
+        div.checkboxes label,
+        div.radio-buttons label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 0 0 12px;
+            font-weight: 400;
+            color: var(--mp-muted);
+
+            input {
+                flex: none;
+                margin: 3px 0 0;
+            }
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--mp-ink);
+        }
+
+        select,
+        textarea,
+        input[type="email"],
+        input[type="tel"],
+        input[type="search"],
+        input[type="date"],
+        input[type="datetime-local"],
+        input[type="number"],
+        input[type="url"],
+        input[type="text"] {
+            width: 100%;
+            margin: 0 0 18px;
+            padding: 0 14px;
+            height: 44px;
+            border: 1px solid var(--mp-line);
+            border-radius: 12px;
+            background: var(--mp-card);
+            color: var(--mp-text);
+            font-size: 15px;
+            box-shadow: none;
+            outline: 0;
+            transition: border-color 0.15s, box-shadow 0.15s;
+
+            &::placeholder {
+                color: var(--mp-muted);
+            }
+
+            &:focus {
+                border-color: var(--mp-accent);
+                box-shadow: 0 0 0 4px var(--mp-focus);
+            }
+        }
+
+        textarea {
+            height: auto;
+            padding: 10px 14px;
+            line-height: 1.5;
+        }
+
+        p.form-field-description {
+            margin: -10px 0 16px;
+            font-size: 13px;
+            font-style: normal;
+            color: var(--mp-muted);
+        }
+
+        // buttons
+        #gh-submit,
+        button[type=submit],
+        input[type=submit],
+        .button {
+            display: inline-block;
+            padding: 11px 20px;
+            border: 0;
+            border-radius: 12px;
+            background: var(--mp-ink);
+            color: var(--mp-ink-text);
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.15s;
+
+            * {
+                font-size: inherit;
+            }
+
+            &:hover {
+                background: var(--mp-ink);
+                color: var(--mp-ink-text);
+                opacity: 0.86;
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--mp-accent);
+                outline-offset: 2px;
+            }
+
+            &.secondary {
+                border: 1px solid var(--mp-line);
+                background: transparent;
+                color: var(--mp-text);
+
+                &:hover {
+                    background: var(--mp-hover);
+                    color: var(--mp-text);
+                    opacity: 1;
+                }
+            }
+
+            &.danger {
+                background: var(--mp-danger);
+                color: var(--mp-danger-text);
+
+                &:hover {
+                    background: var(--mp-danger);
+                    color: var(--mp-danger-text);
+                }
+            }
+        }
+
+        // the list of preferences to choose from
+        .preference-options a {
+            display: block;
+            width: 100%;
+            margin: 8px 0 0;
+            padding: 12px 16px;
+            border: 1px solid var(--mp-line);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--mp-text);
+
+            &:hover {
+                border-color: var(--mp-accent);
+                background: var(--mp-hover);
+                color: var(--mp-text);
+            }
+
+            &.preference-unsubscribe,
+            &.preference-gdpr_delete {
+                color: var(--mp-danger);
+
+                &:hover {
+                    border-color: var(--mp-danger);
+                    background: var(--mp-error-bg);
+                    color: var(--mp-danger);
+                }
+            }
+        }
+
+        // what the page has to say about what just happened, from WordPress's notices
+        .notice {
+            margin: 0 0 14px;
+            padding: 12px 16px;
+            border: 1px solid var(--mp-info-line);
+            border-left-width: 1px;
+            border-radius: 14px;
+            background: var(--mp-info-bg);
+            color: var(--mp-info-text);
+            box-shadow: none;
+
+            p {
+                margin: 0.4em 0;
+                font-size: 14px;
+                line-height: 1.55;
+                color: inherit;
+            }
+
+            a {
+                color: inherit;
+                text-decoration: underline;
+            }
+
+            &.notice-warning {
+                border-color: var(--mp-notice-line);
+                background: var(--mp-notice-bg);
+                color: var(--mp-notice-text);
+            }
+
+            &.notice-success {
+                border-color: var(--mp-success-line);
+                background: var(--mp-success-bg);
+                color: var(--mp-success-text);
+            }
+
+            &.notice-error {
+                border-color: var(--mp-error-line);
+                background: var(--mp-error-bg);
+                color: var(--mp-error-text);
+            }
+        }
+    }
+
+    #extralinks,
+    p#credit {
+        font-size: 13px;
+        color: var(--mp-muted);
+
+        a {
+            color: var(--mp-muted);
+            text-underline-offset: 3px;
+
+            &:hover {
+                color: var(--mp-text);
+            }
+        }
+    }
+
+    // the archives
+    &.archive {
+
+        #main {
+            max-width: 780px;
+        }
+
+        #main .box {
+            padding: 36px;
+
+            @media (max-width: 600px) {
+                padding: 22px 18px;
+            }
+
+            a:not(.button) {
+                color: var(--mp-text);
+            }
+
+            p {
+                margin-bottom: 14px;
+            }
+        }
+
+        // the link back to all of the archives
+        #main .box a.archive-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--mp-muted);
+
+            &:hover {
+                color: var(--mp-text);
+            }
+        }
+
+        // a campaign that is not public, shown to the people that manage campaigns
+        .archive-badge {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            vertical-align: middle;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.5;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: var(--mp-badge-bg);
+            color: var(--mp-badge-text);
+        }
+
+        #main .box p.archive-notice {
+            margin: 0 0 18px;
+            padding: 10px 14px;
+            border: 1px solid var(--mp-notice-line);
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--mp-notice-bg);
+            color: var(--mp-notice-text);
+        }
+
+        #main .box p.archive-count {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        // search
+        #main .box form.list-search {
+            float: none;
+            display: flex;
+            gap: 8px;
+            margin: 20px 0 14px;
+
+            input#search-input {
+                flex: 1;
+                min-width: 0;
+                margin: 0 !important;
+            }
+
+            button#search-submit {
+                height: 44px;
+                padding: 0 22px;
+            }
+        }
+
+        // the list of campaigns
+        .archive-cards {
+            display: grid;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        #main .box a.archive-card {
+            display: block;
+            padding: 16px 18px;
+            border: 1px solid var(--mp-line);
+            border-radius: 14px;
+            background: var(--mp-card);
+            text-decoration: none;
+            transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+
+            &:hover,
+            &:focus-visible {
+                border-color: var(--mp-accent);
+                transform: translateY(-1px);
+                box-shadow: 0 10px 24px -14px rgba(16, 24, 40, 0.3);
+                outline: none;
+            }
+
+            .archive-card-title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                font-size: 16px;
+                font-weight: 650;
+                line-height: 1.35;
+                color: var(--mp-text);
+            }
+
+            .archive-card-count {
+                flex: none;
+                padding: 2px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 500;
+                background: var(--mp-hover);
+                color: var(--mp-muted);
+            }
+
+            .archive-card-description {
+                display: block;
+                margin-top: 4px;
+                font-size: 14px;
+                line-height: 1.5;
+                color: var(--mp-muted);
+            }
+        }
+
+        // the list of emails
+        #main .box .list-wrap {
+            margin: 10px 0 0;
+
+            table.wp-list-table.archive-list {
+                width: 100%;
+                margin: 0;
+                border: 0;
+                border-collapse: separate;
+                border-spacing: 0 8px;
+                background: transparent;
+                box-shadow: none;
+
+                thead {
+                    display: none;
+                }
+
+                tbody tr {
+                    background: transparent;
+                }
+
+                tbody td {
+                    padding: 14px 16px;
+                    border: 0;
+                    border-top: 1px solid var(--mp-line);
+                    border-bottom: 1px solid var(--mp-line);
+                    background: var(--mp-card);
+                    vertical-align: middle;
+                    color: var(--mp-text);
+                    transition: background-color 0.15s;
+                }
+
+                tbody td:first-child {
+                    width: 150px;
+                    padding-left: 16px;
+                    border-left: 1px solid var(--mp-line);
+                    border-radius: 14px 0 0 14px;
+                    font-size: 13px;
+                    font-variant-numeric: tabular-nums;
+                    color: var(--mp-muted);
+                    white-space: nowrap;
+                }
+
+                tbody td:last-child {
+                    border-right: 1px solid var(--mp-line);
+                    border-radius: 0 14px 14px 0;
+                }
+
+                tbody td:only-child {
+                    border-radius: 14px;
+                    border-left: 1px solid var(--mp-line);
+                }
+
+                tbody tr:hover td {
+                    background: var(--mp-hover);
+                }
+
+                @media (max-width: 600px) {
+
+                    tbody,
+                    tbody tr,
+                    tbody td {
+                        display: block;
+                    }
+
+                    tbody tr {
+                        margin-bottom: 8px;
+                        border: 1px solid var(--mp-line);
+                        border-radius: 14px;
+                        overflow: hidden;
+                        background: var(--mp-card);
+                    }
+
+                    tbody td,
+                    tbody td:first-child,
+                    tbody td:last-child {
+                        width: auto;
+                        border: 0;
+                        border-radius: 0;
+                        background: transparent;
+                    }
+
+                    tbody td:first-child {
+                        padding-bottom: 0;
+                    }
+                }
+            }
+
+            div.subject-and-preview {
+                display: grid;
+                grid-template-columns: 40px minmax(0, 1fr);
+                grid-template-areas:
+                    "avatar subject"
+                    "avatar preview";
+                gap: 0 12px;
+                align-items: center;
+
+                img.avatar {
+                    grid-area: avatar;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+
+                a.subject {
+                    grid-area: subject;
+                    font-size: 15px;
+                    font-weight: 600;
+                    line-height: 1.4;
+                    color: var(--mp-text);
+
+                    &:hover {
+                        color: var(--mp-accent);
+                    }
+                }
+
+                span.preview {
+                    grid-area: preview;
+                    overflow: hidden;
+                    font-size: 13.5px;
+                    line-height: 1.45;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    color: var(--mp-muted);
+                }
+            }
+        }
+
+        // pages
+        #main .box .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin: 22px 0 0;
+
+            a,
+            span {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 38px;
+                height: 38px;
+                padding: 0 12px;
+                border-radius: 10px;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            a {
+                border: 1px solid var(--mp-line);
+                background: var(--mp-card);
+                color: var(--mp-text);
+                transition: border-color 0.15s;
+
+                &:hover {
+                    border-color: var(--mp-accent);
+                }
+
+                &.active {
+                    border-color: var(--mp-ink);
+                    background: var(--mp-ink);
+                    color: var(--mp-ink-text);
+                }
+            }
+
+            span {
+                color: var(--mp-muted);
+            }
+        }
+
+        #main .box p.archive-disclaimer {
+            margin: 22px 0 0;
+            padding-top: 16px;
+            border-top: 1px solid var(--mp-line);
+            font-size: 12.5px;
+            font-style: normal;
+            line-height: 1.55;
+        }
+    }
+}
