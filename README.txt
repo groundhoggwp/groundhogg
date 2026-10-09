@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.9.2
+Stable tag: 4.9.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -390,6 +390,19 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.9.3 (2026-10-09) =
+* SECURITY The page for an email in a campaign's archive showed any broadcast on the site, including ones that hadn't been sent and ones in campaigns that aren't public, to anyone who knew its number. It only shows emails that have been sent and are in that campaign, and it can no longer be cached.
+* FIXED Files uploaded to a contact before 4.7.2 were missing from the contact's Files tab, and from {files} and the contact's downloads. 4.7.2 changed the name of the folder that a contact's files are kept in, and the files were left in the old one. They are moved to the right folder when the contact's files are asked for, when the contact's email address is changed, and when an old link to one of them is followed. Files that are in both folders are kept, and nothing is overwritten.
+* FIXED Opening the archive of a campaign that isn't public as someone who manages campaigns ended in a white screen. Anyone else gets a page that says it can't be found.
+* FIXED The flow editor couldn't add or move a step into an empty branch of a split path, random distribution, split test or evergreen sequence. It said the branch didn't exist.
+* FIXED The bounce check could stop moving on when 200 or more emails in the inbox were dated within the same few hours, and read the same emails every time it ran.
+* FIXED Setting up Incoming Messages sent an expired key when the site has an expired master license and a valid license for a single product.
+* FIXED Activating a license key that the site hadn't seen before logged a warning that included the key, and re-activating a key returned the license as it was before.
+* IMPROVED The archive pages and the preferences center, including the profile, erase and unsubscribe pages, have a new look with cards, light and dark colors that follow the visitor's setting, and a layout for small screens.
+* DEV New `File_Box::get_legacy_upload_folder_basename()` and `File_Box::maybe_move_legacy_upload_folder()`. `get_uploads_folder()` moves the files of a folder from before 4.7.2 before it gives the folder.
+* DEV New `Rewrites::current_upload_folder_path()` and `Rewrites::is_in_campaign_archive()`.
+* DEV The colors of the managed pages are CSS variables that begin with `--mp-`, set on `body.managed-page`.
 
 = 4.9.2 (2026-10-06) =
 * ADDED Handle Bounces Now in Settings > Email, for sites that receive bounces in an IMAP inbox. It checks the last 7 days of the inbox and shows how many emails it checked, how many contacts were marked as bounced, and what it decided for each recipient.
