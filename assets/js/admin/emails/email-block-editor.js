@@ -6336,6 +6336,8 @@
                                     setState({ page: 'editor' })
                                     setBlocks(parseBlocksFromContent(data.content),
                                       false)
+                                    // not a change to the blocks, so setBlocks doesn't request the preview
+                                    updatePreview()
                                     renderEditor()
                                     close()
                                     TitlePrompt()
