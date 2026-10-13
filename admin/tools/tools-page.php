@@ -142,6 +142,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 			do_action( 'groundhogg/enqueue_api_docs' );
 		}
 
+		// the tag picker on the map step needs data.js, which isn't something admin.js or make-el.js load
+		if ( $this->get_current_tab() === 'import' && get_url_var( 'action' ) === 'map' ) {
+			wp_enqueue_script( 'groundhogg-admin-data' );
+		}
+
 		if ( $this->get_current_tab() === 'export' ) {
 			wp_enqueue_script( 'groundhogg-make-el' );
 			wp_enqueue_script( 'groundhogg-admin-element' );
