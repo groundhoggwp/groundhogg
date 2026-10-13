@@ -398,6 +398,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED A font set for the links in a text block could break the CSS that came after it. Emails saved this way are repaired when they are sent or viewed.
 * TWEAKED Four column layouts show as two rows of two columns on small screens, instead of a single column. Use the column padding to space them.
 
+= 4.9.4 (unreleased) =
+* FIXED The tag picker on the map step of an import failed with "Groundhogg.createState is not a function" when the admin scripts were delayed or deferred. The step now loads the script that it needs.
+
 = 4.9.3 (2026-10-09) =
 * SECURITY The page for an email in a campaign's archive showed any broadcast on the site, including ones that hadn't been sent and ones in campaigns that aren't public, to anyone who knew its number. It only shows emails that have been sent and are in that campaign, and it can no longer be cached.
 * FIXED Files uploaded to a contact before 4.7.2 were missing from the contact's Files tab, and from {files} and the contact's downloads. 4.7.2 changed the name of the folder that a contact's files are kept in, and the files were left in the old one. They are moved to the right folder when the contact's files are asked for, when the contact's email address is changed, and when an old link to one of them is followed. Files that are in both folders are kept, and nothing is overwritten.
