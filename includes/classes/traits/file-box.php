@@ -79,19 +79,42 @@ trait File_Box {
 			return new WP_Error( 'not_copyable', 'This file can\'t be uploaded.' );
 		}
 
+		if ( file_exists( $url_or_path ) ) {
+
+			// A local file is only copied from inside the uploads directory
+			if ( ! files()::is_file_within_directory( $url_or_path, wp_get_upload_dir()['basedir'] ) ) {
+				return new WP_Error( 'nope', 'File upload not allowed.' );
+			}
+
+			// The original is never the file that gets sideloaded, that is moved into place, or deleted if it's rejected
+			$tmp_name = wp_tempnam( wp_basename( $url_or_path ) );
+
+			if ( ! $tmp_name || ! copy( $url_or_path, $tmp_name ) ) {
+				return new WP_Error( 'copy_failed', 'The file could not be copied.' );
+			}
+		} else {
+			$tmp_name = download_url( $url_or_path );
+
+			if ( is_wp_error( $tmp_name ) ) {
+				return $tmp_name;
+			}
+		}
+
 		$file = [
 			'name'     => wp_basename( $url_or_path ),
 			// Original filename on the user's system
-			'tmp_name' => file_exists( $url_or_path ) ? $url_or_path : download_url( $url_or_path ),
+			'tmp_name' => $tmp_name,
 			// Temporary filename on the server
 		];
 
 		$folder = $this->get_uploads_folder_subdir() . DIRECTORY_SEPARATOR . $this->get_upload_folder_basename();
 
-		$result = files()->safe_file_sideload( $file, $this->get_allowed_mime_types(), $folder );
+		// Not safe_file_sideload(), that refuses anything outside the uploads directory and our temp file is. The source was checked above.
+		$result = files()->safe_file_upload( $file, $this->get_allowed_mime_types(), $folder, true );
 
-		if ( is_wp_error( $result ) ) {
-			wp_delete_file( $file['tmp_name'] );
+		// Only ever a temp file of ours at this point
+		if ( is_wp_error( $result ) && $delete_tmp ) {
+			wp_delete_file( $tmp_name );
 		}
 
 		return $result;

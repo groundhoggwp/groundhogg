@@ -2858,26 +2858,24 @@ function generate_contact_with_map( array $fields, array $map = [], array $submi
 				break;
 			case 'files':
 
-				// passed path as the value
-				if ( file_exists( $value ) ) {
-					$copy[] = $value;
-				} // Get from $_FILES
+				// Get from $_FILES. The value itself is request data, so a path in it is never used.
 				// phpcs:disable WordPress.Security.NonceVerification -- handled upstream
-				else if ( isset_not_empty( $_FILES, $column ) ) {
+				if ( isset_not_empty( $_FILES, $column ) ) {
 					$files[ $column ] = wp_unslash( get_array_var( $_FILES, $column ) );
 				}
 				// phpcs:enable WordPress.Security.NonceVerification
 				break;
 
 			case 'copy_file':
-				if ( is_string( $value ) && is_copyable_file( $value ) ) {
+				// URLs only, the value comes from a CSV, REST request or webhook and can't be trusted to name a file on this server
+				if ( is_copyable_url( $value ) ) {
 					$copy[] = $value;
 					break;
 				}
 				// Maybe multiple files?
 				if ( is_array( $value ) ) {
 					foreach ( $value as $string ) {
-						if ( is_string( $string ) && is_copyable_file( $string ) ) {
+						if ( is_copyable_url( $string ) ) {
 							$copy[] = $string;
 						}
 					}
@@ -8052,6 +8050,23 @@ function is_copyable_file( $file ) {
 
 	// if a url was provided using https:// check that the file is hosted locally first
 	return get_hostname( $file ) === get_hostname();
+}
+
+/**
+ * Whether a value is a URL to a file hosted on this site, and so can be copied to a contact.
+ * Unlike is_copyable_file() a path on the server is never accepted.
+ *
+ * @param $url mixed
+ *
+ * @return bool
+ */
+function is_copyable_url( $url ) {
+
+	if ( ! is_string( $url ) || ! in_array( wp_parse_url( $url, PHP_URL_SCHEME ), [ 'http', 'https' ], true ) ) {
+		return false;
+	}
+
+	return get_hostname( $url ) === get_hostname();
 }
 
 /**

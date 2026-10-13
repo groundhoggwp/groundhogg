@@ -392,6 +392,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.9.4 (2026-10-13) =
+* SECURITY Hardened how files are copied to a contact's files by imports, the REST API and webhooks. Credit: Supakiad S. (m3ez) of E-CQURITY, via Wordfence.
 * FIXED Emails scrolled sideways on phones in email apps that ignore the styles in an email's head, such as Gmail with a non-Google account. This includes emails that were saved before this version.
 * FIXED A font set for the links in a text block could break the CSS that came after it. Emails saved this way are repaired when they are sent or viewed.
 * TWEAKED Four column layouts show as two rows of two columns on small screens, instead of a single column. Use the column padding to space them.
