@@ -54,6 +54,6 @@ class Get_Email_Template extends Ability {
 			return new WP_Error( 'groundhogg_email_not_found', __( 'Email not found.', 'groundhogg' ) );
 		}
 
-		return Email_Schema::transform( $email, [ 'content', 'plain_text' ] );
+		return Email_Schema::transform( $email, [ 'content', 'plain_text', 'css' ] );
 	}
 }

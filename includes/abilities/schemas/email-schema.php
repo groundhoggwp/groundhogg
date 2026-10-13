@@ -61,6 +61,15 @@ class Email_Schema extends Schema {
 					'description' => __( 'The outer page layout/background this email renders inside of - distinct from the block/HTML content itself. Mirrors the "Template Settings" panel in wp-admin\'s email editor. Set via groundhogg/create-email-template\'s or groundhogg/update-email-template\'s `template_settings` input.', 'groundhogg' ),
 					'properties'  => self::template_settings_properties(),
 				],
+				'custom_headers' => [
+					'type'        => 'object',
+					'description' => __( 'Extra headers sent with this email, as {name: value}. Names are lowercased. Set via groundhogg/create-email-template\'s or groundhogg/update-email-template\'s `custom_headers` input.', 'groundhogg' ),
+				],
+				'utm' => [
+					'type'        => 'object',
+					'description' => __( 'UTM parameters added to links in this email when it is sent. Set via groundhogg/create-email-template\'s or groundhogg/update-email-template\'s `utm` input.', 'groundhogg' ),
+					'properties'  => self::utm_properties(),
+				],
 				'from' => [
 					'type'        => 'object',
 					'description' => __( 'The configured sender. name/email may contain merge tags (e.g. the "owner" profile). See groundhogg/list-sender-profiles.', 'groundhogg' ),
@@ -92,7 +101,63 @@ class Email_Schema extends Schema {
 					'type'        => 'string',
 					'description' => __( 'Only present when "plain_text" is passed in expand. The plain-text alternative body.', 'groundhogg' ),
 				],
+				'css' => [
+					'type'        => 'string',
+					'description' => __( 'Only present when "css" is passed in expand. The custom CSS added to the email (its template CSS). The block editor\'s own generated block CSS is not included.', 'groundhogg' ),
+				],
 			],
+		];
+	}
+
+	/**
+	 * The `utm` object's properties - shared by the output schema and the `utm` input
+	 * on groundhogg/create-email-template and groundhogg/update-email-template.
+	 *
+	 * @return array
+	 */
+	public static function utm_properties(): array {
+
+		return [
+			'source'        => [
+				'type'        => 'string',
+				'description' => __( 'utm_source, e.g. "newsletter". Empty values are ignored.', 'groundhogg' ),
+			],
+			'medium'        => [
+				'type'        => 'string',
+				'description' => __( 'utm_medium, e.g. "email".', 'groundhogg' ),
+			],
+			'campaign'      => [
+				'type'        => 'string',
+				'description' => __( 'utm_campaign.', 'groundhogg' ),
+			],
+			'term'          => [
+				'type'        => 'string',
+				'description' => __( 'utm_term.', 'groundhogg' ),
+			],
+			'content'       => [
+				'type'        => 'string',
+				'description' => __( 'utm_content.', 'groundhogg' ),
+			],
+			'url_allowlist' => [
+				'type'        => 'array',
+				'items'       => [ 'type' => 'string', 'format' => 'uri' ],
+				'description' => __( 'Only links that contain one of these URLs get the UTM parameters. Give full URLs including https://. Leave empty to add them to links to this site only.', 'groundhogg' ),
+			],
+		];
+	}
+
+	/**
+	 * The `custom_headers` input - shared by groundhogg/create-email-template and
+	 * groundhogg/update-email-template.
+	 *
+	 * @return array
+	 */
+	public static function custom_headers_input(): array {
+
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => [ 'type' => 'string' ],
+			'description'          => __( 'Extra headers to send with this email, as {"Header-Name": "value"}, e.g. {"X-Campaign": "launch"}. Values can contain merge tags, resolved per recipient. A header with the same name as one of Groundhogg\'s own (such as Reply-To) replaces it. Names may only contain letters, numbers and hyphens, and To, Cc and Bcc are not allowed. When updating, the full set is replaced - pass {} to remove them all.', 'groundhogg' ),
 		];
 	}
 
@@ -172,7 +237,7 @@ class Email_Schema extends Schema {
 	 * or raw DB row).
 	 *
 	 * @param Email|int|object $object
-	 * @param array            $include Optional sections to include: 'content', 'plain_text'.
+	 * @param array            $include Optional sections to include: 'content', 'plain_text', 'css'.
 	 *
 	 * @return array
 	 */
@@ -204,6 +269,15 @@ class Email_Schema extends Schema {
 				'background_size'     => (string) $object->get_meta( 'backgroundSize' ),
 				'background_repeat'   => (string) $object->get_meta( 'backgroundRepeat' ),
 			],
+			'custom_headers'    => (object) ( $object->get_meta( 'custom_headers' ) ?: [] ),
+			'utm'               => [
+				'source'        => (string) $object->get_meta( 'utm_source' ),
+				'medium'        => (string) $object->get_meta( 'utm_medium' ),
+				'campaign'      => (string) $object->get_meta( 'utm_campaign' ),
+				'term'          => (string) $object->get_meta( 'utm_term' ),
+				'content'       => (string) $object->get_meta( 'utm_content' ),
+				'url_allowlist' => array_values( array_filter( array_map( 'trim', preg_split( '/\R/', (string) $object->get_meta( 'utm_url_allowlist' ) ) ) ) ),
+			],
 			'from'              => [
 				'profile' => (string) $object->from_profile,
 				'name'    => $profile['from_name'] ?? '',
@@ -219,6 +293,10 @@ class Email_Schema extends Schema {
 
 		if ( in_array( 'plain_text', $include, true ) ) {
 			$data['plain_text'] = (string) $object->plain_text;
+		}
+
+		if ( in_array( 'css', $include, true ) ) {
+			$data['css'] = (string) $object->get_meta( 'template_css' );
 		}
 
 		return $data;

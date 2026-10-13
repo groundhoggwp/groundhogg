@@ -109,6 +109,17 @@ class Update_Email_Template extends Ability {
 						'description'          => __( 'The outer page layout/background this email renders inside of. Only the properties actually given are changed - see groundhogg/create-email-template\'s `template_settings` for what each one does.', 'groundhogg' ),
 						'properties'           => Email_Schema::template_settings_properties(),
 					],
+					'css' => [
+						'type'        => 'string',
+						'description' => __( 'Custom CSS for the email, added to its stylesheet. Replaces the email\'s current custom CSS - pass an empty string to remove it. Only for emails built with the block editor; for HTML emails put a <style> element in the content instead. Sanitized like the email editor\'s custom CSS.', 'groundhogg' ),
+					],
+					'custom_headers' => Email_Schema::custom_headers_input(),
+					'utm' => [
+						'type'                 => 'object',
+						'additionalProperties' => false,
+						'description'          => __( 'UTM parameters to add to the links in this email when it is sent. Only the properties given are changed - pass an empty string (or an empty list for `url_allowlist`) to clear one. Replacement codes are not supported.', 'groundhogg' ),
+						'properties'           => Email_Schema::utm_properties(),
+					],
 				],
 			],
 
@@ -129,6 +140,17 @@ class Update_Email_Template extends Ability {
 				'groundhogg_content_editor_mismatch',
 				__( '`content` and `editor` must be given together, so the content and the editor-type flag stay in sync.', 'groundhogg' )
 			);
+		}
+
+		// Checked before anything is written. The editor type is the one this call sets, or the email's current one.
+		$editor_type = isset( $input['editor'] )
+			? ( $input['editor'] === 'blocks' ? 'blocks' : 'html' )
+			: $email->get_editor_type();
+
+		$extra_meta = Create_Email_Template::extra_meta_from_input( $input, $editor_type );
+
+		if ( is_wp_error( $extra_meta ) ) {
+			return $extra_meta;
 		}
 
 		if ( isset( $input['from_profile'] ) ) {
@@ -231,6 +253,8 @@ class Update_Email_Template extends Ability {
 			$meta_updates['backgroundRepeat'] = sanitize_text_field( $template_settings['background_repeat'] );
 		}
 
+		$meta_updates = array_merge( $meta_updates, $extra_meta );
+
 		// Nothing else maintains it, and a change to only the meta or campaigns still changes the email
 		if ( ! empty( $data ) || ! empty( $meta_updates ) || isset( $input['campaigns'] ) ) {
 			$data['last_updated'] = current_time( 'mysql' );
@@ -264,6 +288,6 @@ class Update_Email_Template extends Ability {
 		// the REST update path also fires here.
 		do_action( 'groundhogg/api/email/updated', $email );
 
-		return Email_Schema::transform( $email, [ 'content', 'plain_text' ] );
+		return Email_Schema::transform( $email, [ 'content', 'plain_text', 'css' ] );
 	}
 }

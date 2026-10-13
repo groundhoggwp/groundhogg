@@ -57,6 +57,9 @@ use function Groundhogg\get_sender_profiles;
  * trick email_kses() already uses internally for rgb() colors and quoted
  * font families.
  *
+ * `css`, `custom_headers` and `utm` are the email's custom CSS (`template_css`), its extra
+ * headers and its UTM parameters - see extra_meta_from_input().
+ *
  * `template_settings` sets the outer page layout/background this email
  * renders inside of (see templates/email/{boxed,full_width,full_width_contained}.php
  * and the "Template Settings" panel in wp-admin's email editor) - distinct
@@ -144,6 +147,17 @@ class Create_Email_Template extends Ability {
 						'description'          => __( 'The outer page layout/background this email renders inside of - distinct from `content` itself. Mirrors the "Template Settings" panel in wp-admin\'s email editor. Any property left unset falls back to Groundhogg\'s own default for it.', 'groundhogg' ),
 						'properties'           => Email_Schema::template_settings_properties( true ),
 					],
+					'css' => [
+						'type'        => 'string',
+						'description' => __( 'Custom CSS for the email, added to its stylesheet - e.g. media queries or classes that your content uses. Only for emails built with the block editor (editor: "blocks"); for "html" emails put a <style> element in the content instead. Sanitized like the email editor\'s custom CSS.', 'groundhogg' ),
+					],
+					'custom_headers' => Email_Schema::custom_headers_input(),
+					'utm' => [
+						'type'                 => 'object',
+						'additionalProperties' => false,
+						'description'          => __( 'UTM parameters to add to the links in this email when it is sent. Empty values are ignored. Same as the Advanced > UTM Parameters panel in the email editor. Replacement codes are not supported.', 'groundhogg' ),
+						'properties'           => Email_Schema::utm_properties(),
+					],
 				],
 			],
 
@@ -166,6 +180,13 @@ class Create_Email_Template extends Ability {
 		$message_type = $input['message_type'] ?? 'marketing';
 		$status       = $input['status'] ?? 'draft';
 		$editor       = ( $input['editor'] ?? 'html' ) === 'blocks' ? 'blocks' : 'html';
+
+		// Checked before anything is created, so a bad input doesn't leave a half-made email behind
+		$extra_meta = self::extra_meta_from_input( $input, $editor );
+
+		if ( is_wp_error( $extra_meta ) ) {
+			return $extra_meta;
+		}
 
 		$content = $editor === 'blocks'
 			? self::kses_preserving_block_comments( $input['content'] )
@@ -252,7 +273,7 @@ class Create_Email_Template extends Ability {
 			$meta_updates['backgroundRepeat'] = sanitize_text_field( $template_settings['background_repeat'] );
 		}
 
-		$email->update_meta( $meta_updates );
+		$email->update_meta( array_merge( $meta_updates, $extra_meta ) );
 
 		if ( ! empty( $input['campaigns'] ) ) {
 			foreach ( wp_parse_id_list( $input['campaigns'] ) as $campaign_id ) {
@@ -264,7 +285,108 @@ class Create_Email_Template extends Ability {
 		// REST create path (cache busting, integrations, etc.) also fires here.
 		do_action( 'groundhogg/api/email/created', $email );
 
-		return Email_Schema::transform( $email, [ 'content', 'plain_text' ] );
+		return Email_Schema::transform( $email, [ 'content', 'plain_text', 'css' ] );
+	}
+
+	/**
+	 * Header names that can't be set through `custom_headers`. They would change who an email is
+	 * delivered to, and nothing here needs them.
+	 */
+	protected const BLOCKED_HEADERS = [ 'to', 'cc', 'bcc' ];
+
+	/**
+	 * The email meta for the `css`, `custom_headers` and `utm` inputs, which
+	 * groundhogg/create-email-template and groundhogg/update-email-template share. Only the
+	 * inputs that are present are returned, so an update leaves the others as they are.
+	 *
+	 * - `css` is stored in `template_css`, which Email::get_css() adds to the email's
+	 *   stylesheet. The block editor never overwrites it - it keeps its own block CSS in `css`.
+	 *   Emails built with the HTML editor don't use a template at all (Email::build() sends
+	 *   their content as it is), so there is nowhere to put it - that's an error rather than
+	 *   something silently ignored.
+	 * - `custom_headers` is the same meta as the editor's Advanced > Custom Headers, applied in
+	 *   Email::get_headers().
+	 * - `utm` is the same meta as the editor's Advanced > UTM Parameters, applied in
+	 *   Email::maybe_add_utm_to_links().
+	 *
+	 * Everything is sanitized again by Email::sanitize_meta() when it's saved.
+	 *
+	 * @param array  $input
+	 * @param string $editor_type the editor type of the email once this input is applied
+	 *
+	 * @return array|WP_Error
+	 */
+	public static function extra_meta_from_input( array $input, string $editor_type ) {
+
+		$meta = [];
+
+		if ( isset( $input['css'] ) ) {
+
+			if ( $editor_type === 'html' ) {
+				return new WP_Error(
+					'groundhogg_css_requires_blocks',
+					__( '`css` only applies to emails built with the block editor. HTML emails are sent as they are, so put a <style> element in the content instead.', 'groundhogg' )
+				);
+			}
+
+			$meta['template_css'] = (string) $input['css'];
+		}
+
+		if ( isset( $input['custom_headers'] ) ) {
+
+			$headers = [];
+
+			foreach ( (array) $input['custom_headers'] as $name => $value ) {
+
+				$name = (string) $name;
+
+				if ( ! preg_match( '/^[A-Za-z0-9-]+$/', $name ) ) {
+					return new WP_Error(
+						'groundhogg_invalid_header_name',
+						/* translators: %s: the header name */
+						sprintf( __( '"%s" is not a valid header name. Use only letters, numbers and hyphens.', 'groundhogg' ), $name )
+					);
+				}
+
+				if ( in_array( strtolower( $name ), self::BLOCKED_HEADERS, true ) ) {
+					return new WP_Error(
+						'groundhogg_blocked_header',
+						/* translators: %s: the header name */
+						sprintf( __( 'The "%s" header can\'t be set on an email.', 'groundhogg' ), $name )
+					);
+				}
+
+				if ( ! is_scalar( $value ) ) {
+					return new WP_Error(
+						'groundhogg_invalid_header_value',
+						/* translators: %s: the header name */
+						sprintf( __( 'The value of the "%s" header must be a string.', 'groundhogg' ), $name )
+					);
+				}
+
+				$headers[ $name ] = (string) $value;
+			}
+
+			$meta['custom_headers'] = $headers;
+		}
+
+		if ( isset( $input['utm'] ) ) {
+
+			$utm = (array) $input['utm'];
+
+			foreach ( [ 'source', 'medium', 'campaign', 'term', 'content' ] as $param ) {
+				if ( isset( $utm[ $param ] ) ) {
+					$meta[ "utm_$param" ] = sanitize_text_field( $utm[ $param ] );
+				}
+			}
+
+			if ( isset( $utm['url_allowlist'] ) ) {
+				// Email::maybe_add_utm_to_links() splits this on PHP_EOL
+				$meta['utm_url_allowlist'] = implode( PHP_EOL, array_filter( array_map( 'esc_url_raw', array_map( 'trim', (array) $utm['url_allowlist'] ) ) ) );
+			}
+		}
+
+		return $meta;
 	}
 
 	/**

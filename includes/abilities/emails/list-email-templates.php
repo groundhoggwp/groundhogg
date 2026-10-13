@@ -73,10 +73,10 @@ class List_Email_Templates extends Ability {
 						'type'        => 'array',
 						'items'       => [
 							'type' => 'string',
-							'enum' => [ 'content', 'plain_text' ],
+							'enum' => [ 'content', 'plain_text', 'css' ],
 						],
 						'default'     => [],
-						'description' => __( 'Extra sections to include on each email. "content" is the full HTML body and can be very large - only request it with a small limit.', 'groundhogg' ),
+						'description' => __( 'Extra sections to include on each email. "content" is the full HTML body and can be very large - only request it with a small limit. "css" is the email\'s custom CSS.', 'groundhogg' ),
 					],
 					'limit' => [
 						'type'        => 'integer',
