@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.9.3
+Stable tag: 4.9.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -390,6 +390,14 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.9.4 (2026-10-13) =
+* FIXED Emails with images or columns scrolled sideways on phones in email apps that ignore the styles in an email's head, such as Gmail with a non-Google account. Images in the Image block now shrink to fit on their own, and the area that holds an email's content is no wider than the email's width. This also applies to emails that were saved before this version.
+* FIXED A link font in a text block could break the CSS of the emails it was in. When the font was the last thing in a block's CSS, a quote was added after the font's name and the closing brace of the rule was left inside it, and the rule that came after it could be lost. The CSS is repaired when an email that was saved with this problem is sent or viewed, and it is no longer saved this way.
+* FIXED Images in the Image block were saved with a height of "auto", which isn't a valid height. The image's styles set the height, and the invalid height is removed from emails that were saved with it when they are sent or viewed.
+* TWEAKED Four column layouts show as two rows of two columns on small screens, instead of a single column. The space between the columns isn't kept, so use the column padding to space them. Layouts with fewer columns are still a single column.
+* DEV New `make_email_images_fluid()` and `repair_font_family_quotes()` functions. `Email::get_merged_content()` runs the first over emails made with the block editor, and `Email::get_css()` runs the second.
+* DEV `remove_font_family_quotes()` and `restore_font_family_quotes()` stop at the end of a CSS rule, where before they could read into the rule after it.
 
 = 4.9.3 (2026-10-09) =
 * SECURITY The page for an email in a campaign's archive showed any broadcast on the site, including ones that hadn't been sent and ones in campaigns that aren't public, to anyone who knew its number. It only shows emails that have been sent and are in that campaign, and it can no longer be cached.
