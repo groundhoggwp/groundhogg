@@ -589,7 +589,7 @@ function normalize_style_attribute_quotes( $html ) {
  */
 function remove_font_family_quotes( $html ) {
 	return preg_replace_callback(
-		'/font-family\s*:\s*([^";]+)(;?)/i',  // added `"` because inline style rule might not preserve ending `;`
+		'/font-family\s*:\s*([^";}]+)(;?)/i',  // added `"` because inline style rule might not preserve ending `;`, and `}` because a stylesheet rule might not either
 		function ( $matches ) {
 
 			$fonts = $matches[1];
@@ -649,7 +649,7 @@ function restore_font_family_quotes( $html ) {
 	];
 
 	return preg_replace_callback(
-		'/font-family\s*:\s*([^;"]+)(;?)/i', // added `"` because inline style rule might not preserve ending `;`
+		'/font-family\s*:\s*([^;"}]+)(;?)/i', // added `"` because inline style rule might not preserve ending `;`, and `}` because a stylesheet rule might not either
 		function ( $matches ) use ( $generic_fonts, $css_keywords ) {
 
 			$value = trim( $matches[1] );
@@ -723,6 +723,70 @@ function restore_font_family_quotes( $html ) {
 		},
 		$html
 	);
+}
+
+/**
+ * Repair font-family declarations in a stylesheet that were mangled by an older restore_font_family_quotes().
+ *
+ * That function used to read past the closing `}` of a rule whose last declaration was a font-family
+ * (the editor drops the final `;`), producing `font-family:Arial, 'sans-serif}'` and sometimes
+ * swallowing the start of the following rule into the quoted string. Saved email CSS is not regenerated
+ * until the email is edited, so undo the damage when the CSS is read.
+ *
+ * @param string $css
+ *
+ * @return string
+ */
+function repair_font_family_quotes( $css ) {
+
+	if ( ! is_string( $css ) || ! str_contains( $css, "'" ) ) {
+		return $css;
+	}
+
+	return preg_replace(
+		'/(font-family\s*:[^;{}]*?)\'([^\'{};]*)\}([^\']*)\'/i',
+		'$1$2}$3',
+		$css
+	);
+}
+
+/**
+ * Make the images in rendered block email content hold up in clients that drop <style> blocks.
+ *
+ * - Adds an inline `max-width:100%` to images that are sized fluidly (`height:auto`), so they shrink with
+ *   their container without needing `img{max-width:100%}` from the head.
+ * - Removes `height="auto"`, which is not a valid attribute value (the inline `height:auto` does the work).
+ *
+ * @param string $html
+ *
+ * @return string
+ */
+function make_email_images_fluid( $html ) {
+
+	if ( ! is_string( $html ) || stripos( $html, '<img' ) === false ) {
+		return $html;
+	}
+
+	$tags = new \WP_HTML_Tag_Processor( $html );
+
+	while ( $tags->next_tag( 'img' ) ) {
+
+		$style    = trim( (string) $tags->get_attribute( 'style' ) );
+		$height   = $tags->get_attribute( 'height' );
+		$has_auto = is_string( $height ) && strtolower( trim( $height ) ) === 'auto';
+		$fluid    = $has_auto || preg_match( '/(^|;)\s*height\s*:\s*auto/i', $style );
+
+		if ( $has_auto ) {
+			$tags->remove_attribute( 'height' );
+		}
+
+		if ( $fluid && ! preg_match( '/(^|;)\s*max-width\s*:/i', $style ) ) {
+			$style = $style ? rtrim( $style, ';' ) . ';' : '';
+			$tags->set_attribute( 'style', $style . 'max-width:100%' );
+		}
+	}
+
+	return $tags->get_updated_html();
 }
 
 /**

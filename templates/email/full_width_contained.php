@@ -58,9 +58,9 @@ if ( $bgImage ) {
 			do_action( 'groundhogg/templates/email/full-width/content/after' );
 
 			if ( ! $email->has_footer_block() ): ?>
-			<table cellspacing="0" cellpadding="0" role="presentation" align="center">
+			<table cellspacing="0" cellpadding="0" role="presentation" align="center" width="<?php echo esc_attr( $email->get_width() ) ?>" style="width: 100%; max-width: <?php echo esc_attr( $email->get_width() ) ?>px">
 				<tr>
-					<td width="<?php echo esc_attr( $email->get_width() ) ?>" style="width: <?php echo esc_attr( $email->get_width() ) ?>px">
+					<td width="<?php echo esc_attr( $email->get_width() ) ?>" style="width: 100%; max-width: <?php echo esc_attr( $email->get_width() ) ?>px">
 						<?php load_part( 'footer' ); ?>
 					</td>
 				</tr>

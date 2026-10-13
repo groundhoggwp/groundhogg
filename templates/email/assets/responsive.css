@@ -11,6 +11,32 @@
         width: auto !important;
     }
 
+    /* Four columns go 2 x 2 instead of a single column. Floats, because the cells have whitespace between them. */
+    table.responsive.email-columns.four_columns > tbody > tr.email-columns-row {
+        overflow: hidden;
+    }
+
+    table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell:not(.gap) {
+        float: left;
+        width: 50% !important;
+        box-sizing: border-box;
+    }
+
+    /* the horizontal gaps go; the gap between the two rows stays as the vertical spacer */
+    table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell.gap {
+        display: none !important;
+    }
+
+    table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell.gap:nth-child(4) {
+        display: block !important;
+        clear: both;
+    }
+
+    /* without gaps, the third column starts the second row */
+    table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell:not(.gap):nth-child(2) ~ td.email-columns-cell:nth-child(3) {
+        clear: left;
+    }
+
     .alignright:not(.keep-float),
     .alignleft:not(.keep-float) {
         display: block !important;

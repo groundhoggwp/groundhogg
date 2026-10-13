@@ -8817,7 +8817,6 @@
           src,
           alt, // title,
           width,
-          height   : 'auto',
           style    : {
             verticalAlign: 'bottom',
             height       : 'auto',
@@ -8839,11 +8838,11 @@
         src   : src,
         alt, // title,
         width,
-        height: 'auto',
         style : {
           boxSizing    : 'border-box',
           verticalAlign: 'bottom',
           height       : 'auto',
+          maxWidth     : '100%',
           width,
           ...addBorderStyle(borderStyle),
         },

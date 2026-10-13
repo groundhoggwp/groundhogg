@@ -226,6 +226,29 @@
   display: block !important;
   width: auto !important;
 }
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tbody > tr.email-columns-row,
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tr.email-columns-row {
+  overflow: hidden;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell:not(.gap),
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tr.email-columns-row > td.email-columns-cell:not(.gap) {
+  float: left;
+  width: 50% !important;
+  box-sizing: border-box;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell.gap,
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tr.email-columns-row > td.email-columns-cell.gap {
+  display: none !important;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell.gap:nth-child(4),
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tr.email-columns-row > td.email-columns-cell.gap:nth-child(4) {
+  display: block !important;
+  clear: both;
+}
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tbody > tr.email-columns-row > td.email-columns-cell:not(.gap):nth-child(2) ~ td.email-columns-cell:nth-child(3),
+#email-block-editor #content #block-editor-content-wrap.mobile table.responsive.email-columns.four_columns > tr.email-columns-row > td.email-columns-cell:not(.gap):nth-child(2) ~ td.email-columns-cell:nth-child(3) {
+  clear: left;
+}
 #email-block-editor #content #block-editor-content-wrap.mobile .alignright:not(.keep-float),
 #email-block-editor #content #block-editor-content-wrap.mobile .alignleft:not(.keep-float) {
   display: block !important;

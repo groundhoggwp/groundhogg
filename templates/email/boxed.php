@@ -51,9 +51,9 @@ $bodyStyle = array_filter( $bodyStyle );
 <table class="alignment-container" style="width: 100%;border-collapse: collapse;" cellpadding="0" cellspacing="0" role="presentation">
 	<tr>
         <td align="<?php echo esc_attr( $alignment ); ?>" bgcolor="<?php echo esc_attr( $bgColor ); ?>" background="<?php echo esc_url( $bgImage ); ?>" style="<?php echo esc_attr( \Groundhogg\array_to_css( $bodyStyle ) ); ?>">
-			<table class="content-container" cellpadding="0" cellspacing="0" style="border-collapse: collapse" role="presentation">
+			<table class="content-container" cellpadding="0" cellspacing="0" width="<?php echo esc_attr( $email->get_width() ); ?>" style="width: 100%; max-width: <?php echo esc_attr( $email->get_width() ); ?>px; border-collapse: collapse" role="presentation">
 				<tr>
-                    <td width="<?php echo esc_attr( $email->get_width() ); ?>" style="width: <?php echo esc_attr( $email->get_width() ); ?>px">
+                    <td width="<?php echo esc_attr( $email->get_width() ); ?>" style="width: 100%; max-width: <?php echo esc_attr( $email->get_width() ); ?>px">
 						<?php
 
                         load_part( 'browser-view' );

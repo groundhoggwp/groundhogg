@@ -482,6 +482,9 @@ class Email extends Base_Object_With_Meta {
 			$css .= PHP_EOL . $this->get_meta( 'template_css' );
 		}
 
+		// previously saved emails may have mangled font-family quotes
+		$css = repair_font_family_quotes( $css );
+
 		// quickly handle global block css inserts
 
 		preg_match_all( '/\.global-block\.t-(\d+)/', $css, $matches );
@@ -739,6 +742,9 @@ class Email extends Base_Object_With_Meta {
 			case 'blocks':
 				$content = Block_Registry::instance()->parse_blocks( $content, 'html' );
 				$this->parsed_content = $content;
+
+				// saved HTML is not regenerated until the email is edited, so keep images fluid at render time
+				$content = make_email_images_fluid( $content );
 
 				// this is now handled by Block_Registry::parse_blocks()
 //				$content = $this->maybe_hide_blocks( $content );
