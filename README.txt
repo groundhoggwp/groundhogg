@@ -392,14 +392,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.9.4 (2026-10-13) =
-* SECURITY Hardened how files are copied to a contact's files by imports, the REST API and webhooks. Credit: Supakiad S. (m3ez) of E-CQURITY, via Wordfence.
 * ADDED The email abilities can set an email's custom CSS, custom headers and UTM parameters when they create or update an email, and they return them when an email is read.
+* TWEAKED Four column layouts show as two rows of two columns on small screens, instead of a single column. Use the column padding to space them.
 * FIXED Emails scrolled sideways on phones in email apps that ignore the styles in an email's head, such as Gmail with a non-Google account. This includes emails that were saved before this version.
 * FIXED A font set for the links in a text block could break the CSS that came after it. Emails saved this way are repaired when they are sent or viewed.
-* TWEAKED Four column layouts show as two rows of two columns on small screens, instead of a single column. Use the column padding to space them.
-
-= 4.9.4 (unreleased) =
 * FIXED The tag picker on the map step of an import failed with "Groundhogg.createState is not a function" when the admin scripts were delayed or deferred. The step now loads the script that it needs.
+* SECURITY Hardened how files are copied to a contact's files by imports, the REST API and webhooks. Credit: Supakiad S. (m3ez) of E-CQURITY, via Wordfence.
 
 = 4.9.3 (2026-10-09) =
 * SECURITY The page for an email in a campaign's archive showed any broadcast on the site, including ones that hadn't been sent and ones in campaigns that aren't public, to anyone who knew its number. It only shows emails that have been sent and are in that campaign, and it can no longer be cached.
