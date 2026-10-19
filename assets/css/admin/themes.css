@@ -1,0 +1,1939 @@
+/*
+ * Groundhogg admin themes.
+ *
+ * Pure CSS: this file only overrides the --gh-* variables from admin.css and restyles
+ * surfaces. It is loaded after admin.css, and only when the current user picked a theme
+ * on their profile (the body gets .gh-theme-{slug}). It does not change any behavior.
+ *
+ * Each theme sets the --ght-* tokens below. Dark themes invert --gh-dark (which core
+ * uses for text and for its translucent tints) so existing rules keep working.
+ *
+ *   --ght-bg        page background
+ *   --ght-surface   panels, tables, modals, inputs
+ *   --ght-raised    hover, zebra, subtle fills
+ *   --ght-border    hairlines
+ *   --ght-text      body text
+ *   --ght-muted     secondary text
+ *   --ght-accent    primary action color
+ *   --ght-on-accent text on the accent color
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Shared                                                                     */
+/* -------------------------------------------------------------------------- */
+
+body.groundhogg-admin-page[class*="gh-theme-"] {
+  --gh-border-radius: 6px;
+  --gh-panel-border-radius: 10px;
+  --gh-focused-shadow: 0 0 0 3px var(--gh-primary-20);
+  --gh-input-min-height: 36px;
+
+  --gh-primary: var(--ght-accent);
+  --gh-primary-rgb: var(--ght-accent-rgb);
+  --wp-admin-theme-color: var(--ght-accent);
+  --wp-admin-theme-color--rgb: var(--ght-accent-rgb);
+
+  --gh-dark: var(--ght-text);
+  --gh-dark-50: color-mix(in srgb, var(--ght-text) 50%, transparent);
+  --gh-dark-30: color-mix(in srgb, var(--ght-text) 30%, transparent);
+  --gh-dark-15: color-mix(in srgb, var(--ght-text) 15%, transparent);
+  --gh-dark-10: color-mix(in srgb, var(--ght-text) 10%, transparent);
+  --gh-dark-5: color-mix(in srgb, var(--ght-text) 5%, transparent);
+
+  --gh-border-gray: var(--ght-border-strong);
+  --gh-border-gray-light: var(--ght-border);
+  --gh-panel-gray: var(--ght-border);
+  --gh-background-color: var(--ght-bg);
+  --gh-purple: var(--ght-purple);
+  --gh-box-shadow: var(--ght-shadow);
+
+  color-scheme: var(--ght-scheme);
+  background-color: var(--ght-bg);
+  color: var(--ght-text);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page */
+body.groundhogg-admin-page[class*="gh-theme-"] #wpcontent,
+body.groundhogg-admin-page[class*="gh-theme-"] #wpbody,
+body.groundhogg-admin-page[class*="gh-theme-"] #wpbody-content,
+body.groundhogg-admin-page[class*="gh-theme-"] #wpfooter {
+  background-color: var(--ght-bg);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #wpfooter,
+body.groundhogg-admin-page[class*="gh-theme-"] #wpfooter a {
+  color: var(--ght-muted);
+}
+
+/* Element-level colors use :where() so they stay at element specificity, and skip the
+   email canvases, which render the email being authored rather than the admin UI. */
+:where(body.groundhogg-admin-page[class*="gh-theme-"]) :is(h1, h2, h3, h4, label, th):not(:where(#block-editor-content-wrap *, #email-editor-content *, .template-framed *)) {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wrap {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #block-editor-content-wrap,
+body.groundhogg-admin-page[class*="gh-theme-"] #email-editor-content {
+  color: #3c434a;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .description,
+body.groundhogg-admin-page[class*="gh-theme-"] .displaying-num,
+body.groundhogg-admin-page[class*="gh-theme-"] p.description {
+  color: var(--ght-muted);
+}
+
+:where(body.groundhogg-admin-page[class*="gh-theme-"]) a:not(:where(#block-editor-content-wrap *, #email-editor-content *, .template-framed *)) {
+  color: var(--ght-accent);
+}
+
+:where(body.groundhogg-admin-page[class*="gh-theme-"]) a:is(:hover, :active, :focus):not(:where(#block-editor-content-wrap *, #email-editor-content *, .template-framed *)) {
+  color: color-mix(in srgb, var(--ght-accent) 75%, var(--ght-text));
+}
+
+:where(body.groundhogg-admin-page[class*="gh-theme-"]) hr:not(:where(#block-editor-content-wrap *, #email-editor-content *, .template-framed *)) {
+  border-color: var(--ght-border);
+  background: var(--ght-border);
+}
+
+/* Header bar */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header {
+  background-color: var(--ght-surface);
+  border-bottom: 1px solid var(--ght-border);
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header.admin-header {
+  border-bottom-color: var(--ght-border);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header .logo,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header svg {
+  background: transparent;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header h1,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header .title-wrap {
+  color: var(--ght-text);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Surfaces                                                                   */
+/* -------------------------------------------------------------------------- */
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel,
+body.groundhogg-admin-page[class*="gh-theme-"] .postbox,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-dialog-content,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tools-wrap,
+body.groundhogg-admin-page[class*="gh-theme-"] .info-card,
+body.groundhogg-admin-page[class*="gh-theme-"] .report-box,
+body.groundhogg-admin-page[class*="gh-theme-"] .picker-widget {
+  background-color: var(--ght-surface);
+  color: var(--ght-text);
+  border-color: var(--ght-border);
+  box-shadow: var(--ght-shadow);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel-header,
+body.groundhogg-admin-page[class*="gh-theme-"] .postbox .hndle,
+body.groundhogg-admin-page[class*="gh-theme-"] .postbox-header {
+  background-color: transparent;
+  border-color: var(--ght-border);
+  color: var(--ght-text);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tables                                                                     */
+/* -------------------------------------------------------------------------- */
+
+body.groundhogg-admin-page[class*="gh-theme-"] table.wp-list-table,
+body.groundhogg-admin-page[class*="gh-theme-"] table.widefat,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table {
+  background-color: var(--ght-surface);
+  border: 1px solid var(--ght-border);
+  border-radius: var(--gh-panel-border-radius);
+  box-shadow: none;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table th,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table td,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table thead th,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tfoot th {
+  background-color: transparent;
+  border-color: var(--ght-border);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table thead th,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tfoot th {
+  color: var(--ght-muted);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table thead th a,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tfoot th a {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tbody tr,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tbody tr td,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tbody th {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table.striped > tbody > :nth-child(odd),
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tr.alternate {
+  background-color: transparent;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tbody tr:hover td,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tbody tr:hover th {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tbody tr.unconfirmed,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-list-table tbody tr.inactive {
+  background-color: transparent;
+}
+
+/* Tablenav + status filters */
+body.groundhogg-admin-page[class*="gh-theme-"] .tablenav .tablenav-pages .pagination-links a,
+body.groundhogg-admin-page[class*="gh-theme-"] .tablenav .tablenav-pages .pagination-links .tablenav-pages-navspan {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border);
+  color: var(--ght-text);
+  border-radius: var(--gh-border-radius);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .tablenav .tablenav-pages .current-page {
+  min-width: 40px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* List table views and row actions                                           */
+/*                                                                            */
+/* WP prints the "|" separators as bare text, so the wrappers get font-size 0 */
+/* and the links put it back. Row actions keep WP's show-on-hover mechanism.  */
+/* -------------------------------------------------------------------------- */
+
+/* Views: a segmented control */
+body.groundhogg-admin-page[class*="gh-theme-"] ul.subsubsub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 12px 0 14px;
+  padding: 3px;
+  background-color: var(--ght-raised);
+  border: 1px solid var(--ght-border);
+  border-radius: calc(var(--gh-border-radius) + 4px);
+  font-size: 0;
+  line-height: 1;
+  white-space: normal;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub li {
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  color: transparent;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub li a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: calc(var(--gh-border-radius) + 1px);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ght-muted);
+  text-decoration: none;
+  transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub li a:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub li a:focus-visible {
+  color: var(--ght-text);
+  background-color: var(--gh-dark-5);
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub li a.current,
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub li a.current:hover {
+  color: var(--ght-text);
+  font-weight: 600;
+  background-color: var(--ght-surface);
+  box-shadow: 0 0 0 1px var(--ght-border), 0 1px 2px color-mix(in srgb, var(--ght-text) 12%, transparent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub .count {
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ght-muted);
+  opacity: 0.85;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .subsubsub li a.current .count {
+  color: var(--ght-accent);
+  opacity: 1;
+}
+
+/* Row actions: small ghost buttons */
+/* No font-size: 0 here, WP hides the actions with left: -9999em, which would become 0 */
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 4px 0 0 -8px;
+  padding: 0;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span {
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  color: transparent;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span a,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span button.button-link {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--gh-border-radius);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--ght-muted);
+  text-decoration: none;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span a:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span a:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span button.button-link:hover {
+  color: var(--ght-accent);
+  background-color: var(--gh-primary-10);
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.delete a,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.trash a,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.spam a,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span a.submitdelete {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.delete a:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.trash a:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.spam a:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span a.submitdelete:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.delete a:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.trash a:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.spam a:focus-visible {
+  color: var(--ght-red-fg);
+  background-color: var(--ght-red-bg);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Controls                                                                   */
+/* -------------------------------------------------------------------------- */
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="text"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="search"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="email"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="url"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="tel"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="number"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="password"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="date"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="time"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="datetime-local"],
+body.groundhogg-admin-page[class*="gh-theme-"] textarea,
+body.groundhogg-admin-page[class*="gh-theme-"] select,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-input,
+body.groundhogg-admin-page[class*="gh-theme-"] .select2-container .select2-selection,
+body.groundhogg-admin-page[class*="gh-theme-"] .select2-dropdown {
+  background-color: var(--ght-surface);
+  color: var(--ght-text);
+  border: 1px solid var(--ght-border-strong);
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input::placeholder,
+body.groundhogg-admin-page[class*="gh-theme-"] textarea::placeholder {
+  color: var(--ght-muted);
+  opacity: 0.8;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] textarea:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] select:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] .select2-container--focus .select2-selection,
+body.groundhogg-admin-page[class*="gh-theme-"] .select2-container--open .select2-selection {
+  border-color: var(--ght-accent);
+  box-shadow: var(--gh-focused-shadow);
+  outline: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="checkbox"],
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="radio"] {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="checkbox"]:checked,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="radio"]:checked {
+  background-color: var(--ght-accent);
+  border-color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type="checkbox"]:checked::before {
+  filter: var(--ght-tick-filter);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .select2-results__option {
+  color: var(--ght-text);
+}
+
+/* Buttons */
+body.groundhogg-admin-page[class*="gh-theme-"] .button,
+body.groundhogg-admin-page[class*="gh-theme-"] .button-secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] .button,
+body.groundhogg-admin-page[class*="gh-theme-"] .button-secondary {
+  background-color: var(--ght-surface);
+  border: 1px solid var(--ght-border-strong);
+  color: var(--ght-text);
+  box-shadow: none;
+  font-weight: 500;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .button:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .button-secondary:hover {
+  background-color: var(--ght-raised);
+  border-color: var(--ght-accent);
+  color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .button:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] .button:focus {
+  border-color: var(--ght-accent);
+  box-shadow: var(--gh-focused-shadow);
+  color: var(--ght-text);
+  outline: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .button-primary,
+body.groundhogg-admin-page[class*="gh-theme-"] .button-primary {
+  background-color: var(--ght-accent);
+  border-color: var(--ght-accent);
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .button-primary:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .button-primary:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] .button-primary:hover {
+  background-color: color-mix(in srgb, var(--ght-accent) 88%, var(--ght-text));
+  border-color: color-mix(in srgb, var(--ght-accent) 88%, var(--ght-text));
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .button.disabled,
+body.groundhogg-admin-page[class*="gh-theme-"] .button[disabled],
+body.groundhogg-admin-page[class*="gh-theme-"] .button:disabled {
+  background-color: var(--ght-raised);
+  border-color: var(--ght-border);
+  color: var(--ght-muted);
+  opacity: 0.7;
+}
+
+/* Notices */
+body.groundhogg-admin-page[class*="gh-theme-"] .notice,
+body.groundhogg-admin-page[class*="gh-theme-"] div.updated,
+body.groundhogg-admin-page[class*="gh-theme-"] div.error {
+  background-color: var(--ght-surface);
+  color: var(--ght-text);
+  border-color: var(--ght-border);
+  box-shadow: none;
+  border-radius: var(--gh-border-radius);
+}
+
+/* Status pills: soft tinted chips */
+body.groundhogg-admin-page[class*="gh-theme-"] .pill {
+  border-radius: 999px;
+  font-weight: 500;
+  padding: 2px 10px;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.green,
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.success {
+  background: var(--ght-green-bg);
+  color: var(--ght-green-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.red,
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.danger {
+  background: var(--ght-red-bg);
+  color: var(--ght-red-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.yellow,
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.attention {
+  background: var(--ght-yellow-bg);
+  color: var(--ght-yellow-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.orange,
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.warning {
+  background: var(--ght-orange-bg);
+  color: var(--ght-orange-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.blue,
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.notice {
+  background: var(--gh-primary-20);
+  color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.tag {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .pill.dark {
+  background-color: var(--ght-text);
+  color: var(--ght-bg);
+}
+
+/* Scrollbars */
+body.groundhogg-admin-page[class*="gh-theme-"] * {
+  scrollbar-color: var(--ght-border-strong) transparent;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Groundhogg components (hard-coded #fff / #f2f2f2 in core CSS)              */
+/* -------------------------------------------------------------------------- */
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] .page-title-action,
+body.groundhogg-admin-page[class*="gh-theme-"] .show-settings,
+body.groundhogg-admin-page[class*="gh-theme-"] #show-settings-link {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.secondary:not(.text) {
+  color: var(--ght-accent);
+  border-color: color-mix(in srgb, var(--ght-accent) 55%, transparent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.secondary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] .page-title-action:hover {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-submit {
+  background-color: var(--ght-accent);
+  border-color: var(--ght-accent);
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.primary:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--ght-accent) 88%, var(--ght-text));
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.page-title-action,
+body.groundhogg-admin-page[class*="gh-theme-"] a.page-title-action {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.dark {
+  background-color: var(--ght-text);
+  color: var(--ght-bg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-tag,
+body.groundhogg-admin-page[class*="gh-theme-"] span.gh-tag {
+  background-color: var(--ght-raised);
+  color: var(--ght-text);
+  border: 1px solid var(--ght-border);
+}
+
+/* Tabs */
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper,
+body.groundhogg-admin-page[class*="gh-theme-"] h2.nav-tab-wrapper {
+  border-bottom-color: var(--ght-border);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--ght-muted);
+  border-radius: var(--gh-border-radius) var(--gh-border-radius) 0 0;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab:focus {
+  background-color: var(--ght-raised);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] h2.nav-tab-wrapper .nav-tab.nav-tab-active,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab.nav-tab-active,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab.nav-tab-active:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab.nav-tab-active:focus {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border);
+  border-bottom-color: var(--ght-surface);
+  color: var(--ght-accent);
+}
+
+/* Pickers, sticky save bar */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker,
+body.groundhogg-admin-page[class*="gh-theme-"] .sticky-submit {
+  background-color: var(--ght-surface);
+  color: var(--ght-text);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .sticky-submit {
+  border-top: 1px solid var(--ght-border);
+  box-shadow: 0 -8px 24px color-mix(in srgb, var(--ght-bg) 70%, transparent);
+}
+
+/* Radius. Standalone controls get the theme radius at normal specificity, which beats WP's
+   2-4px. Controls joined in a .gh-input-group / .input-wrap are excluded, because core squares
+   their shared edges; there only the two outer corners are set, so the group matches the rest. */
+body.groundhogg-admin-page[class*="gh-theme-"] :is(
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]),
+  textarea,
+  select,
+  .button,
+  .button-secondary,
+  .button-primary,
+  .select2-selection,
+  .select2-dropdown
+):not(:where(:is(.gh-input-group, .input-wrap) > *, :is(.gh-input-group, .input-wrap) .select2-selection, :is(.gh-input-group, .input-wrap) .input-with-replacements *)) {
+  border-radius: var(--gh-border-radius);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] :is(.gh-input-group, .input-wrap) > :first-child:is(input, select, textarea, button, a, .button),
+body.groundhogg-admin-page[class*="gh-theme-"] :is(.gh-input-group, .input-wrap) > .input-with-replacements:first-child input,
+body.groundhogg-admin-page[class*="gh-theme-"] :is(.gh-input-group, .input-wrap) > .select2-container:first-child .select2-selection {
+  border-top-left-radius: var(--gh-border-radius);
+  border-bottom-left-radius: var(--gh-border-radius);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] :is(.gh-input-group, .input-wrap) > :last-child:is(input, select, textarea, button, a, .button),
+body.groundhogg-admin-page[class*="gh-theme-"] :is(.gh-input-group, .input-wrap) > .input-with-replacements:last-child input,
+body.groundhogg-admin-page[class*="gh-theme-"] :is(.gh-input-group, .input-wrap) > .select2-container:last-child .select2-selection {
+  border-top-right-radius: var(--gh-border-radius);
+  border-bottom-right-radius: var(--gh-border-radius);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] :is(.gh-input-group, .input-wrap) > .select2-container:not(:last-child) .select2-selection {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* ItemPicker: the wrapper is the visible control, the inner search input is not */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker .gh-picker-selected > .gh-picker-search,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker .gh-picker-selected > .gh-picker-search:focus {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker .gh-picker-options {
+  border-color: var(--ght-accent);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker .gh-picker-options .gh-picker-option:hover {
+  background: var(--gh-primary-10);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker .gh-picker-options .gh-picker-option.highlighted {
+  background: var(--ght-accent);
+  color: var(--ght-on-accent);
+}
+
+/* Search options widget, and other floating menus */
+body.groundhogg-admin-page[class*="gh-theme-"] .search-options-widget,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-dropdown-menu,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-autocomplete-results,
+body.groundhogg-admin-page[class*="gh-theme-"] .add-filter,
+body.groundhogg-admin-page[class*="gh-theme-"] .filter-edit {
+  color: var(--ght-text);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ght-bg) 60%, transparent), 0 0 0 1px var(--ght-border);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-options-widget .option:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .search-options-widget .option.focused,
+body.groundhogg-admin-page[class*="gh-theme-"] .add-filter .filter-options .option:hover {
+  background: var(--ght-accent);
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .select2-results__option--highlighted {
+  background-color: var(--ght-accent);
+  color: var(--ght-on-accent);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Derived from hard-coded colors in the core stylesheets                     */
+/*                                                                            */
+/* Every rule below maps a literal white / light-gray background, gray border  */
+/* or dark text color from admin.scss, elements.scss and friends onto the     */
+/* theme tokens. When core adds a new hard-coded color it needs a line here.  */
+/* -------------------------------------------------------------------------- */
+
+/* from admin.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .progress-bar-wrap {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=range].slider::-webkit-slider-runnable-track {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=range].slider::-webkit-slider-thumb {
+  border-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=range].slider:focus::-webkit-slider-runnable-track {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=range].slider::-moz-range-track {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=range].slider::-moz-range-thumb {
+  border-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .onoffswitch-inner:before {
+  background-color: var(--ght-surface);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .onoffswitch-inner:after {
+  background-color: var(--ght-surface);
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tools-wrap p.tools-help {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tools-box {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-admin .gh-file-uploader {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .picker-widget {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .picker-widget .emoji-groups .emoji-group {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .picker-widget .emoji-groups .emoji-group.focused {
+  border-bottom-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch .slider:before {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #api-docs {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #api-docs nav a {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #api-docs #endpoint-display {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .funnel-preview div.step-preview div.step-icon {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .funnel-preview div.step-preview div.step-icon.more {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header + h2.gh-nav {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .tour-prompt {
+  background-color: var(--ght-surface);
+}
+
+/* from elements.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal.sidebar.messages-sidebar .messages-widget .messages-compose {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .messages-widget .messages-compose-button {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .messages-widget .message-row.outbound .message-bubble.automated .message-meta {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .messages-widget .message-row.inbound .message-bubble {
+  background-color: var(--ght-surface);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .messages-widget .message-row.inbound .message-bubble .message-meta {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .messages-widget .message-bubble .message-note {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .messages-widget .message-bubble .message-body {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button.dropdown,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit.dropdown {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button.secondary,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit.secondary {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button.dashicon,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit.dashicon {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button .gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit .gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button .gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit .gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button .gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit .gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button .gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit .gh-spinner {
+  border-bottom-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-options-widget-wrap .search-options-widget {
+  border-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-options-widget-wrap .search-options-widget .header {
+  border-bottom-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-legacy-modal .gh-modal-footer {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal.sidebar {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-dialog {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-input-repeater .gh-input-repeater-row span.handle {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-dropdown-menu {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-step-nav .gh-step-nav-step-num-circle {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tags a.gh-tag,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tags span.gh-tag {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-form-fields input[type=file].gh-file-uploader {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-form-wrapper .gh-message-wrapper.gh-form-success-wrapper {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-form-wrapper .gh-message-wrapper.gh-form-warning-wrapper {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-autocomplete-results {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker .gh-picker-options {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .image-picker .image-input-preview {
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-accordion-item {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-calendar {
+  background-color: var(--ght-surface);
+}
+
+/* from contacts.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] #quick-search {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] td.column-tags_col .tags .tag {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .alternate,
+body.groundhogg-admin-page[class*="gh-theme-"] .striped > tbody > :nth-child(odd) td,
+body.groundhogg-admin-page[class*="gh-theme-"] .alternate,
+body.groundhogg-admin-page[class*="gh-theme-"] .striped > tbody > :nth-child(odd) th {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .alternate,
+body.groundhogg-admin-page[class*="gh-theme-"] .striped > tbody > :nth-child(even) td,
+body.groundhogg-admin-page[class*="gh-theme-"] .alternate,
+body.groundhogg-admin-page[class*="gh-theme-"] .striped > tbody > :nth-child(even) th {
+  background-color: var(--ght-surface);
+}
+
+@media only screen and (min-width: 782px) {
+  body.groundhogg-admin-page[class*="gh-theme-"] td.check-column,
+  body.groundhogg-admin-page[class*="gh-theme-"] thead th.column-email,
+  body.groundhogg-admin-page[class*="gh-theme-"] tfoot th.column-email {
+    background-color: var(--ght-surface);
+  }
+  }
+
+/* from contact-editor.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .contact-details .tags .tag {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-note:not(:last-child) {
+  border-bottom-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #activity-timeline li.activity-item .activity-icon:not(.no-frame) {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #activity-timeline li.activity-item .activity-icon:not(.no-frame).action,
+body.groundhogg-admin-page[class*="gh-theme-"] #activity-timeline li.activity-item .activity-icon:not(.no-frame).benchmark {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #activity-timeline li.activity-item .activity-icon:not(.no-frame).page-visit {
+  color: var(--ght-text);
+}
+
+/* from search-filters.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor button.white,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor button.white {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .add-filter-wrap .add-filter,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .add-filter-wrap .add-filter {
+  border-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .add-filter-wrap .add-filter .header,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .add-filter-wrap .add-filter .header {
+  border-bottom-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-view {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-view:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-view:focus {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-edit-wrap .filter-edit,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-edit-wrap .filter-edit {
+  border-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+/* from info-cards.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .info-card ul.info-list li span.data {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .ic-section:not(:last-of-type) {
+  border-bottom-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .ic-section > .ic-section-content {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .ic-section-content .timeline li:before {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .ic-section-content .timeline li:after {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .ic-section-content .timeline-second:before {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .ic-section-content .timeline-second li:after {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #personal-email-form .mce-wrap {
+  border-color: var(--ght-border-strong);
+}
+
+/* from reporting.scss */
+body.groundhogg-admin-page[class*="gh-theme-"].gh_reporting .gh-loader-overlay {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .groundhogg-report {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .groundhogg-quick-stats .groundhogg-quick-stat {
+  border-left-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .groundhogg-chart {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .groundhogg-chart-no-padding {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr th.great,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr td.great {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr th.good,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr td.good {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr th.fair,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr td.fair {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr th.poor,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr td.poor {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr th.bad,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel table.groundhogg-report-table tr td.bad {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] table.groundhogg-report-table td {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #chart_funnel_breakdown div.funnel-stages div.funnel-stage-layer a {
+  color: var(--ght-text);
+}
+
+@media only screen and (max-width: 700px) {
+  body.groundhogg-admin-page[class*="gh-theme-"] .groundhogg-chart-no-padding {
+    background-color: var(--ght-surface);
+    border-color: var(--ght-border-strong);
+  }
+  }
+
+@media only screen and (max-width: 700px) {
+  body.groundhogg-admin-page[class*="gh-theme-"] .groundhogg-chart {
+    background-color: var(--ght-surface);
+    border-color: var(--ght-border-strong);
+  }
+  }
+
+/* from email-block-editor.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .insert-block-grid .block-grid .block-wrap .block {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-block-editor .block {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-block-editor #content #block-editor-toolbar .buttons {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #controls-panel {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #controls-panel .controls-nav {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #controls-panel .controls-nav .gh-button-nav button.tab.active {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #controls-panel .wp-picker-container.wp-picker-active .wp-picker-input-wrap {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-editor .gh-header {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-editor-controls {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-editor-advanced {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-frame #email-editor {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .block-inspector {
+  background-color: var(--ght-surface);
+}
+
+/* from funnel-editor.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .button.button-secondary.submit.trigger-popup {
+  background-color: var(--ght-surface) !important;
+  border-color: var(--ght-border-strong) !important;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner #flow-simulator #flow-simulator-log div.flow-log-item {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid .sub-group {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner #add-steps .steps-select .select-step .step-icon {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner .field-map-wrapper {
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner .field-map-wrapper table th {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .sortable-helper-icon > .step-icon {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .funnel-editor-header {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .arrow-down {
+  border-top-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .fixed-inside .step-branch button.add-step {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step .step-notes {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step .step-reporting div.stat-wrap {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step.active {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step .actions {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step .step-labels .dashicons {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step > .hndle .hndle-icon {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .step .handlediv {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .form-fields .form-field,
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .special-fields .form-field {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .form-fields .form-field .settings-tabs a.settings-tab,
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .special-fields .form-field .settings-tabs a.settings-tab {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .form-fields .form-field .settings-tabs .settings-tab,
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .special-fields .form-field .settings-tabs .settings-tab {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .form-fields .form-field .settings-tabs .settings-tab.active,
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .special-fields .form-field .settings-tabs .settings-tab.active {
+  border-bottom-color: var(--ght-border-strong);
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .form-fields .form-field .field-header .actions button,
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .special-fields .form-field .field-header .actions button {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .form-fields .form-field .field-header .actions button:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .form-builder-main .fields-editor .special-fields .form-field .field-header .actions button:hover {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .inline-tag-picker {
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .inline-tag-picker.show .gh-panel {
+  background-color: var(--ght-surface);
+}
+
+/* from admin-bar.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .groundhogg-toolbar-quick-search#groundhogg-toolbar-quick-search {
+  background-color: var(--ght-surface);
+}
+
+/* from extensions.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .postbox .install-actions {
+  background-color: var(--ght-surface);
+  border-top-color: var(--ght-border-strong);
+}
+
+/* from welcome.scss */
+body.groundhogg-admin-page[class*="gh-theme-"] .progress h2 {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #ghmenu li a:hover:not(.active) {
+  background-color: var(--ght-surface);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .onboarding-checklist .checklist-row {
+  border-top-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .onboarding-checklist .checklist-row:nth-child(odd) {
+  background-color: var(--ght-surface);
+}
+
+/* white text on the accent color, from the *.scss files */
+body.groundhogg-admin-page[class*="gh-theme-"] #api-docs code.post,
+body.groundhogg-admin-page[class*="gh-theme-"] #api-docs code.patch {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .messages-widget .message-row.outbound .message-bubble {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button.primary,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit#gh-submit,
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit.primary {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-button.primary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-submit.primary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-button.primary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=button].gh-submit.primary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-button.primary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] input[type=submit].gh-submit.primary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-button.primary:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit#gh-submit:hover:not(:disabled),
+body.groundhogg-admin-page[class*="gh-theme-"] button.gh-submit.primary:hover:not(:disabled) {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-options-widget-wrap .search-options-widget .search-options .option.focused,
+body.groundhogg-admin-page[class*="gh-theme-"] .search-options-widget-wrap .search-options-widget .search-options .option:hover {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-step-nav .gh-step-nav-step-num.current .gh-step-nav-step-num-circle {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-picker .gh-picker-options .gh-picker-option.highlighted {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-calendar .gh-calendar-day.is-today .gh-calendar-day-number {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-calendar-month-picker .gh-calendar-month-picker-month.current {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .move-block {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .insert-block {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #email-block-editor #content #builder-content .builder-block.is-editing > .block-toolbar .block-buttons button.toolbar-button {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .block-inspector .inspector-block.active {
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow button.add-step-button-flow {
+  color: var(--ght-on-accent);
+}
+
+
+/* Sticky first column: body cells use the surface color, the header keeps the raised one */
+@media only screen and (min-width: 782px) {
+  body.groundhogg-admin-page[class*="gh-theme-"] thead th.column-email,
+  body.groundhogg-admin-page[class*="gh-theme-"] tfoot th.column-email {
+    background-color: var(--ght-raised);
+  }
+}
+
+/* Notices: WP colors the paragraphs inside separately */
+body.groundhogg-admin-page[class*="gh-theme-"] .notice p,
+body.groundhogg-admin-page[class*="gh-theme-"] .notice li {
+  color: inherit;
+}
+
+/* Date range picker (assets/lib/calendar, third-party). Its blue becomes the accent. */
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-preset-list {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-preset-list {
+  border: 1px solid var(--ght-border);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ght-bg) 60%, transparent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input.dr-active,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-presets:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-presets.dr-active {
+  border-color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input.dr-active {
+  box-shadow: var(--gh-focused-shadow);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-presets {
+  border-left-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-presets:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-presets.dr-active {
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-dates .dr-date,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange--single .dr-input .dr-dates .dr-date {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-dates .dr-date:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-dates .dr-date:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-dates .dr-date.dr-active {
+  color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-dates .dr-dates-dash,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input .dr-dates .dr-date:empty:after,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-list-item .dr-item-aside {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-preset-list {
+  color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-list-item {
+  border-bottom-color: var(--ght-border);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-list-item:hover {
+  background-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-range-switcher .dr-switcher {
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-days-of-week-list {
+  background-color: var(--ght-raised);
+  border-color: var(--ght-border);
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-day {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-day.dr-fade,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-day.dr-outside {
+  color: var(--ght-muted);
+  opacity: 0.6;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-day.dr-hover:not(.dr-current),
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-maybe,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-end,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-selected,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-start {
+  background-color: var(--gh-primary-20) !important;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-current {
+  color: var(--ght-accent) !important;
+  background-color: var(--gh-primary-20) !important;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-start,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-end,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-day.dr-hover-before,
+body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar .dr-day-list .dr-day.dr-hover-after {
+  border-color: var(--ght-accent) !important;
+}
+
+/* Local custom properties with hard-coded colors */
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container {
+  --bg-color: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-calendar .gh-calendar-day {
+  --gh-calendar-day-bg: var(--ght-surface);
+}
+
+/* The email preview card is themed; the email itself lives in an iframe and stays as authored */
+body.groundhogg-admin-page[class*="gh-theme-"] .email-preview {
+  background-color: var(--ght-surface) !important; /* the preview sets an inline #fff */
+}
+
+/* The core green action button has white text, which is too low contrast on its light green */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button.action {
+  color: #14230a;
+}
+
+/* Tooltips: core uses --gh-dark (our text color) as the background with hard-coded white text,
+   which is white on light in the dark themes. Invert the pair instead. The arrows also use
+   --gh-dark, so they keep matching. */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tooltip {
+  background-color: var(--ght-text);
+  color: var(--ght-bg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tooltip a,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tooltip a:hover {
+  color: var(--ght-bg);
+}
+
+/* Modal scrim. Core builds it from --gh-dark at 50%, which in the dark themes is a light wash
+   that greys the page out instead of dimming it. */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-overlay {
+  background: color-mix(in srgb, #080c12 58%, transparent);
+  backdrop-filter: blur(1.5px);
+}
+
+/* Elements that put white text on --gh-dark: --gh-dark is light in the dark themes, so use
+   the inverse pair, like the tooltip */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-dialog.gh-dialog-info,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-dom-picker .gh-dom-date.selected,
+body.groundhogg-admin-page[class*="gh-theme-"] #api-docs nav li.current li.current > a,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header span.white-label-icon,
+body.groundhogg-admin-page[class*="gh-theme-"] #chart_funnel_breakdown div.funnel-stages .stage-percentage {
+  color: var(--ght-bg);
+}
+
+/* Screen Options and Help panels (WP's #screen-meta) */
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta {
+  background-color: var(--ght-surface);
+  color: var(--ght-text);
+  border: 1px solid var(--ght-border);
+  border-top: 0;
+  border-radius: 0 0 var(--gh-panel-border-radius) var(--gh-panel-border-radius);
+  box-shadow: var(--ght-shadow);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta legend,
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta h5,
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta h3,
+body.groundhogg-admin-page[class*="gh-theme-"] #contextual-help-back,
+body.groundhogg-admin-page[class*="gh-theme-"] #contextual-help-wrap {
+  color: var(--ght-text);
+  background-color: transparent;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #contextual-help-back {
+  background-color: var(--ght-raised);
+  border-color: var(--ght-border);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta-links .screen-meta-toggle .button {
+  background-color: var(--ght-surface);
+  border: 1px solid var(--ght-border);
+  border-top: 0;
+  border-radius: 0 0 var(--gh-border-radius) var(--gh-border-radius);
+  color: var(--ght-muted);
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta-links .screen-meta-toggle .button:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta-links .screen-meta-toggle .button:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta-links .screen-meta-toggle.screen-meta-active .button {
+  color: var(--ght-text);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #screen-meta-links .screen-meta-toggle .button::after {
+  color: inherit;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Search filters                                                             */
+/* -------------------------------------------------------------------------- */
+
+/* Filters are the main control of the list, so they read as tinted, clickable chips */
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-view {
+  gap: 6px;
+  padding: 4px 6px 4px 12px;
+  background-color: color-mix(in srgb, var(--ght-accent) 13%, var(--ght-surface));
+  border: 1px solid color-mix(in srgb, var(--ght-accent) 42%, transparent);
+  border-radius: 999px;
+  color: var(--ght-text);
+  box-shadow: none;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-view:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-view:focus {
+  background-color: color-mix(in srgb, var(--ght-accent) 22%, var(--ght-surface));
+  border-color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view.filter-broken,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor .filter.filter-view.filter-broken {
+  background-color: var(--ght-red-bg);
+  border-color: var(--ght-red-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view .delete-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border-radius: 50%;
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view .delete-filter .dashicons {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter.filter-view .delete-filter:hover {
+  background: var(--ght-red-bg);
+  color: var(--ght-red-fg);
+}
+
+/* Add filter: a dashed "add" affordance rather than a bare icon */
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor button.add-filter,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor button.add-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px dashed color-mix(in srgb, var(--ght-accent) 60%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ght-accent);
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor button.add-filter:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor button.add-filter:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor button.add-filter:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-filters-editor button.add-filter:focus-visible {
+  border-style: solid;
+  border-color: var(--ght-accent);
+  background-color: var(--gh-primary-10);
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor button.add-filter .dashicons {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
+/* Filter editor popover: the icon buttons are white in core, which vanishes on light themes.
+   Confirm becomes a real primary button, delete turns red on hover. */
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .header button.close-edit,
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--gh-border-radius);
+  color: var(--ght-muted);
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .header button.close-edit {
+  width: 24px;
+  height: 24px;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .header button.close-edit:hover {
+  background: var(--gh-dark-10);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .actions button.delete-filter {
+  width: 28px;
+  height: 28px;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .actions button.delete-filter:hover {
+  background: var(--ght-red-bg);
+  color: var(--ght-red-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .actions button.commit-filter {
+  height: 28px;
+  padding: 0 14px;
+  background: var(--ght-accent);
+  color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters-editor .filter-edit .actions button.commit-filter:hover {
+  background: color-mix(in srgb, var(--ght-accent) 88%, var(--ght-text));
+}
+
+/* Include / Or / Exclude markers: core hard-codes the purple, so point it at the token */
+body.groundhogg-admin-page[class*="gh-theme-"] .or-separator,
+body.groundhogg-admin-page[class*="gh-theme-"] .or-separator .or-circle,
+body.groundhogg-admin-page[class*="gh-theme-"] .include-filters-wrap .include-block,
+body.groundhogg-admin-page[class*="gh-theme-"] .exclude-filters-wrap .exclude-block,
+body.groundhogg-admin-page[class*="gh-theme-"] .search-filters .filters-loading,
+body.groundhogg-admin-page[class*="gh-theme-"] #search-loading-dots-pill {
+  background-color: var(--ght-purple);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .or-separator {
+  background-color: color-mix(in srgb, var(--ght-purple) 55%, transparent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .or-separator .or-circle {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: #fff;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .include-filters-wrap,
+body.groundhogg-admin-page[class*="gh-theme-"] .exclude-filters-wrap {
+  border-color: var(--ght-purple);
+}
+
+/* Toggle (e.g. "Show exclude filters"): a quiet track when off, the accent when on */
+body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch .slider {
+  background-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch .slider:before {
+  background-color: #fff;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch input:checked + .slider {
+  background-color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch input:checked + .slider:before {
+  background-color: var(--ght-on-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch span.off {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch span.on {
+  color: var(--ght-on-accent);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Themes                                                                     */
+/* -------------------------------------------------------------------------- */
+
+/* Light: crisp white surfaces, hairlines, quiet shadows */
+body.groundhogg-admin-page.gh-theme-light {
+  --ght-purple: #6c19ad;
+  --ght-tick-filter: brightness(0) invert(1); /* checkmark: matches --ght-on-accent */
+  --ght-green-bg: #e7f6ec;
+  --ght-green-fg: #146c34;
+  --ght-red-bg: #fdecec;
+  --ght-red-fg: #a12626;
+  --ght-yellow-bg: #fff6dd;
+  --ght-yellow-fg: #7a5600;
+  --ght-orange-bg: #fdeedd;
+  --ght-orange-fg: #9a4a06;
+  --ght-scheme: light;
+  --ght-bg: #f7f8fa;
+  --ght-surface: #ffffff;
+  --ght-raised: #f1f3f6;
+  --ght-border: #e6e8ec;
+  --ght-border-strong: #cfd3da;
+  --ght-text: #14171c;
+  --ght-muted: #667085;
+  --ght-accent: #2563eb;
+  --ght-accent-rgb: 37, 99, 235;
+  --ght-on-accent: #ffffff;
+  --ght-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+/* Paper: warm off-white, calm green-blue accent */
+body.groundhogg-admin-page.gh-theme-paper {
+  --ght-purple: #6c19ad;
+  --ght-tick-filter: brightness(0) invert(1); /* checkmark: matches --ght-on-accent */
+  --ght-green-bg: #e6f1e3;
+  --ght-green-fg: #2f6b2a;
+  --ght-red-bg: #f7e4df;
+  --ght-red-fg: #9a3324;
+  --ght-yellow-bg: #f6ecd0;
+  --ght-yellow-fg: #765a0a;
+  --ght-orange-bg: #f6e6d3;
+  --ght-orange-fg: #8a4a14;
+  --ght-scheme: light;
+  --ght-bg: #f5f2ec;
+  --ght-surface: #fdfcf9;
+  --ght-raised: #eeeae1;
+  --ght-border: #e4dfd3;
+  --ght-border-strong: #cbc4b4;
+  --ght-text: #26231d;
+  --ght-muted: #7a7466;
+  --ght-accent: #0f766e;
+  --ght-accent-rgb: 15, 118, 110;
+  --ght-on-accent: #ffffff;
+  --ght-shadow: 0 1px 2px rgba(60, 50, 30, 0.05), 0 1px 3px rgba(60, 50, 30, 0.07);
+}
+
+/* Slate: dark blue-gray, easy on the eyes */
+body.groundhogg-admin-page.gh-theme-slate {
+  --ght-purple: #9a63e0;
+  --ght-tick-filter: brightness(0); /* checkmark: matches --ght-on-accent */
+  --ght-green-bg: rgba(74,222,128,.14);
+  --ght-green-fg: #7ee2a0;
+  --ght-red-bg: rgba(248,113,113,.14);
+  --ght-red-fg: #fca5a5;
+  --ght-yellow-bg: rgba(250,204,21,.14);
+  --ght-yellow-fg: #fde047;
+  --ght-orange-bg: rgba(251,146,60,.14);
+  --ght-orange-fg: #fdba74;
+  --ght-scheme: dark;
+  --ght-bg: #12161c;
+  --ght-surface: #1a1f27;
+  --ght-raised: #222833;
+  --ght-border: #2a313c;
+  --ght-border-strong: #3a4352;
+  --ght-text: #e6e9ef;
+  --ght-muted: #9aa4b4;
+  --ght-accent: #6ea0ff;
+  --ght-accent-rgb: 110, 160, 255;
+  --ght-on-accent: #0b1220;
+  --ght-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Midnight: true black for OLED, electric accent */
+body.groundhogg-admin-page.gh-theme-midnight {
+  --ght-purple: #a56ae8;
+  --ght-tick-filter: brightness(0); /* checkmark: matches --ght-on-accent */
+  --ght-green-bg: rgba(74,222,128,.14);
+  --ght-green-fg: #86efac;
+  --ght-red-bg: rgba(248,113,113,.16);
+  --ght-red-fg: #fca5a5;
+  --ght-yellow-bg: rgba(250,204,21,.14);
+  --ght-yellow-fg: #fde047;
+  --ght-orange-bg: rgba(251,146,60,.14);
+  --ght-orange-fg: #fdba74;
+  --ght-scheme: dark;
+  --ght-bg: #000000;
+  --ght-surface: #0b0b0d;
+  --ght-raised: #16171a;
+  --ght-border: #1f2024;
+  --ght-border-strong: #33353b;
+  --ght-text: #f2f3f5;
+  --ght-muted: #8b8f99;
+  --ght-accent: #5b8cff;
+  --ght-accent-rgb: 91, 140, 255;
+  --ght-on-accent: #000000;
+  --ght-shadow: none;
+}

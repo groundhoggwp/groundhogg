@@ -10,6 +10,7 @@ use function Groundhogg\get_owners;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_team;
 use function Groundhogg\get_team_ids;
+use function Groundhogg\get_url_var;
 use function Groundhogg\get_valid_contact_tabs;
 use function Groundhogg\html;
 use function Groundhogg\kses_e;
@@ -27,6 +28,81 @@ class Admin_User {
 
 		add_action( 'edit_user_profile_update', [ $this, 'save_fields' ] );
 		add_action( 'personal_options_update', [ $this, 'save_fields' ] );
+
+		add_filter( 'admin_body_class', [ $this, 'theme_body_class' ], 20 );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_theme' ], 100 );
+	}
+
+	/**
+	 * The interface themes a user can choose from, slug => label
+	 *
+	 * @return string[]
+	 */
+	public static function get_themes() {
+		return apply_filters( 'groundhogg/admin/themes', [
+			'default'  => _x( 'Default', 'admin theme', 'groundhogg' ),
+			'light'    => _x( 'Light', 'admin theme', 'groundhogg' ),
+			'paper'    => _x( 'Paper', 'admin theme', 'groundhogg' ),
+			'slate'    => _x( 'Slate (dark)', 'admin theme', 'groundhogg' ),
+			'midnight' => _x( 'Midnight (dark)', 'admin theme', 'groundhogg' ),
+		] );
+	}
+
+	/**
+	 * The slug of the theme the current user picked, or empty for the default look
+	 *
+	 * @return string
+	 */
+	protected function get_current_theme() {
+
+		$theme = get_user_meta( get_current_user_id(), 'gh_admin_theme', true );
+
+		if ( ! $theme || $theme === 'default' || ! array_key_exists( $theme, self::get_themes() ) ) {
+			return '';
+		}
+
+		return $theme;
+	}
+
+	/**
+	 * Whether the current admin screen is a Groundhogg page
+	 *
+	 * @return bool
+	 */
+	protected function is_groundhogg_page() {
+		$page = get_url_var( 'page' );
+
+		return $page && ( $page === 'groundhogg' || str_starts_with( $page, 'gh_' ) );
+	}
+
+	/**
+	 * Add the theme class to the body of Groundhogg pages
+	 *
+	 * @param $class string
+	 *
+	 * @return string
+	 */
+	public function theme_body_class( $class ) {
+
+		$theme = $this->get_current_theme();
+
+		if ( $theme && $this->is_groundhogg_page() ) {
+			$class .= " gh-theme-$theme";
+		}
+
+		return $class;
+	}
+
+	/**
+	 * Load the theme stylesheet, which only overrides variables and colors
+	 */
+	public function enqueue_theme() {
+
+		if ( ! $this->get_current_theme() || ! $this->is_groundhogg_page() ) {
+			return;
+		}
+
+		wp_enqueue_style( 'groundhogg-admin-themes', GROUNDHOGG_ASSETS_URL . 'css/admin/themes.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 	}
 
 	/**
@@ -127,6 +203,22 @@ class Admin_User {
 	        <?php endif;
             endif; ?>
             <tr>
+                <th><?php esc_html_e( 'Interface Theme', 'groundhogg' ); ?></th>
+                <td>
+		            <?php
+		            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+		            echo html()->dropdown( [
+			            'name'        => 'gh_admin_theme',
+			            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+			            'options'     => self::get_themes(),
+			            'option_none' => false,
+			            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
+			            'selected'    => get_user_meta( $profile_user->ID, 'gh_admin_theme', true ) ?: 'default',
+		            ] ); ?>
+                    <p class="description"><?php echo esc_html_x( 'Choose how Groundhogg looks for you. Does not change how it works.', 'settings', 'groundhogg' ); ?></p>
+                </td>
+            </tr>
+            <tr>
                 <th><?php esc_html_e( 'Default Contact Tab', 'groundhogg' ); ?></th>
                 <td>
 					<?php
@@ -191,6 +283,14 @@ class Admin_User {
 		update_user_meta( $user_id, 'gh_default_contact_tab', sanitize_text_field( get_post_var( 'gh_default_contact_tab' ) ) );
 		update_user_meta( $user_id, 'gh_from_name', sanitize_text_field( get_post_var( 'gh_from_name' ) ) );
 		update_user_meta( $user_id, 'gh_from_email', sanitize_email( get_post_var( 'gh_from_email' ) ) );
+
+		$theme = sanitize_key( get_post_var( 'gh_admin_theme' ) );
+
+		if ( $theme && $theme !== 'default' && array_key_exists( $theme, self::get_themes() ) ) {
+			update_user_meta( $user_id, 'gh_admin_theme', $theme );
+		} else {
+			delete_user_meta( $user_id, 'gh_admin_theme' );
+		}
 
 		if ( user_can( $user_id, 'view_reports' ) ) {
 			update_user_meta( $user_id, 'gh_broadcast_results', boolval( get_post_var( 'gh_broadcast_results' ) ) );
