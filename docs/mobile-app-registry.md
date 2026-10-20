@@ -443,6 +443,13 @@ repeats them, and a search shows ordinary results.
 - **Gone things drop out.** A template that returns 404 is forgotten. A recent form that isn't in the list (it holds
   the newest 25) is read with `GET forms/{id}`, and forgotten on a 404. That route was registered in core with no
   handler, so this branch adds one: it returns the same item as the list, and only for an active form step.
+- **Recently viewed contacts** are the same mechanism with one difference: only the **id** is kept. Opening a contact's
+  record records it (`ctx.recent.use( 'contact', { id } )`), and the Home card and the top of the Contacts screen
+  (when there is no search) read the names with `GET contacts?include[]=...`. So no name or email is copied into user
+  meta (nothing personal is left behind when a contact is deleted), the list is always current, it only shows
+  contacts the person can see right now (the owner and team scoping of the contacts endpoint applies), and a
+  contact that is deleted or reassigned away just drops off and is forgotten. A record that comes back 403 or 404
+  is forgotten as well. The Home card is the `recently-viewed` home card, between My tasks and Recently added.
 - **Add-ons** add their own kind with the `groundhogg/mobile/recent_kinds` filter (a pipeline, say) and use
   `ctx.recent` in their own lists.
 

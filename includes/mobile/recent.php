@@ -40,7 +40,11 @@ class Recent {
 	 */
 	const MAX_TEXT = 120;
 
-	const KINDS = [ 'email_template', 'form', 'tag' ];
+	/**
+	 * `contact` is kept as an id alone. The name and email are read when the list is shown, so no personal details are
+	 * copied into user meta, and a contact that was deleted or isn't theirs any more just isn't there.
+	 */
+	const KINDS = [ 'email_template', 'form', 'tag', 'contact' ];
 
 	public function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register_routes' ] );

@@ -96,6 +96,24 @@ class Mobile_Recent_Tests extends GH_UnitTestCase {
 		$this->assertSame( Recent::MAX_TEXT, mb_strlen( $item['sub'] ) );
 	}
 
+	/**
+	 * A contact's name and email are not copied into user meta. The app reads them when it shows the list, so it is
+	 * always current, only shows contacts the person can see right now, and nothing personal is left behind when a
+	 * contact is deleted.
+	 */
+	public function test_a_contact_is_remembered_by_id_alone() {
+		$user = $this->user();
+
+		$this->assertContains( 'contact', Recent::kinds() );
+		$this->assertTrue( Recent::record( $user, 'contact', [ 'id' => 42 ] ) );
+
+		$this->assertSame( [ [ 'id' => 42, 'name' => '', 'sub' => '' ] ], Recent::get( $user )['contact'] );
+
+		// the stored value holds an id and nothing else about them
+		$stored = get_user_meta( $user, Recent::META_KEY, true );
+		$this->assertSame( [ [ 'id' => 42, 'name' => '', 'sub' => '' ] ], $stored['contact'] );
+	}
+
 	public function test_things_that_are_not_an_item_or_a_kind_are_refused() {
 		$user = $this->user();
 
@@ -158,6 +176,7 @@ class Mobile_Recent_Tests extends GH_UnitTestCase {
 
 		$this->assertSame( [ [ 'id' => 7, 'name' => 'Intake', 'sub' => 'Front desk' ] ], $recent['form'] );
 		$this->assertSame( [], $recent['tag'] );
+		$this->assertSame( [], $recent['contact'] );
 
 		wp_set_current_user( $this->user() );
 

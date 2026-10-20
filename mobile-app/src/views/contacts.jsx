@@ -8,7 +8,7 @@ import { formatAddress } from '../core/fields.js'
 import { countryName } from '../core/countries.js'
 import { fromApi } from '../core/tags.js'
 import { EditContactSheet, EditTagsSheet } from './edit.jsx'
-import { avatarUrl, contactName, itemOf, useDebounced, useFetch } from '../util.js'
+import { avatarUrl, contactName, itemOf, useDebounced, useFetch, useRecentContacts } from '../util.js'
 
 export const ContactRow = ( { contact } ) => {
   const name = contactName( contact )
@@ -21,6 +21,26 @@ export const ContactRow = ( { contact } ) => {
       subtitle={ email && email !== name ? email : '' }
       href={ `#/contacts/${ contact.ID }` }
     />
+  )
+}
+
+/**
+ * The contacts opened most recently. It is a home card, and it sits at the top of the Contacts screen. It shows
+ * nothing when there is nothing to show, an empty card would only be noise.
+ */
+export function RecentlyViewedCard ( { ctx, limit = 5 } ) {
+  const { __ } = ctx.i18n
+  const { contacts, loading, expected } = useRecentContacts( ctx, limit )
+
+  if ( ! expected || ( ! loading && ! contacts.length ) ) {
+    return null
+  }
+
+  return (
+    <Card title={ __( 'Recently viewed' ) }>
+      { loading && ! contacts.length ? <SkeletonList variant="avatar" rows={ expected }/> : null }
+      { contacts.length ? <List>{ contacts.map( c => <ContactRow contact={ c } key={ c.ID }/> ) }</List> : null }
+    </Card>
   )
 }
 
@@ -44,7 +64,8 @@ export function ContactsView ( { ctx } ) {
         <Input type="search" placeholder={ __( 'Search contacts' ) } value={ query } onInput={ e => setQuery( e.currentTarget.value ) } aria-label={ __( 'Search contacts' ) } enterkeyhint="search"/>
       </div>
       <ErrorMessage error={ error }/>
-      <Card title={ search ? __( 'Results' ) : __( 'Recent' ) }>
+      { search ? null : <RecentlyViewedCard ctx={ ctx }/> }
+      <Card title={ search ? __( 'Results' ) : __( 'Recently added' ) }>
         { loading && ! items.length ? <SkeletonList variant="avatar" rows={ 6 }/> : null }
         { ! loading && ! error && ! items.length ? <Empty>{ search ? __( 'No contacts found.' ) : __( 'No contacts yet.' ) }</Empty> : null }
         { items.length ? <List>{ items.map( c => <ContactRow contact={ c } key={ c.ID }/> ) }</List> : null }
@@ -127,6 +148,20 @@ export function ContactView ( { ctx, params } ) {
   }, [ params.id ] )
 
   const contact = patched || ( data && itemOf( data ) )
+
+  // opened, so it is one of the most recent. Only the id is kept, the name is read when the list is shown.
+  useEffect( () => {
+    if ( contact ) {
+      ctx.recent.use( 'contact', { id: contact.ID } )
+    }
+  }, [ contact && contact.ID ] )
+
+  // gone, or not theirs any more, so there is no point offering it again
+  useEffect( () => {
+    if ( error && [ 403, 404 ].includes( error.status ) ) {
+      ctx.recent.forget( 'contact', Number( params.id ) )
+    }
+  }, [ error ] )
 
   if ( loading && ! contact ) {
     return (

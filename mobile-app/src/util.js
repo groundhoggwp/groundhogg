@@ -44,6 +44,39 @@ export function useDebounced ( value, ms = 250 ) {
 }
 
 /**
+ * The contacts this person opened most recently, newest first.
+ *
+ * Only their ids are remembered, so the names are read here, by the same call that lists contacts. That means the
+ * list is always current, shows only contacts they can see right now, and a contact that was deleted (or reassigned
+ * away from them) quietly leaves it.
+ *
+ * @param {object} ctx
+ * @param {number} limit
+ * @returns {{contacts: object[], loading: boolean, error: Error|null, expected: number}} expected is how many
+ *   placeholders to show while it loads
+ */
+export function useRecentContacts ( ctx, limit = 5 ) {
+  const ids = ctx.recent.list( 'contact' ).slice( 0, limit ).map( r => r.id )
+  const key = ids.join( ',' )
+
+  const { data, error, loading } = useFetch( () => ids.length
+    ? ctx.api.get( 'contacts', { include: ids, limit: ids.length } )
+    : Promise.resolve( { items: [] } ), [ key ] )
+
+  const found = new Map( ( ( data && data.items ) || [] ).map( c => [ Number( c.ID ), c ] ) )
+  const contacts = ids.map( id => found.get( id ) ).filter( Boolean )
+
+  // ids the server didn't give back are gone, or not theirs any more: forget them
+  useEffect( () => {
+    if ( data ) {
+      ids.filter( id => ! found.has( id ) ).forEach( id => ctx.recent.forget( 'contact', id ) )
+    }
+  }, [ data ] )
+
+  return { contacts, loading, error, expected: Math.min( ids.length, 3 ) }
+}
+
+/**
  * Notes and tasks can carry HTML from the desktop editor. Show it as text.
  */
 export function plainText ( html ) {

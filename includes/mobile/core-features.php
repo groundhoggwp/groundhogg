@@ -57,6 +57,12 @@ class Core_Features {
 					'cap'      => 'view_tasks',
 				],
 				[
+					'id'       => 'recently-viewed',
+					'label'    => __( 'Recently viewed', 'groundhogg' ),
+					'priority' => 15,
+					'cap'      => 'view_contacts',
+				],
+				[
 					'id'       => 'recent-contacts',
 					'label'    => __( 'Recently added contacts', 'groundhogg' ),
 					'priority' => 20,

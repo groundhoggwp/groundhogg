@@ -1380,6 +1380,19 @@
     }, [value, ms]);
     return debounced;
   }
+  function useRecentContacts(ctx, limit = 5) {
+    const ids = ctx.recent.list("contact").slice(0, limit).map((r3) => r3.id);
+    const key = ids.join(",");
+    const { data, error, loading } = useFetch(() => ids.length ? ctx.api.get("contacts", { include: ids, limit: ids.length }) : Promise.resolve({ items: [] }), [key]);
+    const found = new Map((data && data.items || []).map((c3) => [Number(c3.ID), c3]));
+    const contacts = ids.map((id) => found.get(id)).filter(Boolean);
+    A2(() => {
+      if (data) {
+        ids.filter((id) => !found.has(id)).forEach((id) => ctx.recent.forget("contact", id));
+      }
+    }, [data]);
+    return { contacts, loading, error, expected: Math.min(ids.length, 3) };
+  }
   function plainText(html) {
     if (!html) {
       return "";
@@ -1566,6 +1579,17 @@
       }
     );
   };
+  function RecentlyViewedCard({ ctx, limit = 5 }) {
+    const { __ } = ctx.i18n;
+    const { contacts, loading, expected } = useRecentContacts(ctx, limit);
+    if (!expected || !loading && !contacts.length) {
+      return null;
+    }
+    return /* @__PURE__ */ u3(Card, { title: __("Recently viewed"), children: [
+      loading && !contacts.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "avatar", rows: expected }) : null,
+      contacts.length ? /* @__PURE__ */ u3(List, { children: contacts.map((c3) => /* @__PURE__ */ u3(ContactRow, { contact: c3 }, c3.ID)) }) : null
+    ] });
+  }
   function ContactsView({ ctx }) {
     const { __ } = ctx.i18n;
     const [query, setQuery] = d2("");
@@ -1580,7 +1604,8 @@
     return /* @__PURE__ */ u3(M, { children: [
       /* @__PURE__ */ u3("div", { class: "ghm-search", children: /* @__PURE__ */ u3(Input, { type: "search", placeholder: __("Search contacts"), value: query, onInput: (e3) => setQuery(e3.currentTarget.value), "aria-label": __("Search contacts"), enterkeyhint: "search" }) }),
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      /* @__PURE__ */ u3(Card, { title: search ? __("Results") : __("Recent"), children: [
+      search ? null : /* @__PURE__ */ u3(RecentlyViewedCard, { ctx }),
+      /* @__PURE__ */ u3(Card, { title: search ? __("Results") : __("Recently added"), children: [
         loading && !items.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "avatar", rows: 6 }) : null,
         !loading && !error && !items.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No contacts found.") : __("No contacts yet.") }) : null,
         items.length ? /* @__PURE__ */ u3(List, { children: items.map((c3) => /* @__PURE__ */ u3(ContactRow, { contact: c3 }, c3.ID)) }) : null
@@ -1639,6 +1664,16 @@
       });
     }, [params.id]);
     const contact = patched || data && itemOf(data);
+    A2(() => {
+      if (contact) {
+        ctx.recent.use("contact", { id: contact.ID });
+      }
+    }, [contact && contact.ID]);
+    A2(() => {
+      if (error && [403, 404].includes(error.status)) {
+        ctx.recent.forget("contact", Number(params.id));
+      }
+    }, [error]);
     if (loading && !contact) {
       return /* @__PURE__ */ u3(Card, { "aria-busy": "true", children: [
         /* @__PURE__ */ u3("div", { class: "ghm-skel-stack", children: [
@@ -2312,6 +2347,7 @@
       },
       homeCards: {
         "my-tasks": MyTasksCard,
+        "recently-viewed": RecentlyViewedCard,
         "recent-contacts": RecentContactsCard
       },
       contactActions: {
