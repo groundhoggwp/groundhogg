@@ -245,11 +245,12 @@ body.ghm {
   background: var(--ghm-surface); border-radius: 20px 20px 0 0; animation: ghm-rise .2s ease-out;
 }
 /*
- * Stuck to the bottom edge of the sheet's scroll area. The negative margins let it span the sheet's padding, so it
- * sits flush with the edges and keeps the home indicator's safe area clear of the button.
+ * Stuck to the very bottom of the screen. A sticky element is held inside its scroll container's padding, and the
+ * sheet has bottom padding, so `bottom` is pulled down by exactly that much (and the margin does the same at the end
+ * of the scroll). Its own bottom padding keeps the button clear of the home indicator's safe area.
  */
 .ghm-sheet-footer {
-  position: sticky; bottom: 0; z-index: 2;
+  position: sticky; bottom: calc(-16px - var(--ghm-safe-b)); z-index: 2;
   margin: 14px -16px calc(-16px - var(--ghm-safe-b));
   padding: 12px 16px calc(14px + var(--ghm-safe-b));
   background: var(--ghm-surface);
