@@ -9,3 +9,5 @@
 /.php-cs-fixer.dist.php
 /composer.lock
 /.phpunit.result.cache
+
+/mobile-app/node_modules/
