@@ -9,9 +9,10 @@
 // view_emails) and a contact that can receive email. The server has the final say on each of those.
 
 import { useState } from 'preact/hooks'
-import { Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
+import { Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, SheetFooter, SkeletonList, Subhead, Textarea } from '../ui/index.jsx'
 import { plainToHtml } from '../core/text.js'
 import { resolveHref } from '../core/template.js'
+import { withoutRecents } from '../core/recent.js'
 import { contactName, useDebounced, useFetch } from '../util.js'
 
 /**
@@ -143,11 +144,18 @@ function Templates ( { ctx, close, contact, back } ) {
     select: [ 'ID', 'title', 'subject', 'message_type' ],
   } ), [ search ] )
 
-  const emails = ( data && data.items ) || []
+  const listed = ( data && data.items ) || []
+
+  // what was sent last comes first, until they search for something
+  const recents = search ? [] : ctx.recent.list( 'email_template' )
+  const emails = search ? listed : withoutRecents( listed, recents )
 
   if ( picked ) {
     return <ConfirmTemplate ctx={ ctx } close={ close } contact={ contact } email={ picked } back={ () => setPicked( null ) }/>
   }
+
+  // a recent keeps the title and subject it was sent under, which is all the confirmation needs
+  const pickRecent = r => setPicked( { ID: r.id, data: { title: r.name, subject: r.sub } } )
 
   return (
     <>
@@ -156,14 +164,25 @@ function Templates ( { ctx, close, contact, back } ) {
         <Input type="search" placeholder={ __( 'Search your emails' ) } aria-label={ __( 'Search your emails' ) } value={ query } onInput={ e => setQuery( e.currentTarget.value ) } enterkeyhint="search"/>
       </div>
       <ErrorMessage error={ error }/>
-      { loading && ! emails.length ? <SkeletonList rows={ 5 }/> : null }
-      { ! loading && ! error && ! emails.length ? <Empty>{ search ? __( 'No emails found.' ) : __( 'You have no emails ready to send.' ) }</Empty> : null }
+      { recents.length ? (
+        <>
+          <Subhead>{ __( 'Recent' ) }</Subhead>
+          <Card><List>
+            { recents.map( r => <ListItem title={ r.name || r.sub } subtitle={ r.sub } onClick={ () => pickRecent( r ) } trailing={ <Icon name="chevron"/> } key={ r.id }/> ) }
+          </List></Card>
+        </>
+      ) : null }
+      { loading && ! listed.length ? <SkeletonList rows={ recents.length ? 3 : 5 }/> : null }
+      { ! loading && ! error && ! listed.length && ! recents.length ? <Empty>{ search ? __( 'No emails found.' ) : __( 'You have no emails ready to send.' ) }</Empty> : null }
       { emails.length ? (
-        <Card><List>
-          { emails.map( e => (
-            <ListItem title={ e.data.title || e.data.subject } subtitle={ e.data.subject } onClick={ () => setPicked( e ) } trailing={ <Icon name="chevron"/> } key={ e.ID }/>
-          ) ) }
-        </List></Card>
+        <>
+          { recents.length ? <Subhead>{ __( 'All emails' ) }</Subhead> : null }
+          <Card><List>
+            { emails.map( e => (
+              <ListItem title={ e.data.title || e.data.subject } subtitle={ e.data.subject } onClick={ () => setPicked( e ) } trailing={ <Icon name="chevron"/> } key={ e.ID }/>
+            ) ) }
+          </List></Card>
+        </>
       ) : null }
     </>
   )
@@ -181,10 +200,20 @@ function ConfirmTemplate ( { ctx, close, contact, email, back } ) {
 
     try {
       await ctx.api.post( `emails/${ email.ID }/send`, { to: contact.ID } )
+
+      // sent, so it is what they'll most likely want to send next time
+      ctx.recent.use( 'email_template', { id: email.ID, name: email.data.title || email.data.subject, sub: email.data.subject } )
+
       ctx.toast( __( 'Email sent' ) )
       close()
     } catch ( err ) {
       setSending( false )
+
+      // the email was deleted since it was last used, so there is no point offering it again
+      if ( err.status === 404 ) {
+        ctx.recent.forget( 'email_template', email.ID )
+      }
+
       ctx.toast( err.message, 'error' )
     }
   }

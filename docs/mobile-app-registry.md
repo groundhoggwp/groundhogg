@@ -272,6 +272,7 @@ Every component receives a `ctx` prop:
 |---|---|
 | `api` | A thin `gh/v4` client (get/post/patch/delete) that adds the nonce, retries once on nonce expiry, and normalises errors |
 | `user`, `can( cap )`, `locale` | From the manifest |
+| `recent.list( kind )`, `recent.use( kind, { id, name, sub } )`, `recent.forget( kind, id )` | What this person used last, per kind of thing (see Recently used). `use` is called when something is actually used, and tells the server in the background |
 | `on( name, fn )`, `emit( name, payload )` | A small event bus. A sheet tells the screen under it something changed, e.g. `emit( 'contact:changed', { id, item } )` after an edit, and the contact record updates and reloads its panels. `on` returns the unsubscribe function |
 | `navigate( path )`, `route` | Hash router |
 | `toast( msg, type )`, `sheet( Component )`, `confirm( msg )` | Shell feedback and bottom-sheet presentation |
@@ -426,6 +427,24 @@ notifications) is the form's own settings, the same as on the desktop contact ca
   (found when a test did exactly that). Changing a contact's email is what Edit is for.
 - The API client's `postForm()` sends a `FormData` as it is, and an error response that lists several
   errors shows those instead of the generic "Your submission has errors".
+
+**Recently used.** The last few things a person used in a list go to the top of it next time: the email template they
+sent, the form they submitted, the tag they applied. A "Recent" group sits above the full list, which no longer
+repeats them, and a search shows ordinary results.
+
+- **Kept on the server, per user** (user meta `gh_mobile_recent`, `includes/mobile/recent.php`), so it follows the
+  person across devices and survives clearing a browser or reinstalling the home screen app. The manifest carries it
+  (`recent`), so the lists draw it with no extra request. `POST gh/v4/mobile/recent/{kind}` records a use
+  and `DELETE gh/v4/mobile/recent/{kind}/{id}` forgets one. It needs the same access as the app and only ever touches
+  the caller's own list.
+- **An entry is `{ id, name, sub }`**: the name (and second line) it was used under, so a recent is drawn without
+  fetching it. Eight are kept per kind, and a repeat moves to the front. A name can go stale if the thing is renamed.
+- **Recorded on success**, not when something is opened: after the email sends, the form submits, the tags save.
+- **Gone things drop out.** A template that returns 404 is forgotten. A recent form that isn't in the list is looked up
+  by name, and forgotten when it isn't found (`GET forms/{id}` can't be used: core registers that route without a
+  handler).
+- **Add-ons** add their own kind with the `groundhogg/mobile/recent_kinds` filter (a pipeline, say) and use
+  `ctx.recent` in their own lists.
 
 **The activity list** on the contact record comes from its own lean endpoint,
 `GET gh/v4/mobile/contacts/{id}/activity?limit=15&before=<unix time>` (`includes/mobile/activity-feed.php`), not the

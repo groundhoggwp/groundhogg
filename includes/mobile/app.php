@@ -31,8 +31,14 @@ class App {
 	 */
 	public $activity_feed;
 
+	/**
+	 * @var Recent
+	 */
+	public $recent;
+
 	public function __construct() {
 		$this->activity_feed = new Activity_Feed();
+		$this->recent        = new Recent();
 
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 		add_action( 'init', [ $this, 'maybe_flush_rewrite_rules' ], 99 );

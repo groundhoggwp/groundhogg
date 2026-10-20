@@ -885,6 +885,31 @@
     };
   }
 
+  // src/core/recent.js
+  var MAX_RECENT = 8;
+  function touch(list, item, max = MAX_RECENT) {
+    const entry = { id: Number(item.id), name: String(item.name || ""), sub: String(item.sub || "") };
+    return [entry, ...(list || []).filter((i3) => Number(i3.id) !== entry.id)].slice(0, max);
+  }
+  function drop(list, id) {
+    return (list || []).filter((i3) => Number(i3.id) !== Number(id));
+  }
+  function normalizeRecent(raw) {
+    const out = {};
+    Object.keys(raw && typeof raw === "object" ? raw : {}).forEach((kind) => {
+      const list = Array.isArray(raw[kind]) ? raw[kind] : [];
+      out[kind] = list.filter((i3) => i3 && Number(i3.id) > 0).map((i3) => ({ id: Number(i3.id), name: String(i3.name || ""), sub: String(i3.sub || "") })).slice(0, MAX_RECENT);
+    });
+    return out;
+  }
+  function withoutRecents(items, recents) {
+    const ids = new Set(recents.map((r3) => Number(r3.id)));
+    return items.filter((i3) => !ids.has(Number(i3.id ?? i3.ID)));
+  }
+  function escapeRegex(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
   // src/ui/index.jsx
   var ui_exports = {};
   __export(ui_exports, {
@@ -907,6 +932,7 @@
     SheetFooter: () => SheetFooter,
     Skeleton: () => Skeleton,
     SkeletonList: () => SkeletonList,
+    Subhead: () => Subhead,
     Textarea: () => Textarea,
     Toast: () => Toast
   });
@@ -993,6 +1019,7 @@
       row
     ] }) : /* @__PURE__ */ u3("li", { children: row });
   };
+  var Subhead = ({ children }) => /* @__PURE__ */ u3("h3", { class: "ghm-subhead", children });
   var Empty = ({ children }) => /* @__PURE__ */ u3("div", { class: "ghm-empty", children });
   var Skeleton = ({ w: w3 = "100%", h: h3 = 14, round }) => /* @__PURE__ */ u3("span", { class: `ghm-skel ${round ? "round" : ""}`, "aria-hidden": "true", style: { width: typeof w3 === "number" ? w3 + "px" : w3, height: typeof h3 === "number" ? h3 + "px" : h3 } });
   var TITLE_WIDTHS = ["58%", "46%", "66%", "52%", "40%", "62%"];
@@ -1072,6 +1099,20 @@
     const emit = (name, payload) => {
       (listeners.get(name) || []).forEach((fn) => fn(payload));
     };
+    const recentState = normalizeRecent(manifest.recent);
+    const recent = {
+      list: (kind) => recentState[kind] || [],
+      use: (kind, item) => {
+        recentState[kind] = touch(recentState[kind], item);
+        api.post(`mobile/recent/${kind}`, { id: item.id, name: item.name, sub: item.sub || "" }).catch(() => {
+        });
+      },
+      forget: (kind, id) => {
+        recentState[kind] = drop(recentState[kind], id);
+        api.delete(`mobile/recent/${kind}/${id}`).catch(() => {
+        });
+      }
+    };
     const translations = manifest.i18n || {};
     const ctxCache = {};
     const ctxFor = (featureId = "core") => {
@@ -1089,6 +1130,7 @@
           locale: manifest.locale || "en",
           on,
           emit,
+          recent,
           get route() {
             return parseHash(window.location.hash);
           },
@@ -1374,7 +1416,9 @@
   // src/views/edit.jsx
   async function save(ctx, contact, body) {
     const res = await ctx.api.patch(`contacts/${contact.ID}`, body);
-    ctx.emit("contact:changed", { id: contact.ID, item: itemOf(res) });
+    const item = itemOf(res);
+    ctx.emit("contact:changed", { id: contact.ID, item });
+    return item;
   }
   function EditContactSheet({ ctx, close, contact }) {
     const { __ } = ctx.i18n;
@@ -1450,7 +1494,9 @@
     }), [search]);
     const now = resultingTags(current, added, removed);
     const payload = tagPayload(current, added, removed);
-    const options = fromApi(data && data.items).filter((t3) => !hasTag(now, t3));
+    const listed = fromApi(data && data.items).filter((t3) => !hasTag(now, t3));
+    const recents = query.trim() ? [] : ctx.recent.list("tag").filter((t3) => !hasTag(now, t3));
+    const options = query.trim() ? listed : withoutRecents(listed, recents);
     const typed = query.trim();
     const canCreate = typed && !fromApi(data && data.items).some((t3) => t3.name.toLowerCase() === typed.toLowerCase()) && !hasTag(now, { name: typed });
     const add = (tag) => {
@@ -1475,7 +1521,14 @@
       }
       setSaving(true);
       try {
-        await save(ctx, contact, payload);
+        const item = await save(ctx, contact, payload);
+        const onContact = fromApi(item && item.tags);
+        added.forEach((a3) => {
+          const tag = onContact.find((t3) => t3.name.toLowerCase() === a3.name.toLowerCase());
+          if (tag) {
+            ctx.recent.use("tag", tag);
+          }
+        });
         ctx.toast(__("Tags updated"));
         close();
       } catch (err) {
@@ -1488,11 +1541,16 @@
       /* @__PURE__ */ u3(Field, { label: __("Add a tag"), children: /* @__PURE__ */ u3(Input, { type: "search", value: query, onInput: (e3) => setQuery(e3.currentTarget.value), placeholder: __("Search or type a new tag"), enterkeyhint: "search", autocomplete: "off" }) }),
       /* @__PURE__ */ u3(ErrorMessage, { error }),
       loading && !options.length ? /* @__PURE__ */ u3(SkeletonList, { rows: 3 }) : null,
+      recents.length ? /* @__PURE__ */ u3(M, { children: [
+        /* @__PURE__ */ u3(Subhead, { children: __("Recent") }),
+        /* @__PURE__ */ u3(List, { children: recents.map((t3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "plus" }), title: t3.name, onClick: () => add(t3) }, t3.id)) })
+      ] }) : null,
+      recents.length && options.length ? /* @__PURE__ */ u3(Subhead, { children: __("All tags") }) : null,
       /* @__PURE__ */ u3(List, { children: [
         canCreate ? /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "plus" }), title: sprintf2(__('Create "%s"'), typed), onClick: () => add({ name: typed }) }) : null,
         options.map((t3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "plus" }), title: t3.name, onClick: () => add(t3) }, t3.id))
       ] }),
-      !loading && !error && !options.length && !canCreate ? /* @__PURE__ */ u3(Empty, { children: typed ? __("No other tags match.") : __("No more tags to add.") }) : null,
+      !loading && !error && !options.length && !canCreate && !recents.length ? /* @__PURE__ */ u3(Empty, { children: typed ? __("No other tags match.") : __("No more tags to add.") }) : null,
       /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, onClick: submit, disabled: saving, children: saving ? __("Saving\u2026") : __("Save tags") }) })
     ] });
   }
@@ -2033,17 +2091,27 @@
       limit: 30,
       select: ["ID", "title", "subject", "message_type"]
     }), [search]);
-    const emails = data && data.items || [];
+    const listed = data && data.items || [];
+    const recents = search ? [] : ctx.recent.list("email_template");
+    const emails = search ? listed : withoutRecents(listed, recents);
     if (picked) {
       return /* @__PURE__ */ u3(ConfirmTemplate, { ctx, close, contact, email: picked, back: () => setPicked(null) });
     }
+    const pickRecent = (r3) => setPicked({ ID: r3.id, data: { title: r3.name, subject: r3.sub } });
     return /* @__PURE__ */ u3(M, { children: [
       /* @__PURE__ */ u3(BackButton, { onClick: back, label: __("Back") }),
       /* @__PURE__ */ u3("div", { style: "margin-bottom:12px", children: /* @__PURE__ */ u3(Input, { type: "search", placeholder: __("Search your emails"), "aria-label": __("Search your emails"), value: query, onInput: (e3) => setQuery(e3.currentTarget.value), enterkeyhint: "search" }) }),
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      loading && !emails.length ? /* @__PURE__ */ u3(SkeletonList, { rows: 5 }) : null,
-      !loading && !error && !emails.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No emails found.") : __("You have no emails ready to send.") }) : null,
-      emails.length ? /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: emails.map((e3) => /* @__PURE__ */ u3(ListItem, { title: e3.data.title || e3.data.subject, subtitle: e3.data.subject, onClick: () => setPicked(e3), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, e3.ID)) }) }) : null
+      recents.length ? /* @__PURE__ */ u3(M, { children: [
+        /* @__PURE__ */ u3(Subhead, { children: __("Recent") }),
+        /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: recents.map((r3) => /* @__PURE__ */ u3(ListItem, { title: r3.name || r3.sub, subtitle: r3.sub, onClick: () => pickRecent(r3), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, r3.id)) }) })
+      ] }) : null,
+      loading && !listed.length ? /* @__PURE__ */ u3(SkeletonList, { rows: recents.length ? 3 : 5 }) : null,
+      !loading && !error && !listed.length && !recents.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No emails found.") : __("You have no emails ready to send.") }) : null,
+      emails.length ? /* @__PURE__ */ u3(M, { children: [
+        recents.length ? /* @__PURE__ */ u3(Subhead, { children: __("All emails") }) : null,
+        /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: emails.map((e3) => /* @__PURE__ */ u3(ListItem, { title: e3.data.title || e3.data.subject, subtitle: e3.data.subject, onClick: () => setPicked(e3), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, e3.ID)) }) })
+      ] }) : null
     ] });
   }
   function ConfirmTemplate({ ctx, close, contact, email, back }) {
@@ -2053,10 +2121,14 @@
       setSending(true);
       try {
         await ctx.api.post(`emails/${email.ID}/send`, { to: contact.ID });
+        ctx.recent.use("email_template", { id: email.ID, name: email.data.title || email.data.subject, sub: email.data.subject });
         ctx.toast(__("Email sent"));
         close();
       } catch (err) {
         setSending(false);
+        if (err.status === 404) {
+          ctx.recent.forget("email_template", email.ID);
+        }
         ctx.toast(err.message, "error");
       }
     };
@@ -2126,13 +2198,44 @@
       contact: contact.ID,
       search: search || void 0
     }), [search]);
-    const forms = formEntries(data && data.items);
+    const listed = formEntries(data && data.items);
+    const recents = search ? [] : ctx.recent.list("form");
+    const forms = search ? listed : withoutRecents(listed, recents);
+    const [opening, setOpening] = d2(0);
+    const pickRecent = async (r3) => {
+      const known = listed.find((f3) => f3.id === r3.id);
+      if (known) {
+        onPick(known);
+        return;
+      }
+      setOpening(r3.id);
+      try {
+        const res = await ctx.api.get("forms", { active: true, contact: contact.ID, search: escapeRegex(r3.name) });
+        const found = formEntries(res.items).find((f3) => f3.id === r3.id);
+        if (found) {
+          onPick(found);
+          return;
+        }
+        ctx.recent.forget("form", r3.id);
+        ctx.toast(__("That form is no longer available."), "error");
+      } catch (err) {
+        ctx.toast(err.message, "error");
+      }
+      setOpening(0);
+    };
     return /* @__PURE__ */ u3(M, { children: [
       /* @__PURE__ */ u3("div", { style: "margin-bottom:12px", children: /* @__PURE__ */ u3(Input, { type: "search", placeholder: __("Search forms"), "aria-label": __("Search forms"), value: query, onInput: (e3) => setQuery(e3.currentTarget.value), enterkeyhint: "search", autocomplete: "off" }) }),
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      loading && !forms.length ? /* @__PURE__ */ u3(SkeletonList, { rows: 4 }) : null,
-      !loading && !error && !forms.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No forms found.") : __("There are no forms to fill out.") }) : null,
-      forms.length ? /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: forms.map((f3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "form" }), title: f3.name, onClick: () => onPick(f3), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, f3.id)) }) }) : null
+      recents.length ? /* @__PURE__ */ u3(M, { children: [
+        /* @__PURE__ */ u3(Subhead, { children: __("Recent") }),
+        /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: recents.map((r3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "form" }), title: r3.name, onClick: opening ? void 0 : () => pickRecent(r3), trailing: opening === r3.id ? /* @__PURE__ */ u3(Skeleton, { round: true, w: 18, h: 18 }) : /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, r3.id)) }) })
+      ] }) : null,
+      loading && !listed.length ? /* @__PURE__ */ u3(SkeletonList, { rows: recents.length ? 2 : 4 }) : null,
+      !loading && !error && !listed.length && !recents.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No forms found.") : __("There are no forms to fill out.") }) : null,
+      forms.length ? /* @__PURE__ */ u3(M, { children: [
+        recents.length ? /* @__PURE__ */ u3(Subhead, { children: __("All forms") }) : null,
+        /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: forms.map((f3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "form" }), title: f3.name, onClick: () => onPick(f3), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, f3.id)) }) })
+      ] }) : null
     ] });
   }
   function FillForm({ ctx, close, contact, form, back }) {
@@ -2171,6 +2274,7 @@
       try {
         const res = await ctx.api.postForm(`forms/${form.id}/admin`, data);
         const item = res.contact && res.contact.ID ? res.contact : itemOf(res);
+        ctx.recent.use("form", { id: form.id, name: form.name });
         ctx.toast(__("Form submitted"));
         ctx.emit("contact:changed", { id: contact.ID, item });
         close();

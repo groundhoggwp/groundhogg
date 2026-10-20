@@ -204,6 +204,8 @@ body.ghm {
 .ghm-act-icon .ghm-icon { width: 18px; height: 18px; }
 .ghm-more { padding: 10px 16px 14px; }
 
+.ghm-subhead { margin: 4px 2px 8px; font-size: 13px; font-weight: 650; letter-spacing: .02em; text-transform: uppercase; color: var(--ghm-muted); }
+
 .ghm-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px 4px 12px; border-radius: 99px; background: var(--ghm-raised); font-size: 14px; font-weight: 600; }
 .ghm-chip.is-new { background: color-mix(in srgb, var(--ghm-accent) 16%, transparent); color: var(--ghm-accent); }
 .ghm-chip-x { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--ghm-muted); cursor: pointer; }

@@ -52,6 +52,11 @@ export const ListItem = ( { title, subtitle, meta, leading, trailing, control, h
   return control ? <li class="ghm-item-wrap"><div class="ghm-control">{ control }</div>{ row }</li> : <li>{ row }</li>
 }
 
+/**
+ * A small heading inside a sheet, for a group within a list ("Recent", "All").
+ */
+export const Subhead = ( { children } ) => <h3 class="ghm-subhead">{ children }</h3>
+
 export const Empty = ( { children } ) => <div class="ghm-empty">{ children }</div>
 /**
  * A placeholder block. Sizes are px numbers or CSS lengths.

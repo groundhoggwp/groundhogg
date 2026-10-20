@@ -79,6 +79,7 @@ class Manifest {
 			'locale'     => str_replace( '_', '-', get_user_locale( $user_id ) ),
 			'timezone'   => wp_timezone_string(),
 			'features'   => $visible['features'],
+			'recent'     => Recent::get( $user_id ),
 		];
 
 		/**

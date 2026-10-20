@@ -5,8 +5,9 @@
 // submit (tags, flows, notifications) are all the form's own settings.
 
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { Button, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, SheetFooter, SkeletonList } from '../ui/index.jsx'
+import { Button, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, SheetFooter, Skeleton, SkeletonList, Subhead } from '../ui/index.jsx'
 import { formEntries, identitySelector, isUnsafeAttribute, UNSAFE_TAGS, withContact } from '../core/forms.js'
+import { escapeRegex, withoutRecents } from '../core/recent.js'
 import { contactName, itemOf, useDebounced, useFetch } from '../util.js'
 
 /**
@@ -64,7 +65,45 @@ function PickForm ( { ctx, contact, onPick } ) {
     search: search || undefined,
   } ), [ search ] )
 
-  const forms = formEntries( data && data.items )
+  const listed = formEntries( data && data.items )
+
+  // the forms they filled out last come first, until they search for something
+  const recents = search ? [] : ctx.recent.list( 'form' )
+  const forms = search ? listed : withoutRecents( listed, recents )
+
+  const [ opening, setOpening ] = useState( 0 )
+
+  /**
+   * A recent form is opened from the list we already have when it's there. The list only holds the newest forms, so
+   * otherwise it is looked up by its name. If it isn't found it was deleted or switched off, so it is forgotten.
+   */
+  const pickRecent = async r => {
+    const known = listed.find( f => f.id === r.id )
+
+    if ( known ) {
+      onPick( known )
+      return
+    }
+
+    setOpening( r.id )
+
+    try {
+      const res = await ctx.api.get( 'forms', { active: true, contact: contact.ID, search: escapeRegex( r.name ) } )
+      const found = formEntries( res.items ).find( f => f.id === r.id )
+
+      if ( found ) {
+        onPick( found )
+        return
+      }
+
+      ctx.recent.forget( 'form', r.id )
+      ctx.toast( __( 'That form is no longer available.' ), 'error' )
+    } catch ( err ) {
+      ctx.toast( err.message, 'error' )
+    }
+
+    setOpening( 0 )
+  }
 
   return (
     <>
@@ -72,12 +111,23 @@ function PickForm ( { ctx, contact, onPick } ) {
         <Input type="search" placeholder={ __( 'Search forms' ) } aria-label={ __( 'Search forms' ) } value={ query } onInput={ e => setQuery( e.currentTarget.value ) } enterkeyhint="search" autocomplete="off"/>
       </div>
       <ErrorMessage error={ error }/>
-      { loading && ! forms.length ? <SkeletonList rows={ 4 }/> : null }
-      { ! loading && ! error && ! forms.length ? <Empty>{ search ? __( 'No forms found.' ) : __( 'There are no forms to fill out.' ) }</Empty> : null }
+      { recents.length ? (
+        <>
+          <Subhead>{ __( 'Recent' ) }</Subhead>
+          <Card><List>
+            { recents.map( r => <ListItem leading={ <Icon name="form"/> } title={ r.name } onClick={ opening ? undefined : () => pickRecent( r ) } trailing={ opening === r.id ? <Skeleton round w={ 18 } h={ 18 }/> : <Icon name="chevron"/> } key={ r.id }/> ) }
+          </List></Card>
+        </>
+      ) : null }
+      { loading && ! listed.length ? <SkeletonList rows={ recents.length ? 2 : 4 }/> : null }
+      { ! loading && ! error && ! listed.length && ! recents.length ? <Empty>{ search ? __( 'No forms found.' ) : __( 'There are no forms to fill out.' ) }</Empty> : null }
       { forms.length ? (
-        <Card><List>
-          { forms.map( f => <ListItem leading={ <Icon name="form"/> } title={ f.name } onClick={ () => onPick( f ) } trailing={ <Icon name="chevron"/> } key={ f.id }/> ) }
-        </List></Card>
+        <>
+          { recents.length ? <Subhead>{ __( 'All forms' ) }</Subhead> : null }
+          <Card><List>
+            { forms.map( f => <ListItem leading={ <Icon name="form"/> } title={ f.name } onClick={ () => onPick( f ) } trailing={ <Icon name="chevron"/> } key={ f.id }/> ) }
+          </List></Card>
+        </>
       ) : null }
     </>
   )
@@ -137,6 +187,9 @@ function FillForm ( { ctx, close, contact, form, back } ) {
     try {
       const res = await ctx.api.postForm( `forms/${ form.id }/admin`, data )
       const item = res.contact && res.contact.ID ? res.contact : itemOf( res )
+
+      // submitted, so it is the one they'll most likely want next time
+      ctx.recent.use( 'form', { id: form.id, name: form.name } )
 
       ctx.toast( __( 'Form submitted' ) )
       ctx.emit( 'contact:changed', { id: contact.ID, item } )

@@ -3,10 +3,11 @@
 // is now, so the record shows the result without fetching it again.
 
 import { useState } from 'preact/hooks'
-import { Button, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Select, SheetFooter, SkeletonList } from '../ui/index.jsx'
+import { Button, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Select, SheetFooter, SkeletonList, Subhead } from '../ui/index.jsx'
 import { changes, initialValues, isEmpty } from '../core/fields.js'
 import { countryOptions } from '../core/countries.js'
 import { fromApi, hasTag, isUnchanged, resultingTags, tagPayload } from '../core/tags.js'
+import { withoutRecents } from '../core/recent.js'
 import { itemOf, useDebounced, useFetch } from '../util.js'
 
 /**
@@ -14,7 +15,10 @@ import { itemOf, useDebounced, useFetch } from '../util.js'
  */
 async function save ( ctx, contact, body ) {
   const res = await ctx.api.patch( `contacts/${ contact.ID }`, body )
-  ctx.emit( 'contact:changed', { id: contact.ID, item: itemOf( res ) } )
+  const item = itemOf( res )
+  ctx.emit( 'contact:changed', { id: contact.ID, item } )
+
+  return item
 }
 
 export function EditContactSheet ( { ctx, close, contact } ) {
@@ -122,7 +126,11 @@ export function EditTagsSheet ( { ctx, close, contact } ) {
   const payload = tagPayload( current, added, removed )
 
   // what to offer: matching tags the contact doesn't have (or isn't about to have)
-  const options = fromApi( data && data.items ).filter( t => ! hasTag( now, t ) )
+  const listed = fromApi( data && data.items ).filter( t => ! hasTag( now, t ) )
+
+  // the tags they applied last come first, until they start typing
+  const recents = query.trim() ? [] : ctx.recent.list( 'tag' ).filter( t => ! hasTag( now, t ) )
+  const options = query.trim() ? listed : withoutRecents( listed, recents )
   const typed = query.trim()
   const canCreate = typed && ! fromApi( data && data.items ).some( t => t.name.toLowerCase() === typed.toLowerCase() ) && ! hasTag( now, { name: typed } )
 
@@ -154,7 +162,19 @@ export function EditTagsSheet ( { ctx, close, contact } ) {
     setSaving( true )
 
     try {
-      await save( ctx, contact, payload )
+      const item = await save( ctx, contact, payload )
+
+      // remember the tags that were added, the last one added first. New ones have their ids now.
+      const onContact = fromApi( item && item.tags )
+
+      added.forEach( a => {
+        const tag = onContact.find( t => t.name.toLowerCase() === a.name.toLowerCase() )
+
+        if ( tag ) {
+          ctx.recent.use( 'tag', tag )
+        }
+      } )
+
       ctx.toast( __( 'Tags updated' ) )
       close()
     } catch ( err ) {
@@ -178,6 +198,17 @@ export function EditTagsSheet ( { ctx, close, contact } ) {
       <ErrorMessage error={ error }/>
       { loading && ! options.length ? <SkeletonList rows={ 3 }/> : null }
 
+      { recents.length ? (
+        <>
+          <Subhead>{ __( 'Recent' ) }</Subhead>
+          <List>
+            { recents.map( t => <ListItem leading={ <Icon name="plus"/> } title={ t.name } onClick={ () => add( t ) } key={ t.id }/> ) }
+          </List>
+        </>
+      ) : null }
+
+      { recents.length && options.length ? <Subhead>{ __( 'All tags' ) }</Subhead> : null }
+
       <List>
         { canCreate ? (
           <ListItem leading={ <Icon name="plus"/> } title={ sprintf( __( 'Create "%s"' ), typed ) } onClick={ () => add( { name: typed } ) }/>
@@ -185,7 +216,7 @@ export function EditTagsSheet ( { ctx, close, contact } ) {
         { options.map( t => <ListItem leading={ <Icon name="plus"/> } title={ t.name } onClick={ () => add( t ) } key={ t.id }/> ) }
       </List>
 
-      { ! loading && ! error && ! options.length && ! canCreate ? <Empty>{ typed ? __( 'No other tags match.' ) : __( 'No more tags to add.' ) }</Empty> : null }
+      { ! loading && ! error && ! options.length && ! canCreate && ! recents.length ? <Empty>{ typed ? __( 'No other tags match.' ) : __( 'No more tags to add.' ) }</Empty> : null }
 
       <SheetFooter>
         <Button variant="primary" block onClick={ submit } disabled={ saving }>{ saving ? __( 'Saving…' ) : __( 'Save tags' ) }</Button>
