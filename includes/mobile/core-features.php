@@ -1,0 +1,123 @@
+<?php
+
+namespace Groundhogg\Mobile;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Core's own mobile feature. It registers through the same public registry add-ons use, so anything
+ * core can do, an add-on can do. The components for these ids ship in the core bundle.
+ */
+class Core_Features {
+
+	/**
+	 * @param Features $features
+	 */
+	public static function register( Features $features ) {
+
+		$features->register( 'core', [
+			'label'            => __( 'Groundhogg', 'groundhogg' ),
+			// every Groundhogg role has this, anyone without it has no business in the app
+			'cap'              => 'view_contacts',
+			'nav'              => [
+				[
+					'id'        => 'home',
+					'label'     => __( 'Home', 'groundhogg' ),
+					'icon'      => 'home',
+					'route'     => '/',
+					'placement' => 'tab',
+					'priority'  => 1,
+				],
+				[
+					'id'        => 'contacts',
+					'label'     => __( 'Contacts', 'groundhogg' ),
+					'icon'      => 'contacts',
+					'route'     => '/contacts',
+					'placement' => 'tab',
+					'priority'  => 10,
+					'cap'       => 'view_contacts',
+				],
+				[
+					'id'        => 'tasks',
+					'label'     => __( 'Tasks', 'groundhogg' ),
+					'icon'      => 'tasks',
+					'route'     => '/tasks',
+					'placement' => 'tab',
+					'priority'  => 20,
+					'cap'       => 'view_tasks',
+				],
+			],
+			'home_cards'       => [
+				[
+					'id'       => 'my-tasks',
+					'label'    => __( 'My tasks', 'groundhogg' ),
+					'priority' => 10,
+					'cap'      => 'view_tasks',
+				],
+				[
+					'id'       => 'recent-contacts',
+					'label'    => __( 'Recently added contacts', 'groundhogg' ),
+					'priority' => 20,
+					'cap'      => 'view_contacts',
+				],
+			],
+			'contact_actions'  => [
+				[
+					'id'       => 'call',
+					'label'    => __( 'Call', 'groundhogg' ),
+					'icon'     => 'phone',
+					'href'     => 'tel:{mobile_phone|primary_phone}',
+					'priority' => 10,
+				],
+				[
+					'id'       => 'text',
+					'label'    => __( 'Text', 'groundhogg' ),
+					'icon'     => 'message',
+					'href'     => 'sms:{mobile_phone|primary_phone}',
+					'priority' => 20,
+				],
+				[
+					'id'       => 'email',
+					'label'    => __( 'Email', 'groundhogg' ),
+					'icon'     => 'mail',
+					'href'     => 'mailto:{email}',
+					'priority' => 30,
+				],
+			],
+			'contact_panels'   => [
+				[
+					'id'       => 'notes',
+					'label'    => __( 'Notes', 'groundhogg' ),
+					'icon'     => 'note',
+					'priority' => 10,
+					'cap'      => 'view_notes',
+				],
+				[
+					'id'       => 'tasks',
+					'label'    => __( 'Tasks', 'groundhogg' ),
+					'icon'     => 'tasks',
+					'priority' => 20,
+					'cap'      => 'view_tasks',
+				],
+			],
+			'quick_create'     => [
+				[
+					'id'       => 'new-contact',
+					'label'    => __( 'New contact', 'groundhogg' ),
+					'icon'     => 'contacts',
+					'priority' => 10,
+					'cap'      => 'add_contacts',
+				],
+				[
+					'id'       => 'new-task',
+					'label'    => __( 'New task', 'groundhogg' ),
+					'icon'     => 'tasks',
+					'priority' => 20,
+					'cap'      => 'add_tasks',
+				],
+			],
+		] );
+	}
+}

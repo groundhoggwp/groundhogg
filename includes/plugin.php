@@ -156,6 +156,11 @@ class Plugin {
 	public $rewrites;
 
 	/**
+	 * @var Mobile\App
+	 */
+	public $mobile;
+
+	/**
 	 * @var Tag_Mapping
 	 */
 	public $tag_mapping;
@@ -302,6 +307,7 @@ class Plugin {
 		$this->scripts     = new Scripts();
 		$this->notices     = new Notices();
 		$this->rewrites    = new Rewrites();
+		$this->mobile      = new Mobile\App();
 
 		// Back Compat...
 		new Backwards_Compatibility();
