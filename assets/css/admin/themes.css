@@ -68,9 +68,10 @@ body.groundhogg-admin-page[class*="gh-theme-"] #wpfooter a {
   color: var(--ght-muted);
 }
 
-/* Element-level colors use :where() so they stay at element specificity, and skip the
-   email canvases, which render the email being authored rather than the admin UI. */
-:where(body.groundhogg-admin-page[class*="gh-theme-"]) :is(h1, h2, h3, h4, label, th):not(:where(#block-editor-content-wrap *, #email-editor-content *, .template-framed *)) {
+/* Headings, labels and table headers. WP colors these with class selectors (.form-table th),
+   so this needs normal specificity. The email canvases render the email being authored rather
+   than the admin UI, so they are excluded with :not(:where()), which adds no specificity. */
+body.groundhogg-admin-page[class*="gh-theme-"] :is(h1, h2, h3, h4, label, th):not(:where(#block-editor-content-wrap *, #email-editor-content *, .template-framed *)) {
   color: var(--ght-text);
 }
 
@@ -373,7 +374,7 @@ body.groundhogg-admin-page[class*="gh-theme-"] .select2-container .select2-selec
 body.groundhogg-admin-page[class*="gh-theme-"] .select2-dropdown {
   background-color: var(--ght-surface);
   color: var(--ght-text);
-  border: 1px solid var(--ght-border-strong);
+  border-color: var(--ght-border-strong);
   box-shadow: none;
 }
 
@@ -413,13 +414,21 @@ body.groundhogg-admin-page[class*="gh-theme-"] .select2-results__option {
   color: var(--ght-text);
 }
 
-/* Buttons */
+/* Dropdown chevron: WP draws it as a background image with a hard-coded dark fill, which
+   disappears on the dark themes. Same glyph, theme colored. Multi-selects have no chevron. */
+body.groundhogg-admin-page[class*="gh-theme-"] select:not([multiple], [size]) {
+  background-image: var(--ght-select-arrow);
+}
+
+/* Buttons. Borders here are color-only: the width/style come from WP and core, and several core
+   components (input groups, the input repeater) zero individual sides to collapse shared edges,
+   which a `border` shorthand would undo. */
 body.groundhogg-admin-page[class*="gh-theme-"] .button,
 body.groundhogg-admin-page[class*="gh-theme-"] .button-secondary,
 body.groundhogg-admin-page[class*="gh-theme-"] .button,
 body.groundhogg-admin-page[class*="gh-theme-"] .button-secondary {
   background-color: var(--ght-surface);
-  border: 1px solid var(--ght-border-strong);
+  border-color: var(--ght-border-strong);
   color: var(--ght-text);
   box-shadow: none;
   font-weight: 500;
@@ -581,33 +590,74 @@ body.groundhogg-admin-page[class*="gh-theme-"] span.gh-tag {
   border: 1px solid var(--ght-border);
 }
 
-/* Tabs */
+/* Tabs: quiet text tabs with an accent underline that grows in, and a soft glow on the active one */
 body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper,
 body.groundhogg-admin-page[class*="gh-theme-"] h2.nav-tab-wrapper {
-  border-bottom-color: var(--ght-border);
+  border-bottom: 1px solid var(--ght-border);
 }
 
-body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab {
-  background-color: transparent;
-  border-color: transparent;
-  color: var(--ght-muted);
+body.groundhogg-admin-page[class*="gh-theme-"] h2.nav-tab-wrapper .nav-tab,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab {
+  position: relative;
+  margin: 0 2px -1px 0;
+  padding: 10px 16px 12px;
+  border: 0;
   border-radius: var(--gh-border-radius) var(--gh-border-radius) 0 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ght-muted);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab:hover,
-body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab:focus {
-  background-color: var(--ght-raised);
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--ght-accent);
+  opacity: 0;
+  transform: scaleX(0.35);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab:focus {
+  background-color: var(--gh-dark-5);
   color: var(--ght-text);
+  box-shadow: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab:focus-visible {
+  box-shadow: var(--gh-focused-shadow);
+  outline: none;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab:hover::after {
+  opacity: 0.5;
+  transform: scaleX(1);
 }
 
 body.groundhogg-admin-page[class*="gh-theme-"] h2.nav-tab-wrapper .nav-tab.nav-tab-active,
-body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab.nav-tab-active,
-body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab.nav-tab-active:hover,
-body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab.nav-tab-active:focus {
-  background-color: var(--ght-surface);
-  border-color: var(--ght-border);
-  border-bottom-color: var(--ght-surface);
-  color: var(--ght-accent);
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab.nav-tab-active,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab.nav-tab-active:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab.nav-tab-active:focus {
+  background: linear-gradient(to top, color-mix(in srgb, var(--ght-accent) var(--ght-tab-tint), transparent), transparent 80%);
+  border: 0;
+  color: var(--ght-text);
+  font-weight: 600;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .nav-tab-wrapper .nav-tab.nav-tab-active::after {
+  opacity: 1;
+  transform: scaleX(1);
+  box-shadow: 0 0 12px 1px color-mix(in srgb, var(--ght-accent) var(--ght-tab-glow), transparent);
 }
 
 /* Pickers, sticky save bar */
@@ -635,7 +685,7 @@ body.groundhogg-admin-page[class*="gh-theme-"] :is(
   .button-primary,
   .select2-selection,
   .select2-dropdown
-):not(:where(:is(.gh-input-group, .input-wrap) > *, :is(.gh-input-group, .input-wrap) .select2-selection, :is(.gh-input-group, .input-wrap) .input-with-replacements *)) {
+):not(:where(:is(.gh-input-group, .input-wrap) > *, :is(.gh-input-group, .input-wrap) .select2-selection, :is(.gh-input-group, .input-wrap) .input-with-replacements *, .gh-input-repeater *)) {
   border-radius: var(--gh-border-radius);
 }
 
@@ -1830,12 +1880,81 @@ body.groundhogg-admin-page[class*="gh-theme-"] label.gh-switch span.on {
   color: var(--ght-on-accent);
 }
 
+/* Button toggle (HTML::button_toggle(), e.g. the email service pickers): a radio group shown as
+   joined buttons. Core fills the selected one with --gh-dark and hard-codes white text, which is
+   white on light in the dark themes. The selected option takes the accent instead. Borders are
+   color-only so core's joined-edge rules (border-left-width: 0, corner radii) stay intact. */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button-toggle .gh-button-toggle-option .gh-button-toggle-label {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+  color: var(--ght-muted);
+  font-weight: 500;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button-toggle .gh-button-toggle-option:hover input:not(:checked) + .gh-button-toggle-label {
+  background-color: var(--ght-raised);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-button-toggle .gh-button-toggle-option input:checked + .gh-button-toggle-label {
+  background-color: var(--ght-accent);
+  border-color: var(--ght-accent);
+  color: var(--ght-on-accent);
+  font-weight: 600;
+}
+
+/* Tag picker states: a tag being removed reads red, one being added reads green. The generic
+   tag chip rules above would otherwise flatten both to the neutral chip. */
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-tag.remove,
+body.groundhogg-admin-page[class*="gh-theme-"] span.gh-tag.remove,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tags a.gh-tag.remove,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tags span.gh-tag.remove {
+  background-color: var(--ght-red-bg);
+  color: var(--ght-red-fg);
+  border-color: color-mix(in srgb, var(--ght-red-fg) 45%, transparent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] a.gh-tag.adding,
+body.groundhogg-admin-page[class*="gh-theme-"] span.gh-tag.adding,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tags a.gh-tag.adding,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-tags span.gh-tag.adding {
+  background-color: var(--ght-green-bg);
+  color: var(--ght-green-fg);
+  border-color: color-mix(in srgb, var(--ght-green-fg) 45%, transparent);
+}
+
+/* The spinner is an <object> holding a transparent SVG document. The themes set color-scheme: dark on
+   the body, and an embedded document whose scheme differs from its embedder gets an opaque white
+   canvas, which showed up as a white square in the loading modal. Declaring the object as light
+   matches the SVG's own scheme, so it stays transparent. */
+body.groundhogg-admin-page[class*="gh-theme-"] object.gh-spinner,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-spinner-wrap object {
+  color-scheme: light;
+}
+
+/* Flow steps with unsaved changes: core alternates the step color at 10% with a hard-coded #fff,
+   which is white stripes under light text in the dark themes. Stripe against the surface instead. */
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step.has-changes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--color) var(--ght-stripe), transparent),
+    color-mix(in srgb, var(--color) var(--ght-stripe), transparent) 10px,
+    var(--ght-surface) 10px,
+    var(--ght-surface) 20px
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 /* Themes                                                                     */
 /* -------------------------------------------------------------------------- */
 
 /* Light: crisp white surfaces, hairlines, quiet shadows */
 body.groundhogg-admin-page.gh-theme-light {
+  --ght-stripe: 9%; /* "has changes" stripe strength on flow steps */
+  --ght-tab-tint: 5%; /* active tab gradient strength; light themes need far less */
+  --ght-tab-glow: 28%;
+  --ght-select-arrow: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%2314171c%22%2F%3E%3C%2Fsvg%3E"); /* the dropdown chevron, WP draws it as a #1e1e1e background image */
   --ght-purple: #6c19ad;
   --ght-tick-filter: brightness(0) invert(1); /* checkmark: matches --ght-on-accent */
   --ght-green-bg: #e7f6ec;
@@ -1862,6 +1981,10 @@ body.groundhogg-admin-page.gh-theme-light {
 
 /* Paper: warm off-white, calm green-blue accent */
 body.groundhogg-admin-page.gh-theme-paper {
+  --ght-stripe: 9%; /* "has changes" stripe strength on flow steps */
+  --ght-tab-tint: 5%; /* active tab gradient strength; light themes need far less */
+  --ght-tab-glow: 28%;
+  --ght-select-arrow: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%2326231d%22%2F%3E%3C%2Fsvg%3E"); /* the dropdown chevron, WP draws it as a #1e1e1e background image */
   --ght-purple: #6c19ad;
   --ght-tick-filter: brightness(0) invert(1); /* checkmark: matches --ght-on-accent */
   --ght-green-bg: #e6f1e3;
@@ -1888,6 +2011,10 @@ body.groundhogg-admin-page.gh-theme-paper {
 
 /* Slate: dark blue-gray, easy on the eyes */
 body.groundhogg-admin-page.gh-theme-slate {
+  --ght-stripe: 16%; /* "has changes" stripe strength on flow steps */
+  --ght-tab-tint: 18%; /* active tab gradient strength; light themes need far less */
+  --ght-tab-glow: 60%;
+  --ght-select-arrow: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23c4cbd8%22%2F%3E%3C%2Fsvg%3E"); /* the dropdown chevron, WP draws it as a #1e1e1e background image */
   --ght-purple: #9a63e0;
   --ght-tick-filter: brightness(0); /* checkmark: matches --ght-on-accent */
   --ght-green-bg: rgba(74,222,128,.14);
@@ -1914,6 +2041,10 @@ body.groundhogg-admin-page.gh-theme-slate {
 
 /* Midnight: true black for OLED, electric accent */
 body.groundhogg-admin-page.gh-theme-midnight {
+  --ght-stripe: 16%; /* "has changes" stripe strength on flow steps */
+  --ght-tab-tint: 18%; /* active tab gradient strength; light themes need far less */
+  --ght-tab-glow: 60%;
+  --ght-select-arrow: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23d5d8df%22%2F%3E%3C%2Fsvg%3E"); /* the dropdown chevron, WP draws it as a #1e1e1e background image */
   --ght-purple: #a56ae8;
   --ght-tick-filter: brightness(0); /* checkmark: matches --ght-on-accent */
   --ght-green-bg: rgba(74,222,128,.14);
