@@ -2152,6 +2152,7 @@
         if (button && footerRef.current) {
           ref.current.id = `ghm-form-${form.id}`;
           button.setAttribute("form", ref.current.id);
+          button.className = "ghm-btn primary block";
           footerRef.current.replaceChildren(button);
         }
       }

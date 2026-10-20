@@ -58,8 +58,12 @@ body.ghm {
 
 #ghm-root { min-height: 100%; }
 
-.ghm a { color: inherit; text-decoration: none; }
-.ghm button { font: inherit; color: inherit; }
+/*
+ * Resets, at zero specificity (:where), so a component's own class always wins. As `.ghm button` this out-ranked
+ * `.ghm-btn` and `.ghm-action`, and quietly overrode their font size and weight.
+ */
+:where(.ghm) a { color: inherit; text-decoration: none; }
+:where(.ghm) button { font: inherit; color: inherit; }
 .ghm h1, .ghm h2, .ghm h3, .ghm p { margin: 0; }
 
 /* ---- layout ---------------------------------------------------------------------------------------------- */

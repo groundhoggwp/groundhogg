@@ -108,6 +108,10 @@ function FillForm ( { ctx, close, contact, form, back } ) {
       if ( button && footerRef.current ) {
         ref.current.id = `ghm-form-${ form.id }`
         button.setAttribute( 'form', ref.current.id )
+
+        // Out of the form it no longer picks up the form's styles, so it takes the app's own primary button. The
+        // server's classes (gh-button, gh-submit, a theme) are for its own stylesheet, which isn't loaded here.
+        button.className = 'ghm-btn primary block'
         footerRef.current.replaceChildren( button )
       }
     }
