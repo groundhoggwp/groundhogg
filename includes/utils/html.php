@@ -658,6 +658,56 @@ class HTML {
 	}
 
 
+	/**
+	 * A radio group presented as a row of toggle buttons.
+	 *
+	 * @param array $args {
+	 *     @type string $name     the input name
+	 *     @type string $id       the wrapper id, also prefixes the option ids
+	 *     @type array  $options  value => label
+	 *     @type string $selected the selected value, falls back to the first option if it is not in $options
+	 * }
+	 *
+	 * @return string
+	 */
+	public function button_toggle( $args = [] ) {
+		$a = wp_parse_args( $args, [
+			'name'     => '',
+			'id'       => '',
+			'class'    => '',
+			'options'  => [],
+			'selected' => '',
+		] );
+
+		$options  = $a['options'];
+		$selected = (string) $a['selected'];
+
+		if ( ! array_key_exists( $selected, $options ) ) {
+			$selected = (string) array_key_first( $options );
+		}
+
+		$buttons = [];
+
+		foreach ( $options as $value => $label ) {
+			$buttons[] = $this->e( 'label', [ 'class' => 'gh-button-toggle-option' ], [
+				$this->e( 'input', [
+					'type'    => 'radio',
+					'name'    => $a['name'],
+					'id'      => $a['id'] ? $a['id'] . '-' . sanitize_key( $value ) : '',
+					'value'   => $value,
+					'checked' => (string) $value === $selected,
+				] ),
+				$this->e( 'span', [ 'class' => 'gh-button-toggle-label' ], esc_html( $label ) ),
+			] );
+		}
+
+		return $this->e( 'div', [
+			'id'    => $a['id'],
+			'class' => trim( 'gh-button-toggle ' . $a['class'] ),
+			'role'  => 'radiogroup',
+		], $buttons );
+	}
+
 	public function help_icon( $link = '' ) {
 		return $this->modal_link( [
 			'title'              => 'Help',
