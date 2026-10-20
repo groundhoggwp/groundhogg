@@ -335,20 +335,48 @@ body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span button.button
   box-shadow: none;
 }
 
+/* Destructive row actions are red by default, not only on hover. The tables disagree on markup
+   (WP's span.delete/.trash/.spam, a.danger-delete, a.submitdelete, or bare numbered spans with no
+   class at all), so this also matches the action in the link itself. */
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.delete a,
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.trash a,
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.spam a,
-body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span a.submitdelete {
-  color: var(--ght-muted);
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.submitdelete,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.danger-delete,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.delete-link,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.delete-contact,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.spam,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.change-status.spam,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=delete"],
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=trash"],
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=spam"] {
+  color: var(--ght-red-fg);
 }
 
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.delete a:hover,
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.trash a:hover,
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.spam a:hover,
-body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span a.submitdelete:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.submitdelete:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.danger-delete:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.delete-link:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.delete-contact:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.spam:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.change-status.spam:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=delete"]:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=trash"]:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=spam"]:hover,
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.delete a:focus-visible,
 body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.trash a:focus-visible,
-body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.spam a:focus-visible {
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions > span.spam a:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.submitdelete:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.danger-delete:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.delete-link:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.delete-contact:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.spam:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a.change-status.spam:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=delete"]:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=trash"]:focus-visible,
+body.groundhogg-admin-page[class*="gh-theme-"] .row-actions a[href*="action=spam"]:focus-visible {
   color: var(--ght-red-fg);
   background-color: var(--ght-red-bg);
 }
