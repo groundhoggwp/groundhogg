@@ -199,3 +199,19 @@ test( 'plainToHtml makes paragraphs and line breaks, and nothing typed can be ma
   assert.equal( plainToHtml( '<script>alert("x")</script> & more' ), '<p>&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; more</p>' )
   assert.equal( escapeHtml( `'` ), '&#039;' )
 })
+
+// ---- opt-in ----------------------------------------------------------------------------------------------------
+
+import { optinColor } from '../src/core/optin.js'
+
+test( 'optinColor says whether a contact can be emailed', () => {
+  assert.equal( optinColor( 2 ), 'green' )
+  assert.equal( optinColor( '4' ), 'green' )
+  assert.equal( optinColor( 5 ), 'green' )
+  assert.equal( optinColor( 1 ), 'amber' )
+  for ( const bad of [ 3, 6, 7, 8, 9 ] ) {
+    assert.equal( optinColor( bad ), 'red', `status ${ bad }` )
+  }
+  assert.equal( optinColor( 99 ), '' )
+  assert.equal( optinColor( undefined ), '' )
+})

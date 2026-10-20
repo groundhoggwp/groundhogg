@@ -3,6 +3,7 @@ import { Avatar, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, Pill, S
 import { Contribution } from '../contribution.jsx'
 import { useRuntime } from '../runtime.jsx'
 import { resolveHref, contactValue } from '../core/template.js'
+import { optinColor } from '../core/optin.js'
 import { avatarUrl, contactName, itemOf, useDebounced, useFetch } from '../util.js'
 
 export const ContactRow = ( { contact } ) => {
@@ -94,7 +95,7 @@ function ContactActions ( { contact, ctx } ) {
 }
 
 export function ContactView ( { ctx, params } ) {
-  const { __ } = ctx.i18n
+  const { __, _x } = ctx.i18n
   const { registry } = useRuntime()
 
   const { data, error, loading } = useFetch( () => ctx.api.get( `contacts/${ params.id }` ), [ params.id ] )
@@ -120,6 +121,21 @@ export function ContactView ( { ctx, params } ) {
     [ __( 'Phone' ), contactValue( contact, 'primary_phone' ), resolveHref( 'tel:{primary_phone}', contact ) ],
   ].filter( ( [ , value ] ) => value )
 
+  // the names match the ones the desktop app shows, so they come with the same translations
+  const optinNames = {
+    1: _x( 'Unconfirmed', 'optin_status' ),
+    2: _x( 'Confirmed', 'optin_status' ),
+    3: _x( 'Unsubscribed', 'optin_status' ),
+    4: _x( 'Subscribed Weekly', 'optin_status' ),
+    5: _x( 'Subscribed Monthly', 'optin_status' ),
+    6: _x( 'Bounced', 'optin_status' ),
+    7: _x( 'Spam', 'optin_status' ),
+    8: _x( 'Complained', 'optin_status' ),
+    9: _x( 'Blocked', 'optin_status' ),
+  }
+
+  const optin = Number( contact.data.optin_status )
+
   const tags = ( contact.tags || [] ).map( t => t.data.tag_name )
 
   return (
@@ -134,11 +150,10 @@ export function ContactView ( { ctx, params } ) {
         { tags.length ? <div class="ghm-tags">{ tags.map( t => <Pill key={ t }>{ t }</Pill> ) }</div> : null }
       </Card>
 
-      { details.length ? (
-        <Card title={ __( 'Details' ) }><List>
-          { details.map( ( [ label, value, href ] ) => <ListItem title={ value } subtitle={ label } href={ href || undefined }/> ) }
-        </List></Card>
-      ) : null }
+      <Card title={ __( 'Details' ) }><List>
+        { details.map( ( [ label, value, href ] ) => <ListItem title={ value } subtitle={ label } href={ href || undefined } key={ label }/> ) }
+        <ListItem title={ __( 'Opt-in status' ) } meta={ <Pill color={ optinColor( optin ) }>{ optinNames[ optin ] || __( 'Unknown' ) }</Pill> }/>
+      </List></Card>
 
       { registry.contributions( 'contact_panels' ).map( panel => (
         <Card title={ panel.label } key={ `${ panel.feature }/${ panel.id }` }>

@@ -1139,6 +1139,35 @@
     return /^(tel|sms|mailto|https?):/i.test(href) ? href : null;
   }
 
+  // src/core/optin.js
+  var UNCONFIRMED = 1;
+  var CONFIRMED = 2;
+  var UNSUBSCRIBED = 3;
+  var WEEKLY = 4;
+  var MONTHLY = 5;
+  var HARD_BOUNCE = 6;
+  var SPAM = 7;
+  var COMPLAINED = 8;
+  var BLOCKED = 9;
+  function optinColor(status) {
+    switch (Number(status)) {
+      case CONFIRMED:
+      case WEEKLY:
+      case MONTHLY:
+        return "green";
+      case UNCONFIRMED:
+        return "amber";
+      case UNSUBSCRIBED:
+      case HARD_BOUNCE:
+      case SPAM:
+      case COMPLAINED:
+      case BLOCKED:
+        return "red";
+      default:
+        return "";
+    }
+  }
+
   // src/util.js
   function useFetch(load, deps = []) {
     const [state, setState] = d2({ data: null, error: null, loading: true });
@@ -1266,7 +1295,7 @@
     ] });
   }
   function ContactView({ ctx, params }) {
-    const { __ } = ctx.i18n;
+    const { __, _x } = ctx.i18n;
     const { registry } = useRuntime();
     const { data, error, loading } = useFetch(() => ctx.api.get(`contacts/${params.id}`), [params.id]);
     const contact = data && itemOf(data);
@@ -1289,6 +1318,18 @@
       [__("Mobile"), contactValue(contact, "mobile_phone"), resolveHref("tel:{mobile_phone}", contact)],
       [__("Phone"), contactValue(contact, "primary_phone"), resolveHref("tel:{primary_phone}", contact)]
     ].filter(([, value]) => value);
+    const optinNames = {
+      1: _x("Unconfirmed", "optin_status"),
+      2: _x("Confirmed", "optin_status"),
+      3: _x("Unsubscribed", "optin_status"),
+      4: _x("Subscribed Weekly", "optin_status"),
+      5: _x("Subscribed Monthly", "optin_status"),
+      6: _x("Bounced", "optin_status"),
+      7: _x("Spam", "optin_status"),
+      8: _x("Complained", "optin_status"),
+      9: _x("Blocked", "optin_status")
+    };
+    const optin = Number(contact.data.optin_status);
     const tags = (contact.tags || []).map((t3) => t3.data.tag_name);
     return /* @__PURE__ */ u3(M, { children: [
       /* @__PURE__ */ u3(Card, { children: [
@@ -1300,7 +1341,10 @@
         /* @__PURE__ */ u3(ContactActions, { contact, ctx }),
         tags.length ? /* @__PURE__ */ u3("div", { class: "ghm-tags", children: tags.map((t3) => /* @__PURE__ */ u3(Pill, { children: t3 }, t3)) }) : null
       ] }),
-      details.length ? /* @__PURE__ */ u3(Card, { title: __("Details"), children: /* @__PURE__ */ u3(List, { children: details.map(([label, value, href]) => /* @__PURE__ */ u3(ListItem, { title: value, subtitle: label, href: href || void 0 })) }) }) : null,
+      /* @__PURE__ */ u3(Card, { title: __("Details"), children: /* @__PURE__ */ u3(List, { children: [
+        details.map(([label, value, href]) => /* @__PURE__ */ u3(ListItem, { title: value, subtitle: label, href: href || void 0 }, label)),
+        /* @__PURE__ */ u3(ListItem, { title: __("Opt-in status"), meta: /* @__PURE__ */ u3(Pill, { color: optinColor(optin), children: optinNames[optin] || __("Unknown") }) })
+      ] }) }),
       registry.contributions("contact_panels").map((panel) => /* @__PURE__ */ u3(Card, { title: panel.label, children: /* @__PURE__ */ u3(Contribution, { point: "contact_panels", feature: panel.feature, id: panel.id, label: panel.label, contact }) }, `${panel.feature}/${panel.id}`))
     ] });
   }

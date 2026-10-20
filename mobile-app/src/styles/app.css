@@ -193,7 +193,7 @@ body.ghm {
 .ghm-note p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .ghm-note small { display: block; margin-top: 4px; color: var(--ghm-muted); }
 .ghm-note-form { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--ghm-border); align-items: flex-end; }
-.ghm-note-form .ghm-textarea { min-height: 44px; height: 44px; resize: none; }
+.ghm-note-form .ghm-textarea { min-height: 46px; height: 46px; resize: none; }
 
 .ghm-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 16px 14px; }
 
