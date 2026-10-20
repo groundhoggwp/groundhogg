@@ -1983,6 +1983,15 @@ body.groundhogg-admin-page[class*="gh-theme-"] .funnel-editor-header > svg {
   background-color: transparent;
 }
 
+/* The loading modal is just the spinner on the scrim: no card, border or shadow on any layer. */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-dialog.gh-modal-loading,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-dialog.gh-modal-loading .gh-modal-dialog-content,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-dialog.gh-modal-loading .gh-spinner-wrap {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Themes                                                                     */
 /* -------------------------------------------------------------------------- */
