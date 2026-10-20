@@ -8,6 +8,7 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\groundhogg_icon;
 use function Groundhogg\header_icon;
 use function Groundhogg\html;
+use function Groundhogg\white_labeled_name;
 
 /**
  * Abstract Admin Page
@@ -28,6 +29,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Tabbed_Admin_Page extends Admin_Page {
+
+	public function __construct() {
+		parent::__construct();
+
+		add_filter( 'groundhogg/command_palette/commands', [ $this, 'command_palette_tab_commands' ] );
+	}
+
+	/**
+	 * Add the tabs of the page to the command palette, which only knows about the page itself
+	 *
+	 * @param array $commands
+	 *
+	 * @return array
+	 */
+	public function command_palette_tab_commands( $commands ) {
+
+		if ( ! current_user_can( $this->get_cap() ) ) {
+			return $commands;
+		}
+
+		foreach ( $this->parsed_tabs() as $tab ) {
+
+			$name = wp_specialchars_decode( wp_strip_all_tags( $tab['name'] ) );
+
+			// a tab named after its page is the page itself, which the command palette already has
+			if ( ! $name || $name === $this->get_name() ) {
+				continue;
+			}
+
+			$commands[] = [
+				'name'  => 'groundhogg/' . $this->get_slug() . '/' . $tab['slug'],
+				/* translators: 1: plugin name, 2: admin page, 3: tab of the admin page */
+				'label' => sprintf( __( '%1$s %2$s › %3$s', 'groundhogg' ), white_labeled_name(), $this->get_name(), $name ),
+				'url'   => admin_page_url( $this->get_slug(), [ 'tab' => $tab['slug'] ] ),
+			];
+		}
+
+		return $commands;
+	}
 
 	/**
 	 * array of [ 'name', 'slug' ]
