@@ -107,6 +107,26 @@ export const Field = ( { label, children } ) => (
 )
 
 export const Input = props => <input class="ghm-input" { ...props }/>
+
+/**
+ * @param {{options: {value: string, label: string}[], placeholder?: string}} props
+ */
+export const Select = ( { options, placeholder, ...props } ) => (
+  <select class="ghm-select" { ...props }>
+    { placeholder !== undefined ? <option value="">{ placeholder }</option> : null }
+    { options.map( o => <option value={ o.value } key={ o.value }>{ o.label }</option> ) }
+  </select>
+)
+
+/**
+ * A removable label, for tags.
+ */
+export const Chip = ( { children, onRemove, removeLabel = 'Remove' } ) => (
+  <span class="ghm-chip">
+    { children }
+    { onRemove ? <button type="button" class="ghm-chip-x" aria-label={ `${ removeLabel } ${ typeof children === 'string' ? children : '' }`.trim() } onClick={ onRemove }><Icon name="close" size={ 14 }/></button> : null }
+  </span>
+)
 export const Textarea = props => <textarea class="ghm-textarea" { ...props }/>
 
 export const Segmented = ( { options, value, onChange } ) => (

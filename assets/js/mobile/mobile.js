@@ -584,6 +584,13 @@
     }
     return url + (url.includes("?") ? "&" : "?") + qs;
   }
+  function errorMessage(data) {
+    if (!data) {
+      return "";
+    }
+    const more = Array.isArray(data.additional_errors) ? data.additional_errors.map((e3) => e3 && e3.message).filter(Boolean) : [];
+    return more.length ? [...new Set(more)].join(" ") : data.message || "";
+  }
   function createApi({ root, nonce, nonceUrl, fetch: fetchFn = (...a3) => globalThis.fetch(...a3) }) {
     let currentNonce = nonce;
     let refreshing = null;
@@ -605,8 +612,12 @@
       const headers = { "X-WP-Nonce": currentNonce };
       const init = { method, headers, credentials: "same-origin" };
       if (body !== void 0) {
-        headers["Content-Type"] = "application/json";
-        init.body = JSON.stringify(body);
+        if (typeof FormData !== "undefined" && body instanceof FormData) {
+          init.body = body;
+        } else {
+          headers["Content-Type"] = "application/json";
+          init.body = JSON.stringify(body);
+        }
       }
       let res;
       try {
@@ -624,7 +635,7 @@
         return request(method, path, { query, body }, true);
       }
       if (!res.ok) {
-        throw new ApiError(data && data.message || `Request failed (${res.status}).`, {
+        throw new ApiError(errorMessage(data) || `Request failed (${res.status}).`, {
           status: res.status,
           code: data && data.code || "",
           data
@@ -640,6 +651,7 @@
       refreshNonce,
       get: (path, query) => request("GET", path, { query }),
       post: (path, body) => request("POST", path, { body }),
+      postForm: (path, formData) => request("POST", path, { body: formData }),
       patch: (path, body) => request("PATCH", path, { body }),
       put: (path, body) => request("PUT", path, { body }),
       delete: (path, body) => request("DELETE", path, { body })
@@ -879,6 +891,7 @@
     Avatar: () => Avatar,
     Button: () => Button,
     Card: () => Card,
+    Chip: () => Chip,
     Empty: () => Empty,
     ErrorMessage: () => ErrorMessage,
     Field: () => Field,
@@ -889,6 +902,7 @@
     Loading: () => Loading,
     Pill: () => Pill,
     Segmented: () => Segmented,
+    Select: () => Select,
     Sheet: () => Sheet,
     Skeleton: () => Skeleton,
     SkeletonList: () => SkeletonList,
@@ -1007,6 +1021,14 @@
     children
   ] });
   var Input = (props) => /* @__PURE__ */ u3("input", { class: "ghm-input", ...props });
+  var Select = ({ options, placeholder, ...props }) => /* @__PURE__ */ u3("select", { class: "ghm-select", ...props, children: [
+    placeholder !== void 0 ? /* @__PURE__ */ u3("option", { value: "", children: placeholder }) : null,
+    options.map((o4) => /* @__PURE__ */ u3("option", { value: o4.value, children: o4.label }, o4.value))
+  ] });
+  var Chip = ({ children, onRemove, removeLabel = "Remove" }) => /* @__PURE__ */ u3("span", { class: "ghm-chip", children: [
+    children,
+    onRemove ? /* @__PURE__ */ u3("button", { type: "button", class: "ghm-chip-x", "aria-label": `${removeLabel} ${typeof children === "string" ? children : ""}`.trim(), onClick: onRemove, children: /* @__PURE__ */ u3(Icon, { name: "close", size: 14 }) }) : null
+  ] });
   var Textarea = (props) => /* @__PURE__ */ u3("textarea", { class: "ghm-textarea", ...props });
   var Segmented = ({ options, value, onChange }) => /* @__PURE__ */ u3("div", { class: "ghm-seg", role: "tablist", children: options.map((o4) => /* @__PURE__ */ u3("button", { type: "button", role: "tab", "aria-selected": o4.value === value, class: o4.value === value ? "is-active" : "", onClick: () => onChange(o4.value), children: o4.label })) });
   var Sheet = ({ title, onClose, children }) => {
@@ -1036,6 +1058,17 @@
     const registry = createRegistry(manifest);
     const loader = createLoader(registry);
     const caps = manifest.caps || {};
+    const listeners = /* @__PURE__ */ new Map();
+    const on = (name, fn) => {
+      if (!listeners.has(name)) {
+        listeners.set(name, /* @__PURE__ */ new Set());
+      }
+      listeners.get(name).add(fn);
+      return () => listeners.get(name).delete(fn);
+    };
+    const emit = (name, payload) => {
+      (listeners.get(name) || []).forEach((fn) => fn(payload));
+    };
     const translations = manifest.i18n || {};
     const ctxCache = {};
     const ctxFor = (featureId = "core") => {
@@ -1050,6 +1083,9 @@
           user: manifest.user,
           app: manifest.app,
           can: (cap) => !!caps[cap],
+          locale: manifest.locale || "en",
+          on,
+          emit,
           get route() {
             return parseHash(window.location.hash);
           },
@@ -1172,6 +1208,108 @@
     }
   }
 
+  // src/core/fields.js
+  var EDIT_FIELDS = [
+    { key: "first_name", where: "data" },
+    { key: "last_name", where: "data" },
+    { key: "email", where: "data" },
+    { key: "mobile_phone", where: "meta" },
+    { key: "primary_phone", where: "meta" },
+    { key: "company_name", where: "meta" },
+    { key: "job_title", where: "meta" },
+    { key: "street_address_1", where: "meta" },
+    { key: "street_address_2", where: "meta" },
+    { key: "city", where: "meta" },
+    { key: "region", where: "meta" },
+    { key: "postal_zip", where: "meta" },
+    { key: "country", where: "meta" }
+  ];
+  var read = (contact, field) => {
+    const source = contact && contact[field.where] || {};
+    const value = source[field.key];
+    return value === void 0 || value === null ? "" : String(value).trim();
+  };
+  function initialValues(contact) {
+    return Object.fromEntries(EDIT_FIELDS.map((field) => [field.key, read(contact, field)]));
+  }
+  function changes(contact, values) {
+    const out = { data: {}, meta: {} };
+    for (const field of EDIT_FIELDS) {
+      if (!(field.key in values)) {
+        continue;
+      }
+      const next = String(values[field.key] ?? "").trim();
+      if (next !== read(contact, field)) {
+        out[field.where][field.key] = next;
+      }
+    }
+    return out;
+  }
+  var isEmpty = (change) => !Object.keys(change.data).length && !Object.keys(change.meta).length;
+  function formatAddress(contact, countryName2 = (code) => code) {
+    const meta = contact && contact.meta || {};
+    const get = (key) => String(meta[key] ?? "").trim();
+    const cityLine = [get("city"), [get("region"), get("postal_zip")].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+    const country = get("country");
+    return [get("street_address_1"), get("street_address_2"), cityLine, country ? countryName2(country) : ""].filter(Boolean).join(", ");
+  }
+
+  // src/core/countries.js
+  var COUNTRY_CODES = "AF AX AL DZ AS AD AO AI AQ AG AR AM AW AU AT AZ BS BH BD BB BY BE BZ BJ BM BT BO BQ BA BW BV BR IO BN BG BF BI CV KH CM CA KY CF TD CL CN CX CC CO KM CG CD CK CR CI HR CU CW CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FK FO FJ FI FR GF PF TF GA GM GE DE GH GI GR GL GD GP GU GT GG GN GW GY HT HM VA HN HK HU IS IN ID IR IQ IE IM IL IT JM JP JE JO KZ KE KI KP KR KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MQ MR MU YT MX FM MD MC MN ME MS MA MZ MM NA NR NP NL NC NZ NI NE NG NU NF MK MP NO OM PK PW PS PA PG PY PE PH PN PL PT PR QA RE RO RU RW BL SH KN LC MF PM VC WS SM ST SA SN RS SC SL SG SX SK SI SB SO ZA GS SS ES LK SD SR SJ SE CH SY TW TJ TZ TH TL TG TK TO TT TN TR TM TC TV UG UA AE GB US UM UY UZ VU VE VN VG VI WF EH YE ZM ZW".split(" ");
+  function countryName(code, locale = "en") {
+    code = String(code || "").trim().toUpperCase();
+    if (!code) {
+      return "";
+    }
+    try {
+      return new Intl.DisplayNames([locale], { type: "region" }).of(code) || code;
+    } catch (e3) {
+      return code;
+    }
+  }
+  function countryOptions(locale = "en", current = "") {
+    const codes = COUNTRY_CODES.includes(String(current).toUpperCase()) || !current ? COUNTRY_CODES : [...COUNTRY_CODES, current];
+    return codes.map((code) => ({ value: code, label: countryName(code, locale) })).sort((a3, b3) => a3.label.localeCompare(b3.label, locale));
+  }
+
+  // src/core/tags.js
+  var sameName = (a3, b3) => a3.toLowerCase() === b3.toLowerCase();
+  function resultingTags(current, added, removed) {
+    const kept = current.filter((t3) => !removed.includes(t3.id));
+    const extra = added.filter((a3) => !kept.some((t3) => a3.id && t3.id === a3.id || sameName(t3.name, a3.name)));
+    return [...kept, ...extra];
+  }
+  function hasTag(tags, tag) {
+    return tags.some((t3) => tag.id && t3.id === tag.id || sameName(t3.name, tag.name));
+  }
+  function tagPayload(current, added, removed) {
+    const remove_tags = removed.filter((id) => current.some((t3) => t3.id === id));
+    const add_tags = [];
+    const queuedNames = /* @__PURE__ */ new Set();
+    const queuedIds = /* @__PURE__ */ new Set();
+    for (const tag of added) {
+      const already = current.some((t3) => tag.id && t3.id === tag.id || sameName(t3.name, tag.name));
+      const queued = queuedIds.has(tag.id) || queuedNames.has(tag.name.toLowerCase());
+      const cancelsRemoval = tag.id && remove_tags.includes(tag.id);
+      if (cancelsRemoval) {
+        remove_tags.splice(remove_tags.indexOf(tag.id), 1);
+        continue;
+      }
+      if (!already && !queued) {
+        add_tags.push(tag.id || tag.name);
+        queuedNames.add(tag.name.toLowerCase());
+        if (tag.id) {
+          queuedIds.add(tag.id);
+        }
+      }
+    }
+    return { add_tags, remove_tags };
+  }
+  var isUnchanged = (payload) => !payload.add_tags.length && !payload.remove_tags.length;
+  function fromApi(tags) {
+    return (tags || []).map((t3) => ({ id: Number(t3.ID), name: String(t3.data && t3.data.tag_name || "") }));
+  }
+
   // src/util.js
   function useFetch(load, deps = []) {
     const [state, setState] = d2({ data: null, error: null, loading: true });
@@ -1228,6 +1366,132 @@
     const d3 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 9, 0);
     const pad = (n2) => String(n2).padStart(2, "0");
     return `${d3.getFullYear()}-${pad(d3.getMonth() + 1)}-${pad(d3.getDate())}T09:00`;
+  }
+
+  // src/views/edit.jsx
+  async function save(ctx, contact, body) {
+    const res = await ctx.api.patch(`contacts/${contact.ID}`, body);
+    ctx.emit("contact:changed", { id: contact.ID, item: itemOf(res) });
+  }
+  function EditContactSheet({ ctx, close, contact }) {
+    const { __ } = ctx.i18n;
+    const [values, setValues] = d2(() => initialValues(contact));
+    const [saving, setSaving] = d2(false);
+    const set = (key) => (e3) => setValues((v3) => ({ ...v3, [key]: e3.currentTarget.value }));
+    const submit = async (e3) => {
+      e3.preventDefault();
+      const diff = changes(contact, values);
+      if (isEmpty(diff)) {
+        close();
+        return;
+      }
+      setSaving(true);
+      try {
+        await save(ctx, contact, diff);
+        ctx.toast(__("Contact updated"));
+        close();
+      } catch (err) {
+        setSaving(false);
+        ctx.toast(err.message, "error");
+      }
+    };
+    const field = (key, label, props = {}) => /* @__PURE__ */ u3(Field, { label, children: /* @__PURE__ */ u3(Input, { value: values[key], onInput: set(key), ...props }) });
+    return /* @__PURE__ */ u3("form", { onSubmit: submit, children: [
+      /* @__PURE__ */ u3("div", { class: "ghm-form-group", children: [
+        /* @__PURE__ */ u3("h3", { children: __("Name") }),
+        /* @__PURE__ */ u3("div", { class: "ghm-form-row", children: [
+          field("first_name", __("First name"), { autocomplete: "given-name" }),
+          field("last_name", __("Last name"), { autocomplete: "family-name" })
+        ] })
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "ghm-form-group", children: [
+        /* @__PURE__ */ u3("h3", { children: __("Contact") }),
+        field("email", __("Email"), { type: "email", required: true, autocomplete: "email", inputmode: "email" }),
+        field("mobile_phone", __("Mobile phone"), { type: "tel", autocomplete: "tel", inputmode: "tel" }),
+        field("primary_phone", __("Phone"), { type: "tel", autocomplete: "tel", inputmode: "tel" })
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "ghm-form-group", children: [
+        /* @__PURE__ */ u3("h3", { children: __("Work") }),
+        field("company_name", __("Company"), { autocomplete: "organization" }),
+        field("job_title", __("Job title"), { autocomplete: "organization-title" })
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "ghm-form-group", children: [
+        /* @__PURE__ */ u3("h3", { children: __("Address") }),
+        field("street_address_1", __("Street address"), { autocomplete: "address-line1" }),
+        field("street_address_2", __("Address line 2"), { autocomplete: "address-line2" }),
+        /* @__PURE__ */ u3("div", { class: "ghm-form-row", children: [
+          field("city", __("City"), { autocomplete: "address-level2" }),
+          field("region", __("State / Region"), { autocomplete: "address-level1" })
+        ] }),
+        /* @__PURE__ */ u3("div", { class: "ghm-form-row", children: [
+          field("postal_zip", __("Postal code"), { autocomplete: "postal-code" }),
+          /* @__PURE__ */ u3(Field, { label: __("Country"), children: /* @__PURE__ */ u3(Select, { value: values.country, onChange: set("country"), options: countryOptions(ctx.locale, values.country), placeholder: "", autocomplete: "country" }) })
+        ] })
+      ] }),
+      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: saving ? __("Saving\u2026") : __("Save") })
+    ] });
+  }
+  function EditTagsSheet({ ctx, close, contact }) {
+    const { __, sprintf: sprintf2 } = ctx.i18n;
+    const current = fromApi(contact.tags);
+    const [added, setAdded] = d2([]);
+    const [removed, setRemoved] = d2([]);
+    const [query, setQuery] = d2("");
+    const [saving, setSaving] = d2(false);
+    const search = useDebounced(query.trim());
+    const { data, error, loading } = useFetch(() => ctx.api.get("tags", {
+      search: search || void 0,
+      orderby: "tag_name",
+      order: "ASC",
+      limit: 20
+    }), [search]);
+    const now = resultingTags(current, added, removed);
+    const payload = tagPayload(current, added, removed);
+    const options = fromApi(data && data.items).filter((t3) => !hasTag(now, t3));
+    const typed = query.trim();
+    const canCreate = typed && !fromApi(data && data.items).some((t3) => t3.name.toLowerCase() === typed.toLowerCase()) && !hasTag(now, { name: typed });
+    const add = (tag) => {
+      if (tag.id && removed.includes(tag.id)) {
+        setRemoved((r3) => r3.filter((id) => id !== tag.id));
+      } else {
+        setAdded((a3) => [...a3, tag]);
+      }
+      setQuery("");
+    };
+    const remove = (tag) => {
+      if (tag.id && current.some((t3) => t3.id === tag.id)) {
+        setRemoved((r3) => [...r3, tag.id]);
+      } else {
+        setAdded((a3) => a3.filter((t3) => t3.name.toLowerCase() !== tag.name.toLowerCase()));
+      }
+    };
+    const submit = async () => {
+      if (isUnchanged(payload)) {
+        close();
+        return;
+      }
+      setSaving(true);
+      try {
+        await save(ctx, contact, payload);
+        ctx.toast(__("Tags updated"));
+        close();
+      } catch (err) {
+        setSaving(false);
+        ctx.toast(err.message, "error");
+      }
+    };
+    return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3("div", { class: "ghm-chips", "aria-live": "polite", children: now.length ? now.map((t3) => /* @__PURE__ */ u3(Chip, { onRemove: () => remove(t3), removeLabel: __("Remove"), children: t3.name }, t3.id || t3.name)) : /* @__PURE__ */ u3("span", { class: "ghm-item-meta", children: __("No tags yet.") }) }),
+      /* @__PURE__ */ u3(Field, { label: __("Add a tag"), children: /* @__PURE__ */ u3(Input, { type: "search", value: query, onInput: (e3) => setQuery(e3.currentTarget.value), placeholder: __("Search or type a new tag"), enterkeyhint: "search", autocomplete: "off" }) }),
+      /* @__PURE__ */ u3(ErrorMessage, { error }),
+      loading && !options.length ? /* @__PURE__ */ u3(SkeletonList, { rows: 3 }) : null,
+      /* @__PURE__ */ u3(List, { children: [
+        canCreate ? /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "plus" }), title: sprintf2(__('Create "%s"'), typed), onClick: () => add({ name: typed }) }) : null,
+        options.map((t3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "plus" }), title: t3.name, onClick: () => add(t3) }, t3.id))
+      ] }),
+      !loading && !error && !options.length && !canCreate ? /* @__PURE__ */ u3(Empty, { children: typed ? __("No other tags match.") : __("No more tags to add.") }) : null,
+      /* @__PURE__ */ u3("div", { style: "margin-top:14px", children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, onClick: submit, disabled: saving, children: saving ? __("Saving\u2026") : __("Save tags") }) })
+    ] });
   }
 
   // src/views/contacts.jsx
@@ -1302,7 +1566,21 @@
     const { __, _x } = ctx.i18n;
     const { registry } = useRuntime();
     const { data, error, loading } = useFetch(() => ctx.api.get(`contacts/${params.id}`), [params.id]);
-    const contact = data && itemOf(data);
+    const [patched, setPatched] = d2(null);
+    const [version, setVersion] = d2(0);
+    A2(() => {
+      setPatched(null);
+      return ctx.on("contact:changed", ({ id, item }) => {
+        if (String(id) !== String(params.id)) {
+          return;
+        }
+        if (item) {
+          setPatched(item);
+        }
+        setVersion((v3) => v3 + 1);
+      });
+    }, [params.id]);
+    const contact = patched || data && itemOf(data);
     if (loading && !contact) {
       return /* @__PURE__ */ u3(Card, { "aria-busy": "true", children: [
         /* @__PURE__ */ u3("div", { class: "ghm-skel-stack", children: [
@@ -1317,10 +1595,14 @@
       return /* @__PURE__ */ u3(ErrorMessage, { error: error || { message: __("Contact not found.") } });
     }
     const name = contactName(contact);
+    const address = formatAddress(contact, (code) => countryName(code, ctx.locale));
     const details = [
       [__("Email"), contact.data.email, `mailto:${contact.data.email}`],
       [__("Mobile"), contactValue(contact, "mobile_phone"), resolveHref("tel:{mobile_phone}", contact)],
-      [__("Phone"), contactValue(contact, "primary_phone"), resolveHref("tel:{primary_phone}", contact)]
+      [__("Phone"), contactValue(contact, "primary_phone"), resolveHref("tel:{primary_phone}", contact)],
+      [__("Company"), contactValue(contact, "company_name")],
+      [__("Job title"), contactValue(contact, "job_title")],
+      [__("Address"), address]
     ].filter(([, value]) => value);
     const optinNames = {
       1: _x("Unconfirmed", "optin_status"),
@@ -1334,7 +1616,11 @@
       9: _x("Blocked", "optin_status")
     };
     const optin = Number(contact.data.optin_status);
-    const tags = (contact.tags || []).map((t3) => t3.data.tag_name);
+    const tags = fromApi(contact.tags);
+    const canEdit = ctx.can("edit_contacts");
+    const canTag = canEdit && ctx.can("manage_tags");
+    const editLink = canEdit ? /* @__PURE__ */ u3("button", { type: "button", class: "ghm-link-btn", onClick: () => ctx.sheet(EditContactSheet, { title: __("Edit contact"), contact }), children: __("Edit") }) : null;
+    const editTags = () => ctx.sheet(EditTagsSheet, { title: __("Tags"), contact });
     return /* @__PURE__ */ u3(M, { children: [
       /* @__PURE__ */ u3(Card, { children: [
         /* @__PURE__ */ u3("div", { class: "ghm-contact-head", children: [
@@ -1343,13 +1629,16 @@
           name !== contact.data.email ? /* @__PURE__ */ u3("p", { children: contact.data.email }) : null
         ] }),
         /* @__PURE__ */ u3(ContactActions, { contact, ctx }),
-        tags.length ? /* @__PURE__ */ u3("div", { class: "ghm-tags", children: tags.map((t3) => /* @__PURE__ */ u3(Pill, { children: t3 }, t3)) }) : null
+        tags.length || canTag ? /* @__PURE__ */ u3("div", { class: "ghm-tags-row", children: [
+          tags.map((t3) => /* @__PURE__ */ u3(Pill, { children: t3.name }, t3.id)),
+          canTag ? /* @__PURE__ */ u3("button", { type: "button", class: "ghm-link-btn", onClick: editTags, children: tags.length ? __("Edit tags") : __("Add tags") }) : null
+        ] }) : null
       ] }),
-      /* @__PURE__ */ u3(Card, { title: __("Details"), children: /* @__PURE__ */ u3(List, { children: [
+      /* @__PURE__ */ u3(Card, { title: __("Details"), action: editLink, children: /* @__PURE__ */ u3(List, { children: [
         details.map(([label, value, href]) => /* @__PURE__ */ u3(ListItem, { title: value, subtitle: label, href: href || void 0 }, label)),
         /* @__PURE__ */ u3(ListItem, { title: __("Opt-in status"), meta: /* @__PURE__ */ u3(Pill, { color: optinColor(optin), children: optinNames[optin] || __("Unknown") }) })
       ] }) }),
-      registry.contributions("contact_panels").map((panel) => /* @__PURE__ */ u3(Card, { title: panel.label, children: /* @__PURE__ */ u3(Contribution, { point: "contact_panels", feature: panel.feature, id: panel.id, label: panel.label, contact }) }, `${panel.feature}/${panel.id}`))
+      registry.contributions("contact_panels").map((panel) => /* @__PURE__ */ u3(Card, { title: panel.label, children: /* @__PURE__ */ u3(Contribution, { point: "contact_panels", feature: panel.feature, id: panel.id, label: panel.label, contact }) }, `${panel.feature}/${panel.id}/${version}`))
     ] });
   }
 
@@ -1426,7 +1715,7 @@
     const [content, setContent] = d2("");
     const [due, setDue] = d2(tomorrowMorning());
     const [saving, setSaving] = d2(false);
-    const save = async (e3) => {
+    const save2 = async (e3) => {
       e3.preventDefault();
       if (!content.trim()) {
         return;
@@ -1452,7 +1741,7 @@
         ctx.toast(err.message, "error");
       }
     };
-    return /* @__PURE__ */ u3("form", { onSubmit: save, children: [
+    return /* @__PURE__ */ u3("form", { onSubmit: save2, children: [
       /* @__PURE__ */ u3(Field, { label: __("What needs doing?"), children: /* @__PURE__ */ u3(Textarea, { value: content, onInput: (e3) => setContent(e3.currentTarget.value), required: true, autofocus: true }) }),
       /* @__PURE__ */ u3(Field, { label: __("Due"), children: /* @__PURE__ */ u3(Input, { type: "datetime-local", value: due, onInput: (e3) => setDue(e3.currentTarget.value) }) }),
       /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add task") })
@@ -1598,7 +1887,7 @@
     const [f3, setF] = d2({ first_name: "", last_name: "", email: "", mobile_phone: "" });
     const [saving, setSaving] = d2(false);
     const set = (key) => (e3) => setF((v3) => ({ ...v3, [key]: e3.currentTarget.value }));
-    const save = async (e3) => {
+    const save2 = async (e3) => {
       e3.preventDefault();
       setSaving(true);
       try {
@@ -1617,7 +1906,7 @@
         ctx.toast(err.message, "error");
       }
     };
-    return /* @__PURE__ */ u3("form", { onSubmit: save, children: [
+    return /* @__PURE__ */ u3("form", { onSubmit: save2, children: [
       /* @__PURE__ */ u3(Field, { label: __("First name"), children: /* @__PURE__ */ u3(Input, { value: f3.first_name, onInput: set("first_name"), autocomplete: "off", autofocus: true }) }),
       /* @__PURE__ */ u3(Field, { label: __("Last name"), children: /* @__PURE__ */ u3(Input, { value: f3.last_name, onInput: set("last_name"), autocomplete: "off" }) }),
       /* @__PURE__ */ u3(Field, { label: __("Email"), children: /* @__PURE__ */ u3(Input, { type: "email", value: f3.email, onInput: set("email"), required: true, autocomplete: "off" }) }),

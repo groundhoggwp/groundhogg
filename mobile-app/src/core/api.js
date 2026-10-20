@@ -57,6 +57,23 @@ export function buildUrl ( root, path, query ) {
   return url + ( url.includes( '?' ) ? '&' : '?' ) + qs
 }
 
+/**
+ * The message to show for an error response. When the server lists several errors (a form with two invalid fields),
+ * they are what the person needs to read, and the generic line above them ("Your submission has errors") is not.
+ *
+ * @param {object|null} data the error body
+ * @returns {string}
+ */
+export function errorMessage ( data ) {
+  if ( ! data ) {
+    return ''
+  }
+
+  const more = Array.isArray( data.additional_errors ) ? data.additional_errors.map( e => e && e.message ).filter( Boolean ) : []
+
+  return more.length ? [ ...new Set( more ) ].join( ' ' ) : ( data.message || '' )
+}
+
 export function createApi ( { root, nonce, nonceUrl, fetch: fetchFn = ( ...a ) => globalThis.fetch( ...a ) } ) {
   let currentNonce = nonce
   let refreshing = null
@@ -90,8 +107,13 @@ export function createApi ( { root, nonce, nonceUrl, fetch: fetchFn = ( ...a ) =
     const init = { method, headers, credentials: 'same-origin' }
 
     if ( body !== undefined ) {
-      headers[ 'Content-Type' ] = 'application/json'
-      init.body = JSON.stringify( body )
+      // a FormData (a submitted form, with any files) goes as it is, and the browser sets the multipart boundary
+      if ( typeof FormData !== 'undefined' && body instanceof FormData ) {
+        init.body = body
+      } else {
+        headers[ 'Content-Type' ] = 'application/json'
+        init.body = JSON.stringify( body )
+      }
     }
 
     let res
@@ -116,7 +138,7 @@ export function createApi ( { root, nonce, nonceUrl, fetch: fetchFn = ( ...a ) =
     }
 
     if ( ! res.ok ) {
-      throw new ApiError( ( data && data.message ) || `Request failed (${ res.status }).`, {
+      throw new ApiError( errorMessage( data ) || `Request failed (${ res.status }).`, {
         status: res.status,
         code: ( data && data.code ) || '',
         data,
@@ -135,6 +157,7 @@ export function createApi ( { root, nonce, nonceUrl, fetch: fetchFn = ( ...a ) =
     refreshNonce,
     get: ( path, query ) => request( 'GET', path, { query } ),
     post: ( path, body ) => request( 'POST', path, { body } ),
+    postForm: ( path, formData ) => request( 'POST', path, { body: formData } ),
     patch: ( path, body ) => request( 'PATCH', path, { body } ),
     put: ( path, body ) => request( 'PUT', path, { body } ),
     delete: ( path, body ) => request( 'DELETE', path, { body } ),

@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'preact/hooks'
-import { Avatar, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, Pill, Skeleton, SkeletonList } from '../ui/index.jsx'
+import { Avatar, Card, Chip, Empty, ErrorMessage, Icon, Input, List, ListItem, Pill, Skeleton, SkeletonList } from '../ui/index.jsx'
 import { Contribution } from '../contribution.jsx'
 import { useRuntime } from '../runtime.jsx'
 import { resolveHref, contactValue } from '../core/template.js'
 import { optinColor } from '../core/optin.js'
+import { formatAddress } from '../core/fields.js'
+import { countryName } from '../core/countries.js'
+import { fromApi } from '../core/tags.js'
+import { EditContactSheet, EditTagsSheet } from './edit.jsx'
 import { avatarUrl, contactName, itemOf, useDebounced, useFetch } from '../util.js'
 
 export const ContactRow = ( { contact } ) => {
@@ -99,7 +103,30 @@ export function ContactView ( { ctx, params } ) {
   const { registry } = useRuntime()
 
   const { data, error, loading } = useFetch( () => ctx.api.get( `contacts/${ params.id }` ), [ params.id ] )
-  const contact = data && itemOf( data )
+
+  // what a save sent back, which is the contact as it is now, shown without fetching it again
+  const [ patched, setPatched ] = useState( null )
+
+  // bumped when something changes, so the panels under the contact (activity, notes) load again
+  const [ version, setVersion ] = useState( 0 )
+
+  useEffect( () => {
+    setPatched( null )
+
+    return ctx.on( 'contact:changed', ( { id, item } ) => {
+      if ( String( id ) !== String( params.id ) ) {
+        return
+      }
+
+      if ( item ) {
+        setPatched( item )
+      }
+
+      setVersion( v => v + 1 )
+    } )
+  }, [ params.id ] )
+
+  const contact = patched || ( data && itemOf( data ) )
 
   if ( loading && ! contact ) {
     return (
@@ -115,10 +142,15 @@ export function ContactView ( { ctx, params } ) {
   }
 
   const name = contactName( contact )
+  const address = formatAddress( contact, code => countryName( code, ctx.locale ) )
+
   const details = [
     [ __( 'Email' ), contact.data.email, `mailto:${ contact.data.email }` ],
     [ __( 'Mobile' ), contactValue( contact, 'mobile_phone' ), resolveHref( 'tel:{mobile_phone}', contact ) ],
     [ __( 'Phone' ), contactValue( contact, 'primary_phone' ), resolveHref( 'tel:{primary_phone}', contact ) ],
+    [ __( 'Company' ), contactValue( contact, 'company_name' ) ],
+    [ __( 'Job title' ), contactValue( contact, 'job_title' ) ],
+    [ __( 'Address' ), address ],
   ].filter( ( [ , value ] ) => value )
 
   // the names match the ones the desktop app shows, so they come with the same translations
@@ -135,8 +167,17 @@ export function ContactView ( { ctx, params } ) {
   }
 
   const optin = Number( contact.data.optin_status )
+  const tags = fromApi( contact.tags )
 
-  const tags = ( contact.tags || [] ).map( t => t.data.tag_name )
+  // the server has the last word on whether this particular contact can be edited
+  const canEdit = ctx.can( 'edit_contacts' )
+  const canTag = canEdit && ctx.can( 'manage_tags' )
+
+  const editLink = canEdit
+    ? <button type="button" class="ghm-link-btn" onClick={ () => ctx.sheet( EditContactSheet, { title: __( 'Edit contact' ), contact } ) }>{ __( 'Edit' ) }</button>
+    : null
+
+  const editTags = () => ctx.sheet( EditTagsSheet, { title: __( 'Tags' ), contact } )
 
   return (
     <>
@@ -147,16 +188,21 @@ export function ContactView ( { ctx, params } ) {
           { name !== contact.data.email ? <p>{ contact.data.email }</p> : null }
         </div>
         <ContactActions contact={ contact } ctx={ ctx }/>
-        { tags.length ? <div class="ghm-tags">{ tags.map( t => <Pill key={ t }>{ t }</Pill> ) }</div> : null }
+        { tags.length || canTag ? (
+          <div class="ghm-tags-row">
+            { tags.map( t => <Pill key={ t.id }>{ t.name }</Pill> ) }
+            { canTag ? <button type="button" class="ghm-link-btn" onClick={ editTags }>{ tags.length ? __( 'Edit tags' ) : __( 'Add tags' ) }</button> : null }
+          </div>
+        ) : null }
       </Card>
 
-      <Card title={ __( 'Details' ) }><List>
+      <Card title={ __( 'Details' ) } action={ editLink }><List>
         { details.map( ( [ label, value, href ] ) => <ListItem title={ value } subtitle={ label } href={ href || undefined } key={ label }/> ) }
         <ListItem title={ __( 'Opt-in status' ) } meta={ <Pill color={ optinColor( optin ) }>{ optinNames[ optin ] || __( 'Unknown' ) }</Pill> }/>
       </List></Card>
 
       { registry.contributions( 'contact_panels' ).map( panel => (
-        <Card title={ panel.label } key={ `${ panel.feature }/${ panel.id }` }>
+        <Card title={ panel.label } key={ `${ panel.feature }/${ panel.id }/${ version }` }>
           <Contribution point="contact_panels" feature={ panel.feature } id={ panel.id } label={ panel.label } contact={ contact }/>
         </Card>
       ) ) }

@@ -26,6 +26,23 @@ export function createRuntime ( manifest, shell = {} ) {
   const loader = createLoader( registry )
 
   const caps = manifest.caps || {}
+
+  // a small event bus, so a sheet can tell the screen beneath it that something changed (a contact was edited)
+  const listeners = new Map()
+
+  const on = ( name, fn ) => {
+    if ( ! listeners.has( name ) ) {
+      listeners.set( name, new Set() )
+    }
+
+    listeners.get( name ).add( fn )
+
+    return () => listeners.get( name ).delete( fn )
+  }
+
+  const emit = ( name, payload ) => {
+    ( listeners.get( name ) || [] ).forEach( fn => fn( payload ) )
+  }
   const translations = manifest.i18n || {}
   const ctxCache = {}
 
@@ -46,6 +63,9 @@ export function createRuntime ( manifest, shell = {} ) {
         user: manifest.user,
         app: manifest.app,
         can: cap => !! caps[ cap ],
+        locale: manifest.locale || 'en',
+        on,
+        emit,
         get route () { return parseHash( window.location.hash ) },
         navigate: ( path, query ) => {
           window.location.hash = toHash( path, query )
