@@ -27,6 +27,7 @@ class Manifest {
 		'edit_contacts',
 		'view_others_contacts',
 		'send_emails',
+		'view_emails',
 		'view_notes',
 		'add_notes',
 		'view_tasks',

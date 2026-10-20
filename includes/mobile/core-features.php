@@ -79,10 +79,10 @@ class Core_Features {
 					'priority' => 20,
 				],
 				[
+					// no href: the app opens a sheet to choose between the phone's email app, writing one here, or a saved email
 					'id'       => 'email',
 					'label'    => __( 'Email', 'groundhogg' ),
 					'icon'     => 'mail',
-					'href'     => 'mailto:{email}',
 					'priority' => 30,
 				],
 			],

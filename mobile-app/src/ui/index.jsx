@@ -24,7 +24,7 @@ export const List = ( { children } ) => <ul class="ghm-list">{ children }</ul>
  * A row. With an href or onClick it is tappable. `control` is an interactive element (a checkbox) that sits
  * beside the tappable part rather than inside it, since a button can't live inside a link.
  */
-export const ListItem = ( { title, subtitle, meta, leading, trailing, control, href, onClick } ) => {
+export const ListItem = ( { title, subtitle, meta, leading, trailing, control, href, onClick, disabled } ) => {
   const body = (
     <>
       { leading }
@@ -39,7 +39,9 @@ export const ListItem = ( { title, subtitle, meta, leading, trailing, control, h
 
   let row
 
-  if ( href ) {
+  if ( disabled ) {
+    row = <div class="ghm-item is-disabled" aria-disabled="true">{ body }</div>
+  } else if ( href ) {
     row = <a class="ghm-item" href={ href }>{ body }</a>
   } else if ( onClick ) {
     row = <button type="button" class="ghm-item" onClick={ onClick }>{ body }</button>

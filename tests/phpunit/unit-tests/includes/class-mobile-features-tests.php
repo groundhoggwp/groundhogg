@@ -92,6 +92,19 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 		$this->assertSame( [ 'call', 'text', 'email' ], array_column( $visible['features']['core']['contact_actions'], 'id' ) );
 	}
 
+	/**
+	 * Call and text are plain links. Email isn't: the app offers a choice of the phone's email app, writing one in
+	 * the app, or a saved email, so it has no href and is handled in JS.
+	 */
+	public function test_call_and_text_are_links_and_email_is_a_handler_action() {
+		$actions = ( new Features() )->for_user( $this->user_with_role( 'sales_rep' ) )['features']['core']['contact_actions'];
+		$by_id   = array_column( $actions, null, 'id' );
+
+		$this->assertStringStartsWith( 'tel:', $by_id['call']['href'] );
+		$this->assertStringStartsWith( 'sms:', $by_id['text']['href'] );
+		$this->assertArrayNotHasKey( 'href', $by_id['email'] );
+	}
+
 	public function test_sales_reps_and_managers_get_the_app() {
 		foreach ( [ 'sales_rep', 'sales_manager', 'marketer' ] as $role ) {
 			$visible = ( new Features() )->for_user( $this->user_with_role( $role ) );
@@ -266,6 +279,22 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 
 		$this->assertArrayNotHasKey( 'manage_options', $caps );
 		$this->assertArrayNotHasKey( 'install_plugins', $caps );
+	}
+
+	/**
+	 * The email sheet decides which options to offer from these.
+	 */
+	public function test_manifest_caps_say_whether_the_user_can_send_and_view_emails() {
+		wp_set_current_user( $this->user_with_role( 'sales_rep' ) );
+
+		$caps = Manifest::build()['caps'];
+
+		$this->assertTrue( $caps['send_emails'] );
+		$this->assertTrue( $caps['view_emails'] );
+
+		wp_set_current_user( $this->user_with_role( 'subscriber' ) );
+
+		$this->assertFalse( Manifest::build()['caps']['send_emails'] );
 	}
 
 	public function test_manifest_caps_include_those_mentioned_by_visible_registrations() {

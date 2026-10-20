@@ -187,3 +187,15 @@ test( 'i18n falls back to the original text and uses locale data when present', 
   assert.equal( es._n( '%d task', '%d tasks', 1 ), '%d tarea' )
   assert.equal( es._n( '%d task', '%d tasks', 5 ), '%d tareas' )
 })
+
+// ---- text ------------------------------------------------------------------------------------------------------
+
+import { escapeHtml, plainToHtml } from '../src/core/text.js'
+
+test( 'plainToHtml makes paragraphs and line breaks, and nothing typed can be markup', () => {
+  assert.equal( plainToHtml( 'Hi {first},\n\nCall me.\nThanks' ), '<p>Hi {first},</p>\n<p>Call me.<br>Thanks</p>' )
+  assert.equal( plainToHtml( '  \n\n ' ), '' )
+  assert.equal( plainToHtml( 'a\r\n\r\nb' ), '<p>a</p>\n<p>b</p>' )
+  assert.equal( plainToHtml( '<script>alert("x")</script> & more' ), '<p>&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; more</p>' )
+  assert.equal( escapeHtml( `'` ), '&#039;' )
+})

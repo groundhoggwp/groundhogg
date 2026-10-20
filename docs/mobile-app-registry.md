@@ -167,6 +167,13 @@ Buttons on the contact's action bar. Two kinds:
 menu. Core's call and text are plain declarative actions, so the simplest-possible calling and texting is the same
 mechanism add-ons use.
 
+Email is a handler action, because it is a choice and not a link. Tapping it opens a sheet offering three things:
+the phone's own email app (a `mailto:` link), writing an email in the app, or sending one of the site's saved
+Groundhogg emails (with a confirmation step before it goes). The last two use the same endpoints as the desktop
+app (`emails/send`, `emails/{id}/send`), so sender, logging and recipient permissions are the site's own. They need
+`send_emails` (and `view_emails` for saved emails) and a contact who can receive email, and the sheet hides or
+disables them otherwise. Writing in the app records an outbound message on the contact.
+
 ### 5.5 Search providers (`search_providers`)
 
 Contribute results to the global search. PHP declares the provider and the route a result opens. JS side:

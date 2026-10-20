@@ -948,7 +948,7 @@
     children
   ] });
   var List = ({ children }) => /* @__PURE__ */ u3("ul", { class: "ghm-list", children });
-  var ListItem = ({ title, subtitle, meta, leading, trailing, control, href, onClick }) => {
+  var ListItem = ({ title, subtitle, meta, leading, trailing, control, href, onClick, disabled }) => {
     const body = /* @__PURE__ */ u3(M, { children: [
       leading,
       /* @__PURE__ */ u3("div", { class: "ghm-item-body", children: [
@@ -959,7 +959,9 @@
       trailing
     ] });
     let row;
-    if (href) {
+    if (disabled) {
+      row = /* @__PURE__ */ u3("div", { class: "ghm-item is-disabled", "aria-disabled": "true", children: body });
+    } else if (href) {
       row = /* @__PURE__ */ u3("a", { class: "ghm-item", href, children: body });
     } else if (onClick) {
       row = /* @__PURE__ */ u3("button", { type: "button", class: "ghm-item", onClick, children: body });
@@ -1539,6 +1541,159 @@
     ] });
   }
 
+  // src/core/text.js
+  function escapeHtml(text) {
+    return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+  function plainToHtml(text) {
+    return String(text || "").replace(/\r\n?/g, "\n").trim().split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean).map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`).join("\n");
+  }
+
+  // src/views/email.jsx
+  function openEmail({ contact, ctx }) {
+    ctx.sheet(EmailSheet, { title: ctx.i18n.__("Email"), contact });
+  }
+  var BackButton = ({ onClick, label }) => /* @__PURE__ */ u3("div", { style: "margin:-6px 0 10px", children: /* @__PURE__ */ u3(Button, { icon: "back", onClick, children: label }) });
+  function EmailSheet({ ctx, close, contact }) {
+    const { __ } = ctx.i18n;
+    const [view, setView] = d2({ name: "menu" });
+    const back = () => setView({ name: "menu" });
+    if (view.name === "compose") {
+      return /* @__PURE__ */ u3(Compose, { ctx, close, contact, back });
+    }
+    if (view.name === "templates") {
+      return /* @__PURE__ */ u3(Templates, { ctx, close, contact, back });
+    }
+    const mailto = resolveHref("mailto:{email}", contact);
+    const canSend = ctx.can("send_emails");
+    const deliverable = contact.is_deliverable !== false;
+    const blocked = canSend && !deliverable ? __("This contact can't receive email.") : "";
+    return /* @__PURE__ */ u3(List, { children: [
+      /* @__PURE__ */ u3(
+        ListItem,
+        {
+          leading: /* @__PURE__ */ u3(Icon, { name: "external" }),
+          title: __("Use your email app"),
+          subtitle: contact.data.email,
+          href: mailto || void 0,
+          disabled: !mailto
+        }
+      ),
+      canSend ? /* @__PURE__ */ u3(
+        ListItem,
+        {
+          leading: /* @__PURE__ */ u3(Icon, { name: "mail" }),
+          title: __("Write an email here"),
+          subtitle: blocked || __("Sent from the site and saved to their record."),
+          onClick: blocked ? void 0 : () => setView({ name: "compose" }),
+          disabled: !!blocked
+        }
+      ) : null,
+      canSend && ctx.can("view_emails") ? /* @__PURE__ */ u3(
+        ListItem,
+        {
+          leading: /* @__PURE__ */ u3(Icon, { name: "note" }),
+          title: __("Send a Groundhogg email"),
+          subtitle: blocked || __("Pick one of your saved emails."),
+          onClick: blocked ? void 0 : () => setView({ name: "templates" }),
+          disabled: !!blocked
+        }
+      ) : null
+    ] });
+  }
+  function Compose({ ctx, close, contact, back }) {
+    const { __ } = ctx.i18n;
+    const [subject, setSubject] = d2("");
+    const [body, setBody] = d2("");
+    const [sending, setSending] = d2(false);
+    const ready = subject.trim() && body.trim();
+    const send = async (e3) => {
+      e3.preventDefault();
+      if (!ready) {
+        return;
+      }
+      setSending(true);
+      try {
+        await ctx.api.post("emails/send", {
+          to: [contact.data.email],
+          subject: subject.trim(),
+          content: plainToHtml(body)
+        });
+        ctx.toast(__("Email sent"));
+        close();
+      } catch (err) {
+        setSending(false);
+        ctx.toast(err.message, "error");
+      }
+    };
+    return /* @__PURE__ */ u3("form", { onSubmit: send, children: [
+      /* @__PURE__ */ u3(BackButton, { onClick: back, label: __("Back") }),
+      /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin-bottom:12px", children: [
+        __("To"),
+        ": ",
+        contactName(contact),
+        " <",
+        contact.data.email,
+        ">"
+      ] }),
+      /* @__PURE__ */ u3(Field, { label: __("Subject"), children: /* @__PURE__ */ u3(Input, { value: subject, onInput: (e3) => setSubject(e3.currentTarget.value), required: true, autofocus: true }) }),
+      /* @__PURE__ */ u3(Field, { label: __("Message"), children: /* @__PURE__ */ u3(Textarea, { style: "min-height:160px", value: body, onInput: (e3) => setBody(e3.currentTarget.value), required: true }) }),
+      /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin:-6px 0 14px", children: __("Merge tags like {first} are filled in when it is sent.") }),
+      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: sending || !ready, children: sending ? __("Sending\u2026") : __("Send email") })
+    ] });
+  }
+  function Templates({ ctx, close, contact, back }) {
+    const { __ } = ctx.i18n;
+    const [query, setQuery] = d2("");
+    const [picked, setPicked] = d2(null);
+    const search = useDebounced(query.trim());
+    const { data, error, loading } = useFetch(() => ctx.api.get("emails", {
+      status: "ready",
+      message_type: ["marketing", "transactional"],
+      search: search || void 0,
+      orderby: "title",
+      order: "ASC",
+      limit: 30,
+      select: ["ID", "title", "subject", "message_type"]
+    }), [search]);
+    const emails = data && data.items || [];
+    if (picked) {
+      return /* @__PURE__ */ u3(ConfirmTemplate, { ctx, close, contact, email: picked, back: () => setPicked(null) });
+    }
+    return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3(BackButton, { onClick: back, label: __("Back") }),
+      /* @__PURE__ */ u3("div", { style: "margin-bottom:12px", children: /* @__PURE__ */ u3(Input, { type: "search", placeholder: __("Search your emails"), "aria-label": __("Search your emails"), value: query, onInput: (e3) => setQuery(e3.currentTarget.value), enterkeyhint: "search" }) }),
+      /* @__PURE__ */ u3(ErrorMessage, { error }),
+      loading && !emails.length ? /* @__PURE__ */ u3(SkeletonList, { rows: 5 }) : null,
+      !loading && !error && !emails.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No emails found.") : __("You have no emails ready to send.") }) : null,
+      emails.length ? /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: emails.map((e3) => /* @__PURE__ */ u3(ListItem, { title: e3.data.title || e3.data.subject, subtitle: e3.data.subject, onClick: () => setPicked(e3), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, e3.ID)) }) }) : null
+    ] });
+  }
+  function ConfirmTemplate({ ctx, close, contact, email, back }) {
+    const { __ } = ctx.i18n;
+    const [sending, setSending] = d2(false);
+    const send = async () => {
+      setSending(true);
+      try {
+        await ctx.api.post(`emails/${email.ID}/send`, { to: contact.ID });
+        ctx.toast(__("Email sent"));
+        close();
+      } catch (err) {
+        setSending(false);
+        ctx.toast(err.message, "error");
+      }
+    };
+    return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3(BackButton, { onClick: back, label: __("Back") }),
+      /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: [
+        /* @__PURE__ */ u3(ListItem, { title: email.data.title || email.data.subject, subtitle: __("Email") }),
+        /* @__PURE__ */ u3(ListItem, { title: email.data.subject, subtitle: __("Subject") }),
+        /* @__PURE__ */ u3(ListItem, { title: contactName(contact), subtitle: contact.data.email })
+      ] }) }),
+      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, onClick: send, disabled: sending, children: sending ? __("Sending\u2026") : __("Send now") })
+    ] });
+  }
+
   // src/features/core.jsx
   function registerCore() {
     return window.GroundhoggMobile.register("core", {
@@ -1552,6 +1707,9 @@
       homeCards: {
         "my-tasks": MyTasksCard,
         "recent-contacts": RecentContactsCard
+      },
+      contactActions: {
+        email: openEmail
       },
       contactPanels: {
         notes: NotesPanel,
