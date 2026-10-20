@@ -321,6 +321,8 @@ class Plugin {
 
 		if ( is_admin() ) {
 			$this->admin = new Admin_Menu();
+
+			new Command_Palette();
 		}
 
 		// Goes last to ensure everything is installed before running...

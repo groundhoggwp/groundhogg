@@ -32,6 +32,7 @@ class Autoloader {
 	private static $classes_map = [
 		'Notices'                           => 'includes/notices.php',
 		'Scripts'                           => 'includes/scripts.php',
+		'Command_Palette'                   => 'includes/command-palette.php',
 		'Preferences'                       => 'includes/preferences.php',
 		'Tracking'                          => 'includes/tracking.php',
 		'Rewrites'                          => 'includes/rewrites.php',

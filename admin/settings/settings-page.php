@@ -94,6 +94,7 @@ class Settings_Page extends Admin_Page {
 		add_action( 'admin_init', array( $this, 'register_sections' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( "groundhogg/admin/settings/api_tab/after_form", [ $this, 'api_keys_table' ] );
+		add_filter( 'groundhogg/command_palette/commands', [ $this, 'command_palette_commands' ] );
 
 		Incoming_Messages::init();
 	}
@@ -1978,6 +1979,127 @@ class Settings_Page extends Admin_Page {
 	}
 
 	/**
+	 * Whether a tab shows in the navigation for the current user
+	 *
+	 * @param array $tab
+	 *
+	 * @return bool
+	 */
+	private function tab_is_listed( $tab ) {
+
+		// Force API Tab & Licenses Tab
+		if ( ! $this->tab_has_settings( $tab['id'] ) && ! in_array( $tab['id'], [
+				'extensions',
+				'api_tab'
+			] ) ) {
+			return false;
+		}
+
+		// Check for cap restriction on the tab...
+		$cap = get_array_var( $tab, 'cap' );
+
+		// ignore if there is no cap, but if there is one check if the user has required privileges...
+		return ! $cap || current_user_can( $cap );
+	}
+
+	/**
+	 * The id of the anchor placed in front of a setting so it can be linked to
+	 *
+	 * @param string $id the setting ID
+	 *
+	 * @return string
+	 */
+	public static function setting_anchor( $id ) {
+		return 'setting-' . sanitize_key( $id );
+	}
+
+	/**
+	 * Add the settings to the command palette, so they can be found from anywhere in the admin
+	 *
+	 * @param array $commands
+	 *
+	 * @return array
+	 */
+	public function command_palette_commands( $commands ) {
+
+		// settings are not initialized yet, or the user can't use the settings page
+		if ( ! is_array( $this->tabs ) || ! current_user_can( $this->get_cap() ) ) {
+			return $commands;
+		}
+
+		$brand = white_labeled_name();
+
+		// Content that is not made of registered settings, so it can still be found by what is on it
+		$tab_keywords = [
+			'api_tab'    => [
+				__( 'Application Passwords', 'groundhogg' ),
+				__( 'API Keys', 'groundhogg' ),
+				__( 'REST API', 'groundhogg' ),
+				__( 'Authentication', 'groundhogg' ),
+			],
+			'extensions' => [
+				__( 'License', 'groundhogg' ),
+				__( 'Extensions', 'groundhogg' ),
+				__( 'Add-ons', 'groundhogg' ),
+			],
+		];
+
+		$tab_titles = [];
+
+		foreach ( $this->tabs as $tab ) {
+
+			if ( ! $this->tab_is_listed( $tab ) ) {
+				continue;
+			}
+
+			$tab_titles[ $tab['id'] ] = $tab['title'];
+
+			$section_titles = array_column( array_filter( $this->sections, function ( $section ) use ( $tab ) {
+				return $section['tab'] === $tab['id'];
+			} ), 'title' );
+
+			$commands[] = [
+				'name'     => 'groundhogg/settings/' . $tab['id'],
+				/* translators: 1: plugin name, 2: settings tab */
+				'label'    => sprintf( __( '%1$s Settings › %2$s', 'groundhogg' ), $brand, $tab['title'] ),
+				'keywords' => array_merge( $section_titles, get_array_var( $tab_keywords, $tab['id'], [] ) ),
+				'url'      => admin_page_url( $this->get_slug(), [ 'tab' => $tab['id'] ] ),
+			];
+		}
+
+		foreach ( $this->settings as $id => $setting ) {
+
+			$label   = wp_specialchars_decode( wp_strip_all_tags( get_array_var( $setting, 'label', '' ) ) );
+			$section = get_array_var( $this->sections, get_array_var( $setting, 'section' ) );
+
+			// hidden fields and buttons can't be found, and neither can anything that is not displayed
+			if ( ! $label || ! $section || ! isset( $tab_titles[ $section['tab'] ] ) || in_array( get_array_var( $setting, 'type' ), [
+					'hidden',
+					'submit'
+				] ) ) {
+				continue;
+			}
+
+			// defined in wp-config.php, so there is nothing to change
+			if ( maybe_get_option_from_constant( null, $id ) !== null && has_constant_support( $id ) ) {
+				continue;
+			}
+
+			$desc = wp_trim_words( wp_specialchars_decode( wp_strip_all_tags( get_array_var( $setting, 'desc', '' ) ) ), 25 );
+
+			$commands[] = [
+				'name'     => 'groundhogg/settings/' . $id,
+				/* translators: 1: plugin name, 2: settings tab, 3: setting name */
+				'label'    => sprintf( __( '%1$s Settings › %2$s › %3$s', 'groundhogg' ), $brand, $tab_titles[ $section['tab'] ], $label ),
+				'keywords' => array_merge( [ $section['title'], $desc ], (array) get_array_var( $setting, 'keywords', [] ) ),
+				'url'      => admin_page_url( $this->get_slug(), [ 'tab' => $section['tab'] ], self::setting_anchor( $id ) ),
+			];
+		}
+
+		return $commands;
+	}
+
+	/**
 	 * @param $tab
 	 *
 	 * @return bool
@@ -2007,19 +2129,7 @@ class Settings_Page extends Admin_Page {
         <h2 class="gh-nav nav-tab-wrapper">
 			<?php foreach ( $this->tabs as $id => $tab ):
 
-				// Force API Tab & Licenses Tab
-				if ( ! $this->tab_has_settings( $tab['id'] ) && ! in_array( $tab['id'], [
-						'extensions',
-						'api_tab'
-					] ) ) {
-					continue;
-				}
-
-				// Check for cap restriction on the tab...
-				$cap = get_array_var( $tab, 'cap' );
-
-				// ignore if there is no cap, but if there is one check if the user has required privileges...
-				if ( $cap && ! current_user_can( $cap ) ) {
+				if ( ! $this->tab_is_listed( $tab ) ) {
 					continue;
 				}
 
@@ -2070,6 +2180,27 @@ class Settings_Page extends Admin_Page {
             td .select2 {
                 max-width: 300px;
             }
+
+            /* Settings linked to from the command palette */
+            .gh-setting-anchor {
+                display: block;
+                height: 0;
+                scroll-margin-top: 120px;
+            }
+
+            tr:has(.gh-setting-anchor:target) > th,
+            tr:has(.gh-setting-anchor:target) > td {
+                animation: gh-setting-flash 2.4s ease-out;
+            }
+
+            @keyframes gh-setting-flash {
+                0%, 40% {
+                    background-color: rgba(255, 200, 0, .3);
+                }
+                100% {
+                    background-color: transparent;
+                }
+            }
         </style>
         <div class="wrap">
 			<?php
@@ -2105,6 +2236,9 @@ class Settings_Page extends Admin_Page {
 	}
 
 	public function settings_callback( $field ) {
+
+		// anchor so the setting can be linked to, for example from the command palette
+		printf( '<span id="%s" class="gh-setting-anchor"></span>', esc_attr( self::setting_anchor( $field['id'] ) ) );
 
 		$constant_value = maybe_get_option_from_constant( null, $field['id'] );
 

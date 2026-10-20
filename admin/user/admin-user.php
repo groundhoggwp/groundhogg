@@ -31,6 +31,86 @@ class Admin_User {
 
 		add_filter( 'admin_body_class', [ $this, 'theme_body_class' ], 20 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_theme' ], 100 );
+
+		add_filter( 'groundhogg/command_palette/commands', [ $this, 'command_palette_commands' ] );
+		add_action( 'wp_ajax_gh_set_admin_theme', [ $this, 'ajax_set_theme' ] );
+	}
+
+	/**
+	 * Save the interface theme a user picked
+	 *
+	 * @param int    $user_id
+	 * @param string $theme the slug of the theme, anything unknown or the default removes it
+	 *
+	 * @return void
+	 */
+	protected function save_theme( $user_id, $theme ) {
+
+		$theme = sanitize_key( $theme );
+
+		if ( $theme && $theme !== 'default' && array_key_exists( $theme, self::get_themes() ) ) {
+			update_user_meta( $user_id, 'gh_admin_theme', $theme );
+		} else {
+			delete_user_meta( $user_id, 'gh_admin_theme' );
+		}
+	}
+
+	/**
+	 * Add changing the interface theme to the command palette
+	 *
+	 * @param array $commands
+	 *
+	 * @return array
+	 */
+	public function command_palette_commands( $commands ) {
+
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			return $commands;
+		}
+
+		$nonce      = wp_create_nonce( 'gh_set_admin_theme' );
+		$stylesheet = add_query_arg( 'ver', GROUNDHOGG_VERSION, GROUNDHOGG_ASSETS_URL . 'css/admin/themes.css' );
+
+		foreach ( self::get_themes() as $slug => $label ) {
+			$commands[] = [
+				'name'     => 'groundhogg/theme/' . $slug,
+				/* translators: 1: plugin name, 2: name of the interface theme */
+				'label'    => sprintf( __( '%1$s Theme: %2$s', 'groundhogg' ), white_labeled_name(), $label ),
+				'keywords' => [
+					__( 'Interface', 'groundhogg' ),
+					__( 'Appearance', 'groundhogg' ),
+					__( 'Dark mode', 'groundhogg' ),
+					__( 'Light mode', 'groundhogg' ),
+				],
+				'category' => 'command',
+				'action'   => 'set_admin_theme',
+				'args'     => [
+					'theme'      => $slug,
+					'nonce'      => $nonce,
+					'stylesheet' => $stylesheet,
+				],
+			];
+		}
+
+		return $commands;
+	}
+
+	/**
+	 * Save the interface theme of the current user from the command palette
+	 */
+	public function ajax_set_theme() {
+
+		check_ajax_referer( 'gh_set_admin_theme' );
+
+		$theme = sanitize_key( get_post_var( 'theme' ) );
+
+		if ( ! current_user_can( 'view_contacts' ) || ! array_key_exists( $theme, self::get_themes() ) ) {
+			wp_send_json_error( null, 400 );
+		}
+
+		$this->save_theme( get_current_user_id(), $theme );
+
+		wp_send_json_success( [ 'theme' => $theme ] );
 	}
 
 	/**
@@ -284,13 +364,7 @@ class Admin_User {
 		update_user_meta( $user_id, 'gh_from_name', sanitize_text_field( get_post_var( 'gh_from_name' ) ) );
 		update_user_meta( $user_id, 'gh_from_email', sanitize_email( get_post_var( 'gh_from_email' ) ) );
 
-		$theme = sanitize_key( get_post_var( 'gh_admin_theme' ) );
-
-		if ( $theme && $theme !== 'default' && array_key_exists( $theme, self::get_themes() ) ) {
-			update_user_meta( $user_id, 'gh_admin_theme', $theme );
-		} else {
-			delete_user_meta( $user_id, 'gh_admin_theme' );
-		}
+		$this->save_theme( $user_id, get_post_var( 'gh_admin_theme' ) );
 
 		if ( user_can( $user_id, 'view_reports' ) ) {
 			update_user_meta( $user_id, 'gh_broadcast_results', boolval( get_post_var( 'gh_broadcast_results' ) ) );
