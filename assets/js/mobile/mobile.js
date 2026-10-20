@@ -890,6 +890,8 @@
     Pill: () => Pill,
     Segmented: () => Segmented,
     Sheet: () => Sheet,
+    Skeleton: () => Skeleton,
+    SkeletonList: () => SkeletonList,
     Textarea: () => Textarea,
     Toast: () => Toast
   });
@@ -970,7 +972,21 @@
     ] }) : /* @__PURE__ */ u3("li", { children: row });
   };
   var Empty = ({ children }) => /* @__PURE__ */ u3("div", { class: "ghm-empty", children });
-  var Loading = ({ children = "\u2026" }) => /* @__PURE__ */ u3("div", { class: "ghm-loading", role: "status", children });
+  var Skeleton = ({ w: w3 = "100%", h: h3 = 14, round }) => /* @__PURE__ */ u3("span", { class: `ghm-skel ${round ? "round" : ""}`, "aria-hidden": "true", style: { width: typeof w3 === "number" ? w3 + "px" : w3, height: typeof h3 === "number" ? h3 + "px" : h3 } });
+  var TITLE_WIDTHS = ["58%", "46%", "66%", "52%", "40%", "62%"];
+  var SUB_WIDTHS = ["34%", "42%", "28%", "38%", "30%", "36%"];
+  var SkeletonList = ({ rows = 3, variant, label = "Loading" }) => /* @__PURE__ */ u3("div", { class: "ghm-skel-list", role: "status", "aria-busy": "true", children: [
+    /* @__PURE__ */ u3("span", { class: "ghm-sr", children: label }),
+    Array.from({ length: rows }, (_3, i3) => /* @__PURE__ */ u3("div", { class: "ghm-item ghm-skel-row", children: [
+      variant === "avatar" ? /* @__PURE__ */ u3(Skeleton, { round: true, w: 40, h: 40 }) : null,
+      variant === "check" ? /* @__PURE__ */ u3(Skeleton, { round: true, w: 26, h: 26 }) : null,
+      /* @__PURE__ */ u3("div", { class: "ghm-item-body", children: [
+        /* @__PURE__ */ u3(Skeleton, { w: TITLE_WIDTHS[i3 % TITLE_WIDTHS.length], h: 14 }),
+        /* @__PURE__ */ u3(Skeleton, { w: SUB_WIDTHS[i3 % SUB_WIDTHS.length], h: 12 })
+      ] })
+    ] }, i3))
+  ] });
+  var Loading = (props) => /* @__PURE__ */ u3(SkeletonList, { ...props });
   var ErrorMessage = ({ error }) => error ? /* @__PURE__ */ u3("div", { class: "ghm-error", role: "alert", children: error.message || String(error) }) : null;
   var Pill = ({ color, children }) => /* @__PURE__ */ u3("span", { class: `ghm-pill ${color || ""}`, children });
   var Avatar = ({ name = "", src, large }) => {
@@ -1088,7 +1104,7 @@
       }
     }, [Impl, feature]);
     if (!Impl) {
-      return registry.feature(feature) && registry.feature(feature).script && !registry.has(feature) ? /* @__PURE__ */ u3(Loading, {}) : fallback;
+      return registry.feature(feature) && registry.feature(feature).script && !registry.has(feature) ? point === "home_cards" ? /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(Loading, {}) }) : /* @__PURE__ */ u3(Loading, {}) : fallback;
     }
     return /* @__PURE__ */ u3(ErrorBoundary, { label, children: /* @__PURE__ */ u3(Impl, { ctx: ctxFor(feature), ...rest }) });
   }
@@ -1208,7 +1224,7 @@
       /* @__PURE__ */ u3("div", { class: "ghm-search", children: /* @__PURE__ */ u3(Input, { type: "search", placeholder: __("Search contacts"), value: query, onInput: (e3) => setQuery(e3.currentTarget.value), "aria-label": __("Search contacts"), enterkeyhint: "search" }) }),
       /* @__PURE__ */ u3(ErrorMessage, { error }),
       /* @__PURE__ */ u3(Card, { title: search ? __("Results") : __("Recent"), children: [
-        loading && !items.length ? /* @__PURE__ */ u3(Loading, {}) : null,
+        loading && !items.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "avatar", rows: 6 }) : null,
         !loading && !error && !items.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No contacts found.") : __("No contacts yet.") }) : null,
         items.length ? /* @__PURE__ */ u3(List, { children: items.map((c3) => /* @__PURE__ */ u3(ContactRow, { contact: c3 }, c3.ID)) }) : null
       ] })
@@ -1253,7 +1269,14 @@
     const { data, error, loading } = useFetch(() => ctx.api.get(`contacts/${params.id}`), [params.id]);
     const contact = data && itemOf(data);
     if (loading && !contact) {
-      return /* @__PURE__ */ u3(Loading, {});
+      return /* @__PURE__ */ u3(Card, { "aria-busy": "true", children: [
+        /* @__PURE__ */ u3("div", { class: "ghm-skel-stack", children: [
+          /* @__PURE__ */ u3(Skeleton, { round: true, w: 72, h: 72 }),
+          /* @__PURE__ */ u3(Skeleton, { w: 180, h: 22 }),
+          /* @__PURE__ */ u3(Skeleton, { w: 140, h: 14 })
+        ] }),
+        /* @__PURE__ */ u3("div", { class: "ghm-skel-actions", children: [0, 1, 2].map((i3) => /* @__PURE__ */ u3(Skeleton, { w: 84, h: 66 }, i3)) })
+      ] });
     }
     if (error || !contact) {
       return /* @__PURE__ */ u3(ErrorMessage, { error: error || { message: __("Contact not found.") } });
@@ -1343,7 +1366,7 @@
     ].filter(([, items]) => items.length);
     return /* @__PURE__ */ u3(M, { children: [
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      loading && !tasks.length ? /* @__PURE__ */ u3(Loading, {}) : null,
+      loading && !tasks.length ? /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(SkeletonList, { variant: "check", rows: 4 }) }) : null,
       !loading && !error && !tasks.length ? /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(Empty, { children: __("Nothing to do. Enjoy it.") }) }) : null,
       groups.map(([title, items]) => /* @__PURE__ */ u3(Card, { title, children: /* @__PURE__ */ u3(List, { children: items.map((t3) => /* @__PURE__ */ u3(TaskRow, { task: t3, ctx, onComplete: complete, showContact: true }, t3.ID)) }) }, title))
     ] });
@@ -1398,7 +1421,7 @@
     const seeAll = /* @__PURE__ */ u3("a", { href: "#/tasks", style: "color:var(--ghm-accent);text-transform:none;letter-spacing:0", children: __("See all") });
     return /* @__PURE__ */ u3(Card, { title: __("My tasks"), action: seeAll, children: [
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      loading && !tasks.length ? /* @__PURE__ */ u3(Loading, {}) : null,
+      loading && !tasks.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "check", rows: 3 }) : null,
       !loading && !error && !tasks.length ? /* @__PURE__ */ u3(Empty, { children: __("Nothing to do. Enjoy it.") }) : null,
       tasks.length ? /* @__PURE__ */ u3(List, { children: tasks.map((t3) => /* @__PURE__ */ u3(TaskRow, { task: t3, ctx, onComplete: complete, showContact: true }, t3.ID)) }) : null
     ] });
@@ -1413,7 +1436,7 @@
     }
     return /* @__PURE__ */ u3(Card, { title: __("Recently added"), action: seeAll, children: [
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      loading && !items.length ? /* @__PURE__ */ u3(Loading, {}) : null,
+      loading && !items.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "avatar", rows: 3 }) : null,
       items.length ? /* @__PURE__ */ u3(List, { children: items.map((c3) => /* @__PURE__ */ u3(ContactRow, { contact: c3 }, c3.ID)) }) : null
     ] });
   }
@@ -1453,7 +1476,7 @@
         /* @__PURE__ */ u3(Button, { variant: "primary", type: "submit", disabled: saving || !text.trim(), "aria-label": __("Save note"), children: /* @__PURE__ */ u3(Icon, { name: "check" }) })
       ] }) : null,
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      loading && !notes.length ? /* @__PURE__ */ u3(Loading, {}) : null,
+      loading && !notes.length ? /* @__PURE__ */ u3(SkeletonList, { rows: 2 }) : null,
       !loading && !error && !notes.length ? /* @__PURE__ */ u3(Empty, { children: __("No notes yet.") }) : null,
       notes.map((n2) => /* @__PURE__ */ u3("div", { class: "ghm-note", children: [
         /* @__PURE__ */ u3("p", { children: plainText(n2.data.content) }),
@@ -1477,7 +1500,7 @@
     }, [contact.ID]);
     return /* @__PURE__ */ u3(M, { children: [
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      loading && !tasks.length ? /* @__PURE__ */ u3(Loading, {}) : null,
+      loading && !tasks.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "check", rows: 2 }) : null,
       !loading && !error && !tasks.length ? /* @__PURE__ */ u3(Empty, { children: __("No open tasks.") }) : null,
       tasks.length ? /* @__PURE__ */ u3(List, { children: tasks.map((t3) => /* @__PURE__ */ u3(TaskRow, { task: t3, ctx, onComplete: complete }, t3.ID)) }) : null,
       ctx.can("add_tasks") ? /* @__PURE__ */ u3("div", { style: "padding:12px 16px", children: /* @__PURE__ */ u3(Button, { block: true, icon: "plus", onClick: () => ctx.sheet(NewTaskSheet, { title: __("New task"), contact, onCreated: reload }), children: __("Add a task") }) }) : null
@@ -1650,7 +1673,7 @@
     } else if (route.path === "/more") {
       content = /* @__PURE__ */ u3(MoreView, { moreItems: more });
     } else if (owner && !failed[owner]) {
-      content = /* @__PURE__ */ u3(Loading, {});
+      content = /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(SkeletonList, { rows: 4 }) });
     } else {
       content = /* @__PURE__ */ u3(Empty, { children: [
         __("There is nothing here."),
@@ -1684,7 +1707,7 @@
       }
       ctx.sheet(Impl, { title: item.label, feature: item.feature });
     };
-    return /* @__PURE__ */ u3(List, { children: items.map((item) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: item.icon }), title: item.label, onClick: () => pick(item), trailing: busy === item.id ? /* @__PURE__ */ u3(Loading, {}) : null })) });
+    return /* @__PURE__ */ u3(List, { children: items.map((item) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: item.icon }), title: item.label, onClick: () => pick(item), trailing: busy === item.id ? /* @__PURE__ */ u3(Skeleton, { round: true, w: 18, h: 18 }) : null })) });
   }
 
   // src/index.jsx

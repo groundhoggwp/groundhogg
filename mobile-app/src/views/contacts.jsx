@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'preact/hooks'
-import { Avatar, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, Loading, Pill } from '../ui/index.jsx'
+import { Avatar, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, Pill, Skeleton, SkeletonList } from '../ui/index.jsx'
 import { Contribution } from '../contribution.jsx'
 import { useRuntime } from '../runtime.jsx'
 import { resolveHref, contactValue } from '../core/template.js'
@@ -40,7 +40,7 @@ export function ContactsView ( { ctx } ) {
       </div>
       <ErrorMessage error={ error }/>
       <Card title={ search ? __( 'Results' ) : __( 'Recent' ) }>
-        { loading && ! items.length ? <Loading/> : null }
+        { loading && ! items.length ? <SkeletonList variant="avatar" rows={ 6 }/> : null }
         { ! loading && ! error && ! items.length ? <Empty>{ search ? __( 'No contacts found.' ) : __( 'No contacts yet.' ) }</Empty> : null }
         { items.length ? <List>{ items.map( c => <ContactRow contact={ c } key={ c.ID }/> ) }</List> : null }
       </Card>
@@ -101,7 +101,12 @@ export function ContactView ( { ctx, params } ) {
   const contact = data && itemOf( data )
 
   if ( loading && ! contact ) {
-    return <Loading/>
+    return (
+      <Card aria-busy="true">
+        <div class="ghm-skel-stack"><Skeleton round w={ 72 } h={ 72 }/><Skeleton w={ 180 } h={ 22 }/><Skeleton w={ 140 } h={ 14 }/></div>
+        <div class="ghm-skel-actions">{ [ 0, 1, 2 ].map( i => <Skeleton w={ 84 } h={ 66 } key={ i }/> ) }</div>
+      </Card>
+    )
   }
 
   if ( error || ! contact ) {

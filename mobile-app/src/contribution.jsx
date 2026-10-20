@@ -4,7 +4,7 @@
 import { Component } from 'preact'
 import { useEffect, useReducer } from 'preact/hooks'
 import { useRuntime } from './runtime.jsx'
-import { Loading } from './ui/index.jsx'
+import { Card, Loading } from './ui/index.jsx'
 
 export class ErrorBoundary extends Component {
   state = { error: null }
@@ -52,7 +52,9 @@ export function Contribution ( { point, feature, id, label, fallback = null, ...
 
   if ( ! Impl ) {
     // declarative contributions have nothing to load
-    return registry.feature( feature ) && registry.feature( feature ).script && ! registry.has( feature ) ? <Loading/> : fallback
+    return registry.feature( feature ) && registry.feature( feature ).script && ! registry.has( feature )
+      ? ( point === 'home_cards' ? <Card><Loading/></Card> : <Loading/> )
+      : fallback
   }
 
   return (

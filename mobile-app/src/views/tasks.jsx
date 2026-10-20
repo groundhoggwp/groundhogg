@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { Avatar, Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Loading, Pill, Textarea } from '../ui/index.jsx'
+import { Avatar, Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, SkeletonList, Textarea } from '../ui/index.jsx'
 import { plainText, useFetch, toApiDate, tomorrowMorning } from '../util.js'
 
 /**
@@ -90,7 +90,7 @@ export function TasksView ( { ctx } ) {
   return (
     <>
       <ErrorMessage error={ error }/>
-      { loading && ! tasks.length ? <Loading/> : null }
+      { loading && ! tasks.length ? <Card><SkeletonList variant="check" rows={ 4 }/></Card> : null }
       { ! loading && ! error && ! tasks.length ? <Card><Empty>{ __( 'Nothing to do. Enjoy it.' ) }</Empty></Card> : null }
       { groups.map( ( [ title, items ] ) => (
         <Card title={ title } key={ title }>

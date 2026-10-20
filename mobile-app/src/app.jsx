@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useReducer } from 'preact/hooks'
 import { matchRoute, normalizePath, firstSegment, parseHash, toHash } from './core/router.js'
 import { RuntimeContext, useRuntime } from './runtime.jsx'
 import { ErrorBoundary } from './contribution.jsx'
-import { Icon, Sheet, Toast, Loading, Empty, List, ListItem, Button } from './ui/index.jsx'
+import { Icon, Sheet, Toast, Card, Skeleton, SkeletonList, Empty, List, ListItem, Button } from './ui/index.jsx'
 
 const TAB_SLOTS = 5
 
@@ -166,7 +166,7 @@ export function App ( { runtime } ) {
   } else if ( route.path === '/more' ) {
     content = <MoreView moreItems={ more }/>
   } else if ( owner && ! failed[ owner ] ) {
-    content = <Loading/>
+    content = <Card><SkeletonList rows={ 4 }/></Card>
   } else {
     content = <Empty>{ __( 'There is nothing here.' ) } <a href="#/" style="color:var(--ghm-accent)">{ __( 'Go home' ) }</a></Empty>
   }
@@ -221,7 +221,7 @@ function CreateMenu ( { items, close, ctx } ) {
   return (
     <List>
       { items.map( item => (
-        <ListItem leading={ <Icon name={ item.icon }/> } title={ item.label } onClick={ () => pick( item ) } trailing={ busy === item.id ? <Loading/> : null }/>
+        <ListItem leading={ <Icon name={ item.icon }/> } title={ item.label } onClick={ () => pick( item ) } trailing={ busy === item.id ? <Skeleton round w={ 18 } h={ 18 }/> : null }/>
       ) ) }
     </List>
   )

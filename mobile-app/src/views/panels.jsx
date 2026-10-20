@@ -2,7 +2,7 @@
 // same as an add-on's would.
 
 import { useState } from 'preact/hooks'
-import { Button, Empty, ErrorMessage, Field, Input, List, Loading, Textarea, Icon } from '../ui/index.jsx'
+import { Button, Empty, ErrorMessage, Field, Input, List, SkeletonList, Textarea, Icon } from '../ui/index.jsx'
 import { TaskRow, useTaskList, NewTaskSheet } from './tasks.jsx'
 import { itemOf, plainText, useFetch } from '../util.js'
 
@@ -51,7 +51,7 @@ export function NotesPanel ( { ctx, contact } ) {
         </form>
       ) : null }
       <ErrorMessage error={ error }/>
-      { loading && ! notes.length ? <Loading/> : null }
+      { loading && ! notes.length ? <SkeletonList rows={ 2 }/> : null }
       { ! loading && ! error && ! notes.length ? <Empty>{ __( 'No notes yet.' ) }</Empty> : null }
       { notes.map( n => (
         <div class="ghm-note" key={ n.ID }>
@@ -77,7 +77,7 @@ export function ContactTasksPanel ( { ctx, contact } ) {
   return (
     <>
       <ErrorMessage error={ error }/>
-      { loading && ! tasks.length ? <Loading/> : null }
+      { loading && ! tasks.length ? <SkeletonList variant="check" rows={ 2 }/> : null }
       { ! loading && ! error && ! tasks.length ? <Empty>{ __( 'No open tasks.' ) }</Empty> : null }
       { tasks.length ? <List>{ tasks.map( t => <TaskRow task={ t } ctx={ ctx } onComplete={ complete } key={ t.ID }/> ) }</List> : null }
       { ctx.can( 'add_tasks' ) ? (

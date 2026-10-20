@@ -51,7 +51,40 @@ export const ListItem = ( { title, subtitle, meta, leading, trailing, control, h
 }
 
 export const Empty = ( { children } ) => <div class="ghm-empty">{ children }</div>
-export const Loading = ( { children = '…' } ) => <div class="ghm-loading" role="status">{ children }</div>
+/**
+ * A placeholder block. Sizes are px numbers or CSS lengths.
+ */
+export const Skeleton = ( { w = '100%', h = 14, round } ) => (
+  <span class={ `ghm-skel ${ round ? 'round' : '' }` } aria-hidden="true" style={ { width: typeof w === 'number' ? w + 'px' : w, height: typeof h === 'number' ? h + 'px' : h } }/>
+)
+
+// varied widths, so a column of placeholders reads as content and not as a stack of identical bars
+const TITLE_WIDTHS = [ '58%', '46%', '66%', '52%', '40%', '62%' ]
+const SUB_WIDTHS = [ '34%', '42%', '28%', '38%', '30%', '36%' ]
+
+/**
+ * Placeholder rows while a list loads. `variant` picks what leads each row: an avatar, a checkbox, or nothing.
+ */
+export const SkeletonList = ( { rows = 3, variant, label = 'Loading' } ) => (
+  <div class="ghm-skel-list" role="status" aria-busy="true">
+    <span class="ghm-sr">{ label }</span>
+    { Array.from( { length: rows }, ( _, i ) => (
+      <div class="ghm-item ghm-skel-row" key={ i }>
+        { variant === 'avatar' ? <Skeleton round w={ 40 } h={ 40 }/> : null }
+        { variant === 'check' ? <Skeleton round w={ 26 } h={ 26 }/> : null }
+        <div class="ghm-item-body">
+          <Skeleton w={ TITLE_WIDTHS[ i % TITLE_WIDTHS.length ] } h={ 14 }/>
+          <Skeleton w={ SUB_WIDTHS[ i % SUB_WIDTHS.length ] } h={ 12 }/>
+        </div>
+      </div>
+    ) ) }
+  </div>
+)
+
+/**
+ * The generic loading state. Features can use it without choosing a shape.
+ */
+export const Loading = ( props ) => <SkeletonList { ...props }/>
 export const ErrorMessage = ( { error } ) => error ? <div class="ghm-error" role="alert">{ error.message || String( error ) }</div> : null
 
 export const Pill = ( { color, children } ) => <span class={ `ghm-pill ${ color || '' }` }>{ children }</span>

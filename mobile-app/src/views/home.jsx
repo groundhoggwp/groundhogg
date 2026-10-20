@@ -1,4 +1,4 @@
-import { Card, Empty, ErrorMessage, List, Loading } from '../ui/index.jsx'
+import { Card, Empty, ErrorMessage, List, SkeletonList } from '../ui/index.jsx'
 import { Contribution } from '../contribution.jsx'
 import { useRuntime } from '../runtime.jsx'
 import { ContactRow } from './contacts.jsx'
@@ -31,7 +31,7 @@ export function MyTasksCard ( { ctx } ) {
   return (
     <Card title={ __( 'My tasks' ) } action={ seeAll }>
       <ErrorMessage error={ error }/>
-      { loading && ! tasks.length ? <Loading/> : null }
+      { loading && ! tasks.length ? <SkeletonList variant="check" rows={ 3 }/> : null }
       { ! loading && ! error && ! tasks.length ? <Empty>{ __( 'Nothing to do. Enjoy it.' ) }</Empty> : null }
       { tasks.length ? <List>{ tasks.map( t => <TaskRow task={ t } ctx={ ctx } onComplete={ complete } showContact key={ t.ID }/> ) }</List> : null }
     </Card>
@@ -53,7 +53,7 @@ export function RecentContactsCard ( { ctx } ) {
   return (
     <Card title={ __( 'Recently added' ) } action={ seeAll }>
       <ErrorMessage error={ error }/>
-      { loading && ! items.length ? <Loading/> : null }
+      { loading && ! items.length ? <SkeletonList variant="avatar" rows={ 3 }/> : null }
       { items.length ? <List>{ items.map( c => <ContactRow contact={ c } key={ c.ID }/> ) }</List> : null }
     </Card>
   )
