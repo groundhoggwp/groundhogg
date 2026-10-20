@@ -4,7 +4,6 @@ namespace Groundhogg\Mobile;
 
 use Groundhogg\Main_Roles;
 use function Groundhogg\get_team_ids;
-use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -56,7 +55,7 @@ class Manifest {
 		$manifest = [
 			'apiVersion' => Features::API_VERSION,
 			'app'        => [
-				'name'      => white_labeled_name(),
+				'name'      => App::name(),
 				'url'       => App::url(),
 				'homeUrl'   => home_url( '/' ),
 				'adminUrl'  => admin_url(),

@@ -4,6 +4,7 @@ namespace Groundhogg\Mobile;
 
 use function Groundhogg\add_managed_rewrite_rule;
 use function Groundhogg\is_managed_page;
+use function Groundhogg\is_white_labeled;
 use function Groundhogg\managed_page_url;
 use function Groundhogg\white_labeled_name;
 
@@ -31,6 +32,18 @@ class App {
 
 		// Before Rewrites::template_redirect() and the template loader, which don't know these sub pages
 		add_action( 'template_redirect', [ $this, 'template_redirect' ], 8 );
+	}
+
+	/**
+	 * The name the app goes by, on the home screen and in the title bar. It's the white label name when the site has
+	 * one, and the site's own name when a white labeled site hasn't set a name, so it is never blank.
+	 *
+	 * @return string
+	 */
+	public static function name() {
+		$name = white_labeled_name();
+
+		return is_string( $name ) && trim( $name ) !== '' ? trim( $name ) : get_bloginfo( 'name', 'display' );
 	}
 
 	/**
@@ -170,7 +183,8 @@ class App {
 			}
 		}
 
-		if ( ! $icons ) {
+		// the brand's mark is only a fallback for a site that isn't white labeled
+		if ( ! $icons && ! is_white_labeled() ) {
 			$icons[] = [
 				'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-icon-small.png',
 				'sizes' => '200x226',
@@ -182,10 +196,16 @@ class App {
 	}
 
 	/**
-	 * @return string the URL of the icon the iOS home screen uses
+	 * @return string the URL of the icon the iOS home screen uses, empty when there isn't one to use
 	 */
 	public static function touch_icon_url() {
-		return get_site_icon_url( 180 ) ?: GROUNDHOGG_ASSETS_URL . 'images/groundhogg-icon-small.png';
+		$icon = get_site_icon_url( 180 );
+
+		if ( $icon ) {
+			return $icon;
+		}
+
+		return is_white_labeled() ? '' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-icon-small.png';
 	}
 
 	protected function render_web_manifest() {
@@ -193,8 +213,8 @@ class App {
 		$url = self::url();
 
 		$data = [
-			'name'             => white_labeled_name(),
-			'short_name'       => white_labeled_name(),
+			'name'             => self::name(),
+			'short_name'       => self::name(),
 			'description'      => __( 'Your contacts, tasks and deals on the go.', 'groundhogg' ),
 			'id'               => $url,
 			'start_url'        => $url,

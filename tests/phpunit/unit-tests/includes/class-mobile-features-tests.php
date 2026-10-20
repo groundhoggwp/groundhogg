@@ -346,6 +346,31 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 		$this->assertSame( $manifest['features']['core']['label'], $decoded['features']['core']['label'] );
 	}
 
+	/**
+	 * The app is used on white labeled sites, so the labels it shows, and the links it offers, can't name the brand.
+	 * The app's own name is the exception: it comes from the white label setting.
+	 */
+	public function test_labels_and_links_core_registers_do_not_name_the_brand() {
+		$visible = ( new Features() )->for_user( $this->user_with_role( 'administrator' ) );
+		$strings = [];
+
+		array_walk_recursive( $visible['features'], function ( $value, $key ) use ( &$strings ) {
+			if ( in_array( $key, [ 'label', 'href' ], true ) ) {
+				$strings[] = (string) $value;
+			}
+		} );
+
+		$this->assertNotEmpty( $strings );
+
+		foreach ( $strings as $string ) {
+			$this->assertStringNotContainsStringIgnoringCase( 'groundhogg', $string );
+		}
+	}
+
+	public function test_the_app_name_is_never_blank() {
+		$this->assertNotSame( '', App::name() );
+	}
+
 	public function test_the_app_lives_under_the_managed_page() {
 		$this->assertStringEndsWith( '/app/', App::url() );
 		$this->assertStringStartsWith( home_url(), App::url() );

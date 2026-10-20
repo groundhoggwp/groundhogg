@@ -169,7 +169,7 @@ mechanism add-ons use.
 
 Email is a handler action, because it is a choice and not a link. Tapping it opens a sheet offering three things:
 the phone's own email app (a `mailto:` link), writing an email in the app, or sending one of the site's saved
-Groundhogg emails (with a confirmation step before it goes). The last two use the same endpoints as the desktop
+email templates (with a confirmation step before it goes). The last two use the same endpoints as the desktop
 app (`emails/send`, `emails/{id}/send`), so sender, logging and recipient permissions are the site's own. They need
 `send_emails` (and `view_emails` for saved emails) and a contact who can receive email, and the sheet hides or
 disables them otherwise. Writing in the app records an outbound message on the contact.
@@ -384,8 +384,13 @@ Where it differs from the draft above, or decides something the draft left open:
 - **Translations** are wired through `ctx.i18n` (same surface as `wp.i18n`) but the manifest sends no locale data yet.
   Strings fall back to English until that is connected to the languages JSON generated for core.
 - **Rewrite rules** flush once per `App::REWRITES_VERSION`, so a site needn't wait for an update routine.
-- **No app icon art yet.** The web app manifest uses the site icon when one is set, and falls back to the small
-  Groundhogg mark, which isn't square. Installability checks on some browsers want 192 and 512 square PNGs.
+- **No app icon art yet.** The web app manifest uses the site icon when one is set. Without one, a site that isn't
+  white labeled falls back to the small brand mark (which isn't square), and a white labeled site gets no icon rather
+  than the brand's. Installability checks on some browsers want 192 and 512 square PNGs.
+- **White labeling.** The app is used on white labeled sites, so labels, links and messages the user reads use
+  generic terms ("Send an email template", not the product's name). The app's own name comes from
+  `white_labeled_name()`, falling back to the site's name if a white labeled site hasn't set one. Add-on authors:
+  keep the brand out of the `label` of your registrations. A PHPUnit test and a JS test fail if core's do.
 
 Findings from reading the API while building the screens (worth knowing for add-on authors):
 

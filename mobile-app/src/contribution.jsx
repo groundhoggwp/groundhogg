@@ -14,7 +14,7 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch ( error ) {
-    console.error( 'Groundhogg mobile: a feature failed to render.', error )
+    console.error( 'Mobile app: a feature failed to render.', error )
   }
 
   render ( { label, children } ) {

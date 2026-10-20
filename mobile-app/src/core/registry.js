@@ -37,17 +37,17 @@ export function createRegistry ( manifest, { warn = ( ...a ) => console.warn( ..
     register ( id, impl ) {
 
       if ( ! features[ id ] ) {
-        warn( `Groundhogg mobile: "${ id }" is not an available feature, ignoring it.` )
+        warn( `Mobile app: "${ id }" is not an available feature, ignoring it.` )
         return false
       }
 
       if ( impls.has( id ) ) {
-        warn( `Groundhogg mobile: "${ id }" is already registered.` )
+        warn( `Mobile app: "${ id }" is already registered.` )
         return false
       }
 
       if ( ( impl && impl.apiVersion || 1 ) > API_VERSION ) {
-        warn( `Groundhogg mobile: "${ id }" needs a newer mobile API than this site has.` )
+        warn( `Mobile app: "${ id }" needs a newer mobile API than this site has.` )
         return false
       }
 

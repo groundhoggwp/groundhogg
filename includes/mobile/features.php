@@ -245,7 +245,7 @@ class Features {
 
 				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- debug only
-					error_log( sprintf( 'Groundhogg mobile: feature "%s" needs mobile API %d, this is %d.', $id, $feature['min_api_version'], self::API_VERSION ) );
+					error_log( sprintf( 'Mobile app: feature "%s" needs mobile API %d, this is %d.', $id, $feature['min_api_version'], self::API_VERSION ) );
 				}
 
 				continue;

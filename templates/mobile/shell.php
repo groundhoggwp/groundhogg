@@ -30,7 +30,9 @@ $manifest_json = wp_json_encode( $manifest, JSON_HEX_TAG | JSON_HEX_AMP | JSON_H
     <meta name="apple-mobile-web-app-title" content="<?php echo esc_attr( $manifest['app']['name'] ); ?>">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="<?php echo esc_url( App::url() . 'manifest.webmanifest' ); ?>">
+	<?php if ( App::touch_icon_url() ) : ?>
     <link rel="apple-touch-icon" href="<?php echo esc_url( App::touch_icon_url() ); ?>">
+	<?php endif; ?>
     <title><?php echo esc_html( $manifest['app']['name'] ); ?></title>
     <link rel="stylesheet" href="<?php echo esc_url( App::core_style_url() . '?ver=' . $ver ); ?>">
 </head>

@@ -2,7 +2,7 @@
 //
 //   1. Your phone's email app (a mailto link, nothing is sent from the site)
 //   2. Write an email here, sent from the site and saved to the contact's record
-//   3. Send one of the site's saved Groundhogg emails
+//   3. Send one of the site's saved email templates
 //
 // 2 and 3 go through the same REST endpoints as the desktop app (emails/send and emails/{id}/send), so
 // sender, logging and permissions are whatever the site already does. They need send_emails (3 also needs
@@ -66,7 +66,7 @@ function EmailSheet ( { ctx, close, contact } ) {
       { canSend && ctx.can( 'view_emails' ) ? (
         <ListItem
           leading={ <Icon name="note"/> }
-          title={ __( 'Send a Groundhogg email' ) }
+          title={ __( 'Send an email template' ) }
           subtitle={ blocked || __( 'Pick one of your saved emails.' ) }
           onClick={ blocked ? undefined : () => setView( { name: 'templates' } ) }
           disabled={ !! blocked }

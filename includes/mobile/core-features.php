@@ -18,7 +18,7 @@ class Core_Features {
 	public static function register( Features $features ) {
 
 		$features->register( 'core', [
-			'label'            => __( 'Groundhogg', 'groundhogg' ),
+			'label'            => __( 'Contacts and tasks', 'groundhogg' ),
 			// every Groundhogg role has this, anyone without it has no business in the app
 			'cap'              => 'view_contacts',
 			'nav'              => [
