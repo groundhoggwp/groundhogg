@@ -4,7 +4,7 @@
 
   const State = Groundhogg.createState({
     route: 'auth',
-    endpoint: 'apikeys',
+    endpoint: 'pswd',
     request: {},
     playground: true,
   })
@@ -1083,8 +1083,17 @@
       Pg({}, __('Groundhogg offers a variety of authentication methods for you to use to access the REST API.',
         'groundhogg')),
       Ul({}, [
-        Li({}, An({ href: '#auth/apikeys' }, __('Using API keys'))),
-        Li({}, An({ href: '#auth/pswd' }, __('Using application passwords'))),
+        Li({}, [
+          An({ href: '#auth/pswd' }, __('Using application passwords')),
+          ' ',
+          Span({ className: 'pill green' }, __('Recommended', 'groundhogg')),
+        ]),
+        Li({}, An({ href: '#auth/nonce' }, __('Using a Nonce'))),
+        Li({}, [
+          An({ href: '#auth/apikeys' }, __('Using API keys')),
+          ' ',
+          Span({ className: 'pill red' }, __('Deprecated', 'groundhogg')),
+        ]),
       ]),
       Pg({}, __(
         'The Groundhogg REST API is permission based. Regardless of the authentication method, only users accessing the API with the required permissions will be able to perform requests.',
@@ -1092,12 +1101,44 @@
     ]),
   })
 
+  // Application Passwords
+  ApiRegistry.auth.endpoints.add('pswd', {
+    name: __('Using application passwords', 'groundhogg'),
+    description: () => Fragment([
+      Pg({}, __(
+        'Using application passwords is the <b>BEST WAY</b> to use the Groundhogg REST API from external applications.',
+        'groundhogg')),
+      Pg({}, __(
+        'Applications passwords use basic authentication, which is supported by most external applications that you might want to integrate with Groundhogg.',
+        'groundhogg')),
+      Pg({}, An({
+        href: adminPageURL('gh_settings', { tab: 'api_tab' }),
+      }, __('Generate an application password in the settings area.', 'groundhogg'))),
+      makeEl('pre', {}, escHTML([
+        `curl --user "<username>:<application password>" ${ apiRoot }/<endpoint>`,
+      ].join('\n'))),
+      makeEl('h4', {}, __('Authentication token', 'groundhogg')),
+      Pg({}, __(
+        'Some services do not ask for a username and password. Instead they ask for an API key or token. When you generate an application password you are also given an <b>authentication token</b>, which is your username and application password joined with a colon and encoded as base64.',
+        'groundhogg')),
+      Pg({}, __('Send it in the <code>Authorization</code> header, prefixed with <code>Basic</code>.', 'groundhogg')),
+      makeEl('pre', {}, escHTML([
+        `curl ${ apiRoot }/<endpoint> \\`,
+        `  -H "Authorization: Basic <token>"`,
+      ].join('\n'))),
+      Pg({}, __(
+        'For more on application passwords, see the <a href="https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/" target="_blank">WordPress application password integration guide</a>.',
+        'groundhogg')),
+    ]),
+
+  })
+
   // API Keys
   ApiRegistry.auth.endpoints.add('apikeys', {
     name: __('Using API keys', 'groundhogg'),
     description: () => Fragment([
       Pg({}, __(
-        'Using API keys is an easy way to get started with the REST API. And is suitable for most backend applications.',
+        '<b>API keys are deprecated.</b> Existing keys continue to work, but new integrations should use <a href="#auth/pswd">application passwords</a> instead.',
         'groundhogg')),
       Pg({}, __(
         'When creating an API key, you are provided with a <b>token</b> and a <b>public key</b>. Both are required to authenticate requests.',
@@ -1114,27 +1155,7 @@
     ]),
   })
 
-  // Application Passwords
-  ApiRegistry.auth.endpoints.add('pswd', {
-    name: __('Using application passwords', 'groundhogg'),
-    description: () => Fragment([
-      Pg({}, __(
-        'Using application passwords is the <b>BEST WAY</b> to use the Groundhogg REST API from external applications.',
-        'groundhogg')),
-      Pg({}, __(
-        'Applications passwords use basic authentication, which is supported by most external applications that you might want to integrate with Groundhogg.',
-        'groundhogg')),
-      makeEl('pre', {}, escHTML([
-        `curl --user "<username>:<application password>" ${ apiRoot }/<endpoint>`,
-      ].join('\n'))),
-      Pg({}, __(
-        'For more on application passwords, see the <a href="https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/" target="_blank">WordPress application password integration guide</a>.',
-        'groundhogg')),
-    ]),
-
-  })
-
-  // Application Passwords
+  // Nonce
   ApiRegistry.auth.endpoints.add('nonce', {
     name: __('Using a Nonce', 'groundhogg'),
     description: () => Fragment([

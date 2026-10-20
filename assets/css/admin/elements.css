@@ -1939,6 +1939,57 @@ button.gh-submit.effect-balanced-reflection::after {
   border-bottom-right-radius: 0;
 }
 
+.gh-button-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+.gh-button-toggle .gh-button-toggle-option {
+  margin: 0;
+  display: inline-flex;
+}
+.gh-button-toggle .gh-button-toggle-option input[type=radio] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+.gh-button-toggle .gh-button-toggle-option .gh-button-toggle-label {
+  display: inline-block;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 2.2;
+  padding: 0 calc(var(--gh-item-padding) * 2);
+  background: var(--gh-dark-5);
+  color: var(--gh-dark);
+  border: 1px solid var(--gh-dark-50);
+}
+.gh-button-toggle .gh-button-toggle-option:not(:first-child) .gh-button-toggle-label {
+  border-left-width: 0;
+}
+.gh-button-toggle .gh-button-toggle-option:first-child .gh-button-toggle-label {
+  border-top-left-radius: var(--gh-border-radius);
+  border-bottom-left-radius: var(--gh-border-radius);
+}
+.gh-button-toggle .gh-button-toggle-option:last-child .gh-button-toggle-label {
+  border-top-right-radius: var(--gh-border-radius);
+  border-bottom-right-radius: var(--gh-border-radius);
+}
+.gh-button-toggle .gh-button-toggle-option:hover input:not(:checked) + .gh-button-toggle-label {
+  background: var(--gh-dark-15);
+}
+.gh-button-toggle .gh-button-toggle-option input:checked + .gh-button-toggle-label {
+  background: var(--gh-dark);
+  border-color: var(--gh-dark);
+  color: #fff;
+}
+.gh-button-toggle .gh-button-toggle-option input:focus-visible + .gh-button-toggle-label {
+  outline: 2px solid var(--gh-primary);
+  outline-offset: 1px;
+}
+
 .search-options-widget-wrap {
   position: relative;
 }

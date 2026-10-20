@@ -2092,6 +2092,67 @@ button {
 }
 
 
+// Server rendered radio group displayed as toggle buttons, see HTML::button_toggle()
+.gh-button-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+
+  .gh-button-toggle-option {
+    margin: 0;
+    display: inline-flex;
+
+    input[type=radio] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      margin: 0;
+      pointer-events: none;
+    }
+
+    .gh-button-toggle-label {
+      display: inline-block;
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 14px;
+      line-height: 2.2;
+      padding: 0 calc(var(--gh-item-padding) * 2);
+      background: var(--gh-dark-5);
+      color: var(--gh-dark);
+      border: 1px solid var(--gh-dark-50);
+    }
+
+    &:not(:first-child) .gh-button-toggle-label {
+      border-left-width: 0;
+    }
+
+    &:first-child .gh-button-toggle-label {
+      border-top-left-radius: var(--gh-border-radius);
+      border-bottom-left-radius: var(--gh-border-radius);
+    }
+
+    &:last-child .gh-button-toggle-label {
+      border-top-right-radius: var(--gh-border-radius);
+      border-bottom-right-radius: var(--gh-border-radius);
+    }
+
+    &:hover input:not(:checked) + .gh-button-toggle-label {
+      background: var(--gh-dark-15);
+    }
+
+    input:checked + .gh-button-toggle-label {
+      background: var(--gh-dark);
+      border-color: var(--gh-dark);
+      color: #fff;
+    }
+
+    input:focus-visible + .gh-button-toggle-label {
+      outline: 2px solid var(--gh-primary);
+      outline-offset: 1px;
+    }
+  }
+}
+
 .search-options-widget-wrap {
   position: relative;
 
