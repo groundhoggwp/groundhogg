@@ -946,6 +946,7 @@
     link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1",
     globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3c2.5 2.4 3.8 5.4 3.8 9s-1.3 6.6-3.8 9c-2.5-2.4-3.8-5.4-3.8-9S9.5 5.4 12 3Z",
     alert: "M12 4 2.5 20h19L12 4ZM12 10v4M12 17h.01",
+    form: "M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1ZM8 6H6a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2M9 12h6M9 16h4",
     dot: "M12 12h.01"
   };
   function Icon({ name, size, ...props }) {
@@ -2068,6 +2069,114 @@
     ] });
   }
 
+  // src/core/forms.js
+  function isModernForm(html) {
+    return /\bgh-form-v2\b/.test(String(html || ""));
+  }
+  function formEntries(items) {
+    return (items || []).filter((f3) => f3 && isModernForm(f3.rendered)).map((f3) => ({ id: Number(f3.ID), name: String(f3.name || ""), html: String(f3.rendered) }));
+  }
+  function withContact(data, contactId) {
+    data.set("contact", String(contactId));
+    return data;
+  }
+  var IDENTITY_FIELDS = ["email"];
+  var identitySelector = () => IDENTITY_FIELDS.map((name) => `[name="${name}"]`).join(",");
+  var UNSAFE_TAGS = ["script", "style", "link", "iframe", "object", "embed", "meta", "base"];
+  function isUnsafeAttribute(name, value) {
+    name = String(name).toLowerCase();
+    if (name.startsWith("on")) {
+      return true;
+    }
+    return ["href", "src", "action", "formaction", "xlink:href"].includes(name) && /^\s*(javascript|data|vbscript):/i.test(String(value));
+  }
+
+  // src/views/forms.jsx
+  function openForm({ contact, ctx }) {
+    ctx.sheet(FormSheet, { title: ctx.i18n.__("Fill out a form"), contact });
+  }
+  function formInnerHtml(html) {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const form = doc.querySelector("form");
+    if (!form) {
+      return "";
+    }
+    form.querySelectorAll(UNSAFE_TAGS.join(",")).forEach((el) => el.remove());
+    form.querySelectorAll("*").forEach((el) => {
+      [...el.attributes].forEach((attr) => {
+        if (isUnsafeAttribute(attr.name, attr.value)) {
+          el.removeAttribute(attr.name);
+        }
+      });
+    });
+    return form.innerHTML;
+  }
+  function FormSheet({ ctx, close, contact }) {
+    const [picked, setPicked] = d2(null);
+    return picked ? /* @__PURE__ */ u3(FillForm, { ctx, close, contact, form: picked, back: () => setPicked(null) }) : /* @__PURE__ */ u3(PickForm, { ctx, contact, onPick: setPicked });
+  }
+  function PickForm({ ctx, contact, onPick }) {
+    const { __ } = ctx.i18n;
+    const [query, setQuery] = d2("");
+    const search = useDebounced(query.trim());
+    const { data, error, loading } = useFetch(() => ctx.api.get("forms", {
+      active: true,
+      contact: contact.ID,
+      search: search || void 0
+    }), [search]);
+    const forms = formEntries(data && data.items);
+    return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3("div", { style: "margin-bottom:12px", children: /* @__PURE__ */ u3(Input, { type: "search", placeholder: __("Search forms"), "aria-label": __("Search forms"), value: query, onInput: (e3) => setQuery(e3.currentTarget.value), enterkeyhint: "search", autocomplete: "off" }) }),
+      /* @__PURE__ */ u3(ErrorMessage, { error }),
+      loading && !forms.length ? /* @__PURE__ */ u3(SkeletonList, { rows: 4 }) : null,
+      !loading && !error && !forms.length ? /* @__PURE__ */ u3(Empty, { children: search ? __("No forms found.") : __("There are no forms to fill out.") }) : null,
+      forms.length ? /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(List, { children: forms.map((f3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "form" }), title: f3.name, onClick: () => onPick(f3), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) }, f3.id)) }) }) : null
+    ] });
+  }
+  function FillForm({ ctx, close, contact, form, back }) {
+    const { __ } = ctx.i18n;
+    const ref = T2(null);
+    const [sending, setSending] = d2(false);
+    const [error, setError] = d2(null);
+    const [locked, setLocked] = d2(false);
+    A2(() => {
+      if (ref.current) {
+        ref.current.innerHTML = formInnerHtml(form.html);
+        const identity = [...ref.current.querySelectorAll(identitySelector())];
+        identity.forEach((el) => el.setAttribute("readonly", ""));
+        setLocked(identity.length > 0);
+      }
+    }, [form.id]);
+    const submit = async (e3) => {
+      e3.preventDefault();
+      setError(null);
+      const data = withContact(new FormData(ref.current), contact.ID);
+      setSending(true);
+      try {
+        const res = await ctx.api.postForm(`forms/${form.id}/admin`, data);
+        const item = res.contact && res.contact.ID ? res.contact : itemOf(res);
+        ctx.toast(__("Form submitted"));
+        ctx.emit("contact:changed", { id: contact.ID, item });
+        close();
+      } catch (err) {
+        setSending(false);
+        setError(err);
+      }
+    };
+    return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3("div", { style: "margin:-6px 0 10px", children: /* @__PURE__ */ u3(Button, { icon: "back", onClick: back, disabled: sending, children: __("Forms") }) }),
+      /* @__PURE__ */ u3("h3", { class: "ghm-form-title", children: form.name }),
+      /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin-bottom:14px", children: [
+        __("For"),
+        " ",
+        contactName(contact)
+      ] }),
+      locked ? /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin-bottom:12px", children: __("The email can't be changed in a form. Use Edit on the contact to change it.") }) : null,
+      /* @__PURE__ */ u3(ErrorMessage, { error }),
+      /* @__PURE__ */ u3("form", { class: "ghm-form", ref, onSubmit: submit, "aria-busy": sending, style: sending ? "opacity:.6;pointer-events:none" : void 0 })
+    ] });
+  }
+
   // src/features/core.jsx
   function registerCore() {
     return window.GroundhoggMobile.register("core", {
@@ -2083,7 +2192,8 @@
         "recent-contacts": RecentContactsCard
       },
       contactActions: {
-        email: openEmail
+        email: openEmail,
+        form: openForm
       },
       contactPanels: {
         notes: NotesPanel,

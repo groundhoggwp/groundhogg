@@ -85,6 +85,15 @@ class Core_Features {
 					'icon'     => 'mail',
 					'priority' => 30,
 				],
+				[
+					// a handler too: it opens a sheet to pick an internal form and fill it out for this contact
+					'id'       => 'form',
+					'label'    => __( 'Form', 'groundhogg' ),
+					'icon'     => 'form',
+					'priority' => 40,
+					// the forms endpoints need this, since internal forms are also how contacts are added
+					'cap'      => 'add_contacts',
+				],
 			],
 			'contact_panels'   => [
 				[

@@ -154,6 +154,32 @@ class Mobile_Edit_Tests extends GH_UnitTestCase {
 		$this->assertNotContains( 'Nope', $this->tag_names( $contact->get_id() ) );
 	}
 
+	/* ---- internal forms ---------------------------------------------------------------------------------- */
+
+	public function test_a_rep_can_list_the_forms_to_fill_out() {
+		wp_set_current_user( $this->rep() );
+
+		$request = new WP_REST_Request( 'GET', '/gh/v4/forms' );
+		$request->set_query_params( [ 'active' => 1 ] );
+
+		$this->assertSame( 200, rest_do_request( $request )->get_status() );
+	}
+
+	public function test_forms_are_not_listed_to_someone_who_cannot_add_contacts() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+
+		$this->assertContains( rest_do_request( new WP_REST_Request( 'GET', '/gh/v4/forms' ) )->get_status(), [ 401, 403 ] );
+
+		// and nobody gets to submit one
+		$this->assertContains( rest_do_request( new WP_REST_Request( 'POST', '/gh/v4/forms/1/admin' ) )->get_status(), [ 401, 403 ] );
+	}
+
+	public function test_submitting_a_form_that_does_not_exist_is_a_404() {
+		wp_set_current_user( $this->rep() );
+
+		$this->assertSame( 404, rest_do_request( new WP_REST_Request( 'POST', '/gh/v4/forms/99999999/admin' ) )->get_status() );
+	}
+
 	public function test_a_request_with_no_changes_is_refused_not_silently_accepted() {
 		$rep     = $this->rep();
 		$contact = $this->contact_for( $rep );

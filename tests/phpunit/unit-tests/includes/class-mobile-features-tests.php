@@ -89,7 +89,7 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 		$visible = ( new Features() )->for_user( $this->user_with_role( 'administrator' ) );
 
 		$this->assertSame( [ 'home', 'contacts', 'tasks' ], $this->nav_ids( $visible ) );
-		$this->assertSame( [ 'call', 'text', 'email' ], array_column( $visible['features']['core']['contact_actions'], 'id' ) );
+		$this->assertSame( [ 'call', 'text', 'email', 'form' ], array_column( $visible['features']['core']['contact_actions'], 'id' ) );
 	}
 
 	/**
@@ -103,6 +103,10 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 		$this->assertStringStartsWith( 'tel:', $by_id['call']['href'] );
 		$this->assertStringStartsWith( 'sms:', $by_id['text']['href'] );
 		$this->assertArrayNotHasKey( 'href', $by_id['email'] );
+
+		// filling out a form is a handler too, and needs what the forms endpoints need
+		$this->assertArrayHasKey( 'form', $by_id );
+		$this->assertArrayNotHasKey( 'href', $by_id['form'] );
 	}
 
 	public function test_sales_reps_and_managers_get_the_app() {

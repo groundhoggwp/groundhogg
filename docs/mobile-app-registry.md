@@ -271,7 +271,8 @@ Every component receives a `ctx` prop:
 | `ctx.` | What |
 |---|---|
 | `api` | A thin `gh/v4` client (get/post/patch/delete) that adds the nonce, retries once on nonce expiry, and normalises errors |
-| `user`, `can( cap )` | From the manifest |
+| `user`, `can( cap )`, `locale` | From the manifest |
+| `on( name, fn )`, `emit( name, payload )` | A small event bus. A sheet tells the screen under it something changed, e.g. `emit( 'contact:changed', { id, item } )` after an edit, and the contact record updates and reloads its panels. `on` returns the unsubscribe function |
 | `navigate( path )`, `route` | Hash router |
 | `toast( msg, type )`, `sheet( Component )`, `confirm( msg )` | Shell feedback and bottom-sheet presentation |
 | `ui` | The shared kit: `List`, `ListItem`, `Card`, `Button`, `Field`, `Select`, `DatePicker`, `Avatar`, `Empty`, `Loading`, `Sheet` |
@@ -391,6 +392,36 @@ Where it differs from the draft above, or decides something the draft left open:
   generic terms ("Send an email template", not the product's name). The app's own name comes from
   `white_labeled_name()`, falling back to the site's name if a white labeled site hasn't set one. Add-on authors:
   keep the brand out of the `label` of your registrations. A PHPUnit test and a JS test fail if core's do.
+
+**Editing a contact.** The Details card has an Edit button (and the tags row has Edit tags / Add tags), shown to
+people with `edit_contacts` (and `manage_tags`). Both save with one `PATCH gh/v4/contacts/{id}`, which takes
+`{ data, meta }` and `add_tags` / `remove_tags` and answers with the contact as it is now, so the record updates
+without a second request.
+
+- **Fields:** first and last name, email, mobile and other phone, company, job title, and the address. The country
+  is stored as its two letter code and shown by name using the browser's `Intl.DisplayNames`, so it follows the
+  person's language with no list to translate. Only fields that changed are sent, trimmed.
+- **Tags:** search the existing tags or type a new name ("Create ..."), stage several changes, and save once. Existing
+  tags go by id and new ones by name, which the server creates. Adding what is already there, removing what is not,
+  and removing then re-adding a tag all cancel out.
+- **Server behaviour to know about:** phone numbers are stored without spaces or punctuation whatever was typed;
+  an email already used by another contact is a 409 and its message is shown; per-contact permission is
+  `edit_contact` (a rep edits their own contacts, not another rep's).
+
+**Internal forms ("Form" on the contact).** The action opens a sheet to pick one of the site's active forms
+(`GET forms?active=1&contact={id}`), which the server renders pre-filled for the contact, and submits it with
+`POST forms/{id}/admin` as multipart form data with `contact` added. What the form does next (tags, flows,
+notifications) is the form's own settings, the same as on the desktop contact card. Needs `add_contacts`.
+
+- Only current-style forms (`gh-form-v2`) are listed. Older forms submit through admin-ajax and need the desktop's
+  scripts.
+- The server's HTML is restyled with the app's own tokens, and scripts, styles, event handler attributes and
+  `javascript:` links are removed before it is shown.
+- **The email field is locked** (read only). The server decides which contact a submission is for by the email in
+  it, so changing it to another contact's address saves the submission to that contact and overwrites their details
+  (found when a test did exactly that). Changing a contact's email is what Edit is for.
+- The API client's `postForm()` sends a `FormData` as it is, and an error response that lists several
+  errors shows those instead of the generic "Your submission has errors".
 
 **The activity list** on the contact record comes from its own lean endpoint,
 `GET gh/v4/mobile/contacts/{id}/activity?limit=15&before=<unix time>` (`includes/mobile/activity-feed.php`), not the

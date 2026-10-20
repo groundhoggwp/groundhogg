@@ -5,6 +5,7 @@ import { ContactsView, ContactView } from '../views/contacts.jsx'
 import { TasksView, NewTaskSheet } from '../views/tasks.jsx'
 import { NotesPanel, ContactTasksPanel, ActivityPanel, NewContactSheet } from '../views/panels.jsx'
 import { openEmail } from '../views/email.jsx'
+import { openForm } from '../views/forms.jsx'
 
 export function registerCore () {
   return window.GroundhoggMobile.register( 'core', {
@@ -21,6 +22,7 @@ export function registerCore () {
     },
     contactActions: {
       email: openEmail,
+      form: openForm,
     },
     contactPanels: {
       notes: NotesPanel,

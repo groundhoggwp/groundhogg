@@ -210,6 +210,30 @@ body.ghm {
 .ghm-link-btn { border: 0; background: none; padding: 4px 6px; color: var(--ghm-accent); font-weight: 600; text-transform: none; letter-spacing: 0; cursor: pointer; }
 .ghm-tags-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; padding: 4px 16px 14px; }
 
+/* a form the server rendered (internal forms), restyled with the app's own tokens */
+.ghm-form-title { margin-bottom: 2px; font-size: 18px; }
+.ghm-form .gh-form-fields { display: block; }
+.ghm-form .gh-form-column { width: 100%; margin: 0 0 14px; }
+.ghm-form label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--ghm-muted); }
+.ghm-form .required { color: var(--ghm-danger); }
+.ghm-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]),
+.ghm-form select,
+.ghm-form textarea {
+  width: 100%; min-height: 44px; padding: 10px 14px; border-radius: var(--ghm-radius-sm);
+  background: var(--ghm-surface); border: 1px solid var(--ghm-border); color: var(--ghm-text); font: inherit; font-size: 16px;
+}
+.ghm-form textarea { min-height: 110px; resize: vertical; }
+.ghm-form input[readonly] { background: var(--ghm-raised); color: var(--ghm-muted); }
+.ghm-form input:focus, .ghm-form select:focus, .ghm-form textarea:focus { outline: 2px solid var(--ghm-accent); outline-offset: -1px; }
+.ghm-form input[type="checkbox"], .ghm-form input[type="radio"] { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--ghm-accent); }
+.ghm-form .gh-checkbox-label, .ghm-form .radio-item, .ghm-form .gh-radio-buttons label, .ghm-form .gh-checkboxes label { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; font-size: 15px; font-weight: 500; color: var(--ghm-text); }
+.ghm-form .gh-radio-buttons { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.ghm-form input[type="file"] { width: 100%; }
+.ghm-form button[type="submit"], .ghm-form .gh-submit {
+  display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 18px;
+  border: 0; border-radius: var(--ghm-radius-sm); background: var(--ghm-accent); color: var(--ghm-on-accent); font: inherit; font-weight: 650; cursor: pointer;
+}
+
 .ghm-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 16px 14px; }
 
 /* ---- sheet & toast ---------------------------------------------------------------------------------------- */
