@@ -39,3 +39,4 @@ test/                node --test
 2. Build a classic-script (IIFE) bundle that calls `GroundhoggMobile.register( id, { ... } )`, and **does not bundle
    Preact**: use `window.GroundhoggMobile.preact` (`h`, `Fragment`, and the hooks) so there is only one copy.
 3. Style with the `--ghm-*` tokens so the feature follows the user's theme.
+4. Put the main button of any sheet (Save, Send, Add) in `ctx.ui.SheetFooter`, so it stays on screen on a long sheet.

@@ -3,7 +3,7 @@
 // is now, so the record shows the result without fetching it again.
 
 import { useState } from 'preact/hooks'
-import { Button, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Select, SkeletonList } from '../ui/index.jsx'
+import { Button, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Select, SheetFooter, SkeletonList } from '../ui/index.jsx'
 import { changes, initialValues, isEmpty } from '../core/fields.js'
 import { countryOptions } from '../core/countries.js'
 import { fromApi, hasTag, isUnchanged, resultingTags, tagPayload } from '../core/tags.js'
@@ -90,7 +90,9 @@ export function EditContactSheet ( { ctx, close, contact } ) {
         </div>
       </div>
 
-      <Button variant="primary" block type="submit" disabled={ saving }>{ saving ? __( 'Saving…' ) : __( 'Save' ) }</Button>
+      <SheetFooter>
+        <Button variant="primary" block type="submit" disabled={ saving }>{ saving ? __( 'Saving…' ) : __( 'Save' ) }</Button>
+      </SheetFooter>
     </form>
   )
 }
@@ -185,9 +187,9 @@ export function EditTagsSheet ( { ctx, close, contact } ) {
 
       { ! loading && ! error && ! options.length && ! canCreate ? <Empty>{ typed ? __( 'No other tags match.' ) : __( 'No more tags to add.' ) }</Empty> : null }
 
-      <div style="margin-top:14px">
+      <SheetFooter>
         <Button variant="primary" block onClick={ submit } disabled={ saving }>{ saving ? __( 'Saving…' ) : __( 'Save tags' ) }</Button>
-      </div>
+      </SheetFooter>
     </>
   )
 }

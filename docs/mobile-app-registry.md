@@ -275,11 +275,15 @@ Every component receives a `ctx` prop:
 | `on( name, fn )`, `emit( name, payload )` | A small event bus. A sheet tells the screen under it something changed, e.g. `emit( 'contact:changed', { id, item } )` after an edit, and the contact record updates and reloads its panels. `on` returns the unsubscribe function |
 | `navigate( path )`, `route` | Hash router |
 | `toast( msg, type )`, `sheet( Component )`, `confirm( msg )` | Shell feedback and bottom-sheet presentation |
-| `ui` | The shared kit: `List`, `ListItem`, `Card`, `Button`, `Field`, `Select`, `DatePicker`, `Avatar`, `Empty`, `Loading`, `Sheet` |
+| `ui` | The shared kit: `List`, `ListItem`, `Card`, `Button`, `Field`, `Select`, `DatePicker`, `Avatar`, `Empty`, `Loading`, `Sheet`, `SheetFooter` |
 | `i18n` | `__`, `_x`, `_n`, `sprintf` with the feature's own text domain |
 | `h`, `Fragment`, hooks | Preact, exported by the shell |
 
 Rules for bundles:
+
+- **Put a sheet's main button (Save, Send, Add) in `ctx.ui.SheetFooter`.** It sticks to the bottom of the sheet, so it
+  is on screen however long the content above it is, and a first-time user (or someone with the keyboard open)
+  never has to scroll to find it. Core's sheets all do, and a test fails if one forgets.
 
 - **Do not bundle Preact.** Treat it as an external provided by `GroundhoggMobile`. Two copies break hooks, and the
   shell would otherwise download it twice.

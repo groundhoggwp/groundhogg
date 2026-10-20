@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { Avatar, Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, SkeletonList, Textarea } from '../ui/index.jsx'
+import { Avatar, Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
 import { plainText, useFetch, toApiDate, tomorrowMorning } from '../util.js'
 
 /**
@@ -150,7 +150,9 @@ export function NewTaskSheet ( { ctx, close, contact, onCreated } ) {
       <Field label={ __( 'Due' ) }>
         <Input type="datetime-local" value={ due } onInput={ e => setDue( e.currentTarget.value ) }/>
       </Field>
-      <Button variant="primary" block type="submit" disabled={ saving }>{ __( 'Add task' ) }</Button>
+      <SheetFooter>
+        <Button variant="primary" block type="submit" disabled={ saving }>{ __( 'Add task' ) }</Button>
+      </SheetFooter>
     </form>
   )
 }

@@ -5,7 +5,7 @@
 // submit (tags, flows, notifications) are all the form's own settings.
 
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { Button, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, SkeletonList } from '../ui/index.jsx'
+import { Button, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, SheetFooter, SkeletonList } from '../ui/index.jsx'
 import { formEntries, identitySelector, isUnsafeAttribute, UNSAFE_TAGS, withContact } from '../core/forms.js'
 import { contactName, itemOf, useDebounced, useFetch } from '../util.js'
 
@@ -86,6 +86,7 @@ function PickForm ( { ctx, contact, onPick } ) {
 function FillForm ( { ctx, close, contact, form, back } ) {
   const { __ } = ctx.i18n
   const ref = useRef( null )
+  const footerRef = useRef( null )
   const [ sending, setSending ] = useState( false )
   const [ error, setError ] = useState( null )
   const [ locked, setLocked ] = useState( false )
@@ -99,8 +100,27 @@ function FillForm ( { ctx, close, contact, form, back } ) {
       const identity = [ ...ref.current.querySelectorAll( identitySelector() ) ]
       identity.forEach( el => el.setAttribute( 'readonly', '' ) )
       setLocked( identity.length > 0 )
+
+      // The form's own submit button goes to the sheet's sticky footer, so it is always on screen. It still submits
+      // this form (the form attribute ties it back), so validation and onSubmit work as they did.
+      const button = ref.current.querySelector( 'button[type="submit"], input[type="submit"]' )
+
+      if ( button && footerRef.current ) {
+        ref.current.id = `ghm-form-${ form.id }`
+        button.setAttribute( 'form', ref.current.id )
+        footerRef.current.replaceChildren( button )
+      }
     }
   }, [ form.id ] )
+
+  // the moved button can't be disabled by the form's own state, so follow it here
+  useEffect( () => {
+    const button = footerRef.current && footerRef.current.querySelector( 'button, input' )
+
+    if ( button ) {
+      button.disabled = sending
+    }
+  }, [ sending ] )
 
   const submit = async e => {
     e.preventDefault()
@@ -131,6 +151,7 @@ function FillForm ( { ctx, close, contact, form, back } ) {
       { locked ? <p class="ghm-item-meta" style="margin-bottom:12px">{ __( 'The email can\'t be changed in a form. Use Edit on the contact to change it.' ) }</p> : null }
       <ErrorMessage error={ error }/>
       <form class="ghm-form" ref={ ref } onSubmit={ submit } aria-busy={ sending } style={ sending ? 'opacity:.6;pointer-events:none' : undefined }/>
+      <SheetFooter><div ref={ footerRef } style="display:contents"/></SheetFooter>
     </>
   )
 }

@@ -904,6 +904,7 @@
     Segmented: () => Segmented,
     Select: () => Select,
     Sheet: () => Sheet,
+    SheetFooter: () => SheetFooter,
     Skeleton: () => Skeleton,
     SkeletonList: () => SkeletonList,
     Textarea: () => Textarea,
@@ -1049,6 +1050,7 @@
       ] })
     ] });
   };
+  var SheetFooter = ({ children, ...props }) => /* @__PURE__ */ u3("div", { class: "ghm-sheet-footer", ...props, children });
   var Toast = ({ message, type }) => message ? /* @__PURE__ */ u3("div", { class: `ghm-toast ${type || ""}`, role: "status", children: message }) : null;
 
   // src/runtime.jsx
@@ -1429,7 +1431,7 @@
           /* @__PURE__ */ u3(Field, { label: __("Country"), children: /* @__PURE__ */ u3(Select, { value: values.country, onChange: set("country"), options: countryOptions(ctx.locale, values.country), placeholder: "", autocomplete: "country" }) })
         ] })
       ] }),
-      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: saving ? __("Saving\u2026") : __("Save") })
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: saving ? __("Saving\u2026") : __("Save") }) })
     ] });
   }
   function EditTagsSheet({ ctx, close, contact }) {
@@ -1491,7 +1493,7 @@
         options.map((t3) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "plus" }), title: t3.name, onClick: () => add(t3) }, t3.id))
       ] }),
       !loading && !error && !options.length && !canCreate ? /* @__PURE__ */ u3(Empty, { children: typed ? __("No other tags match.") : __("No more tags to add.") }) : null,
-      /* @__PURE__ */ u3("div", { style: "margin-top:14px", children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, onClick: submit, disabled: saving, children: saving ? __("Saving\u2026") : __("Save tags") }) })
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, onClick: submit, disabled: saving, children: saving ? __("Saving\u2026") : __("Save tags") }) })
     ] });
   }
 
@@ -1745,7 +1747,7 @@
     return /* @__PURE__ */ u3("form", { onSubmit: save2, children: [
       /* @__PURE__ */ u3(Field, { label: __("What needs doing?"), children: /* @__PURE__ */ u3(Textarea, { value: content, onInput: (e3) => setContent(e3.currentTarget.value), required: true, autofocus: true }) }),
       /* @__PURE__ */ u3(Field, { label: __("Due"), children: /* @__PURE__ */ u3(Input, { type: "datetime-local", value: due, onInput: (e3) => setDue(e3.currentTarget.value) }) }),
-      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add task") })
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add task") }) })
     ] });
   }
 
@@ -1912,7 +1914,7 @@
       /* @__PURE__ */ u3(Field, { label: __("Last name"), children: /* @__PURE__ */ u3(Input, { value: f3.last_name, onInput: set("last_name"), autocomplete: "off" }) }),
       /* @__PURE__ */ u3(Field, { label: __("Email"), children: /* @__PURE__ */ u3(Input, { type: "email", value: f3.email, onInput: set("email"), required: true, autocomplete: "off" }) }),
       /* @__PURE__ */ u3(Field, { label: __("Mobile phone"), children: /* @__PURE__ */ u3(Input, { type: "tel", value: f3.mobile_phone, onInput: set("mobile_phone"), autocomplete: "off" }) }),
-      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add contact") })
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add contact") }) })
     ] });
   }
 
@@ -2014,7 +2016,7 @@
       /* @__PURE__ */ u3(Field, { label: __("Subject"), children: /* @__PURE__ */ u3(Input, { value: subject, onInput: (e3) => setSubject(e3.currentTarget.value), required: true, autofocus: true }) }),
       /* @__PURE__ */ u3(Field, { label: __("Message"), children: /* @__PURE__ */ u3(Textarea, { style: "min-height:160px", value: body, onInput: (e3) => setBody(e3.currentTarget.value), required: true }) }),
       /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin:-6px 0 14px", children: __("Merge tags like {first} are filled in when it is sent.") }),
-      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: sending || !ready, children: sending ? __("Sending\u2026") : __("Send email") })
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: sending || !ready, children: sending ? __("Sending\u2026") : __("Send email") }) })
     ] });
   }
   function Templates({ ctx, close, contact, back }) {
@@ -2065,7 +2067,7 @@
         /* @__PURE__ */ u3(ListItem, { title: email.data.subject, subtitle: __("Subject") }),
         /* @__PURE__ */ u3(ListItem, { title: contactName(contact), subtitle: contact.data.email })
       ] }) }),
-      /* @__PURE__ */ u3(Button, { variant: "primary", block: true, onClick: send, disabled: sending, children: sending ? __("Sending\u2026") : __("Send now") })
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, onClick: send, disabled: sending, children: sending ? __("Sending\u2026") : __("Send now") }) })
     ] });
   }
 
@@ -2136,6 +2138,7 @@
   function FillForm({ ctx, close, contact, form, back }) {
     const { __ } = ctx.i18n;
     const ref = T2(null);
+    const footerRef = T2(null);
     const [sending, setSending] = d2(false);
     const [error, setError] = d2(null);
     const [locked, setLocked] = d2(false);
@@ -2145,8 +2148,20 @@
         const identity = [...ref.current.querySelectorAll(identitySelector())];
         identity.forEach((el) => el.setAttribute("readonly", ""));
         setLocked(identity.length > 0);
+        const button = ref.current.querySelector('button[type="submit"], input[type="submit"]');
+        if (button && footerRef.current) {
+          ref.current.id = `ghm-form-${form.id}`;
+          button.setAttribute("form", ref.current.id);
+          footerRef.current.replaceChildren(button);
+        }
       }
     }, [form.id]);
+    A2(() => {
+      const button = footerRef.current && footerRef.current.querySelector("button, input");
+      if (button) {
+        button.disabled = sending;
+      }
+    }, [sending]);
     const submit = async (e3) => {
       e3.preventDefault();
       setError(null);
@@ -2173,7 +2188,8 @@
       ] }),
       locked ? /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin-bottom:12px", children: __("The email can't be changed in a form. Use Edit on the contact to change it.") }) : null,
       /* @__PURE__ */ u3(ErrorMessage, { error }),
-      /* @__PURE__ */ u3("form", { class: "ghm-form", ref, onSubmit: submit, "aria-busy": sending, style: sending ? "opacity:.6;pointer-events:none" : void 0 })
+      /* @__PURE__ */ u3("form", { class: "ghm-form", ref, onSubmit: submit, "aria-busy": sending, style: sending ? "opacity:.6;pointer-events:none" : void 0 }),
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3("div", { ref: footerRef, style: "display:contents" }) })
     ] });
   }
 

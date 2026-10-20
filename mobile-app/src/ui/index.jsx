@@ -166,4 +166,10 @@ export const Sheet = ( { title, onClose, children } ) => {
   )
 }
 
+/**
+ * The main button of a sheet. It sticks to the bottom of the sheet, so it is on screen however long the content
+ * above it is, and a first-time user never has to look for it (or scroll for it past an open keyboard).
+ */
+export const SheetFooter = ( { children, ...props } ) => <div class="ghm-sheet-footer" { ...props }>{ children }</div>
+
 export const Toast = ( { message, type } ) => message ? <div class={ `ghm-toast ${ type || '' }` } role="status">{ message }</div> : null

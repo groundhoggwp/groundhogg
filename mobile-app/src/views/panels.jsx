@@ -2,7 +2,7 @@
 // same as an add-on's would.
 
 import { useState } from 'preact/hooks'
-import { Button, Empty, ErrorMessage, Field, Input, List, ListItem, SkeletonList, Textarea, Icon } from '../ui/index.jsx'
+import { Button, Empty, ErrorMessage, Field, Input, List, ListItem, SheetFooter, SkeletonList, Textarea, Icon } from '../ui/index.jsx'
 import { TaskRow, useTaskList, NewTaskSheet } from './tasks.jsx'
 import { itemOf, plainText, useFetch } from '../util.js'
 
@@ -184,7 +184,9 @@ export function NewContactSheet ( { ctx, close } ) {
       <Field label={ __( 'Last name' ) }><Input value={ f.last_name } onInput={ set( 'last_name' ) } autocomplete="off"/></Field>
       <Field label={ __( 'Email' ) }><Input type="email" value={ f.email } onInput={ set( 'email' ) } required autocomplete="off"/></Field>
       <Field label={ __( 'Mobile phone' ) }><Input type="tel" value={ f.mobile_phone } onInput={ set( 'mobile_phone' ) } autocomplete="off"/></Field>
-      <Button variant="primary" block type="submit" disabled={ saving }>{ __( 'Add contact' ) }</Button>
+      <SheetFooter>
+        <Button variant="primary" block type="submit" disabled={ saving }>{ __( 'Add contact' ) }</Button>
+      </SheetFooter>
     </form>
   )
 }

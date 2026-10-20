@@ -9,7 +9,7 @@
 // view_emails) and a contact that can receive email. The server has the final say on each of those.
 
 import { useState } from 'preact/hooks'
-import { Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, SkeletonList, Textarea } from '../ui/index.jsx'
+import { Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
 import { plainToHtml } from '../core/text.js'
 import { resolveHref } from '../core/template.js'
 import { contactName, useDebounced, useFetch } from '../util.js'
@@ -119,7 +119,9 @@ function Compose ( { ctx, close, contact, back } ) {
         <Textarea style="min-height:160px" value={ body } onInput={ e => setBody( e.currentTarget.value ) } required/>
       </Field>
       <p class="ghm-item-meta" style="margin:-6px 0 14px">{ __( 'Merge tags like {first} are filled in when it is sent.' ) }</p>
-      <Button variant="primary" block type="submit" disabled={ sending || ! ready }>{ sending ? __( 'Sending…' ) : __( 'Send email' ) }</Button>
+      <SheetFooter>
+        <Button variant="primary" block type="submit" disabled={ sending || ! ready }>{ sending ? __( 'Sending…' ) : __( 'Send email' ) }</Button>
+      </SheetFooter>
     </form>
   )
 }
@@ -195,7 +197,9 @@ function ConfirmTemplate ( { ctx, close, contact, email, back } ) {
         <ListItem title={ email.data.subject } subtitle={ __( 'Subject' ) }/>
         <ListItem title={ contactName( contact ) } subtitle={ contact.data.email }/>
       </List></Card>
-      <Button variant="primary" block onClick={ send } disabled={ sending }>{ sending ? __( 'Sending…' ) : __( 'Send now' ) }</Button>
+      <SheetFooter>
+        <Button variant="primary" block onClick={ send } disabled={ sending }>{ sending ? __( 'Sending…' ) : __( 'Send now' ) }</Button>
+      </SheetFooter>
     </>
   )
 }
