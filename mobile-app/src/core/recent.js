@@ -59,11 +59,3 @@ export function withoutRecents ( items, recents ) {
   const ids = new Set( recents.map( r => Number( r.id ) ) )
   return items.filter( i => ! ids.has( Number( i.id ?? i.ID ) ) )
 }
-
-/**
- * A name as a search term for a server that searches with a regular expression, so a name with brackets in it
- * finds itself instead of being a broken pattern.
- */
-export function escapeRegex ( text ) {
-  return String( text ).replace( /[.*+?^${}()|[\]\\]/g, '\\$&' )
-}

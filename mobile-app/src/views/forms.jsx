@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { Button, Card, Empty, ErrorMessage, Icon, Input, List, ListItem, SheetFooter, Skeleton, SkeletonList, Subhead } from '../ui/index.jsx'
 import { formEntries, identitySelector, isUnsafeAttribute, UNSAFE_TAGS, withContact } from '../core/forms.js'
-import { escapeRegex, withoutRecents } from '../core/recent.js'
+import { withoutRecents } from '../core/recent.js'
 import { contactName, itemOf, useDebounced, useFetch } from '../util.js'
 
 /**
@@ -75,7 +75,7 @@ function PickForm ( { ctx, contact, onPick } ) {
 
   /**
    * A recent form is opened from the list we already have when it's there. The list only holds the newest forms, so
-   * otherwise it is looked up by its name. If it isn't found it was deleted or switched off, so it is forgotten.
+   * otherwise it is read by its id. If the server says it isn't there, it was deleted or switched off, so it is forgotten.
    */
   const pickRecent = async r => {
     const known = listed.find( f => f.id === r.id )
@@ -88,18 +88,25 @@ function PickForm ( { ctx, contact, onPick } ) {
     setOpening( r.id )
 
     try {
-      const res = await ctx.api.get( 'forms', { active: true, contact: contact.ID, search: escapeRegex( r.name ) } )
-      const found = formEntries( res.items ).find( f => f.id === r.id )
+      const res = await ctx.api.get( `forms/${ r.id }`, { contact: contact.ID } )
+      const found = formEntries( [ res.item ] )[ 0 ]
 
       if ( found ) {
         onPick( found )
         return
       }
 
+      // a form this app can't show (an older one), which is as good as gone
       ctx.recent.forget( 'form', r.id )
       ctx.toast( __( 'That form is no longer available.' ), 'error' )
     } catch ( err ) {
-      ctx.toast( err.message, 'error' )
+      if ( err.status === 404 ) {
+        ctx.recent.forget( 'form', r.id )
+        ctx.toast( __( 'That form is no longer available.' ), 'error' )
+      } else {
+        // a bad connection says nothing about the form, so it stays
+        ctx.toast( err.message, 'error' )
+      }
     }
 
     setOpening( 0 )

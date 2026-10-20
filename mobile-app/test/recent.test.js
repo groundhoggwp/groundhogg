@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { touch, drop, normalizeRecent, withoutRecents, escapeRegex, MAX_RECENT } from '../src/core/recent.js'
+import { touch, drop, normalizeRecent, withoutRecents, MAX_RECENT } from '../src/core/recent.js'
 
 test( 'touch puts the latest first and moves a repeat to the front without duplicating it', () => {
   let list = []
@@ -60,11 +60,4 @@ test( 'withoutRecents shows something once, whichever way the id is named', () =
   assert.deepEqual( withoutRecents( [ { ID: '1' }, { ID: '2' }, { ID: 3 } ], recents ).map( i => i.ID ), [ '1', 3 ] )
   assert.deepEqual( withoutRecents( [ { id: 2 }, { id: 9 } ], recents ).map( i => i.id ), [ 9 ] )
   assert.deepEqual( withoutRecents( [ { id: 1 } ], [] ), [ { id: 1 } ] )
-})
-
-test( 'escapeRegex makes a name safe to search for as a pattern', () => {
-  assert.equal( escapeRegex( 'Intake (v2) [draft] + more?' ), 'Intake \\(v2\\) \\[draft\\] \\+ more\\?' )
-  assert.equal( escapeRegex( 'Plain name' ), 'Plain name' )
-  assert.ok( new RegExp( escapeRegex( 'a.b*c' ) ).test( 'a.b*c' ) )
-  assert.ok( ! new RegExp( escapeRegex( 'a.b' ) ).test( 'axb' ) )
 })

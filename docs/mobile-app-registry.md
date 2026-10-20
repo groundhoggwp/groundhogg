@@ -440,9 +440,9 @@ repeats them, and a search shows ordinary results.
 - **An entry is `{ id, name, sub }`**: the name (and second line) it was used under, so a recent is drawn without
   fetching it. Eight are kept per kind, and a repeat moves to the front. A name can go stale if the thing is renamed.
 - **Recorded on success**, not when something is opened: after the email sends, the form submits, the tags save.
-- **Gone things drop out.** A template that returns 404 is forgotten. A recent form that isn't in the list is looked up
-  by name, and forgotten when it isn't found (`GET forms/{id}` can't be used: core registers that route without a
-  handler).
+- **Gone things drop out.** A template that returns 404 is forgotten. A recent form that isn't in the list (it holds
+  the newest 25) is read with `GET forms/{id}`, and forgotten on a 404. That route was registered in core with no
+  handler, so this branch adds one: it returns the same item as the list, and only for an active form step.
 - **Add-ons** add their own kind with the `groundhogg/mobile/recent_kinds` filter (a pipeline, say) and use
   `ctx.recent` in their own lists.
 

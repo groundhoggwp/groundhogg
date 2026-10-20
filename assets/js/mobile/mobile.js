@@ -906,9 +906,6 @@
     const ids = new Set(recents.map((r3) => Number(r3.id)));
     return items.filter((i3) => !ids.has(Number(i3.id ?? i3.ID)));
   }
-  function escapeRegex(text) {
-    return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  }
 
   // src/ui/index.jsx
   var ui_exports = {};
@@ -2210,8 +2207,8 @@
       }
       setOpening(r3.id);
       try {
-        const res = await ctx.api.get("forms", { active: true, contact: contact.ID, search: escapeRegex(r3.name) });
-        const found = formEntries(res.items).find((f3) => f3.id === r3.id);
+        const res = await ctx.api.get(`forms/${r3.id}`, { contact: contact.ID });
+        const found = formEntries([res.item])[0];
         if (found) {
           onPick(found);
           return;
@@ -2219,7 +2216,12 @@
         ctx.recent.forget("form", r3.id);
         ctx.toast(__("That form is no longer available."), "error");
       } catch (err) {
-        ctx.toast(err.message, "error");
+        if (err.status === 404) {
+          ctx.recent.forget("form", r3.id);
+          ctx.toast(__("That form is no longer available."), "error");
+        } else {
+          ctx.toast(err.message, "error");
+        }
       }
       setOpening(0);
     };
