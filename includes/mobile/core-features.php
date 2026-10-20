@@ -101,6 +101,13 @@ class Core_Features {
 					'priority' => 20,
 					'cap'      => 'view_tasks',
 				],
+				[
+					'id'       => 'activity',
+					'label'    => __( 'Activity', 'groundhogg' ),
+					'icon'     => 'globe',
+					'priority' => 30,
+					'cap'      => 'view_contacts',
+				],
 			],
 			'quick_create'     => [
 				[

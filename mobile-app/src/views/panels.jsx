@@ -2,7 +2,7 @@
 // same as an add-on's would.
 
 import { useState } from 'preact/hooks'
-import { Button, Empty, ErrorMessage, Field, Input, List, SkeletonList, Textarea, Icon } from '../ui/index.jsx'
+import { Button, Empty, ErrorMessage, Field, Input, List, ListItem, SkeletonList, Textarea, Icon } from '../ui/index.jsx'
 import { TaskRow, useTaskList, NewTaskSheet } from './tasks.jsx'
 import { itemOf, plainText, useFetch } from '../util.js'
 
@@ -59,6 +59,65 @@ export function NotesPanel ( { ctx, contact } ) {
           <small>{ n.i18n.time_diff } { __( 'ago' ) }</small>
         </div>
       ) ) }
+    </>
+  )
+}
+
+const PAGE = 15
+
+/**
+ * A short, recent list of what has happened with the contact: emails sent and opened, replies, form submissions,
+ * pages visited. It comes from a lean endpoint (not the desktop timeline, which is megabytes for a busy contact) a
+ * page at a time, newest first.
+ */
+export function ActivityPanel ( { ctx, contact } ) {
+  const { __, sprintf } = ctx.i18n
+  const path = `mobile/contacts/${ contact.ID }/activity`
+
+  const first = useFetch( () => ctx.api.get( path, { limit: PAGE } ), [ contact.ID ] )
+  const [ more, setMore ] = useState( { items: [], cursor: null, busy: false } )
+
+  // the cursor is the last page loaded, which is the first one until more has been asked for
+  const base = first.data
+  const cursor = more.cursor || ( base ? { has_more: base.has_more, next_before: base.next_before } : null )
+
+  // the cursor is inclusive, so a page can start with the entry the last one ended on
+  const seen = new Set()
+  const items = [ ...( base ? base.items : [] ), ...more.items ].filter( i => ! seen.has( i.id ) && seen.add( i.id ) )
+
+  const loadMore = async () => {
+    setMore( m => ( { ...m, busy: true } ) )
+
+    try {
+      const page = await ctx.api.get( path, { limit: PAGE, before: cursor.next_before } )
+      setMore( m => ( { items: [ ...m.items, ...page.items ], cursor: { has_more: page.has_more, next_before: page.next_before }, busy: false } ) )
+    } catch ( err ) {
+      setMore( m => ( { ...m, busy: false } ) )
+      ctx.toast( err.message, 'error' )
+    }
+  }
+
+  return (
+    <>
+      <ErrorMessage error={ first.error }/>
+      { first.loading && ! items.length ? <SkeletonList variant="avatar" rows={ 4 }/> : null }
+      { ! first.loading && ! first.error && ! items.length ? <Empty>{ __( 'No activity yet.' ) }</Empty> : null }
+      { items.length ? (
+        <List>
+          { items.map( i => (
+            <ListItem
+              leading={ <span class={ `ghm-act-icon ${ i.tone || '' }` }><Icon name={ i.icon }/></span> }
+              title={ i.title }
+              subtitle={ i.detail }
+              meta={ sprintf( __( '%s ago' ), i.time_diff ) }
+              key={ i.id }
+            />
+          ) ) }
+        </List>
+      ) : null }
+      { cursor && cursor.has_more ? (
+        <div class="ghm-more"><Button block onClick={ loadMore } disabled={ more.busy }>{ more.busy ? __( 'Loading…' ) : __( 'Show older' ) }</Button></div>
+      ) : null }
     </>
   )
 }

@@ -392,6 +392,25 @@ Where it differs from the draft above, or decides something the draft left open:
   `white_labeled_name()`, falling back to the site's name if a white labeled site hasn't set one. Add-on authors:
   keep the brand out of the `label` of your registrations. A PHPUnit test and a JS test fail if core's do.
 
+**The activity list** on the contact record comes from its own lean endpoint,
+`GET gh/v4/mobile/contacts/{id}/activity?limit=15&before=<unix time>` (`includes/mobile/activity-feed.php`), not the
+desktop timeline. That endpoint returns everything in a date range, including full email bodies and flow definitions:
+about 1.4 MB and 4 seconds for 90 days on a busy contact. This one is a few KB.
+
+- Entries are plain lines (`id`, `type`, `icon`, `title`, `detail`, `time`, `time_diff`, `tone`), newest first:
+  emails sent and failed, opens, clicks, bounces, unsubscribes, emails written to or received from the contact, form
+  submissions and page visits. Flow steps that aren't emails, logins and the site's own pages (preferences, archive)
+  are left out as noise.
+- `before` is an inclusive cursor, so a page starts with the entry the last one ended on, and the client drops it by
+  id. Same-second entries are never skipped.
+- Rows dropped after the query would make a page come back short and look like the last one, so each source reads in
+  batches until it has enough entries (up to `MAX_BATCHES` of at least `MIN_BATCH` rows). Past that cap, noise is
+  not scanned further.
+- Permission is `view_contact` on the contact, the same as the desktop timeline, so reps see their own contacts'
+  activity and managers their team's.
+- **Add-ons add entries** with the `groundhogg/mobile/activity_feed` filter (an entry needs a unique `id`, a `type`,
+  an `icon` from the app's icon set, a `title`, and a unix `time`). A deal moving stage is the obvious one.
+
 Findings from reading the API while building the screens (worth knowing for add-on authors):
 
 - `Base_Object_Api::read()` filters items with `current_user_can_read()` **after** the query. For a user who can't see

@@ -26,7 +26,14 @@ class App {
 	 */
 	const REWRITES_VERSION = 1;
 
+	/**
+	 * @var Activity_Feed
+	 */
+	public $activity_feed;
+
 	public function __construct() {
+		$this->activity_feed = new Activity_Feed();
+
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 		add_action( 'init', [ $this, 'maybe_flush_rewrite_rules' ], 99 );
 

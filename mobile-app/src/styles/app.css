@@ -195,6 +195,11 @@ body.ghm {
 .ghm-note-form { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--ghm-border); align-items: flex-end; }
 .ghm-note-form .ghm-textarea { min-height: 46px; height: 46px; resize: none; }
 
+.ghm-act-icon { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--ghm-raised); color: var(--ghm-muted); }
+.ghm-act-icon.negative { background: color-mix(in srgb, var(--ghm-danger) 14%, transparent); color: var(--ghm-danger); }
+.ghm-act-icon .ghm-icon { width: 18px; height: 18px; }
+.ghm-more { padding: 10px 16px 14px; }
+
 .ghm-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 16px 14px; }
 
 /* ---- sheet & toast ---------------------------------------------------------------------------------------- */

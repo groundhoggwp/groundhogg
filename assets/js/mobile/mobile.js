@@ -928,6 +928,10 @@
     building: "M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17M15 9h3a1 1 0 0 1 1 1v11M3 21h18M9 7h2M9 11h2M9 15h2",
     external: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5",
     logout: "M15 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3M10 16l-4-4 4-4M6 12h10",
+    eye: "M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z",
+    link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1",
+    globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3c2.5 2.4 3.8 5.4 3.8 9s-1.3 6.6-3.8 9c-2.5-2.4-3.8-5.4-3.8-9S9.5 5.4 12 3Z",
+    alert: "M12 4 2.5 20h19L12 4ZM12 10v4M12 17h.01",
     dot: "M12 12h.01"
   };
   function Icon({ name, size, ...props }) {
@@ -1534,6 +1538,43 @@
       ] }, n2.ID))
     ] });
   }
+  var PAGE = 15;
+  function ActivityPanel({ ctx, contact }) {
+    const { __, sprintf: sprintf2 } = ctx.i18n;
+    const path = `mobile/contacts/${contact.ID}/activity`;
+    const first = useFetch(() => ctx.api.get(path, { limit: PAGE }), [contact.ID]);
+    const [more, setMore] = d2({ items: [], cursor: null, busy: false });
+    const base = first.data;
+    const cursor = more.cursor || (base ? { has_more: base.has_more, next_before: base.next_before } : null);
+    const seen = /* @__PURE__ */ new Set();
+    const items = [...base ? base.items : [], ...more.items].filter((i3) => !seen.has(i3.id) && seen.add(i3.id));
+    const loadMore = async () => {
+      setMore((m3) => ({ ...m3, busy: true }));
+      try {
+        const page = await ctx.api.get(path, { limit: PAGE, before: cursor.next_before });
+        setMore((m3) => ({ items: [...m3.items, ...page.items], cursor: { has_more: page.has_more, next_before: page.next_before }, busy: false }));
+      } catch (err) {
+        setMore((m3) => ({ ...m3, busy: false }));
+        ctx.toast(err.message, "error");
+      }
+    };
+    return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3(ErrorMessage, { error: first.error }),
+      first.loading && !items.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "avatar", rows: 4 }) : null,
+      !first.loading && !first.error && !items.length ? /* @__PURE__ */ u3(Empty, { children: __("No activity yet.") }) : null,
+      items.length ? /* @__PURE__ */ u3(List, { children: items.map((i3) => /* @__PURE__ */ u3(
+        ListItem,
+        {
+          leading: /* @__PURE__ */ u3("span", { class: `ghm-act-icon ${i3.tone || ""}`, children: /* @__PURE__ */ u3(Icon, { name: i3.icon }) }),
+          title: i3.title,
+          subtitle: i3.detail,
+          meta: sprintf2(__("%s ago"), i3.time_diff)
+        },
+        i3.id
+      )) }) : null,
+      cursor && cursor.has_more ? /* @__PURE__ */ u3("div", { class: "ghm-more", children: /* @__PURE__ */ u3(Button, { block: true, onClick: loadMore, disabled: more.busy, children: more.busy ? __("Loading\u2026") : __("Show older") }) }) : null
+    ] });
+  }
   function ContactTasksPanel({ ctx, contact }) {
     const { __ } = ctx.i18n;
     const { tasks, error, loading, reload, complete } = useTaskList(ctx, {
@@ -1757,7 +1798,8 @@
       },
       contactPanels: {
         notes: NotesPanel,
-        tasks: ContactTasksPanel
+        tasks: ContactTasksPanel,
+        activity: ActivityPanel
       },
       quickCreate: {
         "new-contact": NewContactSheet,
