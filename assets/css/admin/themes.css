@@ -1945,6 +1945,16 @@ body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step.has-changes {
   );
 }
 
+/* JS-rendered headers (email editor, flow editor, API docs, dashboard) draw the logo as a direct child
+   <svg> with its own navy background, some of them behind an #id selector. The PHP header leaves it
+   transparent, so match that. */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-header > svg:first-child,
+body.groundhogg-admin-page[class*="gh-theme-"] #email-editor .gh-header > svg,
+body.groundhogg-admin-page[class*="gh-theme-"] #api-docs .gh-header > svg,
+body.groundhogg-admin-page[class*="gh-theme-"] .funnel-editor-header > svg {
+  background-color: transparent;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Themes                                                                     */
 /* -------------------------------------------------------------------------- */
