@@ -482,6 +482,27 @@ Findings from reading the API while building the screens (worth knowing for add-
 - Task and note list scoping for reps is by the `view_others_*` capabilities and `map_meta_cap`, with the list
   filtered per item as above. "My tasks" asks for `user_id = me` explicitly rather than relying on that.
 
+### Replies and messages
+
+The desktop app's Messages (what a contact has sent and what was sent to them) and Replies (who has written back and
+hasn't been read) are in the app too, as core's `replies` home card and `messages` contact panel
+(`mobile-app/src/views/messages.jsx`). There is no new server code: both read the same endpoints as the desktop, so
+what counts as unread is the same in both, and the server decides what a person can see.
+
+- **Replies** (Home, first card): `GET messages/unread`, the contacts that have unread replies, newest first, with how
+  many. A row opens the contact. It shows nothing when there is nothing.
+- **Messages** (first panel in a contact): `GET messages/feed`, a page at a time, newest first. Opening a received
+  message reads it (`POST messages/read`), and it can be marked unread again. Automated broadcast and flow emails are
+  not in it, they are in Activity.
+- **Reply** is the email composer with who it is to, the subject (`Re: `) and the `In-Reply-To` and `References`
+  headers filled in, sent with `emails/send`, which stores it in the conversation. The headers are worked out by
+  `core/messages.js`, with the same rule as the desktop's Messages, so the reply is threaded in the contact's mail
+  app and in the inbox. It needs `send_emails`, and a contact that can receive email.
+- A message is shown as text, never as markup. What it was in reply to (a "wrote:" line, or quoted lines) is behind
+  "Show earlier text".
+- Replies only come back into Messages by themselves when the site's inbox is set up; the app doesn't say so, the
+  desktop's Messages does.
+
 ### Finding the app from the admin
 
 Nobody finds an app they were never told about, so the admin points at it (`includes/mobile/promo.php`,

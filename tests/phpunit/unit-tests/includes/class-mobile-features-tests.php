@@ -371,6 +371,14 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 		}
 	}
 
+	public function test_replies_come_first_on_home_and_messages_first_in_a_contact() {
+		$visible = ( new Features() )->for_user( $this->user_with_role( 'sales_rep' ) );
+		$core    = $visible['features']['core'];
+
+		$this->assertSame( 'replies', $core['home_cards'][0]['id'] );
+		$this->assertSame( 'messages', $core['contact_panels'][0]['id'] );
+	}
+
 	public function test_the_app_name_is_never_blank() {
 		$this->assertNotSame( '', App::name() );
 	}

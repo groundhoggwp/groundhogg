@@ -51,6 +51,13 @@ class Core_Features {
 			],
 			'home_cards'       => [
 				[
+					// who has written back and hasn't been read, the first thing to look at
+					'id'       => 'replies',
+					'label'    => __( 'Replies', 'groundhogg' ),
+					'priority' => 5,
+					'cap'      => 'view_contacts',
+				],
+				[
 					'id'       => 'my-tasks',
 					'label'    => __( 'My tasks', 'groundhogg' ),
 					'priority' => 10,
@@ -102,6 +109,15 @@ class Core_Features {
 				],
 			],
 			'contact_panels'   => [
+				[
+					// the conversation with them: what they have sent, what has been sent to them, and a way to reply
+					'id'       => 'messages',
+					'label'    => __( 'Messages', 'groundhogg' ),
+					'icon'     => 'mail',
+					'priority' => 5,
+					// the same as seeing the contact, see Main_Roles::map_meta_cap
+					'cap'      => 'view_contacts',
+				],
 				[
 					'id'       => 'notes',
 					'label'    => __( 'Notes', 'groundhogg' ),

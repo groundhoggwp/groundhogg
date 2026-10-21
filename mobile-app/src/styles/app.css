@@ -204,6 +204,16 @@ body.ghm {
 .ghm-act-icon .ghm-icon { width: 18px; height: 18px; }
 .ghm-more { padding: 10px 16px 14px; }
 
+/* messages: a conversation, a line each until one is opened */
+.ghm-msg .ghm-item { align-items: center; }
+.ghm-msg.is-unread .ghm-item-title { font-weight: 700; }
+.ghm-msg.in .ghm-act-icon { color: var(--ghm-accent); }
+.ghm-unread-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ghm-accent); vertical-align: middle; }
+.ghm-msg-body { padding: 2px 16px 14px 64px; }
+.ghm-msg-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 8px; }
+.ghm-msg-quoted { color: var(--ghm-muted); border-left: 3px solid var(--ghm-border); padding-left: 10px; margin-top: 8px; }
+.ghm-msg-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
 .ghm-subhead { margin: 4px 2px 8px; font-size: 13px; font-weight: 650; letter-spacing: .02em; text-transform: uppercase; color: var(--ghm-muted); }
 
 .ghm-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px 4px 12px; border-radius: 99px; background: var(--ghm-raised); font-size: 14px; font-weight: 600; }

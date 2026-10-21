@@ -77,12 +77,24 @@ function EmailSheet ( { ctx, close, contact } ) {
   )
 }
 
-function Compose ( { ctx, close, contact, back } ) {
+/**
+ * Writing an email to a contact. It is also what a reply is, which is the same email with who it is to, its subject
+ * and the headers that put it in the conversation already filled in.
+ *
+ * @param {object} props
+ * @param {string[]} [props.to] defaults to the contact's email
+ * @param {string} [props.subject] what the subject starts as
+ * @param {Object<string,string>} [props.headers] In-Reply-To and References, when it is a reply
+ * @param {Function} [props.onSent] called once it has been sent
+ * @param {Function} [props.back] there is a Back button when there is somewhere to go back to
+ */
+export function Compose ( { ctx, close, contact, back, to, subject: initialSubject = '', headers, onSent } ) {
   const { __ } = ctx.i18n
-  const [ subject, setSubject ] = useState( '' )
+  const [ subject, setSubject ] = useState( initialSubject )
   const [ body, setBody ] = useState( '' )
   const [ sending, setSending ] = useState( false )
 
+  const recipients = to && to.length ? to : [ contact.data.email ]
   const ready = subject.trim() && body.trim()
 
   const send = async e => {
@@ -96,13 +108,18 @@ function Compose ( { ctx, close, contact, back } ) {
 
     try {
       await ctx.api.post( 'emails/send', {
-        to: [ contact.data.email ],
+        to: recipients,
         subject: subject.trim(),
         content: plainToHtml( body ),
+        ...( headers && Object.keys( headers ).length ? { headers } : {} ),
       } )
 
       ctx.toast( __( 'Email sent' ) )
       close()
+
+      if ( onSent ) {
+        onSent()
+      }
     } catch ( err ) {
       setSending( false )
       ctx.toast( err.message, 'error' )
@@ -111,13 +128,13 @@ function Compose ( { ctx, close, contact, back } ) {
 
   return (
     <form onSubmit={ send }>
-      <BackButton onClick={ back } label={ __( 'Back' ) }/>
-      <p class="ghm-item-meta" style="margin-bottom:12px">{ __( 'To' ) }: { contactName( contact ) } &lt;{ contact.data.email }&gt;</p>
+      { back ? <BackButton onClick={ back } label={ __( 'Back' ) }/> : null }
+      <p class="ghm-item-meta" style="margin-bottom:12px">{ __( 'To' ) }: { recipients[ 0 ] === contact.data.email ? <>{ contactName( contact ) } &lt;{ recipients[ 0 ] }&gt;</> : recipients.join( ', ' ) }</p>
       <Field label={ __( 'Subject' ) }>
-        <Input value={ subject } onInput={ e => setSubject( e.currentTarget.value ) } required autofocus/>
+        <Input value={ subject } onInput={ e => setSubject( e.currentTarget.value ) } required autofocus={ ! initialSubject }/>
       </Field>
       <Field label={ __( 'Message' ) }>
-        <Textarea style="min-height:160px" value={ body } onInput={ e => setBody( e.currentTarget.value ) } required/>
+        <Textarea style="min-height:160px" value={ body } onInput={ e => setBody( e.currentTarget.value ) } required autofocus={ !! initialSubject }/>
       </Field>
       <p class="ghm-item-meta" style="margin:-6px 0 14px">{ __( 'Merge tags like {first} are filled in when it is sent.' ) }</p>
       <SheetFooter>

@@ -971,6 +971,8 @@
     globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3c2.5 2.4 3.8 5.4 3.8 9s-1.3 6.6-3.8 9c-2.5-2.4-3.8-5.4-3.8-9S9.5 5.4 12 3Z",
     alert: "M12 4 2.5 20h19L12 4ZM12 10v4M12 17h.01",
     form: "M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1ZM8 6H6a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2M9 12h6M9 16h4",
+    reply: "M9 14 4 9l5-5M4 9h10a6 6 0 0 1 6 6v3",
+    send: "M21 3 10 14M21 3l-7 18-4-7-7-4 18-7Z",
     dot: "M12 12h.01"
   };
   function Icon({ name, size, ...props }) {
@@ -2068,11 +2070,12 @@
       ) : null
     ] });
   }
-  function Compose({ ctx, close, contact, back }) {
+  function Compose({ ctx, close, contact, back, to, subject: initialSubject = "", headers, onSent }) {
     const { __ } = ctx.i18n;
-    const [subject, setSubject] = d2("");
+    const [subject, setSubject] = d2(initialSubject);
     const [body, setBody] = d2("");
     const [sending, setSending] = d2(false);
+    const recipients = to && to.length ? to : [contact.data.email];
     const ready = subject.trim() && body.trim();
     const send = async (e3) => {
       e3.preventDefault();
@@ -2082,29 +2085,35 @@
       setSending(true);
       try {
         await ctx.api.post("emails/send", {
-          to: [contact.data.email],
+          to: recipients,
           subject: subject.trim(),
-          content: plainToHtml(body)
+          content: plainToHtml(body),
+          ...headers && Object.keys(headers).length ? { headers } : {}
         });
         ctx.toast(__("Email sent"));
         close();
+        if (onSent) {
+          onSent();
+        }
       } catch (err) {
         setSending(false);
         ctx.toast(err.message, "error");
       }
     };
     return /* @__PURE__ */ u3("form", { onSubmit: send, children: [
-      /* @__PURE__ */ u3(BackButton, { onClick: back, label: __("Back") }),
+      back ? /* @__PURE__ */ u3(BackButton, { onClick: back, label: __("Back") }) : null,
       /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin-bottom:12px", children: [
         __("To"),
         ": ",
-        contactName(contact),
-        " <",
-        contact.data.email,
-        ">"
+        recipients[0] === contact.data.email ? /* @__PURE__ */ u3(M, { children: [
+          contactName(contact),
+          " <",
+          recipients[0],
+          ">"
+        ] }) : recipients.join(", ")
       ] }),
-      /* @__PURE__ */ u3(Field, { label: __("Subject"), children: /* @__PURE__ */ u3(Input, { value: subject, onInput: (e3) => setSubject(e3.currentTarget.value), required: true, autofocus: true }) }),
-      /* @__PURE__ */ u3(Field, { label: __("Message"), children: /* @__PURE__ */ u3(Textarea, { style: "min-height:160px", value: body, onInput: (e3) => setBody(e3.currentTarget.value), required: true }) }),
+      /* @__PURE__ */ u3(Field, { label: __("Subject"), children: /* @__PURE__ */ u3(Input, { value: subject, onInput: (e3) => setSubject(e3.currentTarget.value), required: true, autofocus: !initialSubject }) }),
+      /* @__PURE__ */ u3(Field, { label: __("Message"), children: /* @__PURE__ */ u3(Textarea, { style: "min-height:160px", value: body, onInput: (e3) => setBody(e3.currentTarget.value), required: true, autofocus: !!initialSubject }) }),
       /* @__PURE__ */ u3("p", { class: "ghm-item-meta", style: "margin:-6px 0 14px", children: __("Merge tags like {first} are filled in when it is sent.") }),
       /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: sending || !ready, children: sending ? __("Sending\u2026") : __("Send email") }) })
     ] });
@@ -2335,6 +2344,213 @@
     ] });
   }
 
+  // src/core/messages.js
+  function isMessageId(id) {
+    return /^<[^<>\s@]+@[^<>\s@]+>$/.test(id || "");
+  }
+  function replyHeaders(message) {
+    const { message_id, thread_id } = message && message.data || {};
+    if (!isMessageId(message_id)) {
+      return {};
+    }
+    return {
+      "In-Reply-To": message_id,
+      "References": [thread_id, message_id].filter((id, i3, ids) => isMessageId(id) && ids.indexOf(id) === i3).join(" ")
+    };
+  }
+  function replySubject(subject, prefix = "Re:") {
+    const text = String(subject || "").trim();
+    if (/^re\s*:/i.test(text)) {
+      return text;
+    }
+    return `${prefix} ${text}`.trim();
+  }
+  function replyRecipients(message) {
+    const from = (message && message.data && message.data.from_address || "").trim();
+    return from ? [from] : [];
+  }
+  function splitQuoted(text) {
+    const lines = String(text || "").replace(/\r\n?/g, "\n").split("\n");
+    const at = lines.findIndex((line, i3) => {
+      if (/^\s*On .{5,200} wrote:\s*$/i.test(line)) {
+        return i3 > 0;
+      }
+      return i3 > 0 && /^\s*>/.test(line) && /^\s*>/.test(lines[i3 + 1] || "");
+    });
+    let cut = at;
+    if (cut > 0 && /wrote:\s*$/i.test(lines[cut - 1])) {
+      if (/^\s*On /i.test(lines[cut - 1])) {
+        cut -= 1;
+      } else if (/^\s*On /i.test(lines[cut - 2] || "")) {
+        cut -= 2;
+      }
+    }
+    if (cut < 1) {
+      return { text: lines.join("\n").trim(), quoted: "" };
+    }
+    return {
+      text: lines.slice(0, cut).join("\n").trim(),
+      quoted: lines.slice(cut).join("\n").trim()
+    };
+  }
+  function messageText(html) {
+    const source = String(html || "").replace(/<(style|script|head|title)[\s\S]*?<\/\1>/gi, "").replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|div|li|tr|h[1-6]|blockquote)>/gi, "\n\n");
+    let text;
+    if (typeof DOMParser !== "undefined") {
+      text = new DOMParser().parseFromString(source, "text/html").body.textContent || "";
+    } else {
+      text = source.replace(/<[^>]*>/g, "");
+    }
+    return text.replace(/\u00a0/g, " ").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  // src/views/messages.jsx
+  var PAGE2 = 10;
+  function RepliesCard({ ctx }) {
+    const { __, sprintf: sprintf2 } = ctx.i18n;
+    const { data, error, loading } = useFetch(() => ctx.api.get("messages/unread", { limit: 5 }), []);
+    const items = data && data.items || [];
+    if (!loading && !error && !items.length) {
+      return null;
+    }
+    return /* @__PURE__ */ u3(Card, { title: __("Replies"), children: [
+      /* @__PURE__ */ u3(ErrorMessage, { error }),
+      loading && !items.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "avatar", rows: 2 }) : null,
+      items.length ? /* @__PURE__ */ u3(List, { children: items.map((i3) => /* @__PURE__ */ u3(
+        ListItem,
+        {
+          leading: /* @__PURE__ */ u3(Avatar, { name: i3.contact.name, src: avatarUrl({ data: { gravatar: i3.contact.avatar } }) }),
+          title: i3.contact.name,
+          subtitle: i3.latest.preview || i3.latest.data.subject,
+          meta: /* @__PURE__ */ u3(M, { children: [
+            sprintf2(__("%s ago"), i3.latest.i18n.time_diff),
+            i3.unread > 1 ? /* @__PURE__ */ u3(M, { children: [
+              " ",
+              /* @__PURE__ */ u3(Pill, { color: "red", children: i3.unread })
+            ] }) : null
+          ] }),
+          href: `#/contacts/${i3.object_id}`
+        },
+        i3.object_id
+      )) }) : null
+    ] });
+  }
+  function ReplySheet({ ctx, close, contact, message, onSent }) {
+    const { __ } = ctx.i18n;
+    return /* @__PURE__ */ u3(
+      Compose,
+      {
+        ctx,
+        close,
+        contact,
+        to: replyRecipients(message),
+        subject: replySubject(message.data.subject, __("Re:")),
+        headers: replyHeaders(message),
+        onSent
+      }
+    );
+  }
+  function NewMessageSheet({ ctx, close, contact, onSent }) {
+    return /* @__PURE__ */ u3(Compose, { ctx, close, contact, onSent });
+  }
+  function Message({ ctx, contact, item, open, onToggle, onSetRead, canReply, onReply }) {
+    const { __, sprintf: sprintf2 } = ctx.i18n;
+    const [showQuoted, setShowQuoted] = d2(false);
+    const inbound = item.data.direction === "inbound";
+    const unread = inbound && Number(item.data.is_read) === 0;
+    const failed = !inbound && item.data.status === "failed";
+    const who = inbound ? contactName(contact) : __("You");
+    const parts = open ? splitQuoted(messageText(item.data.content)) : null;
+    return /* @__PURE__ */ u3("li", { class: `ghm-msg ${inbound ? "in" : "out"} ${unread ? "is-unread" : ""}`, children: [
+      /* @__PURE__ */ u3("button", { type: "button", class: "ghm-item", "aria-expanded": open, onClick: onToggle, children: [
+        /* @__PURE__ */ u3("span", { class: "ghm-act-icon", children: /* @__PURE__ */ u3(Icon, { name: inbound ? "mail" : "send" }) }),
+        /* @__PURE__ */ u3("div", { class: "ghm-item-body", children: [
+          /* @__PURE__ */ u3("div", { class: "ghm-item-title", children: item.data.subject || __("(no subject)") }),
+          /* @__PURE__ */ u3("div", { class: "ghm-item-sub", children: open ? who : `${who}: ${item.preview || ""}` })
+        ] }),
+        /* @__PURE__ */ u3("div", { class: "ghm-item-meta", children: [
+          failed ? /* @__PURE__ */ u3(Pill, { color: "red", children: __("Failed") }) : null,
+          unread ? /* @__PURE__ */ u3("span", { class: "ghm-unread-dot", role: "img", "aria-label": __("Not read") }) : null,
+          " ",
+          sprintf2(__("%s ago"), item.i18n.time_diff)
+        ] })
+      ] }),
+      open ? /* @__PURE__ */ u3("div", { class: "ghm-msg-body", children: [
+        /* @__PURE__ */ u3("p", { class: "ghm-msg-text", children: parts.text || __("(no message)") }),
+        parts.quoted ? /* @__PURE__ */ u3(M, { children: [
+          /* @__PURE__ */ u3("button", { type: "button", class: "ghm-link-btn", onClick: () => setShowQuoted((v3) => !v3), children: showQuoted ? __("Hide earlier text") : __("Show earlier text") }),
+          showQuoted ? /* @__PURE__ */ u3("p", { class: "ghm-msg-text ghm-msg-quoted", children: parts.quoted }) : null
+        ] }) : null,
+        inbound ? /* @__PURE__ */ u3("div", { class: "ghm-msg-actions", children: [
+          canReply ? /* @__PURE__ */ u3(Button, { variant: "primary", icon: "reply", onClick: () => onReply(item), children: __("Reply") }) : null,
+          /* @__PURE__ */ u3(Button, { onClick: () => onSetRead(item, unread), children: unread ? __("Mark read") : __("Mark unread") })
+        ] }) : null
+      ] }) : null
+    ] });
+  }
+  function MessagesPanel({ ctx, contact }) {
+    const { __ } = ctx.i18n;
+    const [state, setState] = d2({ items: [], next: null, hasMore: false, loading: true, busy: false, error: null });
+    const [open, setOpen] = d2([]);
+    const load = async (next) => {
+      setState((s3) => ({ ...s3, busy: !!next, loading: !next, error: null }));
+      try {
+        const page = await ctx.api.get("messages/feed", { object_type: "contact", object_id: contact.ID, limit: PAGE2, ...next || {} });
+        setState((s3) => {
+          const seen = new Set((next ? s3.items : []).map((i3) => i3.ID));
+          const items2 = [...next ? s3.items : [], ...page.items.filter((i3) => i3.kind === "message" && !seen.has(i3.ID))];
+          return { items: items2, next: page.next, hasMore: !!page.has_more, loading: false, busy: false, error: null };
+        });
+      } catch (err) {
+        setState((s3) => ({ ...s3, loading: false, busy: false, error: err }));
+      }
+    };
+    A2(() => {
+      load();
+    }, [contact.ID]);
+    const setRead = async (item, read2) => {
+      try {
+        await ctx.api.post("messages/read", { message_id: item.ID, read: read2 });
+        setState((s3) => ({ ...s3, items: s3.items.map((i3) => i3.ID === item.ID ? { ...i3, data: { ...i3.data, is_read: read2 ? 1 : 0 } } : i3) }));
+      } catch (err) {
+        ctx.toast(err.message, "error");
+      }
+    };
+    const toggle = (item) => {
+      const opening = !open.includes(item.ID);
+      setOpen((o4) => opening ? [...o4, item.ID] : o4.filter((id) => id !== item.ID));
+      if (opening && item.data.direction === "inbound" && Number(item.data.is_read) === 0) {
+        setRead(item, true);
+      }
+    };
+    const sent = () => ctx.emit("contact:changed", { id: contact.ID });
+    const canSend = ctx.can("send_emails") && contact.is_deliverable !== false;
+    const reply = (item) => ctx.sheet(ReplySheet, { title: __("Reply"), contact, message: item, onSent: sent });
+    const write = () => ctx.sheet(NewMessageSheet, { title: __("New message"), contact, onSent: sent });
+    const { items, hasMore, loading, busy, error } = state;
+    return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3(ErrorMessage, { error }),
+      canSend ? /* @__PURE__ */ u3("div", { class: "ghm-more", style: "padding-bottom:4px", children: /* @__PURE__ */ u3(Button, { block: true, icon: "send", onClick: write, children: __("Write a message") }) }) : null,
+      loading && !items.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "avatar", rows: 3 }) : null,
+      !loading && !error && !items.length ? /* @__PURE__ */ u3(Empty, { children: __("No messages yet.") }) : null,
+      items.length ? /* @__PURE__ */ u3(List, { children: items.map((item) => /* @__PURE__ */ u3(
+        Message,
+        {
+          ctx,
+          contact,
+          item,
+          open: open.includes(item.ID),
+          onToggle: () => toggle(item),
+          onSetRead: setRead,
+          canReply: canSend,
+          onReply: reply
+        },
+        item.ID
+      )) }) : null,
+      hasMore ? /* @__PURE__ */ u3("div", { class: "ghm-more", children: /* @__PURE__ */ u3(Button, { block: true, onClick: () => load(state.next), disabled: busy, children: busy ? __("Loading\u2026") : __("Show older") }) }) : null
+    ] });
+  }
+
   // src/features/core.jsx
   function registerCore() {
     return window.GroundhoggMobile.register("core", {
@@ -2346,6 +2562,7 @@
         "/tasks": TasksView
       },
       homeCards: {
+        replies: RepliesCard,
         "my-tasks": MyTasksCard,
         "recently-viewed": RecentlyViewedCard,
         "recent-contacts": RecentContactsCard
@@ -2355,6 +2572,7 @@
         form: openForm
       },
       contactPanels: {
+        messages: MessagesPanel,
         notes: NotesPanel,
         tasks: ContactTasksPanel,
         activity: ActivityPanel
