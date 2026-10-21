@@ -1516,6 +1516,14 @@ body.groundhogg-admin-page[class*="gh-theme-"] #step-flow button.add-step-button
 }
 
 
+/* The select-all cell is a td in the header and footer rows. Wide screens paint every td.check-column with
+   the surface color (the sticky first column), and narrow screens leave it transparent, so either way it
+   showed the body color instead of matching the rest of the header. */
+body.groundhogg-admin-page[class*="gh-theme-"] thead td.check-column,
+body.groundhogg-admin-page[class*="gh-theme-"] tfoot td.check-column {
+  background-color: var(--ght-raised);
+}
+
 /* Sticky first column: body cells use the surface color, the header keeps the raised one */
 @media only screen and (min-width: 782px) {
   body.groundhogg-admin-page[class*="gh-theme-"] thead th.column-email,
@@ -1990,6 +1998,16 @@ body.groundhogg-admin-page[class*="gh-theme-"] .gh-modal-dialog.gh-modal-loading
   background: transparent;
   border: 0;
   box-shadow: none;
+}
+
+/* On mobile the pagination buttons drop their boxes (see admin.scss), which the themed button styles above
+   would otherwise put back. */
+@media only screen and (max-width: 782px) {
+  body.groundhogg-admin-page[class*="gh-theme-"] .tablenav .tablenav-pages .pagination-links a,
+  body.groundhogg-admin-page[class*="gh-theme-"] .tablenav .tablenav-pages .pagination-links .tablenav-pages-navspan {
+    border-color: transparent;
+    background-color: transparent;
+  }
 }
 
 /* -------------------------------------------------------------------------- */
