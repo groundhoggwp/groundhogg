@@ -513,6 +513,28 @@ body.groundhogg-admin-page[class*="gh-theme-"] div.error {
   border-radius: var(--gh-border-radius);
 }
 
+/* The border shorthand above flattens WP's coloured left stripe, so restore it per type with a soft tint */
+body.groundhogg-admin-page[class*="gh-theme-"] .notice.notice-info {
+  border-left-color: var(--ght-accent);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .notice.notice-success,
+body.groundhogg-admin-page[class*="gh-theme-"] div.updated {
+  background-color: var(--ght-green-bg);
+  border-left-color: var(--ght-green-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .notice.notice-warning {
+  background-color: var(--ght-yellow-bg);
+  border-left-color: var(--ght-yellow-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .notice.notice-error,
+body.groundhogg-admin-page[class*="gh-theme-"] div.error {
+  background-color: var(--ght-red-bg);
+  border-left-color: var(--ght-red-fg);
+}
+
 /* Status pills: soft tinted chips */
 body.groundhogg-admin-page[class*="gh-theme-"] .pill {
   border-radius: 999px;
@@ -1534,7 +1556,9 @@ body.groundhogg-admin-page[class*="gh-theme-"] tfoot td.check-column {
 
 /* Notices: WP colors the paragraphs inside separately */
 body.groundhogg-admin-page[class*="gh-theme-"] .notice p,
-body.groundhogg-admin-page[class*="gh-theme-"] .notice li {
+body.groundhogg-admin-page[class*="gh-theme-"] .notice li,
+body.groundhogg-admin-page[class*="gh-theme-"] div.updated p,
+body.groundhogg-admin-page[class*="gh-theme-"] div.error p {
   color: inherit;
 }
 
