@@ -122,6 +122,7 @@
     telemetry     : false,
     newsletter    : false,
     sharedUsage   : false,
+    theme         : Setup.themes?.current ?? 'default',
   })
 
   /**
@@ -148,6 +149,13 @@
       title : __('Business', 'groundhogg'),
       render: () => BusinessStep(),
       save  : () => saveBusiness(),
+    },
+    {
+      id    : 'theme',
+      title : __('Look', 'groundhogg'),
+      // picking one is saved as it's clicked, there's nothing to save here
+      when  : () => Boolean(Setup.themes),
+      render: () => ThemeStep(),
     },
     {
       id    : 'privacy',
@@ -534,6 +542,102 @@
 
     return Options.patch(values)
   }
+
+  //
+  // Theme
+  //
+
+  /**
+   * Show a theme on this page. The stylesheet is only loaded for users who already have a theme.
+   *
+   * @param slug
+   */
+  const applyTheme = slug => {
+
+    if (!document.getElementById('groundhogg-admin-themes-css')) {
+      document.head.appendChild(makeEl('link', {
+        id  : 'groundhogg-admin-themes-css',
+        rel : 'stylesheet',
+        href: Setup.themes.stylesheet,
+      }))
+    }
+
+    document.body.classList.remove(...[...document.body.classList].filter(c => c.startsWith('gh-theme-')))
+
+    if (slug !== 'default') {
+      document.body.classList.add(`gh-theme-${ slug }`)
+    }
+  }
+
+  /**
+   * Switch to the theme right away, and save it for the user. Goes back to the one they had if it isn't saved.
+   *
+   * @param slug
+   */
+  const chooseTheme = slug => {
+
+    const previous = State.theme
+
+    if (slug === previous) {
+      return
+    }
+
+    State.set({
+      theme: slug,
+      error: '',
+    })
+    applyTheme(slug)
+
+    ajax({
+      action  : 'gh_set_admin_theme',
+      _wpnonce: Setup.themes.nonce,
+      theme   : slug,
+    }).then(r => {
+      if (!r.success) {
+        throw new Error(SOMETHING_WENT_WRONG)
+      }
+    }).catch(err => {
+      State.set({
+        theme: previous,
+        error: errorMessage(err),
+      })
+      applyTheme(previous)
+      render()
+    })
+  }
+
+  const ThemeStep = () => [
+    H1({}, __('Choose your look', 'groundhogg')),
+    Pg({ className: 'gs-lead' }, __('Pick how Groundhogg looks for you. It changes the colors, not how anything works, and it\'s only for your account. You can change it any time from your profile.', 'groundhogg')),
+
+    Div({ className: 'gs-themes' }, Object.entries(Setup.themes.options).map(([slug, label]) => Label({ className: 'gs-theme' }, [
+      Input({
+        type    : 'radio',
+        name    : 'gh_admin_theme',
+        value   : slug,
+        checked : State.theme === slug,
+        onChange: () => chooseTheme(slug),
+      }),
+      // a little window drawn in the theme's colors
+      Div({
+        className: 'gs-theme-swatch',
+        dataTheme: slug,
+      }, [
+        Span({ className: 'gs-theme-swatch-bar' }),
+        Span({ className: 'gs-theme-swatch-line' }),
+        Span({ className: 'gs-theme-swatch-line short' }),
+        Span({ className: 'gs-theme-swatch-button' }),
+      ]),
+      Span({ className: 'gs-theme-name' }, label),
+    ]))),
+
+    Actions({
+      primary: {
+        label  : __('Continue', 'groundhogg'),
+        onClick: next,
+      },
+    }),
+  ]
 
   //
   // Privacy & consent

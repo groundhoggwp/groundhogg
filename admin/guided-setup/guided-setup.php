@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Guided_Setup;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Background\Sync_Users_Last_Id;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Classes\Inbox_Client;
@@ -538,6 +539,29 @@ class Guided_Setup extends Admin_Page {
 	}
 
 	/**
+	 * The interface themes to pick from and the one the current user has, for the theme step. Picking one is saved
+	 * by the same ajax action as the command palette's, which needs a user who can see contacts.
+	 *
+	 * @return array|false false when the user can't pick one
+	 */
+	protected function themes() {
+
+		if ( ! current_user_can( 'view_contacts' ) ) {
+			return false;
+		}
+
+		$themes  = Admin_User::get_themes();
+		$current = get_user_meta( get_current_user_id(), 'gh_admin_theme', true );
+
+		return [
+			'options'    => $themes,
+			'current'    => array_key_exists( $current, $themes ) ? $current : 'default',
+			'nonce'      => wp_create_nonce( 'gh_set_admin_theme' ),
+			'stylesheet' => add_query_arg( 'ver', GROUNDHOGG_VERSION, GROUNDHOGG_ASSETS_URL . 'css/admin/themes.css' ),
+		];
+	}
+
+	/**
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
@@ -560,6 +584,7 @@ class Guided_Setup extends Admin_Page {
 			'prefill'    => $this->prefill(),
 			// names, not codes, the business country is shown in the email footer as it's saved
 			'countries'  => array_values( utils()->location->get_countries_list() ),
+			'themes'     => $this->themes(),
 			'hasLicense' => (bool) Inbox_Client::license_key(),
 			'telemetry'  => Plugin::instance()->stats_collection->is_enabled(),
 			'email'      => wp_get_current_user()->user_email,
