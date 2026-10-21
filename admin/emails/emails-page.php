@@ -402,13 +402,7 @@ class Emails_Page extends Admin_Page {
         <form method="get" class="search-form">
 			<?php html()->hidden_GET_inputs( true ); ?>
 
-			<?php if ( ! get_url_var( 'include_filters' ) ):
-                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-				echo html()->input( [
-					'type' => 'hidden',
-					'name' => 'include_filters'
-				] );
-			endif; ?>
+			<?php $this->table_filters_input(); ?>
 
             <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search', 'groundhogg' ); ?>:</label>
 

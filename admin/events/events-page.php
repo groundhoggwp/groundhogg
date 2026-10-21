@@ -745,14 +745,7 @@ class Events_Page extends Tabbed_Admin_Page {
             <input type="hidden" name="page" value="<?php echo esc_attr( get_request_var( 'page' ) ); ?>">
             <label class="screen-reader-text" for="gh-post-search-input"><?php esc_html_e( 'Search', 'groundhogg' ); ?>:</label>
 
-			<?php if ( ! get_url_var( 'include_filters' ) ):
-
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-				echo html()->input( [
-					'type' => 'hidden',
-					'name' => 'include_filters'
-				] );
-			endif; ?>
+			<?php $this->table_filters_input(); ?>
 
             <div style="float: right" class="gh-input-group">
                 <input type="search" id="gh-post-search-input" name="s"

@@ -457,13 +457,7 @@ abstract class Admin_Page extends Supports_Errors {
         <form method="get" class="search-form">
 	        <?php html()->hidden_GET_inputs( true ); ?>
 
-	        <?php if ( ! get_url_var( 'include_filters' ) && $this->has_table_filters ):
-                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-		        echo html()->input( [
-			        'type' => 'hidden',
-			        'name' => 'include_filters',
-		        ] );
-			endif; ?>
+	        <?php if ( $this->has_table_filters ) { $this->table_filters_input(); } ?>
             <label class="screen-reader-text" for="gh-post-search-input"><?php echo esc_html( $title ); ?>:</label>
             <div style="float: right" class="gh-input-group space-below-10">
                 <input type="search" id="gh-post-search-input" name="<?php echo esc_attr( $name ) ?>"
@@ -476,17 +470,30 @@ abstract class Admin_Page extends Supports_Errors {
 		<?php
 	}
 
+	/**
+	 * Output the hidden input the table filters write into, unless hidden_GET_inputs() already output one.
+	 * A previous search submits an empty include_filters, so the check must be on presence, not on a truthy value,
+	 * otherwise there are two inputs with the same name and the empty one wins on submit.
+	 */
+	protected function table_filters_input() {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only checking presence
+		if ( isset( $_GET['include_filters'] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+		echo html()->input( [
+			'type' => 'hidden',
+			'name' => 'include_filters',
+		] );
+	}
+
 	protected function filters_search_form() {
 		?>
         <form method="get" class="search-form">
 	        <?php html()->hidden_GET_inputs( true ); ?>
-	        <?php if ( ! get_url_var( 'include_filters' ) ):
-                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-		        echo html()->input( [
-			        'type' => 'hidden',
-			        'name' => 'include_filters',
-		        ] );
-			endif; ?>
+	        <?php $this->table_filters_input(); ?>
             <input type="hidden" name="page" value="<?php echo esc_attr( get_request_var( 'page' ) ); ?>">
             <div style="float: right" class="gh-input-group">
                 <button type="submit" id="search-submit"
