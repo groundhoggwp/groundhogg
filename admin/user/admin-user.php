@@ -286,15 +286,17 @@ class Admin_User {
                 <th><?php esc_html_e( 'Interface Theme', 'groundhogg' ); ?></th>
                 <td>
 		            <?php
-		            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-		            echo html()->dropdown( [
-			            'name'        => 'gh_admin_theme',
-			            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-			            'options'     => self::get_themes(),
-			            'option_none' => false,
-			            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped downstream
-			            'selected'    => get_user_meta( $profile_user->ID, 'gh_admin_theme', true ) ?: 'default',
-		            ] ); ?>
+		            $current_theme = get_user_meta( $profile_user->ID, 'gh_admin_theme', true ) ?: 'default';
+		            ?>
+                    <div class="gh-admin-theme-picker" role="radiogroup" aria-label="<?php esc_attr_e( 'Interface Theme', 'groundhogg' ); ?>">
+			            <?php foreach ( self::get_themes() as $slug => $label ): ?>
+                            <label class="gh-admin-theme-option">
+                                <input type="radio" name="gh_admin_theme" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $current_theme, $slug ); ?>>
+                                <span class="gh-admin-theme-swatch" data-theme="<?php echo esc_attr( $slug ); ?>"></span>
+                                <span class="gh-admin-theme-name"><?php echo esc_html( $label ); ?></span>
+                            </label>
+			            <?php endforeach; ?>
+                    </div>
                     <p class="description"><?php echo esc_html_x( 'Choose how Groundhogg looks for you. Does not change how it works.', 'settings', 'groundhogg' ); ?></p>
                 </td>
             </tr>

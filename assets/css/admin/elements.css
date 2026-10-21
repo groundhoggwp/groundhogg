@@ -3971,4 +3971,88 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
   color: var(--gh-dark-50);
 }
 
+.gh-admin-theme-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.gh-admin-theme-picker .gh-admin-theme-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.gh-admin-theme-picker .gh-admin-theme-option input[type=radio] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gh-admin-theme-picker .gh-admin-theme-option:has(input:checked) .gh-admin-theme-swatch {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-admin-theme-color, #2271b1);
+}
+.gh-admin-theme-picker .gh-admin-theme-option:has(input:focus-visible) .gh-admin-theme-swatch {
+  outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+  outline-offset: 5px;
+}
+.gh-admin-theme-picker .gh-admin-theme-name {
+  font-size: 12px;
+}
+.gh-admin-theme-picker .gh-admin-theme-swatch {
+  --swatch-bg: #f0f0f1;
+  --swatch-surface: #ffffff;
+  --swatch-line: #dcdcde;
+  --swatch-accent: #0075ff;
+  position: relative;
+  box-sizing: border-box;
+  width: 64px;
+  height: 44px;
+  border: 1px solid var(--swatch-line);
+  border-radius: 6px;
+  background: var(--swatch-bg);
+  overflow: hidden;
+}
+.gh-admin-theme-picker .gh-admin-theme-swatch::before {
+  content: "";
+  position: absolute;
+  inset: 8px 8px 8px 8px;
+  border-radius: 3px;
+  background: var(--swatch-surface);
+  border: 1px solid var(--swatch-line);
+}
+.gh-admin-theme-picker .gh-admin-theme-swatch::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 14px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--swatch-accent);
+}
+.gh-admin-theme-picker .gh-admin-theme-swatch[data-theme=light] {
+  --swatch-bg: #f7f8fa;
+  --swatch-line: #e6e8ec;
+  --swatch-accent: #2563eb;
+}
+.gh-admin-theme-picker .gh-admin-theme-swatch[data-theme=paper] {
+  --swatch-bg: #f5f2ec;
+  --swatch-surface: #fdfcf9;
+  --swatch-line: #e4dfd3;
+  --swatch-accent: #0f766e;
+}
+.gh-admin-theme-picker .gh-admin-theme-swatch[data-theme=slate] {
+  --swatch-bg: #12161c;
+  --swatch-surface: #1a1f27;
+  --swatch-line: #3a4352;
+  --swatch-accent: #6ea0ff;
+}
+.gh-admin-theme-picker .gh-admin-theme-swatch[data-theme=midnight] {
+  --swatch-bg: #000000;
+  --swatch-surface: #0b0b0d;
+  --swatch-line: #2a2b30;
+  --swatch-accent: #5b8cff;
+}
+
 /*# sourceMappingURL=elements.css.map */
