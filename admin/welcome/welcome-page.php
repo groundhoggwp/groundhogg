@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Mcp\Connection;
 use Groundhogg\Mobile\Promo;
 use Groundhogg_Email_Services;
 use function Groundhogg\admin_page_url;
@@ -216,6 +217,13 @@ class Welcome_Page extends Admin_Page {
 				'completed'   => ! empty( $reports ),
 				'fix'         => admin_page_url( 'gh_campaigns' ),
 				'cap'         => 'manage_campaigns'
+			],
+			[
+				'title'       => __( 'Connect an AI agent', 'groundhogg' ),
+				'description' => __( 'Let an AI assistant such as ChatGPT, Claude or Gemini work with your contacts, emails and flows. We will set up the connection and walk you through adding it to your AI client.', 'groundhogg' ),
+				'completed'   => Connection::is_connected(),
+				'fix'         => Connection::page_url(),
+				'cap'         => Connection::is_supported() ? 'manage_options' : 'do_not_allow'
 			],
 			[
 				'title'       => __( 'Add your email signature', 'groundhogg' ),

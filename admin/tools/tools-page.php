@@ -14,6 +14,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Files;
 use Groundhogg\Plugin;
 use Groundhogg\Properties;
+use Groundhogg\Mcp\Connection;
 use Groundhogg\Mobile\Promo;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Reports;
@@ -298,6 +299,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'name' => esc_html__( 'Mobile app', 'groundhogg' ),
 				'slug' => Promo::TAB,
 				'cap'  => Promo::is_available_to() ? 'view_contacts' : 'do_not_allow'
+			],
+			// needs the Abilities API, which arrived with WordPress 6.9
+			[
+				'name' => esc_html__( 'AI agent', 'groundhogg' ),
+				'slug' => Connection::TAB,
+				'cap'  => Connection::is_supported() ? 'manage_options' : 'do_not_allow'
 			],
 		];
 
@@ -1266,6 +1273,70 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function mobile_view() {
 		include __DIR__ . '/mobile.php';
+	}
+
+	/**
+	 * How to connect an AI agent
+	 */
+	public function mcp_view() {
+		include __DIR__ . '/mcp.php';
+	}
+
+	/**
+	 * The password an AI agent signs in with, kept in memory so the page can show it once
+	 *
+	 * @var array|null
+	 */
+	public $new_agent_password = null;
+
+	/**
+	 * Install and activate the MCP adapter plugin
+	 *
+	 * @return true|WP_Error
+	 */
+	public function process_install_mcp_adapter() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! Connection::is_supported() ) {
+			$this->wp_die_no_access();
+		}
+
+		$result = Connection::install();
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$this->add_notice( 'success', __( 'The MCP Adapter is installed and active.', 'groundhogg' ) );
+
+		return true;
+	}
+
+	/**
+	 * Make the application password an AI agent signs in with
+	 *
+	 * @return true|WP_Error
+	 */
+	public function process_create_agent_password() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! Connection::is_supported() ) {
+			$this->wp_die_no_access();
+		}
+
+		// always the person asking, the agent can then do what they can do and nothing more
+		$created = Connection::create_application_password(
+			get_current_user_id(),
+			sanitize_text_field( get_post_var( 'agent_name' ) )
+		);
+
+		if ( is_wp_error( $created ) ) {
+			return $created;
+		}
+
+		$this->new_agent_password = $created;
+
+		$this->add_notice( 'success', __( 'Application password created!', 'groundhogg' ) );
+
+		return true;
 	}
 
 	/**
