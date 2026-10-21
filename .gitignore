@@ -9,3 +9,9 @@
 /.php-cs-fixer.dist.php
 /composer.lock
 /.phpunit.result.cache
+
+/mobile-app/node_modules/
+
+# PhpStorm's uglify watcher makes this from sw.js. Nothing uses it
+/assets/js/mobile/sw.min.js
+/assets/js/mobile/*.min.min.js

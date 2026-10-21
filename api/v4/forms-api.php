@@ -5,6 +5,7 @@ namespace Groundhogg\Api\V4;
 use Groundhogg\Form\Form;
 use Groundhogg\Form\Form_v2;
 use Groundhogg\Plugin;
+use Groundhogg\Step;
 use Groundhogg\Tracking;
 use WP_Error;
 use WP_REST_Request;
@@ -267,6 +268,33 @@ class Forms_Api extends Base_Api {
 			'total_items' => $total,
 			'items'       => array_values( $items )
 		] );
+	}
+
+	/**
+	 * Read a single form: the same item that read() lists, for a form whose id is known. The route for this was
+	 * registered without a handler, so GET forms/{id} had nothing to call.
+	 *
+	 * It only finds what the list would. A step that isn't a form, or a form that isn't active, is a 404, so this
+	 * can't be used to read an arbitrary step. Pass `contact` to pre-fill the form for that contact, the same as the list.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function read_single( WP_REST_Request $request ) {
+
+		$id   = absint( $request->get_param( 'form' ) );
+		$step = new Step( $id );
+
+		if ( ! $step->exists() || ! in_array( $step->step_type, [ 'form_fill', 'web_form' ], true ) || $step->step_status !== 'active' ) {
+			return self::ERROR_404( 'form_not_found', 'Form not found.' );
+		}
+
+		$form = $step->step_type === 'web_form'
+			? new Form_v2( [ 'id' => $id, 'contact' => self::get_contact_from_request( $request ) ] )
+			: new Form( [ 'id' => $id ] );
+
+		return self::SUCCESS_RESPONSE( [ 'item' => $form ] );
 	}
 
 	/**

@@ -1,0 +1,18 @@
+{
+  "name": "groundhogg-mobile-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Source for the Groundhogg mobile web app. Builds into ../assets/js/mobile and ../assets/css/mobile.",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "preact": "^11.0.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

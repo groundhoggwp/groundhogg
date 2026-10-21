@@ -620,7 +620,7 @@ class Scripts {
 			'assets'           => [
 				'path'    => GROUNDHOGG_ASSETS_URL,
 				'images'  => GROUNDHOGG_ASSETS_URL . 'images/',
-				'spinner' => is_white_labeled() ? GROUNDHOGG_ASSETS_URL . 'images/loading-gears.svg' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-spinner.svg',
+				'spinner' => ( is_white_labeled() ? GROUNDHOGG_ASSETS_URL . 'images/loading-orbit.svg' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-spinner.svg' ) . '?ver=' . GROUNDHOGG_VERSION,
 			],
 			'api'              => [
 				'routes' => [

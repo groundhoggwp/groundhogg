@@ -14,6 +14,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Files;
 use Groundhogg\Plugin;
 use Groundhogg\Properties;
+use Groundhogg\Mobile\Promo;
 use Groundhogg\Queue\Event_Queue;
 use Groundhogg\Reports;
 use WP_Error;
@@ -145,6 +146,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 		// the tag picker on the map step needs data.js, which isn't something admin.js or make-el.js load
 		if ( $this->get_current_tab() === 'import' && get_url_var( 'action' ) === 'map' ) {
 			wp_enqueue_script( 'groundhogg-admin-data' );
+		}
+
+		if ( $this->get_current_tab() === Promo::TAB ) {
+			wp_enqueue_script( 'groundhogg-qrcode' );
+			wp_enqueue_script( 'groundhogg-admin-mobile-app' );
 		}
 
 		if ( $this->get_current_tab() === 'export' ) {
@@ -286,6 +292,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'name' => esc_html__( 'Rest API Playground', 'groundhogg' ),
 				'slug' => 'api',
 				'cap'  => 'manage_options'
+			],
+			// for everyone the mobile app is for
+			[
+				'name' => esc_html__( 'Mobile app', 'groundhogg' ),
+				'slug' => Promo::TAB,
+				'cap'  => Promo::is_available_to() ? 'view_contacts' : 'do_not_allow'
 			],
 		];
 
@@ -1247,6 +1259,13 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	public function misc_view() {
 		include __DIR__ . '/misc.php';
+	}
+
+	/**
+	 * How to get the mobile app
+	 */
+	public function mobile_view() {
+		include __DIR__ . '/mobile.php';
 	}
 
 	/**

@@ -1265,6 +1265,227 @@ body.gh-full-screen #wpadminbar {
   padding: 10px 0 0 20px !important;
   background-color: #fff;
 }
+@media only screen and (max-width: 782px) {
+  .groundhogg-admin-page .gh-header.is-sticky {
+    position: static;
+  }
+  .groundhogg-admin-page .gh-header a[href="#gh-review-please"],
+  .groundhogg-admin-page .gh-header a[href="#gh-show-notifications"],
+  .groundhogg-admin-page .gh-header a#import_contacts {
+    display: none;
+  }
+  .groundhogg-admin-page #wpcontent {
+    padding-left: 0;
+  }
+  .groundhogg-admin-page #wpbody-content .wrap {
+    margin-right: 0;
+  }
+  .groundhogg-admin-page #wpbody-content > .wrap {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .groundhogg-admin-page .gh-header.is-sticky[style*="margin-left:-20px"] {
+    margin-left: 0 !important;
+  }
+  .groundhogg-admin-page .gh-header + h2.gh-nav {
+    margin-left: 0 !important;
+    padding-left: 10px !important;
+  }
+  .groundhogg-admin-page .gh-modal {
+    z-index: 100000;
+  }
+  .groundhogg-admin-page .gh-modal:not(.mini):not(.sidebar):not(.send-email) .gh-modal-dialog:not(.gh-modal-loading) {
+    max-width: calc(100vw - 40px);
+  }
+  .groundhogg-admin-page .gh-modal .gh-modal-dialog-content {
+    padding: 16px;
+  }
+  .groundhogg-admin-page .gh-modal .gh-modal-dialog .gh-header {
+    padding: 8px 14px;
+  }
+  .groundhogg-admin-page .gh-modal.sidebar {
+    top: 0;
+  }
+  .groundhogg-admin-page .gh-modal-frame {
+    max-width: calc(100vw - 40px);
+  }
+}
+@media only screen and (max-width: 782px) and (max-width: 600px) {
+  .groundhogg-admin-page .gh-modal:not(.mini):not(.sidebar):not(.send-email) .gh-modal-dialog:not(.gh-modal-loading) {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+  .groundhogg-admin-page .gh-modal.sidebar, .groundhogg-admin-page .gh-modal.send-email {
+    width: 100%;
+  }
+  .groundhogg-admin-page .gh-modal.send-email {
+    right: 0;
+  }
+  .groundhogg-admin-page .gh-modal.sidebar .gh-modal-dialog, .groundhogg-admin-page .gh-modal.send-email .gh-modal-dialog {
+    width: 100% !important;
+    max-width: 100%;
+  }
+  .groundhogg-admin-page .gh-modal .gh-modal-dialog-content > * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .groundhogg-admin-page .gh-modal-frame {
+    max-width: calc(100vw - 20px);
+  }
+}
+@media only screen and (max-width: 782px) {
+  .groundhogg-admin-page form.search-form {
+    display: flow-root;
+    margin: 0 0 12px;
+  }
+  .groundhogg-admin-page form.search-form .gh-input-group {
+    float: none;
+    width: 100%;
+  }
+  .groundhogg-admin-page form.search-form .gh-input-group > input {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  .groundhogg-admin-page #table-filters {
+    margin: 8px 0;
+  }
+  .groundhogg-admin-page #search-panel {
+    margin: 0 0 12px;
+    gap: 12px;
+  }
+  .groundhogg-admin-page .tablenav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    margin: 0 0 12px;
+    padding: 0;
+  }
+  .groundhogg-admin-page .tablenav.bottom {
+    margin: 12px 0 0;
+  }
+  .groundhogg-admin-page .tablenav br.clear {
+    display: none;
+  }
+  .groundhogg-admin-page .tablenav .alignleft,
+  .groundhogg-admin-page .tablenav .alignright {
+    float: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 !important;
+    padding: 0;
+  }
+  .groundhogg-admin-page .tablenav .alignleft select,
+  .groundhogg-admin-page .tablenav .alignleft input.button,
+  .groundhogg-admin-page .tablenav .alignleft .gh-button,
+  .groundhogg-admin-page .tablenav .alignleft #doaction,
+  .groundhogg-admin-page .tablenav .alignleft #doaction2,
+  .groundhogg-admin-page .tablenav .alignright select,
+  .groundhogg-admin-page .tablenav .alignright input.button,
+  .groundhogg-admin-page .tablenav .alignright .gh-button,
+  .groundhogg-admin-page .tablenav .alignright #doaction,
+  .groundhogg-admin-page .tablenav .alignright #doaction2 {
+    height: 36px;
+    min-height: 36px;
+    margin: 0 !important;
+    box-sizing: border-box;
+  }
+  .groundhogg-admin-page .tablenav .alignleft input.button,
+  .groundhogg-admin-page .tablenav .alignleft #doaction,
+  .groundhogg-admin-page .tablenav .alignleft #doaction2,
+  .groundhogg-admin-page .tablenav .alignright input.button,
+  .groundhogg-admin-page .tablenav .alignright #doaction,
+  .groundhogg-admin-page .tablenav .alignright #doaction2 {
+    padding: 0 12px;
+    line-height: 34px;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-basis: 100%;
+    gap: 8px;
+    float: none;
+    margin: 0;
+    height: auto;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages .displaying-num {
+    display: none;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages .pagination-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages .pagination-links .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages .pagination-links .tablenav-pages-navspan {
+    background: transparent !important;
+    border-color: transparent !important;
+    opacity: 0.35;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages .pagination-links > .button:first-child,
+  .groundhogg-admin-page .tablenav .tablenav-pages .pagination-links > .button:last-child {
+    display: none;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages .paging-input,
+  .groundhogg-admin-page .tablenav .tablenav-pages .tablenav-paging-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 13px;
+  }
+  .groundhogg-admin-page .tablenav .tablenav-pages .current-page {
+    width: 44px;
+    height: 32px;
+    min-height: 32px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  .groundhogg-admin-page .tablenav.bottom .alignleft.actions.bulkactions {
+    display: none;
+  }
+  .groundhogg-admin-page .tablenav.bottom .tablenav-pages {
+    order: 1;
+  }
+  .groundhogg-admin-page .tablenav.bottom .alignleft.gh-actions {
+    order: 2;
+    margin-left: auto !important;
+  }
+  .groundhogg-admin-page .display-flex:has(> .order-by):has(> .filter-by) {
+    flex-wrap: wrap;
+  }
+  .groundhogg-admin-page .display-flex[style*="gap: 40px"] {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px !important;
+  }
+  .groundhogg-admin-page .display-flex[style*="gap: 40px"] > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
 
 .gh-site {
   /* Darks */

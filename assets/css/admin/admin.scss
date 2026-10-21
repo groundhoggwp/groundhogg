@@ -1511,6 +1511,310 @@ body.gh-full-screen {
     background-color: #fff;
   }
 
+  // On mobile the WP admin bar is 46px and scrolls away (absolute under 600px), so the 32px sticky offset
+  // leaves the header floating in the wrong place. Just let it scroll with the page.
+  @media only screen and (max-width: 782px) {
+    .gh-header.is-sticky {
+      position: static;
+    }
+
+    // The review nag and notifications bell eat header space that the title and actions need on small
+    // screens, and importing contacts isn't something anyone does from a phone
+    .gh-header a[href="#gh-review-please"],
+    .gh-header a[href="#gh-show-notifications"],
+    .gh-header a#import_contacts {
+      display: none;
+    }
+
+    // WP gives #wpcontent 10px of left padding (and .wrap a right margin) on mobile, and the PHP headers
+    // pull themselves left by the fixed 20px desktop gutter with an inline style. Drop all of it so the
+    // header and content run edge to edge and line up.
+    #wpcontent {
+      padding-left: 0;
+    }
+
+    #wpbody-content .wrap {
+      margin-right: 0;
+    }
+
+    // ...but the page content under the header (not the header or tab bar) still needs a small gutter,
+    // otherwise tables and forms sit hard against the edge of the screen
+    #wpbody-content > .wrap {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .gh-header.is-sticky[style*="margin-left:-20px"] {
+      margin-left: 0 !important;
+    }
+
+    .gh-header + h2.gh-nav {
+      margin-left: 0 !important;
+      padding-left: 10px !important;
+    }
+
+    // Modals are capped at `100vw - 100px` and sized by an inline `width`/`fit-content`, which is fine on a
+    // desktop but leaves a 300px dialog (and 30px of padding either side) on a phone. Give them back the
+    // room: a much smaller gutter and padding, and on a phone (below) the dialog fills the screen.
+    .gh-modal {
+      &:not(.mini):not(.sidebar):not(.send-email) .gh-modal-dialog:not(.gh-modal-loading) {
+        max-width: calc(100vw - 40px);
+      }
+
+      .gh-modal-dialog-content {
+        padding: 16px;
+      }
+
+      .gh-modal-dialog .gh-header {
+        padding: 8px 14px;
+      }
+
+      // The WP admin bar (z-index 99999) is stacked above modals (10000). On a phone the dialog can be as tall
+      // as the screen, so with the page scrolled to the top the bar hides the top of it. Put the modal above
+      // the bar instead, which also means the sidebar can start at the very top.
+      z-index: 100000;
+
+      &.sidebar {
+        top: 0;
+      }
+    }
+
+    .gh-modal-frame {
+      max-width: calc(100vw - 40px);
+    }
+
+    // On a phone the dialog fills the screen with a small margin, the sidebar and the send email panel go
+    // full width, and the spinner and mini popovers keep their own size.
+    @media only screen and (max-width: 600px) {
+      .gh-modal {
+        &:not(.mini):not(.sidebar):not(.send-email) .gh-modal-dialog:not(.gh-modal-loading) {
+          width: calc(100vw - 20px) !important;
+          max-width: calc(100vw - 20px);
+          max-height: calc(100vh - 20px);
+          max-height: calc(100dvh - 20px);
+        }
+
+        &.sidebar,
+        &.send-email {
+          width: 100%;
+        }
+
+        &.send-email {
+          right: 0;
+        }
+
+        // their stylesheet width is overridden by the inline `fit-content` modal() always writes
+        &.sidebar .gh-modal-dialog,
+        &.send-email .gh-modal-dialog {
+          width: 100% !important;
+          max-width: 100%;
+        }
+
+        // content wrappers often carry their own inline width (e.g. `width: 500px` on the quick add form),
+        // which would overflow and clip the narrower dialog
+        .gh-modal-dialog-content > * {
+          max-width: 100%;
+          box-sizing: border-box;
+        }
+      }
+
+      .gh-modal-frame {
+        max-width: calc(100vw - 20px);
+      }
+    }
+
+    // List table controls. WP stacks the bulk actions, the date filter and a tall pagination block (four boxed
+    // buttons, the page box, "of N" and the item count) as separate rows, and repeats the whole bar under the
+    // table, which is a lot of boxes on a phone. Give every row the same edges, control height and gap:
+    // search on its own full-width row, bulk actions and filters on the next, then one pagination line with
+    // previous and next beside the page number. First/last, the item count and the duplicate bulk bar are dropped.
+
+    // The search bar is `float: right` at its natural width, which is wider than the column on a phone, so it
+    // spills out to the left and the form collapses to no height. Make it fill the column.
+    form.search-form {
+      display: flow-root;
+      margin: 0 0 12px;
+
+      .gh-input-group {
+        float: none;
+        width: 100%;
+
+        > input {
+          flex: 1 1 0;
+          width: auto;
+          min-width: 0;
+        }
+      }
+    }
+
+    #table-filters {
+      margin: 8px 0;
+    }
+
+    // the Contacts search panel (filters + quick search) has a 20px gap and no space below it, so the bulk
+    // actions row sat directly against it
+    #search-panel {
+      margin: 0 0 12px;
+      gap: 12px;
+    }
+
+    .tablenav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      height: auto;
+      margin: 0 0 12px;
+      padding: 0;
+
+      &.bottom {
+        margin: 12px 0 0;
+      }
+
+      br.clear {
+        display: none;
+      }
+
+      // (`!important`: core gives .bulkactions a bottom margin and #doaction a right margin by id)
+      .alignleft,
+      .alignright {
+        float: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 !important;
+        padding: 0;
+
+        select,
+        input.button,
+        .gh-button,
+        #doaction,
+        #doaction2 {
+          height: 36px;
+          min-height: 36px;
+          margin: 0 !important;
+          box-sizing: border-box;
+        }
+
+        input.button,
+        #doaction,
+        #doaction2 {
+          padding: 0 12px;
+          line-height: 34px;
+        }
+      }
+
+      .tablenav-pages {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-basis: 100%;
+        gap: 8px;
+        float: none;
+        margin: 0;
+        height: auto;
+
+        .displaying-num {
+          display: none;
+        }
+
+        // previous, the page box and next stay together as one centred group
+        .pagination-links {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin: 0;
+
+          .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            min-height: 36px;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            border-color: transparent;
+            background: transparent;
+            box-shadow: none;
+          }
+
+          // WP gives disabled buttons a filled box with !important
+          .tablenav-pages-navspan {
+            background: transparent !important;
+            border-color: transparent !important;
+            opacity: 0.35;
+          }
+
+          // first and last page
+          > .button:first-child,
+          > .button:last-child {
+            display: none;
+          }
+        }
+
+        .paging-input,
+        .tablenav-paging-text {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          margin: 0;
+          font-size: 13px;
+        }
+
+        .current-page {
+          width: 44px;
+          height: 32px;
+          min-height: 32px;
+          margin: 0;
+          padding: 0;
+          text-align: center;
+        }
+      }
+
+      // (matches core's `body.groundhogg-admin-page .alignleft.actions.bulkactions`, which is `display: flex`)
+      &.bottom .alignleft.actions.bulkactions {
+        display: none;
+      }
+
+      // The More Actions button only exists under the table on a phone (contacts.scss hides the top one). Its
+      // menu is `position: fixed` with an inline `left` of the button's right edge minus the menu's width, so
+      // a button at the left of the screen pushes the menu off the left edge. Keep the button on the right,
+      // below the pager.
+      &.bottom .tablenav-pages {
+        order: 1;
+      }
+
+      &.bottom .alignleft.gh-actions {
+        order: 2;
+        margin-left: auto !important;
+      }
+    }
+
+    // The contact record's timeline controls (order by, filter by, refresh) are a non-wrapping flex row that is
+    // wider than a phone, which makes the whole page scroll sideways. Fixed modals are then laid out against
+    // that wider area on a real device and spill off the screen, so let the row wrap.
+    .display-flex:has(> .order-by):has(> .filter-by) {
+      flex-wrap: wrap;
+    }
+
+    // Side-by-side layouts (the add form next to the table on Tags and Campaigns, the column picker on the
+    // export tool) are plain flex rows with an inline `gap: 40px`, so they overflow on small screens.
+    // Stack them instead.
+    .display-flex[style*="gap: 40px"] {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px !important;
+
+      > * {
+        min-width: 0;
+        max-width: 100%;
+      }
+    }
+  }
+
 }
 
 .gh-site {
