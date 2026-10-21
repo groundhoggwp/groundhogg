@@ -12,7 +12,6 @@ use Groundhogg\Admin\Events\Events_Page;
 use Groundhogg\Admin\Funnels\Funnels_Page;
 use Groundhogg\Admin\Guided_Setup\Guided_Setup;
 use Groundhogg\Admin\Help\Help_Page;
-use Groundhogg\Admin\Mobile\Mobile_Page;
 use Groundhogg\Admin\Pro\Pro_Page;
 use Groundhogg\Admin\Reports\Reports_Page;
 use Groundhogg\Admin\Settings\Settings_Page;
@@ -172,9 +171,6 @@ class Admin_Menu {
 		$this->bulk_jobs = new Bulk_Job_Page();
 
 		$this->reporting = new Reports_Page();
-
-		// for everyone the mobile app is for, including on a white labeled site
-		$this->mobile = new Mobile_Page();
 
 		if ( ! is_white_labeled() || current_user_can( 'manage_gh_white_label' ) ) {
 			$this->guided_setup = new Guided_Setup();

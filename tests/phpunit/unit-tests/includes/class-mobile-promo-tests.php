@@ -25,7 +25,7 @@ class Mobile_Promo_Tests extends GH_UnitTestCase {
 			$_SERVER['HTTP_USER_AGENT'] = $this->user_agent;
 		}
 
-		unset( $_GET['page'], $_REQUEST['page'] );
+		unset( $_GET['page'], $_REQUEST['page'], $_GET['tab'], $_REQUEST['tab'] );
 		Notices::$dismissed_notices = [];
 		set_current_screen( 'front' );
 		wp_set_current_user( 0 );
@@ -39,10 +39,16 @@ class Mobile_Promo_Tests extends GH_UnitTestCase {
 	/**
 	 * Be this user, looking at one of the pages in the admin.
 	 */
-	protected function visit( int $user, string $page = 'gh_contacts' ) {
+	protected function visit( int $user, string $page = 'gh_contacts', string $tab = '' ) {
 		wp_set_current_user( $user );
 		set_current_screen( 'dashboard' );
 		$_GET['page'] = $_REQUEST['page'] = $page;
+		unset( $_GET['tab'], $_REQUEST['tab'] );
+
+		if ( $tab ) {
+			$_GET['tab'] = $_REQUEST['tab'] = $tab;
+		}
+
 		delete_transient( Notices::TRANSIENT . '_user_' . $user );
 	}
 
@@ -95,7 +101,7 @@ class Mobile_Promo_Tests extends GH_UnitTestCase {
 		$message = $this->notice()['message'];
 
 		$this->assertStringContainsString( 'href="' . esc_url( App::url() ) . '"', $message );
-		$this->assertStringNotContainsString( 'page=' . Promo::PAGE, $message );
+		$this->assertStringNotContainsString( 'tab=' . Promo::TAB, $message );
 	}
 
 	public function test_the_notice_does_not_name_the_product() {
@@ -116,10 +122,16 @@ class Mobile_Promo_Tests extends GH_UnitTestCase {
 		$this->assertNull( $this->notice() );
 	}
 
-	public function test_the_notice_is_not_shown_on_the_page_about_the_app_itself() {
-		$this->visit( $this->user_with_role( 'administrator' ), Promo::PAGE );
+	public function test_the_notice_is_not_shown_on_the_tab_about_the_app_itself() {
+		$this->visit( $this->user_with_role( 'administrator' ), Promo::PAGE, Promo::TAB );
 
 		$this->assertNull( $this->notice() );
+	}
+
+	public function test_the_notice_is_shown_on_the_other_tabs_of_the_page_that_has_it() {
+		$this->visit( $this->user_with_role( 'administrator' ), Promo::PAGE, 'system' );
+
+		$this->assertNotNull( $this->notice() );
 	}
 
 	public function test_the_notice_does_not_interrupt_the_guided_setup() {
@@ -198,30 +210,17 @@ class Mobile_Promo_Tests extends GH_UnitTestCase {
 		$this->assertFalse( Promo::has_used() );
 	}
 
-	/* ---- the command and the page ------------------------------------------------------------------------ */
+	/* ---- the tab in Tools, and the command for it -------------------------------------------------------- */
 
-	public function test_the_command_palette_gets_a_command_for_those_it_is_for() {
-		wp_set_current_user( $this->user_with_role( 'administrator' ) );
+	public function test_the_tab_is_in_tools_and_the_command_palette_can_find_it() {
+		wp_set_current_user( $this->user_with_role( 'sales_rep' ) );
 
-		$commands = ( new Promo() )->add_command( [] );
+		$tools    = new \Groundhogg\Admin\Tools\Tools_Page();
+		$commands = $tools->command_palette_tab_commands( [] );
+		$urls     = array_column( $commands, 'url' );
 
-		$this->assertCount( 1, $commands );
-		$this->assertSame( Promo::page_url(), $commands[0]['url'] );
-		$this->assertSame( 'Mobile app', $commands[0]['label'] );
-	}
-
-	public function test_the_command_is_left_out_for_those_it_is_not_for() {
-		wp_set_current_user( $this->user_with_role( 'subscriber' ) );
-
-		$this->assertSame( [], ( new Promo() )->add_command( [] ) );
-	}
-
-	public function test_the_page_is_in_the_admin_and_open_to_those_who_can_see_contacts() {
-		$page = new \Groundhogg\Admin\Mobile\Mobile_Page();
-
-		$this->assertInstanceOf( \Groundhogg\Admin\Mobile\Mobile_Page::class, $page );
-		$this->assertSame( Promo::PAGE, $page->get_slug() );
-		$this->assertSame( 'view_contacts', $page->get_cap() );
+		$this->assertContains( Promo::page_url(), $urls );
 		$this->assertStringContainsString( 'page=' . Promo::PAGE, Promo::page_url() );
+		$this->assertStringContainsString( 'tab=' . Promo::TAB, Promo::page_url() );
 	}
 }

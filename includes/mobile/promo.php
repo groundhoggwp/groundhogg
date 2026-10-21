@@ -14,11 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * How people find out the mobile app exists, and how to get to it, from the main admin.
  *
- *  - A **Mobile app** page in the menu (`gh_mobile`) with a QR code that opens the app on a phone, the link, and how
- *    to add it to the home screen. See Groundhogg\Admin\Mobile\Mobile_Page.
+ *  - A **Mobile app** tab in Tools with a QR code that opens the app on a phone, the link, and how to add it to the
+ *    home screen. See admin/tools/mobile.php.
  *  - A dismissible notice on Groundhogg's own admin pages, until the person has used the app or closes it. On a phone
  *    it links straight to the app, on a computer it links to the page above.
- *  - A command in the command palette.
+ *  - A command in the command palette, which the Tools page adds for its tab.
  *  - An item in the Welcome page checklist, ticked once the app has been used.
  *
  * Whether someone has used the app is remembered per user (user meta), set when they open it, so a person who already
@@ -28,19 +28,19 @@ class Promo {
 
 	const NOTICE_ID = 'mobile-app-available';
 	const USED_META = 'gh_mobile_app_used';
-	const PAGE      = 'gh_mobile';
+	const PAGE      = 'gh_tools';
+	const TAB       = 'mobile';
 
 	public function __construct() {
 		add_action( 'admin_notices', [ $this, 'maybe_add_notice' ], 1 );
-		add_filter( 'groundhogg/command_palette/commands', [ $this, 'add_command' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_scripts' ] );
 	}
 
 	/**
-	 * @return string the page in the admin that explains how to get the app
+	 * @return string the tab in the admin that explains how to get the app
 	 */
 	public static function page_url(): string {
-		return admin_page_url( self::PAGE );
+		return admin_page_url( self::PAGE, [ 'tab' => self::TAB ] );
 	}
 
 	/**
@@ -97,8 +97,8 @@ class Promo {
 
 		$page = (string) get_url_var( 'page' );
 
-		// not on the page about it, nor in the middle of the setup
-		if ( ! is_admin_groundhogg_page() || in_array( $page, [ self::PAGE, 'gh_guided_setup' ], true ) ) {
+		// not on the tab about it, nor in the middle of the setup
+		if ( ! is_admin_groundhogg_page() || $page === 'gh_guided_setup' || ( $page === self::PAGE && get_url_var( 'tab' ) === self::TAB ) ) {
 			return;
 		}
 
@@ -123,26 +123,6 @@ class Promo {
 			// closing it with the X should be remembered, which that script does
 			wp_enqueue_script( 'groundhogg-admin-mobile-app' );
 		}
-	}
-
-	/**
-	 * @param array[] $commands
-	 *
-	 * @return array[]
-	 */
-	public function add_command( $commands ) {
-
-		if ( self::is_available_to() ) {
-			$commands[] = [
-				'name'     => 'groundhogg/mobile-app',
-				'label'    => __( 'Mobile app', 'groundhogg' ),
-				'url'      => self::page_url(),
-				'keywords' => [ 'phone', 'mobile', 'app', 'install', 'qr', 'home screen' ],
-				'category' => 'view',
-			];
-		}
-
-		return $commands;
 	}
 
 	public function register_scripts() {

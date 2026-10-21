@@ -485,18 +485,18 @@ Findings from reading the API while building the screens (worth knowing for add-
 ### Finding the app from the admin
 
 Nobody finds an app they were never told about, so the admin points at it (`includes/mobile/promo.php`,
-`admin/mobile/mobile-page.php`). All of it is for people who can `view_contacts` and have a home in the app.
+`admin/tools/mobile.php`). All of it is for people who can `view_contacts` and have a home in the app.
 
-- **A "Mobile app" page** (`gh_mobile`, in the menu, also on white labeled sites): a QR code that opens the app, the
+- **A "Mobile app" tab in Tools** (`admin.php?page=gh_tools&tab=mobile`, also on white labeled sites): a QR code that opens the app, the
   link with a copy button, and how to add it to the home screen on iPhone/iPad (Safari) and Android (Chrome). The code
   is drawn in the browser by the vendored `assets/lib/qrcode/` (qrcode-generator, MIT), so the link never leaves the
   site, and it stays dark on white whatever admin theme is in use.
 - **A dismissible notice** on the plugin's own pages. On a phone it links straight to the app, on a computer to the
-  page above. It uses the existing notices system, so closing it is remembered (`gh_dismissed_notices`); it is not
-  shown on the page about the app or during the guided setup.
+  tab above. It uses the existing notices system, so closing it is remembered (`gh_dismissed_notices`); it is not
+  shown on the tab about the app or during the guided setup.
 - **It goes away on its own** once the person has opened the app: `Promo::record_use()` writes the user meta
   `gh_mobile_app_used` (a timestamp, at most once a day) when the app shell renders.
-- **A command palette entry** ("Mobile app") and a **Welcome checklist item** ("Get the mobile app"), ticked by the
+- **A command palette entry**, which the Tools page adds for each of its tabs, and a **Welcome checklist item** ("Get the mobile app"), ticked by the
   same user meta.
 - Copy follows the white label rule: nothing in it names the product.
 
