@@ -58,6 +58,10 @@ class Api_Loader {
 
 	public function load_api() {
 
+		if ( defined( 'DOING_GROUNDHOGG_REST_REQUEST' ) ) {
+			return;
+		}
+
 		define( 'DOING_GROUNDHOGG_REST_REQUEST', true );
 
 		$this->v3 = new API_V3();
