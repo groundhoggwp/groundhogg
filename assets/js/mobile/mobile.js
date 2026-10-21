@@ -2121,7 +2121,7 @@
       orderby: "title",
       order: "ASC",
       limit: 30,
-      select: ["ID", "title", "subject", "message_type"]
+      select: ["ID", "title", "subject", "message_type", "is_template"]
     }), [search]);
     const listed = data && data.items || [];
     const recents = search ? [] : ctx.recent.list("email_template");

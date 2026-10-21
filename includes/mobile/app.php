@@ -36,9 +36,15 @@ class App {
 	 */
 	public $recent;
 
+	/**
+	 * @var Promo
+	 */
+	public $promo;
+
 	public function __construct() {
 		$this->activity_feed = new Activity_Feed();
 		$this->recent        = new Recent();
+		$this->promo         = new Promo();
 
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 		add_action( 'init', [ $this, 'maybe_flush_rewrite_rules' ], 99 );
@@ -160,6 +166,9 @@ class App {
 		}
 
 		$this->never_cache();
+
+		// they have found their way here, so there is no need to tell them about the app any more
+		Promo::record_use();
 
 		$manifest = Manifest::build();
 

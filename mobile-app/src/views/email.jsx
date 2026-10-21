@@ -141,7 +141,7 @@ function Templates ( { ctx, close, contact, back } ) {
     orderby: 'title',
     order: 'ASC',
     limit: 30,
-    select: [ 'ID', 'title', 'subject', 'message_type' ],
+    select: [ 'ID', 'title', 'subject', 'message_type', 'is_template' ],
   } ), [ search ] )
 
   const listed = ( data && data.items ) || []

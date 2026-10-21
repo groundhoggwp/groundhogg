@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Mobile\Promo;
 use Groundhogg_Email_Services;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\db;
@@ -111,6 +112,13 @@ class Welcome_Page extends Admin_Page {
 				'completed'   => get_db( 'broadcasts' )->count( [ 'status' => 'sent' ] ) > 0,
 				'fix'         => admin_page_url( 'gh_broadcasts', [ 'action' => 'add' ] ),
 				'cap'         => 'edit_emails'
+			],
+			[
+				'title'       => __( 'Get the mobile app', 'groundhogg' ),
+				'description' => __( 'Look up contacts, call, text and email them, and add notes and tasks from your phone.', 'groundhogg' ),
+				'completed'   => Promo::has_used(),
+				'fix'         => Promo::page_url(),
+				'cap'         => Promo::is_available_to() ? 'view_contacts' : 'do_not_allow',
 			],
 			[
 				'title'       => __( 'Create a flow', 'groundhogg' ),
