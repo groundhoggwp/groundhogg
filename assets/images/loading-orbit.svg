@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Loading">
+  <style>
+    /* White label spinner: three concentric rings turning at different speeds around a pulsing dot.
+       Drawn in black on purpose, the admin turns it white with a CSS filter. No brand colors. */
+    .track { fill: none; stroke: #000; stroke-opacity: .12; stroke-width: 6; }
+    .ring  { fill: none; stroke: #000; stroke-width: 7; stroke-linecap: round; transform-origin: 100px 100px; }
+    .r1 { stroke-dasharray: 118 284; animation: spin 1.7s cubic-bezier(.55, .1, .45, .9) infinite; }
+    .r2 { stroke-dasharray: 78 211;  stroke-opacity: .7; animation: spin 2.3s cubic-bezier(.55, .1, .45, .9) infinite reverse; }
+    .r3 { stroke-dasharray: 48 128;  stroke-opacity: .45; animation: spin 2.9s cubic-bezier(.55, .1, .45, .9) infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .core { fill: #000; transform-origin: 100px 100px; animation: beat 1.7s ease-in-out infinite; }
+    @keyframes beat {
+      0%, 100% { transform: scale(.7); opacity: .55; }
+      50%      { transform: scale(1.15); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .r1, .r2, .r3, .core { animation: none; }
+    }
+  </style>
+
+  <circle class="track" cx="100" cy="100" r="64"/>
+  <circle class="track" cx="100" cy="100" r="46"/>
+  <circle class="track" cx="100" cy="100" r="28"/>
+
+  <circle class="ring r1" cx="100" cy="100" r="64"/>
+  <circle class="ring r2" cx="100" cy="100" r="46"/>
+  <circle class="ring r3" cx="100" cy="100" r="28"/>
+
+  <circle class="core" cx="100" cy="100" r="7"/>
+</svg>
