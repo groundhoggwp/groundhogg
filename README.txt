@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.9.4
+Stable tag: 4.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -390,6 +390,27 @@ You can purchase a premium plan for access to support and our premium extensions
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
 
 == Changelog ==
+
+= 4.10 (2026-10-21) =
+* ADDED Interface themes. Choose Light, Paper, Slate (dark) or Midnight (dark) for the way the admin looks, or keep the default. A theme is saved per user, and only changes colors, not how anything works.
+ * Pick a theme with swatches on your user profile, from the new Look step of the guided setup, or by searching for "Theme" in the command palette.
+ * Tables, forms, tabs, modals, notices, tooltips, pickers, the flow editor and the email editor have all been styled for each theme.
+ * Delete, trash and spam row actions in list tables show in a danger color.
+ * The loading spinners have been replaced with new animated ones.
+* ADDED A mobile web app that can be installed on a phone. Look up contacts, call, text or email them, work through your tasks, add notes, fill out forms for a contact and read and reply to messages, all from a screen made for phones. Open it from the new Mobile app tab in Tools, which has a QR code, or from the link on the dashboard.
+ * Home shows your tasks, replies and the contacts and templates that you used most recently.
+ * Only shows what the person using it is allowed to do, and add-ons can add their own screens to it.
+* ADDED A recommendation on the dashboard and a new AI agent tab in Tools for connecting an AI agent. It installs the MCP Adapter plugin, creates an application password for you, and has setup steps for ChatGPT, Claude, Codex, Cursor, Gemini CLI and VS Code, and for custom connectors. Only offered on WordPress 6.9 and later to people who can manage options.
+* ADDED Settings, the tabs of admin pages and the interface themes can be found in the WordPress command palette, opened with Ctrl or Cmd + K, on WordPress 7.0 and later.
+* IMPROVED Admin pages are easier to use on phones. The header no longer sticks to the top of the screen, pages have a gutter around their content, forms that sit beside a table, like tags and campaigns, stack, modals use the width of the screen, and the buttons above and below a table are tidier.
+* TWEAKED The REST API documentation recommends application passwords for authentication, and API keys are deprecated.
+* FIXED Filters on a table were dropped after searching it for text.
+* FIXED Asking the REST API for a single form by its ID caused an error. It now returns the form, as long as it is an active form.
+* FIXED A PHP warning that `DOING_GROUNDHOGG_REST_REQUEST` was already defined, when the API loaded more than once.
+* DEV New `groundhogg/mobile/register_features` action for registering the screens of the mobile app. Features are declared in PHP and drawn in JS, see `docs/mobile-app-registry.md`.
+* DEV New `groundhogg/admin/themes` filter for the interface themes that can be chosen, as slug => label, and a `gh-theme-{slug}` class on the body of Groundhogg admin pages. The themes are CSS variables that begin with `--ght-`, in `assets/css/admin/themes.css`.
+* DEV New `groundhogg/command_palette/commands` filter for adding commands to the command palette. Each is a url or a JS action, with keywords and a category.
+* DEV New `Admin_Page::table_filters_input()`, which adds the `include_filters` input of a table only when it is not already in the request.
 
 = 4.9.4 (2026-10-13) =
 * ADDED The email abilities can set an email's custom CSS, custom headers and UTM parameters when they create or update an email, and they return them when an email is read.
