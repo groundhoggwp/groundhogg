@@ -1989,7 +1989,16 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	 */
 	public function merge_changes() {
 
-		if ( ! $this->has_changes() || $this->is_temp_merged ) {
+		if ( $this->is_temp_merged ) {
+			return;
+		}
+
+		// nothing staged yet, but still mark it as merged so the changes that are added next are merged too, see
+		// add_changes(). Without it the step keeps its old settings in memory while its new ones are saved, and
+		// what is generated from them, like the title and the slug, is one edit behind.
+		if ( ! $this->has_changes() ) {
+			$this->is_temp_merged = true;
+
 			return;
 		}
 

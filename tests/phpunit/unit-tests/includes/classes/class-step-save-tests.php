@@ -110,6 +110,30 @@ class Step_Save_Tests extends GH_UnitTestCase {
 		$this->assertTrue( (bool) $step->can_passthru );
 	}
 
+	public function test_the_generated_title_follows_the_settings_of_an_active_flow_when_they_are_saved() {
+		$this->make_funnel( 'active' );
+		$step = $this->add_delay();
+		$this->funnel->commit();
+
+		foreach ( [ 5, 8 ] as $amount ) {
+
+			// each edit is its own request in the editor, so the step is loaded again
+			$step = new Step( $step->get_id() );
+			$step->save( [ 'delay_amount' => $amount, 'delay_type' => 'days', 'run_when' => 'now' ] );
+
+			// staged until it's published, and the title that's staged with it is made from the new settings
+			$staged = new Step( $step->get_id() );
+			$this->assertEquals( $amount, $staged->changes['delay_amount'] );
+			$this->assertStringContainsString( (string) $amount, $staged->changes['step_title'], "title after saving $amount" );
+
+			$staged->commit();
+
+			$live = new Step( $step->get_id() );
+			$this->assertEquals( $amount, $live->get_meta( 'delay_amount' ) );
+			$this->assertStringContainsString( (string) $amount, $live->get_title(), "published title for $amount" );
+		}
+	}
+
 	public function test_update_settings_on_an_active_funnel_is_staged() {
 		$this->make_funnel( 'active' );
 		$step = $this->add_delay();
