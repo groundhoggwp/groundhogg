@@ -619,7 +619,7 @@
         className: 'gh-header sticky',
       }, [
         Groundhogg.isWhiteLabeled ? Span({ className: 'white-label-icon'}, Groundhogg.whiteLabelName ) : icons.groundhogg,
-        `<h1>${ __('Rest API', 'groundhogg') }</h1>`,
+        `<h1>${ __('REST API', 'groundhogg') }</h1>`,
         Div({
           className: 'display-flex gap-10',
         }, [

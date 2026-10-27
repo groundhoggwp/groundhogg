@@ -393,7 +393,7 @@ class Settings_Page extends Admin_Page {
 			),
 			html()->description( html()->e( 'a', [
 				'href' => admin_page_url( 'gh_tools', [ 'tab' => 'api' ] )
-			], esc_html__( 'Test out the API in the new Rest API Playground.', 'groundhogg' ) ) ),
+			], esc_html__( 'Test out the API in the new REST API Playground.', 'groundhogg' ) ) ),
 		] );
 		html()->end_row();
 		html()->start_row();

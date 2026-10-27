@@ -290,7 +290,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'cap'  => 'manage_options'
 			],
 			[
-				'name' => esc_html__( 'Rest API Playground', 'groundhogg' ),
+				'name' => esc_html__( 'REST API Playground', 'groundhogg' ),
 				'slug' => 'api',
 				'cap'  => 'manage_options'
 			],
@@ -309,17 +309,6 @@ class Tools_Page extends Tabbed_Admin_Page {
 		];
 
 		return apply_filters( 'groundhogg/admin/tools/tabs', $tabs );
-	}
-
-	public function page() {
-
-		if ( $this->get_current_tab() === 'api' ) {
-			$this->api_view();
-
-			return;
-		}
-
-		parent::page();
 	}
 
 	/**
