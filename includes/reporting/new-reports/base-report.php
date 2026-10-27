@@ -4,6 +4,7 @@ namespace Groundhogg\Reporting\New_Reports;
 
 use Groundhogg\Campaign;
 use Groundhogg\Contact_Query;
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Reports;
@@ -186,6 +187,39 @@ abstract class Base_Report {
 		] );
 
 		return wp_parse_id_list( wp_list_pluck( $contacts, 'ID' ) );
+	}
+
+	/**
+	 * What a contact meta field is set to, and how many of the contacts created in this time period have it, most
+	 * first. Fields that are empty are left out.
+	 *
+	 * @param string $meta_key the meta key, like country
+	 * @param string $alias    the name of the column that has the value, in the rows
+	 * @param int    $limit    how many rows, 0 is all of them
+	 *
+	 * @return object[] rows with the value as $alias and total
+	 */
+	protected function get_new_contact_meta_totals( string $meta_key, string $alias, int $limit = 0 ) {
+
+		$contacts = new Table_Query( 'contacts' );
+		$contacts->setSelect( 'ID' );
+		$contacts->where()->between( 'date_created', $this->startDate->format( 'Y-m-d H:i:s' ), $this->endDate->format( 'Y-m-d H:i:s' ) );
+
+		$query = new Table_Query( 'contactmeta' );
+		$query->setSelect( [ 'COUNT(contact_id)', 'total' ], [ 'meta_value', $alias ] )
+		      ->setGroupby( 'meta_value' )
+		      ->setOrderby( [ 'total', 'DESC' ] );
+
+		$query->where()
+		      ->equals( 'meta_key', $meta_key )
+		      ->notEmpty( 'meta_value' )
+		      ->in( 'contact_id', $contacts );
+
+		if ( $limit ) {
+			$query->setLimit( $limit );
+		}
+
+		return $query->get_results();
 	}
 
 	/**

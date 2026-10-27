@@ -23,18 +23,7 @@ class Table_Contacts_By_Source_Pages extends Base_Table_Report {
 
 	protected function get_table_data() {
 
-		global $wpdb;
-		$contacts_table = get_db( 'contacts' )->table_name;
-
-		$rows = get_db( 'contactmeta' )->query( [
-			'contact_id' => $wpdb->prepare( "SELECT ID FROM $contacts_table WHERE date_created BETWEEN %s AND %s", $this->startDate->format( 'Y-m-d H:i:s' ), $this->endDate->format( 'Y-m-d H:i:s' ) ),
-			'meta_key'   => 'source_page',
-			'select'     => [ 'COUNT(contact_id) as total', 'meta_value as source_page' ],
-			'meta_value' => 'NOT_EMPTY',
-			'groupby'    => 'source_page',
-			'orderby'    => 'total',
-			'order'      => 'desc',
-		] );
+		$rows = $this->get_new_contact_meta_totals( 'source_page', 'source_page' );
 
 		$totals = [];
 

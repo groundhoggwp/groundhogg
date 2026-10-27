@@ -24,19 +24,7 @@ class Table_Contacts_By_Country extends Base_Table_Report {
 	 */
 	protected function get_table_data() {
 
-		global $wpdb;
-		$contacts_table = get_db( 'contacts' )->table_name;
-
-		$rows = get_db( 'contactmeta' )->query( [
-			'contact_id' => $wpdb->prepare( "SELECT ID FROM $contacts_table WHERE date_created BETWEEN %s AND %s", $this->startDate->format( 'Y-m-d H:i:s' ), $this->endDate->format( 'Y-m-d H:i:s' ) ),
-			'meta_key'   => 'country',
-			'select'     => [ 'COUNT(contact_id) as total', 'meta_value as country' ],
-			'meta_value' => 'NOT_EMPTY',
-			'groupby'    => 'country',
-			'orderby'    => 'total',
-			'order'      => 'desc',
-			'limit'      => 10,
-		] );
+		$rows = $this->get_new_contact_meta_totals( 'country', 'country', 10 );
 
 		$data = [];
 
