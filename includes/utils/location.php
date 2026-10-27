@@ -431,23 +431,43 @@ class Location {
 			DateTimeZone::PACIFIC,
 		);
 
-		static $timezones = [];
+		static $timezone_list = [];
 
-		if ( ! empty( $timezones ) ){
-			return $timezones;
+		if ( ! empty( $timezone_list ) ) {
+			return $timezone_list;
 		}
+
+		$timezones = [];
 
 		foreach ( $regions as $region ) {
 			$timezones = array_merge( $timezones, DateTimeZone::listIdentifiers( $region ) );
 		}
 
+		$timezone_list = $this->format_time_zones( $timezones );
+
+		return $timezone_list;
+	}
+
+	/**
+	 * Make the list of time zones with their offsets, soonest first.
+	 *
+	 * A time zone that the server's time zone data lists but then doesn't know, like America/Ciudad_Juarez on older
+	 * data, is left out, it doesn't stop the rest of the list.
+	 *
+	 * @param string[] $timezones the identifiers
+	 *
+	 * @return array identifier => (UTC+00:00) identifier
+	 */
+	public function format_time_zones( array $timezones ) {
+
 		$timezone_offsets = array();
+		$now              = new DateTime;
+
 		foreach ( $timezones as $timezone ) {
-			$tz = new DateTimeZone( $timezone );
 			try {
-				$timezone_offsets[ $timezone ] = $tz->getOffset( new DateTime );
-			} catch ( \Exception $e ) {
-				return [];
+				$timezone_offsets[ $timezone ] = ( new DateTimeZone( $timezone ) )->getOffset( $now );
+			} catch ( \Throwable $e ) {
+				continue;
 			}
 		}
 
