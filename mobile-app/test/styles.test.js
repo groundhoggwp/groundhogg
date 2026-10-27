@@ -13,3 +13,16 @@ test( 'the base element resets cannot out-rank a component class', () => {
   assert.doesNotMatch( css, /^\.ghm (a|button)\b[^{]*\{/m, 'a reset like ".ghm button" beats ".ghm-btn"; use :where(.ghm) button' )
   assert.match( css, /:where\(\.ghm\) button\s*\{[^}]*font: inherit/ )
 })
+
+// Safari and Chrome paint a field they filled in light blue with dark text, in the dark scheme too, so a form with a
+// filled in name and an empty last name was half dark and half light.
+test( 'a field that the browser filled in keeps the colors of the app', () => {
+  const rule = css.match( /\.ghm-input:-webkit-autofill[^{]*\{([^}]*)\}/ )
+
+  assert.ok( rule, 'the fields have an :-webkit-autofill rule' )
+  assert.match( rule[ 1 ], /-webkit-text-fill-color: var\(--ghm-text\)/ )
+  assert.match( rule[ 1 ], /box-shadow: 0 0 0 1000px var\(--ghm-surface\) inset/ )
+
+  // the same fields of a form that the server rendered
+  assert.match( css, /\.ghm-form input:-webkit-autofill/ )
+})

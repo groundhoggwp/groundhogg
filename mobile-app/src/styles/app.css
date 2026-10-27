@@ -149,6 +149,13 @@ body.ghm {
 }
 .ghm-textarea { min-height: 96px; resize: vertical; }
 .ghm-input:focus, .ghm-textarea:focus, .ghm-select:focus { outline: 2px solid var(--ghm-accent); outline-offset: -1px; }
+/* The browser paints a field that it filled in light blue, with dark text, in the dark scheme too, so a form was half dark
+   and half light. The field's own colors go over it. */
+.ghm-input:-webkit-autofill, .ghm-textarea:-webkit-autofill, .ghm-select:-webkit-autofill,
+.ghm-form input:-webkit-autofill, .ghm-form select:-webkit-autofill, .ghm-form textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--ghm-text); caret-color: var(--ghm-text);
+  box-shadow: 0 0 0 1000px var(--ghm-surface) inset; transition: background-color 9999s ease-out 0s;
+}
 .ghm-field { display: block; margin-bottom: 14px; }
 .ghm-field > span { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--ghm-muted); }
 
