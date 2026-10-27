@@ -1562,6 +1562,14 @@ body.groundhogg-admin-page[class*="gh-theme-"] div.error p {
   color: inherit;
 }
 
+/* WP's link blue is only 2:1 on the tinted notices of the dark themes, so links take the accent, which every theme
+   has chosen to read on its own colors */
+body.groundhogg-admin-page[class*="gh-theme-"] .notice a,
+body.groundhogg-admin-page[class*="gh-theme-"] div.updated a,
+body.groundhogg-admin-page[class*="gh-theme-"] div.error a {
+  color: var(--ght-accent);
+}
+
 /* Date range picker (assets/lib/calendar, third-party). Its blue becomes the accent. */
 body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input,
 body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar,
