@@ -19,6 +19,18 @@ class Admin_Themes_Notice_Links_Tests extends GH_UnitTestCase {
 		);
 	}
 
+	public function test_the_yellow_promo_card_keeps_dark_text_in_every_theme() {
+
+		$css = $this->css();
+
+		// the card is yellow whatever the theme is, and the headings and text of the dark themes are light
+		$this->assertMatchesRegularExpression(
+			'/\[class\*="gh-theme-"\] \.gh-site \.gh-primary-card h3,
+[^{]*\.gh-site \.gh-primary-card p \{\s*color: var\(--color-dark-900\);\s*\}/',
+			$css
+		);
+	}
+
 	public function test_every_theme_has_an_accent_and_notice_backgrounds_to_read_it_on() {
 
 		$css = $this->css();

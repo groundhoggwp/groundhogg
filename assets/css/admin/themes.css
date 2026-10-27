@@ -1570,6 +1570,16 @@ body.groundhogg-admin-page[class*="gh-theme-"] div.error a {
   color: var(--ght-accent);
 }
 
+/* The promo card (like the one on the cron page) is yellow in every theme, so its text is dark in every theme and
+   not the light text of the dark themes */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-site .gh-primary-card,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-site .gh-primary-card h1,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-site .gh-primary-card h2,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-site .gh-primary-card h3,
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-site .gh-primary-card p {
+  color: var(--color-dark-900);
+}
+
 /* Date range picker (assets/lib/calendar, third-party). Its blue becomes the accent. */
 body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input,
 body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar,
