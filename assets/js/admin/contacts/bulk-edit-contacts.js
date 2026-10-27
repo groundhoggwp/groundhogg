@@ -483,9 +483,17 @@
 
     const { close } = loadingModal()
 
+    // The loading modal can't be closed by the person, so it has to close when the count fails too. The form is not
+    // mounted then, its button says how many contacts it will edit, and without the count it could edit the wrong ones.
     fetchContactCount().then(() => {
       mount()
       setCommitText()
+    }).catch(err => {
+      dialog({
+        message: err.message || __('Unable to count the selected contacts. Please refresh and try again.', 'groundhogg'),
+        type   : 'error',
+      })
+    }).finally(() => {
       close()
     })
 

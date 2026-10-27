@@ -756,8 +756,13 @@
           })
         }).then(() => {
           close()
-          loadReport(report.id).then(() => {
+          return loadReport(report.id).then(() => {
             scrollTo(report.id)
+          })
+        }).catch(err => {
+          dialog({
+            message: err.message || __('Unable to save the report. Please try again.', 'groundhogg'),
+            type   : 'error',
           })
         })
       }
@@ -801,6 +806,11 @@
           mount()
           close()
           scrollTo(report.id)
+        }).catch(err => {
+          dialog({
+            message: err.message || __('Unable to save the header. Please try again.', 'groundhogg'),
+            type   : 'error',
+          })
         })
       }
 
@@ -849,7 +859,14 @@
   const { close } = loadingModal()
 
   $(() => {
-    loadReports().then(() => {
+
+    // the loading modal can't be closed by the person, so it has to close when the request fails too
+    loadReports().catch(err => {
+      dialog({
+        message: err.message || __('Unable to load reports. Please refresh and try again.', 'groundhogg'),
+        type   : 'error',
+      })
+    }).finally(() => {
       $('.wrap').removeClass('blurred')
       close()
     })
