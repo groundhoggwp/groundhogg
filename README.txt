@@ -407,6 +407,17 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED Filters on a table were dropped after searching it for text.
 * FIXED Asking the REST API for a single form by its ID caused an error. It now returns the form, as long as it is an active form.
 * FIXED A PHP warning that `DOING_GROUNDHOGG_REST_REQUEST` was already defined, when the API loaded more than once.
+* FIXED The contact editor ended in a fatal error on a server whose time zone data lists a time zone that it then doesn't know, like America/Ciudad_Juarez. That time zone is left out of the list and the rest are kept.
+* FIXED The title and slug of a step in an active flow were made from its settings before the edit, so each publish showed the title of the edit before it, like a Date Timer with the previous date.
+* FIXED The contacts by country, lead source and source page reports counted every contact and not only the ones created in the date range, and logged a notice on the Reports page.
+* FIXED `{owner_signature}` logged a PHP warning for a contact that has no owner.
+* FIXED The REST API Playground didn't have the title and tabs of the Tools page. It is spelled REST API.
+* FIXED The text of the Cancel events buttons in the logs turned red on the red button when they were hovered.
+* FIXED Interface themes: links in notices were hard to read in Slate and Midnight, and so were the steps and logo of the guided setup, the logo of the troubleshooter and the banner on the cron page.
+* FIXED Fields that the browser filled in were light in the dark mode of the mobile app.
+* FIXED The name of the agent on the AI agent tab was squeezed to a sliver on a phone.
+* TWEAKED The AI card in the last step of the guided setup opens the AI agent tab in Tools, for people who can use it.
+* DEV New `Location::format_time_zones()`, which leaves out a time zone that the server doesn't know, and `Base_Report::get_new_contact_meta_totals()` for reports of a contact meta field over the contacts created in the date range.
 * DEV New `groundhogg/mobile/register_features` action for registering the screens of the mobile app. Features are declared in PHP and drawn in JS, see `docs/mobile-app-registry.md`.
 * DEV New `groundhogg/admin/themes` filter for the interface themes that can be chosen, as slug => label, and a `gh-theme-{slug}` class on the body of Groundhogg admin pages. The themes are CSS variables that begin with `--ght-`, in `assets/css/admin/themes.css`.
 * DEV New `groundhogg/command_palette/commands` filter for adding commands to the command palette. Each is a url or a JS action, with keywords and a category.
