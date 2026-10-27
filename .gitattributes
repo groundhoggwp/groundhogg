@@ -1,3 +1,11 @@
+# Text files are LF in the repo and in the archives, whatever the settings of the machine that builds them
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
+
 # Directories
 /.wordpress-org export-ignore
 /.github export-ignore
@@ -27,3 +35,5 @@
 /babel.config.js export-ignore
 /wp-cli.phar export-ignore
 /wp-cli.yml export-ignore
+/mobile-app export-ignore
+/README.md export-ignore
