@@ -416,6 +416,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED Interface themes: links in notices were hard to read in Slate and Midnight, and so were the steps and logo of the guided setup, the logo of the troubleshooter and the banner on the cron page.
 * FIXED Fields that the browser filled in were light in the dark mode of the mobile app.
 * FIXED The name of the agent on the AI agent tab was squeezed to a sliver on a phone.
+* FIXED The loading screen of the dashboard reports, the custom reports and bulk edit contacts stayed open for good when the request for what they show failed, like when it was blocked or answered with an error page. It closes and says that it couldn't load. Bulk edit doesn't open its form without the count of the contacts that it will edit.
 * TWEAKED The AI card in the last step of the guided setup opens the AI agent tab in Tools, for people who can use it.
 * DEV New `Location::format_time_zones()`, which leaves out a time zone that the server doesn't know, and `Base_Report::get_new_contact_meta_totals()` for reports of a contact meta field over the contacts created in the date range.
 * DEV New `groundhogg/mobile/register_features` action for registering the screens of the mobile app. Features are declared in PHP and drawn in JS, see `docs/mobile-app-registry.md`.
