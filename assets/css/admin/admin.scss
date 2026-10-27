@@ -474,6 +474,13 @@ a.danger:hover {
   color: #dc3232;
 }
 
+// a danger link that is a button has a red background, so it keeps its light text, the red above is for plain links
+a.gh-button.danger,
+a.gh-button.danger:hover,
+a.gh-button.danger:focus {
+  color: #fff;
+}
+
 .wp-core-ui .button.danger {
   background-color: #a00;
   border-color: #a00;
