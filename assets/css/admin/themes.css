@@ -1580,6 +1580,20 @@ body.groundhogg-admin-page[class*="gh-theme-"] .gh-site .gh-primary-card p {
   color: var(--color-dark-900);
 }
 
+/* The steps across the top of the guided setup are dark blue for the one you are on and the ones you did, which can't
+   be read on the dark themes */
+body.groundhogg-admin-page[class*="gh-theme-"] #guided-setup .gs-stepper .done .gs-stepper-step,
+body.groundhogg-admin-page[class*="gh-theme-"] #guided-setup .gs-stepper .current .gs-stepper-step {
+  color: var(--ght-text);
+}
+
+/* The logo of the guided setup and the troubleshooter is black letters with a bear, so the letters take the text
+   color of the theme, and not black on the dark ones */
+body.groundhogg-admin-page[class*="gh-theme-"] #guided-setup .gs-logo svg #shine > g:first-child path,
+body.groundhogg-admin-page[class*="gh-theme-"] #troubleshooter svg #shine > g:first-child path {
+  fill: var(--ght-text);
+}
+
 /* Date range picker (assets/lib/calendar, third-party). Its blue becomes the accent. */
 body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-input,
 body.groundhogg-admin-page[class*="gh-theme-"] .daterange .dr-selections .dr-calendar,

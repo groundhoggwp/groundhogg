@@ -31,6 +31,28 @@ class Admin_Themes_Notice_Links_Tests extends GH_UnitTestCase {
 		);
 	}
 
+	public function test_the_steps_of_the_guided_setup_take_the_text_color_of_the_theme() {
+
+		$this->assertMatchesRegularExpression(
+			'/#guided-setup \.gs-stepper \.done \.gs-stepper-step,\n[^{]*#guided-setup \.gs-stepper \.current \.gs-stepper-step \{\s*color: var\(--ght-text\);/',
+			$this->css()
+		);
+	}
+
+	public function test_the_letters_of_the_logo_take_the_text_color_of_the_theme() {
+
+		$css = $this->css();
+
+		foreach ( [ '#guided-setup .gs-logo svg #shine > g:first-child path', '#troubleshooter svg #shine > g:first-child path' ] as $selector ) {
+			$this->assertStringContainsString( $selector, $css );
+		}
+
+		// the letters are the paths of the first group of the logo, the bear is in the second
+		$icons = file_get_contents( GROUNDHOGG_PATH . 'assets/js/admin/element.js' );
+		$this->assertSame( 1, preg_match( '/groundhogg_black: `(.*?)`,/s', $icons, $logo ) );
+		$this->assertMatchesRegularExpression( '/<g id="shine">\s*<g>\s*<path\s+d=/', $logo[1] );
+	}
+
 	public function test_every_theme_has_an_accent_and_notice_backgrounds_to_read_it_on() {
 
 		$css = $this->css();
