@@ -121,6 +121,11 @@ $examples = [
     .gh-mcp details { margin: 10px 0; }
     .gh-mcp summary { cursor: pointer; font-weight: 500; padding: 4px 0; }
     .gh-mcp .gh-input-group { max-width: 600px; }
+    /* on a phone the name gets the whole row, and the button goes under it, so the name isn't 60px wide */
+    @media (max-width: 782px) {
+        .gh-mcp .gh-input-group { flex-wrap: wrap; gap: 8px; }
+        .gh-mcp .gh-input-group > input { flex: 1 1 100%; }
+    }
 </style>
 <p></p>
 <div class="gh-panel">
