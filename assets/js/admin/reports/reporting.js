@@ -29,6 +29,7 @@
   const {
     loadingModal,
     adminPageURL,
+    dialog,
   } = Groundhogg.element
 
   const openInContactsView = (filters) => {
@@ -342,6 +343,19 @@
 
         let { close } = loadingModal()
 
+        // the loading modal can't be closed by the person, so whatever goes wrong has to close it
+        const failed = () => {
+
+          close()
+
+          $('.wrap').removeClass('blurred')
+
+          dialog({
+            message: __('Unable to retrieve report data. Please refresh and try again.', 'groundhogg'),
+            type   : 'error',
+          })
+        }
+
         var start = calendar.start_date.format('YYYY-MM-DD'),
           end = calendar.end_date.format('YYYY-MM-DD')
 
@@ -360,6 +374,12 @@
           },
           success : function (json) {
 
+            // admin-ajax answers 200 with success false when the request is refused
+            if (!json || !json.success || !json.data || !json.data.reports) {
+              failed()
+              return
+            }
+
             self.data = json.data.reports
             self.renderReports()
 
@@ -370,11 +390,8 @@
             window.dispatchEvent(new Event('resize'))
 
           },
-          failure : function (response) {
-
-            alert('Unable to retrieve data...')
-
-          },
+          // jQuery has no failure callback, a request that fails calls error
+          error   : failed,
         })
 
       },
