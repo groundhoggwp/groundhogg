@@ -2181,6 +2181,11 @@ class Replacements implements \JsonSerializable {
 			$user = $this->get_current_contact()->get_ownerdata();
 		}
 
+		// a contact without an owner, or a user that has been deleted
+		if ( ! $user ) {
+			return '';
+		}
+
 		return wpautop( $user->signature );
 	}
 
