@@ -1127,7 +1127,7 @@
         description: __('Connect Claude or another AI assistant, and have it build flows, write emails and find contacts for you.', 'groundhogg'),
         action     : An({
           href     : links.ai,
-          target   : '_blank',
+          ...( links.ai_in_admin ? {} : { target: '_blank' } ),
           className: 'gh-button secondary',
         }, __('Connect an AI assistant', 'groundhogg')),
       }),
