@@ -66,4 +66,16 @@ class Admin_Themes_Notice_Links_Tests extends GH_UnitTestCase {
 			}
 		}
 	}
+
+	public function test_the_canvas_of_the_email_editor_is_white_and_does_not_take_the_surface_of_its_panel() {
+
+		$css = $this->css();
+
+		// the text of the canvas is dark, so it can't be on the dark panel it is in. :where() keeps the specificity of
+		// the rule at one id, so the background that the template CSS of an email sets on the canvas still wins
+		$this->assertMatchesRegularExpression(
+			'/:where\(body\.groundhogg-admin-page\[class\*="gh-theme-"\]\) #block-editor-content-wrap,\n[^{]*\{\s*background-color: #fff;\s*\}/',
+			$css
+		);
+	}
 }

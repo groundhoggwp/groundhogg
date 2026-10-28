@@ -84,6 +84,14 @@ body.groundhogg-admin-page[class*="gh-theme-"] #email-editor-content {
   color: #3c434a;
 }
 
+/* The canvas is the email, which is white unless the email says otherwise, so it isn't painted
+   by the panel it is in. :where() keeps this at the specificity of the canvas's own rule, so the
+   background that an email's template CSS puts on the canvas (#builder-style) still wins. */
+:where(body.groundhogg-admin-page[class*="gh-theme-"]) #block-editor-content-wrap,
+:where(body.groundhogg-admin-page[class*="gh-theme-"]) #email-editor-content {
+  background-color: #fff;
+}
+
 body.groundhogg-admin-page[class*="gh-theme-"] .description,
 body.groundhogg-admin-page[class*="gh-theme-"] .displaying-num,
 body.groundhogg-admin-page[class*="gh-theme-"] p.description {
