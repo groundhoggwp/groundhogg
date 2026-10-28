@@ -417,6 +417,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED Fields that the browser filled in were light in the dark mode of the mobile app.
 * FIXED The name of the agent on the AI agent tab was squeezed to a sliver on a phone.
 * FIXED The loading screen of the dashboard reports, the custom reports and bulk edit contacts stayed open for good when the request for what they show failed, like when it was blocked or answered with an error page. It closes and says that it couldn't load. Bulk edit doesn't open its form without the count of the contacts that it will edit.
+* FIXED Incoming Messages couldn't be set up on a subsite of a multisite network that has its license on the main site, like a subsite with its own domain. A subsite that has no license of its own now uses the licenses of the main site when the White Label add-on is network active and turned on. Licenses of the main site are synced and removed there.
 * TWEAKED The AI card in the last step of the guided setup opens the AI agent tab in Tools, for people who can use it.
 * DEV New `Location::format_time_zones()`, which leaves out a time zone that the server doesn't know, and `Base_Report::get_new_contact_meta_totals()` for reports of a contact meta field over the contacts created in the date range.
 * DEV New `groundhogg/mobile/register_features` action for registering the screens of the mobile app. Features are declared in PHP and drawn in JS, see `docs/mobile-app-registry.md`.

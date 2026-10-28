@@ -272,6 +272,13 @@ class License_Manager {
 	 * @var License[]
 	 */
 	static array $licenses;
+
+	/**
+	 * The licenses of the network's main site, once they have been loaded
+	 *
+	 * @var License[]|null
+	 */
+	static ?array $network_licenses = null;
 	static $storeUrl = "https://my.groundhogg.io/license-api/";
 	static $user_agent = 'Groundhogg/' . GROUNDHOGG_VERSION . ' license-manager';
 
@@ -403,22 +410,105 @@ class License_Manager {
 	}
 
 	/**
-	 * Return the licenses
+	 * Return the licenses the site can use. These are the site's own licenses, or when the site has none and is on a
+	 * network that is white labeled, the licenses of the network's main site.
 	 *
 	 * @return License[]
 	 */
 	public static function get_licenses() {
 
-        if ( empty( self::$licenses ) ){
-            self::$licenses = get_option( 'gh_licenses', [] );
+		$licenses = self::get_own_licenses();
 
-            // filter out funky stuff
-	        self::$licenses = array_filter( self::$licenses, function ( License $license, $key ) {
-		        return ! empty( $key ) && is_a( $license, License::class );
-	        }, ARRAY_FILTER_USE_BOTH );
+		if ( empty( $licenses ) && self::can_use_network_licenses() ) {
+			return self::get_network_licenses();
+		}
+
+		return $licenses;
+	}
+
+	/**
+	 * Return the licenses that are saved on this site, this is what gets added to and saved
+	 *
+	 * @return License[]
+	 */
+	protected static function get_own_licenses() {
+
+        if ( empty( self::$licenses ) ){
+            self::$licenses = self::sanitize_saved_licenses( get_option( 'gh_licenses', [] ) );
         }
 
         return self::$licenses;
+	}
+
+	/**
+	 * Return the licenses that are saved on the main site of the network
+	 *
+	 * @return License[]
+	 */
+	protected static function get_network_licenses() {
+
+		if ( self::$network_licenses === null ) {
+			self::$network_licenses = self::sanitize_saved_licenses( get_blog_option( get_main_blog_id(), 'gh_licenses', [] ) );
+		}
+
+		return self::$network_licenses;
+	}
+
+	/**
+	 * Filter out funky stuff from the saved licenses
+	 *
+	 * @param mixed $licenses
+	 *
+	 * @return License[]
+	 */
+	protected static function sanitize_saved_licenses( $licenses ) {
+
+		if ( ! is_array( $licenses ) ) {
+			return [];
+		}
+
+		return array_filter( $licenses, function ( $license, $key ) {
+			return ! empty( $key ) && is_a( $license, License::class );
+		}, ARRAY_FILTER_USE_BOTH );
+	}
+
+	/**
+	 * Whether the site can use the licenses of the network's main site. That's when
+	 * - it's a subsite on a multisite
+	 * - the White Label add-on is network active and white labeling is on, which is what a WaaS license is for
+	 *
+	 * This doesn't check that the site has no licenses of its own, the licenses of the site always come first.
+	 *
+	 * @return bool
+	 */
+	protected static function can_use_network_licenses() {
+
+		if ( ! is_multisite() || is_main_site() ) {
+			return false;
+		}
+
+		// the White Label add-on defines this, if it isn't there the site isn't white labeled
+		if ( ! function_exists( __NAMESPACE__ . '\white_label_is_network_active' ) ) {
+			return false;
+		}
+
+		return white_label_is_network_active() && is_white_labeled();
+	}
+
+	/**
+	 * Whether the license is one that the site is using from the network's main site, it's managed there and not here
+	 *
+	 * @param string $license_key
+	 *
+	 * @return bool
+	 */
+	public static function is_network_license( string $license_key ) {
+
+		if ( ! empty( self::get_own_licenses() ) ) {
+			return false;
+		}
+
+		return self::can_use_network_licenses() && key_exists( $license_key, self::get_network_licenses() );
 	}
 
 	public static function save_licenses() {
@@ -844,6 +934,11 @@ class License_Manager {
             return new WP_Error( 'license_error', esc_html__( 'License is configured in `wp-config.php`.', 'groundhogg' ) );
         }
 
+		// a license that is the network's is checked on the main site, checking it here would save it to this site
+		if ( self::is_network_license( $license_key ) ) {
+			return self::get_licenses()[ $license_key ];
+		}
+
         // don't check the license more than once during the same request
         if ( flagged( __METHOD__ . ':' . $license_key ) ){
             return self::$licenses[ $license_key ] ?? null;
@@ -899,6 +994,10 @@ class License_Manager {
 
 		if ( defined( 'GH_MASTER_LICENSE' ) && $license_key === GH_MASTER_LICENSE ){
 			return new WP_Error( 'license_error', esc_html__( 'License is configured in `wp-config.php`.', 'groundhogg' ) );
+		}
+
+		if ( self::is_network_license( $license_key ) ) {
+			return new WP_Error( 'license_error', esc_html__( 'This license is used from the main site of the network, remove it there.', 'groundhogg' ) );
 		}
 
 		$response = self::licence_api_request( 'deactivate_license', $license_key );
@@ -964,6 +1063,14 @@ class License_Manager {
 
 		if ( empty( $licenses ) ) {
 			return false;
+		}
+
+		// the licenses are managed on the main site, so there's nothing here to sync or remove
+		if ( empty( self::get_own_licenses() ) ) {
+			html( 'h3', [], esc_html__( 'Your Licenses', 'groundhogg' ) );
+			html( 'p', [], esc_html__( 'This site is using the licenses of the main site of the network. Manage them there.', 'groundhogg' ) );
+
+			return true;
 		}
 
 		html( 'h3', [], esc_html__( 'Your Licenses', 'groundhogg' ) );
