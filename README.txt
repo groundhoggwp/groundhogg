@@ -410,6 +410,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED The contact editor ended in a fatal error on a server whose time zone data lists a time zone that it then doesn't know, like America/Ciudad_Juarez. That time zone is left out of the list and the rest are kept.
 * FIXED The title and slug of a step in an active flow were made from its settings before the edit, so each publish showed the title of the edit before it, like a Date Timer with the previous date.
 * FIXED The contacts by country, lead source and source page reports counted every contact and not only the ones created in the date range, and logged a notice on the Reports page.
+* FIXED The link color and font of a text block, and the other styles of its text, weren't applied to what a replacement code adds, like the list of links from `{files}`. They are added to the replaced content as inline styles, so email clients that drop the styles in an email's head show them too, and a text block that has a replacement code saves the rules for all of its tags.
 * FIXED `{owner_signature}` logged a PHP warning for a contact that has no owner.
 * FIXED The REST API Playground didn't have the title and tabs of the Tools page. It is spelled REST API.
 * FIXED The text of the Cancel events buttons in the logs turned red on the red button when they were hovered.

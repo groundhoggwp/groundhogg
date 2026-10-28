@@ -790,6 +790,218 @@ function make_email_images_fluid( $html ) {
 }
 
 /**
+ * The declarations of a block of CSS, `color: #000; font-family: 'Open Sans', sans-serif` as property => value.
+ *
+ * @param string $declarations
+ *
+ * @return string[]
+ */
+function parse_css_declarations( $declarations ) {
+
+	$parsed = [];
+	$part   = '';
+	$quote  = '';
+	$parens = 0;
+	$parts  = [];
+	$length = strlen( $declarations );
+
+	// split on the ; that aren't in quotes or in parentheses, like in url(data:image/png;base64,...)
+	for ( $i = 0; $i < $length; $i ++ ) {
+
+		$char = $declarations[ $i ];
+
+		if ( $quote ) {
+			if ( $char === $quote ) {
+				$quote = '';
+			}
+		} else if ( $char === '"' || $char === "'" ) {
+			$quote = $char;
+		} else if ( $char === '(' ) {
+			$parens ++;
+		} else if ( $char === ')' && $parens > 0 ) {
+			$parens --;
+		} else if ( $char === ';' && ! $parens ) {
+			$parts[] = $part;
+			$part    = '';
+			continue;
+		}
+
+		$part .= $char;
+	}
+
+	$parts[] = $part;
+
+	foreach ( $parts as $part ) {
+
+		$colon = strpos( $part, ':' );
+
+		if ( $colon === false ) {
+			continue;
+		}
+
+		$property = strtolower( trim( substr( $part, 0, $colon ) ) );
+		$value    = trim( substr( $part, $colon + 1 ) );
+
+		if ( $property === '' || $value === '' || ! preg_match( '/^[a-z-]+$/', $property ) ) {
+			continue;
+		}
+
+		$parsed[ $property ] = $value;
+	}
+
+	return $parsed;
+}
+
+/**
+ * The rules of the CSS of the blocks that style a tag inside of a block, like `#b-ID a{color:#000}`, in the order that
+ * they are written. Rules for anything else, like classes or media queries, are left out.
+ *
+ * @param string $css
+ *
+ * @return array[] each is [ 'block' => 'b-ID', 'tag' => 'a', 'style' => [ 'color' => '#000' ] ]
+ */
+function parse_block_tag_rules( $css ) {
+
+	$css    = preg_replace( '#/\*.*?\*/#s', '', (string) $css );
+	$length = strlen( $css );
+	$rules  = [];
+	$i      = 0;
+
+	while ( $i < $length ) {
+
+		$open = strpos( $css, '{', $i );
+
+		if ( $open === false ) {
+			break;
+		}
+
+		$selectors = trim( substr( $css, $i, $open - $i ) );
+		$depth     = 1;
+		$j         = $open + 1;
+
+		// find where it ends, a media query has rules inside of it
+		while ( $j < $length && $depth > 0 ) {
+
+			if ( $css[ $j ] === '{' ) {
+				$depth ++;
+			} else if ( $css[ $j ] === '}' ) {
+				$depth --;
+			}
+
+			$j ++;
+		}
+
+		$body = substr( $css, $open + 1, $j - $open - 2 );
+		$i    = $j;
+
+		if ( $selectors === '' || $selectors[0] === '@' ) {
+			continue;
+		}
+
+		$style = null;
+
+		foreach ( explode( ',', $selectors ) as $selector ) {
+
+			if ( ! preg_match( '/^#(b-[\w-]+)\s+(a|p|li|h[1-6])$/i', trim( $selector ), $matches ) ) {
+				continue;
+			}
+
+			$style = $style ?? parse_css_declarations( $body );
+
+			if ( $style ) {
+				$rules[] = [
+					'block' => $matches[1],
+					'tag'   => strtolower( $matches[2] ),
+					'style' => $style,
+				];
+			}
+		}
+	}
+
+	return $rules;
+}
+
+/**
+ * Give the elements in the blocks that have no style of their own the styles that the CSS of the blocks has for them.
+ *
+ * The editor puts an inline style on the tags that it can see in a text block, and the block's CSS has rules for the
+ * rest. What a replacement code adds, like the list of links of {files}, is not in the block until the email is built, so
+ * it is only styled by the rules in the head, which some email clients drop. The elements that already have a
+ * style are left as they are.
+ *
+ * @param string $html
+ * @param string $css the CSS of the blocks, with rules like `#b-ID a{color:#000}`
+ *
+ * @return string
+ */
+function inline_block_tag_styles( $html, $css ) {
+
+	if ( ! is_string( $html ) || $html === '' || ! is_string( $css ) || $css === '' ) {
+		return $html;
+	}
+
+	$rules = parse_block_tag_rules( $css );
+
+	if ( ! $rules ) {
+		return $html;
+	}
+
+	$void  = [ 'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr' ];
+	$tags  = new \WP_HTML_Tag_Processor( $html );
+	$stack = []; // the elements that are open, with the id of the block if they are one
+
+	while ( $tags->next_tag( [ 'tag_closers' => 'visit' ] ) ) {
+
+		$name = strtolower( $tags->get_tag() );
+
+		if ( $tags->is_tag_closer() ) {
+
+			// close the element and whatever was left open inside of it
+			for ( $k = count( $stack ) - 1; $k >= 0; $k -- ) {
+				if ( $stack[ $k ]['tag'] === $name ) {
+					$stack = array_slice( $stack, 0, $k );
+					break;
+				}
+			}
+
+			continue;
+		}
+
+		$blocks = array_filter( array_column( $stack, 'block' ) );
+
+		if ( $blocks && trim( (string) $tags->get_attribute( 'style' ) ) === '' ) {
+
+			$style = [];
+
+			// the rules that are written last win, they have the same specificity
+			foreach ( $rules as $rule ) {
+				if ( $rule['tag'] === $name && in_array( $rule['block'], $blocks, true ) ) {
+					$style = array_merge( $style, $rule['style'] );
+				}
+			}
+
+			if ( $style ) {
+				$tags->set_attribute( 'style', implode( ';', array_map( function ( $property, $value ) {
+					return "$property:$value";
+				}, array_keys( $style ), $style ) ) );
+			}
+		}
+
+		if ( ! in_array( $name, $void, true ) ) {
+
+			$id = $tags->get_attribute( 'id' );
+
+			$stack[] = [
+				'tag'   => $name,
+				'block' => is_string( $id ) && preg_match( '/^b-[\w-]+$/', $id ) ? $id : '',
+			];
+		}
+	}
+
+	return $tags->get_updated_html();
+}
+
+/**
  * Compat for email links and replacements
  *
  * @param $content

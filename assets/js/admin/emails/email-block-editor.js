@@ -8115,9 +8115,13 @@
         'a',
       ]
 
+      // A replacement code, like {files}, adds tags that are not in the content until the email is built, and these
+      // rules are what styles them
+      const hasReplacements = /\{[a-z_][^{}]*\}/i.test(content)
+
       tags.forEach(tag => {
-        // only include the CSS if the tag is actually present
-        if (content.match(new RegExp(`<${tag} [^>]*>`))) {
+        // only include the CSS if the tag is actually present, or could be added by a replacement code
+        if (hasReplacements || content.match(new RegExp(`<${tag} [^>]*>`))) {
           rules.push(tagBlock(tag, props[tag] ?? {}))
         }
       })

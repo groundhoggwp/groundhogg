@@ -795,10 +795,19 @@ class Email extends Base_Object_With_Meta {
 
 		// No contact? Ignore replacements.
 		if ( is_a_contact( $this->contact ) ) {
+
+			$before = $content;
+
 			$content = do_replacements(
 				$content,
 				$this->get_contact()
 			);
+
+			// What a replacement adds, like the links of {files}, isn't in the block until now, so it has none of the styles
+			// that the editor put on the tags that it could see. The head styles have rules for it, but some clients drop them.
+			if ( $this->is_block_editor() && $content !== $before ) {
+				$content = inline_block_tag_styles( $content, $this->get_css() );
+			}
 		}
 
 		/* filter out double http based on bug where links have http:// prepended */
