@@ -1167,6 +1167,12 @@ add_filter( 'tiny_mce_before_init', __NAMESPACE__ . '\tiny_mce_before_init' );
 
 // Add listener for on lick event
 function tiny_mce_before_init( $initArray ) {
+
+	// the setup of the editors of other pages, and of other plugins, isn't replaced
+	if ( ! is_admin_groundhogg_page() ) {
+		return $initArray;
+	}
+
 	$initArray['setup'] = <<<JS
 [function(ed) {
     ed.on( 'click', function(ed, e) {

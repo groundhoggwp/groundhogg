@@ -1189,6 +1189,101 @@ body.groundhogg-admin-page[class*="gh-theme-"] #personal-email-form .mce-wrap {
   border-color: var(--ght-border-strong);
 }
 
+/* TinyMCE: its frame, toolbar and status bar are in the page and use its skin's colors. The text is in an
+   iframe, which is given the colors of the theme as its content style in element.js */
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-panel,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-statusbar {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-toolbar-grp,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-toolbar-grp .mce-panel {
+  background-color: var(--ght-raised);
+  border-color: var(--ght-border);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-statusbar {
+  border-color: var(--ght-border);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-ico,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-btn .mce-txt,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-path-item,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-caret {
+  color: var(--ght-text);
+}
+
+/* the dropdown, like the one for the paragraph format, is before the hover rule so that wins */
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-btn.mce-listbox {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-btn:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-btn:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-tinymce .mce-btn.mce-active {
+  background-color: var(--ght-border);
+  border-color: var(--ght-border-strong);
+}
+
+/* The menus of TinyMCE are in the body, not in its frame */
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-panel {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu-item .mce-text,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu-item .mce-ico {
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu-item .mce-menu-shortcut {
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu-item:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu-item:focus,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu-item.mce-selected,
+body.groundhogg-admin-page[class*="gh-theme-"] .mce-floatpanel .mce-menu-item.mce-active {
+  background-color: var(--ght-border);
+}
+
+/* The editor of WordPress around TinyMCE: the Visual and Code tabs, the box and the toolbar of the Code tab */
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-editor-container {
+  background-color: var(--ght-surface);
+  border-color: var(--ght-border-strong);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-editor-tabs .wp-switch-editor {
+  background-color: var(--ght-raised);
+  border-color: var(--ght-border-strong);
+  color: var(--ght-muted);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-editor-tabs .wp-switch-editor:hover,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-editor-tabs .wp-switch-editor:focus {
+  background-color: var(--ght-border);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-editor-wrap.tmce-active .wp-editor-tabs .switch-tmce,
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-editor-wrap.html-active .wp-editor-tabs .switch-html {
+  background-color: var(--ght-surface);
+  border-bottom-color: var(--ght-surface);
+  color: var(--ght-text);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .wp-editor-wrap .quicktags-toolbar {
+  background-color: var(--ght-raised);
+  border-color: var(--ght-border);
+}
+
 /* from reporting.scss */
 body.groundhogg-admin-page[class*="gh-theme-"].gh_reporting .gh-loader-overlay {
   background-color: var(--ght-surface);

@@ -393,39 +393,22 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.10 (2026-10-21) =
 * ADDED Interface themes. Choose Light, Paper, Slate (dark) or Midnight (dark) for the way the admin looks, or keep the default. A theme is saved per user, and only changes colors, not how anything works.
- * Pick a theme with swatches on your user profile, from the new Look step of the guided setup, or by searching for "Theme" in the command palette.
- * Tables, forms, tabs, modals, notices, tooltips, pickers, the flow editor and the email editor have all been styled for each theme.
- * Delete, trash and spam row actions in list tables show in a danger color.
- * The loading spinners have been replaced with new animated ones.
-* ADDED A mobile web app that can be installed on a phone. Look up contacts, call, text or email them, work through your tasks, add notes, fill out forms for a contact and read and reply to messages, all from a screen made for phones. Open it from the new Mobile app tab in Tools, which has a QR code, or from the link on the dashboard.
- * Home shows your tasks, replies and the contacts and templates that you used most recently.
- * Only shows what the person using it is allowed to do, and add-ons can add their own screens to it.
-* ADDED A recommendation on the dashboard and a new AI agent tab in Tools for connecting an AI agent. It installs the MCP Adapter plugin, creates an application password for you, and has setup steps for ChatGPT, Claude, Codex, Cursor, Gemini CLI and VS Code, and for custom connectors. Only offered on WordPress 6.9 and later to people who can manage options.
+ * Pick a theme with swatches on your user profile, from the new Look step of the guided setup, or in the command palette.
+ * Tables, forms, tabs, modals, notices, tooltips, pickers, the flow editor, the text editors and the email editor are styled for each theme. The email in the editor stays white, as it will look.
+ * Delete, trash and spam row actions in list tables show in a danger color, and the loading spinners are new animated ones.
+* ADDED A mobile web app that can be installed on a phone. Look up contacts, call, text or email them, work through your tasks, add notes, fill out forms for a contact and read and reply to messages, all from a screen made for phones. Open it from the new Mobile app tab in Tools, which has a QR code, or from the link on the dashboard. It only shows what the person using it is allowed to do, and add-ons can add their own screens to it.
+* ADDED A recommendation on the dashboard and in the last step of the guided setup, and a new AI agent tab in Tools, for connecting an AI agent. It installs the MCP Adapter plugin, creates an application password for you, and has setup steps for ChatGPT, Claude, Codex, Cursor, Gemini CLI and VS Code, and for custom connectors. Only offered on WordPress 6.9 and later to people who can manage options.
 * ADDED Settings, the tabs of admin pages and the interface themes can be found in the WordPress command palette, opened with Ctrl or Cmd + K, on WordPress 7.0 and later.
-* IMPROVED Admin pages are easier to use on phones. The header no longer sticks to the top of the screen, pages have a gutter around their content, forms that sit beside a table, like tags and campaigns, stack, modals use the width of the screen, and the buttons above and below a table are tidier.
-* TWEAKED The REST API documentation recommends application passwords for authentication, and API keys are deprecated.
-* FIXED Filters on a table were dropped after searching it for text.
-* FIXED Asking the REST API for a single form by its ID caused an error. It now returns the form, as long as it is an active form.
-* FIXED A PHP warning that `DOING_GROUNDHOGG_REST_REQUEST` was already defined, when the API loaded more than once.
-* FIXED The contact editor ended in a fatal error on a server whose time zone data lists a time zone that it then doesn't know, like America/Ciudad_Juarez. That time zone is left out of the list and the rest are kept.
-* FIXED The title and slug of a step in an active flow were made from its settings before the edit, so each publish showed the title of the edit before it, like a Date Timer with the previous date.
-* FIXED The contacts by country, lead source and source page reports counted every contact and not only the ones created in the date range, and logged a notice on the Reports page.
-* FIXED The link color and font of a text block, and the other styles of its text, weren't applied to what a replacement code adds, like the list of links from `{files}`. They are added to the replaced content as inline styles, so email clients that drop the styles in an email's head show them too, and a text block that has a replacement code saves the rules for all of its tags.
-* FIXED The email in the block editor was drawn on the dark panel of the dark themes with its dark text, which was hard to read, like when editing the email of a Send Email step. It is white like the preview, unless the email's own CSS gives it another background.
+* IMPROVED Admin pages are easier to use on phones. The header no longer sticks to the top, pages have a gutter, forms that sit beside a table, like tags and campaigns, stack, modals use the width of the screen, and the buttons around a table are tidier.
+* TWEAKED The REST API documentation recommends application passwords, and API keys are deprecated.
+* FIXED The link color, font and other text styles of a text block weren't applied to what a replacement code adds, like the links of `{files}`. They are now added to it as inline styles, so email clients that drop the styles in an email's head show them. Emails saved with a replacement code before this need to be saved in the editor once to get them.
+* FIXED Asking the REST API for a single form by its ID caused an error. It now returns the form, as long as it is active. A PHP warning that `DOING_GROUNDHOGG_REST_REQUEST` was already defined, when the API loaded more than once, is gone.
+* FIXED The contacts by country, lead source and source page reports counted every contact, not only the ones created in the date range, and logged a notice.
+* FIXED The contact editor ended in a fatal error on a server whose time zone data lists a time zone that it then doesn't know, like America/Ciudad_Juarez. That time zone is left out of the list.
+* FIXED The loading screen of the dashboard reports, the custom reports and bulk edit contacts stayed open when the request for what they show failed. It closes and says that it couldn't load, and bulk edit doesn't open its form without the count of the contacts that it will edit.
+* FIXED Incoming Messages couldn't be set up on a subsite of a multisite network that has its license on the main site. When the White Label add-on is network active and turned on, a subsite uses the licenses of the main site, which are synced and removed there.
+* FIXED The click listener that is added to TinyMCE replaced the `setup` of every editor in the admin, including the ones of other plugins and the post editor. It is only added on the pages of the plugin.
 * FIXED `{owner_signature}` logged a PHP warning for a contact that has no owner.
-* FIXED The REST API Playground didn't have the title and tabs of the Tools page. It is spelled REST API.
-* FIXED The text of the Cancel events buttons in the logs turned red on the red button when they were hovered.
-* FIXED Interface themes: links in notices were hard to read in Slate and Midnight, and so were the steps and logo of the guided setup, the logo of the troubleshooter and the banner on the cron page.
-* FIXED Fields that the browser filled in were light in the dark mode of the mobile app.
-* FIXED The name of the agent on the AI agent tab was squeezed to a sliver on a phone.
-* FIXED The loading screen of the dashboard reports, the custom reports and bulk edit contacts stayed open for good when the request for what they show failed, like when it was blocked or answered with an error page. It closes and says that it couldn't load. Bulk edit doesn't open its form without the count of the contacts that it will edit.
-* FIXED Incoming Messages couldn't be set up on a subsite of a multisite network that has its license on the main site, like a subsite with its own domain. A subsite that has no license of its own now uses the licenses of the main site when the White Label add-on is network active and turned on. Licenses of the main site are synced and removed there.
-* TWEAKED The AI card in the last step of the guided setup opens the AI agent tab in Tools, for people who can use it.
-* DEV New `Location::format_time_zones()`, which leaves out a time zone that the server doesn't know, and `Base_Report::get_new_contact_meta_totals()` for reports of a contact meta field over the contacts created in the date range.
-* DEV New `groundhogg/mobile/register_features` action for registering the screens of the mobile app. Features are declared in PHP and drawn in JS, see `docs/mobile-app-registry.md`.
-* DEV New `groundhogg/admin/themes` filter for the interface themes that can be chosen, as slug => label, and a `gh-theme-{slug}` class on the body of Groundhogg admin pages. The themes are CSS variables that begin with `--ght-`, in `assets/css/admin/themes.css`.
-* DEV New `groundhogg/command_palette/commands` filter for adding commands to the command palette. Each is a url or a JS action, with keywords and a category.
-* DEV New `Admin_Page::table_filters_input()`, which adds the `include_filters` input of a table only when it is not already in the request.
 
 = 4.9.4 (2026-10-13) =
 * ADDED The email abilities can set an email's custom CSS, custom headers and UTM parameters when they create or update an email, and they return them when an email is read.

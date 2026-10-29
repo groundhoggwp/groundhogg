@@ -1052,6 +1052,43 @@
     $(document).off('tinymce-editor-setup', addPostMergeTagsToTinyMCE)
   }
 
+  /**
+   * The text of TinyMCE is in an iframe that the stylesheet of an interface theme can't reach, so with a theme on it
+   * is given the colors of the theme as its content style. An editor that has a content style of its own, like the
+   * text block of an email, which shows the email as it will look, keeps it.
+   *
+   * @return {string}
+   */
+  const getThemeContentStyle = () => {
+
+    const style = getComputedStyle(document.body)
+    const color = name => style.getPropertyValue(name).trim()
+
+    // there is no theme
+    if (!color('--ght-surface')) {
+      return ''
+    }
+
+    return `html, body, body#tinymce { background-color: ${ color('--ght-surface') }; color: ${ color('--ght-text') }; }
+a { color: ${ color('--ght-accent') }; }
+blockquote { border-color: ${ color('--ght-border-strong') }; }`
+  }
+
+  const addThemeContentStyleToTinyMCE = (event, editor) => {
+
+    if (editor.settings.content_style) {
+      return
+    }
+
+    const contentStyle = getThemeContentStyle()
+
+    if (contentStyle) {
+      editor.settings.content_style = contentStyle
+    }
+  }
+
+  $doc.on('tinymce-editor-setup', addThemeContentStyleToTinyMCE)
+
   const tinymceElement = (editor_id, config = {}, onChange = (v) => {
     console.log(v)
   }) => {

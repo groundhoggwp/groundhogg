@@ -78,4 +78,45 @@ class Admin_Themes_Notice_Links_Tests extends GH_UnitTestCase {
 			$css
 		);
 	}
+
+	public function test_the_toolbar_and_frame_of_tinymce_take_the_colors_of_the_theme() {
+
+		$css = $this->css();
+
+		// the frame is in the page, the text is in an iframe that element.js gives the colors to
+		$this->assertMatchesRegularExpression(
+			'/\[class\*="gh-theme-"\] \.mce-tinymce,\n[^{]*\.mce-tinymce \.mce-panel,\n[^{]*\.mce-tinymce \.mce-statusbar \{\s*background-color: var\(--ght-surface\);/',
+			$css
+		);
+
+		$this->assertMatchesRegularExpression(
+			'/\.mce-tinymce \.mce-toolbar-grp,\n[^{]*\{\s*background-color: var\(--ght-raised\);/',
+			$css
+		);
+
+		$this->assertMatchesRegularExpression(
+			'/\.mce-tinymce \.mce-ico,\n[^{]*\{\s*color: var\(--ght-text\);/',
+			$css
+		);
+	}
+
+	public function test_the_menus_tabs_and_dropdown_of_the_editor_take_the_colors_of_the_theme() {
+
+		$css = $this->css();
+
+		// the menus of TinyMCE are in the body, so they aren't in its frame
+		$this->assertMatchesRegularExpression(
+			'/\.mce-floatpanel,\n[^{]*\.mce-floatpanel \.mce-menu,\n[^{]*\.mce-floatpanel \.mce-panel \{\s*background-color: var\(--ght-surface\);/',
+			$css
+		);
+
+		$this->assertMatchesRegularExpression( '/\.mce-tinymce \.mce-btn\.mce-listbox \{\s*background-color: var\(--ght-surface\);/', $css );
+
+		// the dropdown is before the hover rule, which has the same specificity, so hovering it still shows
+		$this->assertLessThan( strpos( $css, '.mce-tinymce .mce-btn:hover' ), strpos( $css, '.mce-tinymce .mce-btn.mce-listbox' ) );
+
+		$this->assertMatchesRegularExpression( '/\.wp-editor-tabs \.wp-switch-editor \{\s*background-color: var\(--ght-raised\);/', $css );
+		$this->assertMatchesRegularExpression( '/\.wp-editor-container \{\s*background-color: var\(--ght-surface\);/', $css );
+		$this->assertMatchesRegularExpression( '/\.wp-editor-wrap \.quicktags-toolbar \{\s*background-color: var\(--ght-raised\);/', $css );
+	}
 }
