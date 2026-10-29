@@ -732,7 +732,7 @@ class Scripts {
 			'groundhogg-admin-element',
 			'groundhogg-admin-components',
 			'groundhogg-admin-broadcast-calendar',
-			'groundhogg-admin-replies',
+			'groundhogg-admin-saved-replies',
 			'groundhogg-admin-properties',
 			'groundhogg-admin-contact-search',
 			'groundhogg-admin-filter-contacts',
