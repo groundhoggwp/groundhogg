@@ -402,7 +402,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.10 (2026-10-21) =
+= 4.10 (2026-10-29) =
 * ADDED Interface themes. Choose Light, Paper, Slate (dark) or Midnight (dark) for the way the admin looks, or keep the default. A theme is saved per user, and only changes colors, not how anything works.
  * Pick a theme with swatches on your user profile, from the new Look step of the guided setup, or in the command palette.
  * Tables, forms, tabs, modals, notices, tooltips, pickers, the flow editor, the text editors and the email editor are styled for each theme. The email in the editor stays white, as it will look.
