@@ -2,7 +2,7 @@
 
 **Build flows, send email, and run your whole CRM from inside WordPress, with no limits on contacts, flows or emails.** Now with AI agents, replies in your CRM, and a mobile app.
 
-[![Install free from WordPress.org](https://img.shields.io/badge/Install%20free-WordPress.org-2271b1?style=for-the-badge&logo=wordpress&logoColor=white)](https://wordpress.org/plugins/groundhogg/) [![Try the $1 demo](https://img.shields.io/badge/Try%20the-%241%20demo-e8590c?style=for-the-badge)](https://groundhogg.io/try/)
+[![Install free from WordPress.org](https://img.shields.io/badge/Install%20free-WordPress.org-2271b1?style=for-the-badge&logo=wordpress&logoColor=white)](https://wordpress.org/plugins/groundhogg/) [![Try the free demo](https://img.shields.io/badge/Try%20the-free%20demo-e8590c?style=for-the-badge)](https://groundhogg.io/try/)
 
 👉 [Official Site](https://groundhogg.io/) | 📃 [Documentation](https://groundhogg.io/documentation/) | 🎓 [Training](https://groundhogg.io/events/)
 
@@ -263,11 +263,11 @@ Groundhogg does a lot on its own, and **add-ons and integrations** make it do mo
 
 👉 Browse the [add-ons and integrations](https://groundhogg.io/downloads/), or bundle all of the premium add-ons into a [flat rate plan](https://groundhogg.io/pricing/). [Yearly](https://groundhogg.io/pricing/) & [monthly](https://groundhogg.io/pricing/monthly/) options available.
 
-You can also use our **[⏱️ 14-day $1 demo](https://groundhogg.io/try/)** to see a preview of the premium features.
+You can also use our **[⏱️ free 14-day demo](https://groundhogg.io/try/)** to see a preview of the premium features.
 
 ## 🚀 Ready to try it?
 
-Install Groundhogg free from [WordPress.org](https://wordpress.org/plugins/groundhogg/), complete the guided setup, and start marketing. Want to see the premium add-ons first? Take the [14-day $1 demo](https://groundhogg.io/try/).
+Install Groundhogg free from [WordPress.org](https://wordpress.org/plugins/groundhogg/), complete the guided setup, and start marketing. Want to see the premium add-ons first? Take the [free 14-day demo](https://groundhogg.io/try/).
 
 ## 💡 Made by people who know CRM & Marketing Automation!
 

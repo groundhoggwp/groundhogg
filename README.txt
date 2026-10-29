@@ -46,7 +46,7 @@ Businesses that switch to Groundhogg save on average **$240/m** on CRM fees.
 
 🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg) | [Ⅹ (Twitter)](https://twitter.com/Groundhoggwp/)
 
-🚀 [**14-day $1 demo!** Try before you buy.](https://groundhogg.io/try/)
+🚀 [**Free 14-day demo!** Try before you buy.](https://groundhogg.io/try/)
 
 ⭐⭐⭐⭐⭐ 5.0 average from [41 customer reviews](https://groundhogg.io/reviews/) · 3,000+ businesses · 35+ countries
 
@@ -284,11 +284,11 @@ Groundhogg does a lot on its own, and **add-ons and integrations** make it do mo
 
 👉 Browse the [add-ons and integrations](https://groundhogg.io/downloads/), or bundle all of the premium add-ons into a [flat rate plan](https://groundhogg.io/pricing/). [Yearly](https://groundhogg.io/pricing/) & [monthly](https://groundhogg.io/pricing/monthly/) options available.
 
-You can also use our **[⏱️ 14-day $1 demo](https://groundhogg.io/try/)** to see a preview of the premium features.
+You can also use our **[⏱️ free 14-day demo](https://groundhogg.io/try/)** to see a preview of the premium features.
 
 ## 🚀 Ready to try it?
 
-Complete the guided setup after you activate the plugin and start marketing. Want to see the premium add-ons first? Take the [14-day $1 demo](https://groundhogg.io/try/).
+Complete the guided setup after you activate the plugin and start marketing. Want to see the premium add-ons first? Take the [free 14-day demo](https://groundhogg.io/try/).
 
 ## Milestones
 
