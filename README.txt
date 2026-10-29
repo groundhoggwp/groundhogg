@@ -14,15 +14,29 @@ Groundhogg is the best WordPress CRM & Marketing Automation plugin. Create flows
 
 == Description ==
 
-## Groundhogg 4.0 is here!
+## Your CRM, now with AI agents, replies and a mobile app
 
-Groundhogg 4.0 introduces the **Flow Editor** which makes Groundhogg the most powerful marketing automation tool currently available for WordPress. Seriously, no other WordPress CRM comes close, we checked.
+**Build flows, send email, and run your whole CRM from inside WordPress, with no limits on contacts, flows or emails.**
+
+Groundhogg's **Flow Editor** makes it the most powerful marketing automation tool currently available for WordPress. Seriously, no other WordPress CRM comes close, we checked.
 
 Create beautiful flows that convert leads into customers! Your customers will thank you.
 
 [youtube https://youtu.be/HID8m2vRi-A]
 
 Do your business a favor and switch to Groundhogg.
+
+## ✨ What's new
+
+Ten releases in six weeks. Here are the highlights from 4.8 to 4.10.
+
+* 🤖 **AI agents can work inside your CRM.** The new **AI agent** tab in Tools connects ChatGPT, Claude, Codex, Cursor, Gemini CLI, VS Code and custom connectors in a few clicks. Agents can build and edit flows, schedule broadcasts, and manage contacts, all within the permissions of the user they act as.
+* 💬 **Replies land in your CRM.** Turn on Incoming Messages and replies to your emails are saved to the contact, laid out like a chat in a new Messages tab, with a Replies widget on your dashboard. _(Needs an active license.)_
+* 📱 **A mobile app for your CRM.** Install it from the Tools menu with a QR code. Look up contacts, call, text or email them, work through tasks, add notes and answer replies from your phone.
+* ⚡ **A much faster Flow Editor.** Changes show right away and save in the background, and undo and redo cover step settings, duplicated steps and pasted steps. Only one person can edit a flow at a time, and you choose what happens to contacts waiting at steps you delete.
+* 🗓️ **Broadcasts in a calendar.** See what's going out and when, and click any day to schedule a new one.
+* 🕰️ **A redesigned contact timeline.** Flow runs and browsing sessions are grouped, opens and clicks sit under their email, and failed flow events show the error.
+* 🎨 **Interface themes.** Light, Paper, Slate or Midnight. Saved per user, and also found in the command palette (Ctrl or Cmd + K).
 
 ## Epic WordPress CRM, Email & Marketing Automation
 
@@ -32,19 +46,19 @@ Businesses that switch to Groundhogg save on average **$240/m** on CRM fees.
 
 🌎 [Facebook Group](https://www.facebook.com/groups/groundhoggwp/) | 📺 [YouTube Channel](https://www.youtube.com/groundhogg) | [Ⅹ (Twitter)](https://twitter.com/Groundhoggwp/)
 
-🚀 [**14-day demo!** Try before you buy.](https://groundhogg.io/try/)
+🚀 [**14-day $1 demo!** Try before you buy.](https://groundhogg.io/try/)
 
-🏆 [2020 Gold Stevie Award Winner](https://groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/)
+⭐⭐⭐⭐⭐ 5.0 average from [41 customer reviews](https://groundhogg.io/reviews/) · 3,000+ businesses · 35+ countries
 
 Groundhogg CRM & Marketing Automation for WordPress can help you dramatically improve how you acquire leads and make more sales!
 
-Our award winning WordPress CRM is the very best alternative to [Keap](https://groundhogg.io/comparison/keap-infusionsoft/), [ActiveCampaign](https://groundhogg.io/comparison/activecampaign/), [HighLevel](https://groundhogg.io/comparison/gohighlevel/), [HubSpot](https://groundhogg.io/comparison/hubspot/), [MailChimp](https://groundhogg.io/comparison/mailchimp/) and [other SaaS platforms](https://groundhogg.io/crm-type/saas/).
+Our WordPress CRM is the very best alternative to [Keap](https://groundhogg.io/comparison/keap-infusionsoft/), [ActiveCampaign](https://groundhogg.io/comparison/activecampaign/), [HighLevel](https://groundhogg.io/comparison/gohighlevel/), [HubSpot](https://groundhogg.io/comparison/hubspot/), [MailChimp](https://groundhogg.io/comparison/mailchimp/) and [other SaaS platforms](https://groundhogg.io/crm-type/saas/).
 
 You don’t have to sacrifice CRM features when you switch to our self-hosted solution. In fact you can **[save $1,000s per year](https://groundhogg.io/compare/)** and have the added benefit of owning all your information.
 
 If you are an agency, WaaS, WordPress developer, LMS/Course Creator, WordPress freelancer, or CRM implementation service provider then the Groundhogg CRM and Marketing Automation suite is for you.
 
-## 🪓 Ax the "Success Tax"
+## 🪓 Axe the "Success Tax"
 
 Other SaaS (Software as a Service) CRM platforms will charge you more as your list grows.
 
@@ -98,7 +112,7 @@ Groundhoggers are very generous with their business intelligence. Just as the Gr
 
 The Groundhogg CRM & Marketing Automation suite is being used by a wide variety of 3,000+ businesses in over 35+ countries. The diversity of use cases is huge!
 
-If you're business is using WordPress, you can use Groundhogg.
+If your business is using WordPress, you can use Groundhogg.
 
 Here are some of the more common use cases:
 
@@ -131,22 +145,30 @@ You can trust us to not only provide you with stellar software and support, but 
 
 3,000+ businesses in 35+ countries are using Groundhogg CRM & Marketing Automation to launch their flows, grow their lists and scale their businesses.
 
-Here's what a few of them had to say about our products and support!
+Our customers rate us **5.0 out of 5** across [41 customer reviews](https://groundhogg.io/reviews/), and 28 of them switched from another CRM. Here's what a few of them had to say about our products and support!
 
-From 👨  **[Chris Badget](https://wordpress.org/support/topic/best-crm-and-marketing-automation-for-wordpress/)**, _CEO of [LifterLMS](https://groundhogg.io/best-lifterlms-crm/)_
+> Price, better integrated with WordPress and WooCommerce than ActiveCampaign, more flexible, and perfect support.
+
+**[Wojciech Habało](https://groundhogg.io/review/wojciech-habalo/)**, _A4 Academy, switched from ActiveCampaign_
+
+> My #1 reason for leaving HubSpot was cost. I also used Outreach with another company and it was also way too expensive for a small consultancy. I like that Groundhogg is integrated with my website, like HubSpot before it.
+
+**[Gary Feldman](https://groundhogg.io/review/gary-feldman/)**, _Consultant @ i-BN, switched from HubSpot_
+
+> It is built into WordPress, and I can have more than one admin user on my plan. Groundhogg is customisable, so I can store the information I need to manage my Association's membership. I can have a real relationship with the developers of Groundhogg. That's not possible with Mailchimp. We are so glad we made the shift.
+
+**[Simon Gurnsey](https://groundhogg.io/review/simon-gurnsey/)**, _Treasurer @ AANZPA, switched from Mailchimp_
+
+> It's so nice having a CRM that is natively connected to your actual data.
+
+**[Clifton Griffin](https://groundhogg.io/review/clifton-griffin/)**, _Founder of CheckoutWC_
 
 > Great team, great product, and works with all the key WordPress tools I’m using.
 > So nice to be able to do broadcast emails, tagging, and marketing automation all from inside my WordPress website.
 
-From 👨‍🦱 **[Francisco Opazo](https://groundhogg.io/best-buddyboss-crm/)**, _Marketing Manager at [BuddyBoss](https://groundhogg.io/best-buddyboss-crm/)_
+**[Chris Badgett](https://groundhogg.io/review/chris-badgett/)**, _Founder @ [LifterLMS](https://groundhogg.io/best-lifterlms-crm/)_
 
-> Groundhogg CRM & Marketing Automation is essential for many community builders, course creators, and membership site owners to achieve higher rates of engagement and retention. It simplifies many complex processes including onboarding, email marketing, flows, and enables you to scale your marketing efforts more efficiently.
-
-From 👨 **[Jonathan Denwood](https://wordpress.org/support/topic/great-crm-product/)**, _Podcaster & Owner of [WP-Tonic Agency](https://groundhogg.io/best-crm-for-agencies/)_
-
-> Adrian and his team have really built a great WordPress based CRM that’s really competitive with the big guys like ActiveCampagin. I would highly recommend it to anybody who is running WordPress.
-
-There are over [110 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
+[Read all the reviews](https://groundhogg.io/reviews/). There are also over [110 ⭐⭐⭐⭐⭐ reviews](https://wordpress.org/support/plugin/groundhogg/reviews/?filter=5) for Groundhogg on WordPress.org and even [more reviews on our Facebook Page](https://www.facebook.com/groundhoggwp/reviews/)!
 
 **Kris Britton of the KAYBE marketing agency moved all of his clients from HubSpot to Groundhogg!**
 
@@ -161,13 +183,14 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 * Advanced searching and filtering on any data
 * Unlimited CRM custom fields
 * Segmentation with tags
+* A timeline of every flow run, browsing session, email open and click, with filters by flow, email, broadcast or activity type
 * Activity and email history
 * Profile pictures
 * Automatic location discovery
 * CRM Notes
 * CSV importing & exporting
 * Sync contacts in the CRM with WordPress users
-* View congregated information other WordPress plugins in the contact record.
+* View aggregated information from other WordPress plugins in the contact record.
 
 **Quickly and easily segment your list with Groundhogg's unrivaled search filter system!**
 
@@ -179,11 +202,14 @@ Our integrations with [WooCommerce](https://groundhogg.io/downloads/woocommerce/
 
 ### ⚙️ Flows & Marketing Automation Features
 
-* Create highly effective customer journeys with our easy to learn funnel builder.
-* Over 30+ integrations available to connect the CRM with your favorite WordPress plugins.
-* Create simple flows or complex ones!
-* Measure the effectiveness of your flows with easy to read metrics.
+* Create highly effective customer journeys with our easy to learn flow builder.
+* A rebuilt, much faster Flow Editor with undo and redo for every change.
 * Start flows from forms, payments, new users, and more!
+* Create simple flows or complex ones, with branches, split tests and timers.
+* Test a flow before you publish it with the built-in simulator.
+* Publish changes to a live flow when you're ready, and choose what happens to contacts waiting at the steps you removed.
+* Measure the effectiveness of your flows with easy to read metrics.
+* Add-ons and integrations connect the CRM with your favorite WordPress plugins.
 * Open API to add your own triggers & actions.
 
 [youtube https://youtu.be/uWZ8pNgBysg]
@@ -193,8 +219,19 @@ Our integrations with [WooCommerce](https://groundhogg.io/downloads/woocommerce/
 * Use images, headers, paragraph and more.
 * Simple preview & testing.
 * Perfect for sales emails, newsletters, transactional notifications and more.
-* Send broadcast emails to your contact lists.
+* Send broadcast emails to your contact lists, and see them all in a calendar.
+* Compose an email to a contact from any of your sender profiles.
 * Distinguish between **transactional** and **marketing** emails.
+
+### 💬 Replies in Your CRM
+
+* Replies to your emails are saved to the contact who replied, instead of going to your own mailbox.
+* A Messages tab on every contact shows your whole conversation, laid out like a chat.
+* A Replies widget on your dashboard lists who has replied and what you haven't read yet.
+* BCC your site's private inbox address to keep a copy of emails you send from your own mailbox.
+* Handle bounces from an IMAP inbox with a manual "Handle Bounces Now" check.
+
+_Incoming Messages needs an active Groundhogg license._
 
 ### 📈 Unmatched Analytics Reporting
 
@@ -205,6 +242,8 @@ Our integrations with [WooCommerce](https://groundhogg.io/downloads/woocommerce/
 * Integrate with Ecommerce to see revenue from your marketing.
 * Learn more about your audience with demographic reporting.
 * See which flows/emails are under-performing.
+* Build custom reports, including tables and pie charts grouped by tag.
+* Reports and segments are cached and indexed so dashboards load fast on big lists.
 
 **Use campaigns to make comparing reporting results easier**
 
@@ -219,70 +258,43 @@ Our integrations with [WooCommerce](https://groundhogg.io/downloads/woocommerce/
 
 ### 🤖 AI & MCP Ready
 
-Let AI assistants and agents work inside your CRM — safely.
+Let ChatGPT, Claude, Gemini, Cursor and other AI agents work inside your CRM, safely.
 
-* Groundhogg registers **abilities** with the WordPress Abilities API, so AI agents and MCP clients can act on your CRM through a supported, permission-checked interface.
-* **Contacts:** find, create, update, and search contacts, read and add notes, and list tags, owners, custom fields, and saved searches.
-* **Email:** list saved emails and sender profiles, and send a saved or one-off email to specific contacts.
-* **Broadcasts:** schedule a broadcast to a segment, list and cancel broadcasts, and read open & click reports.
-* **Flows:** list flows and add a contact or a whole segment to one.
-* Every action runs through the same capability and per-object permission checks as the rest of Groundhogg — an agent can only do what its user is allowed to do.
+* **Set up in a few clicks.** The AI agent tab in Tools installs the MCP Adapter plugin, creates an application password for you, and has setup steps for ChatGPT, Claude, Codex, Cursor, Gemini CLI, VS Code and custom connectors. _(WordPress 6.9 or later, for people who can manage options.)_
+* **Build flows by asking for them.** Agents can discover the available steps, build a flow with branches from scratch, activate it, and read and edit an existing one. Changes to a live flow are staged until they're published, just like in the Flow Editor.
+* **Try before you publish.** Agents can simulate what a flow would do for a contact, with no side effects, before anything goes live.
+* **Contacts:** find, create, update and search contacts, read and add notes, and manage tags, owners, custom fields and saved searches.
+* **Email and broadcasts:** list saved emails and sender profiles, send a saved or one-off email to specific contacts, schedule a broadcast to a segment, cancel one, and read open and click reports.
+* **Campaigns, settings and add-ons:** create campaigns, read and change registered settings, and see which official add-ons are installed and licensed.
+* **Extensible.** Add-ons can register their own abilities alongside Groundhogg's.
+* Every action runs through the same capability and per-object permission checks as the rest of Groundhogg. An agent can only do what its user is allowed to do.
 
-This is an early release and an active work in progress. More abilities, including SMS, are on the way.
+More abilities, including SMS, are on the way.
 
-## 🙌 Get more with premium features!
+### 📱 Works Where You Do
 
-Groundhogg CRM & Marketing Automation has 45+ extensions to help you expand and integrate Groundhogg to help you build your all in one solution.
+* **Mobile app.** Install it on your phone from Tools > Mobile app. Look up contacts, call, text or email them, work through your tasks, add notes, fill out forms for a contact and reply to messages. It only shows what the person using it is allowed to do, and add-ons can add their own screens.
+* **Interface themes.** Choose Light, Paper, Slate (dark) or Midnight (dark) for the admin, per user.
+* **Command palette.** Jump to settings, admin page tabs and themes with Ctrl or Cmd + K on WordPress 7.0 and later.
+* **Made for small screens.** Admin pages, the preferences center and campaign archives work on phones.
 
-👉 Bundle all of our incredible premium features into a [flat rate plan](https://groundhogg.io/pricing/). [Yearly](https://groundhogg.io/pricing/) & [monthly](https://groundhogg.io/pricing/monthly/) options available.
+## 🙌 Add-ons and integrations
 
-You can also use our **[⏱️ 14 day $1 demo](https://groundhogg.io/try/)** to see a preview of these stellar features.
+Groundhogg does a lot on its own, and **add-ons and integrations** make it do more. Connect it to the WordPress plugins you already use, and add features like a sales pipeline, booking calendars and lead scoring.
 
-Over **[24+ extensions](https://groundhogg.io/downloads/category/add-ons/)** to help you handle more...
+👉 Browse the [add-ons and integrations](https://groundhogg.io/downloads/), or bundle all of the premium add-ons into a [flat rate plan](https://groundhogg.io/pricing/). [Yearly](https://groundhogg.io/pricing/) & [monthly](https://groundhogg.io/pricing/monthly/) options available.
 
-* [Extend your CRM with Custom Fields](https://groundhogg.io/downloads/advanced-custom-meta-fields/)
-* [Extend your CRM with Custom SMTP](https://groundhogg.io/downloads/smtp/)
-* [Extend your CRM with Advanced Email Preferences](https://groundhogg.io/downloads/advanced-preferences/)
-* [Extend your CRM with Superlinks](https://groundhogg.io/downloads/advanced-features/)
-* [Extend your CRM with Lead Scoring](https://groundhogg.io/downloads/lead-scoring/)
-* [Extend your CRM with Booking Calendars](https://groundhogg.io/downloads/booking-calendar/)
-* [Extend your CRM with Social Proof Popups](https://groundhogg.io/downloads/proof/)
-* [Extend your CRM with Signed Contracts](https://groundhogg.io/downloads/contracts/)
-* [Extend your CRM with Company Management](https://groundhogg.io/downloads/companies/)
-* [Extend your CRM with a Sales Pipeline](https://groundhogg.io/downloads/pipeline/)
-* [Extend your CRM with Birthday Automation](https://groundhogg.io/downloads/birthdays/)
-* And [many more...](https://groundhogg.io/downloads/)
+You can also use our **[⏱️ 14-day $1 demo](https://groundhogg.io/try/)** to see a preview of the premium features.
 
-Over **[30+ integrations](https://groundhogg.io/downloads/category/integrations/)** to connect to your favorite WordPress plugins. Integrate with...
+## 🚀 Ready to try it?
 
-* **[Connect LifterLMS to your CRM](https://groundhogg.io/best-lifterlms-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
-* **[Connect LearnDash to your CRM](https://groundhogg.io/best-learndash-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/course-creator-essentials/)_
-* **[Connect BuddyBoss to your CRM](https://groundhogg.io/best-buddyboss-crm/)** | _[FREE COURSE](https://academy.groundhogg.io/course/essentials-funnels-for-buddyboss/)_
-* **[Connect GiveWP to your CRM](https://groundhogg.io/press/nonprofits-can-finally-leverage-their-data-to-collect-more-donations-with-groundhogg-and-givewp/)**
-* **[Connect Easy Digital Downloads to your CRM](https://groundhogg.io/best-crm-for-easy-digital-downloads/)**
-* [Connect WooCommerce to your CRM](https://groundhogg.io/downloads/woocommerce/)
-* [Connect HelpScout to your CRM](https://groundhogg.io/downloads/woocommerce/)
-* [Connect Elementor to your CRM](https://groundhogg.io/downloads/elementor/)
-* [Connect Amazon Web Services to your CRM](https://groundhogg.io/downloads/aws/)
-* [Connect SendGrid to your CRM](https://groundhogg.io/downloads/sendgrid-integration/)
-* [Connect AffiliateWP to your CRM](https://groundhogg.io/downloads/affiliatewp-integration/)
-* [Connect ThriveCart to your CRM](https://groundhogg.io/downloads/thrivecart/)
-* [Connect WPForms to your CRM](https://groundhogg.io/downloads/wpforms/)
-* And [many more...](https://groundhogg.io/downloads/category/integrations/)
-
-## ⏱️ Want to test out the premium Groundhogg CRM and Marketing Automation suite?
-
-If you'd like a trial of our premium plans, please check out our [$1 sandbox demo](https://groundhogg.io/try/).
+Complete the guided setup after you activate the plugin and start marketing. Want to see the premium add-ons first? Take the [14-day $1 demo](https://groundhogg.io/try/).
 
 ## Milestones
 
 * Serving 3,000+ businesses in 35+ countries.
 * ⭐⭐⭐⭐⭐ rated software and support!
 * 40+ Certified partners.
-* 🏆 [Gold Stevie Award 2020](https://groundhogg.io/press/gold-2020-stevie-award-winner-our-first-award/) for Tech Start up of the Year _(American Business Awards)_.
-* 🏆 [Gold Stevie Award 2021](https://groundhogg.io/wp-content/uploads/2021/02/gold-winner-01.jpg) for Best In Class Customer Service _(American Business Awards)_.
-* 🏅 Best Software Innovation 2020 finalist _(Canadian Search Awards)_.
-* 🏅 Canadian Small Business Awards 2021 finalist _(Canadian Search Awards)_.
 
 ## External services & APIs
 
@@ -357,12 +369,12 @@ Groundhogg provides a number of recommended solutions:
 Groundhogg will automatically use the mail solution you have configured on your WordPress website.
 
 = Does Groundhogg have any required monthly fee or upgrades? =
-No, you can use Groundhogg CRM and Marketing Automation for free forever. Groundhogg is a Open Source project designed to democratize CRM and email marketing automation and provide simple easy to use tools to new and none tech savvy business owners.
+No, you can use Groundhogg CRM and Marketing Automation for free forever. Groundhogg is a Open Source project designed to democratize CRM and email marketing automation and provide simple easy to use tools to new and non-tech-savvy business owners.
 
 That being said, our [premium upgrades](https://groundhogg.io/pricing/) can seriously help your business! Use our proven tools and strategies to supercharge your marketing and WordPress site!
 
 = Does Groundhogg connect to Woocommerce or other plugins? =
-Yes, Groundhogg can [integrate with over 30+](https://groundhogg.io/downloads/category/integrations/) of the most popular WordPress plugins around to crate an even more powerful CRM.
+Yes, Groundhogg has [integrations](https://groundhogg.io/downloads/category/integrations/) for the most popular WordPress plugins around to create an even more powerful CRM.
 
 = Does Groundhogg work with my theme? =
 Groundhogg is theme agnostic, meaning it will work with every and any theme. Groundhogg is mostly administrative and very little is seen by visitors.
@@ -383,7 +395,7 @@ Yes, we have tools available to meet the criteria of all the worlds ANTI-SPAM & 
 Well, that's up to you! We'll never say Groundhogg is better than anyone, but it is **different.** And sometimes different is better than better.
 
 = Where can I upgrade to premium? =
-You can purchase a premium plan for access to support and our premium extensions & integrations on our [pricing page](https://groundhogg.io/pricing/).
+You can purchase a premium plan for access to support and our premium add-ons & integrations on our [pricing page](https://groundhogg.io/pricing/).
 
 = How can I report security bugs? =
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.]( https://patchstack.com/database/vdp/9e5fb9d9-417e-4ba2-a0bf-8b7529b7122b )
@@ -476,14 +488,14 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  * The simulate abilities can run against a flow's unpublished changes, so a change can be tested before it's published.
 * ADDED When you publish changes to a flow or activate it, you choose what happens to contacts waiting at steps you deleted: cancel their events, or move them to another step. Before, they were silently removed from the flow. Deleted steps that contacts have already been through are archived, so their history and reports still work.
 * TWEAKED The flow editor has been rebuilt to be much faster. Adding, moving, deleting and changing steps shows right away and saves in the background, and undo and redo now cover step settings, duplicated steps and pasted steps too.
-* TWEAKED If a flow or an email is changed from somewhere else while you have it open in the editor, the editor tells you and offers to reload.
-* TWEAKED Public form submissions are limited to 20 per form, per IP address, every 10 minutes. People who can add contacts aren't limited.
-* TWEAKED The send time optimization option is hidden in the broadcast scheduler for now.
  * Only one person can edit a flow at a time, so two people can't overwrite each other's changes. The flow is unlocked as soon as its editor is closed.
  * Duplicating a step with branches, like a Yes/No, copies the steps in its branches too, and steps copied from one flow can be pasted into another.
  * Steps that other steps rely on, like the step a Reroute goes to or the step another flow's "Add to Flow" starts at, can't be deleted until those steps are changed.
  * The search in the add steps panel stays while you switch between Triggers, Actions and Logic.
  * The flow editor tour is written for people new to Groundhogg.
+* TWEAKED If a flow or an email is changed from somewhere else while you have it open in the editor, the editor tells you and offers to reload.
+* TWEAKED Public form submissions are limited to 20 per form, per IP address, every 10 minutes. People who can add contacts aren't limited.
+* TWEAKED The send time optimization option is hidden in the broadcast scheduler for now.
 * TWEAKED Faster reports, segments and contact timelines.
  * Segments, reports, and contact timelines that filter activity by type or by contact and date are faster, thanks to new indexes on the activity table. Existing sites get them from a background task after updating.
  * Reports and contact counts are cached, so dashboards and reports load faster.
