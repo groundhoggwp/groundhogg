@@ -853,9 +853,14 @@ and redraws right away (`redraw()`: `drawCanvas()`, `makeSortable()`, `drawLogic
   panel (`FlowStore.formToSettings( $(panel).find(':input').serializeArray(), id )`), which the server saves with
   `Step::save( $form )` after writing `meta`, keeping the step's branch (see 8). `meta` and `flags` apply to the
   store right away. `step_notes` is `meta`. The flow title saves through REST (`FunnelsStore.patch()`).
-  - The step before its first unsent change is kept in `settingsBefore`, and once saved
-    (`recordSettingsChanges()`) the difference, including the regenerated title, becomes a history entry of
-    stored-value updates (`FlowStore.stepChanges()`).
+  - The step before its first unsent change is kept in `settingsBefore`. What the settings changed isn't known until
+    the server has saved them, but where they go in the history is, so `flushSettings()` reserves an entry
+    (`history.reserve( key )`, keys kept per step in `settingsHistoryKeys`) before queueing. Once saved
+    (`recordSettingsChanges()`) the difference, including the regenerated title, fills it in
+    (`history.fill()`, stored-value updates from `FlowStore.stepChanges()`), or removes it if nothing changed. It never
+    adds an entry, so a delete or move made between the flush and the reply is undone first, and filling it in
+    doesn't drop the redo tail. `settingsBefore` is rebased on the saved step for settings sent after.
+  - `undo()` and `redo()` wait for unfilled entries and unsent settings (`afterSettingsSaved()`).
   - Inputs with `.no-morph` don't redraw the step type's settings after (`skipIslandMorph`).
   - `save()` (the form) sends pending settings first (`flushAllSettings()`).
 

@@ -1241,10 +1241,36 @@
       },
 
       /**
+       * Settings that aren't saved yet have a place in the history but not what they changed, so undo and redo wait
+       * for them. Once saved they're not waited for again, whatever is still reserved is a change that can't be known.
+       *
+       * @param then function what to do once they're saved
+       * @return bool whether it will be done later
+       */
+      afterSettingsSaved (then) {
+
+        if (!this.history.hasPending() && !Object.keys(this.pendingSettings).length) {
+          return false
+        }
+
+        this.whenSaved().then(() => {
+          // anything left is a reserved place that never got filled in, so it's nothing
+          this.history.entries.filter(entry => entry.pending !== undefined).forEach(entry => this.history.fill(entry.pending))
+          then()
+        })
+
+        return true
+      },
+
+      /**
        * Undoing records what redoing it takes, the inverse of the undo as it was applied, and the other way around.
        * Like undoing a duplicate, which deletes the copy and the steps in its branches, so redoing restores them all.
        */
       undo () {
+
+        if (this.afterSettingsSaved(() => this.undo())) {
+          return
+        }
 
         const operations = this.history.undo()
         const inverse = this.replay(operations)
@@ -1261,6 +1287,10 @@
       },
 
       redo () {
+
+        if (this.afterSettingsSaved(() => this.redo())) {
+          return
+        }
 
         const operations = this.history.redo()
         const inverse = this.replay(operations)
@@ -1340,7 +1370,10 @@
         // the history can have changes that were refused
         UndoRedoManager.clear()
 
-        operations.filter(operation => operation.form).forEach(operation => delete this.settingsBefore[operation.step])
+        operations.filter(operation => operation.form).forEach(operation => {
+          delete this.settingsBefore[operation.step]
+          delete this.settingsHistoryKeys[operation.step]
+        })
 
         if (data.state) {
           this.forcePanels = true
@@ -1449,6 +1482,11 @@
 
       // the steps before their settings changed, for undo, step ID => step
       settingsBefore: {},
+
+      // the history entries reserved for settings sent and not saved yet, in the order sent, step ID => [ key ]
+      settingsHistoryKeys: {},
+
+      lastHistoryKey: 0,
 
       // steps whose settings were changed with an input that doesn't redraw them, see .no-morph
       skipIslandMorph: {},
@@ -1637,6 +1675,14 @@
           console.warn(err)
         }
 
+        // what they changed isn't known until the server has saved them, but where they go in the history is, so a
+        // delete or move made before then is undone before them, see recordSettingsChanges()
+        if (operation.form) {
+          const key = ++this.lastHistoryKey
+          ;( this.settingsHistoryKeys[step.ID] ??= [] ).push(key)
+          this.history.reserve(key)
+        }
+
         this.queue.push([operation])
       },
 
@@ -1650,31 +1696,47 @@
       },
 
       /**
-       * Once settings changes are saved, what the server made of them can be undone
+       * Once settings changes are saved, what the server made of them can be undone. The history has a place for
+       * each since they were sent, see flushSettings(), so this fills it in and never adds to the end.
        *
-       * @param ids the steps saved
+       * @param ids the steps saved, once for each time their settings were sent
        */
       recordSettingsChanges (ids) {
 
         ids.forEach(id => {
 
+          const key = this.settingsHistoryKeys[id]?.shift()
+
+          if (!this.settingsHistoryKeys[id]?.length) {
+            delete this.settingsHistoryKeys[id]
+          }
+
           const before = this.settingsBefore[id]
           const step = this.getStep(id)
 
-          // more changes are on their way, they're recorded together
-          if (!before || !step || this.hasPendingSettings(id)) {
+          if (key === undefined) {
             return
           }
 
-          delete this.settingsBefore[id]
+          // like a step that's gone, so there's nothing to put back
+          if (!before || !step) {
+            this.history.fill(key)
+            return
+          }
 
           const changes = FlowStore.stepChanges(before, step)
 
-          if (changes) {
-            this.history.record({
-              undo: [changes.undo],
-              redo: [changes.redo],
-            })
+          this.history.fill(key, {
+            undo: changes ? [changes.undo] : [],
+            redo: changes ? [changes.redo] : [],
+          })
+
+          // the next changes are from what the server saved
+          if (this.settingsHistoryKeys[id] || this.pendingSettings[id]) {
+            this.settingsBefore[id] = JSON.parse(JSON.stringify(step))
+          }
+          else {
+            delete this.settingsBefore[id]
           }
         })
       },

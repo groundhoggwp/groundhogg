@@ -176,6 +176,113 @@ test('the history undoes and redoes in order, and a new change drops what was un
   assert.equal(history.canUndo(), false)
 })
 
+test('settings reserve their place in the history, so a delete made before they are saved is undone first', () => {
+
+  const history = FlowStore.createHistory()
+
+  // the settings are sent, then a step is deleted before the server replies
+  history.reserve(1)
+  history.record({ undo: [{ op: 'restore', step: 9 }], redo: [{ op: 'delete', step: 9 }] })
+
+  // the reply says what the settings changed
+  history.fill(1, { undo: [{ op: 'update', step: 5, meta: { a: 1 } }], redo: [{ op: 'update', step: 5, meta: { a: 2 } }] })
+
+  assert.equal(history.hasPending(), false)
+  assert.equal(history.entries.length, 2)
+  assert.equal(history.pointer, 2)
+
+  // the delete is undone first, then the settings
+  assert.deepEqual(history.undo(), [{ op: 'restore', step: 9 }])
+  assert.deepEqual(history.undo(), [{ op: 'update', step: 5, meta: { a: 1 } }])
+  assert.equal(history.canUndo(), false)
+
+  // and redone in the order they were made
+  assert.deepEqual(history.redo(), [{ op: 'update', step: 5, meta: { a: 2 } }])
+  assert.deepEqual(history.redo(), [{ op: 'delete', step: 9 }])
+})
+
+test('filling in a reserved place does not drop what was undone', () => {
+
+  const history = FlowStore.createHistory()
+
+  history.record({ undo: [{ n: 1 }], redo: [{ n: -1 }] })
+  history.reserve(1)
+  history.record({ undo: [{ n: 3 }], redo: [{ n: -3 }] })
+  history.undo()
+
+  assert.equal(history.canRedo(), true)
+
+  history.fill(1, { undo: [{ n: 2 }], redo: [{ n: -2 }] })
+
+  assert.equal(history.canRedo(), true)
+  assert.deepEqual(history.redo(), [{ n: -3 }])
+})
+
+test('a reserved place for settings that changed nothing is removed, and the pointer follows', () => {
+
+  const history = FlowStore.createHistory()
+
+  history.record({ undo: [{ n: 1 }], redo: [{ n: -1 }] })
+  history.reserve(1)
+  history.record({ undo: [{ n: 3 }], redo: [{ n: -3 }] })
+
+  history.fill(1)
+
+  assert.equal(history.entries.length, 2)
+  assert.equal(history.pointer, 2)
+  assert.deepEqual(history.undo(), [{ n: 3 }])
+  assert.deepEqual(history.undo(), [{ n: 1 }])
+
+  // and when it was undone, the pointer stays where it is
+  history.clear()
+  history.record({ undo: [{ n: 1 }], redo: [{ n: -1 }] })
+  history.reserve(2)
+  history.undo()
+  history.fill(2)
+
+  assert.equal(history.entries.length, 1)
+  assert.equal(history.pointer, 1)
+  assert.equal(history.canRedo(), false)
+})
+
+test('filling in a place that is gone does nothing', () => {
+
+  const history = FlowStore.createHistory({ size: 2 })
+
+  history.reserve(1)
+  history.record({ undo: [{ n: 1 }], redo: [{ n: -1 }] })
+  history.record({ undo: [{ n: 2 }], redo: [{ n: -2 }] })
+
+  // the oldest entry was dropped to keep two
+  history.fill(1, { undo: [{ n: 9 }], redo: [{ n: -9 }] })
+  assert.equal(history.entries.length, 2)
+  assert.equal(history.hasPending(), false)
+
+  history.reserve(2)
+  history.clear()
+  history.fill(2, { undo: [{ n: 9 }], redo: [{ n: -9 }] })
+  assert.equal(history.entries.length, 0)
+})
+
+test('reserved places survive the ids of added steps being replaced', () => {
+
+  const history = FlowStore.createHistory()
+
+  history.record({
+    undo: [{ op: 'delete', step: 'tmp_a' }],
+    redo: [{ op: 'add', at: { after: 5 }, steps: [{ type: 'apply_tag', id: 'tmp_a' }] }],
+  })
+  history.reserve(7)
+  history.rewriteIds({ tmp_a: 42 })
+
+  assert.equal(history.hasPending(), true)
+
+  history.fill(7, { undo: [{ op: 'update', step: 42, meta: { a: 1 } }], redo: [{ op: 'update', step: 42, meta: { a: 2 } }] })
+
+  assert.equal(history.hasPending(), false)
+  assert.deepEqual(history.undo(), [{ op: 'update', step: 42, meta: { a: 1 } }])
+})
+
 test('once an added step is saved, redoing the add restores it instead of adding another', () => {
 
   const history = FlowStore.createHistory()

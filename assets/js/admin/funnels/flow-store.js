@@ -1151,18 +1151,79 @@
         return
       }
 
-      // a new change replaces anything that was undone
-      this.entries = this.entries.slice(0, this.pointer)
-      this.entries.push({
+      this.add({
         undo,
         redo,
       })
+    },
+
+    add (entry) {
+
+      // a new change replaces anything that was undone
+      this.entries = this.entries.slice(0, this.pointer)
+      this.entries.push(entry)
 
       if (this.entries.length > size) {
         this.entries.shift()
       }
 
       this.pointer = this.entries.length
+    },
+
+    /**
+     * Take the place of a change now, like settings that are saved before what they changed is known, so changes
+     * made after it are recorded after it. See fill().
+     *
+     * @param key number what fill() finds it by
+     */
+    reserve (key) {
+      this.add({
+        undo   : [],
+        redo   : [],
+        pending: key,
+      })
+    },
+
+    /**
+     * Say what a reserved change was. It's removed if it turned out to be nothing, and nothing happens if it's no
+     * longer there, like after the history was cleared or it was the oldest of the entries kept.
+     *
+     * @param key number
+     * @param undo Object[]
+     * @param redo Object[]
+     */
+    fill (key, {
+      undo = [],
+      redo = [],
+    } = {}) {
+
+      const index = this.entries.findIndex(entry => entry.pending === key)
+
+      if (index === -1) {
+        return
+      }
+
+      if (!undo.length && !redo.length) {
+        this.entries.splice(index, 1)
+
+        if (index < this.pointer) {
+          this.pointer--
+        }
+
+        return
+      }
+
+      this.entries[index] = {
+        undo,
+        redo,
+      }
+    },
+
+    /**
+     * Whether a reserved change hasn't been filled in yet
+     */
+    hasPending () {
+      return this.entries.some(entry => entry.pending !== undefined)
     },
 
     canUndo () {
