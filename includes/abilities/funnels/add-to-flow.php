@@ -72,6 +72,11 @@ class Add_To_Flow extends Ability {
 						'default'     => false,
 						'description' => __( 'Explicitly add every contact. Required when no contact_id and no narrowing segment param (tags_include, saved_search, ...) is given.', 'groundhogg' ),
 					],
+					'event_args' => [
+						'type'                 => 'object',
+						'additionalProperties' => true,
+						'description'          => __( 'Arbitrary key/value data stored on the entry event(s), available to replacement codes throughout the flow via get_event_arg(). Applied to every contact entered, including a segment\'s background batches.', 'groundhogg' ),
+					],
 				] ),
 			],
 
@@ -135,6 +140,8 @@ class Add_To_Flow extends Ability {
 			'title' => $step->get_title(),
 		];
 
+		$event_args = is_array( $input['event_args'] ?? null ) ? $input['event_args'] : [];
+
 		// --- Single contact ---------------------------------------------------
 		if ( ! empty( $input['contact_id'] ) ) {
 
@@ -148,7 +155,7 @@ class Add_To_Flow extends Ability {
 				return new WP_Error( 'groundhogg_cannot_edit_contact', __( 'You do not have permission to add this contact to a flow.', 'groundhogg' ) );
 			}
 
-			$step->enqueue( $contact );
+			$step->enqueue( $contact, true, $event_args );
 
 			return [
 				'flow_id'    => $funnel->get_id(),
@@ -188,7 +195,7 @@ class Add_To_Flow extends Ability {
 			return new WP_Error( 'groundhogg_no_contacts', __( 'No contacts match the given audience.', 'groundhogg' ) );
 		}
 
-		$scheduled = Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query, 0, [] );
+		$scheduled = Background_Tasks::add_contacts_to_funnel( $step->get_id(), $query, 0, $event_args );
 
 		if ( is_wp_error( $scheduled ) ) {
 			return $scheduled;

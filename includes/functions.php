@@ -1755,10 +1755,11 @@ function get_form_list() {
  * @param int|Email          $email_id            the ID of the email to send
  * @param int|string|Contact $contact_id_or_email the ID of the contact to send to
  * @param int                $time                time time to send at, defaults to time()
+ * @param array              $args                event args, made available to replacement codes via get_event_arg() while the event runs
  *
  * @return bool whether the scheduling was successful.
  */
-function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
+function send_email_notification( $email_id, $contact_id_or_email, $time = 0, array $args = [] ) {
 
 	$contact = is_a_contact( $contact_id_or_email ) ? $contact_id_or_email : get_contactdata( $contact_id_or_email );
 	$email   = is_numeric( $email_id ) ? new Email( $email_id ) : $email_id;
@@ -1779,6 +1780,10 @@ function send_email_notification( $email_id, $contact_id_or_email, $time = 0 ) {
 		'priority'   => 5,
 		'status'     => Event::WAITING,
 	];
+
+	if ( ! empty( $args ) ) {
+		$event['args'] = $args;
+	}
 
 	if ( enqueue_event( $event ) ) {
 		return true;

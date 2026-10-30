@@ -77,6 +77,11 @@ abstract class Abstract_Simulate_Flow extends Ability {
 						'default'     => 'live',
 						'description' => __( '"live" (default) runs the published flow, exactly what contacts go through. "draft" runs the flow with its unpublished changes - new steps, edited settings, moved steps, and without steps deleted in the draft - so a change can be tested before it is published. Only differs for active flows with unpublished changes (see has_unpublished_changes in groundhogg/get-flow). With a live run, "draft" really executes the draft\'s steps against the contact.', 'groundhogg' ),
 					],
+					'event_args' => [
+						'type'                 => 'object',
+						'additionalProperties' => true,
+						'description'          => __( 'Arbitrary key/value data to make available to replacement codes via get_event_arg() while tracing, as if the starting event carried this data (e.g. submission_id for a form-related merge tag).', 'groundhogg' ),
+					],
 				],
 			],
 
@@ -150,11 +155,13 @@ abstract class Abstract_Simulate_Flow extends Ability {
 
 		$view = ( $input['view'] ?? 'live' ) === 'draft' ? 'draft' : 'live';
 
+		$event_args = is_array( $input['event_args'] ?? null ) ? $input['event_args'] : [];
+
 		// Funnel::get_steps() only includes unpublished changes in editing mode, and the Simulator walks
 		// whatever get_steps() returns - so this is all it takes to trace the draft instead of the live flow
 		$output = $view === 'draft'
-			? $funnel->while_editing( fn() => $this->trace( $funnel, $contact, $start ) )
-			: $this->trace( $funnel, $contact, $start );
+			? $funnel->while_editing( fn() => $this->trace( $funnel, $contact, $start, $event_args ) )
+			: $this->trace( $funnel, $contact, $start, $event_args );
 
 		if ( is_wp_error( $output ) ) {
 			return $output;
@@ -169,10 +176,11 @@ abstract class Abstract_Simulate_Flow extends Ability {
 	 * @param Funnel  $funnel
 	 * @param Contact $contact
 	 * @param Step    $start
+	 * @param array   $event_args
 	 *
 	 * @return array|WP_Error
 	 */
-	protected function trace( Funnel $funnel, Contact $contact, Step $start ) {
+	protected function trace( Funnel $funnel, Contact $contact, Step $start, array $event_args = [] ) {
 
 		$steps_by_id = [];
 		foreach ( $funnel->get_steps() as $step ) {
@@ -185,7 +193,7 @@ abstract class Abstract_Simulate_Flow extends Ability {
 			return new WP_Error( 'groundhogg_step_not_in_view', __( 'That step is not part of this version of the flow. A step added in the draft only exists in the "draft" view, and a step deleted in the draft only exists in the "live" view.', 'groundhogg' ) );
 		}
 
-		$result = Simulator::simulate( $start, $contact, $this->is_dry_run() );
+		$result = Simulator::simulate( $start, $contact, $this->is_dry_run(), $event_args );
 
 		if ( is_wp_error( $result ) ) {
 			return $result;
