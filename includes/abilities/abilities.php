@@ -46,6 +46,7 @@ use Groundhogg\Abilities\Emails\List_Replacement_Codes;
 use Groundhogg\Abilities\Emails\List_Sender_Profiles;
 use Groundhogg\Abilities\Emails\Send_Composed_Email;
 use Groundhogg\Abilities\Emails\Send_Email_Template;
+use Groundhogg\Abilities\Emails\Send_Test_Email;
 use Groundhogg\Abilities\Emails\Update_Email_Template;
 use Groundhogg\Abilities\Schemas\Step_Type_Schema;
 use Groundhogg\Abilities\Reports\Get_Reports;
@@ -412,6 +413,7 @@ class Abilities {
 			List_Replacement_Codes::class,
 			Send_Composed_Email::class,
 			Send_Email_Template::class,
+			Send_Test_Email::class,
 			Send_Email_Broadcast::class,
 			List_Broadcasts::class,
 			Get_Broadcast::class,

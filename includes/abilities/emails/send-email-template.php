@@ -86,6 +86,10 @@ class Send_Email_Template extends Ability {
 					'email_title' => [
 						'type' => 'string',
 					],
+					'preview_url' => [
+						'type'        => 'string',
+						'description' => __( 'A signed link (valid about a week) that renders this email in the browser, no login required.', 'groundhogg' ),
+					],
 					'scheduled' => [
 						'type'        => 'boolean',
 						'description' => __( 'True when the send was scheduled for a future time rather than sent immediately.', 'groundhogg' ),
@@ -242,6 +246,7 @@ class Send_Email_Template extends Ability {
 		return [
 			'email_id'      => $email->get_id(),
 			'email_title'   => $email->get_title(),
+			'preview_url'   => $email->get_preview_url(),
 			'scheduled'     => (bool) $future,
 			'scheduled_for' => $future ? gmdate( 'Y-m-d\TH:i:s\Z', $when_ts ) : null,
 			'recipients'    => $recipients,

@@ -93,6 +93,10 @@ class Email_Schema extends Schema {
 					'type'        => 'string',
 					'description' => __( 'Y-m-d H:i:s in the site timezone.', 'groundhogg' ),
 				],
+				'preview_url' => [
+					'type'        => 'string',
+					'description' => __( 'A signed link (valid about a week) that renders this email in the browser, no login required. Use groundhogg/send-test-email to mail a test instead.', 'groundhogg' ),
+				],
 				'content' => [
 					'type'        => 'string',
 					'description' => __( 'Only present when "content" is passed in expand. The full email body as HTML - can be large.', 'groundhogg' ),
@@ -285,6 +289,7 @@ class Email_Schema extends Schema {
 			],
 			'date_created'      => (string) $object->get_date_created(),
 			'last_updated'      => (string) $object->get_last_updated(),
+			'preview_url'       => $object->get_preview_url(),
 		];
 
 		if ( in_array( 'content', $include, true ) ) {

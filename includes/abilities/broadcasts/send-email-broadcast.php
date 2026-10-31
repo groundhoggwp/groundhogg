@@ -135,8 +135,12 @@ class Send_Email_Broadcast extends Ability {
 					'email' => [
 						'type'       => 'object',
 						'properties' => [
-							'id'    => [ 'type' => 'integer' ],
-							'title' => [ 'type' => 'string' ],
+							'id'          => [ 'type' => 'integer' ],
+							'title'       => [ 'type' => 'string' ],
+							'preview_url' => [
+								'type'        => 'string',
+								'description' => __( 'A signed link (valid about a week) that renders this email in the browser, no login required.', 'groundhogg' ),
+							],
 						],
 					],
 					'send_now' => [
@@ -263,8 +267,9 @@ class Send_Email_Broadcast extends Ability {
 			'broadcast_id'         => $broadcast->get_id(),
 			'status'               => $broadcast->get_status(),
 			'email'                => [
-				'id'    => $email->get_id(),
-				'title' => $email->get_title(),
+				'id'          => $email->get_id(),
+				'title'       => $email->get_title(),
+				'preview_url' => $email->get_preview_url(),
 			],
 			'send_now'             => $send_now,
 			'send_time'            => Broadcast_Schema::datetime( $broadcast->get_send_time() ),
