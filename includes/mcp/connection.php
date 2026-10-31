@@ -80,13 +80,14 @@ class Connection {
 	}
 
 	/**
+	 * Whether the MCP Adapter plugin itself is active.
+	 *
+	 * This is deliberately not a check for the adapter's classes: other plugins, WooCommerce for one, bundle their own
+	 * copy, which says nothing about whether the plugin is installed and active. See is_served() for that.
+	 *
 	 * @return bool
 	 */
 	public static function is_active(): bool {
-
-		if ( class_exists( '\WP\MCP\Core\McpAdapter' ) ) {
-			return true;
-		}
 
 		$file = self::plugin_file();
 
@@ -99,6 +100,16 @@ class Connection {
 		}
 
 		return is_plugin_active( $file ) || ( is_multisite() && is_plugin_active_for_network( $file ) );
+	}
+
+	/**
+	 * Whether the site answers on the default server's address, whatever provides it, the plugin or another plugin
+	 * that bundles the adapter.
+	 *
+	 * @return bool
+	 */
+	public static function is_served(): bool {
+		return array_key_exists( '/mcp/mcp-adapter-default-server', rest_get_server()->get_routes() );
 	}
 
 	/**
@@ -269,7 +280,7 @@ class Connection {
 	}
 
 	/**
-	 * Whether this person has got as far as connecting an agent: the adapter serves their site and they have a
+	 * Whether this person has got as far as connecting an agent: the site answers to MCP clients and they have a
 	 * password for an agent to sign in with.
 	 *
 	 * @param int $user_id defaults to the current user
@@ -277,7 +288,7 @@ class Connection {
 	 * @return bool
 	 */
 	public static function is_connected( int $user_id = 0 ): bool {
-		return self::is_active() && ! empty( self::application_passwords( $user_id ) );
+		return ! empty( self::application_passwords( $user_id ) ) && ( self::is_active() || self::is_served() );
 	}
 
 	/**

@@ -22,6 +22,7 @@ $new        = $this->new_agent_password;
 $user       = wp_get_current_user();
 $active     = Connection::is_active();
 $installed  = Connection::is_installed();
+$served     = ! $active && Connection::is_served();
 $endpoint   = Connection::endpoint();
 $server     = Connection::server_name();
 $passwords  = Connection::application_passwords();
@@ -144,6 +145,12 @@ $examples = [
                     <span><?php esc_html_e( 'The MCP Adapter is installed and active.', 'groundhogg' ); ?></span>
                 </div>
 			<?php elseif ( current_user_can( 'install_plugins' ) ): ?>
+				<?php if ( $served ): ?>
+                    <div class="gh-mcp-status">
+                        <span aria-hidden="true">ℹ️</span>
+                        <span><?php esc_html_e( 'The MCP Adapter plugin is not active, but another plugin on this site is already answering MCP clients. You can continue, or install the plugin to be sure the connection does not depend on that other plugin.', 'groundhogg' ); ?></span>
+                    </div>
+				<?php endif; ?>
                 <form method="post" action="<?php echo esc_url( Connection::page_url() ); ?>">
 					<?php action_input( 'install_mcp_adapter', true, true ); ?>
                     <button type="submit" class="gh-button primary">

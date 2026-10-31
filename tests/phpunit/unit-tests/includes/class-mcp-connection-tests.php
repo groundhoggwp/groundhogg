@@ -16,6 +16,7 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 	public function tearDown(): void {
 		remove_filter( 'wp_is_application_passwords_available', '__return_true' );
 		wp_set_current_user( 0 );
+		$this->reset_rest_server();
 		parent::tearDown();
 	}
 
@@ -41,6 +42,98 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		// nothing in the test site's plugins directory, so it is neither installed nor active
 		$this->assertFalse( Connection::is_installed() );
 		$this->assertFalse( Connection::is_active() );
+	}
+
+	public function test_a_copy_of_the_adapter_bundled_in_another_plugin_is_not_the_plugin() {
+
+		// what WooCommerce and others do: ship the adapter's classes inside themselves
+		if ( ! class_exists( '\WP\MCP\Core\McpAdapter' ) ) {
+			eval( 'namespace WP\MCP\Core; final class McpAdapter {}' );
+		}
+
+		$this->assertFalse( Connection::is_installed() );
+		$this->assertFalse( Connection::is_active(), 'the plugin is not active just because its classes are loaded' );
+	}
+
+	/* ---- whether the site answers MCP clients ------------------------------------------------------------ */
+
+	protected $route_callback;
+
+	protected function reset_rest_server() {
+		global $wp_rest_server;
+		$wp_rest_server = null;
+	}
+
+	protected function serve_the_default_server() {
+		$this->route_callback = function () {
+			register_rest_route( 'mcp', '/mcp-adapter-default-server', [
+				'methods'             => 'POST',
+				'callback'            => '__return_true',
+				'permission_callback' => '__return_true',
+			] );
+		};
+
+		add_action( 'rest_api_init', $this->route_callback );
+		$this->reset_rest_server();
+	}
+
+	public function test_the_site_is_served_when_something_answers_on_the_default_address() {
+		$this->reset_rest_server();
+		$this->assertFalse( Connection::is_served() );
+
+		$this->serve_the_default_server();
+		$this->assertTrue( Connection::is_served() );
+
+		remove_action( 'rest_api_init', $this->route_callback );
+		$this->reset_rest_server();
+	}
+
+	public function test_a_password_is_not_enough_to_be_connected_without_an_answering_server() {
+		$user = $this->user_with_role( 'administrator' );
+		Connection::create_application_password( $user, 'My assistant' );
+		$this->reset_rest_server();
+
+		$this->assertFalse( Connection::is_connected( $user ) );
+
+		$this->serve_the_default_server();
+
+		// another plugin answers, so the person is connected even though the adapter plugin is not active
+		$this->assertTrue( Connection::is_connected( $user ) );
+
+		remove_action( 'rest_api_init', $this->route_callback );
+		$this->reset_rest_server();
+	}
+
+	public function test_the_tab_does_not_say_the_adapter_is_active_when_it_is_not() {
+		$this->user_with_role( 'administrator' );
+		$this->reset_rest_server();
+
+		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+
+		ob_start();
+		$tools->mcp_view();
+		$html = ob_get_clean();
+
+		$this->assertStringNotContainsString( 'installed and active', $html );
+		$this->assertStringContainsString( 'Install and activate the MCP Adapter', $html );
+		$this->assertStringNotContainsString( 'another plugin on this site is already answering', $html );
+	}
+
+	public function test_the_tab_tells_when_another_plugin_is_answering() {
+		$this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
+
+		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+
+		ob_start();
+		$tools->mcp_view();
+		$html = ob_get_clean();
+
+		$this->assertStringNotContainsString( 'installed and active', $html );
+		$this->assertStringContainsString( 'another plugin on this site is already answering', $html );
+
+		remove_action( 'rest_api_init', $this->route_callback );
+		$this->reset_rest_server();
 	}
 
 	/* ---- the application password ------------------------------------------------------------------------ */
