@@ -5,6 +5,7 @@ namespace Groundhogg\Abilities\Schemas;
 use Groundhogg\Abilities\Traits\Has_Optin_Status;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
+use Groundhogg\Pii;
 use WP_Error;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\base64_json_encode;
@@ -843,7 +844,7 @@ class Segment_Schema {
 				}
 
 				$compare = in_array( $condition['compare'] ?? 'equals', self::META_COMPARISONS, true )
-					? $condition['compare']
+					? ( $condition['compare'] ?? 'equals' )
 					: 'equals';
 
 				// "empty"/"not_empty" ignore the value entirely (Where::compare()
@@ -924,7 +925,16 @@ class Segment_Schema {
 		// WP_Error returns above (e.g. unknown tags, an extend()'d callback
 		// rejecting its own input) bypass this filter, same as any other hard
 		// validation failure.
-		return apply_filters( 'groundhogg/segment_schema/query', $query, $input );
+		$query = apply_filters( 'groundhogg/segment_schema/query', $query, $input );
+
+		// Checked on the finished query, not the input, so conditions an add-on contributed are covered too
+		$allowed = Pii::check_query( $query );
+
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+
+		return $query;
 	}
 
 	/**
@@ -1174,7 +1184,7 @@ class Segment_Schema {
 				}
 
 				$compare = in_array( $condition['compare'] ?? 'equals', self::META_COMPARISONS, true )
-					? $condition['compare']
+					? ( $condition['compare'] ?? 'equals' )
 					: 'equals';
 
 				$meta_conditions[] = [
@@ -1222,7 +1232,15 @@ class Segment_Schema {
 		array_push( $conditions, ...$extension_conditions );
 
 		// See the class docblock for how an add-on adds its own conditions here.
-		return apply_filters( 'groundhogg/segment_schema/filters', empty( $conditions ) ? [] : [ $conditions ], $input );
+		$filters = apply_filters( 'groundhogg/segment_schema/filters', empty( $conditions ) ? [] : [ $conditions ], $input );
+
+		$allowed = Pii::check_filters( (array) $filters );
+
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+
+		return $filters;
 	}
 
 	/**

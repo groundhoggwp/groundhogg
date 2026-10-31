@@ -4055,4 +4055,9 @@ div:has(> button.hide-panel) > button.hide-panel:hover {
   --swatch-accent: #5b8cff;
 }
 
+.property-field .gh-rows-and-columns > .gh-row .description {
+  max-width: 0;
+  min-width: 100%;
+}
+
 /*# sourceMappingURL=elements.css.map */

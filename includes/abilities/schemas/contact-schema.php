@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use Groundhogg\Abilities\Traits\Extensible_Schema;
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use Groundhogg\Preferences;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,8 +68,9 @@ class Contact_Schema extends Schema {
 				'type' => 'integer',
 			],
 			'email' => [
-				'type'   => 'string',
-				'format' => 'email',
+				'type'        => 'string',
+				// No `format: email`, a redacted value is not an email address
+				'description' => __( '"[redacted]" when the user lacks the view_contact_pii capability.', 'groundhogg' ),
 			],
 			'first_name' => [
 				'type' => 'string',
@@ -155,6 +157,14 @@ class Contact_Schema extends Schema {
 			],
 		];
 
+		if ( Pii::is_restricted() ) {
+			foreach ( Pii::contact_fields() as $field ) {
+				if ( isset( $data[ $field ] ) ) {
+					$data[ $field ] = Pii::REDACTED;
+				}
+			}
+		}
+
 		if ( in_array( 'tags', $include, true ) ) {
 			// array_values(): get_tags(true) => array_map() over $this->tags, which can
 			// be a non-sequential-keyed array - e.g. right after Contact::remove_tag()
@@ -170,7 +180,7 @@ class Contact_Schema extends Schema {
 		}
 
 		if ( in_array( 'meta', $include, true ) ) {
-			$data['meta'] = $object->get_all_meta();
+			$data['meta'] = Pii::filter_meta( $object->get_all_meta() );
 		}
 
 		return self::extend_transform( $data, $object, $include );

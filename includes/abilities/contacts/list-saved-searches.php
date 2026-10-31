@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Contacts;
 
 use Groundhogg\Abilities\Ability;
+use Groundhogg\Pii;
 use Groundhogg\Saved_Searches;
 
 /**
@@ -84,7 +85,7 @@ class List_Saved_Searches extends Ability {
 			];
 
 			if ( in_array( 'query', $expand, true ) ) {
-				$data['query'] = $search['query'] ?? [];
+				$data['query'] = Pii::scrub_query( $search['query'] ?? [] );
 			}
 
 			return $data;

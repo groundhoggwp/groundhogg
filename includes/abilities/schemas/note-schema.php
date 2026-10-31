@@ -5,6 +5,7 @@ namespace Groundhogg\Abilities\Schemas;
 use DateTime;
 use Exception;
 use Groundhogg\Classes\Note;
+use Groundhogg\Pii;
 use Groundhogg\Utils\DateTimeHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -69,12 +70,15 @@ class Note_Schema extends Schema {
 			$object = new Note( $object );
 		}
 
+		// what was written can name the contact
+		$contact = Pii::contact_for( (string) $object->object_type, absint( $object->object_id ) );
+
 		return [
 			'id'           => $object->get_id(),
 			'contact_id'   => absint( $object->object_id ),
 			'user_id'      => $object->get_owner_id(),
-			'summary'      => $object->summary,
-			'content'      => $object->content,
+			'summary'      => Pii::scrub_text( (string) $object->summary, $contact ),
+			'content'      => Pii::scrub_text( (string) $object->content, $contact ),
 			'date_created' => self::format_date_created( $object ),
 		];
 	}

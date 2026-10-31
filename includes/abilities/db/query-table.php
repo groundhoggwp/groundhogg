@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Db;
 
 use Groundhogg\Abilities\Ability;
+use Groundhogg\Pii;
 use Throwable;
 use WP_Error;
 use function Groundhogg\get_db;
@@ -193,6 +194,12 @@ class Query_Table extends Ability {
 	}
 
 	public function __invoke( $input ) {
+
+		// Most of these tables hold PII (contactmeta, email_log, submissions, notes, events...) and a raw query has no
+		// way to redact it, so a restricted user doesn't get raw access at all.
+		if ( Pii::is_restricted() ) {
+			return Pii::restricted_error( __( 'Raw table queries are not available to accounts without access to personal information.', 'groundhogg' ) );
+		}
 
 		$table = $input['table'] ?? '';
 

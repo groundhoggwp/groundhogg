@@ -50,10 +50,45 @@ class Properties {
 		] );
 
 		return [
-			'fields' => self::sanitize_properties( $all['fields'] ),
+			'fields' => self::keep_pii_flags( self::sanitize_properties( $all['fields'] ) ),
 			'groups' => self::sanitize_groups( $all['groups'] ),
 			'tabs'   => self::sanitize_tabs( $all['tabs'] ),
 		];
+	}
+
+	/**
+	 * A user who can't view PII can't take the flag off a field, that would unhide it for them. Matches by name as well
+	 * as id, otherwise the field could be deleted and added again without the flag.
+	 *
+	 * @param array $fields sanitized fields
+	 *
+	 * @return array
+	 */
+	protected static function keep_pii_flags( array $fields ): array {
+
+		if ( ! Pii::is_restricted() ) {
+			return $fields;
+		}
+
+		$stored = get_option( 'gh_contact_custom_properties' );
+		$ids    = [];
+		$names  = [];
+
+		foreach ( (array) ( $stored['fields'] ?? [] ) as $field ) {
+			if ( ! empty( $field['pii'] ) ) {
+				$ids[]   = $field['id'] ?? '';
+				$names[] = $field['name'] ?? '';
+			}
+		}
+
+		return array_map( function ( $field ) use ( $ids, $names ) {
+
+			if ( in_array( $field['id'] ?? '', $ids, true ) || in_array( $field['name'] ?? '', $names, true ) ) {
+				$field['pii'] = true;
+			}
+
+			return $field;
+		}, $fields );
 	}
 
 	protected static function sanitize_stuff( $stuff, $callbacks ) {
@@ -98,6 +133,8 @@ class Properties {
 			'width'   => 'absint',
 			'decimals' => 'absint',
 			'multiple' => 'boolval',
+			// personal information, hidden from users without the view_contact_pii capability
+			'pii'      => 'boolval',
 			'options' => function ( $array ) {
 				return array_map( 'sanitize_text_field', $array );
 			},

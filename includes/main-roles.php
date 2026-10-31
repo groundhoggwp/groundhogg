@@ -539,6 +539,7 @@ class Main_Roles extends Roles {
 			'edit_contacts',
 			'edit_others_contacts',
 			'view_contacts',
+			'view_contact_pii',
 			'view_others_contacts',
 			'import_contacts',
 			'export_contacts',
@@ -586,6 +587,7 @@ class Main_Roles extends Roles {
 			'edit_contacts',
 			'add_contacts',
 			'view_contacts',
+			'view_contact_pii',
 			'import_contacts',
 			'export_contacts',
 			// email
@@ -638,6 +640,7 @@ class Main_Roles extends Roles {
 			'edit_contacts',
 			'edit_others_contacts',
 			'view_contacts',
+			'view_contact_pii',
 			'view_others_contacts',
 			'delete_contacts',
 			'delete_others_contacts',

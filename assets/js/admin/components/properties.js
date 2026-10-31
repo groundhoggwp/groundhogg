@@ -443,7 +443,7 @@
 
     addField: (field) => {
 
-      const { type, label, name, id, order = 10, width = 2 } = field
+      const { type, label, name, id, order = 10, width = 2, pii = false } = field
 
       let editUI = ''
 
@@ -494,6 +494,14 @@
 						  ${editUI}
 					  </div>
 				  </div>
+          <div class="gh-row">
+              <div class="gh-col">
+                  <label class="space-between">${__('Contains personal information (PII)?', 'groundhogg')} ${toggle({
+                      id: 'property-field-pii', checked: pii,
+                  })}</label>
+                  <p class="description">${__('Hidden from anyone who is not allowed to view contact personal information, including AI connections that run as them. Use it for things like a phone number, address or date of birth.', 'groundhogg')}</p>
+              </div>
+          </div>
 				  <div class="gh-row">
 					  <div class="gh-col">
 						  <label class="">${__('Order', 'groundhogg')}</label>
@@ -765,6 +773,10 @@
 
         $('#property-field-width').on('change', (e) => {
           updateField({ width: parseInt(e.target.value) })
+        })
+
+        $('#property-field-pii').on('change', (e) => {
+          updateField({ pii: e.target.checked })
         })
 
         $('#property-field-group').ghSelect2({

@@ -5,6 +5,7 @@ namespace Groundhogg\Abilities\Contacts;
 use Groundhogg\Abilities\Ability;
 use Groundhogg\Abilities\Schemas\Property_Field_Schema;
 use Groundhogg\Abilities\Traits\Has_Custom_Field_Validation;
+use Groundhogg\Pii;
 use Groundhogg\Properties;
 use WP_Error;
 
@@ -79,6 +80,10 @@ class Update_Custom_Field extends Ability {
 						'maximum'     => 100,
 						'description' => __( 'Decimal places allowed. Only meaningful for number fields.', 'groundhogg' ),
 					],
+					'pii' => [
+						'type'        => 'boolean',
+						'description' => __( 'Whether the field holds personal information, hidden from users and AI connections without the view_contact_pii capability. A user without that capability can set it but not clear it.', 'groundhogg' ),
+					],
 					'order' => [
 						'type' => 'integer',
 					],
@@ -107,6 +112,7 @@ class Update_Custom_Field extends Ability {
 			|| array_key_exists( 'options', $input )
 			|| array_key_exists( 'multiple', $input )
 			|| array_key_exists( 'decimals', $input )
+			|| array_key_exists( 'pii', $input )
 			|| array_key_exists( 'order', $input )
 			|| array_key_exists( 'width', $input );
 
@@ -198,6 +204,16 @@ class Update_Custom_Field extends Ability {
 
 		if ( array_key_exists( 'decimals', $input ) && $field['type'] === 'number' ) {
 			$field['decimals'] = absint( $input['decimals'] );
+		}
+
+		if ( array_key_exists( 'pii', $input ) ) {
+
+			// Clearing the flag would unhide the field for the user clearing it
+			if ( ! $input['pii'] && ! empty( $field['pii'] ) && Pii::is_restricted() ) {
+				return Pii::restricted_error( __( 'Your account is not allowed to remove the personal information flag from a field.', 'groundhogg' ) );
+			}
+
+			$field['pii'] = (bool) $input['pii'];
 		}
 
 		if ( array_key_exists( 'order', $input ) ) {

@@ -78,6 +78,11 @@ class Add_Custom_Field extends Ability {
 						'maximum'     => 100,
 						'description' => __( 'Decimal places allowed. Only meaningful for number fields.', 'groundhogg' ),
 					],
+					'pii' => [
+						'type'        => 'boolean',
+						'default'     => false,
+						'description' => __( 'Whether the field holds personal information (a phone number, address, date of birth...). It is then hidden from users and AI connections without the view_contact_pii capability. Set this whenever the field is personal information.', 'groundhogg' ),
+					],
 					'order' => [
 						'type'        => 'integer',
 						'default'     => 10,
@@ -167,6 +172,10 @@ class Add_Custom_Field extends Ability {
 
 		if ( $type === 'number' && isset( $input['decimals'] ) ) {
 			$field['decimals'] = absint( $input['decimals'] );
+		}
+
+		if ( ! empty( $input['pii'] ) ) {
+			$field['pii'] = true;
 		}
 
 		$all['fields'][] = $field;

@@ -3,6 +3,7 @@
 namespace Groundhogg\Api\V4;
 
 use Groundhogg\Contact_Query;
+use Groundhogg\Pii;
 use Groundhogg\Reports;
 use Groundhogg\Saved_Searches;
 use function Groundhogg\sanitize_query_url_params;
@@ -87,6 +88,13 @@ class Searches_Api extends Base_Api {
 			} );
 		}
 
+		// a restricted user can run a search that filters on PII, but not read what it filters on
+		$searches = array_map( function ( $search ) {
+			$search['query'] = Pii::scrub_query( (array) ( $search['query'] ?? [] ) );
+
+			return $search;
+		}, $searches );
+
 		return self::SUCCESS_RESPONSE( [
 			'items'       => $searches,
 			'total_items' => count( $searches )
@@ -125,8 +133,22 @@ class Searches_Api extends Base_Api {
 		$search_id = $request->get_param( 'id' );
 
 		return self::SUCCESS_RESPONSE( [
-			'item' => Saved_Searches::instance()->get( $search_id )
+			'item' => $this->scrubbed( Saved_Searches::instance()->get( $search_id ) )
 		] );
+	}
+
+	/**
+	 * @param mixed $search
+	 *
+	 * @return mixed
+	 */
+	protected function scrubbed( $search ) {
+
+		if ( is_array( $search ) && isset( $search['query'] ) ) {
+			$search['query'] = Pii::scrub_query( (array) $search['query'] );
+		}
+
+		return $search;
 	}
 
 	/**

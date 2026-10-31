@@ -4765,3 +4765,10 @@ div:has( > button.hide-panel) {
     }
   }
 }
+
+// The add/edit field modal sizes itself to its content (fit-content), so a long help text would stretch it.
+// A zero max-width with a 100% min-width keeps the text wrapping at the width the inputs give the modal.
+.property-field .gh-rows-and-columns > .gh-row .description {
+  max-width: 0;
+  min-width: 100%;
+}

@@ -298,6 +298,7 @@ class Plugin {
 		// Settings & DBS needs to go first...
 		$this->settings = new Settings();
 		$this->roles    = new Main_Roles();
+		new Pii_Rest();
 		$this->dbs      = new DB_Manager();
 
 		// Modules

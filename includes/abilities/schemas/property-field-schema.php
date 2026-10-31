@@ -76,6 +76,10 @@ class Property_Field_Schema extends Schema {
 					'type'        => 'integer',
 					'description' => __( 'Number of decimal places allowed. Only meaningful for number fields.', 'groundhogg' ),
 				],
+				'pii' => [
+					'type'        => 'boolean',
+					'description' => __( 'Whether the field holds personal information, hidden from users without the view_contact_pii capability.', 'groundhogg' ),
+				],
 				'order' => [
 					'type'        => 'integer',
 					'description' => __( 'Sort order relative to other fields in the same group - lower shows first.', 'groundhogg' ),
@@ -121,6 +125,7 @@ class Property_Field_Schema extends Schema {
 			'options'  => $field['options'] ?? [],
 			'multiple' => ! empty( $field['multiple'] ),
 			'decimals' => isset( $field['decimals'] ) ? (int) $field['decimals'] : 0,
+			'pii'      => ! empty( $field['pii'] ),
 			'order'    => isset( $field['order'] ) ? (int) $field['order'] : 10,
 			'width'    => isset( $field['width'] ) && (int) $field['width'] === 1 ? 1 : 2,
 		];

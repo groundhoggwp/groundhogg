@@ -3,6 +3,7 @@
 namespace Groundhogg\Classes;
 
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\get_array_var;
@@ -290,9 +291,44 @@ class Task extends Note {
 			$associated['name'] = empty( trim( $object->get_full_name() ) ) ? $object->get_email() : $object->get_full_name();
 			$associated['type'] = $object->get_object_type();
 			$associated['img']  = $object->get_profile_picture( 40 );
+
+			// who the task is for is who they are
+			if ( Pii::is_restricted() ) {
+				$associated['name'] = sprintf( __( 'Contact #%d', 'groundhogg' ), $object->get_id() );
+				$associated['img']  = includes_url( 'images/blank.gif' );
+			}
 		}
 
 		return apply_filters( 'groundhogg/task/associated_context', $associated, $object );
+	}
+
+	/**
+	 * The notes and outcomes on the task, which can name the contact, scrubbed for a restricted user
+	 *
+	 * @return Other_Activity[]|array[]
+	 */
+	protected function get_scrubbed_task_activity() {
+
+		$activity = $this->get_task_activity();
+
+		if ( ! Pii::is_restricted() ) {
+			return $activity;
+		}
+
+		$contact = Pii::contact_for( (string) $this->object_type, absint( $this->object_id ) );
+
+		return array_map( function ( $item ) use ( $contact ) {
+
+			$array = $item->get_as_array();
+
+			foreach ( [ 'note', 'outcome' ] as $key ) {
+				if ( isset( $array['meta'][ $key ] ) && is_string( $array['meta'][ $key ] ) ) {
+					$array['meta'][ $key ] = Pii::scrub_text( $array['meta'][ $key ], $contact );
+				}
+			}
+
+			return $array;
+		}, $activity );
 	}
 
 	public function get_as_array() {
@@ -313,7 +349,7 @@ class Task extends Note {
 				'completed_date' => $this->is_complete() ? $this->get_date_completed()->format( get_date_time_format() ) : '',
 			],
 			'associated'    => $this->get_associated_data(),
-			'activity'      => $this->get_task_activity()
+			'activity'      => $this->get_scrubbed_task_activity()
 		] );
 	}
 }

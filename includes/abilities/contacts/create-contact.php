@@ -7,6 +7,7 @@ use Groundhogg\Abilities\Schemas\Contact_Schema;
 use Groundhogg\Abilities\Traits\Has_Optin_Status;
 use Groundhogg\Abilities\Traits\Has_Owner_Validation;
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use Groundhogg\Preferences;
 use Groundhogg\Submission;
 use WP_Error;
@@ -122,6 +123,15 @@ class Create_Contact extends Ability {
 		// this check has to happen first or a caller without edit rights on someone
 		// else's contact could overwrite it just by re-submitting their email.
 		$existing = is_email_address_in_use( $email );
+
+		// An existing contact would be returned (or refused) by email, confirming the address is on the list. A
+		// restricted user can add new contacts but can't find out whether an address is already one.
+		if ( $existing && Pii::is_restricted() ) {
+			return new WP_Error(
+				'groundhogg_contact_not_created',
+				__( 'A contact could not be created with this email address.', 'groundhogg' )
+			);
+		}
 
 		if ( $existing ) {
 			$contact = new Contact( $email );

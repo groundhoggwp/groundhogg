@@ -378,6 +378,23 @@ class Main_Updater extends Old_Updater {
 					Background_Tasks::add( new Migrate_Composed_Emails() );
 				},
 			],
+			'4.11' => [
+				'automatic'   => true,
+				'description' => __( 'Add the <code>view_contact_pii</code> capability to every role that can view contacts, so that access to contact personal information can be taken away from a role or user.', 'groundhogg' ),
+				'callback'    => function () {
+
+					$roles = wp_roles();
+
+					foreach ( array_keys( $roles->roles ) as $role_name ) {
+
+						$role = $roles->get_role( $role_name );
+
+						if ( $role && $role->has_cap( 'view_contacts' ) && ! array_key_exists( Pii::CAP, $role->capabilities ) ) {
+							$roles->add_cap( $role_name, Pii::CAP );
+						}
+					}
+				},
+			],
 		];
 	}
 

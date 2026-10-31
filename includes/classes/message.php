@@ -3,6 +3,7 @@
 namespace Groundhogg\Classes;
 
 use Groundhogg\Base_Object;
+use Groundhogg\Pii;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_Error;
 use function Groundhogg\create_object_from_type;
@@ -901,7 +902,7 @@ class Message extends Base_Object {
 
 		return array_merge( parent::get_as_array(), [
 			'timestamp' => $timestamp,
-			'preview'   => $this->get_preview(),
+			'preview'   => Pii::is_restricted() ? Pii::REDACTED : $this->get_preview(),
 			'i18n'      => [
 				'time_diff' => human_time_diff( $timestamp, time() ),
 			],
@@ -925,10 +926,10 @@ class Message extends Base_Object {
 		$date = new DateTimeHelper( (int) $array['timestamp'] );
 
 		$sent_by = $this->is_inbound() ? false : get_userdata( (int) $this->user_id );
-		$sender  = $this->from_address;
+		$sender  = Pii::is_restricted() ? Pii::REDACTED : $this->from_address;
 
 		// what the person that got it would call them
-		if ( $this->is_inbound() && $contact && strtolower( (string) $contact->get_email() ) === strtolower( $this->from_address ) ) {
+		if ( ! Pii::is_restricted() && $this->is_inbound() && $contact && strtolower( (string) $contact->get_email() ) === strtolower( $this->from_address ) ) {
 			$sender = $contact->get_full_name() ?: $this->from_address;
 		}
 
@@ -936,7 +937,7 @@ class Message extends Base_Object {
 			'diff_time' => $date->wi18n(),
 			'ymdhis'    => $date->ymdhis(),
 			// who sent what we sent, and who wrote what we got
-			'sent_by'   => $sent_by ? $sent_by->display_name : $this->from_address,
+			'sent_by'   => $sent_by ? $sent_by->display_name : $sender,
 			'sender'    => $sender,
 		] );
 

@@ -4,6 +4,7 @@ namespace Groundhogg\Abilities\Contacts;
 
 use Groundhogg\Abilities\Ability;
 use Groundhogg\Abilities\Schemas\Contact_Schema;
+use Groundhogg\Pii;
 use WP_Error;
 use function Groundhogg\get_contactdata;
 
@@ -69,6 +70,11 @@ class Get_Contact extends Ability {
 	}
 
 	public function __invoke( $input ) {
+
+		// Looking a contact up by email address is a search by PII, it confirms an address is on the list
+		if ( ! empty( $input['email'] ) && Pii::is_restricted() ) {
+			return Pii::restricted_error();
+		}
 
 		if ( ! empty( $input['id'] ) ) {
 			$contact = get_contactdata( $input['id'] );

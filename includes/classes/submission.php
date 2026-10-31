@@ -157,7 +157,7 @@ class Submission extends Base_Object_With_Meta {
 
 		$array['i18n'] = [
 			'diff_time' => ucfirst( $date->wi18n() ),
-			'answers'   => $this->get_answers( true )
+			'answers'   => Pii::is_restricted() ? [] : $this->get_answers( true )
 		];
 
 		return $array;
