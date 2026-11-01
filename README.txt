@@ -404,6 +404,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.11 =
 * SECURITY The `{post_title}` replacement code could output HTML from a post title. A Contributor could save a title of entity-encoded markup, put `[ghr]{post_title}[/ghr]` in the post, and when the post was published the markup was written to the page unescaped. The title is now stripped of tags and escaped. Credit: Wordfence PRISM, via Wordfence.
+* FIXED A Link Click link could be stored by a page cache or a CDN, which sent later visitors on to the page without running the Link Click trigger. The redirect is now sent as uncacheable, so every click reaches the site.
+* FIXED A Link Click trigger didn't run for a site that answers on both `example.com` and `www.example.com` when an email's tracking link redirected to the other one. The tracking cookie is only sent back to the address that set it, so the visitor wasn't recognized. Tracking links now redirect to the address that the visitor is already on.
 
 = 4.10 (2026-10-29) =
 * ADDED Interface themes. Choose Light, Paper, Slate (dark) or Midnight (dark) for the way the admin looks, or keep the default. A theme is saved per user, and only changes colors, not how anything works.
