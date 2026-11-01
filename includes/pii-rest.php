@@ -48,6 +48,8 @@ class Pii_Rest {
 		'#^/gh/v4/activity(/|$)#'    => [ 'ip_address' ],
 		'#^/gh/v4/notes(/|$)#'       => [ 'content', 'summary' ],
 		'#^/gh/v4/tasks(/|$)#'       => [ 'content', 'summary' ],
+		// what was typed into a form is meta, so filtering by meta is searching the answers
+		'#^/gh/v4/submissions(/|$)#' => [ 'meta_key', 'meta_value', 'meta_query', 'meta_compare', 'meta' ],
 	];
 
 	/**
@@ -58,6 +60,7 @@ class Pii_Rest {
 		'#^/gh/v4/messages(/|$)#',
 		'#^/gh/v4/notes(/|$)#',
 		'#^/gh/v4/tasks(/|$)#',
+		'#^/gh/v4/submissions(/|$)#',
 	];
 
 	public function __construct() {

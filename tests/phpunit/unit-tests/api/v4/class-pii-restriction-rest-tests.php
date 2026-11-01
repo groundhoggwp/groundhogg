@@ -5,6 +5,7 @@ use Groundhogg\Classes\Note;
 use Groundhogg\Classes\Task;
 use Groundhogg\Pii;
 use Groundhogg\Saved_Searches;
+use Groundhogg\Submission;
 use function Groundhogg\get_contactdata;
 
 /**
@@ -411,6 +412,83 @@ class Pii_Restriction_Rest_Tests extends GH_UnitTestCase {
 		$this->assertRestricted( $this->request( 'GET', '/gh/v4/notes', [ 'content' => 'jane' ] ) );
 		$this->assertRestricted( $this->request( 'GET', '/gh/v4/tasks', [ 'search' => 'jane' ] ) );
 		$this->assertRestricted( $this->request( 'GET', '/gh/v4/tasks', [ 'query' => [ 'summary' => 'jane' ] ] ) );
+	}
+
+	protected function create_submission(): Submission {
+
+		$submission = new Submission();
+		$submission->create( [
+			'type'       => 'custom',
+			'name'       => 'Survey',
+			'contact_id' => $this->contact_id,
+		] );
+
+		$submission->add_posted_data( [ 'best_phone' => '555-0100', 'comment' => 'Please email jane.doe@example.com' ] );
+
+		return $submission;
+	}
+
+	public function test_a_restricted_user_gets_a_submission_without_the_answers() {
+
+		$this->admin( true );
+		$submission = $this->create_submission();
+		$array      = json_decode( wp_json_encode( $submission->get_as_array() ), true );
+
+		$this->assertSame( '555-0100', $array['meta']['best_phone'] );
+		$this->assertNotEmpty( $array['i18n']['answers'] );
+
+		$this->admin( false );
+		$array = json_decode( wp_json_encode( $submission->get_as_array() ), true );
+
+		$this->assertSame( $submission->get_id(), $array['ID'] );
+		$this->assertSame( 'Survey', $array['data']['name'] );
+		$this->assertEmpty( $array['meta'] );
+		$this->assertEmpty( $array['i18n']['answers'] );
+		$this->assertStringNotContainsString( '555-0100', wp_json_encode( $array ) );
+	}
+
+	public function test_restricted_user_reads_a_submission_over_rest_without_the_answers() {
+
+		$this->admin( true );
+		$submission = $this->create_submission();
+
+		$response = $this->request( 'GET', '/gh/v4/submissions/' . $submission->get_id() );
+		$this->assertSame( 200, $response->get_status(), wp_json_encode( $response->get_data() ) );
+		$this->assertSame( '555-0100', json_decode( wp_json_encode( $response->get_data() ), true )['item']['meta']['best_phone'] );
+
+		$this->admin( false );
+
+		$response = $this->request( 'GET', '/gh/v4/submissions/' . $submission->get_id() );
+		$item     = json_decode( wp_json_encode( $response->get_data() ), true )['item'];
+
+		$this->assertSame( 200, $response->get_status(), wp_json_encode( $response->get_data() ) );
+		$this->assertEmpty( $item['meta'] );
+		$this->assertEmpty( $item['i18n']['answers'] );
+		$this->assertNoPii( $response );
+	}
+
+	public function test_restricted_user_gets_the_submission_in_the_timeline_without_the_answers() {
+
+		$this->admin( true );
+		$this->create_submission();
+
+		$this->admin( false );
+
+		$response = $this->request( 'GET', "/gh/v4/contacts/{$this->contact_id}/timeline" );
+
+		$this->assertSame( 200, $response->get_status(), wp_json_encode( $response->get_data() ) );
+		$this->assertStringContainsString( 'Survey', wp_json_encode( $response->get_data() ) );
+		$this->assertNoPii( $response );
+	}
+
+	public function test_restricted_user_cannot_search_submissions_by_their_answers() {
+		$this->admin( false );
+
+		$this->assertRestricted( $this->request( 'GET', '/gh/v4/submissions', [ 'meta_key' => 'best_phone', 'meta_value' => '555-0100' ] ) );
+		$this->assertRestricted( $this->request( 'GET', '/gh/v4/submissions', [ 'search' => 'jane' ] ) );
+		$this->assertRestricted( $this->request( 'GET', '/gh/v4/submissions', [ 'query' => [ 'meta_query' => [ [ 'key' => 'comment', 'value' => 'jane', 'compare' => 'LIKE' ] ] ] ] ) );
+
+		$this->assertSame( 200, $this->request( 'GET', '/gh/v4/submissions', [ 'contact_id' => $this->contact_id ] )->get_status() );
 	}
 
 	public function test_no_user_is_not_restricted_over_rest() {
