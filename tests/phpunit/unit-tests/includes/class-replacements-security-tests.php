@@ -390,4 +390,41 @@ class Replacements_Security_Tests extends GH_UnitTestCase {
 		$this->assertNoSubstring( '{', $content );
 		$this->assertNoSubstring( 'user_pass', $content );
 	}
+
+	/**
+	 * {post_title} is a 'nested' code, so do_replacement() doesn't escape it. single_post() decodes
+	 * entities, and wp_filter_kses leaves a Contributor's entity-encoded title intact, so without
+	 * escaping the decoded title the markup comes back live.
+	 *
+	 * @see Replacements::single_post()
+	 */
+	public function test_post_title_does_not_emit_markup_from_entity_encoded_title() {
+
+		$post_id = self::factory()->post->create( [
+			'post_status' => 'publish',
+			'post_title'  => '&lt;img src=x onerror=alert(1)&gt;',
+		] );
+
+		$output = do_replacements( '{post_title}' );
+
+		$this->assertNoSubstring( '<img', $output );
+		$this->assertNoSubstring( '<', $output );
+
+		wp_delete_post( $post_id, true );
+	}
+
+	public function test_post_title_still_decodes_ordinary_entities() {
+
+		$post_id = self::factory()->post->create( [
+			'post_status' => 'publish',
+			'post_title'  => 'Tom &amp; Jerry',
+		] );
+
+		$output = do_replacements( '{post_title}' );
+
+		// Rendered as HTML this displays "Tom & Jerry"
+		$this->assertHasSubstring( 'Tom &amp; Jerry', $output );
+
+		wp_delete_post( $post_id, true );
+	}
 }

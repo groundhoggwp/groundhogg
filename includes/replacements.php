@@ -2595,7 +2595,10 @@ class Replacements implements \JsonSerializable {
 		switch ( $which ) {
 			default:
 			case 'title':
-				$content = html_entity_decode( get_the_title(), ENT_QUOTES );
+				// post_title is registered 'nested', so do_replacement() does not escape it. Decoding
+				// entities turns a Contributor's entity-encoded title (which wp_filter_kses leaves intact)
+				// into live markup, so strip tags from the decoded value and re-escape it.
+				$content = esc_html( wp_strip_all_tags( html_entity_decode( get_the_title(), ENT_QUOTES ) ) );
 				break;
 			case 'content':
 				$content = get_the_content();
