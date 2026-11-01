@@ -402,6 +402,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.11 =
+* SECURITY The `{post_title}` replacement code could output HTML from a post title. A Contributor could save a title of entity-encoded markup, put `[ghr]{post_title}[/ghr]` in the post, and when the post was published the markup was written to the page unescaped. The title is now stripped of tags and escaped. Credit: Wordfence PRISM, via Wordfence.
+
 = 4.10 (2026-10-29) =
 * ADDED Interface themes. Choose Light, Paper, Slate (dark) or Midnight (dark) for the way the admin looks, or keep the default. A theme is saved per user, and only changes colors, not how anything works.
  * Pick a theme with swatches on your user profile, from the new Look step of the guided setup, or in the command palette.
