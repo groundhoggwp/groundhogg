@@ -924,6 +924,8 @@ class Tracking {
 	 */
 	protected function redirect_to_target() {
 
+		$target_url = $this->match_request_host( $this->get_target_url() );
+
 		if ( is_option_enabled( 'gh_use_js_cookie_method' ) ) {
 
 			include_once __DIR__ . '/../templates/managed-page.php';
@@ -935,7 +937,7 @@ class Tracking {
               ( () => {
 
                 const state = <?php echo wp_json_encode( [
-					'target'       => $this->get_target_url(),
+					'target'       => $target_url,
 					'cookie-value' => $this->get_tracking_cookie_value(),
 					'expiry'       => $this->get_tracking_cookie_expiry(),
 				] ); ?>;
@@ -957,7 +959,7 @@ class Tracking {
             <div class="box">
                 <h2 class="loading-dots"><?php esc_html_e( 'Just a moment', 'groundhogg' ); ?></h2>
                 <p><?php esc_html_e( 'We’re securely processing your request and will redirect you automatically.', 'groundhogg' ); ?></p>
-                <p><?php esc_html_e( 'Not redirected?', 'groundhogg' ); ?> <?php html()->a( $this->get_target_url(), esc_html__( 'Click here!', 'groundhogg' ), [], true ); ?></p>
+                <p><?php esc_html_e( 'Not redirected?', 'groundhogg' ); ?> <?php html()->a( $target_url, esc_html__( 'Click here!', 'groundhogg' ), [], true ); ?></p>
             </div>
 			<?php
 
@@ -968,13 +970,67 @@ class Tracking {
 
 		// safe redirects only
 		if ( self::$use_safe_redirect ){
-			wp_safe_redirect( $this->get_target_url(), $this->redirect_http_status_code() );
+			wp_safe_redirect( $target_url, $this->redirect_http_status_code() );
 			exit;
 		}
 
 		// phpcs:ignore WordPress.Security.SafeRedirect -- user-defined redirect
-		wp_redirect( $this->get_target_url(), $this->redirect_http_status_code() );
+		wp_redirect( $target_url, $this->redirect_http_status_code() );
 		exit;
+	}
+
+	/**
+	 * The tracking cookie is only sent back to the host it was set on. When a site answers on both
+	 * example.com and www.example.com, a tracking link opened on one that redirects to the other loses
+	 * the cookie, and whatever is waiting on the cookie (a Link Click trigger, for example) can't tell
+	 * who the visitor is. So when the target is the www/non-www twin of the host the visitor is already
+	 * on, keep them on that host.
+	 *
+	 * Only the www/non-www swap is ever made, so no other host can be introduced through the request.
+	 *
+	 * @param string $url the redirect target
+	 *
+	 * @return string
+	 */
+	public function match_request_host( string $url ): string {
+
+		/**
+		 * Filter whether the redirect target host is matched to the host of the current request.
+		 *
+		 * @param bool   $match
+		 * @param string $url
+		 */
+		if ( ! apply_filters( 'groundhogg/tracking/match_request_host', true, $url ) ) {
+			return $url;
+		}
+
+		$target_host = wp_parse_url( $url, PHP_URL_HOST );
+
+		// relative urls are already on the current host, and credentials in the url aren't ours to rewrite around
+		if ( ! $target_host || wp_parse_url( $url, PHP_URL_USER ) ) {
+			return $url;
+		}
+
+		$request_host = wp_parse_url( 'http://' . sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ?? '' ) ), PHP_URL_HOST );
+
+		if ( ! $request_host ) {
+			return $url;
+		}
+
+		$target_host  = strtolower( $target_host );
+		$request_host = strtolower( $request_host );
+
+		if ( $target_host === $request_host ) {
+			return $url;
+		}
+
+		// not the same site, leave it alone
+		if ( preg_replace( '/^www\./', '', $target_host ) !== preg_replace( '/^www\./', '', $request_host ) ) {
+			return $url;
+		}
+
+		// only the host changes, the scheme, port, path and query stay as they were
+		return preg_replace( '@^([a-z][a-z0-9+.\-]*://|//)([^/?#:]+)@i', '${1}' . $request_host, $url, 1 );
 	}
 
 	/**
