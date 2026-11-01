@@ -420,6 +420,13 @@ class Rewrites {
 					$target_url = home_url();
 				}
 
+				// The redirect is per-contact, a cached copy would skip the benchmark entirely
+				if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+					define( 'DONOTCACHEPAGE', true );
+				}
+
+				nocache_headers();
+
 				if ( $contact ) {
 					$target_url = do_replacements( $target_url, $contact->get_id() );
 
