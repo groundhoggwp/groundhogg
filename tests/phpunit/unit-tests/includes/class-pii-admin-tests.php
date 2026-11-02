@@ -10,6 +10,7 @@ use Groundhogg\Api\V4\Contacts_Api;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Pii;
+use Groundhogg\Pii_Admin;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 use function Groundhogg\track_page_visit;
@@ -755,5 +756,94 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( '[redacted]', $trace[0] );
 		// step IDs are not text
 		$this->assertSame( 42, $trace[1] );
+	}
+
+	public function test_access_can_be_taken_away_from_a_user_and_given_back() {
+
+		$user_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		get_userdata( $user_id )->add_cap( Pii::CAP, true );
+
+		Pii_Admin::set_user_access( $user_id, false );
+		$this->assertFalse( user_can( $user_id, Pii::CAP ) );
+
+		Pii_Admin::set_user_access( $user_id, true );
+		$this->assertTrue( user_can( $user_id, Pii::CAP ) );
+	}
+
+	public function test_access_that_matches_the_role_is_not_stored_on_the_user() {
+
+		$user_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		get_role( 'administrator' )->add_cap( Pii::CAP );
+
+		Pii_Admin::set_user_access( $user_id, true );
+		$this->assertArrayNotHasKey( Pii::CAP, get_userdata( $user_id )->caps );
+
+		// taking it away is stored, as a denial
+		Pii_Admin::set_user_access( $user_id, false );
+		$this->assertFalse( user_can( $user_id, Pii::CAP ) );
+		$this->assertArrayHasKey( Pii::CAP, get_userdata( $user_id )->caps );
+
+		// and giving it back removes the denial, so the role's capability counts again
+		Pii_Admin::set_user_access( $user_id, true );
+		$this->assertArrayNotHasKey( Pii::CAP, get_userdata( $user_id )->caps );
+		$this->assertTrue( user_can( $user_id, Pii::CAP ) );
+	}
+
+	public function test_only_a_user_with_access_can_manage_access() {
+
+		$this->admin( true );
+		$this->assertTrue( Pii_Admin::can_manage_access() );
+
+		$this->admin( false );
+		$this->assertFalse( Pii_Admin::can_manage_access() );
+	}
+
+	protected function profile_fields( int $profile_user_id ): string {
+		ob_start();
+		( new Groundhogg\Admin\User\Admin_User() )->show_fields( get_userdata( $profile_user_id ) );
+
+		return ob_get_clean();
+	}
+
+	public function test_the_profile_has_a_checkbox_for_access() {
+
+		$profile_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		get_userdata( $profile_id )->add_cap( 'view_contacts', true );
+		get_userdata( $profile_id )->add_cap( Pii::CAP, false );
+
+		$this->admin( true );
+		$html = $this->profile_fields( $profile_id );
+		$this->assertStringContainsString( 'name="gh_pii_access"', $html );
+		$this->assertDoesNotMatchRegularExpression( '/name="gh_pii_access"[^>]*checked/', $html );
+		$this->assertDoesNotMatchRegularExpression( '/name="gh_pii_access"[^>]*disabled/', $html );
+
+		// a restricted user sees it, but can't change it
+		$this->admin( false );
+		$this->assertMatchesRegularExpression( '/name="gh_pii_access"[^>]*disabled/', $this->profile_fields( $profile_id ) );
+	}
+
+	public function test_saving_the_profile_sets_access_only_for_a_user_who_can_manage_it() {
+
+		$profile_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		get_userdata( $profile_id )->add_cap( Pii::CAP, true );
+
+		$admin = new Groundhogg\Admin\User\Admin_User();
+
+		// the field was on the form and unchecked
+		$_POST = [ 'gh_pii_access_present' => '1' ];
+
+		$this->admin( false );
+		$admin->save_fields( $profile_id );
+		$this->assertTrue( user_can( $profile_id, Pii::CAP ), 'a restricted user can not take it away or give it' );
+
+		$this->admin( true );
+		$admin->save_fields( $profile_id );
+		$this->assertFalse( user_can( $profile_id, Pii::CAP ) );
+
+		// without the field on the form, nothing is changed
+		get_userdata( $profile_id )->add_cap( Pii::CAP, true );
+		$_POST = [];
+		$admin->save_fields( $profile_id );
+		$this->assertTrue( user_can( $profile_id, Pii::CAP ) );
 	}
 }

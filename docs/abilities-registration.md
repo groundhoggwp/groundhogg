@@ -371,7 +371,7 @@ sender and error messages are `[redacted]`, and the generic admin `Table` refuse
 there is nothing in them to redact. A restricted user doesn't have the capabilities that take PII out as a file, or that find out
 what's on the list by putting it in: `export_contacts`, `view_previous_exports`, `import_contacts` and
 `download_contact_files` are removed from them on `user_has_cap` (`Pii_Admin::CAPS`), and `download_file` for exports,
-imports and contact files also needs `view_contact_pii` for super admins. A flow simulation trace is scrubbed of the contact's details for a restricted user. The admin reports are aggregates and have nothing to redact. The admin JS shows a contact as "Contact #N" (`Groundhogg.functions.contactLabel`) in pickers, the events filter, and record-page headings when it was given redacted details. A column or card an add-on adds is the add-on's to redact.
+imports and contact files also needs `view_contact_pii` for super admins. A flow simulation trace is scrubbed of the contact's details for a restricted user. The admin reports are aggregates and have nothing to redact. The admin JS shows a contact as "Contact #N" (`Groundhogg.functions.contactLabel`) in pickers, the events filter, and record-page headings when it was given redacted details. A checkbox on the user profile (Pii_Admin::set_user_access()) grants or revokes the cap for one user, and only a user who has it can change it. A column or card an add-on adds is the add-on's to redact.
 
 Redact where data is output, never in the `Contact` model, or sending would break. Cron, background tasks and WP-CLI have
 no user and are never restricted.

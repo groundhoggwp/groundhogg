@@ -66,6 +66,43 @@ class Pii_Admin {
 	}
 
 	/**
+	 * Whether the current user may give or take away another user's access to contact PII. Only someone who has it
+	 * themselves can, or a restricted user could lift their own restriction.
+	 *
+	 * @return bool
+	 */
+	public static function can_manage_access() {
+		return current_user_can( 'edit_users' ) && current_user_can( Pii::CAP );
+	}
+
+	/**
+	 * Give a user access to contact PII, or take it away, whatever their role says. The capability is set on the user
+	 * only when it differs from what the role gives, so changing the role's capability still reaches everyone who
+	 * hasn't been set apart.
+	 *
+	 * @param int  $user_id
+	 * @param bool $allowed
+	 *
+	 * @return void
+	 */
+	public static function set_user_access( int $user_id, bool $allowed ) {
+
+		$user = get_userdata( $user_id );
+
+		if ( ! $user ) {
+			return;
+		}
+
+		$user->remove_cap( Pii::CAP );
+
+		$by_role = $user->has_cap( Pii::CAP );
+
+		if ( $allowed !== $by_role ) {
+			$user->add_cap( Pii::CAP, $allowed );
+		}
+	}
+
+	/**
 	 * @param string $picture
 	 *
 	 * @return string

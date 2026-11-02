@@ -3,6 +3,8 @@
 namespace Groundhogg\Admin\User;
 
 use Groundhogg\Main_Roles;
+use Groundhogg\Pii;
+use Groundhogg\Pii_Admin;
 use WP_User;
 use function Groundhogg\andList;
 use function Groundhogg\bold_it;
@@ -232,6 +234,21 @@ class Admin_User {
                     </td>
                 </tr>
 			<?php endif; ?>
+			<?php if ( current_user_can( 'edit_users' ) ):
+				$can_manage_pii = Pii_Admin::can_manage_access() && ! ( is_multisite() && is_super_admin( $profile_user->ID ) );
+				?>
+                <tr>
+                    <th><?php esc_html_e( 'Personal information', 'groundhogg' ); ?></th>
+                    <td>
+                        <input type="hidden" name="gh_pii_access_present" value="1">
+                        <label class="gh-checkbox-label">
+                            <input type="checkbox" name="gh_pii_access" value="1" <?php checked( user_can( $profile_user, Pii::CAP ) ); ?> <?php disabled( ! $can_manage_pii ); ?>>
+                            <span class="checkbox-label"><?php esc_html_e( 'Can see the personal information of contacts.', 'groundhogg' ); ?></span>
+                        </label>
+                        <p class="description"><?php esc_html_e( 'When this is off, the personal details of contacts, like their name, email address, phone numbers and address, are replaced with [redacted] for this user, and for any AI agent that connects as them. They can still work with contacts by their ID, tags, activity and segments, but cannot search by personal information, or export, import or download contact files.', 'groundhogg' ); ?></p>
+                    </td>
+                </tr>
+			<?php endif; ?>
 	        <?php if ( Main_Roles::is_sales_manager( $profile_user ) ):
                 if ( current_user_can( 'delete_users' ) ) : ?>
                 <tr>
@@ -367,6 +384,11 @@ class Admin_User {
 		update_user_meta( $user_id, 'gh_from_email', sanitize_email( get_post_var( 'gh_from_email' ) ) );
 
 		$this->save_theme( $user_id, get_post_var( 'gh_admin_theme' ) );
+
+		// a disabled checkbox isn't posted, so only act when the field was on the form
+		if ( get_post_var( 'gh_pii_access_present' ) && Pii_Admin::can_manage_access() ) {
+			Pii_Admin::set_user_access( $user_id, boolval( get_post_var( 'gh_pii_access' ) ) );
+		}
 
 		if ( user_can( $user_id, 'view_reports' ) ) {
 			update_user_meta( $user_id, 'gh_broadcast_results', boolval( get_post_var( 'gh_broadcast_results' ) ) );
