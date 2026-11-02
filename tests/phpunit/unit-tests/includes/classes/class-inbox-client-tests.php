@@ -5,6 +5,7 @@ use Groundhogg\Classes\Inbound_Signature;
 use Groundhogg\Classes\Inbox;
 use Groundhogg\Classes\Inbox_Client;
 use Groundhogg\Classes\Message;
+use Groundhogg\License_Manager;
 use function Groundhogg\get_contactdata;
 
 /**
@@ -255,6 +256,50 @@ class Inbox_Client_Tests extends GH_UnitTestCase {
 		$this->assertSame( rest_url( 'gh/v4/messages/inbound' ), $data['endpoint'] );
 		$this->assertMatchesRegularExpression( '/^[0-9a-f]{64}$/', $data['secret'] );
 		$this->assertGreaterThanOrEqual( 30, $timeout, 'the relay checks the license and then calls the site back' );
+	}
+
+	public function test_it_does_not_send_a_license_url_for_a_site_with_a_license_of_its_own() {
+
+		Inbox_Client::enable();
+
+		$this->assertArrayNotHasKey( 'license_url', $this->requests[0]['data'] );
+	}
+
+	/**
+	 * A subsite that uses the network's license has no activation of its own, the relay has to check the license for the
+	 * main site's url, while the inbox stays the subsite's own. The relay forgets it when it's left out, so it's sent
+	 * every time the inbox is set up, including again after the secret was lost.
+	 */
+	public function test_a_subsite_that_uses_the_network_license_gives_the_relay_the_url_it_is_activated_on() {
+
+		add_filter( 'groundhogg/inbox/license_url', fn() => 'https://network.example.test' );
+
+		Inbox_Client::enable();
+		Inbox_Client::enable();
+
+		$this->assertCount( 2, $this->requests );
+
+		foreach ( $this->requests as $request ) {
+			$this->assertSame( 'https://network.example.test', $request['data']['license_url'] );
+			$this->assertSame( home_url(), $request['data']['site_url'] ); // still the site's own
+		}
+
+		remove_all_filters( 'groundhogg/inbox/license_url' );
+	}
+
+	public function test_a_license_of_the_site_is_never_a_network_license() {
+		$this->assertSame( '', License_Manager::network_license_url( 'not-a-network-license' ) );
+	}
+
+	public function test_a_license_that_is_not_a_multisite_one_is_explained_when_the_relay_refuses_to_share_it() {
+
+		$this->behaviour['error'] = [ 403, [ 'code' => 'invalid_license', 'reason' => 'product_not_allowed' ] ];
+
+		$result = Inbox_Client::enable();
+
+		$this->assertSame( 'invalid_license', $result->get_error_code() );
+		$this->assertSame( 'product_not_allowed', $result->get_error_data()['reason'] );
+		$this->assertStringContainsString( 'multisite license', $result->get_error_message() );
 	}
 
 	public function test_the_secret_is_the_one_that_was_given_to_the_relay_and_was_pending_while_the_relay_checked_it() {

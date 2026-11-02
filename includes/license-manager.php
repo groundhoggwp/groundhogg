@@ -511,6 +511,24 @@ class License_Manager {
 		return self::can_use_network_licenses() && key_exists( $license_key, self::get_network_licenses() );
 	}
 
+	/**
+	 * The url that a license is activated on when that isn't this site. A license that a subsite uses from the network
+	 * is activated once, on the network's main site, so that's the url it's checked against, not the subsite's own (which
+	 * can be a mapped domain that the license has never been activated on).
+	 *
+	 * @param string $license_key
+	 *
+	 * @return string empty if the license is the site's own, and is activated on the site's own url
+	 */
+	public static function network_license_url( string $license_key ) {
+
+		if ( ! self::is_network_license( $license_key ) ) {
+			return '';
+		}
+
+		return (string) get_home_url( get_main_blog_id() );
+	}
+
 	public static function save_licenses() {
 	    update_option( 'gh_licenses', self::$licenses );
     }

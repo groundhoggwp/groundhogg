@@ -73,6 +73,23 @@ class Inbox_Client {
 	}
 
 	/**
+	 * The url that the license is activated on, when that isn't this site's. The relay checks the license for it, and
+	 * still sets the inbox up for this site. Only a multisite license can be checked this way.
+	 *
+	 * @param string $license_key
+	 *
+	 * @return string empty if the license is activated on this site
+	 */
+	public static function license_url( string $license_key ) {
+
+		/**
+		 * @param string $url         the main site's url if this site uses the network's license, otherwise empty
+		 * @param string $license_key
+		 */
+		return (string) apply_filters( 'groundhogg/inbox/license_url', License_Manager::network_license_url( $license_key ), $license_key );
+	}
+
+	/**
 	 * Set up the inbox, or set it up again. Setting it up again is how a site that lost its secret gets the inbox back,
 	 * the relay gives the addresses that it already has, and the site has a new secret.
 	 *
@@ -92,12 +109,22 @@ class Inbox_Client {
 		$secret = Inbound_Signature::is_constant() ? Inbound_Signature::secret() : Inbound_Signature::generate();
 		Inbound_Signature::set_pending( $secret );
 
-		$response = self::request( 'POST', '/v1/inboxes', [
+		$body = [
 			'license_key' => $license,
 			'site_url'    => home_url(),
 			'endpoint'    => Inbox::endpoint(),
 			'secret'      => $secret,
-		] );
+		];
+
+		// A subsite that uses the network's license has no activation of its own, the license is checked for the
+		// main site's url. It's sent every time, the relay forgets it if it's left out.
+		$license_url = self::license_url( $license );
+
+		if ( $license_url ) {
+			$body['license_url'] = $license_url;
+		}
+
+		$response = self::request( 'POST', '/v1/inboxes', $body );
 
 		if ( is_wp_error( $response ) ) {
 			Inbound_Signature::clear_pending();
@@ -304,6 +331,15 @@ class Inbox_Client {
 
 		switch ( $code ) {
 			case 'invalid_license':
+				if ( $reason === 'product_not_allowed' ) {
+					$message = sprintf(
+					/* translators: %s: the site's hostname */
+						__( 'The license that %s uses from the network cannot be shared with its subsites. A multisite license is needed to receive messages on a subsite.', 'groundhogg' ),
+						$hostname
+					);
+					break;
+				}
+
 				$message = sprintf(
 				/* translators: %s: the site's hostname */
 					__( 'Your license is not valid for %s. Check that it is active for that site on the Licenses tab.', 'groundhogg' ),
