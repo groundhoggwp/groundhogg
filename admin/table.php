@@ -6,6 +6,8 @@ use Exception;
 use Groundhogg\Base_Object;
 use Groundhogg\Base_Object_With_Meta;
 use Groundhogg\DB\DB;
+use Groundhogg\Pii;
+use WP_Error;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\array_find;
@@ -26,6 +28,27 @@ if ( ! class_exists( '\WP_List_Table' ) ) {
 }
 
 abstract class Table extends WP_List_Table {
+
+	/**
+	 * Set when a user who can't view PII searched, filtered or sorted by it, see Pii::check_table_query()
+	 *
+	 * @var WP_Error|null
+	 */
+	protected $pii_error = null;
+
+	/**
+	 * Say why there is nothing, when it's because the search wasn't allowed
+	 */
+	public function no_items() {
+
+		if ( is_wp_error( $this->pii_error ) ) {
+			echo esc_html( $this->pii_error->get_error_message() );
+
+			return;
+		}
+
+		parent::no_items();
+	}
 
 	/**
 	 * @return string
@@ -278,7 +301,24 @@ abstract class Table extends WP_List_Table {
 			'found_rows'     => true,
 		] );
 
+		// a count, a match or an order is an answer about the PII it's on, so a user who can't view it doesn't get one
+		$allowed = Pii::check_table_query(
+			preg_replace( '/^gh_/', '', $this->get_db()->get_db_suffix() ),
+			array_merge( get_request_query(), [
+				'search'         => $search,
+				'search_columns' => $search_columns,
+				'orderby'        => $orderby,
+			] )
+		);
+
+		$this->pii_error = is_wp_error( $allowed ) ? $allowed : null;
+
 		try {
+
+			if ( is_wp_error( $this->pii_error ) ) {
+				throw new Exception( $this->pii_error->get_error_message() );
+			}
+
 			$items = $this->get_db()->query( $query );
 			$total = $this->get_db()->found_rows();
 		} catch ( Exception $e ) {

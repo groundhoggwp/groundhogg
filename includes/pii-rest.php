@@ -38,31 +38,6 @@ class Pii_Rest {
 		'#^/gh/v4/files/exports$#',
 	];
 
-	/**
-	 * The columns that are PII, by the route of the table they are on
-	 */
-	const TABLE_COLUMNS = [
-		'#^/gh/v4/email_log(/|$)#'   => [ 'recipients', 'from_address', 'subject', 'content', 'altbody', 'headers', 'error_message', 'msg_id' ],
-		'#^/gh/v4/messages(/|$)#'    => [ 'from_address', 'to_address', 'subject', 'content', 'summary', 'message_id', 'in_reply_to', 'thread_id' ],
-		'#^/gh/v4/page_visits(/|$)#' => [ 'ip_address', 'query', 'fragment' ],
-		'#^/gh/v4/activity(/|$)#'    => [ 'ip_address' ],
-		'#^/gh/v4/notes(/|$)#'       => [ 'content', 'summary' ],
-		'#^/gh/v4/tasks(/|$)#'       => [ 'content', 'summary' ],
-		// what was typed into a form is meta, so filtering by meta is searching the answers
-		'#^/gh/v4/submissions(/|$)#' => [ 'meta_key', 'meta_value', 'meta_query', 'meta_compare', 'meta' ],
-	];
-
-	/**
-	 * Tables whose free text search looks in PII columns
-	 */
-	const SEARCH_BLOCKED = [
-		'#^/gh/v4/email_log(/|$)#',
-		'#^/gh/v4/messages(/|$)#',
-		'#^/gh/v4/notes(/|$)#',
-		'#^/gh/v4/tasks(/|$)#',
-		'#^/gh/v4/submissions(/|$)#',
-	];
-
 	public function __construct() {
 
 		add_filter( 'rest_pre_dispatch', [ $this, 'pre_dispatch' ], 5, 3 );
@@ -103,15 +78,10 @@ class Pii_Rest {
 
 		$params = $request->get_params();
 
-		foreach ( self::TABLE_COLUMNS as $pattern => $columns ) {
+		// the tables that hold PII, see Pii::table_columns(), are routes of their own name
+		foreach ( array_keys( Pii::table_columns() ) as $table ) {
 
-			if ( ! preg_match( $pattern, $route ) ) {
-				continue;
-			}
-
-			$searches = in_array( $pattern, self::SEARCH_BLOCKED, true ) && ( ! empty( $params['search'] ) || ! empty( $params['query']['search'] ) );
-
-			if ( $searches || Pii::query_mentions_columns( $params, $columns ) ) {
+			if ( preg_match( '#^/gh/v4/' . preg_quote( $table, '#' ) . '(/|$)#', $route ) && Pii::table_query_touches_pii( $table, $params ) ) {
 				return Pii::restricted_error();
 			}
 		}

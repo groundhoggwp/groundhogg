@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Events;
 
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
+use Groundhogg\Pii;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\DateTimeHelper;
 use WP_List_Table;
@@ -155,7 +156,7 @@ class Events_Table extends WP_List_Table {
 		$html = sprintf(
 			"<a class='row-title' href='%s'>%s</a>",
 			sprintf( admin_url( 'admin.php?page=gh_events&contact_id=%s&&status=%s' ), $event->get_contact_id(), $this->get_view() ),
-			$event->get_contact()->get_email()
+			esc_html( Pii::is_restricted() ? Pii::contact_label( $event->get_contact_id() ) : $event->get_contact()->get_email() )
 		);
 
 		return $html;
@@ -276,7 +277,14 @@ class Events_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_error_message( $event ) {
-		return $event->get_error_message() ? esc_html( strtolower( $event->get_error_message() ) ) : '&#x2014;';
+		if ( ! $event->get_error_message() ) {
+			return '&#x2014;';
+		}
+
+		// the reason an event failed can say who it failed for
+		$message = Pii::is_restricted() ? Pii::scrub_text( $event->get_error_message(), $event->get_contact() ) : $event->get_error_message();
+
+		return esc_html( strtolower( $message ) );
 	}
 
 	/**

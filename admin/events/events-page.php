@@ -10,6 +10,7 @@ use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Email_Log_Item;
 use Groundhogg\Email_Logger;
 use Groundhogg\Event;
+use Groundhogg\Pii;
 use Groundhogg\Plugin;
 use Groundhogg\Utils\Micro_Time_Tracker;
 use Groundhogg_Email_Services;
@@ -113,7 +114,8 @@ class Events_Page extends Tabbed_Admin_Page {
 						],
 						'error_code'    => [ 'Error code', $error_codes ]
 					],
-					'stringColumns' => [
+					// searching what an email said or who it went to is searching PII
+					'stringColumns' => Pii::is_restricted() ? [] : [
 						'from_address'  => 'From address',
 						'subject'       => 'Subject',
 						'content'       => 'Content',

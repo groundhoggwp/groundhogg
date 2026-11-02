@@ -6,6 +6,7 @@ namespace Groundhogg\Admin\Events;
 use DateTime;
 use Groundhogg\Admin\Table;
 use Groundhogg\Email_Log_Item;
+use Groundhogg\Pii;
 use Groundhogg_Email_Services;
 use WP_List_Table;
 use function Groundhogg\action_url;
@@ -288,7 +289,8 @@ class Email_Log_Table extends Table {
 	 */
 	protected function column_to( $email ) {
 
-		$links = [];
+		$links      = [];
+		$restricted = Pii::is_restricted();
 
 		foreach ( $email->recipients as $recipient ) {
 
@@ -297,6 +299,16 @@ class Email_Log_Table extends Table {
 			}
 
 			$contact = get_contactdata( $recipient );
+
+			if ( $restricted ) {
+
+				// who it went to is the contact, when there is one, and nothing else is shown
+				$links[] = $contact
+					? sprintf( '<a href="%2$s">%1$s</a>', esc_html( Pii::contact_label( $contact->get_id() ) ), esc_url( $contact->admin_link() ) )
+					: esc_html( Pii::REDACTED );
+
+				continue;
+			}
 
 			if ( $contact ) {
 				$links[] = sprintf( '<a href="%2$s">%1$s</a>', $recipient, admin_page_url( 'gh_contacts', [
@@ -317,7 +329,7 @@ class Email_Log_Table extends Table {
 	 * @return string|void
 	 */
 	protected function column_subject( $email ) {
-		echo esc_html( $email->subject );
+		echo esc_html( Pii::display( $email->subject ) );
 	}
 
 	/**
@@ -326,7 +338,7 @@ class Email_Log_Table extends Table {
 	 * @return string|void
 	 */
 	protected function column_from( $email ) {
-		echo esc_html( $email->from_address );
+		echo esc_html( Pii::display( $email->from_address ) );
 	}
 
 	/**
@@ -353,7 +365,7 @@ class Email_Log_Table extends Table {
 				?>
                 <span class="pill danger gh-has-tooltip">
                     <?php esc_html_e( 'Failed', 'groundhogg' ) ?>
-                    <span class="gh-tooltip bottom"><?php echo esc_html( $email->error_message ); ?></span>
+                    <span class="gh-tooltip bottom"><?php echo esc_html( Pii::display( $email->error_message ) ); ?></span>
                 </span>
 				<?php
 
@@ -385,6 +397,17 @@ class Email_Log_Table extends Table {
 		}
 
 		return '<abbr title="' . $date->format( DATE_RFC3339 ) . '">' . $time . '</abbr>';
+	}
+
+    /**
+	 * What went wrong is often said with the address it went to
+	 *
+	 * @param $email Email_Log_Item
+	 *
+	 * @return string
+	 */
+	protected function column_error_message( $email ) {
+		return $email->error_message ? esc_html( Pii::display( $email->error_message ) ) : '&#x2014;';
 	}
 
     protected function column_service( $email ) {

@@ -346,6 +346,86 @@ class Pii {
 	}
 
 	/**
+	 * The columns that are PII, by the name of the table they are on, which is what the REST routes are called too.
+	 * Tables that aren't here have none.
+	 *
+	 * @return array<string,string[]>
+	 */
+	public static function table_columns(): array {
+
+		/**
+		 * Filters the PII columns of the tables that have them
+		 *
+		 * @param array<string,string[]> $tables table name => columns
+		 */
+		return apply_filters( 'groundhogg/pii/table_columns', [
+			'email_log'   => [ 'recipients', 'from_address', 'subject', 'content', 'altbody', 'headers', 'error_message', 'msg_id' ],
+			'messages'    => [ 'from_address', 'to_address', 'subject', 'content', 'summary', 'message_id', 'in_reply_to', 'thread_id' ],
+			'page_visits' => [ 'ip_address', 'query', 'fragment' ],
+			'activity'    => [ 'ip_address' ],
+			'notes'       => [ 'content', 'summary' ],
+			'tasks'       => [ 'content', 'summary' ],
+			// what was typed into a form is meta, so filtering by meta is searching the answers
+			'submissions' => [ 'meta_key', 'meta_value', 'meta_query', 'meta_compare', 'meta' ],
+		] );
+	}
+
+	/**
+	 * The tables whose free text search looks in PII columns
+	 *
+	 * @return string[]
+	 */
+	public static function search_tables(): array {
+
+		/**
+		 * Filters the tables whose free text search looks in PII columns
+		 *
+		 * @param string[] $tables
+		 */
+		return apply_filters( 'groundhogg/pii/search_tables', [ 'email_log', 'messages', 'notes', 'tasks', 'submissions' ] );
+	}
+
+	/**
+	 * Whether the query vars of a table search, filter or sort by its PII columns
+	 *
+	 * @param string $table the name of the table, like email_log
+	 * @param array  $query
+	 *
+	 * @return bool
+	 */
+	public static function table_query_touches_pii( string $table, array $query ): bool {
+
+		$columns = self::table_columns()[ $table ] ?? [];
+
+		if ( empty( $columns ) ) {
+			return false;
+		}
+
+		if ( in_array( $table, self::search_tables(), true ) && ( ! empty( $query['search'] ) || ! empty( $query['query']['search'] ) ) ) {
+			return true;
+		}
+
+		return self::query_mentions_columns( $query, $columns );
+	}
+
+	/**
+	 * Refuse a query on a table that searches, filters or sorts by its PII columns, for a restricted user
+	 *
+	 * @param string $table
+	 * @param array  $query
+	 *
+	 * @return true|WP_Error
+	 */
+	public static function check_table_query( string $table, array $query ) {
+
+		if ( self::is_restricted() && self::table_query_touches_pii( $table, $query ) ) {
+			return self::restricted_error();
+		}
+
+		return true;
+	}
+
+	/**
 	 * Refuse Contact_Query vars that search or filter by PII, for a restricted user
 	 *
 	 * @param array $query

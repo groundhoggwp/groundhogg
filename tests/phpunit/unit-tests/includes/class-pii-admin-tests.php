@@ -3,8 +3,11 @@
 use Groundhogg\Admin\Contacts\Contacts_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
+use Groundhogg\Admin\Events\Email_Log_Table;
+use Groundhogg\Admin\Events\Events_Table;
 use Groundhogg\Api\V4\Contacts_Api;
 use Groundhogg\Contact;
+use Groundhogg\Event;
 use Groundhogg\Pii;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
@@ -541,5 +544,120 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		$this->admin( true );
 
 		$this->assertStringContainsString( 'already', $this->page()->process_add()->get_error_message() );
+	}
+
+	protected function email_log_id( array $args = [] ): int {
+		return get_db( 'email_log' )->add( array_merge( [
+			'recipients'    => maybe_serialize( [ self::EMAIL ] ),
+			'from_address'  => 'sender@example.org',
+			'subject'       => 'Hello Jane Doe',
+			'content'       => '<p>Hi Jane</p>',
+			'headers'       => maybe_serialize( [ [ 'Content-Type', 'text/html' ] ] ),
+			'message_type'  => 'marketing',
+			'email_service' => 'wp_mail',
+			'status'        => 'sent',
+		], $args ) );
+	}
+
+	/**
+	 * The rows of an admin table, and what it says when there are none
+	 *
+	 * @param WP_List_Table $table
+	 * @param array         $get
+	 *
+	 * @return array
+	 */
+	protected function list_table( $table, array $get = [] ): array {
+
+		set_current_screen( 'dashboard' );
+		get_current_screen()->add_option( 'per_page', [ 'default' => 20, 'option' => 'gh_events_per_page' ] );
+
+		$_GET = $_REQUEST = $get;
+
+		$table->prepare_items();
+
+		ob_start();
+		$table->display_rows_or_placeholder();
+
+		return [ $table->items, ob_get_clean() ];
+	}
+
+	public function test_a_restricted_users_email_log_has_no_pii_in_it() {
+
+		// the lookup of a contact by address is remembered for the whole run, so the recipient has an address of its own
+		$recipient_email = 'log.recipient.' . wp_generate_password( 6, false ) . '@example.org';
+		$recipient_id    = $this->factory()->contacts->create( [ 'email' => $recipient_email ] );
+
+		$this->email_log_id( [
+			'recipients'    => maybe_serialize( [ $recipient_email ] ),
+			'status'        => 'failed',
+			'error_message' => 'Could not deliver to ' . $recipient_email,
+		] );
+
+		$this->admin( true );
+		[ , $html ] = $this->list_table( new Email_Log_Table(), [ 'view' => 'failed' ] );
+		$this->assertStringContainsString( $recipient_email, $html );
+		$this->assertStringContainsString( 'Hello Jane Doe', $html );
+
+		$this->admin( false );
+		[ $items, $html ] = $this->list_table( new Email_Log_Table(), [ 'view' => 'failed' ] );
+
+		$this->assertNotEmpty( $items );
+		$this->assertStringNotContainsString( $recipient_email, $html );
+		$this->assertNoPii( $html );
+		$this->assertStringNotContainsString( 'sender@example.org', $html );
+		$this->assertStringContainsString( Pii::contact_label( $recipient_id ), $html );
+		$this->assertStringContainsString( Pii::REDACTED, $html );
+		// the same goes for the copy of the rows that is handed to the page's scripts
+		$this->assertStringNotContainsString( $recipient_email, wp_json_encode( $items ) );
+		$this->assertNoPii( wp_json_encode( $items ) );
+	}
+
+	public function test_a_restricted_users_email_log_refuses_a_search_or_sort_by_pii() {
+		$this->email_log_id();
+		$this->admin( false );
+
+		foreach ( [ [ 's' => 'Jane' ], [ 's' => self::EMAIL ], [ 'orderby' => 'subject' ], [ 'orderby' => 'recipients' ], [ 'search_columns' => 'subject' ] ] as $get ) {
+			[ $items, $html ] = $this->list_table( new Email_Log_Table(), $get );
+
+			$this->assertSame( [], $items, wp_json_encode( $get ) );
+			$this->assertStringContainsString( 'not allowed', $html );
+		}
+
+		// what isn't personal is still sortable
+		[ $items ] = $this->list_table( new Email_Log_Table(), [ 'orderby' => 'date_sent' ] );
+		$this->assertNotEmpty( $items );
+
+		// and the user who can view it still searches
+		$this->admin( true );
+		[ $items ] = $this->list_table( new Email_Log_Table(), [ 's' => 'Jane' ] );
+		$this->assertNotEmpty( $items );
+	}
+
+	public function test_a_restricted_users_events_show_the_contact_by_label() {
+
+		get_db( 'events' )->add( [
+			'time'          => time(),
+			'time_scheduled' => time(),
+			'status'        => 'failed',
+			'contact_id'    => $this->contact_id,
+			'event_type'    => Event::FUNNEL,
+			'funnel_id'     => 1,
+			'step_id'       => 1,
+			'error_code'    => 'failed',
+			'error_message' => 'Unable to send to ' . self::EMAIL . ' for Jane',
+		] );
+
+		$this->admin( true );
+		[ , $html ] = $this->list_table( new Events_Table(), [ 'status' => 'failed' ] );
+		$this->assertStringContainsString( self::EMAIL, $html );
+
+		$this->admin( false );
+		[ $items, $html ] = $this->list_table( new Events_Table(), [ 'status' => 'failed' ] );
+
+		$this->assertNotEmpty( $items );
+		$this->assertNoPii( $html );
+		$this->assertStringContainsString( Pii::contact_label( $this->contact_id ), $html );
+		$this->assertStringContainsString( Pii::REDACTED, $html );
 	}
 }

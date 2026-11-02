@@ -363,8 +363,12 @@ for a restricted user, so they are not submitted, and saving the record leaves a
 contact model never stores the marker either: `Contact::update()`, `create()`, `add_meta()` and `update_meta()` drop a PII
 value that is `[redacted]` (`Pii::is_marker()`, `Pii::without_marker()`), so a client that hands back what it was shown
 can't overwrite the real value. The JS quick edit disables the fields it was given redacted. A restricted user adding a
-contact in the admin isn't told that an address is taken. The email log, events, exports,
-reports and pickers are still to do. A column or card an add-on adds is the add-on's to redact.
+contact in the admin isn't told that an address is taken. The email log and the events table
+redact the same way: recipients show as the contact's label (or `[redacted]` when the address is not a contact), the subject,
+sender and error messages are `[redacted]`, and the generic admin `Table` refuses a search or sort on the columns in
+`Pii::table_columns()` (`Pii::check_table_query()`), which REST uses too. Add a table or columns to it with the
+`groundhogg/pii/table_columns` filter. Email previews and test sends use the current user's own details, not a contact's, so
+there is nothing in them to redact. Exports, reports and pickers are still to do. A column or card an add-on adds is the add-on's to redact.
 
 Redact where data is output, never in the `Contact` model, or sending would break. Cron, background tasks and WP-CLI have
 no user and are never restricted.
