@@ -1879,6 +1879,11 @@ class Form_v2 extends Step {
 			return '';
 		}
 
+		// Saved field configs don't always include a value, the render callbacks read it directly
+		if ( is_array( $field ) && ! array_key_exists( 'value', $field ) ) {
+			$field['value'] = '';
+		}
+
 		return call_user_func( $field_type['render'], $field, $contact );
 	}
 
