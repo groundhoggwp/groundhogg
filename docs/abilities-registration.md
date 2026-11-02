@@ -368,7 +368,10 @@ redact the same way: recipients show as the contact's label (or `[redacted]` whe
 sender and error messages are `[redacted]`, and the generic admin `Table` refuses a search or sort on the columns in
 `Pii::table_columns()` (`Pii::check_table_query()`), which REST uses too. Add a table or columns to it with the
 `groundhogg/pii/table_columns` filter. Email previews and test sends use the current user's own details, not a contact's, so
-there is nothing in them to redact. Exports, reports and pickers are still to do. A column or card an add-on adds is the add-on's to redact.
+there is nothing in them to redact. A restricted user doesn't have the capabilities that take PII out as a file, or that find out
+what's on the list by putting it in: `export_contacts`, `view_previous_exports`, `import_contacts` and
+`download_contact_files` are removed from them on `user_has_cap` (`Pii_Admin::CAPS`), and `download_file` for exports,
+imports and contact files also needs `view_contact_pii` for super admins. Reports and pickers are still to do. A column or card an add-on adds is the add-on's to redact.
 
 Redact where data is output, never in the `Contact` model, or sending would break. Cron, background tasks and WP-CLI have
 no user and are never restricted.

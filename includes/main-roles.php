@@ -429,16 +429,23 @@ class Main_Roles extends Roles {
 					break;
 				}
 
+				$file_path = wp_normalize_path( $file_path );
+
+				$path = explode( '/', $file_path );
+
 				if ( is_super_admin( $user_id ) ) {
 					$caps = [ 'download_files' ];
+
+					// exports, imports and a contact's files are contact data, which a super admin can't take out without
+					// the capability to view it either
+					if ( in_array( $path[0], [ 'exports', 'imports', 'uploads' ], true ) ) {
+						$caps[] = Pii::CAP;
+					}
+
 					break;
 				}
 
 				$caps = [];
-
-				$file_path = wp_normalize_path( $file_path );
-
-				$path = explode( '/', $file_path );
 
 				switch ( $path[0] ) {
 					case 'uploads':

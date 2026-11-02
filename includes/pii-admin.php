@@ -15,10 +15,54 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Pii_Admin {
 
+	/**
+	 * Capabilities that are only any good to a user who can view contact PII. What they let you do is take PII out as a
+	 * file (exports, a contact's files), or find out what is on the list by putting it in (imports tell you which
+	 * addresses they updated). A restricted user doesn't have them, whatever their role says.
+	 */
+	const CAPS = [
+		'export_contacts',
+		'view_previous_exports',
+		'import_contacts',
+		'download_contact_files',
+	];
+
 	public function __construct() {
+
+		add_filter( 'user_has_cap', [ $this, 'user_has_cap' ], 99, 4 );
 
 		// the picture is a hash of the email address, which would confirm a guess
 		add_filter( 'groundhogg/contact/profile_picture', [ $this, 'profile_picture' ] );
+	}
+
+	/**
+	 * Take the capabilities that need PII off a user who can't view it
+	 *
+	 * @param bool[]   $allcaps capability => has it
+	 * @param string[] $caps
+	 * @param array    $args
+	 * @param \WP_User $user
+	 *
+	 * @return bool[]
+	 */
+	public function user_has_cap( $allcaps, $caps, $args, $user ) {
+
+		if ( ! $user instanceof \WP_User || ! $user->ID ) {
+			return $allcaps;
+		}
+
+		// not Pii::is_restricted(), that asks whether the user has the capability and this is where that's answered
+		if ( ! apply_filters( 'groundhogg/pii/is_restricted', empty( $allcaps[ Pii::CAP ] ), $user->ID ) ) {
+			return $allcaps;
+		}
+
+		foreach ( self::CAPS as $cap ) {
+			if ( isset( $allcaps[ $cap ] ) ) {
+				$allcaps[ $cap ] = false;
+			}
+		}
+
+		return $allcaps;
 	}
 
 	/**

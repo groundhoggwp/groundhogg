@@ -660,4 +660,55 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( Pii::contact_label( $this->contact_id ), $html );
 		$this->assertStringContainsString( Pii::REDACTED, $html );
 	}
+
+	public function test_a_restricted_user_cant_export_import_or_download_contact_files() {
+
+		$caps = [ 'export_contacts', 'view_previous_exports', 'import_contacts', 'download_contact_files' ];
+
+		$user_id = $this->admin( true );
+		foreach ( $caps as $cap ) {
+			get_userdata( $user_id )->add_cap( $cap, true );
+			$this->assertTrue( current_user_can( $cap ), $cap );
+		}
+
+		$this->assertTrue( current_user_can( 'download_file', 'exports/contacts.csv' ) );
+
+		// the same user, without the capability to view PII
+		get_userdata( $user_id )->add_cap( Pii::CAP, false );
+		// setting the user who is already the current one keeps the capabilities they were loaded with
+		wp_set_current_user( 0 );
+		wp_set_current_user( $user_id );
+
+		foreach ( $caps as $cap ) {
+			$this->assertFalse( current_user_can( $cap ), $cap );
+		}
+
+		$this->assertFalse( current_user_can( 'download_file', 'exports/contacts.csv' ) );
+		$this->assertFalse( current_user_can( 'download_file', 'imports/contacts.csv' ) );
+
+		// what isn't about PII is left alone
+		$this->assertTrue( current_user_can( 'edit_contacts' ) );
+	}
+
+	public function test_the_export_bulk_action_is_not_offered_to_a_restricted_user() {
+
+		$offered = function () {
+			$this->boot_table();
+
+			$table  = new Contacts_Table();
+			$method = new ReflectionMethod( $table, 'get_bulk_actions' );
+			$method->setAccessible( true );
+
+			return array_keys( $method->invoke( $table ) );
+		};
+
+		$user_id = $this->admin( true );
+		get_userdata( $user_id )->add_cap( 'export_contacts', true );
+		$this->assertContains( '__export', $offered() );
+
+		$this->admin( false );
+		get_userdata( get_current_user_id() )->add_cap( 'export_contacts', true );
+		$this->assertNotContains( '__export', $offered() );
+		$this->assertContains( '__bulk_edit', $offered() );
+	}
 }

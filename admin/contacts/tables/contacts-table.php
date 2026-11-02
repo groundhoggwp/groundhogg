@@ -355,6 +355,11 @@ class Contacts_Table extends WP_List_Table {
 			unset( $actions['delete'] );
 		}
 
+		// ...and a user who can't view contact PII can't take it out as a file
+		if ( ! current_user_can( 'export_contacts' ) ) {
+			unset( $actions['__export'] );
+		}
+
 		return apply_filters( 'groundhogg_contact_bulk_actions', $actions );
 	}
 
