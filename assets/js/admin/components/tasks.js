@@ -251,13 +251,14 @@
           let phones = []
 
           const pushContactPhones = (contact) => {
-            const {
-              primary_phone = '',
-              mobile_phone = '',
-              company_phone = '',
-            } = contact.meta
+            // a user who can't view contact PII is given [redacted] in place of a number, it can't be called
+            const real = number => number === '[redacted]' ? '' : number
 
-            const { full_name } = contact.data
+            const primary_phone = real(contact.meta.primary_phone ?? '')
+            const mobile_phone = real(contact.meta.mobile_phone ?? '')
+            const company_phone = real(contact.meta.company_phone ?? '')
+
+            const full_name = Groundhogg.functions.contactLabel(contact)
 
             if (primary_phone) {
               phones.push([
