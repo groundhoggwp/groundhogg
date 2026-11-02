@@ -294,8 +294,8 @@ class Task extends Note {
 
 			// who the task is for is who they are
 			if ( Pii::is_restricted() ) {
-				$associated['name'] = sprintf( __( 'Contact #%d', 'groundhogg' ), $object->get_id() );
-				$associated['img']  = includes_url( 'images/blank.gif' );
+				$associated['name'] = Pii::contact_label( $object->get_id() );
+				$associated['img']  = Pii::blank_picture();
 			}
 		}
 

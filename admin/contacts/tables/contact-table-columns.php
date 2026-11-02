@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Contacts\Tables;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Tag;
@@ -338,7 +339,8 @@ class Contact_Table_Columns {
 				return '';
 			}
 
-			return esc_html( $activity->get_meta( 'feedback' ) );
+			// free text the contact typed, which may say who they are
+			return esc_html( Pii::scrub_text( (string) $activity->get_meta( 'feedback' ), $contact ) );
 		}, false, 92, 'view_contacts', 'unsub' );
 	}
 
@@ -362,7 +364,7 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_first_name( $contact ) {
-		echo $contact->get_first_name() ? esc_html( $contact->get_first_name() ) : '&#x2014;';
+		echo $contact->get_first_name() ? esc_html( Pii::display( $contact->get_first_name() ) ) : '&#x2014;';
 	}
 
 	/**
@@ -371,7 +373,7 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_last_name( $contact ) {
-		echo $contact->get_last_name() ? esc_html( $contact->get_last_name() ) : '&#x2014;';
+		echo $contact->get_last_name() ? esc_html( Pii::display( $contact->get_last_name() ) ) : '&#x2014;';
 	}
 
 	/**
@@ -380,6 +382,13 @@ class Contact_Table_Columns {
 	 * @return void
 	 */
 	protected static function column_user_id( $contact ) {
+		if ( $contact->get_userdata() && Pii::is_restricted() ) {
+			// the user's name and login are the contact's
+			echo esc_html( Pii::REDACTED );
+
+			return;
+		}
+
 		echo $contact->get_userdata() ? '<a href="' . esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_userdata()->ID ) ). '">' . esc_html( $contact->get_userdata()->display_name ) . '</a>' : '&#x2014;';
 	}
 
@@ -441,6 +450,12 @@ class Contact_Table_Columns {
 			return;
 		}
 
+		if ( Pii::is_restricted() ) {
+			echo esc_html( Pii::REDACTED );
+
+			return;
+		}
+
 		$date = date_i18n( get_option( 'date_format' ), strtotime( $contact->birthday ) );
 		$age  = $contact->get_age();
 
@@ -454,6 +469,16 @@ class Contact_Table_Columns {
 	 * @param $contact Contact
 	 */
 	protected static function column_tel_numbers( Contact $contact ) {
+
+		if ( Pii::is_restricted() ) {
+
+			if ( $contact->get_phone_number() || $contact->get_mobile_number() ) {
+				echo esc_html( Pii::REDACTED );
+			}
+
+			return;
+		}
+
 		if ( $contact->get_phone_number() ): ?>
             <div class="phone"
                  title="<?php esc_attr_e( 'Primary phone number', 'groundhogg' ); ?>"><?php
@@ -484,19 +509,28 @@ class Contact_Table_Columns {
 	 */
 	protected static function column_location( Contact $contact ) {
 
-		if ( count( $contact->get_address() ) > 0 ):
+		$restricted = Pii::is_restricted();
+
+		// the region and country say where, the street, city and postcode say who
+		$address = $restricted ? $contact->get_address( [ 'street_address_1', 'street_address_2', 'city', 'postal_zip' ] ) : $contact->get_address();
+
+		if ( count( $address ) > 0 ):
 			?>
             <div class="address">
-				<?php html( 'a', [
-					'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ),
-					'target' => '_blank'
-				], esc_html( implode( ', ', $contact->get_address() ) ) ) ?>
+				<?php if ( $restricted ) {
+					echo esc_html( implode( ', ', $address ) );
+				} else {
+					html( 'a', [
+						'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $address ),
+						'target' => '_blank'
+					], esc_html( implode( ', ', $address ) ) );
+				} ?>
             </div>
 		<?php
 		endif;
 		?><span class="sub"><?php
 
-		if ( $contact->get_ip_address() ) {
+		if ( $contact->get_ip_address() && ! $restricted ) {
 			?>
             <span class="ip-address"><?php echo esc_html( $contact->get_ip_address() ); ?></span>
 			<?php
@@ -504,7 +538,7 @@ class Contact_Table_Columns {
 
 		if ( $contact->get_time_zone() ) {
 
-			if ( $contact->get_ip_address() ) {
+			if ( $contact->get_ip_address() && ! $restricted ) {
 				echo " | ";
 			}
 

@@ -206,7 +206,6 @@ class Pii_Restriction_Rest_Tests extends GH_UnitTestCase {
 
 		$this->assertRestricted( $this->request( 'GET', "/gh/v4/contacts/{$this->contact_id}/files" ) );
 		$this->assertRestricted( $this->request( 'GET', "/gh/v4/contacts/{$this->contact_id}/inbox" ) );
-		$this->assertRestricted( $this->request( 'GET', '/gh/v4/contacts/table/row', [ 'contact' => $this->contact_id ] ) );
 		$this->assertRestricted( $this->request( 'GET', '/gh/v4/files/exports' ) );
 	}
 

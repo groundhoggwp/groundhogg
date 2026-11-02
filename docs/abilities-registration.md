@@ -351,7 +351,13 @@ visits and activity are redacted on their `groundhogg/{object_type}/get_as_array
 covered. Requests that search by PII are refused on `rest_pre_dispatch`, and so are the routes that are personal by nature
 (a contact's files and mailbox, exports). If you add a REST route that returns contact data in some other shape, redact it
 with `Pii::is_restricted()` and `Pii::REDACTED`, and add the route to `Pii_Rest::BLOCKED_ROUTES` if it can't be redacted.
-The admin UI's own pages and table rows are not covered yet.
+
+The server rendered admin UI is covered by `Groundhogg\Pii_Admin` and by the templates themselves, which call
+`Pii::display( $value )` (the value, or `[redacted]` for a restricted user), `Pii::contact_label( $id )` ("Contact #12")
+and `Pii::blank_picture()` where they print a contact's details. So far that is the contacts table, its rows and its
+`/contacts/table/row` route: a restricted user's search or sort by PII is refused with a message in the empty table, and
+the picture, which is a hash of the email address, is blank. The contact record, email log, events, exports, reports and
+pickers are still to do. A column an add-on adds to the contacts table is the add-on's to redact.
 
 Redact where data is output, never in the `Contact` model, or sending would break. Cron, background tasks and WP-CLI have
 no user and are never restricted.

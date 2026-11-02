@@ -299,6 +299,7 @@ class Plugin {
 		$this->settings = new Settings();
 		$this->roles    = new Main_Roles();
 		new Pii_Rest();
+		new Pii_Admin();
 		$this->dbs      = new DB_Manager();
 
 		// Modules

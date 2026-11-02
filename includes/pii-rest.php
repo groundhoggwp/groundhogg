@@ -28,13 +28,13 @@ class Pii_Rest {
 	/**
 	 * Routes that are personal by nature, and that a restricted user doesn't get:
 	 * - a contact's files and their mailbox
-	 * - the admin table row, which is rendered HTML with the name and address in it, until the admin UI redacts its own
 	 * - exports, which are files of contact data
+	 *
+	 * The admin table row is not blocked, the table redacts its own rows, see Contacts_Table.
 	 */
 	const BLOCKED_ROUTES = [
 		'#^/gh/v4/contacts/\d+/files$#',
 		'#^/gh/v4/contacts/\d+/inbox$#',
-		'#^/gh/v4/contacts/table/row$#',
 		'#^/gh/v4/files/exports$#',
 	];
 
@@ -245,7 +245,7 @@ class Pii_Rest {
 
 			// the picture is a hash of the email address, which would confirm a guess
 			if ( isset( $array['data']['gravatar'] ) ) {
-				$array['data']['gravatar'] = includes_url( 'images/blank.gif' );
+				$array['data']['gravatar'] = Pii::blank_picture();
 			}
 
 			// worked out from the birthday
@@ -263,8 +263,7 @@ class Pii_Rest {
 		}
 
 		if ( isset( $array['i18n']['displayAs'] ) ) {
-			/* translators: %d: a contact ID */
-			$array['i18n']['displayAs'] = sprintf( __( 'Contact #%d', 'groundhogg' ), $id );
+			$array['i18n']['displayAs'] = Pii::contact_label( $id );
 		}
 
 		return $array;

@@ -6,6 +6,7 @@ use Groundhogg\Contact;
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Main_Roles;
+use Groundhogg\Pii;
 use Groundhogg\Preferences;
 use WP_List_Table;
 use wpdb;
@@ -55,6 +56,13 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 class Contacts_Table extends WP_List_Table {
 
 	private $query;
+
+	/**
+	 * Set to an error when the query asks a restricted user for something they can't have
+	 *
+	 * @var true|\WP_Error
+	 */
+	private $restricted = true;
 
 	/**
 	 * TT_Example_List_Table constructor.
@@ -113,6 +121,9 @@ class Contacts_Table extends WP_List_Table {
 			'exclude_filters' => '\Groundhogg\sanitize_payload',
 		] );
 
+		// a restricted user can't search or sort by who people are, a match or an order is an answer
+		$this->restricted = Pii::check_query( array_merge( $query, [ 'search' => $search, 'orderby' => $orderby ] ) );
+
 		$full_name = split_name( $search );
 
 		if ( $full_name[0] && $full_name[1] ) {
@@ -170,11 +181,21 @@ class Contacts_Table extends WP_List_Table {
         // select is not allowed here
         unset( $query['select'] );
 
+		// and not by what something filtered in either
+		if ( ! is_wp_error( $this->restricted ) ) {
+			$this->restricted = Pii::check_query( $query );
+		}
+
 		$this->query = $query;
 
-		$c_query     = new Contact_Query( $query );
-		$this->items = $c_query->query( null, true );
-		$total       = $c_query->found_items;
+		if ( is_wp_error( $this->restricted ) ) {
+			$this->items = [];
+			$total       = 0;
+		} else {
+			$c_query     = new Contact_Query( $query );
+			$this->items = $c_query->query( null, true );
+			$total       = $c_query->found_items;
+		}
 
 		// Add condition to be sure we don't divide by zero.
 		// If $this->per_page is 0, then set total pages to 1.
@@ -224,7 +245,30 @@ class Contacts_Table extends WP_List_Table {
 			'email' => [ 'email', false ],
 		);
 
-		return apply_filters( 'groundhogg_contact_sortable_columns', $sortable_columns );
+		$sortable_columns = apply_filters( 'groundhogg_contact_sortable_columns', $sortable_columns );
+
+		// don't offer a restricted user sorts they would be refused
+		if ( Pii::is_restricted() ) {
+			$sortable_columns = array_filter( $sortable_columns, function ( $sort ) {
+				return ! Pii::query_touches_pii( [ 'orderby' => is_array( $sort ) ? $sort[0] : $sort ] );
+			} );
+		}
+
+		return $sortable_columns;
+	}
+
+	/**
+	 * Say why there is nothing, when it's because the search was refused
+	 */
+	public function no_items() {
+
+		if ( is_wp_error( $this->restricted ) ) {
+			echo esc_html( $this->restricted->get_error_message() );
+
+			return;
+		}
+
+		parent::no_items();
 	}
 
 	/**
@@ -254,7 +298,7 @@ class Contacts_Table extends WP_List_Table {
         <strong>
             <a class="row-title" href="<?php echo esc_url( $contact->admin_link() ); ?>">
                 <?php html()->covered_square_image( $contact->get_profile_picture(), 40 ); ?>
-                <?php echo esc_html( $contact->get_email() ); ?>
+                <?php echo esc_html( Pii::is_restricted() ? Pii::contact_label( $contact->get_id() ) : $contact->get_email() ); ?>
             </a>
         </strong>
         <?php
@@ -400,7 +444,7 @@ class Contacts_Table extends WP_List_Table {
 		}
 
 		$actions = array();
-		$title   = $contact->get_email();
+		$title   = Pii::is_restricted() ? Pii::contact_label( $contact->get_id() ) : $contact->get_email();
 
 		if ( current_user_can( 'edit_contacts' ) ) {
 

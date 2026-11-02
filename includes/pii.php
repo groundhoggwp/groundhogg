@@ -298,6 +298,11 @@ class Pii {
 			return true;
 		}
 
+		// sorting by a PII meta column, like cm.birthday, is as good as reading it
+		if ( ! empty( $query['orderby'] ) && is_string( $query['orderby'] ) && str_starts_with( $query['orderby'], 'cm.' ) && ! self::can_expose_meta_key( substr( $query['orderby'], 3 ) ) ) {
+			return true;
+		}
+
 		if ( ! empty( $query['meta_key'] ) && ! self::can_expose_meta_key( (string) $query['meta_key'] ) ) {
 			return true;
 		}
@@ -370,6 +375,38 @@ class Pii {
 		}
 
 		return true;
+	}
+
+	/**
+	 * What a restricted user sees in place of a contact's name or email address
+	 *
+	 * @param int $contact_id
+	 *
+	 * @return string
+	 */
+	public static function contact_label( int $contact_id ): string {
+		/* translators: %d: a contact ID */
+		return sprintf( __( 'Contact #%d', 'groundhogg' ), $contact_id );
+	}
+
+	/**
+	 * What a restricted user sees in place of a contact's picture, which is a hash of their email address
+	 *
+	 * @return string
+	 */
+	public static function blank_picture(): string {
+		return includes_url( 'images/blank.gif' );
+	}
+
+	/**
+	 * A value for display: the value, or the redacted marker for a restricted user. Empty values stay empty.
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 */
+	public static function display( $value ) {
+		return ( $value !== '' && $value !== null && $value !== false && self::is_restricted() ) ? self::REDACTED : $value;
 	}
 
 	/**
