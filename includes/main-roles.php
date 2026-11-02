@@ -193,6 +193,7 @@ class Main_Roles extends Roles {
 			'add_messages'            => [ 'do_not_allow' ],
 			'edit_messages'           => [ 'do_not_allow' ],
 			// A step is a part of its flow, so it follows the flow caps. The steps routes themselves ask for edit_funnels.
+			'add_steps'               => [ 'add_funnels' ],
 			'view_step'               => [ 'view_funnels' ],
 			'edit_step'               => [ 'edit_funnels' ],
 			'delete_step'             => [ 'delete_funnels' ],

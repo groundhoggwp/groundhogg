@@ -261,8 +261,7 @@ More abilities, including SMS, are on the way.
 
 Groundhogg does a lot on its own, and **add-ons and integrations** make it do more. Connect it to the WordPress plugins you already use, and add features like a sales pipeline, booking calendars and lead scoring.
 
-👉 Browse the [add-ons and integrations](https://groundhogg.io/downloads/), or bundle all of the premium add-ons into a [flat rate plan](https://groundhogg.io/pricing/). [Yearly](https://groundhogg.io/pricing/) & [monthly](https://groundhogg.io/pricing/monthly/) options available.
-
+👉 Browse the [add-ons and integrations](https://groundhogg.io/downloads/), or bundle all of the premium add-ons into a [flat rate plan](https://groundhogg.io/pricing/).
 You can also use our **[⏱️ free 14-day demo](https://groundhogg.io/try/)** to see a preview of the premium features.
 
 ## 🚀 Ready to try it?
