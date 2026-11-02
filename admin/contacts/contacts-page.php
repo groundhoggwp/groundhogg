@@ -374,6 +374,9 @@ class Contacts_Page extends Admin_Page {
 
 		if ( ! get_db( 'contacts' )->exists( $email ) ) {
 			$args['email'] = $email;
+		} else if ( Pii::is_restricted() ) {
+			// saying the address is taken would confirm it's on the list
+			return new WP_Error( 'email_exists', esc_html__( 'A contact could not be created with this email address.', 'groundhogg' ) );
 		} else {
             /* translators: %s: a contact's email address */
 			return new WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'page_title', 'groundhogg' ), esc_html( $email ) ) );
@@ -545,20 +548,28 @@ class Contacts_Page extends Admin_Page {
 
 		$args = [];
 
-		$email = sanitize_email( get_request_var( 'email' ) );
+		// The form shows a user who can't view contact PII a disabled, redacted copy of it, so what isn't posted is not
+		// a blank to save. Their form leaves the PII alone.
+		$restricted = Pii::is_restricted();
 
-		//check if it's the current email address.
-		if ( $contact->get_email() !== $email ) {
-			if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->exists( $email ) ) {
-				$args['email'] = $email;
-			} else {
-                /* translators: %s: a contact's email address */
-				$this->add_notice( new WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email ) ) );
+		if ( ! $restricted ) {
+
+			$email = sanitize_email( get_request_var( 'email' ) );
+
+			//check if it's the current email address.
+			if ( $contact->get_email() !== $email ) {
+				if ( ! Plugin::$instance->dbs->get_db( 'contacts' )->exists( $email ) ) {
+					$args['email'] = $email;
+				} else {
+                    /* translators: %s: a contact's email address */
+					$this->add_notice( new WP_Error( 'email_exists', sprintf( _x( 'Sorry, the email %s already belongs to another contact.', 'notice', 'groundhogg' ), $email ) ) );
+				}
 			}
+
+			$args['first_name'] = sanitize_text_field( get_request_var( 'first_name' ) );
+			$args['last_name']  = sanitize_text_field( get_request_var( 'last_name' ) );
 		}
 
-		$args['first_name']   = sanitize_text_field( get_request_var( 'first_name' ) );
-		$args['last_name']    = sanitize_text_field( get_request_var( 'last_name' ) );
 		$args['owner_id']     = absint( get_request_var( 'owner_id' ) );
 		$args['user_id']      = absint( get_request_var( 'user', $contact->get_user_id() ) );
 		$args['optin_status'] = Preferences::sanitize( get_request_var( 'optin_status' ), $contact->get_optin_status() );
@@ -585,6 +596,11 @@ class Contacts_Page extends Admin_Page {
 		$basic_text_fields = apply_filters( 'groundhogg/contact/update/basic_fields', $basic_text_fields, $contact );
 
 		foreach ( $basic_text_fields as $field ) {
+
+			if ( $restricted && Pii::is_pii_meta_key( $field ) ) {
+				continue;
+			}
+
 			if ( get_request_var( $field, false, true ) ) {
 				$contact->update_meta( $field, sanitize_text_field( get_request_var( $field, false, true ) ) );
 			} else {
@@ -595,7 +611,7 @@ class Contacts_Page extends Admin_Page {
 		$birthday_parts = map_deep( get_request_var( 'birthday', [] ), 'absint' );
 
 		// Ignore 0 values.
-		if ( ! empty( $birthday_parts ) && array_sum( $birthday_parts ) > 0 ) {
+		if ( ! $restricted && ! empty( $birthday_parts ) && array_sum( $birthday_parts ) > 0 ) {
 			// Birthday
 			$parts = [
 				'year',

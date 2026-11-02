@@ -359,7 +359,11 @@ contact's details. So far that is the contacts table, its rows and its `/contact
 record page: a restricted user's search or sort by PII is refused with a message in the empty table, the quick search box
 is not offered, the picture, which is a hash of the email address, is blank, and the record's titles, details card,
 editor, WordPress user card and page visits show the label or `[redacted]` instead. The editor's PII inputs are disabled
-for a restricted user, so they are not submitted, but saving doesn't ignore them yet. The email log, events, exports,
+for a restricted user, so they are not submitted, and saving the record leaves a restricted user's PII alone. The
+contact model never stores the marker either: `Contact::update()`, `create()`, `add_meta()` and `update_meta()` drop a PII
+value that is `[redacted]` (`Pii::is_marker()`, `Pii::without_marker()`), so a client that hands back what it was shown
+can't overwrite the real value. The JS quick edit disables the fields it was given redacted. A restricted user adding a
+contact in the admin isn't told that an address is taken. The email log, events, exports,
 reports and pickers are still to do. A column or card an add-on adds is the add-on's to redact.
 
 Redact where data is output, never in the `Contact` model, or sending would break. Cron, background tasks and WP-CLI have

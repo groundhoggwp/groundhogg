@@ -658,6 +658,10 @@ class Contact extends Base_Object_With_Meta {
 	 */
 	public function create( $data = [] ) {
 
+		if ( is_array( $data ) ) {
+			$data = Pii::without_marker( $data, Pii::contact_fields() );
+		}
+
 		$created = parent::create( $data );
 
 		if ( $created ) {
@@ -689,6 +693,9 @@ class Contact extends Base_Object_With_Meta {
 		if ( ! is_array( $data ) ) {
 			return false;
 		}
+
+		// what a redacted screen handed back is not the contact's name or email address
+		$data = Pii::without_marker( $data, Pii::contact_fields() );
 
 		// If we do this first, then it makes dealing with other stuff much easier because sanitize columns will remove unknown table columns
 		$this->handle_consents_in_data( $data );
@@ -1533,6 +1540,11 @@ class Contact extends Base_Object_With_Meta {
 
 		if ( is_string( $key ) ) {
 
+			// what a redacted screen handed back is not the contact's data
+			if ( Pii::is_marker( $value ) && Pii::is_pii_meta_key( $key ) ) {
+				return true;
+			}
+
 			if ( $this->handle_special_meta_keys( $key, $value ) ) {
 				return true;
 			}
@@ -1564,6 +1576,11 @@ class Contact extends Base_Object_With_Meta {
 	public function update_meta( $key, $value = false ) {
 
 		if ( is_string( $key ) ) {
+
+			// what a redacted screen handed back is not the contact's data
+			if ( Pii::is_marker( $value ) && Pii::is_pii_meta_key( $key ) ) {
+				return true;
+			}
 
 			if ( $this->handle_special_meta_keys( $key, $value ) ) {
 				return true;

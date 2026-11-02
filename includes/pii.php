@@ -427,6 +427,38 @@ class Pii {
 	}
 
 	/**
+	 * Whether a value is the redacted marker, which a screen that shows redacted data can hand back when it's saved
+	 *
+	 * @param mixed $value
+	 *
+	 * @return bool
+	 */
+	public static function is_marker( $value ): bool {
+		return is_string( $value ) && trim( $value ) === self::REDACTED;
+	}
+
+	/**
+	 * Drop the given fields of an array that are the redacted marker. What was never shown is not a value to store: a
+	 * form or a client that hands back what it was given must not overwrite the real thing with the marker. This is for
+	 * everyone, not only restricted users, nothing should be stored as the marker.
+	 *
+	 * @param array    $data
+	 * @param string[] $fields
+	 *
+	 * @return array
+	 */
+	public static function without_marker( array $data, array $fields ): array {
+
+		foreach ( $fields as $field ) {
+			if ( array_key_exists( $field, $data ) && self::is_marker( $data[ $field ] ) ) {
+				unset( $data[ $field ] );
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Replace the given fields of a flat array with the redacted marker, leaving fields that aren't there alone
 	 *
 	 * @param array    $data

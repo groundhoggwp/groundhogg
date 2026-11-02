@@ -4,6 +4,7 @@ use Groundhogg\Admin\Contacts\Contacts_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Api\V4\Contacts_Api;
+use Groundhogg\Contact;
 use Groundhogg\Pii;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
@@ -421,5 +422,124 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		$this->admin( true );
 
 		$this->assertStringContainsString( 'contact-quick-search', $this->render( 'parts/quick-search.php' ) );
+	}
+
+	protected function page(): Contacts_Page {
+		// the constructor sets up the page and redirects
+		return ( new ReflectionClass( Contacts_Page::class ) )->newInstanceWithoutConstructor();
+	}
+
+	/**
+	 * What the record form posts for a user who can't view PII: nothing for the fields that are shown disabled
+	 */
+	public function test_saving_the_record_as_a_restricted_user_leaves_the_pii_alone() {
+		$this->admin( false );
+
+		$_POST = $_REQUEST = [
+			'contact'      => $this->contact_id,
+			'owner_id'     => get_current_user_id(),
+			'optin_status' => 2,
+			'lead_source'  => 'A friend',
+		];
+
+		$this->assertTrue( $this->page()->process_edit() );
+
+		$contact = new Contact( $this->contact_id );
+
+		$this->assertSame( self::EMAIL, $contact->get_email() );
+		$this->assertSame( 'Jane', $contact->get_first_name() );
+		$this->assertSame( 'Doe', $contact->get_last_name() );
+		$this->assertSame( '555-0100', $contact->get_meta( 'primary_phone' ) );
+		$this->assertSame( '1 Main Street', $contact->get_meta( 'street_address_1' ) );
+		$this->assertSame( '203.0.113.9', $contact->get_meta( 'ip_address' ) );
+		$this->assertSame( '1990-04-12', $contact->get_meta( 'birthday' ) );
+		// what isn't PII is saved
+		$this->assertSame( 'A friend', $contact->get_meta( 'lead_source' ) );
+		$this->assertSame( get_current_user_id(), $contact->get_owner_id() );
+	}
+
+	public function test_saving_the_record_as_a_restricted_user_ignores_pii_that_is_posted() {
+		$this->admin( false );
+
+		$_POST = $_REQUEST = [
+			'contact'       => $this->contact_id,
+			'email'         => 'someone.else@example.com',
+			'first_name'    => 'Other',
+			'primary_phone' => '555-0000',
+			'birthday'      => [ 'year' => 2000, 'month' => 1, 'day' => 1 ],
+		];
+
+		$this->page()->process_edit();
+
+		$contact = new Contact( $this->contact_id );
+
+		$this->assertSame( self::EMAIL, $contact->get_email() );
+		$this->assertSame( 'Jane', $contact->get_first_name() );
+		$this->assertSame( '555-0100', $contact->get_meta( 'primary_phone' ) );
+		$this->assertSame( '1990-04-12', $contact->get_meta( 'birthday' ) );
+	}
+
+	public function test_saving_the_record_as_an_unrestricted_user_still_edits_the_pii() {
+		$this->admin( true );
+
+		$_POST = $_REQUEST = [
+			'contact'       => $this->contact_id,
+			'email'         => 'someone.else@example.com',
+			'first_name'    => 'Other',
+			'last_name'     => 'Person',
+			'primary_phone' => '555-0000',
+		];
+
+		$this->page()->process_edit();
+
+		$contact = new Contact( $this->contact_id );
+
+		$this->assertSame( 'someone.else@example.com', $contact->get_email() );
+		$this->assertSame( 'Other', $contact->get_first_name() );
+		$this->assertSame( '555-0000', $contact->get_meta( 'primary_phone' ) );
+	}
+
+	public function test_the_redacted_marker_is_never_stored_as_a_contacts_pii() {
+
+		$contact = new Contact( $this->contact_id );
+
+		$this->assertTrue( $contact->update( [
+			'email'      => Pii::REDACTED,
+			'first_name' => Pii::REDACTED,
+			'last_name'  => ' ' . Pii::REDACTED . ' ',
+		] ) );
+		$contact->update_meta( 'primary_phone', Pii::REDACTED );
+		$contact->update_meta( [ 'street_address_1' => Pii::REDACTED, 'birthday' => Pii::REDACTED ] );
+		$contact->add_meta( 'city', Pii::REDACTED );
+
+		$contact = new Contact( $this->contact_id );
+
+		$this->assertSame( self::EMAIL, $contact->get_email() );
+		$this->assertSame( 'Jane', $contact->get_first_name() );
+		$this->assertSame( 'Doe', $contact->get_last_name() );
+		$this->assertSame( '555-0100', $contact->get_meta( 'primary_phone' ) );
+		$this->assertSame( '1 Main Street', $contact->get_meta( 'street_address_1' ) );
+		$this->assertSame( '1990-04-12', $contact->get_meta( 'birthday' ) );
+		$this->assertSame( 'Springfield', $contact->get_meta( 'city' ) );
+
+		// what isn't PII is whatever it's set to
+		$contact->update_meta( 'company_name', 'Acme 2' );
+		$this->assertSame( 'Acme 2', ( new Contact( $this->contact_id ) )->get_meta( 'company_name' ) );
+	}
+
+	public function test_a_restricted_user_adding_a_contact_is_not_told_an_address_is_taken() {
+		$this->admin( false );
+
+		$_POST = $_REQUEST = [ 'email' => self::EMAIL ];
+
+		$result = $this->page()->process_add();
+
+		$this->assertWPError( $result );
+		$this->assertStringNotContainsString( 'already', $result->get_error_message() );
+		$this->assertStringNotContainsString( self::EMAIL, $result->get_error_message() );
+
+		$this->admin( true );
+
+		$this->assertStringContainsString( 'already', $this->page()->process_add()->get_error_message() );
 	}
 }

@@ -295,7 +295,12 @@
       return ContactsStore.get(contact.ID)
     }
 
+    // what a user who can't view contact PII is given in its place, it isn't a value to edit
+    const isRedacted = (value) => value === '[redacted]'
+
     const quickEdit = (contact) => {
+
+      const redactedName = isRedacted(contact.data.first_name) || isRedacted(contact.data.last_name)
 
       // language=HTML
       return `
@@ -304,7 +309,7 @@
                   <div class="align-left-space-between">
                       <img class="border-radius-5" height="40" width="40" src="${ contact.data.gravatar }" alt="avatar"/>
                       <h3 class="contact-name">
-                          ${ specialChars(`${ contact.data.first_name } ${ contact.data.last_name }`) }</h3>
+                          ${ specialChars(redactedName ? ( contact.i18n?.displayAs ?? '' ) : `${ contact.data.first_name } ${ contact.data.last_name }`) }</h3>
                   </div>
                   <div class="actions align-right-space-between">
                       <a class="gh-button secondary"
@@ -321,6 +326,7 @@
                               id   : `${ prefix }-first-name`,
                               name : 'first_name',
                               value: contact.data.first_name,
+                              disabled: isRedacted(contact.data.first_name),
                           }) }
                       </div>
                       <div class="gh-col">
@@ -329,6 +335,7 @@
                               id   : `${ prefix }-last-name`,
                               name : 'last_name',
                               value: contact.data.last_name,
+                              disabled: isRedacted(contact.data.last_name),
                           }) }
                       </div>
                   </div>
@@ -340,6 +347,7 @@
                               name : 'email',
                               id   : `${ prefix }-email`,
                               value: contact.data.email,
+                              disabled: isRedacted(contact.data.email),
                           }) }
                       </div>
                       <div class="gh-col">
@@ -351,6 +359,7 @@
                                       id   : `${ prefix }-primary-phone`,
                                       name : 'primary_phone',
                                       value: contact.meta.primary_phone,
+                                      disabled: isRedacted(contact.meta.primary_phone),
                                   }) }
                               </div>
                               <div class="primary-phone-ext">
@@ -362,6 +371,7 @@
                                       id   : `${ prefix }-primary-phone-extension`,
                                       name : 'primary_phone_extension',
                                       value: contact.meta.primary_phone_extension,
+                                      disabled: isRedacted(contact.meta.primary_phone_extension),
                                   }) }
                               </div>
                           </div>
@@ -382,6 +392,7 @@
                               id   : `${ prefix }-mobile-phone`,
                               name : 'mobile_phone',
                               value: contact.meta.mobile_phone,
+                              disabled: isRedacted(contact.meta.mobile_phone),
                           }) }
                       </div>
                   </div>
