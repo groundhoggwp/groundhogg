@@ -5,6 +5,7 @@ namespace Groundhogg\Admin\Funnels;
 use Groundhogg\Contact;
 use Groundhogg\Event;
 use Groundhogg\Event_Queue_Item;
+use Groundhogg\Pii;
 use Groundhogg\Step;
 use Groundhogg\Steps\Actions\Send_Email;
 use Groundhogg\Utils\DateTimeHelper;
@@ -27,6 +28,13 @@ class Simulator {
 	protected static $options = [];
 	protected static $steps = [];
 	protected static $is_dry_run = true;
+
+	/**
+	 * The contact being simulated, so a restricted user's trace can be scrubbed of their details
+	 *
+	 * @var Contact|null
+	 */
+	protected static $contact = null;
 
 	/**
 	 * @var Event
@@ -127,6 +135,11 @@ class Simulator {
 			return;
 		}
 
+		// what a step says it did can have the contact's details in it, a note or a task that was merged for them
+		if ( is_string( $item ) && Pii::is_restricted() ) {
+			$item = Pii::scrub_text( $item, self::$contact );
+		}
+
 		self::$flow[] = $item;
 
 		if ( doing_cli() ) {
@@ -222,6 +235,7 @@ class Simulator {
 		self::$flow       = [];
 		self::$options    = [];
 		self::$event_args = $event_args;
+		self::$contact    = $contact;
 
 		if ( ! $step->exists() ) {
 

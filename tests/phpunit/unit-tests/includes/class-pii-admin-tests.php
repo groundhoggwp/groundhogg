@@ -5,6 +5,7 @@ use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Admin\Events\Email_Log_Table;
 use Groundhogg\Admin\Events\Events_Table;
+use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Api\V4\Contacts_Api;
 use Groundhogg\Contact;
 use Groundhogg\Event;
@@ -710,5 +711,49 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		get_userdata( get_current_user_id() )->add_cap( 'export_contacts', true );
 		$this->assertNotContains( '__export', $offered() );
 		$this->assertContains( '__bulk_edit', $offered() );
+	}
+
+	/**
+	 * The lines a simulation logs for the contact, as the current user sees them
+	 */
+	protected function simulator_trace( string $line ): array {
+
+		$simulator = new ReflectionClass( Simulator::class );
+		$set       = function ( string $name, $value ) use ( $simulator ) {
+			$prop = $simulator->getProperty( $name );
+			$prop->setAccessible( true );
+			$prop->setValue( null, $value );
+
+			return $prop;
+		};
+
+		$set( 'is_simulating', true );
+		$set( 'contact', get_contactdata( $this->contact_id ) );
+		$flow = $set( 'flow', [] );
+
+		Simulator::log( $line );
+		Simulator::log( 42 );
+
+		$trace = $flow->getValue();
+
+		$set( 'is_simulating', false );
+
+		return $trace;
+	}
+
+	public function test_the_simulator_trace_is_scrubbed_for_a_restricted_user() {
+
+		$line = 'Added a note for Jane Doe <' . self::EMAIL . '>';
+
+		$this->admin( true );
+		$this->assertSame( [ $line, 42 ], $this->simulator_trace( $line ) );
+
+		$this->admin( false );
+		$trace = $this->simulator_trace( $line );
+
+		$this->assertNoPii( $trace[0] );
+		$this->assertStringContainsString( '[redacted]', $trace[0] );
+		// step IDs are not text
+		$this->assertSame( 42, $trace[1] );
 	}
 }
