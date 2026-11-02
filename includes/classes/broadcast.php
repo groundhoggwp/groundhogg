@@ -624,6 +624,9 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		$time_elapsed = $timer->time_elapsed();
 
 		$this->update_meta( 'num_scheduled', $num_scheduled );
+		// num_scheduled counts every contact the query returned, including those skipped above
+		// for being undeliverable or not marketable. num_queued is what actually got an event.
+		$this->update_meta( 'num_queued', $this->get_num_queued() + count( $inserts ) );
 		$this->update_meta( 'batch_time_elapsed', number_format( $time_elapsed, 2 ) );
 		$this->update_meta( 'batch_delay', $batch_delay );
 		$this->update_meta( 'last_id', $last_id );
@@ -1002,6 +1005,16 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 	const BATCH_LIMIT = 500;
 
 	/**
+	 * The number of send events that have actually been queued so far. Can be lower than the number of
+	 * contacts the query matches, because contacts that can't be delivered to are skipped.
+	 *
+	 * @return int
+	 */
+	public function get_num_queued() {
+		return absint( $this->get_meta( 'num_queued' ) );
+	}
+
+	/**
 	 * Get the number of items remaining that require scheduling
 	 *
 	 * @return array|false|mixed
@@ -1080,6 +1093,7 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			case 'use_optimized_send_time':
 				return (bool) $value;
 			case 'num_scheduled':
+			case 'num_queued':
 			case 'total_contacts':
 			case 'batch_interval_length':
 			case 'batch_amount':

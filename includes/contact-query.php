@@ -2420,6 +2420,9 @@ class Contact_Query extends Table_Query {
 	/**
 	 * Exclude contacts that have the given tags
 	 *
+	 * By default a contact with ANY of the tags is excluded. With $all, only a contact with EVERY one
+	 * of the tags is excluded, so a contact that is missing at least one of them stays in.
+	 *
 	 * @param Where $where
 	 * @param int[] $tags
 	 * @param bool  $all
@@ -2434,35 +2437,28 @@ class Contact_Query extends Table_Query {
 
 		$tags = wp_parse_id_list( $tags );
 
-		if ( count( $tags ) === 1 ) {
+		if ( $all && count( $tags ) > 1 ) {
 
-			$tagQuery = new Table_Query( 'tag_relationships' );
-			$tagQuery->setSelect( 'contact_id' )->where->equals( 'tag_id', $tags[0] );
+			// Not holding a given tag is an OR, because lacking even one of them keeps the contact in
+			// (NOT (a AND b) is NOT a OR NOT b)
+			$subWhere = $where->subWhere( 'OR' );
 
-			$where->notIn( 'ID', $tagQuery );
+			foreach ( $tags as $tag ) {
 
-			return;
-		}
+				$tagQuery = new Table_Query( 'tag_relationships' );
+				$tagQuery->setSelect( 'contact_id' )->where->equals( 'tag_id', $tag );
 
-		if ( $all ) {
-
-			$tagQuery = new Table_Query( 'tag_relationships' );
-			$tagQuery->setSelect( 'contact_id' )->where->in( 'tag_id', $tags );
-
-			$where->notIn( 'ID', $tagQuery );
+				$subWhere->notIn( 'ID', $tagQuery );
+			}
 
 			return;
 		}
 
-		$subWhere = $where->subWhere();
+		// A single sub query of every tag excludes a contact with any one of them
+		$tagQuery = new Table_Query( 'tag_relationships' );
+		$tagQuery->setSelect( 'contact_id' )->where->in( 'tag_id', $tags );
 
-		foreach ( $tags as $tag ) {
-
-			$tagQuery = new Table_Query( 'tag_relationships' );
-			$tagQuery->setSelect( 'contact_id' )->where->in( 'tag_id', $tag );
-
-			$subWhere->notIn( 'ID', $tagQuery );
-		}
+		$where->notIn( 'ID', $tagQuery );
 	}
 
 	/**

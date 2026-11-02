@@ -161,7 +161,7 @@ class Send_Email_Broadcast extends Ability {
 					],
 					'estimated_recipients' => [
 						'type'        => 'integer',
-						'description' => __( 'Contacts matching the audience at schedule time. Actual sends may be lower once per-contact deliverability is checked.', 'groundhogg' ),
+						'description' => __( 'How many contacts the broadcast is going to. When scheduling_complete is true this is exactly the number of send events queued, with contacts who can\'t be delivered to already left out. Otherwise (a dynamic segment, which is evaluated just before sending, or a large audience still being enqueued) it is the number of contacts matching the audience right now.', 'groundhogg' ),
 					],
 					'scheduling_complete' => [
 						'type'        => 'boolean',
@@ -198,25 +198,21 @@ class Send_Email_Broadcast extends Ability {
 			);
 		}
 
-		// Filters, not to_contact_query()'s live query object - this gets stored
+		// to_query(), not to_contact_query()'s live query object - this gets stored
 		// (Broadcast::schedule()'s 'query' arg below) and, for a "dynamic"
 		// segment_type, re-run later against whatever then matches; a live query
 		// object (and anything attached to it) can't survive that round trip.
-		// Same translation create-flow uses for logic steps. The filters are
-		// stored under Contact_Query's `filters` query var.
-		$filters = Segment_Schema::to_filters( $input );
+		// It is the very same translation groundhogg/search-contacts runs
+		// (to_contact_query() is to_query() plus a Contact_Query), so every segment
+		// param narrows the audience identically in both - exclude_segment becomes
+		// the `exclude_filters` query var, tags_exclude and the other native params
+		// stay native, and `search` carries through. NOT to_filters(), which is the
+		// translation for branch/logic conditions and leaves exclude_segment and
+		// `search` out.
+		$query = Segment_Schema::to_query( $input );
 
-		if ( is_wp_error( $filters ) ) {
-			return $filters;
-		}
-
-		$query = empty( $filters ) ? [] : [ 'filters' => $filters ];
-
-		// `search` has no Filters equivalent (to_filters() drops it), but it counts
-		// as an audience above - carry it as a plain query var so it still narrows
-		// rather than silently widening to everyone.
-		if ( ! empty( $input['search'] ) ) {
-			$query['search'] = sanitize_text_field( $input['search'] );
+		if ( is_wp_error( $query ) ) {
+			return $query;
 		}
 
 		$args = [
@@ -279,7 +275,12 @@ class Send_Email_Broadcast extends Ability {
 				'interval'        => $args['batch_interval'],
 				'interval_length' => $args['batch_interval_length'],
 			] : null,
-			'estimated_recipients' => absint( $broadcast->get_meta( 'total_contacts' ) ),
+			// Once every event is enqueued this is the number actually queued, so it can't
+			// disagree with the events. Until then (a dynamic segment, or a list too big to
+			// finish synchronously) it's the count of contacts the stored query matches.
+			'estimated_recipients' => $broadcast->is_scheduled()
+				? $broadcast->get_num_queued()
+				: absint( $broadcast->get_meta( 'total_contacts' ) ),
 			'scheduling_complete'  => $broadcast->is_scheduled(),
 		];
 	}
