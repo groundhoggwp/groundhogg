@@ -6,6 +6,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Contact;
 use Groundhogg\DB\Query\Filters;
+use Groundhogg\Pii;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Properties;
@@ -27,7 +28,6 @@ use function Groundhogg\get_request_var;
 use function Groundhogg\get_sanitized_FILE;
 use function Groundhogg\get_unsub_reasons;
 use function Groundhogg\get_url_var;
-use function Groundhogg\guess_name_from_email;
 use function Groundhogg\set_request_var;
 use function Groundhogg\utils;
 use function Groundhogg\verify_admin_ajax_nonce;
@@ -269,8 +269,7 @@ class Contacts_Page extends Admin_Page {
 				$contact    = get_contactdata( absint( $contact_id ) );
 
 				if ( $contact ) {
-					$prefix      = $contact->get_first_name() ? $contact->get_full_name() : guess_name_from_email( $contact->get_email() );
-					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", esc_html( $prefix ), esc_html__( 'Edit' , 'groundhogg' ), $admin_title );
+					$admin_title = sprintf( "%s &lsaquo; %s &lsaquo; %s", esc_html( Pii::contact_name( $contact ) ), esc_html__( 'Edit' , 'groundhogg' ), $admin_title );
 				}
 
 				break;
@@ -297,7 +296,7 @@ class Contacts_Page extends Admin_Page {
 				$contact  = get_contactdata( array_shift( $contacts ) ); //todo check
 				if ( $contact ) {
 					/* translators: 1: contact's full name */
-					return sprintf( _x( 'Editing %s', 'page_title', 'groundhogg' ), $contact->get_full_name() ?: guess_name_from_email( $contact->get_email() ) );
+					return sprintf( _x( 'Editing %s', 'page_title', 'groundhogg' ), Pii::contact_name( $contact ) );
 				} else {
 					return _x( 'Oops!', 'page_title', 'groundhogg' );
 				}
@@ -309,7 +308,7 @@ class Contacts_Page extends Admin_Page {
 					$contact  = get_contactdata( array_shift( $contacts ) ); // todo check
 
                     /* translators: %s: contact's full name */
-					return sprintf( _x( 'Submit Form For %s', 'page_title', 'groundhogg' ), $contact->get_full_name() ?: guess_name_from_email( $contact->get_email() ) );
+					return sprintf( _x( 'Submit Form For %s', 'page_title', 'groundhogg' ), Pii::contact_name( $contact ) );
 				} else {
 					return _x( 'Submit Form', 'page_title', 'groundhogg' );
 				}

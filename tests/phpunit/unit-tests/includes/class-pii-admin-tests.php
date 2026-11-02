@@ -1,10 +1,13 @@
 <?php
 
+use Groundhogg\Admin\Contacts\Contacts_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
 use Groundhogg\Admin\Contacts\Tables\Contacts_Table;
 use Groundhogg\Api\V4\Contacts_Api;
 use Groundhogg\Pii;
 use function Groundhogg\get_contactdata;
+use function Groundhogg\get_db;
+use function Groundhogg\track_page_visit;
 
 /**
  * What a user without the view_contact_pii capability sees in the admin screens that are rendered on the server
@@ -239,5 +242,184 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		$this->assertNotContains( 'first_name', $restricted );
 		$this->assertNotContains( 'birthday', $restricted );
 		$this->assertContains( 'date_created', $restricted );
+	}
+
+	/**
+	 * A part of the contact record page, as it's rendered with the contact in scope
+	 *
+	 * @param string $file relative to the admin/contacts directory
+	 *
+	 * @return string
+	 */
+	protected function render( string $file ): string {
+
+		$contact = get_contactdata( $this->contact_id );
+
+		ob_start();
+		include GROUNDHOGG_PATH . 'admin/contacts/' . $file;
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * The "Contact Information", "Location" and "Source" sections of the record
+	 */
+	protected function render_editor(): string {
+
+		$contact = get_contactdata( $this->contact_id );
+		$fn      = '\Groundhogg\Admin\Contacts\contact_record_general_info';
+
+		// the editor declares the function when it is included, which can only be done once
+		if ( ! function_exists( $fn ) ) {
+			$_GET['contact'] = $this->contact_id;
+
+			ob_start();
+			include GROUNDHOGG_PATH . 'admin/contacts/parts/contact-editor.php';
+			ob_end_clean();
+		}
+
+		ob_start();
+		$fn( $contact );
+
+		return ob_get_clean();
+	}
+
+	public function test_an_unrestricted_user_sees_the_details_card() {
+		$this->admin( true );
+
+		$html = $this->render( 'parts/details-card.php' );
+
+		$this->assertStringContainsString( self::EMAIL, $html );
+		$this->assertStringContainsString( 'Jane Doe', $html );
+		$this->assertStringContainsString( '555-0100', $html );
+		$this->assertStringContainsString( 'Springfield', $html );
+	}
+
+	public function test_a_restricted_users_details_card_has_no_pii_in_it() {
+		$this->admin( false );
+
+		$html = $this->render( 'parts/details-card.php' );
+
+		$this->assertNoPii( $html );
+		$this->assertStringContainsString( Pii::contact_label( $this->contact_id ), $html );
+		$this->assertStringContainsString( Pii::REDACTED, $html );
+		// where, not who
+		$this->assertStringContainsString( 'United States', $html );
+		$this->assertStringNotContainsString( 'mailto:', $html );
+		$this->assertStringNotContainsString( 'google.com/maps', $html );
+		$this->assertStringNotContainsString( 'example.com', $html );
+	}
+
+	public function test_a_restricted_users_editor_has_no_pii_in_it_and_cant_post_it_back() {
+		$this->admin( false );
+
+		$html = $this->render_editor();
+
+		$this->assertNoPii( $html );
+		$this->assertStringContainsString( Pii::REDACTED, $html );
+
+		// nothing that is redacted is submitted with the form
+		foreach ( [ 'first_name', 'last_name', 'email', 'primary_phone', 'mobile_phone', 'street_address_1', 'city', 'postal_zip', 'ip_address' ] as $name ) {
+			$this->assertMatchesRegularExpression( '/<input[^>]*name=[\'"]' . $name . '[\'"][^>]*\sdisabled/', $html, $name );
+		}
+
+		$this->assertStringNotContainsString( 'birthday[year]', $html );
+	}
+
+	public function test_an_unrestricted_users_editor_is_editable() {
+		$this->admin( true );
+
+		$html = $this->render_editor();
+
+		$this->assertStringContainsString( self::EMAIL, $html );
+		$this->assertStringContainsString( 'birthday[year]', $html );
+		$this->assertDoesNotMatchRegularExpression( '/<input[^>]*name=[\'"]email[\'"][^>]*\sdisabled/', $html );
+	}
+
+	public function test_a_restricted_users_page_titles_have_no_name_in_them() {
+		$this->admin( false );
+
+		$this->assertSame( Pii::contact_label( $this->contact_id ), Pii::contact_name( get_contactdata( $this->contact_id ) ) );
+
+		$_GET['page']    = 'gh_contacts';
+		$_GET['action']  = 'edit';
+		$_GET['contact'] = $this->contact_id;
+		$_REQUEST        = $_GET;
+
+		// the constructor sets up the page and redirects, the titles only need the request
+		$page = ( new ReflectionClass( Contacts_Page::class ) )->newInstanceWithoutConstructor();
+
+		$this->assertNoPii( $page->get_title() );
+		$this->assertStringContainsString( Pii::contact_label( $this->contact_id ), $page->get_title() );
+		$this->assertNoPii( $page->admin_title( 'Contacts', 'Contacts' ) );
+	}
+
+	public function test_an_unrestricted_users_title_is_the_name() {
+		$this->admin( true );
+
+		$this->assertSame( 'Jane Doe', Pii::contact_name( get_contactdata( $this->contact_id ) ) );
+	}
+
+	public function test_a_restricted_users_page_visits_have_no_query_string() {
+		$this->admin( false );
+
+		track_page_visit( home_url( '/pricing/?lead=jane.doe@example.com#Jane' ), get_contactdata( $this->contact_id ) );
+
+		$html = $this->render( 'cards/page-visits.php' );
+
+		$this->assertStringContainsString( '/pricing/', $html );
+		$this->assertNoPii( $html );
+		// nothing after the path, not even where it's the card's own doing to leave it out
+		$this->assertStringNotContainsString( 'lead=', $html );
+		$this->assertStringNotContainsString( '?', $html );
+
+	}
+
+	public function test_a_restricted_users_user_card_has_no_pii_in_it() {
+
+		$user_id = self::factory()->user->create( [
+			'role'         => 'administrator',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane.user@example.com',
+			'display_name' => 'Jane Doe',
+		] );
+
+		// the user has a contact of their own, which gets the user, so this one takes it over
+		get_db( 'contacts' )->update( [ 'user_id' => $user_id ], [ 'user_id' => 0 ] );
+		get_contactdata( $this->contact_id )->update( [ 'user_id' => $user_id ] );
+
+		$this->admin( true );
+		$this->assertStringContainsString( 'janedoe', $this->render( 'cards/user.php' ) );
+
+		$this->admin( false );
+		$html = $this->render( 'cards/user.php' );
+
+		$this->assertStringNotContainsString( 'janedoe', $html );
+		$this->assertStringNotContainsString( 'jane.user', $html );
+		$this->assertStringNotContainsString( 'Jane Doe', $html );
+		$this->assertStringContainsString( Pii::REDACTED, $html );
+	}
+
+	public function test_a_restricted_user_cant_start_a_user_account_from_a_contacts_details() {
+		$this->admin( false );
+
+		$html = $this->render( 'cards/user.php' );
+
+		$this->assertStringNotContainsString( 'create-user-form', $html );
+		$this->assertNoPii( $html );
+
+		$this->admin( true );
+
+		$this->assertStringContainsString( self::EMAIL, $this->render( 'cards/user.php' ) );
+	}
+
+	public function test_a_restricted_user_isnt_offered_the_name_and_email_search() {
+		$this->admin( false );
+
+		$this->assertStringNotContainsString( 'contact-quick-search', $this->render( 'parts/quick-search.php' ) );
+
+		$this->admin( true );
+
+		$this->assertStringContainsString( 'contact-quick-search', $this->render( 'parts/quick-search.php' ) );
 	}
 }

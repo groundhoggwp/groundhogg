@@ -11,6 +11,7 @@
 
 use Groundhogg\Classes\Page_Visit;
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use function Groundhogg\collapse_string;
 use function Groundhogg\get_db;
 use function Groundhogg\html;
@@ -18,6 +19,8 @@ use function Groundhogg\html;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
+
+$restricted = Pii::is_restricted();
 
 $page_visits = get_db( 'page_visits' )->query( [
 	'contact_id' => $contact->get_id(),
@@ -63,13 +66,17 @@ $cur_date = $page_visit->get_date();
             <li><?php
 
                 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                // the query string and the fragment can carry anything, an address included
+                $page_url  = $restricted ? home_url( $page_visit->path ) : $page_visit->get_url();
+                $page_path = $restricted ? $page_visit->path : $page_visit->get_path();
+
                 echo html()->e( 'a', [
 		                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						'href'   => $page_visit->get_url(),
+						'href'   => $page_url,
 						'target' => '_blank',
 		                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						'title'  => $page_visit->get_path(),
-					], esc_html( collapse_string( $page_visit->get_path() ) ), false ) . ' (' . esc_html( $page_visit->get_date()->format( get_option( 'time_format' ) ) ) . ')' ?></li>
+						'title'  => $page_path,
+					], esc_html( collapse_string( $page_path ) ), false ) . ' (' . esc_html( $page_visit->get_date()->format( get_option( 'time_format' ) ) ) . ')' ?></li>
 			<?php
 
 			}

@@ -3,6 +3,7 @@ namespace Groundhogg\Admin\Contacts;
 
 use Exception;
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use function Groundhogg\dashicon_e;
@@ -76,6 +77,10 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 				 *
 				 */
 				function contact_record_general_info( $contact ) {
+
+					// PII is shown redacted, and can't be edited, by a user who can't view it
+					$restricted = Pii::is_restricted();
+
 					?>
                     <h2><?php esc_html_e( 'Contact Information', 'groundhogg' ); ?></h2>
                     <!-- GENERAL NAME INFO -->
@@ -89,7 +94,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'name'        => 'first_name',
 									'title'       => esc_html__( 'First Name', 'groundhogg' ),
 									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-									'value'       => $contact->get_first_name(),
+									'value'       => Pii::display( $contact->get_first_name() ),
+									'disabled'    => $restricted,
 									'class'       => 'auto-copy regular-text',
 									'placeholder' => esc_html__( 'First Name', 'groundhogg' )
 								] );
@@ -103,7 +109,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'name'        => 'last_name',
 									'title'       => esc_html__( 'Last Name', 'groundhogg' ),
 									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-									'value'       => $contact->get_last_name(),
+									'value'       => Pii::display( $contact->get_last_name() ),
+									'disabled'    => $restricted,
 									'class'       => 'auto-copy regular-text',
 									'placeholder' => esc_html__( 'Last Name', 'groundhogg' )
 								] );
@@ -119,7 +126,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'id'    => 'email',
 									'name'  => 'email',
 									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-									'value' => $contact->get_email(),
+									'value'    => Pii::display( $contact->get_email() ),
+									'disabled' => $restricted,
 								] ); ?>
                             </div>
                             <div class="gh-col">
@@ -150,14 +158,16 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
                                                     'class'       => 'input',
                                                     'id'          => 'primary_phone',
                                                     'name'        => 'primary_phone',
-                                                    'value'       => $contact->get_meta( 'primary_phone' ),
+                                                    'value'       => Pii::display( $contact->get_meta( 'primary_phone' ) ),
+                                                    'disabled'    => $restricted,
                                                     'placeholder' => esc_html_x( '+1 (555) 555-5555', 'phone number', 'groundhogg' )
 		                                        ] ),
 		                                        html()->input( [
                                                     'id'          => 'primary_phone_extension',
                                                     'name'        => 'primary_phone_extension',
                                                     'class'       => 'phone-ext',
-                                                    'value'       => $contact->get_meta( 'primary_phone_extension' ),
+                                                    'value'       => Pii::display( $contact->get_meta( 'primary_phone_extension' ) ),
+                                                    'disabled'    => $restricted,
                                                     'style'       => [
                                                         'width' => '60px'
                                                     ],
@@ -175,7 +185,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 									'class' => 'input',
 									'id'    => 'mobile_phone',
 									'name'  => 'mobile_phone',
-									'value' => $contact->get_meta( 'mobile_phone' ),
+									'value'    => Pii::display( $contact->get_meta( 'mobile_phone' ) ),
+									'disabled' => $restricted,
 								] ) ); ?>
                             </div>
                         </div>
@@ -266,6 +277,17 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 
 								}
 
+								if ( $restricted ) {
+									// the three dropdowns would each give a part of the date away
+									$inputs = [
+										html()->input( [
+											'name'     => 'birthday_redacted',
+											'value'    => Pii::display( $birthday ),
+											'disabled' => true,
+										] )
+									];
+								}
+
 								html( 'div', [
 									'class' => 'gh-input-group',
 								], $inputs );
@@ -291,7 +313,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								<?php html( html()->input( [
 									'id'    => 'street_address_1',
 									'name'  => 'street_address_1',
-									'value' => $contact->get_meta( 'street_address_1' ),
+									'value'    => Pii::display( $contact->get_meta( 'street_address_1' ) ),
+									'disabled' => $restricted,
 								] ) ); ?>
                             </div>
                             <div class="gh-col">
@@ -299,7 +322,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								<?php html( html()->input( [
 									'id'    => 'street_address_2',
 									'name'  => 'street_address_2',
-									'value' => $contact->get_meta( 'street_address_2' ),
+									'value'    => Pii::display( $contact->get_meta( 'street_address_2' ) ),
+									'disabled' => $restricted,
 								] ) ); ?>
                             </div>
                         </div>
@@ -309,7 +333,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								<?php html( html()->input( [
 									'id'    => 'city',
 									'name'  => 'city',
-									'value' => $contact->get_meta( 'city' ),
+									'value'    => Pii::display( $contact->get_meta( 'city' ) ),
+									'disabled' => $restricted,
 								] ) ); ?>
                             </div>
                             <div class="gh-col">
@@ -317,7 +342,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								<?php html( html()->input( [
 									'id'    => 'postal_zip',
 									'name'  => 'postal_zip',
-									'value' => $contact->get_meta( 'postal_zip' ),
+									'value'    => Pii::display( $contact->get_meta( 'postal_zip' ) ),
+									'disabled' => $restricted,
 								] ) ); ?>
                             </div>
                         </div>
@@ -348,7 +374,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
 								<?php html( html()->input( [
 									'id'    => 'ip_address',
 									'name'  => 'ip_address',
-									'value' => $contact->get_meta( 'ip_address' ),
+									'value'    => Pii::display( $contact->get_meta( 'ip_address' ) ),
+									'disabled' => $restricted,
 								] ) ); ?>
                             </div>
                             <div class="gh-col">

@@ -1,12 +1,12 @@
 <?php
 
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use Groundhogg\Plugin;
 use Groundhogg\Preferences;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\dashicon_e;
 use function Groundhogg\get_email_address_hostname;
-use function Groundhogg\guess_name_from_email;
 use function Groundhogg\html;
 use function Groundhogg\is_free_email_provider;
 
@@ -17,6 +17,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @var $contact Contact
  */
+
+// a user without the capability to view contact PII gets the card without who the contact is
+$restricted = Pii::is_restricted();
+
 ?>
 
 <div class="contact-details">
@@ -26,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
     <!-- FIRST -->
     <h1 id="contact-full-name">
-		<?php echo esc_html( trim( $contact->get_full_name() ) ?: guess_name_from_email( $contact->get_email() ) ); ?></span>
+		<?php echo esc_html( Pii::contact_name( $contact ) ); ?></span>
     </h1>
     <div class="gh-panel">
         <div id="contact-more-actions" class="display-flex gap-5" style="padding: 20px 20px 20px 0"></div>
@@ -35,10 +39,14 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div id="contact-email" class="email align-left-space-between">
 				<?php dashicon_e( 'email' ); ?>
                 <div>
-	                <?php html()->e( 'a', [
-						'id'   => 'send-email',
-						'href' => 'mailto:' . $contact->get_email(),
-	                ], esc_html( $contact->get_email() ), false, true ) ?>
+	                <?php if ( $restricted ): ?>
+                        <span id="send-email"><?php echo esc_html( Pii::REDACTED ); ?></span>
+	                <?php else:
+		                html()->e( 'a', [
+			                'id'   => 'send-email',
+			                'href' => 'mailto:' . $contact->get_email(),
+		                ], esc_html( $contact->get_email() ), false, true );
+	                endif; ?>
                     <span class="pill <?php echo $contact->is_marketable() ? 'green' : 'red'; ?>">
                     <?php echo esc_html( Preferences::get_preference_pretty_name( $contact->get_optin_status() ) ); ?>
                 </span>
@@ -49,7 +57,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php endif; ?>
                 </div>
             </div>
-			<?php if ( ! is_free_email_provider( $contact->get_email() ) ):
+			<?php // the domain of the address is part of the address
+			if ( ! $restricted && ! is_free_email_provider( $contact->get_email() ) ):
 				$hostname = get_email_address_hostname( $contact->get_email() );
 				$url = 'https://' . $hostname;
 				?>
@@ -64,7 +73,14 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </div>
                 </div>
 			<?php endif; ?>
-			<?php if ( $contact->get_phone_number() || $contact->get_mobile_number() ): ?>
+			<?php if ( $restricted && ( $contact->get_phone_number() || $contact->get_mobile_number() ) ): ?>
+                <div id="contact-phones" class="align-left-space-between">
+                    <div class="phone align-left-space-between">
+						<?php dashicon_e( 'phone' ); ?>
+                        <span><?php echo esc_html( Pii::REDACTED ); ?></span>
+                    </div>
+                </div>
+			<?php elseif ( ! $restricted && ( $contact->get_phone_number() || $contact->get_mobile_number() ) ): ?>
                 <div id="contact-phones" class="align-left-space-between">
 					<?php if ( $contact->get_phone_number() ): ?>
                         <div class="phone align-left-space-between">
@@ -87,15 +103,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php endif; ?>
                 </div>
 			<?php endif; ?>
-			<?php if ( count( $contact->get_address() ) > 0 ): ?>
+			<?php
+
+			// where, not who: the region and the country are all a restricted user is told
+			$address = $restricted ? $contact->get_address( [ 'street_address_1', 'street_address_2', 'city', 'postal_zip' ] ) : $contact->get_address();
+
+			if ( count( $address ) > 0 ): ?>
                 <div id="contact-location" class="location align-left-space-between"
                      title="<?php esc_attr_e( 'Location', 'groundhogg' ); ?>">
 					<?php dashicon_e( 'location' ); ?>
                     <div class="address">
-	                    <?php html( 'a', [
-							'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $contact->get_address() ),
-							'target' => '_blank'
-						], implode( ', ', $contact->get_address() ) ) ?>
+	                    <?php if ( $restricted ):
+		                    echo esc_html( implode( ', ', $address ) );
+	                    else:
+		                    html( 'a', [
+			                    'href'   => 'https://www.google.com/maps/place/' . implode( ',+', $address ),
+			                    'target' => '_blank'
+		                    ], implode( ', ', $address ) );
+	                    endif; ?>
                     </div>
                 </div>
 			<?php endif; ?>
@@ -127,7 +152,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			$birthday         = $contact->get_meta( 'birthday' );
 
-			if ( $birthday ):
+			if ( $birthday && ! $restricted ):
 
 				$age = $contact->get_age();
 				$age1         = $age + 1;

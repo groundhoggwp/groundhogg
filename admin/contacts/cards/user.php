@@ -11,6 +11,7 @@
  */
 
 use Groundhogg\Contact;
+use Groundhogg\Pii;
 use function Groundhogg\action_url;
 use function Groundhogg\andList;
 use function Groundhogg\contact_and_user_match;
@@ -33,15 +34,15 @@ if ( $contact->get_userdata() ):
         </tr>
         <tr>
             <th><?php esc_html_e( 'Username', 'groundhogg' ) ?></th>
-            <td><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ) ) ?>"><?php echo esc_html( $contact->get_userdata()->user_login ); ?></a></td>
+            <td><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $contact->get_user_id() ) ) ?>"><?php echo esc_html( Pii::display( $contact->get_userdata()->user_login ) ); ?></a></td>
         </tr>
         <tr>
             <th><?php esc_html_e( 'Email', 'groundhogg' ) ?></th>
-            <td><?php echo esc_html( $contact->user->user_email ); ?></td>
+            <td><?php echo esc_html( Pii::display( $contact->user->user_email ) ); ?></td>
         </tr>
         <tr>
             <th><?php esc_html_e( 'Display Name', 'groundhogg' ) ?></th>
-            <td><?php echo esc_html( $contact->user->display_name ); ?></td>
+            <td><?php echo esc_html( Pii::display( $contact->user->display_name ) ); ?></td>
         </tr>
         <tr>
             <th><?php esc_html_e( 'Roles', 'groundhogg' ) ?></th>
@@ -58,7 +59,8 @@ if ( $contact->get_userdata() ):
 <?php endif; ?>
 <?php else: ?>
     <p><?php esc_html_e( 'This contact does not have a WordPress user account.', 'groundhogg' ); ?></p>
-    <?php if ( current_user_can( 'create_users' ) ): ?>
+    <?php // the form would carry the contact's name and email address to the new user screen
+    if ( current_user_can( 'create_users' ) && ! Pii::is_restricted() ): ?>
     <form id="create-user-form" action="<?php echo esc_url( admin_url( 'user-new.php' ) ); ?>" method="post">
         <input type="hidden" name="createuser" value="1">
         <input type="hidden" name="first_name" value="<?php echo esc_attr( $contact->get_first_name() ); ?>">

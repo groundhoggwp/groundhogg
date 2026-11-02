@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Contacts;
 
+use Groundhogg\Pii;
 use Groundhogg\Saved_Searches;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -22,6 +23,8 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 <?php endif; ?>
 <div id="search-panel">
     <div class="filters"></div>
+    <?php // a search by name or email address is refused to a user who can't view them, so it isn't offered
+    if ( ! Pii::is_restricted() ): ?>
     <div class="contact-quick-search">
         <form method="get">
 			<?php
@@ -45,4 +48,5 @@ if ( $saved_search = get_url_var( 'saved_search' ) ) :
 			?>
         </form>
     </div>
+    <?php endif; ?>
 </div>

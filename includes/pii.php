@@ -390,6 +390,23 @@ class Pii {
 	}
 
 	/**
+	 * What to call a contact in a title or heading: their name, or the address they signed up with when there isn't one.
+	 * A restricted user gets contact_label().
+	 *
+	 * @param Contact $contact
+	 *
+	 * @return string
+	 */
+	public static function contact_name( Contact $contact ): string {
+
+		if ( self::is_restricted() ) {
+			return self::contact_label( $contact->get_id() );
+		}
+
+		return trim( $contact->get_full_name() ) ?: guess_name_from_email( $contact->get_email() );
+	}
+
+	/**
 	 * What a restricted user sees in place of a contact's picture, which is a hash of their email address
 	 *
 	 * @return string
