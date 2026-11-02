@@ -489,7 +489,7 @@
 
         return data.items.map(item => ( {
           id  : item.ID,
-          text: `${ item.data.first_name } ${ item.data.last_name } (${ item.data.email })`,
+          text: item.data.email === '[redacted]' ? contactLabel(item) : `${ item.data.first_name } ${ item.data.last_name } (${ item.data.email })`,
         } ))
       },
       (query) => {
@@ -861,6 +861,23 @@
 
   const jsonCopy = stuff => JSON.parse(JSON.stringify(stuff))
 
+  /**
+   * What to call a contact in a picker, a filter or a heading. A user who can't view contact PII is given
+   * "[redacted]" for every detail, so fall back on the label the server made for them ("Contact #12").
+   *
+   * @param contact
+   * @returns {string}
+   */
+  const contactLabel = contact => {
+    const { first_name = '', last_name = '', email = '' } = contact.data ?? {}
+
+    if (email === '[redacted]' || first_name === '[redacted]' || last_name === '[redacted]') {
+      return contact.i18n?.displayAs || `#${ contact.ID }`
+    }
+
+    return `${ first_name } ${ last_name }`.trim() || email
+  }
+
   function setNestedValue (obj, path, value) {
     const keys = path.split('.')
     let current = obj
@@ -954,6 +971,7 @@
   gh.functions.base64_json_encode = base64_json_encode
   gh.functions.assoc2array = assoc2array
   gh.functions.jsonCopy = jsonCopy
+  gh.functions.contactLabel = contactLabel
   gh.functions.setNestedValue = setNestedValue
   gh.functions.getNestedValue = getNestedValue
   gh.functions.debounce = debounce

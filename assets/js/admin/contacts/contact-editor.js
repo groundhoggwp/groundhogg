@@ -7,6 +7,7 @@
   } = editor
 
   const { gh_contact_custom_properties } = Groundhogg.filters
+  const { contactLabel } = Groundhogg.functions
 
   const {
     tooltip,
@@ -246,7 +247,7 @@
           className: 'display-flex gap-10 column',
         }, [
           /* translators: %s: the name of a contact */
-          `<h3 style="margin: 0">${ sprintf(__('Add %s to a flow', 'groundhogg'), getContact().data.full_name) }</h3>`,
+          `<h3 style="margin: 0">${ sprintf(__('Add %s to a flow', 'groundhogg'), contactLabel(getContact())) }</h3>`,
           MakeEl.ItemPicker({
             id          : `select-a-funnel`,
             noneSelected: __('Select a flow...', 'groundhogg'),
@@ -328,7 +329,7 @@
                   message: sprintf(
                     /* translators: %s: the name of a contact */
                     __('%s added to flow!', 'groundhogg'),
-                    getContact().data.full_name),
+                    contactLabel(getContact())),
                 })
 
                 activityUpdated()
@@ -427,8 +428,8 @@
                       ${ sprintf(
                               /* translators: 1: the name of a contact, 2: the name of another contact */
                               __('Are you sure you want to merge %1$s with %2$s? This action cannot be undone.', 'groundhogg'),
-                              bold(_contact.data.full_name),
-                              bold(getContact().data.full_name)) }</p>
+                              bold(contactLabel(_contact)),
+                              bold(contactLabel(getContact()))) }</p>
                   <p>
                       <a href="https://groundhogg.io/doc/merging-contacts/"
                          target="_blank">${ __(
@@ -456,13 +457,13 @@
               alert      : `<p>${ sprintf(
                 /* translators: %s: the name of an asset (contacts, flows, emails, etc...) */
                 __('Are you sure you want to delete %s?', 'groundhogg'),
-                bold(getContact().data.full_name)) }</p>`,
+                bold(contactLabel(getContact()))) }</p>`,
               onConfirm  : () => {
                 ContactsStore.delete(contact.ID).then(() => {
                   dialog({
                     /* translators: %s: the name of an asset (contacts, flows, emails, etc...) */
                     message: sprintf(__('%s was deleted!', 'groundhogg'),
-                      contact.data.full_name),
+                      contactLabel(contact)),
                   })
                   window.open(adminPageURL('gh_contacts'), '_self')
                 })

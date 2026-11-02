@@ -17,6 +17,7 @@
     broadcasts: BroadcastsStore,
     contacts  : ContactsStore,
   } = Groundhogg.stores
+  const { contactLabel } = Groundhogg.functions
   const {
     sprintf,
     __,
@@ -211,7 +212,7 @@
         return 'Any contact'
       }
 
-      return sprintf('Contact is %s', orList(contacts.map(id => bold(ContactsStore.get(id).data.email))))
+      return sprintf('Contact is %s', orList(contacts.map(id => bold(contactLabel(ContactsStore.get(id))))))
     },
     edit   : ({
       contacts = [],
@@ -222,7 +223,7 @@
         noneSelected: __('Select a contact...', 'groundhogg'),
         selected    : contacts.map(id => ( {
           id,
-          text: ContactsStore.get(id).data.email,
+          text: contactLabel(ContactsStore.get(id)),
         } )),
         multiple    : true,
         style       : {

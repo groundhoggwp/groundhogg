@@ -83,6 +83,7 @@
     maybeCall,
     debounce,
     jsonCopy,
+    contactLabel,
   } = Groundhogg.functions
 
   const selectContactModal = ({
@@ -1522,13 +1523,13 @@
       let contact = contactId
       contactIds = [contact.ID]
       /* translators: %s: the name of a contact */
-      title = sprintf(__('Select an email to send to %s', 'groundhogg'), contact.data.full_name.trim() || contact.data.email)
+      title = sprintf(__('Select an email to send to %s', 'groundhogg'), contactLabel(contact))
     }
     else { // contact ID provided
       let contact = await Groundhogg.stores.contacts.maybeFetchItem(contactId)
       contactIds = [contact.ID]
       /* translators: %s: the name of a contact */
-      title = sprintf(__('Select an email to send to %s', 'groundhogg'), contact.data.full_name.trim() || contact.data.email)
+      title = sprintf(__('Select an email to send to %s', 'groundhogg'), contactLabel(contact))
     }
 
     const State = Groundhogg.createState({
