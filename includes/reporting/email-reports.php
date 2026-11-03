@@ -2,9 +2,9 @@
 
 namespace Groundhogg\Reporting;
 
-use Groundhogg\Classes\Task;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Event;
+use Groundhogg\Notifications\Subscriptions;
 use Groundhogg\Reports;
 use Groundhogg\Templates\Notifications\Notification_Builder;
 use Groundhogg\Utils\DateTimeHelper;
@@ -41,24 +41,52 @@ class Email_Reports extends Notification_Builder {
 	}
 
 	/**
-	 * Send the report via email
+	 * What stands in for the unsubscribe link of a report until it's sent. The link is made for the person it's sent to, so
+	 * a report is built once and each person's link goes in as it's sent.
+	 */
+	const UNSUBSCRIBE_PLACEHOLDER = '%%gh_unsubscribe_url%%';
+
+	/**
+	 * The notification, see Subscriptions::types(), that each type of report is
+	 */
+	const REPORT_NOTIFICATIONS = [
+		'broadcast-results'    => 'broadcast_results',
+		'performance-overview' => 'performance_overview',
+		'my-day'               => 'my_day',
+	];
+
+	/**
+	 * Send the report via email, one email to each recipient, so that the unsubscribe link in it is theirs
 	 *
 	 * @param string $report_type
 	 * @param array  $recipients
 	 * @param string $subject
 	 * @param string $content
 	 *
-	 * @return bool
+	 * @return bool whether at least one was sent
 	 */
-	protected static function mail_report( string $report_type, array $recipients, string $subject, string $content ) {
+	public static function mail_report( string $report_type, array $recipients, string $subject, string $content ) {
 
 		$recipients = apply_filters( 'groundhogg/email_reports/recipients', $recipients, $report_type );
 		$subject    = apply_filters( 'groundhogg/email_reports/subject', $subject, $report_type );
 		$content    = apply_filters( 'groundhogg/email_reports/content', $content, $report_type );
 
-		return \Groundhogg_Email_Services::send_wordpress( $recipients, $subject, $content, [
-			'Content-Type: text/html',
-		] );
+		$notification = get_array_var( self::REPORT_NOTIFICATIONS, $report_type, '' );
+		$sent         = false;
+
+		foreach ( $recipients as $recipient ) {
+
+			$user = get_user_by( 'email', $recipient );
+
+			// An address that isn't a user, one that an add-on added, has no link of its own, so it gets the profile
+			$unsubscribe_url = $user && $notification ? Subscriptions::unsubscribe_url( $user->ID, $notification ) : admin_url( 'profile.php' ) . '#groundhogg';
+
+			$sent = \Groundhogg_Email_Services::send_wordpress( $recipient, $subject, str_replace( self::UNSUBSCRIBE_PLACEHOLDER, $unsubscribe_url, $content ), [
+				'Content-Type: text/html',
+			] ) || $sent;
+		}
+
+		return $sent;
 	}
 
 	/**
@@ -180,124 +208,6 @@ class Email_Reports extends Notification_Builder {
 	}
 
 	/**
-	 * Send an individualized status report to each user
-	 *
-	 * @return void
-	 */
-	public static function send_status_reports() {
-
-	}
-
-	public static function task_due_by( Task $task ) {
-
-		if ( $task->is_overdue() ) {
-			return html()->e( 'span', [
-				'class' => 'pill red',
-				'title' => $task->get_due_date()->wpDateTimeFormat()
-			], sprintf( '%s overdue', $task->get_due_date()->human_time_diff() ) );
-		}
-
-		$color = '';
-
-		if ( $task->is_due_today() ) {
-			$color = 'orange';
-		} else if ( $task->is_due_soon() ) {
-			$color = 'yellow';
-		}
-
-		return html()->e( 'span', [
-			'class' => "pill $color",
-			'title' => $task->get_due_date()->wpDateTimeFormat()
-		], sprintf( 'In %s', $task->get_due_date()->human_time_diff() ) );
-	}
-
-	public static function generate_user_status_report( \WP_User $user ) {
-
-		// tasks
-		// deals
-		// appointments
-
-		$taskQuery = new Table_Query( 'tasks' );
-		$taskQuery->setOrderby( [ 'date_created', 'DESC' ], [ 'due_date', 'ASC' ] ) // overdue first
-		          ->setLimit( 15 ) // Show up to 15 in the email
-		          ->setFoundRows( true )
-		          ->where()
-		          ->equals( 'user_id', $user->ID )
-		          ->equals( 'date_completed', '0000-00-00 00:00:00' ); // only pending tasks
-		$tasks       = $taskQuery->get_objects( Task::class );
-		$total_tasks = $taskQuery->get_found_rows();
-
-		$pending_tasks = '';
-		$task_template = self::get_template_part( 'single-task' );
-
-		$taskIcons = [
-			'task'    => '📝',
-			'call'    => '📞',
-			'meeting' => '📆',
-			'email'   => '✉️',
-		];
-
-		/** @var $task Task */
-		foreach ( $tasks as $task ) {
-
-			$object_data = $task->get_associated_data();
-
-			$addedByName = $task->context;
-			switch ( $task->context ) {
-				case 'user':
-					$addedByName = get_userdata( $task->user_id )->display_name;
-					break;
-				case 'funnel':
-					$addedByName = __( 'System', 'groundhogg' );
-					break;
-				case 'system':
-					$addedByName = html()->a( admin_page_url( 'gh_funnels', [
-						'action' => 'edit',
-						'funnel' => $task->funnel_id
-					], $task->step_id ), __( 'Flow', 'groundhogg' ) );
-					break;
-			}
-
-			$replacer = new Replacer( [
-				'the_task_summary'       => $task->summary,
-				'the_task_content'       => $task->content,
-				'the_task_icon'          => get_array_var( $taskIcons, $task->type, $taskIcons['task'] ),
-				'the_object_name'        => $object_data['name'],
-				'the_object_link'        => $object_data['link'],
-				'the_object_img'         => $task->object_type === 'deal' ? '💼' : html()->e( 'img', [
-					'src'    => $object_data['img'],
-					'width'  => 18,
-					'height' => 18,
-					'style'  => [ 'border-radius' => '5px', 'vertical-align' => 'text-top' ],
-				] ),
-				'the_task_link'          => add_query_arg( 'task', $task->ID, $object_data['link'] ),
-				'the_task_snooze_link'   => add_query_arg( [
-					'task'   => $task->ID,
-					'snooze' => 1,
-				], $object_data['link'] ),
-				'the_task_complete_link' => add_query_arg( [
-					'task'     => $task->ID,
-					'complete' => 1,
-				], $object_data['link'] ),
-				'task_due_by'            => self::task_due_by( $task ),
-				'task_added_by'          => sprintf( 'Add by %s <abbr title="%s">%s</abbr> ago', $addedByName, $task->get_date_created()->wpDateTimeFormat(), $task->get_date_created()->human_time_diff() )
-			] );
-
-			$pending_tasks .= $replacer->replace( $task_template );
-		}
-
-		$replacements = [
-			'all_pending_tasks_count' => _nf( $total_tasks ),
-			'pending_tasks'           => $pending_tasks
-		];
-
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-		echo self::get_general_notification_template_html( 'pending-tasks', $replacements );
-
-		die();
-	}
-
-	/**
 	 * Send reports for broadcasts sent the previous day.
 	 *
 	 * @return bool
@@ -322,6 +232,7 @@ class Email_Reports extends Notification_Builder {
 
 		$email_content = self::get_general_notification_template_html( 'broadcast-results', [
 			'broadcast_results_table' => $table_html,
+			'unsubscribe_url'         => self::UNSUBSCRIBE_PLACEHOLDER,
 			'full_report_link'        => admin_page_url( 'gh_reporting', [
 				'tab'   => 'broadcasts',
 				'start' => $after->ymd(),
@@ -408,6 +319,7 @@ class Email_Reports extends Notification_Builder {
 
 		$email_content = self::get_general_notification_template_html( 'overview', [
 			'compare_text'             => $totalNewContacts['compare']['text'],
+			'unsubscribe_url'          => self::UNSUBSCRIBE_PLACEHOLDER,
 			'broadcast_results_table'  => $broadcasts_table,
 			'funnel_results_table'     => $funnels_table,
 			'site_name'                => get_bloginfo(),

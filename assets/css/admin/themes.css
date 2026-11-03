@@ -157,8 +157,22 @@ body.groundhogg-admin-page[class*="gh-theme-"] .postbox-header {
   color: var(--ght-text);
 }
 
+/* The settings card for things that destroy data */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-settings-section.danger {
+  border-color: var(--ght-red-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-settings-section.danger .gh-settings-section-header {
+  background-color: var(--ght-red-bg);
+  border-color: var(--ght-red-fg);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-settings-section.danger .gh-settings-section-header h2 {
+  color: var(--ght-red-fg);
+}
+
 /* -------------------------------------------------------------------------- */
-/* Tables                                                                     */
+/* Tables                                                                   */
 /* -------------------------------------------------------------------------- */
 
 body.groundhogg-admin-page[class*="gh-theme-"] table.wp-list-table,

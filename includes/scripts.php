@@ -589,7 +589,7 @@ class Scripts {
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
-		if ( ! is_admin_groundhogg_page() && ! is_option_enabled( 'gh_disable_email_detection' ) && current_user_can( 'view_others_contacts' ) ){
+		if ( ! is_admin_groundhogg_page() && ! is_user_preference_enabled( 'gh_disable_email_detection' ) && current_user_can( 'view_others_contacts' ) ){
 			wp_enqueue_script( 'groundhogg-admin-email-detector' );
 		}
 

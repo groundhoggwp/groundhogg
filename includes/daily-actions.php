@@ -14,7 +14,6 @@ class Daily_Actions {
 	public function __construct() {
 		add_action( 'init', [ $this, 'schedule_event' ] );
 
-//		add_action( 'groundhogg/daily', [ $this, 'send_status_report' ] );
 		add_action( 'groundhogg/daily', [ $this, 'schedule_recurring_broadcasts' ] );
 		add_action( 'groundhogg/daily', [ $this, 'send_broadcast_reports' ] );
 		add_action( 'groundhogg/daily', [ $this, 'maybe_send_overview_report' ] );
@@ -54,10 +53,6 @@ class Daily_Actions {
 		foreach ( $schedules as $schedule ) {
 			$schedule->schedule_next();
 		}
-	}
-
-	public function send_status_report() {
-//		Email_Reports::send_status_report();
 	}
 
 	/**

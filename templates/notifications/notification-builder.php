@@ -115,6 +115,8 @@ class Notification_Builder {
 			'the_header'         => self::get_template_part( ! is_white_labeled() ? 'branded-header' : 'generic-header' ),
 			'the_content'        => self::get_template_part( $content_template ),
 			'the_footer'         => self::get_template_part( ! is_white_labeled() ? 'branded-footer' : 'generic-footer' ),
+			// after the footer that has it, and before the replacements, which can have one that works without signing in
+			'unsubscribe_url'    => admin_url( 'profile.php' ) . '#groundhogg',
 		], $replacements, [
 			'assets_url'         => GROUNDHOGG_ASSETS_URL,
 			'site_url'           => home_url(),

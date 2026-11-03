@@ -182,7 +182,7 @@ class Admin_Menu {
 		}
 
 		// user profile edits...
-		new Admin_User();
+		Admin_User::instance();
 
 		do_action( 'groundhogg/admin/init', $this );
 	}

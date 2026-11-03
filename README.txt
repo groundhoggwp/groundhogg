@@ -408,6 +408,14 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  * A Personal information checkbox on a user's profile gives them access or takes it away, whatever their role says. Only a user who has access can change it.
  * A note or a task has the contact's own name, email address, phone numbers and other personal details replaced with `[redacted]` where they are written in its text.
  * Custom fields have a new Contains personal information setting in the custom properties editor, and a field that has it is hidden from them. A user without the capability can turn it on for a field, but can't turn it off.
+* ADDED A daily My day email with what is on for a user's day, turned on or off from the Notifications card of their profile. It has the tasks that are overdue or due today, the replies that haven't been read and the contacts that came in since yesterday. A section is only in it when it has something to show, and nothing is sent on a day when none of them do.
+ * It is sent at the time each user chooses, in the timezone they choose, and not later than six hours after it.
+ * Each task in it has links to snooze or complete it, which work without signing in. Opening a link asks first, and only the button on the page does it, so a mail scanner that opens every link in an email can't snooze or complete anything.
+ * A sales manager can add a section for their team's tasks, replies and new contacts.
+ * Add-ons add their own sections, like deals and appointments, with the `groundhogg/email_reports/my_day_sections` filter.
+ * Users who own contacts are subscribed when the plugin updates. Nobody is subscribed to the team's section.
+* ADDED The footer of every notification email has a link that unsubscribes from it without signing in. Each report is now sent to each recipient on its own, so the link is theirs. The links are signed, so they can't be changed to unsubscribe someone else, and opening one asks first.
+* FIXED The profile of a sales manager who can't delete users raised an error where their team is listed.
 * FIXED The event queue and background tasks put a 60 second limit on a process that had none, like one run from the command line or a server's cron, because raising the time limit also lowered a limit of 0. A limit of 0 is now left alone.
 * ADDED The email abilities return a `preview_url` for the email, so what was built can be opened without reading the email again. It is on `groundhogg/get-email-template`, `groundhogg/create-email-template`, `groundhogg/update-email-template`, `groundhogg/list-email-templates`, `groundhogg/send-email-template` and `groundhogg/send-email-broadcast`.
 * ADDED The `groundhogg/send-test-email` ability sends a design test of a saved email to one or more addresses, the same as the Send Test button in the email editor. It doesn't queue an event, track the email or check consent.

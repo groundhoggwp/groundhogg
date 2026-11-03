@@ -4766,6 +4766,136 @@ div:has( > button.hide-panel) {
   }
 }
 
+//
+// The fields of a user, on their profile and in the Me tab of the settings. Related fields share a card, each field is a row
+// with its label on the left, see Admin_User::fields_table()
+//
+
+.gh-settings-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 960px;
+  margin: 16px 0 24px;
+
+  // what a section prints by itself, ahead of its fields, a notice or a component that brings its own layout
+  .gh-settings-section-intro {
+    padding: 16px 20px;
+
+    // rows bring their own space, and a mount point that nothing was rendered into takes none
+    &:has(> .gh-settings-row:first-child),
+    &:has(> :only-child:empty) {
+      padding: 0;
+    }
+
+    // a card of its own would be a card in a card, the section is the card
+    &:has(> .gh-panel.outlined:only-child) {
+      padding: 0;
+
+      > .gh-panel.outlined {
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+        background: transparent;
+      }
+    }
+
+    & + .gh-settings-row {
+      border-top: 1px solid var(--gh-panel-gray);
+    }
+  }
+
+  .gh-settings-section-header {
+    padding: 14px 20px;
+
+    // the card doesn't clip, so a background on the header would show past its rounded corners
+    border-radius: calc(var(--gh-panel-border-radius) - 1px) calc(var(--gh-panel-border-radius) - 1px) 0 0;
+
+    h2 {
+      padding: 0;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .description {
+      margin: 4px 0 0;
+    }
+  }
+
+  // settings that destroy data, always the last card of a tab
+  .gh-settings-section.danger {
+    border-color: $error-red-50;
+
+    .gh-settings-section-header {
+      background: $error-red-10;
+      border-bottom-color: $error-red-25;
+
+      h2 {
+        color: $error-red;
+      }
+    }
+
+    .gh-settings-row ~ .gh-settings-row,
+    .gh-settings-section-intro + .gh-settings-row {
+      border-top-color: $error-red-10;
+    }
+  }
+
+  .gh-settings-row {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 8px 24px;
+    padding: 16px 20px;
+
+    // after any row, with whatever is between them, like the hidden inputs of a setting
+    & ~ .gh-settings-row {
+      border-top: 1px solid var(--gh-panel-gray);
+    }
+
+    // the text of the label lines up with the first line of the control
+    .gh-settings-row-label {
+      padding-top: 5px;
+      font-weight: 600;
+    }
+
+    .gh-settings-row-control {
+      min-width: 0;
+
+      input[type=text],
+      input[type=email] {
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .description {
+        margin: 8px 0 0;
+        max-width: 640px;
+      }
+    }
+
+    // wide controls, like the editor, have the whole row under their label
+    &.wide {
+      grid-template-columns: minmax(0, 1fr);
+
+      .gh-settings-row-label {
+        padding-top: 0;
+      }
+
+      .gh-settings-row-control {
+        max-width: 800px;
+      }
+    }
+
+    @media (max-width: 782px) {
+      grid-template-columns: minmax(0, 1fr);
+
+      .gh-settings-row-label {
+        padding-top: 0;
+      }
+    }
+  }
+}
+
 // The add/edit field modal sizes itself to its content (fit-content), so a long help text would stretch it.
 // A zero max-width with a 100% min-width keeps the text wrapping at the width the inputs give the modal.
 .property-field .gh-rows-and-columns > .gh-row .description {

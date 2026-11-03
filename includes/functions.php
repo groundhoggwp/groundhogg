@@ -389,6 +389,27 @@ function is_option_enabled( $option = '' ) {
 }
 
 /**
+ * The preferences of a user that replaced a setting of the whole site. The user's own choice, saved on their profile,
+ * wins. If they haven't made one the site setting is the default, so a site that set it before keeps its behavior.
+ *
+ * @param string $key     the name of the user meta and of the site option it replaced
+ * @param int    $user_id defaults to the current user
+ *
+ * @return bool
+ */
+function is_user_preference_enabled( $key, $user_id = 0 ) {
+
+	$user_id = $user_id ?: get_current_user_id();
+	$saved   = $user_id ? get_user_meta( $user_id, $key, true ) : '';
+
+	if ( $saved === 'on' || $saved === 'off' ) {
+		return $saved === 'on';
+	}
+
+	return is_option_enabled( $key );
+}
+
+/**
  * Shorthand;
  * When using as the wrapper for HTML::e() echo defaults to true
  *
@@ -7546,7 +7567,7 @@ function get_filters_from_old_query_vars( $query = [] ) {
  * @return mixed|void
  */
 function is_admin_bar_widget_disabled() {
-	return apply_filters( 'groundhogg/is_admin_bar_widget_disabled', is_option_enabled( 'gh_is_admin_bar_widget_disabled' ) );
+	return apply_filters( 'groundhogg/is_admin_bar_widget_disabled', is_user_preference_enabled( 'gh_is_admin_bar_widget_disabled' ) );
 }
 
 /**
@@ -8198,6 +8219,10 @@ function andList( $array ) {
 	if ( empty( $array ) ) {
 		return '';
 	}
+
+	// a list that was filtered has gaps in its keys, and the first and last item are what's wanted
+	$array = array_values( $array );
+
 	if ( count( $array ) === 1 ) {
 		return $array[0];
 	}
@@ -8598,6 +8623,7 @@ function get_valid_contact_tabs() {
 		'notes'    => __( 'Notes', 'groundhogg' ),
 		'tasks'    => __( 'Tasks', 'groundhogg' ),
 		'files'    => __( 'Files', 'groundhogg' ),
+		'messages' => __( 'Messages', 'groundhogg' ),
 	] );
 }
 
@@ -9860,6 +9886,30 @@ function is_staging_environment() {
 	}
 
 	return false;
+}
+
+/**
+ * Run something as a user, and put the current user back afterwards, even if it throws.
+ *
+ * What a user is allowed to see is decided by the current user, including what is redacted for a user who can't see the
+ * personal information of contacts, so anything built for a user in the background, like an email, has to be built as them.
+ *
+ * @param int      $user_id
+ * @param callable $callback
+ *
+ * @return mixed whatever the callback returns
+ */
+function run_as_user( int $user_id, callable $callback ) {
+
+	$previous = get_current_user_id();
+
+	wp_set_current_user( $user_id );
+
+	try {
+		return call_user_func( $callback );
+	} finally {
+		wp_set_current_user( $previous );
+	}
 }
 
 /**

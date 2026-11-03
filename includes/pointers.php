@@ -28,7 +28,7 @@ class Pointers {
 			return;
 		}
 
-		if (is_option_enabled( 'gh_hide_tooltips' )) {
+		if (is_user_preference_enabled( 'gh_hide_tooltips' )) {
 		   return;
         }
 
