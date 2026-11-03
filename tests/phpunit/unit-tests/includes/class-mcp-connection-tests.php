@@ -8,15 +8,25 @@ use Groundhogg\Mcp\Connection;
  */
 class Mcp_Connection_Tests extends GH_UnitTestCase {
 
+	/**
+	 * The REST server the rest of the suite shares. Groundhogg's routes are only declared on the first server built in
+	 * a process, so a server rebuilt from scratch has none of them: build it before the tests replace it, and put it
+	 * back when they are done.
+	 *
+	 * @var WP_REST_Server
+	 */
+	protected $suite_rest_server;
+
 	public function setUp(): void {
 		parent::setUp();
 		add_filter( 'wp_is_application_passwords_available', '__return_true' );
+		$this->suite_rest_server = rest_get_server();
 	}
 
 	public function tearDown(): void {
 		remove_filter( 'wp_is_application_passwords_available', '__return_true' );
 		wp_set_current_user( 0 );
-		$this->reset_rest_server();
+		$GLOBALS['wp_rest_server'] = $this->suite_rest_server;
 		parent::tearDown();
 	}
 
