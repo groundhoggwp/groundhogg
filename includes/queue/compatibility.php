@@ -90,7 +90,10 @@ class Compatibility {
 	 * @param int The time limit in seconds.
 	 */
 	public static function raise_time_limit( $limit = 0 ) {
-		if ( $limit < ini_get( 'max_execution_time' ) ) {
+		$current = (int) ini_get( 'max_execution_time' );
+
+		// 0 is no limit at all, which is more than any limit that could be set
+		if ( $current === 0 || $limit < $current ) {
 			return;
 		}
 

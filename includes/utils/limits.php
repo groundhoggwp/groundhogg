@@ -43,6 +43,20 @@ class Limits {
 	}
 
 	/**
+	 * Forget that the limits were exceeded and start counting again.
+	 *
+	 * The exceeded flag is deliberately kept for the rest of the request, so that one queue running out of budget
+	 * means the next one doesn't start. Use this when that's not wanted, like at the start of a test.
+	 *
+	 * The totals from get_actions_processed() and total_time_elapsed() are kept, because they are for the whole request.
+	 */
+	public static function reset() {
+		self::$limits_exceeded   = false;
+		self::$processed_actions = 0;
+		self::$start_time        = 0;
+	}
+
+	/**
 	 * Increment the process actions variable.
 	 */
 	public static function processed_action() {
@@ -162,7 +176,10 @@ class Limits {
 			$limit = self::get_time_limit();
 		}
 
-		if ( $limit < ini_get( 'max_execution_time' ) ) {
+		$current = (int) ini_get( 'max_execution_time' );
+
+		// 0 is no limit at all, which is more than any limit that could be set
+		if ( $current === 0 || $limit < $current ) {
 			return;
 		}
 
@@ -184,15 +201,46 @@ class Limits {
 		$execution_time = self::total_time_elapsed();
 
 		// Get the CPU time if the hosting environment uses it rather than wall-clock time to calculate a process's execution time.
-		if ( function_exists( 'getrusage' ) && apply_filters( 'action_scheduler_use_cpu_execution_time', defined( 'PANTHEON_ENVIRONMENT' ) ) ) {
-			$resource_usages = getrusage();
+		if ( apply_filters( 'action_scheduler_use_cpu_execution_time', defined( 'PANTHEON_ENVIRONMENT' ) ) ) {
+			$cpu_time = self::get_cpu_time();
 
-			if ( isset( $resource_usages['ru_stime.tv_usec'], $resource_usages['ru_stime.tv_usec'] ) ) {
-				$execution_time = $resource_usages['ru_stime.tv_sec'] + ( $resource_usages['ru_stime.tv_usec'] / 1000000 );
+			if ( $cpu_time !== false ) {
+				$execution_time = $cpu_time;
 			}
 		}
 
 		return $execution_time;
+	}
+
+	/**
+	 * The CPU time the process has used, user and system together.
+	 *
+	 * @return float|false seconds, or false if the host can't say
+	 */
+	public static function get_cpu_time() {
+
+		if ( ! function_exists( 'getrusage' ) ) {
+			return false;
+		}
+
+		$usage = getrusage();
+
+		if ( ! is_array( $usage ) ) {
+			return false;
+		}
+
+		$time = 0;
+
+		foreach ( [ 'ru_utime', 'ru_stime' ] as $kind ) {
+
+			if ( ! isset( $usage["$kind.tv_sec"], $usage["$kind.tv_usec"] ) ) {
+				return false;
+			}
+
+			$time += $usage["$kind.tv_sec"] + ( $usage["$kind.tv_usec"] / 1000000 );
+		}
+
+		return $time;
 	}
 
 
