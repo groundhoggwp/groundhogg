@@ -203,7 +203,7 @@ class Recent {
 		$kind = sanitize_key( $request->get_param( 'kind' ) );
 
 		if ( ! in_array( $kind, self::kinds(), true ) ) {
-			return new WP_Error( 'unknown_kind', 'That is not something that can be remembered.', [ 'status' => 404 ] );
+			return new WP_Error( 'unknown_kind', __( 'That is not something that can be remembered.', 'groundhogg' ), [ 'status' => 404 ] );
 		}
 
 		$item = [
@@ -213,7 +213,7 @@ class Recent {
 		];
 
 		if ( ! self::clean( $item ) ) {
-			return new WP_Error( 'invalid_item', 'An id is needed.', [ 'status' => 400 ] );
+			return new WP_Error( 'invalid_item', __( 'An id is needed.', 'groundhogg' ), [ 'status' => 400 ] );
 		}
 
 		self::record( get_current_user_id(), $kind, $item );
