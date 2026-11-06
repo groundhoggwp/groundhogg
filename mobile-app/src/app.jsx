@@ -75,10 +75,17 @@ function TabBar ( { tabs, hasCreate, hasMore, path, onCreate } ) {
 
 function MoreView ( { moreItems } ) {
   const { manifest, ctxFor } = useRuntime()
-  const { __ } = ctxFor( 'core' ).i18n
+  const { __, sprintf } = ctxFor( 'core' ).i18n
 
   return (
     <>
+      <div class="ghm-card"><List>
+        <ListItem
+          leading={ <span class="ghm-site-swatch" aria-hidden="true"/> }
+          title={ manifest.app.domain }
+          subtitle={ sprintf( __( 'Signed in as %s' ), manifest.user.name ) }
+        />
+      </List></div>
       { moreItems.length ? (
         <div class="ghm-card"><List>
           { moreItems.map( item => (
@@ -173,12 +180,15 @@ export function App ( { runtime } ) {
 
   return (
     <RuntimeContext.Provider value={ runtime }>
-      <div class="ghm-app">
+      <div class="ghm-app" style={ { '--ghm-site': runtime.manifest.app.color } }>
         <header class="ghm-head">
           <div class="ghm-head-side">
             { atRoot ? null : <Button class="icon" icon="back" aria-label={ __( 'Back' ) } onClick={ goBack }/> }
           </div>
-          <h1>{ title }</h1>
+          <div class="ghm-head-title">
+            <h1>{ title }</h1>
+            <small class="ghm-head-domain">{ runtime.manifest.app.domain }</small>
+          </div>
           <div class="ghm-head-side"/>
         </header>
         <main class="ghm-main">{ content }</main>

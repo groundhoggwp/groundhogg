@@ -6,7 +6,6 @@ use function Groundhogg\add_managed_rewrite_rule;
 use function Groundhogg\is_managed_page;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\managed_page_url;
-use function Groundhogg\white_labeled_name;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -54,15 +53,70 @@ class App {
 	}
 
 	/**
-	 * The name the app goes by, on the home screen and in the title bar. It's the white label name when the site has
-	 * one, and the site's own name when a white labeled site hasn't set a name, so it is never blank.
+	 * The domain the site is on, without a leading www. It is what tells this site's app from another's: someone
+	 * with the app for several sites sees it on each home screen icon and at the top of every screen.
+	 *
+	 * @return string
+	 */
+	public static function domain() {
+
+		$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$host = preg_replace( '/^www\./', '', $host );
+
+		// a site always has a host, but the app's name can never be blank
+		return $host !== '' ? $host : strtolower( (string) wp_parse_url( network_home_url(), PHP_URL_HOST ) ?: 'localhost' );
+	}
+
+	/**
+	 * The name the app goes by, on the home screen and in the title bar. It is the site's domain and nothing else,
+	 * so that the same app on several sites reads as several different ones, whatever the site or the white label
+	 * is called.
 	 *
 	 * @return string
 	 */
 	public static function name() {
-		$name = white_labeled_name();
+		return self::domain();
+	}
 
-		return is_string( $name ) && trim( $name ) !== '' ? trim( $name ) : get_bloginfo( 'name', 'display' );
+	/**
+	 * A color for a domain: the same one every time, spread over the whole circle of hues from the domain's text, so that
+	 * two sites rarely have the same. It is dark enough for white text to be read on it, whatever the hue is.
+	 *
+	 * @param string $domain
+	 *
+	 * @return string like #7a2f4b
+	 */
+	public static function color_for( string $domain ): string {
+
+		$hue        = crc32( strtolower( $domain ) ) % 360;
+		$saturation = 0.55;
+		$lightness  = 0.30;
+
+		// HSL to RGB
+		$c = ( 1 - abs( 2 * $lightness - 1 ) ) * $saturation;
+		$x = $c * ( 1 - abs( fmod( $hue / 60, 2 ) - 1 ) );
+		$m = $lightness - $c / 2;
+
+		$sector = (int) floor( $hue / 60 );
+		$rgb    = [
+			[ $c, $x, 0 ],
+			[ $x, $c, 0 ],
+			[ 0, $c, $x ],
+			[ 0, $x, $c ],
+			[ $x, 0, $c ],
+			[ $c, 0, $x ],
+		][ $sector % 6 ];
+
+		return sprintf( '#%02x%02x%02x', round( ( $rgb[0] + $m ) * 255 ), round( ( $rgb[1] + $m ) * 255 ), round( ( $rgb[2] + $m ) * 255 ) );
+	}
+
+	/**
+	 * The color of this site's app: the header, and what the phone paints around it.
+	 *
+	 * @return string
+	 */
+	public static function color(): string {
+		return self::color_for( self::domain() );
 	}
 
 	/**
@@ -244,7 +298,8 @@ class App {
 			'display'          => 'standalone',
 			'orientation'      => 'portrait',
 			'background_color' => '#ffffff',
-			'theme_color'      => '#ffffff',
+			// the header is this color, so the phone's own bars match it
+			'theme_color'      => self::color(),
 			'icons'            => $this->get_icons(),
 		];
 

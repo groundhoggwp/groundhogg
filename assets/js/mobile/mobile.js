@@ -2633,8 +2633,16 @@
   }
   function MoreView({ moreItems }) {
     const { manifest, ctxFor } = useRuntime();
-    const { __ } = ctxFor("core").i18n;
+    const { __, sprintf: sprintf2 } = ctxFor("core").i18n;
     return /* @__PURE__ */ u3(M, { children: [
+      /* @__PURE__ */ u3("div", { class: "ghm-card", children: /* @__PURE__ */ u3(List, { children: /* @__PURE__ */ u3(
+        ListItem,
+        {
+          leading: /* @__PURE__ */ u3("span", { class: "ghm-site-swatch", "aria-hidden": "true" }),
+          title: manifest.app.domain,
+          subtitle: sprintf2(__("Signed in as %s"), manifest.user.name)
+        }
+      ) }) }),
       moreItems.length ? /* @__PURE__ */ u3("div", { class: "ghm-card", children: /* @__PURE__ */ u3(List, { children: moreItems.map((item) => /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: item.icon }), title: item.label, href: toHash(item.route), trailing: /* @__PURE__ */ u3(Icon, { name: "chevron" }) })) }) }) : null,
       /* @__PURE__ */ u3("div", { class: "ghm-card", children: /* @__PURE__ */ u3(List, { children: [
         /* @__PURE__ */ u3(ListItem, { leading: /* @__PURE__ */ u3(Icon, { name: "external" }), title: __("Open the full site"), subtitle: __("Settings, flows and the email editor live on desktop."), href: manifest.app.adminUrl }),
@@ -2701,10 +2709,13 @@
         /* @__PURE__ */ u3("a", { href: "#/", style: "color:var(--ghm-accent)", children: __("Go home") })
       ] });
     }
-    return /* @__PURE__ */ u3(RuntimeContext.Provider, { value: runtime, children: /* @__PURE__ */ u3("div", { class: "ghm-app", children: [
+    return /* @__PURE__ */ u3(RuntimeContext.Provider, { value: runtime, children: /* @__PURE__ */ u3("div", { class: "ghm-app", style: { "--ghm-site": runtime.manifest.app.color }, children: [
       /* @__PURE__ */ u3("header", { class: "ghm-head", children: [
         /* @__PURE__ */ u3("div", { class: "ghm-head-side", children: atRoot ? null : /* @__PURE__ */ u3(Button, { class: "icon", icon: "back", "aria-label": __("Back"), onClick: goBack }) }),
-        /* @__PURE__ */ u3("h1", { children: title }),
+        /* @__PURE__ */ u3("div", { class: "ghm-head-title", children: [
+          /* @__PURE__ */ u3("h1", { children: title }),
+          /* @__PURE__ */ u3("small", { class: "ghm-head-domain", children: runtime.manifest.app.domain })
+        ] }),
         /* @__PURE__ */ u3("div", { class: "ghm-head-side" })
       ] }),
       /* @__PURE__ */ u3("main", { class: "ghm-main", children: content }),

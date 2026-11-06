@@ -57,6 +57,8 @@ class Manifest {
 			'apiVersion' => Features::API_VERSION,
 			'app'        => [
 				'name'      => App::name(),
+				'domain'    => App::domain(),
+				'color'     => App::color(),
 				'url'       => App::url(),
 				'homeUrl'   => home_url( '/' ),
 				'adminUrl'  => admin_url(),

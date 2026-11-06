@@ -333,7 +333,7 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 	 */
 	public function test_the_shell_cannot_be_broken_out_of_through_the_manifest() {
 		$manifest = [
-			'app'      => [ 'name' => 'Groundhogg</script><script>alert(1)</script>', 'url' => App::url() ],
+			'app'      => [ 'name' => 'Groundhogg</script><script>alert(1)</script>', 'url' => App::url(), 'color' => '#336699"><script>alert(2)</script>' ],
 			'features' => [ 'core' => [ 'label' => '<!-- &amp; -->' ] ],
 		];
 
@@ -342,6 +342,8 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 		$html = ob_get_clean();
 
 		$this->assertStringNotContainsString( '<script>alert(1)', $html );
+		// and the color, which is put in an attribute, can't open a tag either
+		$this->assertStringNotContainsString( '<script>alert(2)', $html );
 		$this->assertSame( 1, preg_match( '#<script type="application/json" id="ghm-manifest">(.*?)</script>#s', $html, $m ) );
 
 		// it still round trips
@@ -352,7 +354,7 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 
 	/**
 	 * The app is used on white labeled sites, so the labels it shows, and the links it offers, can't name the brand.
-	 * The app's own name is the exception: it comes from the white label setting.
+	 * The app's own name is the exception: it is the domain of the site.
 	 */
 	public function test_labels_and_links_core_registers_do_not_name_the_brand() {
 		$visible = ( new Features() )->for_user( $this->user_with_role( 'administrator' ) );
@@ -381,6 +383,89 @@ class Mobile_Features_Tests extends GH_UnitTestCase {
 
 	public function test_the_app_name_is_never_blank() {
 		$this->assertNotSame( '', App::name() );
+	}
+
+	/**
+	 * Someone with the app for several sites has to be able to tell them apart, so the app goes by the site's domain,
+	 * and not by its title or a white label, which the sites could share.
+	 */
+	public function test_the_app_is_named_for_the_domain_of_the_site() {
+		$host = preg_replace( '/^www\./', '', strtolower( wp_parse_url( home_url(), PHP_URL_HOST ) ) );
+
+		$this->assertSame( $host, App::domain() );
+		$this->assertSame( App::domain(), App::name() );
+		$this->assertSame( App::name(), Manifest::build( $this->user_with_role( 'sales_rep' ) )['app']['name'] );
+		$this->assertSame( App::domain(), Manifest::build( $this->user_with_role( 'sales_rep' ) )['app']['domain'] );
+	}
+
+	public function test_the_name_does_not_change_with_the_title_of_the_site() {
+		$before = App::name();
+
+		update_option( 'blogname', 'Another Name Entirely' );
+
+		$this->assertSame( $before, App::name() );
+	}
+
+	public function test_www_is_not_part_of_the_domain() {
+		$filter = fn() => 'https://www.Example.COM/blog';
+		add_filter( 'home_url', $filter );
+
+		$this->assertSame( 'example.com', App::domain() );
+
+		remove_filter( 'home_url', $filter );
+	}
+
+	public function test_a_site_has_the_same_color_every_time_and_a_different_one_from_most_other_sites() {
+		$this->assertSame( App::color_for( 'example.com' ), App::color_for( 'EXAMPLE.com' ) );
+		$this->assertMatchesRegularExpression( '/^#[0-9a-f]{6}$/', App::color() );
+
+		$colors = [];
+
+		foreach ( range( 1, 40 ) as $i ) {
+			$colors[ App::color_for( "site-$i.example.com" ) ] = true;
+		}
+
+		// 360 hues, so a few clashes are expected, but they are not all one color
+		$this->assertGreaterThan( 25, count( $colors ) );
+	}
+
+	/**
+	 * White text is on it, whatever the hue the domain lands on. 4.5 is what WCAG asks of text of this size.
+	 */
+	public function test_white_text_can_be_read_on_the_color_of_any_site() {
+
+		$luminance = function ( string $hex ): float {
+			$channels = array_map( function ( $c ) {
+				$c = hexdec( $c ) / 255;
+
+				return $c <= 0.03928 ? $c / 12.92 : pow( ( $c + 0.055 ) / 1.055, 2.4 );
+			}, str_split( ltrim( $hex, '#' ), 2 ) );
+
+			return 0.2126 * $channels[0] + 0.7152 * $channels[1] + 0.0722 * $channels[2];
+		};
+
+		$worst = 21.0;
+
+		foreach ( range( 1, 720 ) as $i ) {
+			$worst = min( $worst, 1.05 / ( $luminance( App::color_for( "site-$i.test" ) ) + 0.05 ) );
+		}
+
+		$this->assertGreaterThanOrEqual( 4.5, $worst );
+	}
+
+	public function test_the_web_manifest_and_the_shell_use_the_color_of_the_site() {
+		$manifest = Manifest::build( $this->user_with_role( 'sales_rep' ) );
+
+		$this->assertSame( App::color(), $manifest['app']['color'] );
+
+		ob_start();
+		$user = $this->user_with_role( 'sales_rep' );
+		wp_set_current_user( $user );
+		include GROUNDHOGG_PATH . 'templates/mobile/shell.php';
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( '<meta name="theme-color" content="' . App::color() . '">', $html );
+		$this->assertStringContainsString( '<title>' . App::domain() . '</title>', $html );
 	}
 
 	public function test_the_app_lives_under_the_managed_page() {

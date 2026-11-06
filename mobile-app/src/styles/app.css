@@ -74,11 +74,16 @@ body.ghm {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 8px;
   height: calc(var(--ghm-head-h) + var(--ghm-safe-t)); padding: var(--ghm-safe-t) 12px 0;
-  background: color-mix(in srgb, var(--ghm-surface) 92%, transparent);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--ghm-border);
+  /* the color of this site's app, from its domain, so the same app for another site is a different color. The
+     fallback is for a page that has no site color. */
+  background: var(--ghm-site, var(--ghm-surface));
+  color: #fff;
 }
-.ghm-head h1 { flex: 1; font-size: 17px; font-weight: 650; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ghm-head .ghm-btn.icon { color: inherit; }
+.ghm-head-title { flex: 1; min-width: 0; text-align: center; line-height: 1.2; }
+.ghm-head h1 { font-size: 17px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ghm-head-domain { display: block; font-size: 11px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ghm-site-swatch { width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--ghm-site, var(--ghm-accent)); }
 .ghm-head .ghm-head-side { width: 44px; display: flex; }
 .ghm-head .ghm-head-side:last-child { justify-content: flex-end; }
 

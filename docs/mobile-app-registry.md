@@ -394,9 +394,23 @@ Where it differs from the draft above, or decides something the draft left open:
   white labeled falls back to the small brand mark (which isn't square), and a white labeled site gets no icon rather
   than the brand's. Installability checks on some browsers want 192 and 512 square PNGs.
 - **White labeling.** The app is used on white labeled sites, so labels, links and messages the user reads use
-  generic terms ("Send an email template", not the product's name). The app's own name comes from
-  `white_labeled_name()`, falling back to the site's name if a white labeled site hasn't set one. Add-on authors:
-  keep the brand out of the `label` of your registrations. A PHPUnit test and a JS test fail if core's do.
+  generic terms ("Send an email template", not the product's name). The app's own name is the site's domain (see
+  "Telling one site's app from another's" below). Add-on authors: keep the brand out of the `label` of your
+  registrations. A PHPUnit test and a JS test fail if core's do.
+
+**Telling one site's app from another's.** Someone can install the app for several sites, and each is its own app
+(its manifest `id` and scope are that site's `/gh/app/`), with its own login. A web app can't see or open the other
+ones installed on a phone, so there is no switcher. What there is, is that each says clearly which site it is, from
+the site's domain alone (not its title, and not the white label name, which sites could share):
+
+- The home screen name, the title and `apple-mobile-web-app-title` are `App::name()`, which is `App::domain()`: the
+  host of `home_url()` without a leading `www.`.
+- The domain is under the title on every screen, and More starts with a row for it with who is signed in.
+- Each site has a color, `App::color()`, from its domain (the same every time, spread over the hues, and dark enough
+  for white text at any hue, which a test checks). It is the header, and the web manifest's `theme_color` and the shell's
+  `theme-color`, so the phone's own bars match. The manifest carries `app.domain` and `app.color`.
+- The icon is still the site's own icon when it has one. A site without one gets the brand's mark (or none, white
+  labeled), so the name and color are what tell those apart.
 
 **Editing a contact.** The Details card has an Edit button (and the tags row has Edit tags / Add tags), shown to
 people with `edit_contacts` (and `manage_tags`). Both save with one `PATCH gh/v4/contacts/{id}`, which takes
