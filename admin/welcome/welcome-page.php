@@ -262,7 +262,7 @@ class Welcome_Page extends Admin_Page {
 			self::get_notifications_item(),
 			[
 				'title'       => __( 'Add your email signature', 'groundhogg' ),
-				'description' => __( "Adding an email signature to your profile will make it easier for subscribers to know who your are.", 'groundhogg' ),
+				'description' => __( "Adding an email signature to your profile will make it easier for subscribers to know who you are.", 'groundhogg' ),
 				'completed'   => ! empty( $signature ),
 				'fix'         => admin_url( 'profile.php' ) . '#groundhogg-options',
 				'cap'         => 'send_emails'
