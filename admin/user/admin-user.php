@@ -359,7 +359,10 @@ class Admin_User {
 			// everyone who can see contacts has their day, the reports are for the people who can see reports
 			Card_Sections::section_start(
 				__( 'Notifications', 'groundhogg' ),
-				__( 'Reports and updates sent directly to your inbox.', 'groundhogg' )
+				__( 'Reports and updates sent directly to your inbox.', 'groundhogg' ),
+				'',
+				'',
+				'groundhogg-notifications'
 			);
 
 			if ( $can_see_report ) {

@@ -23,10 +23,11 @@ class Card_Sections {
 	 * @param string $description a line on what the section is for
 	 * @param string $badge       HTML allowed in posts, shown next to the title, like a pill
 	 * @param string $class       'danger' makes the card red, for settings that destroy data
+	 * @param string $id          the id of the card, so that a link can go to it
 	 */
-	public static function section_start( $title, $description = '', $badge = '', $class = '' ) {
+	public static function section_start( $title, $description = '', $badge = '', $class = '', $id = '' ) {
 		?>
-        <div class="gh-panel gh-settings-section <?php echo esc_attr( trim( $class ) ); ?>">
+        <div <?php echo $id ? 'id="' . esc_attr( $id ) . '"' : ''; ?> class="gh-panel gh-settings-section <?php echo esc_attr( trim( $class ) ); ?>">
             <div class="gh-panel-header gh-settings-section-header">
                 <div>
                     <h2><?php echo esc_html( $title ); ?><?php if ( $badge ) { echo ' ' . wp_kses_post( $badge ); } ?></h2>
