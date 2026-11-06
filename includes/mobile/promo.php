@@ -3,8 +3,6 @@
 namespace Groundhogg\Mobile;
 
 use function Groundhogg\admin_page_url;
-use function Groundhogg\get_url_var;
-use function Groundhogg\is_admin_groundhogg_page;
 use function Groundhogg\notices;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -16,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  *  - A **Mobile app** tab in Tools with a QR code that opens the app on a phone, the link, and how to add it to the
  *    home screen. See admin/tools/mobile.php.
- *  - A dismissible notice on Groundhogg's own admin pages, until the person has used the app or closes it. On a phone
- *    it links straight to the app, on a computer it links to the page above.
+ *  - A notification in the notifications feed, until the person has used the app or dismisses it. It links to the
+ *    page above.
  *  - A command in the command palette, which the Tools page adds for its tab.
  *  - An item in the Welcome page checklist, ticked once the app has been used.
  *
@@ -32,7 +30,7 @@ class Promo {
 	const TAB       = 'mobile';
 
 	public function __construct() {
-		add_action( 'admin_notices', [ $this, 'maybe_add_notice' ], 1 );
+		add_action( 'admin_init', [ $this, 'maybe_add_notification' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_scripts' ] );
 	}
 
@@ -91,37 +89,30 @@ class Promo {
 	}
 
 	/**
-	 * The notice, on Groundhogg's own pages. Already dismissed ones are left out by notices()->add().
+	 * The notification, in the notifications feed. It is stored for the whole site and dismissed per person, so
+	 * someone who has used the app already is treated as having dismissed it.
 	 */
-	public function maybe_add_notice() {
+	public function maybe_add_notification() {
 
-		$page = (string) get_url_var( 'page' );
-
-		// not on the tab about it, nor in the middle of the setup
-		if ( ! is_admin_groundhogg_page() || $page === 'gh_guided_setup' || ( $page === self::PAGE && get_url_var( 'tab' ) === self::TAB ) ) {
+		if ( ! self::is_available_to() ) {
 			return;
 		}
 
-		if ( notices()->is_dismissed( self::NOTICE_ID ) || self::has_used() || ! self::is_available_to() ) {
-			return;
-		}
+		notices()->add_notification( self::NOTICE_ID, [
+			'title'    => __( 'Your contacts, tasks and email now work on your phone.', 'groundhogg' ),
+			'message'  => sprintf(
+				'<p>%1$s</p><p><a class="button button-primary" href="%2$s">%3$s</a></p>',
+				esc_html__( 'Scan a code with your phone to open the mobile app, then add it to your home screen so it is easy to find.', 'groundhogg' ),
+				esc_url( self::page_url() ),
+				esc_html__( 'Get the mobile app', 'groundhogg' )
+			),
+			'type'     => 'info',
+			'cap'      => 'view_contacts',
+			'location' => 'feed',
+		] );
 
-		// on a phone the app is one tap away, so take them there. Otherwise explain how to get it onto one.
-		$phone = wp_is_mobile();
-
-		$message = sprintf(
-			'<strong>%1$s</strong> %2$s</p><p><a class="button button-primary" href="%3$s">%4$s</a>',
-			esc_html__( 'Your contacts, tasks and email now work on your phone.', 'groundhogg' ),
-			$phone
-				? esc_html__( 'Open the mobile app, then add it to your home screen so it is easy to find.', 'groundhogg' )
-				: esc_html__( 'Scan a code with your phone to open it, and add it to your home screen.', 'groundhogg' ),
-			esc_url( $phone ? App::url() : self::page_url() ),
-			$phone ? esc_html__( 'Open the mobile app', 'groundhogg' ) : esc_html__( 'Get the mobile app', 'groundhogg' )
-		);
-
-		if ( notices()->add( self::NOTICE_ID, $message, 'info', 'view_contacts', false ) ) {
-			// closing it with the X should be remembered, which that script does
-			wp_enqueue_script( 'groundhogg-admin-mobile-app' );
+		if ( self::has_used() && ! notices()->is_dismissed( self::NOTICE_ID ) ) {
+			notices()->dismiss_notice( self::NOTICE_ID );
 		}
 	}
 

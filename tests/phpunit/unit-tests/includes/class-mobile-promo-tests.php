@@ -5,29 +5,20 @@ use Groundhogg\Mobile\Promo;
 use Groundhogg\Notices;
 
 /**
- * How people find the mobile app from the main admin: a notice on Groundhogg's pages, a command, and the record of
+ * How people find the mobile app from the main admin: a notification in the feed, a command, and the record of
  * who has already used the app so they aren't told about it again.
  */
 class Mobile_Promo_Tests extends GH_UnitTestCase {
 
-	protected $user_agent;
-
 	public function setUp(): void {
 		parent::setUp();
-		$this->user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+		delete_option( Notices::NOTIFICATIONS_OPTION );
 		Notices::$dismissed_notices = [];
 	}
 
 	public function tearDown(): void {
-		if ( $this->user_agent === null ) {
-			unset( $_SERVER['HTTP_USER_AGENT'] );
-		} else {
-			$_SERVER['HTTP_USER_AGENT'] = $this->user_agent;
-		}
-
-		unset( $_GET['page'], $_REQUEST['page'], $_GET['tab'], $_REQUEST['tab'] );
+		delete_option( Notices::NOTIFICATIONS_OPTION );
 		Notices::$dismissed_notices = [];
-		set_current_screen( 'front' );
 		wp_set_current_user( 0 );
 		parent::tearDown();
 	}
@@ -37,30 +28,23 @@ class Mobile_Promo_Tests extends GH_UnitTestCase {
 	}
 
 	/**
-	 * Be this user, looking at one of the pages in the admin.
+	 * Be this user, as they load the admin, and with what they have already dismissed.
 	 */
-	protected function visit( int $user, string $page = 'gh_contacts', string $tab = '' ) {
+	protected function visit( int $user ) {
 		wp_set_current_user( $user );
-		set_current_screen( 'dashboard' );
-		$_GET['page'] = $_REQUEST['page'] = $page;
-		unset( $_GET['tab'], $_REQUEST['tab'] );
 
-		if ( $tab ) {
-			$_GET['tab'] = $_REQUEST['tab'] = $tab;
-		}
+		$dismissed = get_user_meta( $user, Notices::DISMISSED_NOTICES_OPTION, true );
 
-		delete_transient( Notices::TRANSIENT . '_user_' . $user );
+		Notices::$dismissed_notices = is_array( $dismissed ) ? $dismissed : [];
 	}
 
 	/**
-	 * What the notice would say, or null when it isn't shown.
+	 * The notification as the current user would get it in the feed, or null when they don't.
 	 */
-	protected function notice(): ?array {
-		( new Promo() )->maybe_add_notice();
+	protected function notification(): ?array {
+		( new Promo() )->maybe_add_notification();
 
-		$notices = get_transient( Notices::TRANSIENT . '_user_' . get_current_user_id() );
-
-		return $notices[ Promo::NOTICE_ID ] ?? null;
+		return \Groundhogg\notices()->get_notifications( 'feed' )[ Promo::NOTICE_ID ] ?? null;
 	}
 
 	/* ---- who it is for ----------------------------------------------------------------------------------- */
@@ -72,102 +56,96 @@ class Mobile_Promo_Tests extends GH_UnitTestCase {
 		$this->assertFalse( Promo::is_available_to( 0 ), 'nobody is signed in' );
 	}
 
-	/* ---- the notice -------------------------------------------------------------------------------------- */
+	/* ---- the notification -------------------------------------------------------------------------------- */
 
-	public function test_the_notice_is_shown_on_a_page_in_the_admin() {
+	public function test_the_notification_is_in_the_feed_and_not_a_banner() {
 		$this->visit( $this->user_with_role( 'administrator' ) );
 
-		$notice = $this->notice();
+		$notification = $this->notification();
 
-		$this->assertNotNull( $notice );
-		$this->assertSame( 'view_contacts', $notice['cap'] );
-		$this->assertFalse( $notice['site_wide'], 'it belongs to the admin pages, not every screen' );
+		$this->assertNotNull( $notification );
+		$this->assertSame( 'view_contacts', $notification['cap'] );
+		$this->assertSame( 'feed', $notification['location'] );
+		$this->assertArrayNotHasKey( Promo::NOTICE_ID, \Groundhogg\notices()->get_notifications( 'banner' ) );
 	}
 
-	public function test_on_a_computer_the_notice_leads_to_the_page_that_explains_it() {
-		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36';
+	public function test_it_leads_to_the_page_that_explains_the_app() {
 		$this->visit( $this->user_with_role( 'administrator' ) );
 
-		$message = $this->notice()['message'];
+		$message = $this->notification()['message'];
 
-		$this->assertStringContainsString( 'href="' . esc_url( Promo::page_url() ) . '"', $message );
+		// the stored message has been through wp_kses_post, which writes the & in the url as &amp;
+		$this->assertStringContainsString( 'href="' . htmlspecialchars( Promo::page_url() ) . '"', $message );
 		$this->assertStringNotContainsString( App::url(), $message );
 	}
 
-	public function test_on_a_phone_the_notice_leads_straight_to_the_app() {
-		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1';
+	public function test_the_notification_does_not_name_the_product() {
 		$this->visit( $this->user_with_role( 'administrator' ) );
 
-		$message = $this->notice()['message'];
+		$notification = $this->notification();
 
-		$this->assertStringContainsString( 'href="' . esc_url( App::url() ) . '"', $message );
-		$this->assertStringNotContainsString( 'tab=' . Promo::TAB, $message );
-	}
-
-	public function test_the_notice_does_not_name_the_product() {
-		$this->visit( $this->user_with_role( 'administrator' ) );
-
-		$this->assertStringNotContainsStringIgnoringCase( 'groundhogg', wp_strip_all_tags( $this->notice()['message'] ) );
+		$this->assertStringNotContainsStringIgnoringCase( 'groundhogg', wp_strip_all_tags( $notification['title'] . ' ' . $notification['message'] ) );
 	}
 
 	public function test_nobody_is_nagged_who_cannot_use_it() {
 		$this->visit( $this->user_with_role( 'subscriber' ) );
 
-		$this->assertNull( $this->notice() );
+		$this->assertNull( $this->notification() );
 	}
 
-	public function test_the_notice_stays_out_of_pages_that_are_not_groundhoggs() {
-		$this->visit( $this->user_with_role( 'administrator' ), 'some_other_plugin' );
+	public function test_someone_who_cannot_use_it_does_not_see_it_even_once_it_is_stored() {
+		$this->visit( $this->user_with_role( 'administrator' ) );
+		$this->assertNotNull( $this->notification() );
 
-		$this->assertNull( $this->notice() );
+		$this->visit( $this->user_with_role( 'subscriber' ) );
+
+		$this->assertArrayNotHasKey( Promo::NOTICE_ID, \Groundhogg\notices()->get_notifications( 'feed' ) );
 	}
 
-	public function test_the_notice_is_not_shown_on_the_tab_about_the_app_itself() {
-		$this->visit( $this->user_with_role( 'administrator' ), Promo::PAGE, Promo::TAB );
+	public function test_it_is_stored_once_for_the_whole_site() {
+		$this->visit( $this->user_with_role( 'administrator' ) );
+		$this->notification();
 
-		$this->assertNull( $this->notice() );
+		$added = get_option( Notices::NOTIFICATIONS_OPTION )[ Promo::NOTICE_ID ]['added'];
+
+		$this->visit( $this->user_with_role( 'sales_rep' ) );
+
+		$this->assertNotNull( $this->notification() );
+		$this->assertSame( $added, get_option( Notices::NOTIFICATIONS_OPTION )[ Promo::NOTICE_ID ]['added'] );
 	}
 
-	public function test_the_notice_is_shown_on_the_other_tabs_of_the_page_that_has_it() {
-		$this->visit( $this->user_with_role( 'administrator' ), Promo::PAGE, 'system' );
+	public function test_dismissing_it_is_for_that_person_only() {
+		$one     = $this->user_with_role( 'sales_rep' );
+		$another = $this->user_with_role( 'sales_rep' );
 
-		$this->assertNotNull( $this->notice() );
-	}
+		$this->visit( $one );
+		$this->assertNotNull( $this->notification() );
 
-	public function test_the_notice_does_not_interrupt_the_guided_setup() {
-		$this->visit( $this->user_with_role( 'administrator' ), 'gh_guided_setup' );
-
-		$this->assertNull( $this->notice() );
-	}
-
-	public function test_closing_the_notice_keeps_it_away() {
-		$user = $this->user_with_role( 'administrator' );
-		$this->visit( $user );
-
-		$this->assertNotNull( $this->notice() );
-
-		// what the X does (gh_dismiss_notice)
+		// what the X in the feed does (gh_dismiss_notice)
 		\Groundhogg\notices()->dismiss_notice( Promo::NOTICE_ID );
 
-		// and the next page
-		Notices::$dismissed_notices = [];
-		$this->assertNotEmpty( get_user_meta( $user, Notices::DISMISSED_NOTICES_OPTION, true ) );
-		Notices::$dismissed_notices = get_user_meta( $user, Notices::DISMISSED_NOTICES_OPTION, true );
-		$this->visit( $user );
+		$this->assertNotEmpty( get_user_meta( $one, Notices::DISMISSED_NOTICES_OPTION, true ) );
 
-		$this->assertNull( $this->notice() );
+		$this->visit( $another );
+		$this->assertFalse( \Groundhogg\notices()->is_dismissed( Promo::NOTICE_ID ) );
+
+		$this->visit( $one );
+		$this->assertTrue( \Groundhogg\notices()->is_dismissed( Promo::NOTICE_ID ) );
 	}
 
-	public function test_a_person_who_has_used_the_app_is_not_told_about_it() {
+	public function test_a_person_who_has_used_the_app_is_treated_as_having_dismissed_it() {
 		$user = $this->user_with_role( 'sales_rep' );
 		$this->visit( $user );
 
-		$this->assertNotNull( $this->notice() );
+		$this->notification();
+		$this->assertFalse( \Groundhogg\notices()->is_dismissed( Promo::NOTICE_ID ) );
 
 		Promo::record_use( $user );
 		$this->visit( $user );
+		$this->notification();
 
-		$this->assertNull( $this->notice() );
+		$this->assertTrue( \Groundhogg\notices()->is_dismissed( Promo::NOTICE_ID ) );
+		$this->assertNotEmpty( get_user_meta( $user, Notices::DISMISSED_NOTICES_OPTION, true ) );
 	}
 
 	/* ---- remembering that it was used ------------------------------------------------------------------- */

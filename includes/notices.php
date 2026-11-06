@@ -26,6 +26,8 @@ class Notices {
 	const TRANSIENT = 'groundhogg_notices';
 	const DISMISSED_NOTICES_OPTION = 'gh_dismissed_notices';
 	const READ_NOTICES_OPTION = 'gh_read_notices';
+	const NOTIFICATIONS_OPTION = 'gh_notifications';
+	const NOTIFICATION_LOCATIONS = [ 'feed', 'banner', 'both' ];
 	const REMOTE_NOTICES_URL = 'https://groundhogg.io/wp-json/gh/v4/broadcasts/archive';
 	const CDN_NOTICES_URL = 'https://cdn.groundhogg.io/broadcasts';
 
@@ -38,6 +40,7 @@ class Notices {
 		add_action( 'admin_notices', [ $this, 'pre_notices' ] );
 		add_action( 'admin_notices', [ $this, 'notices' ] );
 		add_action( 'admin_notices', [ $this, 'user_notices' ] );
+		add_action( 'admin_notices', [ $this, 'notification_banners' ] );
 
 		add_action( 'admin_init', [ $this, 'dismiss_notices' ] );
 		add_action( 'wp_ajax_gh_dismiss_notice', [ $this, 'ajax_dismiss_notice' ] );
@@ -176,7 +179,244 @@ class Notices {
 	 * @return void
 	 */
 	function ajax_fetch_remote_notices() {
-		wp_send_json( $this->fetch_remote_notices() );
+		wp_send_json( $this->get_feed() );
+	}
+
+	/**
+	 * Add a notification that stays in the notifications feed (the bell in the admin) until each person dismisses it.
+	 * Use this instead of hooking into admin_notices, e.g. from an update path or after something was set up.
+	 *
+	 * The id is what dismissal and "read" are remembered by, so give a new notification a new id.
+	 * Adding the same id again updates the content but keeps the date it first appeared, so it is safe to call
+	 * on every request.
+	 *
+	 * @param string $id   unique id for the notification, e.g. 'updated-to-4-12'
+	 * @param array  $args {
+	 *
+	 * @type string  $title     the heading in the feed
+	 * @type string  $message   the content, HTML allowed (same tags as post content)
+	 * @type string  $type      info, success, warning, error, which colors the banner
+	 * @type string  $cap       capability needed to see it, false for anyone who can see Groundhogg's admin
+	 * @type string  $location  'feed' (default), 'banner' (admin_notices only) or 'both'
+	 * @type bool    $site_wide for banners, whether it appears on every admin page and not only Groundhogg's
+	 * @type int     $expires   timestamp after which it is no longer shown, 0 to keep it
+	 * }
+	 *
+	 * @return bool whether it was stored
+	 */
+	public function add_notification( string $id, array $args = [] ): bool {
+
+		$id = sanitize_key( $id );
+
+		if ( $id === '' ) {
+			return false;
+		}
+
+		// ids from the remote feed are numbers, keep ours apart from them
+		if ( is_numeric( $id ) ) {
+			$id = 'notice-' . $id;
+		}
+
+		$args = wp_parse_args( $args, [
+			'title'     => '',
+			'message'   => '',
+			'type'      => 'info',
+			'cap'       => false,
+			'location'  => 'feed',
+			'site_wide' => false,
+			'expires'   => 0,
+		] );
+
+		if ( trim( $args['title'] ) === '' && trim( $args['message'] ) === '' ) {
+			return false;
+		}
+
+		$now    = time();
+		$stored = array_filter( $this->get_stored_notifications(), function ( $notification ) use ( $now ) {
+			return ! $notification['expires'] || $notification['expires'] > $now;
+		} );
+
+		$notification = [
+			'id'        => $id,
+			'title'     => sanitize_text_field( $args['title'] ),
+			'message'   => wp_kses_post( $args['message'] ),
+			'type'      => in_array( $args['type'], [ 'info', 'success', 'warning', 'error' ], true ) ? $args['type'] : 'info',
+			'cap'       => $args['cap'] ? sanitize_text_field( $args['cap'] ) : false,
+			'location'  => in_array( $args['location'], self::NOTIFICATION_LOCATIONS, true ) ? $args['location'] : 'feed',
+			'site_wide' => (bool) $args['site_wide'],
+			'expires'   => absint( $args['expires'] ),
+			'added'     => isset( $stored[ $id ]['added'] ) ? absint( $stored[ $id ]['added'] ) : $now,
+		];
+
+		// nothing changed, don't write on every request
+		if ( isset( $stored[ $id ] ) && $stored[ $id ] === $notification && count( $stored ) === count( $this->get_stored_notifications() ) ) {
+			return true;
+		}
+
+		$stored[ $id ] = $notification;
+
+		update_option( self::NOTIFICATIONS_OPTION, $stored, false );
+
+		return true;
+	}
+
+	/**
+	 * Remove a notification, for everyone
+	 *
+	 * @param string $id
+	 *
+	 * @return bool whether there was one to remove
+	 */
+	public function remove_notification( string $id ): bool {
+
+		$stored = $this->get_stored_notifications();
+		$id     = sanitize_key( $id );
+
+		if ( ! isset( $stored[ $id ] ) ) {
+			return false;
+		}
+
+		unset( $stored[ $id ] );
+
+		update_option( self::NOTIFICATIONS_OPTION, $stored, false );
+
+		return true;
+	}
+
+	/**
+	 * @return array every stored notification, expired or not
+	 */
+	protected function get_stored_notifications(): array {
+		$stored = get_option( self::NOTIFICATIONS_OPTION, [] );
+
+		return is_array( $stored ) ? $stored : [];
+	}
+
+	/**
+	 * The notifications the current user can see, that haven't expired.
+	 *
+	 * @param string $where 'feed' or 'banner' for the ones that belong there, empty for all
+	 *
+	 * @return array[] keyed by id
+	 */
+	public function get_notifications( string $where = '' ): array {
+
+		$now = time();
+		$out = [];
+
+		foreach ( $this->get_stored_notifications() as $id => $notification ) {
+
+			if ( $notification['expires'] && $notification['expires'] <= $now ) {
+				continue;
+			}
+
+			if ( $notification['cap'] && ! current_user_can( $notification['cap'] ) ) {
+				continue;
+			}
+
+			$location = $notification['location'];
+
+			// the bell is hidden when white labeled, so the feed can't be reached
+			if ( $location === 'feed' && is_white_labeled() ) {
+				$location = 'banner';
+			}
+
+			if ( ( $where === 'feed' && $location === 'banner' ) || ( $where === 'banner' && $location === 'feed' ) ) {
+				continue;
+			}
+
+			$out[ $id ] = $notification;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * The items for the notifications feed: the remote notices and the ones added in code, newest first.
+	 * If the remote ones can't be fetched the others are still returned.
+	 *
+	 * @return array[]|WP_Error
+	 */
+	public function get_feed() {
+
+		$remote = $this->fetch_remote_notices();
+		$rows   = [];
+
+		foreach ( $this->get_notifications( 'feed' ) as $notification ) {
+			$rows[] = [
+				'ts'   => $notification['added'],
+				'i'    => count( $rows ),
+				'item' => [
+					'id'      => $notification['id'],
+					'title'   => $notification['title'],
+					'content' => wp_kses_post( wpautop( $notification['message'] ) ),
+					'sent'    => wp_date( 'Y-m-d H:i:s', $notification['added'] ),
+				],
+			];
+		}
+
+		if ( is_wp_error( $remote ) ) {
+			if ( empty( $rows ) ) {
+				return $remote;
+			}
+
+			$remote = [];
+		}
+
+		// one with a date that can't be read stays next to the one before it
+		$ts = 0;
+
+		foreach ( $remote as $item ) {
+			$ts     = strtotime( $item['sent'] ) ?: $ts;
+			$rows[] = [
+				'ts'   => $ts,
+				'i'    => count( $rows ),
+				'item' => $item,
+			];
+		}
+
+		// usort isn't stable before PHP 8, so ties keep their order by index
+		usort( $rows, function ( $a, $b ) {
+			return $b['ts'] <=> $a['ts'] ?: $a['i'] <=> $b['i'];
+		} );
+
+		return array_column( $rows, 'item' );
+	}
+
+	/**
+	 * Show the notifications that are set to appear as a banner, until they are dismissed.
+	 *
+	 * @return void
+	 */
+	public function notification_banners() {
+
+		foreach ( $this->get_notifications( 'banner' ) as $id => $notification ) {
+
+			if ( $this->is_dismissed( $id ) ) {
+				continue;
+			}
+
+			if ( ! $notification['site_wide'] && ! is_admin_groundhogg_page() ) {
+				continue;
+			}
+
+			$dismiss_url = wp_nonce_url( add_query_arg( 'notice', $id ), 'gh_dismiss_notice' );
+
+			?>
+            <div id="gh-notification-<?php echo esc_attr( $id ); ?>" class="notice notice-<?php echo esc_attr( $notification['type'] ); ?>">
+                <div class="display-flex gap-10">
+					<?php groundhogg_icon( 24 ); ?>
+                    <div class="notice-message">
+						<?php if ( $notification['title'] ): ?>
+                            <p><strong><?php echo esc_html( $notification['title'] ); ?></strong></p>
+						<?php endif; ?>
+						<?php echo wp_kses_post( wpautop( $notification['message'] ) ); ?>
+                        <p><a href="<?php echo esc_url( $dismiss_url ); ?>"><?php esc_html_e( 'Dismiss', 'groundhogg' ); ?></a></p>
+                    </div>
+                </div>
+            </div>
+			<?php
+		}
 	}
 
 	/**
@@ -232,9 +472,16 @@ class Notices {
 	 * @return int
 	 */
 	function count_unread() {
-		$ids = wp_parse_id_list( wp_list_pluck( $this->fetch_remote_notices(), 'id' ) );
+		$feed = $this->get_feed();
 
-		return count( array_diff( $ids, array_values( self::$read_notices ) ) );
+		if ( is_wp_error( $feed ) ) {
+			return 0;
+		}
+
+		$ids  = wp_list_pluck( $feed, 'id' );
+		$done = array_merge( array_values( self::$read_notices ), self::get_dismissed_notice_ids() );
+
+		return count( array_diff( $ids, $done ) );
 	}
 
 	/**

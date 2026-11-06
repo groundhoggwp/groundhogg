@@ -1,23 +1,9 @@
 /**
  * The mobile app in the admin.
  *
- *  - The notice that tells people about the app: closing it with the X is remembered, so it doesn't come back.
- *  - The Mobile app page: draw the code that opens the app on a phone, and copy the link.
+ * The Mobile app page: draw the code that opens the app on a phone, and copy the link.
  */
 ( function () {
-
-  const NOTICE = 'mobile-app-available'
-
-  // The X is added to every dismissible notice by the admin's own script, and only hides it. For this one it is
-  // remembered as well (the notice's id is the code it was added with).
-  document.addEventListener( 'click', e => {
-    if ( e.target.closest && e.target.closest( '#' + NOTICE + ' .notice-dismiss' ) && window.Groundhogg && Groundhogg.api ) {
-      Groundhogg.api.ajax( {
-        action: 'gh_dismiss_notice',
-        notice: NOTICE,
-      } )
-    }
-  } )
 
   const qr = document.getElementById( 'gh-mobile-qr' )
 
