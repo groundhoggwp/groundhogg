@@ -2064,9 +2064,10 @@ function split_name( $name ) {
 		$name = implode( ' ', $name );
 	}
 
-	$name       = trim( $name );
-	$last_name  = ( strpos( $name, ' ' ) === false ) ? '' : preg_replace( '#.*\s([\w-]*)$#', '$1', $name );
-	$first_name = trim( preg_replace( '#' . $last_name . '#', '', $name ) );
+	// the last word is the last name, everything before it is the first name
+	$parts      = preg_split( '/\s+/', trim( (string) $name ), - 1, PREG_SPLIT_NO_EMPTY );
+	$last_name  = count( $parts ) > 1 ? array_pop( $parts ) : '';
+	$first_name = implode( ' ', $parts );
 
 	return array( $first_name, $last_name );
 }
