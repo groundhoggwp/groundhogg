@@ -1716,7 +1716,13 @@
   /**
    * IFrame, useful for email previews
    *
+   * The content is a blob: URL, which takes the origin of the admin page, so a script in the content would run with
+   * the access of the logged in user. Previews don't need scripts, so by default the frame is sandboxed without
+   * allow-scripts. allow-same-origin is only there so the parent can size the frame, and is only safe because scripts
+   * are off, never add allow-scripts alongside it.
+   *
    * @param onCreate
+   * @param sandbox
    * @param attributes
    * @param content
    * @returns {*}
@@ -1724,6 +1730,7 @@
    */
   const Iframe = ({
     onCreate = () => {},
+    sandbox = 'allow-same-origin allow-popups allow-popups-to-escape-sandbox',
     ...attributes
   }, content = null) => {
 
@@ -1732,6 +1739,7 @@
 
     return makeEl('iframe', {
       ...attributes,
+      sandbox,
       src,
     })
   }

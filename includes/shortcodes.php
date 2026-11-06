@@ -119,7 +119,8 @@ class Shortcodes {
 
 		?>
         <div class="gh-email-preview-wrapper has-iframe">
-            <iframe style="overflow: hidden" scrolling="no" width="100%" class="gh-email-preview" id="gh-email-preview-<?php echo esc_attr( $atts['id'] ); ?>"></iframe>
+            <?php // blob: URLs share the site origin, so no allow-scripts. allow-same-origin is only for sizing the frame ?>
+            <iframe sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" style="overflow: hidden" scrolling="no" width="100%" class="gh-email-preview" id="gh-email-preview-<?php echo esc_attr( $atts['id'] ); ?>"></iframe>
             <script>
 
               let iframe = document.getElementById('gh-email-preview-<?php echo esc_attr( $atts['id'] ); ?>')

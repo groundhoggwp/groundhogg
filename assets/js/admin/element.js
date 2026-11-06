@@ -2476,6 +2476,10 @@ ${ afterProgress() }`,
   }
 
   const setFrameContent = (frame, content) => {
+    // blob: URLs share the admin origin, so keep scripts off. Must be set before the src is
+    if (!frame.hasAttribute('sandbox')) {
+      frame.setAttribute('sandbox', 'allow-same-origin allow-popups allow-popups-to-escape-sandbox')
+    }
     let blob = new Blob([content], { type: 'text/html; charset=utf-8' })
     frame.src = URL.createObjectURL(blob)
   }
