@@ -77,7 +77,6 @@ class Main_Installer extends Installer {
 
 			update_user_meta( $owner->ID, 'gh_broadcast_results', 1 );
 			update_user_meta( $owner->ID, 'gh_weekly_overview', 1 );
-			update_user_meta( $owner->ID, 'gh_my_day', 1 );
 		}
 	}
 

@@ -413,7 +413,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  * Each task in it has links to snooze or complete it, which work without signing in. Opening a link asks first, and only the button on the page does it, so a mail scanner that opens every link in an email can't snooze or complete anything.
  * A sales manager can add a section for their team's tasks, replies and new contacts.
  * Add-ons add their own sections, like deals and appointments, with the `groundhogg/email_reports/my_day_sections` filter.
- * Users who own contacts are subscribed when the plugin updates. Nobody is subscribed to the team's section.
+ * It is opt-in. Nobody is subscribed to it automatically, a user turns it on from the Notifications card of their profile.
 * ADDED The footer of every notification email has a link that unsubscribes from it without signing in. Each report is now sent to each recipient on its own, so the link is theirs. The links are signed, so they can't be changed to unsubscribe someone else, and opening one asks first.
 * FIXED The profile of a sales manager who can't delete users raised an error where their team is listed.
 * FIXED The event queue and background tasks put a 60 second limit on a process that had none, like one run from the command line or a server's cron, because raising the time limit also lowered a limit of 0. A limit of 0 is now left alone.

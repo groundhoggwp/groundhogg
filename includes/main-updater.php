@@ -6,7 +6,6 @@ use Groundhogg\Background\Add_Activity_Indexes;
 use Groundhogg\Background\Iterate_Over_List;
 use Groundhogg\Background\Migrate_Composed_Emails;
 use Groundhogg\DB\Query\Table_Query;
-use Groundhogg\Reporting\My_Day;
 use Groundhogg\Steps\Actions\Send_Email;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -381,11 +380,10 @@ class Main_Updater extends Old_Updater {
 			],
 			'4.11' => [
 				'automatic'   => true,
-				'description' => __( 'Add the <code>view_contact_pii</code> capability to every role that can view contacts, so that access to contact personal information can be taken away from a role or user. Copy the interface settings of the site, now chosen by each user on their profile, to every user who can view contacts. Subscribe the sales team to the daily summary of their day.', 'groundhogg' ),
+				'description' => __( 'Add the <code>view_contact_pii</code> capability to every role that can view contacts, so that access to contact personal information can be taken away from a role or user. Copy the interface settings of the site, now chosen by each user on their profile, to every user who can view contacts.', 'groundhogg' ),
 				'callback'    => function () {
 
 					self::move_interface_settings_to_users();
-					self::subscribe_owners_to_my_day();
 
 					$roles = wp_roles();
 
@@ -400,34 +398,6 @@ class Main_Updater extends Old_Updater {
 				},
 			],
 		];
-	}
-
-	/**
-	 * Subscribe the people who own contacts to the daily summary of their day, unless they have already chosen. They can
-	 * turn it off from the link in the email, or their profile.
-	 *
-	 * Like the performance reports before it, it leaves out the super admin and users with an email address that doesn't
-	 * belong to the site, like agency and support users, who didn't ask for any email from it. Nobody is subscribed to the
-	 * team's section.
-	 *
-	 * @return void
-	 */
-	public static function subscribe_owners_to_my_day() {
-
-		$owners = get_users( [ 'role__in' => get_owner_roles() ] );
-
-		foreach ( $owners as $owner ) {
-
-			if ( ( is_multisite() && is_super_admin( $owner->ID ) ) || ! email_is_same_domain( $owner->user_email ) ) {
-				continue;
-			}
-
-			if ( ! user_can( $owner, 'view_contacts' ) || metadata_exists( 'user', $owner->ID, My_Day::META_ENABLED ) ) {
-				continue;
-			}
-
-			update_user_meta( $owner->ID, My_Day::META_ENABLED, 1 );
-		}
 	}
 
 	/**
