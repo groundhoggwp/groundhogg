@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.10
+Stable tag: 4.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -401,7 +401,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.11 =
+= 4.11 (2026-11-05) =
 * ADDED A permission that hides contact personal information. Roles and users without the `view_contact_pii` capability, administrators included, can still work with contacts by their ID, tags, activity, opt-in status, segments, broadcasts and flows, but see `[redacted]` in place of a contact's name, email address, phone numbers, address and other personal details, and can't search or filter by them. Every role that can view contacts is given the capability when 4.11 updates, so nothing changes until you take it away from a role or a user. AI abilities run as a WordPress user, so an AI agent that connects as a user without it is limited too.
  * It covers the AI abilities and the REST API. Contacts, messages, the email log, form submissions, notes, tasks, page visits and activity are redacted, searching or filtering by personal information is refused, and a contact's files and mailbox, exports and the contact table row are closed to them.
  * It covers the admin screens. The contacts table, the contact record and its editor, the quick edit, the email log, the events table, the contact pickers and the flow simulator show `[redacted]` or a label like Contact #12 in place of personal information, the contact search and the sorting by personal information are refused, and what they save can never write `[redacted]` into a contact. Exports, imports, previous exports and the contact files are closed to them, and the Export bulk action isn't offered. Add-ons are responsible for redacting the columns and cards that they add.
