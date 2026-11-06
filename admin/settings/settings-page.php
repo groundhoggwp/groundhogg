@@ -411,7 +411,7 @@ class Settings_Page extends Admin_Page {
 			'token'    => self::basic_auth_token( $user->user_login, $password ),
 		];
 
-		$this->add_notice( 'success', 'Application password created!' );
+		$this->add_notice( 'success', __( 'Application password created!', 'groundhogg' ) );
 
 		return true;
 	}
