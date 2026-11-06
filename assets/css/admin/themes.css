@@ -1680,10 +1680,10 @@ body.groundhogg-admin-page[class*="gh-theme-"] div.error p {
 }
 
 /* WP's link blue is only 2:1 on the tinted notices of the dark themes, so links take the accent, which every theme
-   has chosen to read on its own colors */
-body.groundhogg-admin-page[class*="gh-theme-"] .notice a,
-body.groundhogg-admin-page[class*="gh-theme-"] div.updated a,
-body.groundhogg-admin-page[class*="gh-theme-"] div.error a {
+   has chosen to read on its own colors. Buttons keep theirs, a primary one is the accent behind its label. */
+body.groundhogg-admin-page[class*="gh-theme-"] .notice a:not(.button),
+body.groundhogg-admin-page[class*="gh-theme-"] div.updated a:not(.button),
+body.groundhogg-admin-page[class*="gh-theme-"] div.error a:not(.button) {
   color: var(--ght-accent);
 }
 

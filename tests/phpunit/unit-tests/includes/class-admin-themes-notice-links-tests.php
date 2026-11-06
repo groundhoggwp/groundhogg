@@ -14,9 +14,20 @@ class Admin_Themes_Notice_Links_Tests extends GH_UnitTestCase {
 		$css = $this->css();
 
 		$this->assertMatchesRegularExpression(
-			'/\[class\*="gh-theme-"\] \.notice a,\n[^{]*div\.updated a,\n[^{]*div\.error a \{\s*color: var\(--ght-accent\);\s*\}/',
+			'/\[class\*="gh-theme-"\] \.notice a:not\(\.button\),\n[^{]*div\.updated a:not\(\.button\),\n[^{]*div\.error a:not\(\.button\) \{\s*color: var\(--ght-accent\);\s*\}/',
 			$css
 		);
+	}
+
+	public function test_a_button_in_a_notice_keeps_the_label_color_of_the_button() {
+
+		$css = $this->css();
+
+		// the accent link rule is more specific than the label color of a primary button, so on the accent background of
+		// the button the label took the accent too, like the mobile app notice
+		$this->assertDoesNotMatchRegularExpression( '/\.notice a(,| \{)/', $css );
+		$this->assertDoesNotMatchRegularExpression( '/div\.(updated|error) a(,| \{)/', $css );
+		$this->assertMatchesRegularExpression( '/\[class\*="gh-theme-"\] \.button-primary \{[^}]*[^-]color: var\(--ght-on-accent\);/', $css );
 	}
 
 	public function test_the_yellow_promo_card_keeps_dark_text_in_every_theme() {
