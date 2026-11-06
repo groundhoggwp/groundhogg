@@ -132,7 +132,7 @@ class Welcome_Page extends Admin_Page {
 			],
 		];
 
-		apply_filters( 'groundhogg/admin/checklist_items', $checklist_items );
+		$checklist_items = apply_filters( 'groundhogg/admin/checklist_items', $checklist_items );
 
 		// set the ID as the query part of the fix
 		$checklist_items = array_map( function ( $item ) {
@@ -304,7 +304,7 @@ class Welcome_Page extends Admin_Page {
 			}
 		}
 
-		apply_filters( 'groundhogg/admin/recommendation_items', $checklist_items );
+		$checklist_items = apply_filters( 'groundhogg/admin/recommendation_items', $checklist_items );
 
 		// set the ID as the query part of the fix
 		$checklist_items = array_map( function ( $item ) {

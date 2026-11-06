@@ -75,6 +75,66 @@ class Notification_Recommendation_Tests extends GH_UnitTestCase {
 		$this->assertSame( 'do_not_allow', Welcome_Page::get_notifications_item()['cap'] );
 	}
 
+	/**
+	 * Run an ajax handler of the welcome page and return what it sent
+	 */
+	protected function ajax( string $method ): array {
+
+		$_REQUEST['gh_admin_ajax_nonce'] = wp_create_nonce( 'admin_ajax' );
+
+		$die = function () {
+			throw new Exception( 'wp_die' );
+		};
+
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		add_filter( 'wp_die_ajax_handler', function () use ( $die ) {
+			return $die;
+		} );
+
+		ob_start();
+
+		try {
+			( new Welcome_Page() )->$method();
+		} catch ( Exception $e ) {
+			// it ends by dying
+		}
+
+		$response = json_decode( ob_get_clean(), true );
+
+		remove_filter( 'wp_doing_ajax', '__return_true' );
+		unset( $_REQUEST['gh_admin_ajax_nonce'] );
+
+		return $response['data']['items'] ?? [];
+	}
+
+	public function test_an_add_on_can_add_to_the_recommendations_and_the_checklist() {
+
+		$this->user_with( 'administrator' );
+
+		foreach ( [ 'recommendation_items' => 'ajax_get_recommendation_items', 'checklist_items' => 'ajax_get_checklist_items' ] as $filter => $method ) {
+
+			$add = function ( $items ) use ( $filter ) {
+				$items[] = [
+					'title'       => "Added to $filter",
+					'description' => 'From an add-on.',
+					'completed'   => false,
+					'fix'         => admin_url( "admin.php?page=$filter" ),
+					'cap'         => 'read',
+				];
+
+				return $items;
+			};
+
+			add_filter( "groundhogg/admin/$filter", $add );
+
+			$titles = wp_list_pluck( $this->ajax( $method ), 'title' );
+
+			remove_filter( "groundhogg/admin/$filter", $add );
+
+			$this->assertContains( "Added to $filter", $titles );
+		}
+	}
+
 	public function test_it_includes_the_summaries_of_add_ons() {
 
 		add_filter( 'groundhogg/notifications/types', function ( $types ) {
