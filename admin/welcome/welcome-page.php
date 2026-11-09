@@ -3,6 +3,7 @@
 namespace Groundhogg\Admin\Welcome;
 
 use Groundhogg\Admin\Admin_Page;
+use Groundhogg\Mailhawk;
 use Groundhogg\Mcp\Connection;
 use Groundhogg\Mobile\Promo;
 use Groundhogg\Notifications\Subscriptions;
@@ -195,19 +196,13 @@ class Welcome_Page extends Admin_Page {
 		$reports   = get_option( 'gh_custom_reports', [] );
 		$signature = get_user_meta( get_current_user_id(), 'signature', true );
 
-		// MailHawk is installed but not connected -> redirect to the mailhawk connect page
-		if ( function_exists( 'mailhawk_is_connected' ) && ! mailhawk_is_connected() ):
-			$smtp_fix_link = admin_page_url( 'mailhawk' );
-
-		// The number of registered services is > 1, means that an integration is installed.
-        elseif ( count( Groundhogg_Email_Services::get() ) > 1 ):
+		// MailHawk is installed but not connected -> its own page, where it's connected
+		if ( defined( 'MAILHAWK_VERSION' ) && ! Mailhawk::is_connected() ) {
+			$smtp_fix_link = Mailhawk::connect_url();
+		} else {
+			// the email settings, to pick a service or connect MailHawk
 			$smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
-
-		// No other service is currently in use.
-		else:
-			$smtp_fix_link = admin_page_url( 'gh_settings', [ 'tab' => 'email' ] );
-
-		endif;
+		}
 
 		$checklist_items = [
 			[
@@ -227,7 +222,8 @@ class Welcome_Page extends Admin_Page {
 			[
 				'title'       => __( 'Integrate a verified SMTP service', 'groundhogg' ),
 				'description' => __( "You need a proper SMTP service to ensure your email reaches the inbox. We recommend <a href='https://mailhawk.io'>MailHawk!</a>", 'groundhogg' ),
-				'completed'   => Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || function_exists( 'mailhawk_mail' ),
+				// MailHawk only sends once it's connected, being active isn't enough
+				'completed'   => Groundhogg_Email_Services::get_marketing_service() !== 'wp_mail' || Mailhawk::is_connected(),
 				'fix'         => $smtp_fix_link,
 				'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins'
 			],
