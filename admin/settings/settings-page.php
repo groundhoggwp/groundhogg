@@ -58,9 +58,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Settings_Page extends Admin_Page {
 
-	// UNUSED FUNCTIONS
 	protected function add_ajax_actions() {
+		// installs MailHawk from the email settings
+		Mailhawk::instance();
 	}
+
+	// UNUSED FUNCTIONS
 
 	public function help() {
 	}
@@ -833,6 +836,13 @@ class Settings_Page extends Admin_Page {
 //				'tab'      => 'email',
 //				'callback' => [ SendWp::instance(), 'settings_connect_ui' ],
 //			],
+			'mailhawk'              => [
+				'id'       => 'mailhawk',
+				'title'    => _x( 'Send Email with MailHawk', 'settings_sections', 'groundhogg' ),
+				'tab'      => 'email',
+				'badge'    => Mailhawk::is_connected() ? '' : '<span class="pill green">' . esc_html__( 'Recommended', 'groundhogg' ) . '</span>',
+				'callback' => [ Mailhawk::instance(), 'settings_connect_ui' ],
+			],
 			'outgoing_email_config' => [
 				'id'    => 'outgoing_email_config',
 				'title' => _x( 'Outgoing Email', 'settings_sections', 'groundhogg' ),
@@ -850,12 +860,6 @@ class Settings_Page extends Admin_Page {
 					}
 				},
 			],
-//			'mailhawk'              => [
-//				'id'       => 'mailhawk',
-//				'title'    => _x( 'MailHawk', 'settings_sections', 'groundhogg' ),
-//				'tab'      => 'email',
-//				'callback' => [ Mailhawk::instance(), 'settings_connect_ui' ],
-//			],
 			'overrides'             => [
 				'id'    => 'overrides',
 				'title' => _x( 'Sender Profiles', 'settings_sections', 'groundhogg' ),
@@ -976,6 +980,10 @@ class Settings_Page extends Admin_Page {
 
 		if ( is_white_labeled() ) {
 			unset( $sections['affiliate'] );
+		}
+
+		if ( Mailhawk::is_disabled() ) {
+			unset( $sections['mailhawk'] );
 		}
 
 		return apply_filters( 'groundhogg/admin/settings/sections', $sections );
@@ -2538,11 +2546,13 @@ class Settings_Page extends Admin_Page {
 			}
 
 			// add_settings_section() drops the keys it doesn't know, so look the section up by the id it was registered with
-			$is_danger = (bool) get_array_var( get_array_var( $this->sections, substr( $section['id'], 3 ), [] ), 'danger' );
+			$registered = get_array_var( $this->sections, substr( $section['id'], 3 ), [] );
+			$is_danger  = (bool) get_array_var( $registered, 'danger' );
 
 			ob_start();
 
-			Card_Sections::section_start( $section['title'], '', '', $is_danger ? 'danger' : '' );
+			// a badge is HTML next to the title, like a pill
+			Card_Sections::section_start( $section['title'], '', get_array_var( $registered, 'badge', '' ), $is_danger ? 'danger' : '' );
 
 			if ( $intro !== '' ) {
 				Card_Sections::intro( $intro );

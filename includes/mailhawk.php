@@ -2,11 +2,21 @@
 
 namespace Groundhogg;
 
+use Groundhogg\Admin\Card_Sections;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+/**
+ * Recommends MailHawk on the email settings, and installs it in one click
+ *
+ * Connecting is left to MailHawk's own screen, so that it always matches the version of MailHawk that is installed.
+ */
 class Mailhawk {
 
-	const PARTNER_ID = 1;
+	/**
+	 * The notice id the recommendation is dismissed by, per user
+	 */
+	const DISMISS_ID = 'mailhawk-settings';
 
 	/**
 	 * Constructor.
@@ -17,24 +27,56 @@ class Mailhawk {
 	 */
 	public function __construct() {
 
-		/**
-		 * Disable the SendWP Connector class and settings
-		 *
-		 * @param bool $disabled Whether or not this class is disabled.
-		 *
-		 * @since 3.36.1
-		 *
-		 */
-		if ( apply_filters( 'groundhogg/disable_mailhawk', false ) ) {
+		if ( self::is_disabled() ) {
 			return;
 		}
 
 		add_action( 'wp_ajax_groundhogg_mailhawk_remote_install', array( $this, 'ajax_callback_remote_install' ) );
 	}
 
+	/**
+	 * Whether the recommendation is turned off, by white labeling or the groundhogg/disable_mailhawk filter
+	 *
+	 * @return bool
+	 */
+	public static function is_disabled() {
+
+		/**
+		 * Disable the MailHawk recommendation and installer
+		 *
+		 * @param bool $disabled Whether or not this class is disabled.
+		 *
+		 * @since 3.36.1
+		 *
+		 */
+		return is_white_labeled() || apply_filters( 'groundhogg/disable_mailhawk', false );
+	}
 
 	/**
-	 * Ajax callback for installing SendWP Plugin.
+	 * Whether MailHawk is active and connected to the service
+	 *
+	 * @return bool
+	 */
+	public static function is_connected() {
+		return function_exists( 'mailhawk_is_connected' ) && mailhawk_is_connected();
+	}
+
+	/**
+	 * MailHawk's own page, which is where a site is connected when it isn't yet
+	 *
+	 * @return string
+	 */
+	public static function connect_url() {
+
+		if ( function_exists( '\MailHawk\mailhawk_admin_page' ) ) {
+			return \MailHawk\mailhawk_admin_page();
+		}
+
+		return admin_url( 'tools.php?page=mailhawk' );
+	}
+
+	/**
+	 * Ajax callback for installing the MailHawk plugin.
 	 *
 	 * @return void
 	 * @since 3.36.1
@@ -45,13 +87,17 @@ class Mailhawk {
 	public function ajax_callback_remote_install() {
 
 		$ret = $this->do_remote_install();
-		ob_clean();
-		wp_send_json( $ret, ! empty( $ret['status'] ) ? $ret['status'] : 200 );
 
+		// the upgrader may have printed something, which would break the JSON
+		if ( ob_get_level() ) {
+			ob_clean();
+		}
+
+		wp_send_json( $ret, ! empty( $ret['status'] ) ? $ret['status'] : 200 );
 	}
 
 	/**
-	 * Remote installation method.
+	 * Install and activate MailHawk, then say where to go to connect it
 	 *
 	 * @return array
 	 * @since 3.36.1
@@ -77,33 +123,25 @@ class Mailhawk {
 			);
 		}
 
-		if ( ! defined( 'MAILHAWK_VERSION' ) ) {
-			return array(
-				'code'    => 'mailhawk_missing',
-				'message' => 'MailHawk not installed.',
-				'status'  => 400,
-			);
-		}
-
-		$redirect = \MailHawk\get_admin_mailhawk_uri();
-
 		return array(
-			'partner_id'   => self::PARTNER_ID,
-			'register_url' => esc_url( trailingslashit( MAILHAWK_LICENSE_SERVER_URL ) ),
-			'redirect_uri' => esc_url( $redirect ),
-			'client_state' => esc_attr( \MailHawk\Keys::instance()->state() ),
+			'redirect' => esc_url_raw( self::connect_url() ),
 		);
-
 	}
 
 	/**
-	 * Install / Activate SendWP plugin.
+	 * Install / Activate the MailHawk plugin.
 	 *
 	 * @return \WP_Error|true
 	 * @since 3.36.1
 	 *
 	 */
 	private function install() {
+
+		if ( defined( 'MAILHAWK_VERSION' ) ) {
+			return true;
+		}
+
+		include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 		$is_mailhawk_installed = false;
 
@@ -144,119 +182,105 @@ class Mailhawk {
 				return $install;
 			}
 
+			if ( ! $install ) {
+				return new \WP_Error( 'mailhawk_install_failed', __( 'MailHawk could not be installed. Please try again, or install it from the Plugins page.', 'groundhogg' ) );
+			}
+
 			$activate = activate_plugin( $upgrader->plugin_info() );
 			if ( is_wp_error( $activate ) ) {
 				return $activate;
 			}
 		}
 
-		// Final check to see if SendWP is available.
+		// Final check to see if MailHawk is available.
 		if ( ! defined( 'MAILHAWK_VERSION' ) ) {
 			return new \WP_Error( 'mailhawk_not_found', __( 'MailHawk plugin not found. Please try again.', 'groundhogg' ), $install );
 		}
 
 		return true;
-
 	}
 
 	/**
-	 * Get the "Connect" Setting field html.
-	 */
-	public function output_connect_button() {
-
-		if ( function_exists( '\MailHawk\mailhawk_is_connected' ) && \MailHawk\mailhawk_is_connected() ) {
-
-			$ret = array(
-				__( 'Your site is connected to MailHawk.', 'groundhogg' ),
-			);
-
-			if ( function_exists( '\MailHawk\mailhawk_is_suspended' ) && ! \MailHawk\mailhawk_is_suspended() ) {
-				$ret[] = sprintf(
-				// Translators: 1: Opening anchor tag, 2: Closing anchor tag.
-					esc_html__( '%1$sManage your account%2$s.', 'groundhogg' ),
-					'<a href="https://mailhawk.io/account/" target="_blank" rel="noopener noreferrer">',
-					'</a>'
-				);
-			} else {
-				$ret[] = sprintf(
-				// Translators: 1: Opening anchor tag; 2: Closing anchor tag.
-					'<em>' . esc_html__( 'Email sending is currently disabled. %1$sVisit the MailHawk Settings%2$s to enable sending..', 'groundhogg' ) . '</em>',
-					'<a href="' . admin_url( '/tools.php?page=mailhawk' ) . '">',
-					'</a>'
-				);
-			}
-
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
-			echo '<p>' . implode( ' ', $ret ) . '</p>';
-
-			return;
-
-		}
-
-		printf( '<button type="button" class="button button-primary" id="groundhogg-mailhawk-connect">%s %s</button>',
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
-            dashicon( 'email-alt' ),
-            esc_html__( 'Connect MailHawk', 'groundhogg' )
-        );
-	}
-
-	/**
-	 * Output some quick and dirty inline CSS.
+	 * The status of a connected site, or the recommendation and the button to connect one
 	 *
-	 * @return void
-	 * @since 3.36.1
-	 *
-	 */
-	public function output_css() {
-		?>
-        <style type="text/css">
-            #wpbody #groundhogg-mailhawk-connect {
-                font-size: 16px;
-                height: auto;
-                margin: 0 0 6px;
-                padding: 8px 14px;
-            }
-
-            #groundhogg-mailhawk-connect .dashicons {
-                /*vertical-align: middle;*/
-                font-size: 26px;
-                margin: 5px 10px 0 0;
-            }
-        </style>
-		<?php
-	}
-
-	/**
-	 * Settings UI output.
+	 * Prints nothing for someone who can't install plugins on a site that isn't connected, or who dismissed the
+	 * recommendation, so the section is left out.
 	 */
 	public function settings_connect_ui() {
 
-		$this->output_css();
+		if ( self::is_connected() ) {
 
-		?>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th><?php esc_html_e( 'A better way to send email.', 'groundhogg' ); ?></th>
-                <td><?php $this->output_connect_button(); ?>
+			Card_Sections::row( __( 'Status', 'groundhogg' ), '', function () {
 
-					<?php if ( ! function_exists( '\MailHawk\mailhawk_is_connected' ) || ! \MailHawk\mailhawk_is_connected() ) : ?>
-                        <p class="description"><?php printf(
-                                /* translators: %s: link to Mailhawk */
-                                esc_html__( 'Never worry about sending email again! %s takes care of everything for you for starting at $1/month!', 'groundhogg' ),
-                                '<a href="https://mailhawk.io/" target="_blank">MailHawk</a>' ); ?></p>
+				if ( function_exists( '\MailHawk\mailhawk_is_suspended' ) && \MailHawk\mailhawk_is_suspended() ) {
+					?>
+                    <p><span class="pill red"><?php esc_html_e( 'Sending paused', 'groundhogg' ); ?></span></p>
+                    <p><?php
+						/* translators: 1: opening anchor tag, 2: closing anchor tag */
+						printf( esc_html__( 'Your MailHawk account isn\'t sending email right now. %1$sGo to MailHawk%2$s to turn sending back on.', 'groundhogg' ),
+							'<a href="' . esc_url( self::connect_url() ) . '">',
+							'</a>'
+						); ?></p>
+					<?php
+					return;
+				}
+
+				?>
+                <p><span class="pill green"><?php esc_html_e( 'Connected', 'groundhogg' ); ?></span></p>
+                <p><?php
+					/* translators: 1: opening anchor tag to MailHawk's settings, 2: opening anchor tag to the MailHawk account, 3: closing anchor tag */
+					printf( esc_html__( 'This site sends its email with MailHawk. See your email log in %1$sMailHawk%3$s, or %2$smanage your account%3$s.', 'groundhogg' ),
+						'<a href="' . esc_url( self::connect_url() ) . '">',
+						'<a href="https://mailhawk.io/account/" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					); ?></p>
+				<?php
+			} );
+
+			return;
+		}
+
+		if ( ! current_user_can( 'install_plugins' ) || notices()->is_dismissed( self::DISMISS_ID ) ) {
+			return;
+		}
+
+		Card_Sections::row( '', '', function () {
+			?>
+            <div class="display-flex column gap-10" style="max-width: 600px">
+                <p>
+                    <b><?php esc_html_e( 'Get your email to the inbox with MailHawk.', 'groundhogg' ); ?></b>
+					<?php esc_html_e( 'MailHawk is a mail service built for delivery, from the team behind Groundhogg. Connect this site and your email stops depending on your web host.', 'groundhogg' ); ?>
+                </p>
+                <ul class="styled">
+                    <li><?php esc_html_e( 'Authenticated email sent from your own domain, so it reaches the inbox.', 'groundhogg' ); ?></li>
+                    <li><?php esc_html_e( 'Risky recipients are held back before bounces and spam complaints hurt your reputation.', 'groundhogg' ); ?></li>
+                    <li><?php esc_html_e( 'A complete log of every email that was sent, and a way to resend it.', 'groundhogg' ); ?></li>
+                </ul>
+                <div class="display-flex gap-10 align-center">
+					<?php if ( defined( 'MAILHAWK_VERSION' ) ): ?>
+                        <a class="gh-button primary" href="<?php echo esc_url( self::connect_url() ); ?>"><?php esc_html_e( 'Connect MailHawk', 'groundhogg' ); ?></a>
+					<?php else: ?>
+                        <button type="button" class="gh-button primary" id="groundhogg-mailhawk-connect"><?php esc_html_e( 'Connect MailHawk', 'groundhogg' ); ?></button>
 					<?php endif; ?>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-		<?php
+                    <a class="gh-button secondary text" id="groundhogg-mailhawk-dismiss"
+                       href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'notice', self::DISMISS_ID ), 'gh_dismiss_notice' ) ); ?>"><?php esc_html_e( 'No thanks', 'groundhogg' ); ?></a>
+                </div>
+                <p class="description"><?php
+					if ( defined( 'MAILHAWK_VERSION' ) ) {
+						esc_html_e( 'You\'ll sign in or create a MailHawk account, then come straight back. Until you connect, your site keeps sending email the way it does now.', 'groundhogg' );
+					} else {
+						esc_html_e( 'This installs the free MailHawk plugin from WordPress.org. Then you\'ll sign in or create a MailHawk account, and come straight back. Until you connect, your site keeps sending email the way it does now.', 'groundhogg' );
+					}
+					?></p>
+            </div>
+			<?php
+		} );
 
 		$this->output_js();
 	}
 
 	/**
-	 * Output some quick and dirty inline JS.
+	 * Dismiss the recommendation without leaving the page, and install MailHawk with ajax, then go to its page to connect
 	 *
 	 * @return void
 	 * @since 3.36.1
@@ -265,73 +289,62 @@ class Mailhawk {
 	public function output_js() {
 		?>
         <script>
-            var btn = document.getElementById("groundhogg-mailhawk-connect");
-            btn.addEventListener("click", function (e) {
-                e.preventDefault();
-                groundhogg_mailhawk_remote_install();
-            });
+          ( () => {
+            // without the notices api the link dismisses it and comes back to the page
+            document.getElementById('groundhogg-mailhawk-dismiss').addEventListener('click', e => {
+              if (!window.Groundhogg?.notices) {
+                return
+              }
 
-            /**
-             * Perform AJAX request to install SendWP plugin.
-             *
-             * @since 3.36.1
-             *
-             * @return void
-             */
-            function groundhogg_mailhawk_remote_install() {
-                var data = {
-                    "action": "groundhogg_mailhawk_remote_install",
-                    "nonce": <?php echo wp_json_encode( wp_create_nonce( 'install_mailhawk' ) ); ?>
-                };
+              e.preventDefault()
+              Groundhogg.notices.dismiss(<?php echo wp_json_encode( self::DISMISS_ID ); ?>)
+              e.currentTarget.closest('.gh-settings-section').remove()
+            })
 
-                jQuery.post(ajaxurl, data, function (res) {
+            const btn = document.getElementById('groundhogg-mailhawk-connect')
 
-                    groundhogg_mailhawk_register_client(res.register_url, res.client_state, res.redirect_uri, res.partner_id);
-                }).fail(function (jqxhr) {
-                    if (jqxhr.responseJSON && jqxhr.responseJSON.message) {
-                        alert("Error: " + jqxhr.responseJSON.message);
-                        console.log(jqxhr);
-                    }
-                });
+            // MailHawk is installed already, the button is a link to connect it
+            if (!btn) {
+              return
             }
 
-            /**
-             * Register client with SendWP.
-             *
-             * @since 3.36.1
-             *
-             * @param {string} register_url Registration URL.
-             * @param {string} client_state string state for oauth.
-             * @param {string} redirect_uri Client redirect URL.
-             * @param {int} partner_id SendWP partner ID.
-             * @return {void}
-             */
-            function groundhogg_mailhawk_register_client(register_url, client_state, redirect_uri, partner_id) {
+            btn.addEventListener('click', e => {
+              e.preventDefault()
 
-                var form = document.createElement("form");
-                form.setAttribute("method", "POST");
-                form.setAttribute("action", register_url);
+              btn.disabled = true
+              btn.classList.add('loading-dots')
+              btn.textContent = <?php echo wp_json_encode( __( 'Installing MailHawk', 'groundhogg' ) ); ?>
 
-                function groundhogg_mailhawk_append_form_input(name, value) {
-                    var input = document.createElement("input");
-                    input.setAttribute("type", "hidden");
-                    input.setAttribute("name", name);
-                    input.setAttribute("value", value);
-                    form.appendChild(input);
+              const fail = message => {
+                btn.disabled = false
+                btn.classList.remove('loading-dots')
+                btn.textContent = <?php echo wp_json_encode( __( 'Connect MailHawk', 'groundhogg' ) ); ?>
+
+                if (window.Groundhogg?.element?.dialog) {
+                  Groundhogg.element.dialog({ type: 'error', message })
+                }
+                else {
+                  window.alert(message)
+                }
+              }
+
+              jQuery.post(ajaxurl, {
+                action: 'groundhogg_mailhawk_remote_install',
+                nonce : <?php echo wp_json_encode( wp_create_nonce( 'install_mailhawk' ) ); ?>,
+              }, res => {
+                if (res && res.redirect) {
+                  window.location.href = res.redirect
+                  return
                 }
 
-                groundhogg_mailhawk_append_form_input("mailhawk_plugin_signup", "yes");
-                groundhogg_mailhawk_append_form_input("state", client_state);
-                groundhogg_mailhawk_append_form_input("redirect_uri", redirect_uri);
-                groundhogg_mailhawk_append_form_input("partner_id", partner_id);
-
-                document.body.appendChild(form);
-                form.submit();
-
-            }
+                fail(<?php echo wp_json_encode( __( 'MailHawk could not be installed. Please try again, or install it from the Plugins page.', 'groundhogg' ) ); ?>)
+              }).fail(jqxhr => {
+                fail(jqxhr.responseJSON?.message || <?php echo wp_json_encode( __( 'MailHawk could not be installed. Please try again, or install it from the Plugins page.', 'groundhogg' ) ); ?>)
+              })
+            })
+          } )()
         </script>
 		<?php
-
 	}
 
 	/**
@@ -344,7 +357,7 @@ class Mailhawk {
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.
 	 *
-	 * @return Mailhawk An instance of the class.
+	 * @return Mailhawk An instance of the plugin class.
 	 * @since 1.0.0
 	 * @access public
 	 * @static
