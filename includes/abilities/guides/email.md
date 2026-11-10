@@ -217,5 +217,5 @@ Merge tags are resolved for each recipient when the email is sent, in the subjec
 - One clear call to action, usually a button. Keep the email under about 600px wide and the copy short.
 - Write a subject line under about 50 characters and a `preview_text` that adds to it rather than repeating it.
 - Don't make up facts, prices, dates, testimonials or links. Where something is missing, leave a clear placeholder like `[LINK TO OFFER]`, or a placehold.co image (see the image block), and say where it is.
-- Save as `status: "draft"` unless asked otherwise, then send a test with `send-test-email` and share the email's edit link.
+- Save as `status: "draft"` unless asked otherwise, then send a test with `send-test-email` and share the email's edit link. Both kinds of test work on a draft: a design test (the default) shows how it looks; `type: "simulated"` sends it the way a broadcast or flow would, so links, tracking, personalization and conditional blocks can be checked too. Send tests only to the person you're working for.
 - Never send it to contacts (`send-email-template`, `send-email-broadcast`) unless the person you're working for asks you to, with that audience.
