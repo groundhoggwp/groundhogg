@@ -6482,7 +6482,11 @@
         id       : 'template-grid',
         className: 'display-grid gap-20',
       },
-      items)
+      [
+        // building it with an AI assistant, not when choosing an email for a step in the flow editor
+        Groundhogg.buildWithAI && isEmailEditorPage() ? Groundhogg.buildWithAI.Card('span-4') : null,
+        ...items,
+      ])
 
     let items
 

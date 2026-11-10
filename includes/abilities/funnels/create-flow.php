@@ -90,7 +90,7 @@ class Create_Flow extends Ability {
 
 		return [
 			'label'       => __( 'Create Flow', 'groundhogg' ),
-			'description' => __( 'Create a new Groundhogg flow (funnel) with its full sequence of steps, including branching logic. Always creates a brand-new, inactive flow - never returns an existing one, and never activates it. See groundhogg/list-step-types for the available step types and their settings. For guidance on choosing step types, structuring branches, and making sure every step is reachable - plus a downloadable Claude skill that packages this reasoning - see https://groundhogg.io/doc/working-with-the-abilities-api-mcp/.', 'groundhogg' ),
+			'description' => __( 'Create a new Groundhogg flow (funnel) with its full sequence of steps, including branching logic. Always creates a brand-new, inactive flow - never returns an existing one, and never activates it. See groundhogg/list-step-types for the available step types and their settings. Before designing one, get the guide with groundhogg/get-authoring-guide (topic "flow") - it covers choosing step types, placing triggers and delays, branching, and making sure every step is reachable.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',

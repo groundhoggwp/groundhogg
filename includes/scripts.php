@@ -445,6 +445,14 @@ class Scripts {
 			'groundhogg-admin-modal'
 		], GROUNDHOGG_VERSION, true );
 
+		wp_register_script( 'groundhogg-admin-build-with-ai', GROUNDHOGG_ASSETS_URL . 'js/admin/build-with-ai' . $dot_min . '.js', [
+			'groundhogg-admin',
+			'groundhogg-make-el',
+			'wp-i18n',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_set_script_translations( 'groundhogg-admin-build-with-ai', 'groundhogg', GROUNDHOGG_PATH . 'languages' );
+
 		wp_register_script( 'groundhogg-admin-email-log', GROUNDHOGG_ASSETS_URL . 'js/admin/email-log' . $dot_min . '.js', [
 			'groundhogg-admin-components',
 		], GROUNDHOGG_VERSION, true );

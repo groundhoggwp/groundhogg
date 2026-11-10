@@ -7,6 +7,7 @@ use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Campaign;
 use Groundhogg\Email;
 use Groundhogg\Funnel;
+use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg_Email_Services;
 use WP_Error;
 use function Groundhogg\get_db;
@@ -105,6 +106,9 @@ class Emails_Page extends Admin_Page {
 
 			if ( ! $email->exists() ) {
 				$email->title = 'My new email';
+
+				// before the editor, which draws the card among the templates
+				Build_With_AI::enqueue( 'email' );
 			}
 
 			Groundhogg\enqueue_email_block_editor_assets( [

@@ -2068,3 +2068,99 @@ body.gh-full-screen {
 .gh-square-image {
   border-radius: var(--gh-border-radius);
 }
+
+/* Build with AI: the card among the templates on the email and flow add screens, and the popup it opens */
+/* .gh-panel twice, to beat its own border in elements.css, which loads after this */
+.gh-panel.build-with-ai-card.gh-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 260px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px dashed var(--gh-primary);
+  box-sizing: border-box;
+
+  /* a span, not a button, since the whole card is the button. elements.css only styles a and button */
+  .gh-button {
+    display: inline-block;
+    white-space: nowrap;
+    color: #FFFFFF;
+    border-radius: var(--gh-border-radius);
+    padding: 0 calc(var(--gh-item-padding) * 3);
+    line-height: var(--gh-button-line-height);
+    font-size: 16px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0;
+    max-width: 340px;
+    font-size: 14px;
+  }
+
+  .build-with-ai-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--gh-primary);
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-style: solid;
+    box-shadow: 5px 5px 30px 0 rgba(24, 45, 70, 0.1);
+    outline: none;
+  }
+}
+
+/* the admin themes color every panel's border, so use the theme's accent instead */
+body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel.build-with-ai-card {
+  border-color: var(--ght-accent);
+
+  .build-with-ai-icon {
+    color: var(--ght-accent);
+  }
+}
+
+.build-with-ai-modal {
+
+  .build-with-ai label {
+    font-weight: 500;
+  }
+
+  .build-with-ai-examples {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .build-with-ai-examples-label {
+    opacity: 0.75;
+    margin-right: 4px;
+  }
+
+  textarea.code {
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  .build-with-ai-connect {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 15px;
+    border-left: 4px solid #dba617;
+    background: #fcf9e8;
+    color: #1d2327;
+  }
+}

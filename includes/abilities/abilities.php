@@ -57,6 +57,8 @@ use Groundhogg\Abilities\Settings\List_Settings;
 use Groundhogg\Abilities\Settings\Update_Settings;
 use Groundhogg\Abilities\Tags\Create_Tag;
 use Groundhogg\Abilities\Tags\List_Tags;
+use Groundhogg\Abilities\Utils\Get_Authoring_Guide;
+use Groundhogg\Abilities\Utils\Search_Media;
 use Groundhogg\Abilities\Utils\Upload_Media;
 
 /**
@@ -439,7 +441,9 @@ class Abilities {
 			Get_Reports::class,
 			Describe_Table::class,
 			Query_Table::class,
+			Search_Media::class,
 			Upload_Media::class,
+			Get_Authoring_Guide::class,
 			Activate_License::class,
 			Check_License::class,
 			List_Extensions::class,

@@ -81,7 +81,7 @@ class Create_Email_Template extends Ability {
 
 		return [
 			'label'       => __( 'Create Email Template', 'groundhogg' ),
-			'description' => __( 'Create a new saved Groundhogg email (subject + HTML body). Always creates a brand-new email, never returns an existing one. Use the returned id with groundhogg/send-email-template, or attach it to a broadcast/funnel step. For a full guide to authoring block-editor content (editor: "blocks") - block types, merge tags, worked examples - and a downloadable Claude skill that packages it, see https://groundhogg.io/doc/working-with-the-abilities-api-mcp/.', 'groundhogg' ),
+			'description' => __( 'Create a new saved Groundhogg email (subject + HTML body). Always creates a brand-new email, never returns an existing one. Use the returned id with groundhogg/send-email-template, or attach it to a broadcast/funnel step. Before writing block-editor content (editor: "blocks"), get the guide with groundhogg/get-authoring-guide (topic "email") - it has every block type, merge tags and worked examples.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',

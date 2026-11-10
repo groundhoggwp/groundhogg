@@ -10,6 +10,7 @@ use Groundhogg\Campaign;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Funnel;
 use Groundhogg\Library;
+use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
 use WP_Error;
@@ -297,6 +298,7 @@ class Funnels_Page extends Admin_Page {
 			case 'add':
 				wp_enqueue_style( 'groundhogg-admin-element' );
                 wp_enqueue_script( 'groundhogg-admin-data' ); // needed for createState
+				Build_With_AI::enqueue( 'flow' );
 				break;
 			case 'view':
 				$this->enqueue_table_filters( [

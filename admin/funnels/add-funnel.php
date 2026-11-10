@@ -143,7 +143,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <style id="template-filter-css"></style>
     <form method="post">
 		<?php wp_nonce_field( 'add' ); ?>
-        <div class="post-box-grid">
+        <div class="post-box-grid" data-build-with-ai>
 			<?php foreach ( $funnel_templates as $template ):
 
 				/* @var $template Funnel */
