@@ -346,6 +346,12 @@ class Tools_Page extends Tabbed_Admin_Page {
                 </div>
                 <div class="inside">
                     <p><?php esc_html_e( 'Download System Info when requesting support.', 'groundhogg' ); ?></p>
+                    <p><?php
+						/* translators: %s: link to the Site Health screen */
+						printf( esc_html__( 'Problems that stop email and automation from working are also listed in %s.', 'groundhogg' ),
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated HTML
+							html()->a( admin_url( 'site-health.php' ), esc_html__( 'Site Health', 'groundhogg' ) )
+						); ?></p>
                     <a class="gh-button primary"
                        href="<?php echo esc_url( admin_url( '?gh_download_sys_info=1' ) ) ?>"><?php esc_html_e( 'Download System Info', 'groundhogg' ); ?></a>
                     <a class="gh-button secondary"

@@ -365,6 +365,7 @@ class Plugin {
 		new My_Day();
 		new Notifications\Actions();
 		new Abilities();
+		new Site_Health();
 	}
 
 	/**

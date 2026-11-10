@@ -466,12 +466,7 @@ abstract class Updater {
 			return;
 		}
 
-		if ( is_multisite() && is_main_site() && is_groundhogg_network_active() ) {
-			$action_url = Plugin::instance()->bulk_jobs->update_subsites->get_start_url( [ 'updater' => $this->get_updater_name() ] );
-		} else {
-			$action     = 'gh_' . $this->get_updater_name() . '_do_updates';
-			$action_url = action_url( $action );
-		}
+		$action_url = $this->get_do_updates_url();
 
 ?><div class="notice notice-info">
         <p><?php
@@ -495,6 +490,22 @@ abstract class Updater {
 				'class' => 'gh-button secondary small'
 			], esc_html__( 'Update Now!', 'groundhogg' ) ) ?></p>
 </div><?php
+	}
+
+	/**
+	 * The url that runs the updates that are waiting for confirmation
+	 *
+	 * @param array $args query args for the page to run them from, defaults to the current one
+	 *
+	 * @return string
+	 */
+	public function get_do_updates_url( $args = [] ) {
+
+		if ( is_multisite() && is_main_site() && is_groundhogg_network_active() ) {
+			return Plugin::instance()->bulk_jobs->update_subsites->get_start_url( [ 'updater' => $this->get_updater_name() ] );
+		}
+
+		return action_url( 'gh_' . $this->get_updater_name() . '_do_updates', $args );
 	}
 
 	/**
