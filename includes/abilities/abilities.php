@@ -11,6 +11,7 @@ use Groundhogg\Abilities\Campaigns\Create_Campaign;
 use Groundhogg\Abilities\Campaigns\List_Campaigns;
 use Groundhogg\Abilities\Contacts\Add_Contact_Note;
 use Groundhogg\Abilities\Contacts\Add_Custom_Field;
+use Groundhogg\Abilities\Contacts\Bulk_Update_Contacts;
 use Groundhogg\Abilities\Contacts\Create_Contact;
 use Groundhogg\Abilities\Contacts\Get_Contact;
 use Groundhogg\Abilities\Contacts\List_Contact_Notes;
@@ -19,6 +20,7 @@ use Groundhogg\Abilities\Contacts\List_Owners;
 use Groundhogg\Abilities\Contacts\List_Saved_Searches;
 use Groundhogg\Abilities\Contacts\Search_Contacts;
 use Groundhogg\Abilities\Contacts\Update_Contact;
+use Groundhogg\Abilities\Contacts\Update_Contacts;
 use Groundhogg\Abilities\Contacts\Update_Custom_Field;
 use Groundhogg\Abilities\Db\Describe_Table;
 use Groundhogg\Abilities\Db\Query_Table;
@@ -392,6 +394,8 @@ class Abilities {
 			Get_Contact::class,
 			Create_Contact::class,
 			Update_Contact::class,
+			Update_Contacts::class,
+			Bulk_Update_Contacts::class,
 			Search_Contacts::class,
 			List_Custom_Fields::class,
 			Add_Custom_Field::class,
