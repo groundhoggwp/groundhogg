@@ -6,6 +6,7 @@ use Groundhogg\Abilities\Ability;
 use Groundhogg\Email;
 use WP_Error;
 use function Groundhogg\check_lock;
+use function Groundhogg\email_kses;
 use function Groundhogg\get_edit_version;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,6 +27,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * operation fails or leaves a block the editor couldn't open. The plain-text version is rebuilt from the result, as
  * the editor does when it saves.
  *
+ * Emails that aren't built with blocks, like ones from the HTML editor, are changed with "replace_text", which only
+ * changes visible text, and "replace_html", which replaces an exact piece of the HTML (see Email_Html_Document).
+ * Whatever they don't touch stays exactly as it was.
+ *
  * Like the flow abilities, it won't change an email someone else has open in the email editor, and takes the
  * `version` from groundhogg/get-email-template to make sure the email wasn't changed since it was read.
  */
@@ -39,7 +44,12 @@ class Edit_Email extends Ability {
 	protected const DESTRUCTIVE = true;
 	protected const IDEMPOTENT  = false;
 
-	const OPERATIONS = [ 'replace_text', 'set_content', 'set_props', 'add', 'replace', 'move', 'delete' ];
+	const OPERATIONS = [ 'replace_text', 'set_content', 'set_props', 'add', 'replace', 'move', 'delete', 'replace_html' ];
+
+	/**
+	 * The operations for emails that aren't built with blocks
+	 */
+	const HTML_OPERATIONS = [ 'replace_text', 'replace_html' ];
 
 	protected function get_args(): array {
 
@@ -50,7 +60,7 @@ class Edit_Email extends Ability {
 
 		return [
 			'label'       => __( 'Edit Email', 'groundhogg' ),
-			'description' => __( 'Change an email built with the block editor a block at a time, instead of rewriting the whole body with groundhogg/update-email-template: find and replace text, or change, add, move and delete blocks by id. Get the block ids from groundhogg/get-email-template (its outline), and read only the blocks you need to change with its `blocks` input. Operations are applied in order, all or nothing, and every change is checked so the email still opens in the editor. Use groundhogg/update-email-template for the subject, sender, status and other settings.', 'groundhogg' ),
+			'description' => __( 'Change part of an email instead of rewriting the whole body with groundhogg/update-email-template. For an email built with the block editor: find and replace text, or change, add, move and delete blocks by id. Get the block ids from groundhogg/get-email-template (its outline), and read only the blocks you need to change with its `blocks` input. For an email that isn\'t built with blocks, like one from the HTML editor: "replace_text" for visible text, and "replace_html" for an exact piece of the HTML (links, styles, images, rows), which groundhogg/get-email-template\'s `find` returns to copy. Operations are applied in order, all or nothing, and every change is checked so the email still opens in the editor. Use groundhogg/update-email-template for the subject, sender, status and other settings.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -81,7 +91,7 @@ class Edit_Email extends Ability {
 								'op'      => [
 									'type'        => 'string',
 									'enum'        => self::OPERATIONS,
-									'description' => __( '"replace_text": `find` and `replace`, optionally only in `block`; the cheapest way to change wording or a link. It must match exactly once unless `all` is true. It matches the HTML as written, so text split by tags like <strong> won\'t match. Matching text in the block settings (like a button\'s) is changed too. "set_content": `block` and `html`, the new HTML inside the block\'s <td>; the <td> (padding, background) and settings stay. "set_props": `block` and `props`, changes only the given settings in the block\'s comment, null removes one; the email\'s HTML isn\'t rebuilt from them, so this is for settings used when sending (like include_filters or a global block\'s templateId) or only when editing. "add": `blocks` (specs) or `html` with one or more new blocks, and `at`. "replace": `block`, and `blocks` or `html` with the blocks to put in its place; ids of the blocks being replaced can be reused. "move": `block` and `at`, it moves with the blocks inside it. "delete": `block`, and the blocks inside it.', 'groundhogg' ),
+									'description' => __( '"replace_text": `find` and `replace`, optionally only in `block`; the cheapest way to change wording or a link. It must match exactly once unless `all` is true. It matches the HTML as written, so text split by tags like <strong> won\'t match. Matching text in the block settings (like a button\'s) is changed too. In an email that isn\'t built with blocks it only matches visible text, not tags, attributes or CSS. "replace_html", only for emails that aren\'t built with blocks: `find` and `replace`, an exact piece of the HTML and what to put in its place, like an href="..." or a whole <tr>...</tr>; it must match exactly once unless `all` is true, and tags it opens must be closed. "set_content": `block` and `html`, the new HTML inside the block\'s <td>; the <td> (padding, background) and settings stay. "set_props": `block` and `props`, changes only the given settings in the block\'s comment, null removes one; the email\'s HTML isn\'t rebuilt from them, so this is for settings used when sending (like include_filters or a global block\'s templateId) or only when editing. "add": `blocks` (specs) or `html` with one or more new blocks, and `at`. "replace": `block`, and `blocks` or `html` with the blocks to put in its place; ids of the blocks being replaced can be reused. "move": `block` and `at`, it moves with the blocks inside it. "delete": `block`, and the blocks inside it.', 'groundhogg' ),
 								],
 								'block'   => $block_schema,
 								'find'    => [
@@ -93,7 +103,7 @@ class Edit_Email extends Ability {
 								'all'     => [
 									'type'        => 'boolean',
 									'default'     => false,
-									'description' => __( 'For "replace_text": replace every match instead of needing exactly one.', 'groundhogg' ),
+									'description' => __( 'For "replace_text" and "replace_html": replace every match instead of needing exactly one.', 'groundhogg' ),
 								],
 								'blocks'  => [
 									'type'        => 'array',
@@ -168,6 +178,22 @@ class Edit_Email extends Ability {
 						'type'        => 'integer',
 						'description' => __( 'How many blocks the email has now.', 'groundhogg' ),
 					],
+					'changes'  => [
+						'type'        => 'array',
+						'description' => __( 'For an email that isn\'t built with blocks: each operation, how many matches it replaced, and some of the HTML around the first one as it is now.', 'groundhogg' ),
+						'items'       => [
+							'type'       => 'object',
+							'properties' => [
+								'op'      => [ 'type' => 'string' ],
+								'count'   => [ 'type' => 'integer' ],
+								'excerpt' => [ 'type' => 'string' ],
+							],
+						],
+					],
+					'content_length' => [
+						'type'        => 'integer',
+						'description' => __( 'For an email that isn\'t built with blocks, how many characters its content has now.', 'groundhogg' ),
+					],
 					'warnings' => [
 						'type'  => 'array',
 						'items' => [
@@ -187,13 +213,6 @@ class Edit_Email extends Ability {
 			return new WP_Error( 'groundhogg_email_not_found', __( 'Email not found.', 'groundhogg' ) );
 		}
 
-		if ( $email->get_editor_type() !== 'blocks' ) {
-			return new WP_Error(
-				'groundhogg_email_not_blocks',
-				__( 'This email isn\'t built with the block editor, so it has no blocks to edit. Change its content with groundhogg/update-email-template.', 'groundhogg' )
-			);
-		}
-
 		$locked_by = check_lock( $email );
 
 		if ( $locked_by ) {
@@ -206,6 +225,10 @@ class Edit_Email extends Ability {
 
 		if ( ! empty( $input['expected_version'] ) && get_edit_version( $email ) !== $input['expected_version'] ) {
 			return new WP_Error( 'groundhogg_email_changed', __( 'The email was changed since it was read. Read it again with groundhogg/get-email-template and retry.', 'groundhogg' ) );
+		}
+
+		if ( $email->get_editor_type() !== 'blocks' ) {
+			return $this->edit_html( $email, $input );
 		}
 
 		$doc = new Email_Block_Document( (string) $email->get_content() );
@@ -282,6 +305,105 @@ class Edit_Email extends Ability {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Change an email that isn't built with blocks, with "replace_text" and "replace_html"
+	 *
+	 * @param Email $email
+	 * @param array $input
+	 *
+	 * @return array|WP_Error
+	 */
+	protected function edit_html( Email $email, array $input ) {
+
+		$doc     = new Email_Html_Document( (string) $email->get_content() );
+		$changes = [];
+
+		foreach ( array_values( (array) $input['operations'] ) as $i => $operation ) {
+
+			$operation = (array) $operation;
+			$op        = $operation['op'] ?? '';
+			$result    = $this->apply_html( $doc, $operation );
+
+			if ( is_wp_error( $result ) ) {
+				return new WP_Error(
+					$result->get_error_code(),
+					/* translators: 1: the operation number, 2: the operation, 3: the error */
+					sprintf( __( 'Operation %1$d ("%2$s") failed, so nothing was changed: %3$s', 'groundhogg' ), $i + 1, $op, $result->get_error_message() ),
+					$result->get_error_data()
+				);
+			}
+
+			$changes[] = [
+				'op'      => $op,
+				'count'   => $result['count'],
+				'excerpt' => $doc->excerpt( $result['at'], strlen( (string) $operation['replace'] ) ),
+			];
+		}
+
+		// like groundhogg/update-email-template does with HTML content
+		$content = email_kses( $doc->html() );
+		$dry_run = ! empty( $input['dry_run'] );
+
+		if ( ! $dry_run ) {
+
+			// the plain text of an HTML email is made from its content when it's sent, so it can't be out of date
+			$email->update( [
+				'content'      => $content,
+				'plain_text'   => '',
+				'last_updated' => current_time( 'mysql' ),
+			] );
+
+			// Mirrors Emails_Api::do_object_updated_action(), like groundhogg/update-email-template
+			do_action( 'groundhogg/api/email/updated', $email );
+		}
+
+		return [
+			'email_id'       => $email->get_id(),
+			'dry_run'        => $dry_run,
+			'version'        => get_edit_version( $email ),
+			'changes'        => $changes,
+			'content_length' => strlen( $content ),
+		];
+	}
+
+	/**
+	 * Apply one operation to an email that isn't built with blocks
+	 *
+	 * @param Email_Html_Document $doc
+	 * @param array               $operation
+	 *
+	 * @return array|WP_Error count, at
+	 */
+	protected function apply_html( Email_Html_Document $doc, array $operation ) {
+
+		$op = $operation['op'] ?? '';
+
+		if ( ! in_array( $op, self::HTML_OPERATIONS, true ) ) {
+			return new WP_Error(
+				'groundhogg_email_not_blocks',
+				/* translators: %s: the operation */
+				sprintf( __( 'This email isn\'t built with the block editor, so it has no blocks for "%s". Change it with "replace_text" and "replace_html", or replace the whole body with groundhogg/update-email-template.', 'groundhogg' ), $op )
+			);
+		}
+
+		if ( isset( $operation['block'] ) ) {
+			return new WP_Error( 'groundhogg_email_not_blocks', __( 'This email isn\'t built with the block editor, so it has no blocks to look in. Leave out `block`.', 'groundhogg' ) );
+		}
+
+		foreach ( [ 'find', 'replace' ] as $field ) {
+			if ( ! isset( $operation[ $field ] ) ) {
+				/* translators: 1: the field, 2: the operation */
+				return new WP_Error( 'groundhogg_missing_field', sprintf( __( '"%2$s" needs `%1$s`.', 'groundhogg' ), $field, $op ) );
+			}
+		}
+
+		$all = ! empty( $operation['all'] );
+
+		return $op === 'replace_text'
+			? $doc->replace_text( $operation['find'], $operation['replace'], $all )
+			: $doc->replace_html( $operation['find'], $operation['replace'], $all );
 	}
 
 	/**
@@ -412,6 +534,9 @@ class Edit_Email extends Ability {
 				$result = $doc->delete( $block );
 
 				return is_wp_error( $result ) ? $result : [];
+
+			case 'replace_html':
+				return new WP_Error( 'groundhogg_not_for_blocks', __( '"replace_html" is for emails that aren\'t built with blocks. Change a block\'s HTML with "set_content", or its text with "replace_text".', 'groundhogg' ) );
 		}
 
 		/* translators: %s: the operation */

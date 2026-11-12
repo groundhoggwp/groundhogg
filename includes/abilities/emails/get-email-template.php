@@ -18,7 +18,9 @@ use WP_Error;
  * to change one sentence doesn't need it. With the ids, `blocks` returns just the blocks to look at, and
  * groundhogg/edit-email changes them. `view: "full"` still returns everything.
  *
- * Emails that aren't built with blocks have no outline, so their content is always returned.
+ * An email that isn't built with blocks, like one from the HTML editor, is returned as its visible text instead (see
+ * Email_Html_Document::outline()), and `find` returns where something is in the HTML with what's around it, so an
+ * exact piece can be changed with groundhogg/edit-email's "replace_html". `view: "full"` still returns everything.
  */
 class Get_Email_Template extends Ability {
 
@@ -54,6 +56,34 @@ class Get_Email_Template extends Ability {
 			],
 		];
 
+		$schema['properties']['text'] = [
+			'type'        => 'string',
+			'description' => __( 'For an email that isn\'t built with blocks, unless view is "full": its visible text, a line for each paragraph, heading, list item or cell, with links as [text](href) and images as ![alt](file name). Without the head, CSS and attributes, so it\'s much smaller than the HTML.', 'groundhogg' ),
+		];
+
+		$schema['properties']['found'] = [
+			'type'        => 'object',
+			'description' => __( 'With `find`: how many times it\'s in the content, and up to 10 of them, each with some of the HTML before and after it, exactly as saved.', 'groundhogg' ),
+			'properties'  => [
+				'count'   => [ 'type' => 'integer' ],
+				'matches' => [
+					'type'  => 'array',
+					'items' => [
+						'type'       => 'object',
+						'properties' => [
+							'before' => [ 'type' => 'string' ],
+							'match'  => [ 'type' => 'string' ],
+							'after'  => [ 'type' => 'string' ],
+							'block'  => [
+								'type'        => 'string',
+								'description' => __( 'In an email built with blocks, the block it\'s in.', 'groundhogg' ),
+							],
+						],
+					],
+				],
+			],
+		];
+
 		$schema['properties']['content_length'] = [
 			'type'        => 'integer',
 			'description' => __( 'How many characters the full content has, when it isn\'t returned.', 'groundhogg' ),
@@ -67,7 +97,7 @@ class Get_Email_Template extends Ability {
 
 		return [
 			'label'       => __( 'Get Email Template', 'groundhogg' ),
-			'description' => __( 'Retrieve one saved Groundhogg email by ID. For an email built with the block editor this returns an outline of its blocks (id, type and a summary of each) instead of the whole body, which can be very large: pass block ids in `blocks` to get just those blocks\' markup, and change them with groundhogg/edit-email. view "specs" returns the blocks as compact block specs instead, the format groundhogg/edit-email and groundhogg/create-email-template take as `blocks`. view "full" returns the whole body and plain text. Emails that aren\'t built with blocks always include their content. Find IDs with groundhogg/list-email-templates.', 'groundhogg' ),
+			'description' => __( 'Retrieve one saved Groundhogg email by ID. For an email built with the block editor this returns an outline of its blocks (id, type and a summary of each) instead of the whole body, which can be very large: pass block ids in `blocks` to get just those blocks\' markup, and change them with groundhogg/edit-email. view "specs" returns the blocks as compact block specs instead, the format groundhogg/edit-email and groundhogg/create-email-template take as `blocks`. view "full" returns the whole body and plain text. For an email that isn\'t built with blocks, like one from the HTML editor, it returns its visible text instead of the HTML. With `find`, it returns where some text or HTML is, with the HTML around it, to change with groundhogg/edit-email ("replace_html" for an email that isn\'t built with blocks). Find IDs with groundhogg/list-email-templates.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -82,12 +112,16 @@ class Get_Email_Template extends Ability {
 						'type'        => 'string',
 						'enum'        => [ 'outline', 'specs', 'full' ],
 						'default'     => 'outline',
-						'description' => __( '"outline": the email\'s settings, custom CSS and an outline of its blocks. "specs": its settings and its blocks as block specs, to change and give back to groundhogg/edit-email. "full": also its whole body and plain text - only when you really need all of it, it can be tens of thousands of characters.', 'groundhogg' ),
+						'description' => __( '"outline": the email\'s settings, custom CSS and an outline of its blocks, or for an email that isn\'t built with blocks its visible text. "specs": its settings and its blocks as block specs, to change and give back to groundhogg/edit-email. "full": also its whole body and plain text - only when you really need all of it, it can be tens of thousands of characters.', 'groundhogg' ),
 					],
 					'blocks'   => [
 						'type'        => 'array',
 						'items'       => [ 'type' => 'string' ],
 						'description' => __( 'Ids of blocks to return, from the outline: their markup, or with view "specs" only their specs.', 'groundhogg' ),
+					],
+					'find'     => [
+						'type'        => 'string',
+						'description' => __( 'Text or HTML to look for in the content, ignoring case. Returns each place it is with some of the HTML around it, exactly as saved, so you can copy a piece of it for groundhogg/edit-email.', 'groundhogg' ),
 					],
 				],
 			],
@@ -140,18 +174,58 @@ class Get_Email_Template extends Ability {
 		$specs  = $view === 'specs';
 		$blocks = array_values( array_filter( (array) ( $input['blocks'] ?? [] ), 'is_string' ) );
 
+		$find = isset( $input['find'] ) && is_string( $input['find'] ) ? $input['find'] : '';
+
 		if ( $email->get_editor_type() !== 'blocks' ) {
 
-			if ( ! empty( $blocks ) ) {
-				return new WP_Error( 'groundhogg_email_not_blocks', __( 'This email isn\'t built with the block editor, so it has no blocks. Its content is returned without `blocks`.', 'groundhogg' ) );
+			if ( ! empty( $blocks ) || $specs ) {
+				return new WP_Error( 'groundhogg_email_not_blocks', __( 'This email isn\'t built with the block editor, so it has no blocks. Read its text without `blocks` and view "specs", find HTML in it with `find`, or get all of it with view "full".', 'groundhogg' ) );
 			}
 
-			return Email_Schema::transform( $email, [ 'content', 'plain_text', 'css', 'version' ] );
+			$data = Email_Schema::transform( $email, $full ? [ 'content', 'plain_text', 'css', 'version' ] : [ 'css', 'version' ] );
+			$html = new Email_Html_Document( (string) $email->get_content() );
+
+			if ( ! $full ) {
+				$data['text']           = $html->outline();
+				$data['content_length'] = strlen( $email->get_content() );
+			}
+
+			if ( $find !== '' ) {
+
+				$data['found'] = $html->find( $find );
+
+				$data['found']['matches'] = array_map( function ( $match ) {
+					unset( $match['position'] );
+
+					return $match;
+				}, $data['found']['matches'] );
+			}
+
+			return $data;
 		}
 
 		// the custom CSS is usually small, so it's in the outline too
 		$data = Email_Schema::transform( $email, $full ? [ 'content', 'plain_text', 'css', 'version' ] : [ 'css', 'version' ] );
 		$doc  = new Email_Block_Document( (string) $email->get_content() );
+
+		if ( $find !== '' ) {
+
+			$data['found'] = ( new Email_Html_Document( (string) $email->get_content() ) )->find( $find );
+
+			// which block each one is in
+			foreach ( $data['found']['matches'] as &$match ) {
+
+				$block = $doc->innermost_block_at( $match['position'] );
+
+				if ( $block ) {
+					$match['block'] = $block;
+				}
+
+				unset( $match['position'] );
+			}
+
+			unset( $match );
+		}
 
 		$missing = array_values( array_filter( $blocks, function ( $id ) use ( $doc ) {
 			return ! $doc->has( $id );

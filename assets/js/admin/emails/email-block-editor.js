@@ -763,11 +763,37 @@
   }
 
   /**
+   * The edit lock of the page, if it's this email's. In the flow editor it's the flow's.
+   *
+   * @return {object|null}
+   */
+  const emailLock = () => {
+    const lock = window.GhLockData
+    return lock && lock.type === 'email' && typeof lock.setVersion === 'function' && parseInt(lock.id) === parseInt(State.email.ID) ? lock : null
+  }
+
+  let isSavingEmail = false
+
+  /**
+   * Says that the email was changed after it was opened, like by an AI agent, so saving was refused
+   */
+  const ChangedSinceOpenedModal = () => dangerConfirmationModal({
+    alert      : `<p>${ __('This email was changed after you opened it, by someone else or an AI agent.', 'groundhogg') }</p><p>${ __('Reload the page to see their changes, which loses yours, or save anyway to replace theirs with yours.', 'groundhogg') }</p>`,
+    confirmText: __('Save anyway', 'groundhogg'),
+    closeText  : __('Keep editing', 'groundhogg'),
+    onConfirm  : () => {
+      saveEmail(true).finally(morphHeader)
+    },
+  })
+
+  /**
    * Saves the email
+   *
+   * @param force save even if the email was changed after it was opened
    *
    * @return {Promise<*>}
    */
-  const saveEmail = () => {
+  const saveEmail = (force = false) => {
 
     // Save editor settings
     saveEditorSettings()
@@ -809,16 +835,43 @@
 
     }
 
-    // so the edit lock's heartbeat doesn't take this save for someone else's change, while it's sent and after,
-    // see edit-lock.js
-    window.GhLockData?.resync?.()
+    const lock = emailLock()
 
-    return EmailsStore.patch(State.email.ID, State.changes).then(email => {
+    // the version of the email this page has, so the save is refused if something else changed it since, see
+    // Emails_Api::update_single()
+    const version = lock && !force ? lock.knownVersion() : ''
+
+    if (lock) {
+      // a heartbeat that comes back while this is sent has the new version, which isn't the page's until it replies
+      lock.isBusy = () => isSavingEmail
+    }
+    else {
+      // so the edit lock's heartbeat doesn't take this save for someone else's change, while it's sent and after,
+      // see edit-lock.js
+      window.GhLockData?.resync?.()
+    }
+
+    isSavingEmail = true
+
+    return patch(`${ EmailsStore.route }/${ State.email.ID }`, {
+      ...State.changes,
+      ...( version ? { version } : {} ),
+    }).then(r => {
+
+      const email = r.item
+
+      EmailsStore.itemsFetched([email])
+
       dialog({
         message: 'Email updated!',
       })
 
-      window.GhLockData?.resync?.()
+      if (lock) {
+        lock.setVersion(r.version)
+      }
+      else {
+        window.GhLockData?.resync?.()
+      }
 
       setState({
         email,
@@ -829,10 +882,22 @@
 
       onSave(email)
     }).catch(err => {
+
+      setState({
+        savingDraft: false,
+      })
+
+      if (err.code === 'groundhogg_email_changed') {
+        ChangedSinceOpenedModal()
+        return
+      }
+
       dialog({
         message: 'Oops, something went wrong. Try refreshing the page.',
         type   : 'error',
       })
+    }).finally(() => {
+      isSavingEmail = false
     })
   }
 

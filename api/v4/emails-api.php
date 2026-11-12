@@ -24,6 +24,7 @@ use function Groundhogg\enqueue_event;
 use function Groundhogg\get_contactdata;
 use function Groundhogg\get_default_from_email;
 use function Groundhogg\get_default_from_name;
+use function Groundhogg\get_edit_version;
 use function Groundhogg\get_sender_profiles;
 use function Groundhogg\get_object_ids;
 use function Groundhogg\is_sending;
@@ -168,6 +169,10 @@ class Emails_Api extends Base_Object_Api {
 	/**
 	 * Handle campaigns
 	 *
+	 * With `version`, the version of the email that the caller has (see get_edit_version()), the update is refused if
+	 * the email was changed since, so a save from the editor doesn't replace what something else changed while it was
+	 * open, like an AI agent. The response has the email's new version.
+	 *
 	 * @param WP_REST_Request $request
 	 *
 	 * @return \WP_Error|\WP_REST_Response
@@ -179,6 +184,21 @@ class Emails_Api extends Base_Object_Api {
 
 		if ( ! $object->exists() ) {
 			return $this->ERROR_RESOURCE_NOT_FOUND();
+		}
+
+		$version = $request->get_param( 'version' );
+
+		if ( is_string( $version ) && $version !== '' ) {
+
+			$current = get_edit_version( $object );
+
+			if ( ! hash_equals( $current, $version ) ) {
+				return self::ERROR_409(
+					'groundhogg_email_changed',
+					__( 'This email was changed after the version you have. Get it again to see the changes, or update it without a version to replace them.', 'groundhogg' ),
+					[ 'version' => $current ]
+				);
+			}
 		}
 
 		$data = $request->get_param( 'data' );
@@ -213,7 +233,10 @@ class Emails_Api extends Base_Object_Api {
 
 		$this->do_object_updated_action( $object );
 
-		return self::SUCCESS_RESPONSE( [ 'item' => $object ] );
+		return self::SUCCESS_RESPONSE( [
+			'item'    => $object,
+			'version' => get_edit_version( $object ),
+		] );
 	}
 
 	/**

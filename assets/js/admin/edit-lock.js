@@ -138,6 +138,19 @@
       window.wp.heartbeat.connectNow()
     }
 
+    // the version the server says this page has, from a heartbeat or setVersion(), or '' before the first heartbeat:
+    // the version printed with the page can differ, see maybeShowChanged(). An editor sends it with its save, so the
+    // save is refused if something else changed the object since
+    GhLockData.knownVersion = () => hasBaseline || typeof GhLockData.getVersion === 'function' ? currentVersion() || '' : ''
+
+    // the version after the editor's own save, from the save's response
+    GhLockData.setVersion = version => {
+      if ( version ) {
+        GhLockData.version = version
+        hasBaseline = true
+      }
+    }
+
     const { lock_error = null } = GhLockData
 
     if ( ! lock_error ){

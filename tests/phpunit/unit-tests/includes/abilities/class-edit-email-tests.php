@@ -159,13 +159,20 @@ class Edit_Email_Tests extends GH_UnitTestCase {
 		$this->assertArrayNotHasKey( 'outline', $out );
 	}
 
-	public function test_get_returns_the_content_of_an_html_email() {
+	public function test_get_returns_the_text_of_an_html_email_and_its_content_with_view_full() {
 
-		$out = $this->run_ability( 'create-email-template', [ 'subject' => 'Plain', 'content' => '<p>Hello</p>', 'editor' => 'html' ] );
-		$out = $this->run_ability( 'get-email-template', [ 'email_id' => $out['id'] ] );
+		$id  = $this->run_ability( 'create-email-template', [ 'subject' => 'Plain', 'content' => '<p>Hello</p>', 'editor' => 'html' ] )['id'];
+		$out = $this->run_ability( 'get-email-template', [ 'email_id' => $id ] );
+
+		$this->assertSame( 'Hello', $out['text'] );
+		$this->assertSame( strlen( '<p>Hello</p>' ), $out['content_length'] );
+		$this->assertArrayNotHasKey( 'content', $out );
+		$this->assertArrayNotHasKey( 'outline', $out );
+
+		$out = $this->run_ability( 'get-email-template', [ 'email_id' => $id, 'view' => 'full' ] );
 
 		$this->assertSame( '<p>Hello</p>', $out['content'] );
-		$this->assertArrayNotHasKey( 'outline', $out );
+		$this->assertArrayNotHasKey( 'text', $out );
 	}
 
 	public function test_edit_applies_operations_in_order_and_saves() {
@@ -266,13 +273,31 @@ class Edit_Email_Tests extends GH_UnitTestCase {
 		$this->assertSame( 'groundhogg_email_locked', $out->get_error_code() );
 	}
 
-	public function test_edit_refuses_an_html_email() {
+	public function test_edit_refuses_block_operations_on_an_html_email() {
 
 		$out = $this->run_ability( 'create-email-template', [ 'subject' => 'Plain', 'content' => '<p>Hello</p>', 'editor' => 'html' ] );
-		$out = $this->edit( $out['id'], [ [ 'op' => 'replace_text', 'find' => 'Hello', 'replace' => 'Hi' ] ] );
+		$out = $this->edit( $out['id'], [ [ 'op' => 'delete', 'block' => 'intro' ] ] );
 
 		$this->assertWPError( $out );
 		$this->assertSame( 'groundhogg_email_not_blocks', $out->get_error_code() );
+	}
+
+	public function test_replace_html_is_only_for_html_emails() {
+
+		$out = $this->edit( $this->create_newsletter(), [ [ 'op' => 'replace_html', 'find' => '<p>', 'replace' => '<p>' ] ] );
+
+		$this->assertWPError( $out );
+		$this->assertSame( 'groundhogg_not_for_blocks', $out->get_error_code() );
+	}
+
+	public function test_get_finds_text_in_a_block_email_and_names_the_block() {
+
+		$out = $this->run_ability( 'get-email-template', [ 'email_id' => $this->create_newsletter(), 'find' => 'ends friday' ] );
+
+		$this->assertSame( 1, $out['found']['count'] );
+		$this->assertSame( 'ends Friday', $out['found']['matches'][0]['match'] );
+		$this->assertSame( 'intro', $out['found']['matches'][0]['block'] );
+		$this->assertArrayNotHasKey( 'position', $out['found']['matches'][0] );
 	}
 
 	public function test_edit_checks_each_operation_has_what_it_needs() {

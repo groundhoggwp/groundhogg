@@ -73,7 +73,7 @@ Never make up an image URL or link to an image on someone else's site. When you 
 
 Don't read or rewrite the whole email to change part of it. Use `edit-email`, which changes blocks by id:
 
-1. `get-email-template` returns an outline: each block's `id`, `type`, the `parent` and `column` of blocks in columns, and a `summary` of its text, image or link. It also returns the email's `version`. With `view: "specs"` it returns the blocks as specs instead, and with `blocks` (ids) only those.
+1. `get-email-template` returns an outline: each block's `id`, `type`, the `parent` and `column` of blocks in columns, and a `summary` of its text, image or link. It also returns the email's `version`. With `view: "specs"` it returns the blocks as specs instead, and with `blocks` (ids) only those. `find` returns where some text or HTML is and which block it's in.
 2. Call `edit-email` with `expected_version` and a list of `operations`, applied in order, all or nothing:
 
 ```json
@@ -98,6 +98,25 @@ Don't read or rewrite the whole email to change part of it. Use `edit-email`, wh
 - Use `dry_run: true` to check a change without saving it.
 
 The result lists the blocks that changed and the new `version` for the next call. Use `update-email-template` for the subject, preview text, sender, status and other settings.
+
+### Emails that aren't built with blocks
+
+An email from the HTML editor has no blocks. `get-email-template` returns its visible text as `text`, a line for each paragraph, heading or cell, with links as `[text](href)` and images as `![alt](file)`, instead of the HTML. Change it with `edit-email` too:
+
+```json
+{
+  "email_id": 37,
+  "expected_version": "…",
+  "operations": [
+    { "op": "replace_text", "find": "ends Sunday", "replace": "ends Monday" },
+    { "op": "replace_html", "find": "href=\"https://example.com/fall\"", "replace": "href=\"https://example.com/fall-sale\"" }
+  ]
+}
+```
+
+- `replace_text` only changes visible text, never tags, attributes or the CSS, so it's the safe way to change wording.
+- `replace_html` replaces an exact piece of the HTML: a link, an image, a style, or a whole `<tr>…</tr>`. Copy it from `get-email-template` with `find`, which returns each place some text or HTML is with the HTML around it, exactly as saved. A piece that opens a tag has to close it.
+- Both must match exactly once, unless `all: true`.
 
 ## Merge tags
 
