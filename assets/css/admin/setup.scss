@@ -511,6 +511,12 @@
     padding-top: 20px;
     border-top: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
   }
+
+  // "Set up with AI" on the first step, the card itself is styled in admin.scss
+  .gs-ai-card.build-with-ai-card {
+    min-height: 0;
+    margin-bottom: 15px;
+  }
 }
 
 // the team modal is appended to the body, outside of #guided-setup

@@ -145,6 +145,13 @@
 
   const STEPS = [
     {
+      id    : 'start',
+      title : __('Start', 'groundhogg'),
+      // only when the site can serve the setup abilities and this person can use them, see Build_With_AI
+      when  : () => Boolean(Groundhogg.buildWithAI),
+      render: () => StartStep(),
+    },
+    {
       id    : 'business',
       title : __('Business', 'groundhogg'),
       render: () => BusinessStep(),
@@ -358,6 +365,23 @@
       ])),
     ])
   }
+
+  //
+  // Start: hand the setup to an AI assistant, or go through it step by step
+  //
+
+  const StartStep = () => [
+    H1({}, __('How would you like to set up?', 'groundhogg')),
+    Pg({ className: 'gs-lead' }, __('Your AI assistant can do this for you. Describe your business and what you want, and it fills in your details, sets up email, and builds your first forms, emails and flows, asking you for anything it needs.', 'groundhogg')),
+    Groundhogg.buildWithAI.Card('gs-ai-card'),
+    Pg({ className: 'description' }, __('Works with any assistant that supports MCP, like ChatGPT, Claude, Cursor or Gemini. It needs connecting to your site first, which takes a few minutes.', 'groundhogg')),
+    Actions({
+      primary: {
+        label  : __('Set up step by step', 'groundhogg'),
+        onClick: next,
+      },
+    }),
+  ]
 
   //
   // Business & sender
@@ -1124,7 +1148,7 @@
       Card({
         icon       : 'lightbulb',
         title      : __('Get started with AI', 'groundhogg'),
-        description: __('Connect Claude or another AI assistant, and have it build flows, write emails and find contacts for you.', 'groundhogg'),
+        description: __('Connect an AI assistant like ChatGPT, Claude, Cursor or Gemini, and have it build flows, write emails and find contacts for you.', 'groundhogg'),
         action     : An({
           href     : links.ai,
           ...( links.ai_in_admin ? {} : { target: '_blank' } ),

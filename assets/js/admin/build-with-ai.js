@@ -1,12 +1,12 @@
 /**
- * "Build with AI" on the add screens of emails and flows.
+ * "Build with AI" on the add screens of emails and flows, and "Set up with AI" in the guided setup.
  *
  * A card among the templates opens a popup where someone describes what they want, then copies a prompt that has
  * their AI assistant build it over MCP. The prompt comes from the server, see Groundhogg\Mcp\Build_With_AI, with
  * {{goal}} standing in for the description.
  *
- * The email editor draws the card itself, with Groundhogg.buildWithAI.Card(). On the flow add screen it goes first in
- * the grid of templates marked with data-build-with-ai.
+ * The email editor and the guided setup draw the card themselves, with Groundhogg.buildWithAI.Card(). On the flow add
+ * screen it goes first in the grid of templates marked with data-build-with-ai.
  */
 ( () => {
 
@@ -42,6 +42,12 @@
       description: __( 'Describe the email you want and your AI assistant writes it, ready for you to review and edit.', 'groundhogg' ),
       placeholder: __( 'A welcome email for new newsletter subscribers that links to our three most popular blog posts.', 'groundhogg' ),
       after      : __( 'When it\'s done, you\'ll find the email in your emails list as a draft.', 'groundhogg' ),
+    },
+    setup: {
+      title      : __( 'Set up with AI', 'groundhogg' ),
+      description: __( 'Describe your business and what you want, and your AI assistant sets everything up for you, asking for anything it needs.', 'groundhogg' ),
+      placeholder: __( 'I run a yoga studio. I want a newsletter signup form on my website, a welcome email for new subscribers, and a monthly schedule email.', 'groundhogg' ),
+      after      : __( 'When it\'s done, your assistant gives you a list of anything left for you to do, like connecting your email service.', 'groundhogg' ),
     },
     flow : {
       title      : __( 'Build a flow with AI', 'groundhogg' ),

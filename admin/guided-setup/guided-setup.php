@@ -7,6 +7,7 @@ use Groundhogg\Admin\User\Admin_User;
 use Groundhogg\Background\Sync_Users_Last_Id;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Classes\Inbox_Client;
+use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Mcp\Connection;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\License_Manager;
@@ -566,6 +567,11 @@ class Guided_Setup extends Admin_Page {
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
+
+		// before the wizard, which draws its card on the first step. The setup abilities need manage_options.
+		if ( current_user_can( 'manage_options' ) ) {
+			Build_With_AI::enqueue( 'setup' );
+		}
 
 		wp_enqueue_style( 'groundhogg-admin-guided-setup' );
 		wp_enqueue_script( 'groundhogg-admin-guided-setup' );

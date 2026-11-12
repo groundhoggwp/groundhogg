@@ -416,6 +416,10 @@
   padding-top: 20px;
   border-top: 1px solid var(--gh-dark-10, rgba(16, 38, 64, 0.1));
 }
+#guided-setup .gs-ai-card.build-with-ai-card {
+  min-height: 0;
+  margin-bottom: 15px;
+}
 
 .gs-team p {
   margin-top: 0;

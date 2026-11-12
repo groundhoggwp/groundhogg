@@ -7,8 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * "Build with AI" on the add screens of emails and flows: a card among the templates that opens a popup, where someone
- * describes what they want and copies a prompt for their AI assistant.
+ * "Build with AI" on the add screens of emails and flows, and "Set up with AI" in the guided setup: a card that opens a
+ * popup, where someone describes what they want and copies a prompt for their AI assistant.
  *
  * The prompt is short on purpose. It says which abilities to call in which order and sets a few ground rules, and
  * sends the assistant to groundhogg/get-authoring-guide for the detail, so that detail stays in one place, current
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Build_With_AI {
 
-	const TYPES = [ 'email', 'flow' ];
+	const TYPES = [ 'email', 'flow', 'setup' ];
 
 	/**
 	 * Whether there's anything for an assistant to connect to: without the Abilities API (WordPress 6.9+) the prompt
@@ -35,7 +35,7 @@ class Build_With_AI {
 	/**
 	 * The prompt for the assistant. The person's own description of what they want replaces {{goal}}.
 	 *
-	 * @param string $type email or flow
+	 * @param string $type email, flow or setup
 	 *
 	 * @return string
 	 */
@@ -50,7 +50,26 @@ class Build_With_AI {
 
 		$email = wp_get_current_user()->user_email;
 
-		if ( $type === 'flow' ) {
+		if ( $type === 'setup' ) {
+			$lines = [
+				/* translators: %s: the site's name and address */
+				sprintf( __( 'Set up the CRM on my website %s, using the tools from the MCP connection to that site.', 'groundhogg' ), $site ),
+				'',
+				__( 'About my business and what I want:', 'groundhogg' ),
+				'{{goal}}',
+				'',
+				__( 'How to do it:', 'groundhogg' ),
+				__( '1. Call the get-authoring-guide ability with topic "setup" and follow it. It explains what to set up, what to ask me, and what only I can do.', 'groundhogg' ),
+				__( '2. Call get-setup-status to see what\'s already done and what\'s left.', 'groundhogg' ),
+				__( '3. Ask me everything you need in one go before you change anything: my business details, who I email, the address email should come from, and anything else you\'re missing.', 'groundhogg' ),
+				__( '4. Set it up, building any emails and flows as drafts I can review, then call get-setup-status again.', 'groundhogg' ),
+				__( '5. Finish with a short list of what\'s left for me to do, and where to do it.', 'groundhogg' ),
+				'',
+				__( 'Rules:', 'groundhogg' ),
+				__( '- Never ask me for a password, API key or other secret in chat. Tell me where to enter it myself.', 'groundhogg' ),
+				__( '- Don\'t email my contacts, activate flows or import contacts without asking me first.', 'groundhogg' ),
+			];
+		} else if ( $type === 'flow' ) {
 			$lines = [
 				/* translators: %s: the site's name and address */
 				sprintf( __( 'Build an automation flow for my website %s, using the tools from the MCP connection to that site.', 'groundhogg' ), $site ),
@@ -95,7 +114,7 @@ class Build_With_AI {
 		 * Filter the prompt the "Build with AI" popup gives someone to copy into their AI assistant.
 		 *
 		 * @param string $prompt the prompt, {{goal}} is replaced with what the person describes
-		 * @param string $type   email or flow
+		 * @param string $type   email, flow or setup
 		 */
 		return apply_filters( 'groundhogg/build_with_ai/prompt', implode( "\n", $lines ), $type );
 	}
@@ -103,13 +122,40 @@ class Build_With_AI {
 	/**
 	 * Examples someone can start from instead of a blank box. Each fills in the description, which they can then change.
 	 *
-	 * @param string $type email or flow
+	 * @param string $type email, flow or setup
 	 *
 	 * @return array[] [ 'label' => string, 'text' => string ]
 	 */
 	public static function examples( string $type ): array {
 
-		if ( $type === 'flow' ) {
+		if ( $type === 'setup' ) {
+			$examples = [
+				[
+					'label' => __( 'Online store', 'groundhogg' ),
+					'text'  => __( 'I sell handmade candles online. I want a thank you email after someone buys, a monthly newsletter, and a way to win back customers who haven\'t bought in a while.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Coach or consultant', 'groundhogg' ),
+					'text'  => __( 'I\'m a business coach. I want a free guide people can sign up for on my website, a short series of emails that follows up, and an invitation to book a call.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Local business', 'groundhogg' ),
+					'text'  => __( 'I run a dental clinic. I want a contact form on my website, a thank you email when someone fills it in, and a newsletter with seasonal tips for our patients.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Courses', 'groundhogg' ),
+					'text'  => __( 'I sell online courses. I want my existing WordPress users added as contacts, a welcome series for new students, and a check-in for students who haven\'t logged in for a while.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Nonprofit', 'groundhogg' ),
+					'text'  => __( 'We\'re a small animal shelter. We want a newsletter signup form, a welcome email for new subscribers, and a monthly update about the animals looking for homes.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Blog', 'groundhogg' ),
+					'text'  => __( 'I write a blog about gardening. I want a signup form on my posts and a weekly email with my latest articles.', 'groundhogg' ),
+				],
+			];
+		} else if ( $type === 'flow' ) {
 			$examples = [
 				[
 					'label' => __( 'Welcome series', 'groundhogg' ),
@@ -169,7 +215,7 @@ class Build_With_AI {
 		 * Filter the examples the "Build with AI" popup offers to start from.
 		 *
 		 * @param array[] $examples [ 'label' => string, 'text' => string ]
-		 * @param string  $type     email or flow
+		 * @param string  $type     email, flow or setup
 		 */
 		return apply_filters( 'groundhogg/build_with_ai/examples', $examples, $type );
 	}
@@ -177,7 +223,7 @@ class Build_With_AI {
 	/**
 	 * Load the popup on an add screen.
 	 *
-	 * @param string $type email or flow
+	 * @param string $type email, flow or setup
 	 *
 	 * @return void
 	 */
