@@ -65,11 +65,15 @@ abstract class Base_Object_With_Meta extends Base_Object {
 	 */
 	public function __get( $name ) {
 
-		$maybe = parent::__get( $name );
+		$maybe = $this->get_property_or_data( $name, $found );
 
 		// Check meta data
-		if ( ! $maybe && key_exists( $name, $this->meta ) ) {
-			$maybe = $this->meta[ $name ];
+		if ( ! $maybe && is_array( $this->meta ) && key_exists( $name, $this->meta ) ) {
+			return $this->meta[ $name ];
+		}
+
+		if ( ! $found ) {
+			$this->method_read_as_property( $name );
 		}
 
 		return $maybe;

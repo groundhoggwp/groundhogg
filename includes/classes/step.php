@@ -212,12 +212,12 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	public function is_conversion() {
-		// read the column directly - $this->is_conversion would resolve to this method via __get and recurse
+		// read the column directly, the name is shared with this method
 		return (bool) ( $this->data['is_conversion'] ?? false ) && $this->is_benchmark();
 	}
 
 	public function is_entry() {
-		// read the column directly - $this->is_entry would resolve to this method via __get and recurse
+		// read the column directly, the name is shared with this method
 		return (bool) ( $this->data['is_entry'] ?? false ) && $this->is_benchmark();
 	}
 

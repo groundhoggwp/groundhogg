@@ -243,25 +243,71 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 	 * @return bool|mixed
 	 */
 	public function __get( $name ) {
-		// Check main data first
+
+		$value = $this->get_property_or_data( $name, $found );
+
+		if ( ! $found ) {
+			$this->method_read_as_property( $name );
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Read a declared property or a column from the data array.
+	 *
+	 * @param string $name
+	 * @param bool   $found set to whether a property or column by that name exists
+	 *
+	 * @return mixed false when neither exists
+	 */
+	protected function get_property_or_data( $name, &$found = null ) {
+
+		$found = true;
+
 		if ( property_exists( $this, $name ) ) {
 			return $this->$name;
 		}
 
-		// Check data array
 		if ( ! empty( $this->data ) && key_exists( $name, $this->data ) ) {
 			return $this->data[ $name ];
 		}
 
-		if ( method_exists( $this, $name ) && is_callable( [ $this, $name ] ) ) {
-			return call_user_func( [ $this, $name ] );
-		}
-
-//		if ( method_exists( $this, 'get_' . $name ) && is_callable( [ $this, 'get_' . $name ] ) ) {
-//			return call_user_func( [ $this, 'get_' . $name ] );
-//		}
+		$found = false;
 
 		return false;
+	}
+
+	/**
+	 * Reading a property used to call the method by the same name. That ran methods like delete() and unsubscribe()
+	 * whenever a name came from settings (a form field, a webhook value, an export column), so it no longer does.
+	 * Flag code that still reads a method as a property, once per class and name.
+	 *
+	 * @param string $name
+	 *
+	 * @return void
+	 */
+	protected function method_read_as_property( $name ) {
+
+		static $warned = [];
+
+		if ( ! is_string( $name ) || ! method_exists( $this, $name ) ) {
+			return;
+		}
+
+		$key = static::class . '::' . $name;
+
+		if ( isset( $warned[ $key ] ) ) {
+			return;
+		}
+
+		$warned[ $key ] = true;
+
+		_doing_it_wrong(
+			esc_html( static::class . '::__get' ),
+			sprintf( 'Reading $%1$s as a property no longer calls %1$s(). Call the method instead.', esc_html( $name ) ),
+			'4.11.1'
+		);
 	}
 
 	/**
