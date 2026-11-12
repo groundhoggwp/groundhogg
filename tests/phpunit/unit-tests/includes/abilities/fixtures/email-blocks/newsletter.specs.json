@@ -1,7 +1,7 @@
 [
     {
         "type": "image",
-        "id": "image-e0ea76",
+        "id": "image-9a53ec",
         "src": "https://placehold.co/240x80?text=Logo",
         "width": 120,
         "alt": "Logo",
@@ -10,7 +10,7 @@
     },
     {
         "type": "heading",
-        "id": "heading-0ad35d",
+        "id": "heading-49807b",
         "tag": "h1",
         "fontStyle": {
             "color": "#1e73be",
@@ -22,7 +22,7 @@
     },
     {
         "type": "text",
-        "id": "text-617bd1",
+        "id": "text-cc143b",
         "p": {
             "color": "#333333",
             "fontSize": 16
@@ -30,11 +30,11 @@
         "a": {
             "color": "#dd3333"
         },
-        "content": "<p style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333;margin: 0px 0px 1em\">Hi {first},</p><p style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333;margin: 1em 0px\">Some <strong style=\"font-weight: bold\">bold</strong>, <em>italic</em> and a <a href=\"https://example.com/a?x=1&amp;y=2\" style=\"color: #dd3333;font-family:Arial, sans-serif\">link</a>.</p><h2 style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: 500;font-size: 24px;font-style: normal;text-transform: none\">A sub heading</h2><ul style=\"padding-left: 30px\"><li style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333\">One</li><li style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333\">Two &amp; three</li></ul><ol style=\"padding-left: 30px\"><li style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333\">First</li></ol><p style=\"text-align: center;line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333;margin: 1em 0px 0px\">Centered</p>"
+        "content": "<p style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333;margin: 0px 0px 1em\">Hi {first},</p><p style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333;margin: 1em 0px\">Some <strong style=\"font-weight: bold\">bold</strong>, <em>italic</em> and a <a href=\"https://example.com/a?x=1&amp;y=2\" style=\"color: #dd3333\">link</a>.</p><h2 style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: 500;font-size: 24px;font-style: normal;text-transform: none\">A sub heading</h2><ul style=\"padding-left: 30px\"><li style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333\">One</li><li style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333\">Two &amp; three</li></ul><ol style=\"padding-left: 30px\"><li style=\"line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333\">First</li></ol><p style=\"text-align: center;line-height: 1.4;font-family:system-ui, sans-serif;font-weight: normal;font-size: 16px;font-style: normal;text-transform: none;color: #333333;margin: 1em 0px 0px\">Centered</p>"
     },
     {
         "type": "button",
-        "id": "button-0054b5",
+        "id": "button-d9eb66",
         "size": "lg",
         "text": "Go & see",
         "link": "https://example.com/go",
@@ -47,7 +47,7 @@
     },
     {
         "type": "button",
-        "id": "button-35dce5",
+        "id": "button-bc0080",
         "size": "sm",
         "text": "Small",
         "link": "https://example.com/small",
@@ -55,7 +55,7 @@
     },
     {
         "type": "divider",
-        "id": "divider-36d865",
+        "id": "divider-781b45",
         "height": 2,
         "width": 60,
         "color": "#cccccc",
@@ -63,14 +63,14 @@
     },
     {
         "type": "spacer",
-        "id": "spacer-7473ae",
+        "id": "spacer-a8da72",
         "advancedStyle": {
             "padding": 0
         }
     },
     {
         "type": "columns",
-        "id": "columns-46d511",
+        "id": "columns-e37270",
         "gap": 20,
         "layout": "three_columns",
         "verticalAlign": "middle",
@@ -88,20 +88,20 @@
             [
                 {
                     "type": "heading",
-                    "id": "heading-24d37e",
+                    "id": "heading-790a3a",
                     "tag": "h3",
                     "content": "Col 1"
                 },
                 {
                     "type": "text",
-                    "id": "text-0e2552",
+                    "id": "text-42ca47",
                     "content": "<p>One</p>"
                 }
             ],
             [
                 {
                     "type": "image",
-                    "id": "image-f467e9",
+                    "id": "image-e9759a",
                     "src": "https://placehold.co/160x90",
                     "width": 160,
                     "alt": "Pic"
@@ -112,7 +112,7 @@
     },
     {
         "type": "columns",
-        "id": "columns-10b561",
+        "id": "columns-9b2654",
         "gap": 0,
         "layout": "custom_columns",
         "customColumns": [
@@ -123,14 +123,14 @@
             [
                 {
                     "type": "text",
-                    "id": "text-5aaa73",
+                    "id": "text-4aecd0",
                     "content": "<p>Thirty</p>"
                 }
             ],
             [
                 {
                     "type": "text",
-                    "id": "text-0e61c7",
+                    "id": "text-6b50c2",
                     "content": "<p>Seventy</p>"
                 }
             ]
@@ -138,7 +138,7 @@
     },
     {
         "type": "menu",
-        "id": "menu-e7dc3b",
+        "id": "menu-00f930",
         "links": [
             [
                 "Home",
@@ -156,7 +156,7 @@
     },
     {
         "type": "social",
-        "id": "social-d3e2f1",
+        "id": "social-88d54e",
         "use": "custom",
         "size": 28,
         "gap": 8,
@@ -174,17 +174,17 @@
     },
     {
         "type": "social",
-        "id": "social-3096c3",
+        "id": "social-0fd42f",
         "align": "left"
     },
     {
         "type": "html",
-        "id": "html-51c432",
+        "id": "html-941cd0",
         "content": "<div style=\"text-align:center;color:#888\">Raw <b>HTML</b> &amp; things<br>line two</div>"
     },
     {
         "type": "text",
-        "id": "text-58b279",
+        "id": "text-fbf290",
         "content": "<p>Boxed text</p>",
         "advancedStyle": {
             "padding": {
@@ -204,7 +204,7 @@
     },
     {
         "type": "footer",
-        "id": "footer-0afe77",
+        "id": "footer-28eb52",
         "alignment": "center"
     }
 ]

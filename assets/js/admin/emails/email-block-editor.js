@@ -1992,13 +1992,14 @@
    * Extract style given CSS declaration
    *
    * @param style
+   * @param keepEmptyFont if the style has no font, leave it empty instead of normalizing it to Arial
    * @return {{fontFamily: string, color: string, lineHeight: string, fontSize: number, fontStyle: string, fontWeight:
    *   string, textTransform: string}}
    */
-  const parseFontStyle = style => ( {
+  const parseFontStyle = (style, { keepEmptyFont = false } = {}) => ( {
     color: style.getPropertyValue('color'),
 
-    fontFamily: normalizeFont(style.getPropertyValue('font-family')),
+    fontFamily: keepEmptyFont && !style.getPropertyValue('font-family') ? '' : normalizeFont(style.getPropertyValue('font-family')),
 
     lineHeight: style.getPropertyValue('line-height'),
 
@@ -7767,7 +7768,7 @@
   })
 
   // cleverly get the style from the content
-  const parseFontStyleFromTag = (el,tag) => {
+  const parseFontStyleFromTag = (el, tag, options = {}) => {
 
     let styledEl = el.querySelector(tag)
     if ( ! styledEl ){
@@ -7776,7 +7777,7 @@
       })[tag]
     }
 
-    return parseFontStyle(styledEl.style)
+    return parseFontStyle(styledEl.style, options)
   }
 
   // Register new heading block
@@ -7940,7 +7941,8 @@
   registerBlock('text', 'Text', {
     attributes: {
       p: el  => parseFontStyleFromTag(el, 'p,li'),
-      a: el  => parseFontStyleFromTag(el, 'a'),
+      // links without a font of their own inherit the paragraph's
+      a: el  => parseFontStyleFromTag(el, 'a', { keepEmptyFont: true }),
       h1: el => parseFontStyleFromTag(el, 'h1'),
       h2: el => parseFontStyleFromTag(el, 'h2'),
       h3: el => parseFontStyleFromTag(el, 'h3'),
@@ -11538,6 +11540,10 @@
     const getAttributes = BlockType.attributes
     const el = tr.querySelector(`td#b-${ id }`)
 
+    // the full_width_contained template wraps top level blocks in a table, see BlockHTML()
+    // read the block's own content from inside it, or every save nests another wrapper
+    const contentEl = el.querySelector(`:scope > table td#b-${ id }-inner`) ?? el
+
     let block = {
       type,
       id, ...attributes,
@@ -11545,7 +11551,7 @@
 
     for (let getter in getAttributes) {
       try {
-        block[getter] = getAttributes[getter](el, block)
+        block[getter] = getAttributes[getter](contentEl, block)
       }
       catch (e) {
         block[getter] = BlockType.defaults[getter]

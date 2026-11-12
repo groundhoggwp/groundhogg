@@ -1522,7 +1522,8 @@ class Email_Block_Renderer {
 
 		return [
 			'p'       => $this->font_style_from_tag( $inner, [ 'p', 'li' ], $defaults['p'] ),
-			'a'       => $this->font_style_from_tag( $inner, [ 'a' ], $defaults['a'] ),
+			// links without a font of their own inherit the paragraph's
+			'a'       => $this->font_style_from_tag( $inner, [ 'a' ], $defaults['a'], true ),
 			'h1'      => $this->font_style_from_tag( $inner, [ 'h1' ], $defaults['h1'] ),
 			'h2'      => $this->font_style_from_tag( $inner, [ 'h2' ], $defaults['h2'] ),
 			'h3'      => $this->font_style_from_tag( $inner, [ 'h3' ], $defaults['h3'] ),
@@ -2413,13 +2414,17 @@ class Email_Block_Renderer {
 	 * Font settings from a style, like parseFontStyle() in the editor
 	 *
 	 * @param Email_Block_Style $style
+	 * @param bool              $keep_empty_font if the style has no font, leave it empty instead of normalizing it to Arial
 	 *
 	 * @return array
 	 */
-	protected static function parse_font_style( Email_Block_Style $style ): array {
+	protected static function parse_font_style( Email_Block_Style $style, bool $keep_empty_font = false ): array {
+
+		$font = $style->get( 'font-family' );
+
 		return [
 			'color'         => $style->get( 'color' ),
-			'fontFamily'    => Email_Block_Style::normalize_font( $style->get( 'font-family' ) ),
+			'fontFamily'    => $keep_empty_font && ! $font ? '' : Email_Block_Style::normalize_font( $font ),
 			'lineHeight'    => $style->get( 'line-height' ),
 			'fontWeight'    => $style->get( 'font-weight' ),
 			'fontStyle'     => $style->get( 'font-style' ),
@@ -2434,10 +2439,11 @@ class Email_Block_Renderer {
 	 * @param string   $html
 	 * @param string[] $tags
 	 * @param array    $default
+	 * @param bool     $keep_empty_font
 	 *
 	 * @return array
 	 */
-	protected function font_style_from_tag( string $html, array $tags, array $default ): array {
+	protected function font_style_from_tag( string $html, array $tags, array $default, bool $keep_empty_font = false ): array {
 
 		$found = self::find_element( $html, $tags );
 
@@ -2445,7 +2451,7 @@ class Email_Block_Renderer {
 			return $default;
 		}
 
-		return self::parse_font_style( new Email_Block_Style( (string) ( $found['attributes']['style'] ?? '' ) ) );
+		return self::parse_font_style( new Email_Block_Style( (string) ( $found['attributes']['style'] ?? '' ) ), $keep_empty_font );
 	}
 
 	/**

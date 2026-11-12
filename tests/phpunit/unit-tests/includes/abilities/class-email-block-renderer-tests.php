@@ -139,14 +139,15 @@ class Email_Block_Renderer_Tests extends GH_UnitTestCase {
 
 		$text = $made['plain_text'];
 
-		$this->assertStringContainsString( '<!--button:button-0054b5 {"size":"lg"}-->[Go & see](https://example.com/go)<!--/button:button-0054b5-->', $text );
+		// block ids differ each time the fixtures are made
+		$this->assertMatchesRegularExpression( '/<!--button:(button-[0-9a-f]+) \{"size":"lg"\}-->\[Go & see\]\(https:\/\/example\.com\/go\)<!--\/button:\1-->/', $text );
 		$this->assertStringContainsString( '[Home](https://example.com) | [Blog](https://example.com/blog)', $text );
-		$this->assertStringContainsString( '<!--divider:divider-36d865 {}-->---<!--/divider:divider-36d865-->', $text );
+		$this->assertMatchesRegularExpression( '/<!--divider:(divider-[0-9a-f]+) \{\}-->---<!--\/divider:\1-->/', $text );
 		$this->assertStringContainsString( '[![Logo](https://placehold.co/240x80?text=Logo)](https://example.com)', $text );
 		// a spacer has no plain text
 		$this->assertStringNotContainsString( 'spacer:', $text );
 		// the blocks in columns are in the columns block
-		$this->assertMatchesRegularExpression( '/<!--columns:columns-46d511 \{[^}]*\}--><!--heading:/', $text );
+		$this->assertMatchesRegularExpression( '/<!--columns:columns-[0-9a-f]+ \{[^}]*\}--><!--heading:/', $text );
 	}
 
 	/*
