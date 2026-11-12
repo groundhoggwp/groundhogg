@@ -1754,6 +1754,9 @@ body.groundhogg-admin-page[class*=gh-theme-] .gh-panel.build-with-ai-card .build
   color: var(--ght-accent);
 }
 
+.build-with-ai-modal {
+  /* before there's an assistant to copy a prompt into, connecting one is the only thing to do */
+}
 .build-with-ai-modal .build-with-ai label {
   font-weight: 500;
 }
@@ -1773,13 +1776,46 @@ body.groundhogg-admin-page[class*=gh-theme-] .gh-panel.build-with-ai-card .build
 }
 .build-with-ai-modal .build-with-ai-connect {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
+  padding: 20px 10px 10px;
+  text-align: center;
+}
+.build-with-ai-modal .build-with-ai-connect h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.build-with-ai-modal .build-with-ai-connect p {
+  margin: 0;
+  max-width: 440px;
+}
+.build-with-ai-modal .build-with-ai-connect a.gh-button.primary {
+  font-size: 16px;
+  padding: 4px 20px;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-waiting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.75;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-waiting .spinner {
+  float: none;
+  margin: 0;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-next {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  align-self: stretch;
+  max-width: none;
+  opacity: 0.75;
+}
+.build-with-ai-modal .build-with-ai-connected {
   padding: 10px 15px;
-  border-left: 4px solid #dba617;
-  background: #fcf9e8;
+  border-left: 4px solid #00a32a;
+  background: #edfaef;
   color: #1d2327;
 }
 

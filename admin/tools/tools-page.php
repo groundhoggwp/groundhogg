@@ -167,6 +167,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		add_action( 'wp_ajax_gh_install_cron', [ $this, 'ajax_install_gh_cron' ] );
 		add_action( 'wp_ajax_gh_check_cron', [ $this, 'ajax_check_cron' ] );
 		add_action( 'wp_ajax_gh_disable_internal_cron', [ $this, 'ajax_disable_internal_wp_cron' ] );
+		add_action( 'wp_ajax_gh_mcp_step', [ $this, 'ajax_mcp_step' ] );
 	}
 
 	public function ajax_check_cron() {
@@ -1285,25 +1286,80 @@ class Tools_Page extends Tabbed_Admin_Page {
 	public $new_agent_password = null;
 
 	/**
+	 * The steps of the AI agent tab. Each one is a form that works on its own with a page load, and the page also
+	 * sends them in the background, see ajax_mcp_step().
+	 */
+	const MCP_STEPS = [ 'install_mcp_adapter', 'install_mcp_connector', 'create_agent_password' ];
+
+	/**
+	 * Do one of the steps of the AI agent tab
+	 *
+	 * @param string $step one of MCP_STEPS
+	 * @param string $name what to call the password, when the step makes one. Left empty, a name is picked
+	 *
+	 * @return string|WP_Error what was done, in words, or what went wrong
+	 */
+	protected function do_mcp_step( string $step, string $name = '' ) {
+
+		if ( ! current_user_can( 'manage_options' ) || ! Connection::is_supported() || ! in_array( $step, self::MCP_STEPS, true ) ) {
+			return new WP_Error( 'error', __( 'You are not allowed to do that.', 'groundhogg' ) );
+		}
+
+		switch ( $step ) {
+
+			case 'install_mcp_adapter':
+
+				$result = Connection::install();
+
+				return is_wp_error( $result ) ? $result : __( 'The MCP Adapter is installed and active.', 'groundhogg' );
+
+			case 'install_mcp_connector':
+
+				if ( ! Connection::can_use_connector_plugin() ) {
+					return new WP_Error( 'error', sprintf(
+					/* translators: %s: the PHP version the plugin needs */
+						__( 'That plugin needs PHP %s or newer, which this site does not have.', 'groundhogg' ),
+						Connection::CONNECTOR_MIN_PHP
+					) );
+				}
+
+				$result = Connection::install( Connection::CONNECTOR_PLUGIN_SLUG );
+
+				return is_wp_error( $result ) ? $result : __( 'The plugin is installed and active.', 'groundhogg' );
+
+			default: // create_agent_password
+
+				// always the person asking, the agent can then do what they can do and nothing more
+				$name    = trim( sanitize_text_field( $name ) );
+				$created = Connection::create_application_password( get_current_user_id(), $name !== '' ? $name : Connection::next_name() );
+
+				if ( is_wp_error( $created ) ) {
+					return $created;
+				}
+
+				// kept in memory so the page can show it, once
+				$this->new_agent_password = $created;
+
+				return __( 'Application password created!', 'groundhogg' );
+		}
+	}
+
+	/**
 	 * Install and activate the MCP adapter plugin
 	 *
 	 * @return true|WP_Error
 	 */
 	public function process_install_mcp_adapter() {
+		return $this->process_mcp_step( 'install_mcp_adapter' );
+	}
 
-		if ( ! current_user_can( 'manage_options' ) || ! Connection::is_supported() ) {
-			$this->wp_die_no_access();
-		}
-
-		$result = Connection::install();
-
-		if ( is_wp_error( $result ) ) {
-			return $result;
-		}
-
-		$this->add_notice( 'success', __( 'The MCP Adapter is installed and active.', 'groundhogg' ) );
-
-		return true;
+	/**
+	 * Install and activate the plugin that adds sign-in for the Claude and ChatGPT apps
+	 *
+	 * @return true|WP_Error
+	 */
+	public function process_install_mcp_connector() {
+		return $this->process_mcp_step( 'install_mcp_connector' );
 	}
 
 	/**
@@ -1312,26 +1368,56 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 * @return true|WP_Error
 	 */
 	public function process_create_agent_password() {
+		return $this->process_mcp_step( 'create_agent_password' );
+	}
+
+	/**
+	 * A step sent as a form with a page load: the result is a notice
+	 *
+	 * @param string $step
+	 *
+	 * @return true|WP_Error
+	 */
+	protected function process_mcp_step( string $step ) {
 
 		if ( ! current_user_can( 'manage_options' ) || ! Connection::is_supported() ) {
 			$this->wp_die_no_access();
 		}
 
-		// always the person asking, the agent can then do what they can do and nothing more
-		$created = Connection::create_application_password(
-			get_current_user_id(),
-			sanitize_text_field( get_post_var( 'agent_name' ) )
-		);
+		$result = $this->do_mcp_step( $step, (string) get_post_var( 'agent_name' ) );
 
-		if ( is_wp_error( $created ) ) {
-			return $created;
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
 
-		$this->new_agent_password = $created;
-
-		$this->add_notice( 'success', __( 'Application password created!', 'groundhogg' ) );
+		$this->add_notice( 'success', $result );
 
 		return true;
+	}
+
+	/**
+	 * A step sent in the background: answers with the tab as it is now, so the page can swap it in without a reload.
+	 * No notice is queued, as it would show up on the next page the person opens.
+	 */
+	public function ajax_mcp_step() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error( [ 'message' => __( 'This page has expired, please reload it and try again.', 'groundhogg' ) ] );
+		}
+
+		$result = $this->do_mcp_step( sanitize_key( (string) get_post_var( 'step' ) ), (string) get_post_var( 'agent_name' ) );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
+
+		ob_start();
+		$this->mcp_view();
+
+		wp_send_json_success( [
+			'message' => $result,
+			'html'    => ob_get_clean(),
+		] );
 	}
 
 	/**

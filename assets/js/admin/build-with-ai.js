@@ -32,9 +32,12 @@
     type,
     prompt,
     examples = [],
-    connected,
     setupUrl,
+    ajaxUrl,
+    nonce,
   } = GroundhoggBuildWithAI
+
+  let { connected } = GroundhoggBuildWithAI
 
   const text = {
     email: {
@@ -108,25 +111,115 @@
     return Promise.resolve()
   }
 
+  // the site notes when an assistant first signs in, see Groundhogg\Mcp\Connection::note_seen()
+  const checkConnected = () => {
+    const body = new URLSearchParams()
+    body.append( 'action', 'gh_mcp_is_connected' )
+    body.append( 'gh_admin_ajax_nonce', nonce )
+
+    return fetch( ajaxUrl, {
+      method     : 'POST',
+      credentials: 'same-origin',
+      body,
+    } ).then( response => response.json() ).then( json => Boolean( json && json.success && json.data.connected ) ).catch( () => false )
+  }
+
+  // swap the connect step for the prompt, in the popup that's open
+  const reveal = ( justConnected = false ) => {
+    connected = true
+    const current = document.getElementById( 'build-with-ai-body' )
+
+    if ( current ) {
+      current.replaceWith( Body( justConnected ) )
+      document.getElementById( 'build-with-ai-goal' ).focus()
+    }
+  }
+
+  // while the connect step shows, keep asking, and ask again the moment they come back to this tab
+  const watch = () => {
+
+    let checking = false
+
+    const check = () => {
+
+      if ( ! document.getElementById( 'build-with-ai-connect' ) ) {
+        stop()
+        return
+      }
+
+      if ( checking ) {
+        return
+      }
+
+      checking = true
+
+      checkConnected().then( isConnected => {
+        checking = false
+        if ( isConnected && document.getElementById( 'build-with-ai-connect' ) ) {
+          stop()
+          reveal( true )
+        }
+      } )
+    }
+
+    const timer = setInterval( check, 5000 )
+
+    const stop = () => {
+      clearInterval( timer )
+      window.removeEventListener( 'focus', check )
+    }
+
+    window.addEventListener( 'focus', check )
+  }
+
+  // before there's an assistant to copy a prompt into, connecting one is the only thing to do
+  const ConnectStep = () => Div( {
+    id: 'build-with-ai-body',
+  }, Div( {
+    id       : 'build-with-ai-connect',
+    className: 'build-with-ai-connect',
+  }, [
+    H2( {}, __( 'First, connect your AI assistant', 'groundhogg' ) ),
+    Pg( {}, __( 'Your assistant needs a connection to this site before it can build anything for you. It takes a few minutes, and you only do it once.', 'groundhogg' ) ),
+    An( {
+      className: 'gh-button primary',
+      href     : setupUrl,
+      target   : '_blank',
+      rel      : 'noopener',
+    }, __( 'Connect your AI assistant', 'groundhogg' ) ),
+    Div( { className: 'build-with-ai-waiting' }, [
+      Span( { className: 'spinner is-active' } ),
+      Span( {}, __( 'Waiting for your assistant to connect. Come back to this tab when you\'re done.', 'groundhogg' ) ),
+    ] ),
+    Button( {
+      type     : 'button',
+      className: 'gh-button secondary text',
+      onClick  : () => reveal(),
+    }, __( 'I\'ve already connected one', 'groundhogg' ) ),
+    Pg( { className: 'build-with-ai-next' }, __( 'Next, you\'ll describe what you want and copy a prompt into your assistant.', 'groundhogg' ) ),
+  ] ) )
+
+  const Body = ( justConnected = false ) => connected ? PromptStep( justConnected ) : ConnectStep()
+
   const open = () => ModalWithHeader( {
     header   : text.title,
     width    : '640px',
     className: 'build-with-ai-modal',
-    onOpen   : () => document.getElementById( 'build-with-ai-goal' ).focus(),
-  }, () => Div( {
+    onOpen   : () => {
+      if ( connected ) {
+        document.getElementById( 'build-with-ai-goal' ).focus()
+        return
+      }
+
+      watch()
+    },
+  }, () => Body() )
+
+  const PromptStep = ( justConnected = false ) => Div( {
+    id       : 'build-with-ai-body',
     className: 'build-with-ai display-flex column gap-10',
   }, [
-    connected ? null : Div( {
-      className: 'build-with-ai-connect',
-    }, [
-      Span( {}, __( 'Your AI assistant needs to be connected to this site to build this. Already connected one? Carry on.', 'groundhogg' ) ),
-      An( {
-        className: 'gh-button secondary small',
-        href     : setupUrl,
-        target   : '_blank',
-        rel      : 'noopener',
-      }, __( 'Connect an assistant', 'groundhogg' ) ),
-    ] ),
+    justConnected ? Div( { className: 'build-with-ai-connected' }, __( 'Your assistant is connected. Now tell it what to build.', 'groundhogg' ) ) : null,
     Label( { for: 'build-with-ai-goal' }, __( '1. Describe what you want', 'groundhogg' ) ),
     Examples(),
     Textarea( {
@@ -165,7 +258,7 @@
       }, __( 'Copy prompt', 'groundhogg' ) ),
     ] ),
     Pg( { className: 'no-margin' }, text.after ),
-  ] ) )
+  ] )
 
   /**
    * The card that opens the popup, drawn like one of the templates it sits with.

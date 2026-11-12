@@ -26,6 +26,9 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 	public function tearDown(): void {
 		remove_filter( 'wp_is_application_passwords_available', '__return_true' );
 		wp_set_current_user( 0 );
+		if ( $this->route_callback ) {
+			remove_action( 'rest_api_init', $this->route_callback );
+		}
 		$GLOBALS['wp_rest_server'] = $this->suite_rest_server;
 		parent::tearDown();
 	}
@@ -114,34 +117,24 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->reset_rest_server();
 	}
 
-	public function test_the_tab_does_not_say_the_adapter_is_active_when_it_is_not() {
-		$this->user_with_role( 'administrator' );
-		$this->reset_rest_server();
-
-		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+	/**
+	 * The tab, as the current user sees it.
+	 */
+	/**
+	 * The tab as the page prints it. Without its script by default, which lists every step, so what is left is the
+	 * forms and text that are really on the page.
+	 */
+	protected function render_tab( ?\Groundhogg\Admin\Tools\Tools_Page $tools = null, bool $with_script = false ): string {
+		$tools = $tools ?: new \Groundhogg\Admin\Tools\Tools_Page();
 
 		ob_start();
 		$tools->mcp_view();
 		$html = ob_get_clean();
 
-		$this->assertStringNotContainsString( 'installed and active', $html );
-		$this->assertStringContainsString( 'Install and activate the MCP Adapter', $html );
-		$this->assertStringNotContainsString( 'another plugin on this site is already answering', $html );
+		return $with_script ? $html : preg_replace( '#<script>.*?</script>#s', '', $html );
 	}
 
-	public function test_the_tab_tells_when_another_plugin_is_answering() {
-		$this->user_with_role( 'administrator' );
-		$this->serve_the_default_server();
-
-		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
-
-		ob_start();
-		$tools->mcp_view();
-		$html = ob_get_clean();
-
-		$this->assertStringNotContainsString( 'installed and active', $html );
-		$this->assertStringContainsString( 'another plugin on this site is already answering', $html );
-
+	protected function stop_serving_the_default_server() {
 		remove_action( 'rest_api_init', $this->route_callback );
 		$this->reset_rest_server();
 	}
@@ -274,17 +267,86 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->assertNotContains( Connection::page_url(), $urls );
 	}
 
-	public function test_the_tab_walks_through_the_steps_and_does_not_name_the_product() {
+	/* ---- one step at a time ------------------------------------------------------------------------------ */
+
+	public function test_at_first_the_tab_only_asks_for_the_adapter() {
 		$this->user_with_role( 'administrator' );
+		$this->reset_rest_server();
 
-		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+		$html = $this->render_tab();
 
-		ob_start();
-		$tools->mcp_view();
-		$html = ob_get_clean();
+		$this->assertStringNotContainsString( 'installed and active', $html );
+		$this->assertStringContainsString( 'Install and activate the MCP Adapter', $html );
+		$this->assertStringContainsString( 'install_mcp_adapter', $html );
+
+		// the next steps wait their turn
+		$this->assertStringContainsString( 'Create a password for your assistant', $html );
+		$this->assertStringContainsString( 'Connect your assistant', $html );
+		$this->assertStringNotContainsString( 'create_agent_password', $html );
+		$this->assertStringNotContainsString( 'claude mcp add', $html );
+	}
+
+	public function test_once_the_site_answers_the_tab_only_asks_for_a_password() {
+		$this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
+
+		$html = $this->render_tab();
+
+		$this->stop_serving_the_default_server();
+
+		// another plugin answers, so there is nothing to install, and it is not the plugin that is said to be active
+		$this->assertStringContainsString( 'Your site is ready for AI assistants.', $html );
+		$this->assertStringNotContainsString( 'installed and active', $html );
+		$this->assertStringNotContainsString( 'install_mcp_adapter', $html );
+
+		$this->assertStringContainsString( 'create_agent_password', $html );
+		$this->assertStringNotContainsString( 'claude mcp add', $html );
+	}
+
+	public function test_a_password_is_not_asked_for_where_they_are_off() {
+		$this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
+
+		remove_filter( 'wp_is_application_passwords_available', '__return_true' );
+		add_filter( 'wp_is_application_passwords_available', '__return_false' );
+
+		$html = $this->render_tab();
+
+		remove_filter( 'wp_is_application_passwords_available', '__return_false' );
+		$this->stop_serving_the_default_server();
+
+		$this->assertStringContainsString( 'Application passwords are not available on this site', $html );
+		$this->assertStringNotContainsString( 'create_agent_password', $html );
+	}
+
+	public function test_the_next_name_is_not_one_that_is_taken() {
+		$user = $this->user_with_role( 'administrator' );
+
+		$this->assertSame( 'AI assistant', Connection::next_name( $user ) );
+
+		Connection::create_application_password( $user, Connection::next_name( $user ) );
+		$this->assertSame( 'AI assistant 2', Connection::next_name( $user ) );
+
+		Connection::create_application_password( $user, Connection::next_name( $user ) );
+		$this->assertSame( 'AI assistant 3', Connection::next_name( $user ) );
+
+		// someone else's passwords do not count
+		$this->assertSame( 'AI assistant', Connection::next_name( $this->user_with_role( 'administrator' ) ) );
+	}
+
+	public function test_the_tab_walks_through_the_steps_and_does_not_name_the_product() {
+		$user = $this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
+		Connection::create_application_password( $user, 'Earlier' );
+
+		$html = $this->render_tab();
+
+		$this->stop_serving_the_default_server();
 
 		$this->assertStringContainsString( Connection::endpoint(), $html );
-		$this->assertStringContainsString( 'YOUR_AUTH_TOKEN', $html, 'a placeholder, as nothing has been created yet' );
+		$this->assertStringContainsString( 'YOUR_AUTH_TOKEN', $html, 'a placeholder, as that password can not be shown again' );
+		$this->assertStringContainsString( 'Create a new password', $html );
+		$this->assertStringNotContainsString( 'can not be shown again', $html, 'passwords are cheap, just offer a new one' );
 		$this->assertStringContainsString( 'Header name: Authorization', $html, 'for custom connectors' );
 		// no one assistant is favored, each gets its own instructions
 		$this->assertStringContainsString( 'claude mcp add', $html );
@@ -299,17 +361,160 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->assertStringNotContainsStringIgnoringCase( 'groundhogg', wp_strip_all_tags( $html ) );
 	}
 
+	public function test_the_sign_in_plugin_is_offered_with_the_last_step_only_where_it_can_run() {
+		$user = $this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
+		Connection::create_application_password( $user, 'Earlier' );
+
+		$html = $this->render_tab();
+
+		$this->assertSame( version_compare( PHP_VERSION, '8.0', '>=' ), Connection::can_use_connector_plugin() );
+		$this->assertStringContainsString( 'install_mcp_connector', $html );
+		$this->assertStringContainsString( 'Install and activate Enable Abilities for MCP', $html );
+		$this->assertStringContainsString( 'It also adds abilities for the rest of WordPress.', $html );
+		$this->assertStringContainsString( 'ewpa-settings', Connection::connector_settings_url() );
+		$this->assertStringNotContainsStringIgnoringCase( 'groundhogg', wp_strip_all_tags( $html ) );
+
+		// not before they get there
+		$this->stop_serving_the_default_server();
+		$this->reset_rest_server();
+		$this->assertStringNotContainsString( 'install_mcp_connector', $this->render_tab() );
+	}
+
+	public function test_the_plugin_helpers_work_for_any_plugin() {
+		$this->assertSame( '', Connection::plugin_file( 'no-such-plugin-here' ) );
+		$this->assertFalse( Connection::is_installed( 'no-such-plugin-here' ) );
+		$this->assertFalse( Connection::is_active( 'no-such-plugin-here' ) );
+	}
+
+	/* ---- steps sent in the background -------------------------------------------------------------------- */
+
+	/**
+	 * Send a step the way the page does in the background, and read the answer.
+	 *
+	 * @param string $step
+	 * @param bool   $with_nonce
+	 *
+	 * @return array the decoded JSON answer
+	 */
+	protected function send_step( string $step, bool $with_nonce = true, string $name = '' ): array {
+
+		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+
+		$die = function () {
+			return function () {
+				throw new \RuntimeException( 'wp_die' );
+			};
+		};
+
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		add_filter( 'wp_die_ajax_handler', $die );
+
+		$_POST['step']                = $step;
+		$_POST['agent_name']          = $name;
+		$_REQUEST['gh_admin_ajax_nonce'] = $with_nonce ? wp_create_nonce( 'admin_ajax' ) : 'nope';
+
+		ob_start();
+
+		try {
+			$tools->ajax_mcp_step();
+		} catch ( \RuntimeException $e ) {
+			// wp_send_json() ends the request
+		}
+
+		$out = ob_get_clean();
+
+		remove_filter( 'wp_doing_ajax', '__return_true' );
+		remove_filter( 'wp_die_ajax_handler', $die );
+		unset( $_POST['step'], $_POST['agent_name'], $_REQUEST['gh_admin_ajax_nonce'] );
+
+		return json_decode( $out, true ) ?: [];
+	}
+
+	public function test_the_page_can_send_a_step_without_a_reload() {
+		$user = $this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
+
+		$html = $this->render_tab( null, true );
+
+		$this->assertStringContainsString( 'id="gh-mcp-content"', $html, 'what is swapped' );
+		$this->assertStringContainsString( 'gh_mcp_step', $html );
+		$this->assertStringContainsString( 'data-nonce=', $html );
+		foreach ( \Groundhogg\Admin\Tools\Tools_Page::MCP_STEPS as $step ) {
+			$this->assertStringContainsString( $step, $html );
+		}
+
+		$answer = $this->send_step( 'create_agent_password' );
+
+		$this->stop_serving_the_default_server();
+
+		$this->assertTrue( $answer['success'] );
+		$this->assertSame( 'Application password created!', $answer['data']['message'] );
+		$this->assertCount( 1, Connection::application_passwords( $user ) );
+
+		// the page that comes back has the password in it, and no notice is left to turn up on the next page
+		$this->assertStringContainsString( 'will not be shown again', $answer['data']['html'] );
+		$this->assertStringNotContainsString( 'YOUR_AUTH_TOKEN', $answer['data']['html'] );
+		$this->assertEmpty( get_transient( 'groundhogg_notices_user_' . $user ) );
+	}
+
+	public function test_the_password_can_be_named_and_a_name_is_suggested_when_it_is_not() {
+		$user = $this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
+
+		// the suggestion is in the form
+		$this->assertStringContainsString( 'name="agent_name"', $this->render_tab() );
+		$this->assertStringContainsString( 'value="AI assistant"', $this->render_tab() );
+
+		$this->assertTrue( $this->send_step( 'create_agent_password', true, 'Work laptop' )['success'] );
+		$this->assertSame( 'Work laptop', Connection::application_passwords( $user )[0]['name'] );
+
+		// the same name twice is refused, the others are not touched
+		$again = $this->send_step( 'create_agent_password', true, 'work laptop' );
+		$this->assertFalse( $again['success'] );
+		$this->assertCount( 1, Connection::application_passwords( $user ) );
+
+		// left empty, one is picked
+		$this->assertTrue( $this->send_step( 'create_agent_password', true, '  ' )['success'] );
+		$names = wp_list_pluck( Connection::application_passwords( $user ), 'name' );
+		$this->assertContains( 'AI assistant', $names );
+
+		// and the form suggests the next free one, even with passwords already made
+		$this->assertStringContainsString( 'value="AI assistant 2"', $this->render_tab() );
+
+		$this->stop_serving_the_default_server();
+	}
+
+	public function test_a_step_sent_in_the_background_needs_the_nonce_and_the_right() {
+		$user = $this->user_with_role( 'administrator' );
+
+		$answer = $this->send_step( 'create_agent_password', false );
+		$this->assertFalse( $answer['success'] );
+		$this->assertCount( 0, Connection::application_passwords( $user ) );
+
+		$this->user_with_role( 'sales_rep' );
+		$answer = $this->send_step( 'create_agent_password' );
+		$this->assertFalse( $answer['success'] );
+
+		$this->user_with_role( 'administrator' );
+		$answer = $this->send_step( 'delete_everything' );
+		$this->assertFalse( $answer['success'], 'only the steps of the tab' );
+	}
+
 	public function test_a_password_just_made_is_in_the_examples() {
 		$user = $this->user_with_role( 'administrator' );
+		$this->serve_the_default_server();
 
 		$tools                     = new \Groundhogg\Admin\Tools\Tools_Page();
 		$tools->new_agent_password = Connection::create_application_password( $user, 'Claude' );
 
-		ob_start();
-		$tools->mcp_view();
-		$html = ob_get_clean();
+		$html = $this->render_tab( $tools );
+
+		$this->stop_serving_the_default_server();
 
 		$this->assertStringContainsString( $tools->new_agent_password['token'], $html );
 		$this->assertStringNotContainsString( 'YOUR_AUTH_TOKEN', $html );
+		$this->assertStringContainsString( 'will not be shown again', $html );
+		$this->assertStringNotContainsString( 'Create a new password', $html, 'the one just made is right there' );
 	}
 }

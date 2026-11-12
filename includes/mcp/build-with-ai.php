@@ -241,6 +241,8 @@ class Build_With_AI {
 				'examples'  => array_values( self::examples( $type ) ),
 				'connected' => Connection::is_connected(),
 				'setupUrl'  => Connection::page_url(),
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'admin_ajax' ),
 			] ), 'before' );
 	}
 }

@@ -370,6 +370,7 @@ class Plugin {
 		new My_Day();
 		new Notifications\Actions();
 		new Abilities();
+		Mcp\Connection::init();
 		$this->site_health = new Site_Health();
 	}
 

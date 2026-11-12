@@ -1,6 +1,6 @@
-# Groundhogg: the WordPress CRM, Email & Marketing Automation Suite
+# Groundhogg: the AI CRM for WordPress, with Email & Marketing Automation
 
-**Build flows, send email, and run your whole CRM from inside WordPress, with no limits on contacts, flows or emails.** Now with AI agents, replies in your CRM, and a mobile app.
+**Groundhogg is the AI CRM for WordPress. Build flows, send email, and run your whole CRM from inside WordPress, with no limits on contacts, flows or emails.** Let AI agents like ChatGPT, Claude, Gemini and Cursor work in it with you, read replies in your CRM, and take it with you in the mobile app.
 
 [![Install free from WordPress.org](https://img.shields.io/badge/Install%20free-WordPress.org-2271b1?style=for-the-badge&logo=wordpress&logoColor=white)](https://wordpress.org/plugins/groundhogg/) [![Try the free demo](https://img.shields.io/badge/Try%20the-free%20demo-e8590c?style=for-the-badge)](https://groundhogg.io/try/)
 
@@ -18,7 +18,7 @@ Businesses that switch to Groundhogg save on average **$240/m** on CRM fees.
 
 Ten releases in six weeks. Here are the highlights from 4.8 to 4.10.
 
-* 🤖 **AI agents can work inside your CRM.** The new **AI agent** tab in Tools connects ChatGPT, Claude, Codex, Cursor, Gemini CLI, VS Code and custom connectors in a few clicks. Agents can build and edit flows, schedule broadcasts, and manage contacts, all within the permissions of the user they act as. [See what they can do.](#-ai--mcp-ready)
+* 🤖 **An AI CRM: AI agents can work inside it.** The new **AI agent** tab in Tools connects ChatGPT, Claude, Codex, Cursor, Gemini CLI, VS Code and custom connectors in a few clicks. Agents can build and edit flows, schedule broadcasts, and manage contacts, all within the permissions of the user they act as. [See what they can do.](#-ai-crm--mcp-ready)
 * 💬 **Replies land in your CRM.** Turn on Incoming Messages and replies to your emails are saved to the contact, laid out like a chat in a new Messages tab, with a Replies widget on your dashboard. _(Needs an active license.)_
 * 📱 **A mobile app for your CRM.** Install it from the Tools menu with a QR code. Look up contacts, call, text or email them, work through tasks, add notes and answer replies from your phone.
 * ⚡ **A much faster Flow Editor.** Changes show right away and save in the background, and undo and redo cover step settings, duplicated steps and pasted steps. Only one person can edit a flow at a time, and you choose what happens to contacts waiting at steps you delete.
@@ -26,7 +26,7 @@ Ten releases in six weeks. Here are the highlights from 4.8 to 4.10.
 * 🕰️ **A redesigned contact timeline.** Flow runs and browsing sessions are grouped, opens and clicks sit under their email, and failed flow events show the error.
 * 🎨 **Interface themes.** Light, Paper, Slate or Midnight. Saved per user, and also found in the command palette (Ctrl or Cmd + K).
 
-## Epic WordPress CRM, Email & Marketing Automation
+## Epic WordPress AI CRM, Email & Marketing Automation
 
 Groundhogg 4.0 introduced the **Flow Editor**, which makes Groundhogg the most powerful marketing automation tool currently available for WordPress. Seriously, no other WordPress CRM comes close, we checked.
 
@@ -83,7 +83,7 @@ Everything your business needs to thrive!
 * Best in class CRM & Marketing Automation suite.
 * Organize and segment your contacts to send more relevant communications.
 * Automate your communications to save you time and increase your productivity.
-* Let AI agents build flows and manage contacts for you, safely, with your permissions.
+* An AI CRM: let AI agents build flows, write emails and manage contacts for you, safely, with your permissions.
 * Read and answer replies to your emails right inside the CRM.
 * Run your CRM from your phone with the installable mobile app.
 * Collect data and mine your list so you can stop bleeding money. "The money is in the list!"
@@ -228,9 +228,9 @@ _Incoming Messages needs an active Groundhogg license._
 
 [![Understand your reports](https://img.youtube.com/vi/LIEVWVBC2Ww/hqdefault.jpg)](https://youtu.be/LIEVWVBC2Ww)
 
-### 🤖 AI & MCP Ready
+### 🤖 AI CRM & MCP Ready
 
-Let ChatGPT, Claude, Gemini, Cursor and other AI agents work inside your CRM, safely.
+Groundhogg is an AI CRM: let ChatGPT, Claude, Gemini, Cursor and other AI agents work inside it, safely.
 
 * **Set up in a few clicks.** The AI agent tab in Tools installs the MCP Adapter plugin, creates an application password for you, and has setup steps for ChatGPT, Claude, Codex, Cursor, Gemini CLI, VS Code and custom connectors. _(WordPress 6.9 or later, for people who can manage options.)_
 * **Build flows by asking for them.** Agents can discover the available steps, build a flow with branches from scratch, activate it, and read and edit an existing one. Changes to a live flow are staged until they're published, just like in the Flow Editor.
