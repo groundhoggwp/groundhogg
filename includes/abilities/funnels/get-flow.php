@@ -4,6 +4,7 @@ namespace Groundhogg\Abilities\Funnels;
 
 use Groundhogg\Abilities\Ability;
 use Groundhogg\Abilities\Schemas\Step_Type_Schema;
+use Groundhogg\Form\Form_v2;
 use Groundhogg\Funnel;
 use Groundhogg\Step;
 use WP_Error;
@@ -115,6 +116,7 @@ class Get_Flow extends Ability {
 					'items'       => [ 'type' => 'integer' ],
 					'description' => __( 'IDs of the steps that point at this one in their settings (a jump, a reply in thread, a task to complete, add to flow from another flow...). It can\'t be deleted until they\'re changed or deleted too.', 'groundhogg' ),
 				],
+				'embed' => self::embed_schema(),
 				'branches' => [
 					'type'                 => 'object',
 					'description'          => __( 'Branch key => the ordered step nodes in that branch. if_else has "yes" and "no". A benchmark\'s "then" branch holds steps that only run after that trigger.', 'groundhogg' ),
@@ -373,6 +375,54 @@ class Get_Flow extends Ability {
 	 *
 	 * @return array
 	 */
+	/**
+	 * The schema of a form step's `embed`, see form_embed()
+	 *
+	 * @return array
+	 */
+	public static function embed_schema(): array {
+		return [
+			'type'        => 'object',
+			'description' => __( 'Web forms only: how to put the form on a page. The same as "Embed options" in the flow editor. Contacts only enter the flow from the form once the flow is active.', 'groundhogg' ),
+			'properties'  => [
+				'shortcode'  => [
+					'type'        => 'string',
+					'description' => __( 'For a page or post on this site, e.g. in a shortcode block.', 'groundhogg' ),
+				],
+				'hosted_url' => [
+					'type'        => 'string',
+					'description' => __( 'A page that shows just the form, to link to directly.', 'groundhogg' ),
+				],
+				'iframe'     => [
+					'type'        => 'string',
+					'description' => __( 'A script tag that shows the form on another website.', 'groundhogg' ),
+				],
+			],
+		];
+	}
+
+	/**
+	 * How to put a web form on a page, null for any other step
+	 *
+	 * @param Step $step
+	 *
+	 * @return array|null
+	 */
+	public static function form_embed( Step $step ) {
+
+		if ( ! $step->type_is( 'web_form' ) ) {
+			return null;
+		}
+
+		$form = new Form_v2( [ 'id' => $step->get_id() ] );
+
+		return [
+			'shortcode'  => $form->get_shortcode(),
+			'hosted_url' => $form->get_submission_url(),
+			'iframe'     => $form->get_iframe_embed_code(),
+		];
+	}
+
 	protected static function step_node( Step $step, array $branches, bool $has_drafts ) {
 
 		$settings = Step_Type_Schema::export_settings( $step );
@@ -392,6 +442,12 @@ class Get_Flow extends Ability {
 		if ( $settings !== null ) {
 			// an object even when empty
 			$node['settings'] = (object) $settings;
+		}
+
+		$embed = self::form_embed( $step );
+
+		if ( $embed ) {
+			$node['embed'] = $embed;
 		}
 
 		if ( $step->is_benchmark() ) {

@@ -43,11 +43,9 @@ class Settings {
 	}
 
 	/**
-	 * Register the settings that have been migrated to the new registry so far.
-	 *
-	 * Only the business_info settings are registered here for now - this is meant to
-	 * establish the shape of the registry, not to migrate every setting at once. Settings
-	 * not registered here are unaffected and continue to work exactly as before.
+	 * Register the settings that have been migrated to the new registry so far: the ones
+	 * someone (or an agent) needs to set up a site, plus a few the editors read and write.
+	 * Settings not registered here are unaffected and continue to work exactly as before.
 	 *
 	 * @return void
 	 */
@@ -289,6 +287,209 @@ class Settings {
 			'sanitize_callback' => [ Form_Fields::class, 'sanitize_form_and_map' ],
 			'description'       => __( 'Custom fields shown on the contact-facing preferences page. Same 2-element [form, map] tuple shape as custom_profile_fields.', 'groundhogg' ),
 		] );
+
+		$this->add_group( 'general', [
+			'label' => __( 'General', 'groundhogg' ),
+		] );
+
+		// only someone who can own contacts, see get_owners()
+		$this->add_setting( 'primary_user', [
+			'group'       => 'general',
+			'type'        => 'integer',
+			'schema'      => function () {
+				return [ 'enum' => array_values( array_map( 'absint', wp_list_pluck( get_owners(), 'ID' ) ) ) ];
+			},
+			'description' => __( 'The default contact owner: the user ID new contacts are assigned to when nothing else gives them an owner. Must be a user who can own contacts, see groundhogg/list-owners.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'email_services', [
+			'label' => __( 'Email Services', 'groundhogg' ),
+		] );
+
+		// add-ons register their services on init, after this, so the choices are worked out when a value is saved
+		$services = function () {
+			return [ 'enum' => array_keys( \Groundhogg_Email_Services::get() ) ];
+		};
+
+		$this->add_setting( 'wordpress_email_service', [
+			'group'       => 'email_services',
+			'type'        => 'string',
+			'default'     => 'wp_mail',
+			'schema'      => $services,
+			'description' => __( 'The service that sends all email from WordPress itself: password resets, plugin notifications and so on. "wp_mail" is the WordPress default (or whatever SMTP plugin overrides it), "log_only" logs email without sending it. Add-ons and integrations with email services add their own.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'transactional_email_service', [
+			'group'       => 'email_services',
+			'type'        => 'string',
+			'default'     => 'wp_mail',
+			'schema'      => $services,
+			'description' => __( 'The service that sends transactional email: receipts, confirmations and other messages contacts can\'t unsubscribe from. "wp_mail" follows wordpress_email_service.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'marketing_email_service', [
+			'group'       => 'email_services',
+			'type'        => 'string',
+			'default'     => 'wp_mail',
+			'schema'      => $services,
+			'description' => __( 'The service that sends marketing email: broadcasts and flow emails. "wp_mail" follows wordpress_email_service.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'allow_email_in_staging', [
+			'group'       => 'email_services',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Send email even though this site looks like a staging site. Off by default, so a copy of a live site doesn\'t email real contacts.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'email_logging', [
+			'label' => __( 'Email Logging', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'log_emails', [
+			'group'       => 'email_logging',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Keep a log of every email sent, with its content and whether it was delivered to the sending service. Needed to see anything when a service is set to "log_only".', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'email_log_retention', [
+			'group'       => 'email_logging',
+			'type'        => 'integer',
+			'default'     => 14,
+			'schema'      => [ 'minimum' => 1, 'maximum' => 365 ],
+			'description' => __( 'Number of days email log entries are kept.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'unsubscribe', [
+			'label' => __( 'Unsubscribe', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'unsubscribe_email', [
+			'group'             => 'unsubscribe',
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_email',
+			'description'       => __( 'The mailbox the List-Unsubscribe header points to, which email clients use for their own unsubscribe button. Falls back to the site admin email when empty.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'enable_one_click_unsubscribe', [
+			'group'       => 'unsubscribe',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Unsubscribe contacts as soon as they click the unsubscribe link, instead of taking them to the preferences page first. Not recommended: link scanners in some inboxes click every link.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'email_footer', [
+			'label' => __( 'Email Footer', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'custom_email_footer_text', [
+			'group'             => 'email_footer',
+			'type'              => 'string',
+			'sanitize_callback' => 'wp_kses_post',
+			'description'       => __( 'Extra text, HTML allowed, shown in the footer of every email above the business details. Supports merge tags.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'email_footer_alignment', [
+			'group'       => 'email_footer',
+			'type'        => 'string',
+			'default'     => 'left',
+			'schema'      => [ 'enum' => [ 'left', 'center' ] ],
+			'description' => __( 'How the email footer is aligned.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'tracking', [
+			'label' => __( 'Tracking', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'disable_open_tracking', [
+			'group'       => 'tracking',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Stop tracking when contacts open emails.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'disable_click_tracking', [
+			'group'       => 'tracking',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Stop tracking when contacts click links in emails. Links then go straight to their destination.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'url_tracking_exclusions', [
+			'group'             => 'tracking',
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'description'       => __( 'Links that are never tracked, one per line. A link is left alone when it contains one of the lines; start or end a line with ^ or $ to match only the start or end of a link.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'disable_page_tracking', [
+			'group'       => 'tracking',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Stop tracking which pages contacts visit and which forms they see on the site.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'consent_cookie_name', [
+			'group'       => 'cookies',
+			'type'        => 'string',
+			'description' => __( 'The name of the cookie a cookie consent plugin sets when a visitor accepts cookies, e.g. "viewed_cookie_policy". Used with disable_unnecessary_cookies, so tracking cookies are only set after consent.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'consent_cookie_value', [
+			'group'       => 'cookies',
+			'type'        => 'string',
+			'description' => __( 'The value of consent_cookie_name that means the visitor accepted, e.g. "yes".', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'user_sync', [
+			'label' => __( 'WordPress Users', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'disable_user_sync', [
+			'group'       => 'user_sync',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Stop creating and updating a contact for every WordPress user.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'sync_user_meta', [
+			'group'       => 'user_sync',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Copy all of a WordPress user\'s meta to their contact\'s meta whenever it changes.', 'groundhogg' ),
+		] );
+
+		$this->add_group( 'event_notices', [
+			'label' => __( 'Event Failure Notices', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'send_notifications_on_event_failure', [
+			'group'       => 'event_notices',
+			'type'        => 'boolean',
+			'default'     => false,
+			'description' => __( 'Email a report when flow or broadcast events fail, so problems get noticed.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'event_failure_notification_email', [
+			'group'             => 'event_notices',
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_email',
+			'description'       => __( 'Where event failure reports go. Falls back to the site admin email when empty.', 'groundhogg' ),
+		] );
+
+		$this->add_setting( 'ignore_event_errors', [
+			'group'             => 'event_notices',
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'description'       => __( 'Error codes left out of failure reports, one per line.', 'groundhogg' ),
+		] );
+
+		/**
+		 * gh_disable_wp_cron is intentionally NOT registered here - turning WP Cron off while no
+		 * external cron job runs gh-cron.php stops every flow and broadcast. The cron abilities
+		 * (see includes/abilities/cron/) only turn it off once gh-cron.php is being pinged.
+		 */
 	}
 
 	/**

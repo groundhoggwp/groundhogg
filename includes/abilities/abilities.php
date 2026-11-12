@@ -14,11 +14,13 @@ use Groundhogg\Abilities\Contacts\Add_Custom_Field;
 use Groundhogg\Abilities\Contacts\Bulk_Update_Contacts;
 use Groundhogg\Abilities\Contacts\Create_Contact;
 use Groundhogg\Abilities\Contacts\Get_Contact;
+use Groundhogg\Abilities\Contacts\Import_Contacts;
 use Groundhogg\Abilities\Contacts\List_Contact_Notes;
 use Groundhogg\Abilities\Contacts\List_Custom_Fields;
 use Groundhogg\Abilities\Contacts\List_Owners;
 use Groundhogg\Abilities\Contacts\List_Saved_Searches;
 use Groundhogg\Abilities\Contacts\Search_Contacts;
+use Groundhogg\Abilities\Contacts\Sync_Users;
 use Groundhogg\Abilities\Contacts\Update_Contact;
 use Groundhogg\Abilities\Contacts\Update_Contacts;
 use Groundhogg\Abilities\Contacts\Update_Custom_Field;
@@ -36,6 +38,8 @@ use Groundhogg\Abilities\Funnels\Discard_Flow_Changes;
 use Groundhogg\Abilities\Funnels\Edit_Flow;
 use Groundhogg\Abilities\Funnels\Get_Flow;
 use Groundhogg\Abilities\Funnels\Get_Form_Integration_Fields;
+use Groundhogg\Abilities\Funnels\Import_Flow_Template;
+use Groundhogg\Abilities\Funnels\List_Flow_Templates;
 use Groundhogg\Abilities\Funnels\List_Flows;
 use Groundhogg\Abilities\Funnels\List_Step_Types;
 use Groundhogg\Abilities\Funnels\Live_Simulate_Flow;
@@ -46,7 +50,9 @@ use Groundhogg\Abilities\Emails\Edit_Email;
 use Groundhogg\Abilities\Emails\Get_Email_Template;
 use Groundhogg\Abilities\Emails\List_Email_Templates;
 use Groundhogg\Abilities\Emails\List_Replacement_Codes;
+use Groundhogg\Abilities\Emails\Delete_Sender_Profile;
 use Groundhogg\Abilities\Emails\List_Sender_Profiles;
+use Groundhogg\Abilities\Emails\Save_Sender_Profile;
 use Groundhogg\Abilities\Emails\Send_Composed_Email;
 use Groundhogg\Abilities\Emails\Send_Email_Template;
 use Groundhogg\Abilities\Emails\Send_Test_Email;
@@ -56,6 +62,9 @@ use Groundhogg\Abilities\Reports\Get_Reports;
 use Groundhogg\Abilities\Reports\List_Report_Types;
 use Groundhogg\Abilities\Settings\List_Settings;
 use Groundhogg\Abilities\Settings\Update_Settings;
+use Groundhogg\Abilities\Setup\Get_Cron_Status;
+use Groundhogg\Abilities\Setup\Get_Setup_Status;
+use Groundhogg\Abilities\Setup\Set_Up_Cron;
 use Groundhogg\Abilities\Tags\Create_Tag;
 use Groundhogg\Abilities\Tags\List_Tags;
 use Groundhogg\Abilities\Utils\Get_Authoring_Guide;
@@ -380,6 +389,11 @@ class Abilities {
 			'description' => __( 'List and update Groundhogg settings that have been registered for ability access.', 'groundhogg' ),
 		] );
 
+		self::register_category( 'groundhogg-setup', [
+			'label'       => __( 'Groundhogg Setup', 'groundhogg' ),
+			'description' => __( 'Check what is left to set up and what stops automation or email from working, and set up the cron jobs.', 'groundhogg' ),
+		] );
+
 		foreach ( self::$extra_categories as $slug => $args ) {
 			self::register_category( $slug, $args );
 		}
@@ -400,6 +414,8 @@ class Abilities {
 			Update_Contacts::class,
 			Bulk_Update_Contacts::class,
 			Search_Contacts::class,
+			Sync_Users::class,
+			Import_Contacts::class,
 			List_Custom_Fields::class,
 			Add_Custom_Field::class,
 			Update_Custom_Field::class,
@@ -415,6 +431,8 @@ class Abilities {
 			List_Email_Templates::class,
 			Get_Email_Template::class,
 			List_Sender_Profiles::class,
+			Save_Sender_Profile::class,
+			Delete_Sender_Profile::class,
 			Create_Email_Template::class,
 			Update_Email_Template::class,
 			Edit_Email::class,
@@ -431,6 +449,8 @@ class Abilities {
 			List_Step_Types::class,
 			Get_Form_Integration_Fields::class,
 			Create_Flow::class,
+			List_Flow_Templates::class,
+			Import_Flow_Template::class,
 			Edit_Flow::class,
 			Publish_Flow_Changes::class,
 			Discard_Flow_Changes::class,
@@ -452,6 +472,9 @@ class Abilities {
 			Install_Extension::class,
 			List_Settings::class,
 			Update_Settings::class,
+			Get_Setup_Status::class,
+			Get_Cron_Status::class,
+			Set_Up_Cron::class,
 		], self::$extra_abilities );
 
 		foreach ( $abilities as $ability ) {

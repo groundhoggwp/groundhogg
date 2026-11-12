@@ -6,8 +6,6 @@ use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
-use function Groundhogg\is_pro_features_active;
-use function Groundhogg\is_white_labeled;
 
 /**
  * Add Funnel
@@ -49,15 +47,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php if ( 'templates' === $active_tab ):
 
-	$funnel_templates = Plugin::$instance->library->get_funnel_templates();
-
-	if ( ! is_array( $funnel_templates ) ) {
-		$funnel_templates = [];
-	}
-
-	$funnel_templates = array_map( function ( $template ) {
-		return new Funnel( $template, true );
-	}, $funnel_templates );
+	// without the ones that have steps that are not registered on this site
+	$funnel_templates = Plugin::$instance->library->get_available_funnel_templates();
 
 	$campaigns = array_reduce( $funnel_templates, function ( $carry, Funnel $template ) {
 		foreach ( $template->campaigns as $campaign ) {
@@ -65,28 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		}
 
 		return $carry;
-	}, [] );
-
-	// Filter out templates that have steps that are not registered on this site
-	$funnel_templates = array_filter( $funnel_templates, function ( $funnel ) {
-
-		$funnel->is_premium = false;
-
-		foreach ( $funnel->steps as $step ) {
-			$step = (object) $step;
-
-			// don't show funnels with unregistered types
-			if ( ! Plugin::instance()->step_manager->type_is_registered( $step->data->step_type ) ) {
-				return false;
-			}
-
-			if ( Plugin::instance()->step_manager->get_element( $step->data->step_type )->is_premium() && ! is_pro_features_active() && ! is_white_labeled() ) {
-				$funnel->is_premium = true;
-			}
-		}
-
-		return true;
-	} )
+	}, [] )
 
 	?>
     <p></p>

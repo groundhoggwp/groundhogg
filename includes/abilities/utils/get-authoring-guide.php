@@ -40,6 +40,11 @@ class Get_Authoring_Guide extends Ability {
 				'file'        => dirname( __DIR__ ) . '/guides/flow.md',
 				'capability'  => 'add_funnels',
 			],
+			'setup' => [
+				'description' => __( 'Setting up the site for someone: what to ask them, business details, privacy and consent, sending email, cron, owners, and what only a person can do.', 'groundhogg' ),
+				'file'        => dirname( __DIR__ ) . '/guides/setup.md',
+				'capability'  => 'manage_options',
+			],
 		];
 
 		/**

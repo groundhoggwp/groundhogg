@@ -187,6 +187,11 @@ class Plugin {
 	public $imap_inbox;
 
 	/**
+	 * @var Site_Health
+	 */
+	public $site_health;
+
+	/**
 	 * @var Step_Manager
 	 */
 	public $step_manager;
@@ -365,7 +370,7 @@ class Plugin {
 		new My_Day();
 		new Notifications\Actions();
 		new Abilities();
-		new Site_Health();
+		$this->site_health = new Site_Health();
 	}
 
 	/**

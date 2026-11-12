@@ -78,4 +78,90 @@ class Settings_Registry_Tests extends GH_UnitTestCase {
 		update_option( 'gh_telemetry_email', 'not an email' );
 		$this->assertSame( '', get_option( 'gh_telemetry_email' ) );
 	}
+
+	/**
+	 * What an agent needs to set up sending, compliance and tracking, through groundhogg/update-settings
+	 */
+	public function test_setup_settings_are_registered() {
+
+		$settings = Plugin::instance()->settings;
+
+		foreach ( [
+			'primary_user',
+			'wordpress_email_service',
+			'transactional_email_service',
+			'marketing_email_service',
+			'allow_email_in_staging',
+			'log_emails',
+			'email_log_retention',
+			'unsubscribe_email',
+			'enable_one_click_unsubscribe',
+			'custom_email_footer_text',
+			'email_footer_alignment',
+			'disable_open_tracking',
+			'disable_click_tracking',
+			'url_tracking_exclusions',
+			'disable_page_tracking',
+			'consent_cookie_name',
+			'consent_cookie_value',
+			'disable_user_sync',
+			'sync_user_meta',
+			'send_notifications_on_event_failure',
+			'event_failure_notification_email',
+			'ignore_event_errors',
+		] as $setting ) {
+			$this->assertTrue( $settings->is_setting_registered( $setting ), "gh_$setting is not registered" );
+		}
+
+		// turning it off without an external cron stops the queue, so only the cron abilities may
+		$this->assertFalse( $settings->is_setting_registered( 'disable_wp_cron' ) );
+	}
+
+	public function test_email_service_must_be_registered() {
+
+		update_option( 'gh_marketing_email_service', 'log_only' );
+		$this->assertSame( 'log_only', get_option( 'gh_marketing_email_service' ) );
+
+		update_option( 'gh_marketing_email_service', 'not_a_service' );
+		$this->assertSame( 'wp_mail', get_option( 'gh_marketing_email_service' ) );
+
+		update_option( 'gh_marketing_email_service', 'wp_mail' );
+	}
+
+	public function test_primary_user_must_be_an_owner() {
+
+		$owner = wp_list_pluck( \Groundhogg\get_owners(), 'ID' )[0];
+
+		update_option( 'gh_primary_user', (string) $owner );
+		$this->assertSame( absint( $owner ), absint( get_option( 'gh_primary_user' ) ) );
+
+		$subscriber = self::factory()->user->create( [ 'role' => 'subscriber' ] );
+
+		update_option( 'gh_primary_user', $subscriber );
+		$this->assertNotEquals( $subscriber, absint( get_option( 'gh_primary_user' ) ) );
+	}
+
+	/**
+	 * The settings page still saves 'on', the abilities save true
+	 */
+	public function test_tracking_checkboxes_read_either_way() {
+
+		update_option( 'gh_disable_page_tracking', 'on' );
+		$this->assertTrue( \Groundhogg\is_option_enabled( 'gh_disable_page_tracking' ) );
+
+		update_option( 'gh_disable_page_tracking', true );
+		$this->assertTrue( \Groundhogg\is_option_enabled( 'gh_disable_page_tracking' ) );
+
+		update_option( 'gh_disable_page_tracking', false );
+		$this->assertFalse( \Groundhogg\is_option_enabled( 'gh_disable_page_tracking' ) );
+	}
+
+	public function test_footer_alignment_is_left_or_center() {
+
+		update_option( 'gh_email_footer_alignment', 'center' );
+		$this->assertSame( 'center', get_option( 'gh_email_footer_alignment' ) );
+
+		update_option( 'gh_email_footer_alignment', 'sideways' );
+		$this->assertSame( 'left', get_option( 'gh_email_footer_alignment' ) );
+	}
 }

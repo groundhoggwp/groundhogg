@@ -34,13 +34,11 @@ class Site_Health {
 	}
 
 	/**
-	 * Add the tests to the Status tab
+	 * The tests that apply to this site
 	 *
-	 * @param array $tests
-	 *
-	 * @return array
+	 * @return array test id, without the prefix => [ label, callable ]
 	 */
-	public function register_tests( $tests ) {
+	public function tests() {
 
 		$direct = [
 			'event_queue'      => [ __( 'Automation is running on time', 'groundhogg' ), 'test_event_queue' ],
@@ -74,13 +72,45 @@ class Site_Health {
 		$direct = apply_filters( 'groundhogg/site_health/tests', $direct );
 
 		foreach ( $direct as $id => [ $label, $callback ] ) {
+			$direct[ $id ] = [ $label, is_string( $callback ) && method_exists( $this, $callback ) ? [ $this, $callback ] : $callback ];
+		}
+
+		return $direct;
+	}
+
+	/**
+	 * Add the tests to the Status tab
+	 *
+	 * @param array $tests
+	 *
+	 * @return array
+	 */
+	public function register_tests( $tests ) {
+
+		foreach ( $this->tests() as $id => [ $label, $callback ] ) {
 			$tests['direct'][ 'groundhogg_' . $id ] = [
 				'label' => $label,
-				'test'  => is_string( $callback ) && method_exists( $this, $callback ) ? [ $this, $callback ] : $callback,
+				'test'  => $callback,
 			];
 		}
 
 		return $tests;
+	}
+
+	/**
+	 * Run every test, for somewhere other than the Site Health screen, e.g. groundhogg/get-setup-status
+	 *
+	 * @return array[] test id, without the prefix => the test's result
+	 */
+	public function run() {
+
+		$results = [];
+
+		foreach ( $this->tests() as $id => [ $label, $callback ] ) {
+			$results[ $id ] = call_user_func( $callback );
+		}
+
+		return $results;
 	}
 
 	/**
@@ -112,6 +142,8 @@ class Site_Health {
 			],
 			'description' => $description,
 			'actions'     => empty( $links ) ? '' : '<p>' . implode( ' | ', $links ) . '</p>',
+			// the same links as data, Site Health ignores it
+			'links'       => $actions,
 		];
 	}
 

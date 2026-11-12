@@ -91,6 +91,46 @@ class Library extends Supports_Errors {
 	}
 
 	/**
+	 * The flow templates this site can use: as Funnel template objects, without the ones that have a step type that
+	 * isn't registered here, and with is_premium set on the ones that need paid features this site doesn't have.
+	 * What the Add Flow screen shows.
+	 *
+	 * @return Funnel[]
+	 */
+	public function get_available_funnel_templates() {
+
+		$templates = $this->get_funnel_templates();
+
+		if ( ! is_array( $templates ) ) {
+			return [];
+		}
+
+		$templates = array_map( function ( $template ) {
+			return new Funnel( $template, true );
+		}, $templates );
+
+		return array_values( array_filter( $templates, function ( Funnel $funnel ) {
+
+			$funnel->is_premium = false;
+
+			foreach ( $funnel->steps as $step ) {
+				$step = (object) $step;
+
+				// don't show funnels with unregistered types
+				if ( ! Plugin::instance()->step_manager->type_is_registered( $step->data->step_type ) ) {
+					return false;
+				}
+
+				if ( Plugin::instance()->step_manager->get_element( $step->data->step_type )->is_premium() && ! is_pro_features_active() && ! is_white_labeled() ) {
+					$funnel->is_premium = true;
+				}
+			}
+
+			return true;
+		} ) );
+	}
+
+	/**
 	 * Get a specific funnel template
 	 *
 	 * @param $id

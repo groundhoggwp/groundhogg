@@ -160,6 +160,7 @@ class Step_Tree_Builder {
 					'type'        => 'object',
 					'description' => __( 'Echoes back the input node\'s own `settings`, as given (not Groundhogg\'s internal stored shape, where the two differ - e.g. if_else\'s include_condition/exclude_condition rather than its internal include_filters/exclude_filters).', 'groundhogg' ),
 				],
+				'embed' => Get_Flow::embed_schema(),
 				'branches' => [
 					'type'                 => 'object',
 					'additionalProperties' => [
@@ -436,6 +437,12 @@ class Step_Tree_Builder {
 
 			if ( $local_id ) {
 				$out_node['local_id'] = $local_id;
+			}
+
+			$embed = Get_Flow::form_embed( $step );
+
+			if ( $embed ) {
+				$out_node['embed'] = $embed;
 			}
 
 			if ( ! empty( $node['branches'] ) && is_array( $node['branches'] ) ) {
