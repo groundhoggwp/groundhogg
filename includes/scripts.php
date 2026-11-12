@@ -161,7 +161,7 @@ class Scripts {
 			'unnecessary_cookies_disabled' => is_option_enabled( 'gh_disable_unnecessary_cookies' ),
 			'has_accepted_cookies'         => has_accepted_cookies(),
 			// page tracking
-			'disable_page_tracking'        => is_option_enabled( 'gh_disable_open_tracking' ),
+			'disable_page_tracking'        => is_option_enabled( 'gh_disable_page_tracking' ),
 			//deprecated
 			'ajaxurl'                      => admin_url( 'admin-ajax.php' ),
 			'_wpnonce'                     => wp_create_nonce( 'wp_rest' ),
