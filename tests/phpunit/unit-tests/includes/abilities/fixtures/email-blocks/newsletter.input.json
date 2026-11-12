@@ -1,0 +1,24 @@
+[
+  {"type": "image", "src": "https://placehold.co/240x80?text=Logo", "alt": "Logo", "width": 120, "align": "left", "link": "https://example.com"},
+  {"type": "heading", "tag": "h1", "content": "Round <em>trip</em> test", "alignment": "center", "fontStyle": {"color": "palette:6", "fontSize": 36, "fontFamily": "Georgia"}},
+  {"type": "text", "content": "<p>Hi {first},</p><p>Some <strong>bold</strong>, <em>italic</em> and a <a href=\"https://example.com/a?x=1&y=2\">link</a>.</p><h2>A sub heading</h2><ul><li>One</li><li>Two &amp; three</li></ul><ol><li>First</li></ol><p style=\"text-align:center\">Centered</p>", "p": {"use": "Paragraph", "color": "#333"}, "a": {"color": "palette:2"}},
+  {"type": "button", "text": "Go & see", "link": "https://example.com/go", "size": "lg", "align": "justify", "backgroundColor": "#1E73BE", "style": {"color": "#fff", "fontSize": 18}, "borderStyle": {"borderStyle": "solid", "borderColor": "#000", "borderWidth": 2, "borderRadius": 8}},
+  {"type": "button", "text": "Small", "link": "https://example.com/small", "size": "sm", "align": "left"},
+  {"type": "divider", "color": "#ccc", "height": 2, "width": 60, "lineStyle": "dashed"},
+  {"type": "spacer", "height": 30, "advancedStyle": {"padding": 0}},
+  {"type": "columns", "layout": "three_columns", "gap": 20, "verticalAlign": "middle", "columnStyle": {"backgroundColor": "#f5f5f5", "padding": {"top": 10, "right": 10, "bottom": 10, "left": 10}}, "columns": [
+    [{"type": "heading", "tag": "h3", "content": "Col 1"}, {"type": "text", "content": "<p>One</p>"}],
+    [{"type": "image", "src": "https://placehold.co/160x90", "alt": "Pic", "width": 160, "borderStyle": {"borderRadius": 6}}],
+    []
+  ]},
+  {"type": "columns", "layout": "custom_columns", "customColumns": [30, 70], "gap": 0, "columns": [
+    [{"type": "text", "content": "<p>Thirty</p>"}],
+    [{"type": "text", "content": "<p>Seventy</p>"}]
+  ]},
+  {"type": "menu", "links": [["Home", "https://example.com"], ["Blog", "https://example.com/blog"]], "separator": "&bull;", "fontStyle": {"color": "#666", "fontSize": 14}},
+  {"type": "social", "use": "custom", "theme": "black-circle", "size": 28, "gap": 8, "socials": [["facebook", "https://facebook.com/x"], ["youtube", "https://youtube.com/x"]]},
+  {"type": "social", "align": "left"},
+  {"type": "html", "content": "<div style=\"text-align:center;color:#888\">Raw <b>HTML</b> &amp; things<br>line two</div>"},
+  {"type": "text", "content": "<p>Boxed text</p>", "advancedStyle": {"padding": "20px 30px", "backgroundColor": "#fffbe6", "borderStyle": "solid", "borderColor": "#e0c000", "borderWidth": 1, "borderRadius": 4}, "hide_on_mobile": true},
+  {"type": "footer", "alignment": "center"}
+]

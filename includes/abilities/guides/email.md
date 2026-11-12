@@ -1,211 +1,80 @@
 # Building an email that stays editable
 
-Emails on this site are edited in a drag-and-drop block editor. To make an email the site owner can open and keep editing there, save it with `create-email-template` (or `update-email-template`) using `editor: "blocks"`, and write `content` in the block format below. Plain HTML (`editor: "html"`) also sends fine, but it opens in a code editor instead, so use blocks unless you're asked otherwise.
+Emails on this site are edited in a drag-and-drop block editor. To make an email the site owner can open and keep editing there, give `create-email-template` (or `update-email-template`) the body as `blocks`: a JSON array of block specs. The markup, block CSS and plain text are written for you, the same way the editor writes them. Plain HTML (`content` with `editor: "html"`) also sends fine, but it opens in a code editor instead, so use blocks unless you're asked otherwise.
 
 ## Before you write
 
-1. Look at one or two existing block emails so the new one looks like it belongs to this site. Find them with `list-email-templates` (without `expand`), get the outline of one with `get-email-template`, then get a few of its blocks (a text block, a button, the footer) with `get-email-template`'s `blocks` input. Reuse their structure, fonts and colors and swap in new copy; don't invent new markup when a working example is right there. Don't read whole emails, they're often tens of thousands of characters.
+1. Look at one or two existing block emails so the new one looks like it belongs to this site. Find them with `list-email-templates` (without `expand`) and read one with `get-email-template` and `view: "specs"`. Reuse their structure, fonts and colors and swap in new copy.
 2. Call `list-replacement-codes` for the merge tags this site supports. Use them for greetings, sign-offs and compliance links instead of static text.
 3. Call `list-sender-profiles` if the email should come from someone other than the default sender.
 
-## The format
+{{email_design}}
 
-The saved content is ordinary HTML in which each block is wrapped in a pair of HTML comments that carry its type and settings. The editor parses those comments back into blocks when the email is opened.
+## Block specs
 
-```html
-<table cellpadding="0" cellspacing="0" width="100%" role="presentation">
-<tr><!-- {type}:{id} {json-props} --><td id="b-{id}">...the block's HTML...</td><!-- /{type}:{id} --></tr>
-<tr><!-- {type}:{id} {json-props} --><td id="b-{id}">...</td><!-- /{type}:{id} --></tr>
-</table>
+A spec is a block's `type` and only the settings that differ from the defaults. Settings you leave out get this site's block defaults. Give an `id` (letters, digits and hyphens, like `intro` or `cta`) to blocks you may want to change later; otherwise one is made for you.
+
+```json
+[
+  { "type": "image", "src": "https://example.com/logo.png", "alt": "Acme", "width": 140 },
+  { "type": "heading", "id": "title", "tag": "h1", "content": "The October roundup", "fontStyle": { "fontSize": 36 } },
+  { "type": "text", "id": "intro", "content": "<p>Hi {first::there},</p><p>Here's what's new this month.</p>" },
+  { "type": "button", "id": "cta", "text": "Read the blog", "link": "https://example.com/blog" },
+  { "type": "columns", "columns": [
+    [ { "type": "image", "src": "https://example.com/a.png", "alt": "Feature A", "width": 280 },
+      { "type": "text", "content": "<p><strong>Feature A</strong> does this.</p>" } ],
+    [ { "type": "image", "src": "https://example.com/b.png", "alt": "Feature B", "width": 280 },
+      { "type": "text", "content": "<p><strong>Feature B</strong> does that.</p>" } ]
+  ] },
+  { "type": "social" },
+  { "type": "footer", "alignment": "center" }
+]
 ```
 
-Rules the parser enforces:
+Colors are hex (`#1e73be`), or `palette:N` for this site's palette colors. Specs with a mistake (an unknown type, a taken id, a bad layout) are refused with what's wrong, and nothing is saved.
 
-- `{type}` is lowercase letters only (`a-z`). No digits, underscores or camelCase.
-- `{id}` is letters, digits and hyphens, unique within the email. Keep ids short and meaningful, like `intro` or `cta-1`; they don't need to be UUIDs, and you'll use them to change blocks later.
-- `{json-props}` must be valid JSON.
-- The opening comment is followed directly by `<td id="b-{id}">`, and the closing comment repeats the exact same `{type}:{id}`.
-- Each block is its own `<tr>`, all inside one outer `<table>`.
+### Every block
 
-Content that breaks these rules is refused with a list of what's wrong, and nothing is saved, so fix what it says and save again. Whitespace and spacing in the comments are tidied for you.
+- `advancedStyle`: the block's box. `padding` (a number for every side, `"10px 20px"`, or `{top, right, bottom, left}`; 5 by default), `backgroundColor`, `borderStyle` (`solid`, `dashed`...), `borderColor`, `borderWidth`, `borderRadius`.
+- `hide_on_mobile`, `hide_on_desktop`, `hide_in_plain`, `hide_in_browser`: true to hide it there.
+- `css`: custom CSS for the block, where `selector` stands for the block, like `selector p { letter-spacing: 1px; }`.
 
-**The HTML between the comments is what gets sent.** Only `global` blocks are rebuilt when the email is sent. For every other type the JSON props only matter for editing the block later, so the HTML has to be correct on its own: inline styles, table-based layout, absolute URLs.
+Font settings (`p`, `fontStyle`, `style`...) are objects of `fontSize` (pixels), `fontFamily`, `fontWeight`, `lineHeight`, `fontStyle` (`normal`, `italic`), `textTransform` and `color`. `fontFamily` is one of the editor's fonts (Arial, Arial Black, Arial Narrow, Book Antiqua, Calibri, Century Gothic, Comic Sans MS, Copperplate, Courier New, Futura, Garamond, Georgia, Helvetica, Impact, Lucida Grande, Lucida Sans, Palatino, system-ui, Tahoma, Times New Roman, Trebuchet MS, Verdana); others become Arial. `use` takes the name of one of the site's global fonts instead.
 
-## Block types
+### Types
 
-### text
+| type | settings |
+|---|---|
+| `text` | `content`: HTML with `p`, `h1`-`h3`, `ul`/`ol`/`li`, `a`, `strong`/`b`, `em`, `br`. Font settings for its tags: `p` (also lists), `a` (links, usually just `color`), `h1`, `h2`, `h3`. The fonts are added to each tag as inline styles, so don't write those yourself; a tag's own `style`, like `text-align`, is kept. |
+| `heading` | `content` (inline HTML), `tag` (`h1`-`h6`, default `h2`), `alignment` (`left`, `center`, `right`), `fontStyle`. The size doesn't follow the tag: set `fontStyle.fontSize` for a big `h1`. |
+| `button` | `text`, `link`, `align` (`left`, `center`, `right`, or `justify` for full width), `size` (`sm`, `md`, `lg`), `backgroundColor`, `style` (font settings, `color` is the text color), `borderStyle` (`{borderStyle, borderColor, borderWidth, borderRadius}`). |
+| `image` | `src`, `alt`, `width` (pixels), `link`, `align`, `borderStyle` (as for a button; `{"borderRadius": 8}` for rounded corners). |
+| `spacer` | `height` (pixels). |
+| `divider` | `height` (line thickness), `width` (percent), `color`, `lineStyle` (`solid`, `dashed`, `dotted`, `double`, `ridge`, `groove`). |
+| `columns` | `columns`: an array of columns, each an array of specs. `layout`: `one_column`, `two_columns` (50/50), `three_columns`, `four_columns`, `two_columns_left` (66/33), `two_columns_right` (33/66), `three_columns_center` (25/50/25), `three_columns_left` (50/25/25), `three_columns_right` (25/25/50), or `custom_columns` with `customColumns` widths in percent, like `[30, 70]`. `gap` (pixels between columns), `verticalAlign` (`top`, `middle`, `bottom`), `responsive` (stack on phones, default true), `columnStyle` (`{backgroundColor, padding, borderStyle...}` for every column that has blocks). |
+| `menu` | `links`: `[["Blog", "https://..."], ["Shop", "https://..."]]`, `align`, `gap`, `separator` (text between links, like `"|"` or `"&bull;"`), `fontStyle`. |
+| `social` | `use`: `"global"` (default, the site's own social accounts) or `"custom"` with `socials`: `[["facebook", "https://..."], ...]`. `theme`, `size` (pixels), `gap`, `align`. Icons: facebook, instagram, linkedin, pinterest, reddit, threads, tiktok, tumblr, twitch, twitter, vimeo, whatsapp, wordpress, youtube, github, truthsocial, odysee, discord, rumble, bluesky. Themes: `brand-circle`, `brand-boxed`, `brand-icons`, and `black-`, `dark-grey-`, `grey-`, `white-` with `circle`, `boxed` or `icons`. |
+| `html` | `content`: raw HTML for anything the other blocks can't do. Scripts, forms, iframes and video are taken out. |
+| `footer` | The business name, address, phone, privacy policy and terms links and the unsubscribe link, from the site's settings. `alignment`, `style` (font settings), `linkStyle` (`{color}`), and `tel`, `privacyPolicy`, `terms` (false to leave that link out). There's no unsubscribe line in a transactional email. |
+| `global` | `templateId`: the ID of a global block (a saved reusable block) that exists on the site. It's put in when the email is sent. |
 
-The HTML sits directly in the `<td>`, no wrapper. Allowed tags: `p`, `ul`, `ol`, `li`, `h1`-`h3`, `a`, `strong`, `b`, `em`. The editor inlines the font styles from the props onto each tag; do the same so the email looks right before it's reopened.
-
-```html
-<!-- text:intro {"p":{"lineHeight":"1.4","fontFamily":"system-ui, sans-serif","fontWeight":"normal","fontSize":"16","fontStyle":"normal","textTransform":"none"},"a":{"color":"#488aff"}} --><td id="b-intro" style="padding:20px">
-<p style="line-height: 1.4;font-family: system-ui, sans-serif;font-weight: normal;font-size: 16px;margin: 0 0 1em">Hi {first::there},</p>
-<p style="line-height: 1.4;font-family: system-ui, sans-serif;font-weight: normal;font-size: 16px;margin-bottom: 0">Last paragraph, no bottom margin.</p>
-</td><!-- /text:intro -->
-```
-
-Props `p`, `a`, `h1`, `h2`, `h3` are font style objects: `lineHeight`, `fontFamily`, `fontWeight`, `fontSize`, `fontStyle`, `textTransform`, and optionally `color`.
-
-### heading
-
-```html
-<!-- heading:title {"tag":"h2","content":"Section title","fontStyle":{"lineHeight":"1.4","fontFamily":"system-ui, sans-serif","fontWeight":"500","fontSize":24,"fontStyle":"normal","textTransform":"none"},"alignment":"left"} --><td id="b-title">
-<h2 style="line-height: 1.4;font-family: system-ui, sans-serif;font-weight: 500;font-size: 24px;margin: 0;text-align: left">Section title</h2>
-</td><!-- /heading:title -->
-```
-
-`tag` is one of `h1`, `h2`, `h3`, `h4`, `p`.
-
-### image
-
-```html
-<!-- image:hero {"src":"https://example.com/image.png","alt":"Description","width":600,"align":"center","link":"https://example.com"} --><td id="b-hero" style="padding: 20px">
-<div class="img-container" style="text-align: center">
-<a href="https://example.com"><img src="https://example.com/image.png" alt="Description" width="600" height="auto" style="vertical-align: bottom;height: auto;border-width: 0px;max-width: 100%"></a>
-</div>
-</td><!-- /image:hero -->
-```
-
-Leave out the `<a>` when there's no link.
+### Images
 
 Where images come from, in this order:
 
-1. Images you were given, or that the site's existing emails already use (`list-email-templates` shows them).
+1. Images you were given, or that the site's existing emails already use.
 2. A relevant image from the site's media library. Search it with your connection's own media library tools if it has them, otherwise with `search-media`.
 3. An image that's online and that you're allowed to use: add it to the media library with `upload-media`, giving its `url` so the site downloads it, and use the URL it returns. Never write base64 yourself, it won't be a valid image.
-4. Otherwise a placeholder from placehold.co, the size of the image it stands in for, labelled with what belongs there: `https://placehold.co/600x300/png?text=Product+photo`. Keep `/png` in the URL, the default is SVG and many email clients don't show SVG images. Write spaces in the label as `+`. Full width is 600 wide, half of a two column row about 290, a third about 190.
+4. Otherwise a placeholder from placehold.co, the size of the image it stands in for, labelled with what belongs there: `https://placehold.co/600x300/png?text=Product+photo`. Keep `/png` in the URL, the default is SVG and many email clients don't show SVG images. Write spaces in the label as `+`. Full width is 600 wide, half of a two column row about 280, a third about 180.
 
 Never make up an image URL or link to an image on someone else's site. When you use placeholders, say which images need replacing.
-
-### button
-
-```html
-<!-- button:cta {"link":"https://example.com","align":"center","text":"Read more","size":"md","backgroundColor":"#dd3333","style":{"color":"#ffffff","fontSize":18,"fontWeight":"600","fontFamily":"Arial, sans-serif"}} --><td id="b-cta">
-<table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation"><tr><td align="center">
-<table border="0" cellspacing="0" cellpadding="0" role="presentation" width="auto"><tr>
-<td class="email-button" bgcolor="#dd3333" align="center" style="padding: 12px 18px;border-radius: 3px;background-color: #dd3333">
-<a href="https://example.com" style="color: #ffffff;font-weight: 600;font-family: Arial, sans-serif;font-size: 18px;text-decoration: none;display: inline-block;background-color: #dd3333">Read more</a>
-</td>
-</tr></table>
-</td></tr></table>
-</td><!-- /button:cta -->
-```
-
-`size`: `sm` (padding `8px 12px`), `md` (`12px 18px`), `lg` (`16px 24px`). `align`: `left`, `center`, `right`, or `justify` (makes the inner table `width="100%"`).
-
-### spacer
-
-```html
-<!-- spacer:gap-1 {"height":20} --><td id="b-gap-1" style="padding: 5px"><table cellspacing="0" cellpadding="0" role="presentation"><tr><td height="20" style="height: 20px"></td></tr></table></td><!-- /spacer:gap-1 -->
-```
-
-### divider
-
-```html
-<!-- divider:line-1 {"height":2,"color":"#cccccc","width":100,"lineStyle":"solid"} --><td id="b-line-1"><hr class="divider" style="border-width: 2px 0px 0px;width: 100%;border-color: #cccccc;border-style: solid"></td><!-- /divider:line-1 -->
-```
-
-`lineStyle`: `solid`, `dashed`, `dotted`, `double`. `width` is a percentage.
-
-### columns
-
-Each column holds its own blocks, as `<tr>` rows inside a `<table class="column">`:
-
-```html
-<!-- columns:row-1 {"layout":"two_columns","gap":10} --><td id="b-row-1">
-<table class="email-columns two_columns responsive" cellspacing="0" cellpadding="0" width="100%" role="presentation" style="table-layout: fixed;border-spacing: 0px;width: 100%"><tr class="email-columns-row">
-<td class="email-columns-cell one-half" width="50%" style="width: 50%;vertical-align: top;padding: 0px">
-<table class="column" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-  <!-- one <tr> per block in the first column -->
-</table>
-</td>
-<td class="email-columns-cell gap" width="10" style="width: 10px">&nbsp;</td>
-<td class="email-columns-cell one-half" width="50%" style="width: 50%;vertical-align: top;padding: 0px">
-<table class="column" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-  <!-- the second column's blocks -->
-</table>
-</td>
-</tr></table>
-</td><!-- /columns:row-1 -->
-```
-
-`layout`: `two_columns` (50/50), `three_columns` (33/33/33), `four_columns`, `two_columns_left` (67/33), `two_columns_right` (33/67), `three_columns_center` (25/50/25). Put the gap cell between columns, not after the last one.
-
-### menu
-
-A row of text links:
-
-```html
-<!-- menu:nav {"links":[["Blog","https://example.com/blog"],["Shop","https://example.com/shop"]],"align":"center","gap":20,"separator":"&bull;"} --><td id="b-nav">
-<table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation"><tr><td align="center">
-<table border="0" cellspacing="0" cellpadding="0" role="presentation" width="auto"><tr>
-<td><a href="https://example.com/blog" style="color: #000000;font-size: 14px;text-decoration: none">Blog</a></td>
-<td class="gap" width="20" align="center" style="width: 20px;text-align: center">&bull;</td>
-<td><a href="https://example.com/shop" style="color: #000000;font-size: 14px;text-decoration: none">Shop</a></td>
-</tr></table>
-</td></tr></table>
-</td><!-- /menu:nav -->
-```
-
-### social
-
-Always use `"use":"custom"` with the links listed in `socials`. `"use":"global"` depends on settings that only exist inside the editor, and renders empty otherwise.
-
-```html
-<!-- social:follow {"align":"center","theme":"brand-circle","use":"custom","socials":[["facebook","https://facebook.com/example"],["instagram","https://instagram.com/example"]],"gap":10,"size":24} --><td id="b-follow">
-<table class="socials" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tr><td align="center">
-<table class="socials" cellpadding="0" cellspacing="0" role="presentation"><tr>
-<td><a href="https://facebook.com/example"><img src="{{assets_url}}images/social-icons/brand-circle/facebook.png" alt="Facebook" height="24" width="24" style="vertical-align: bottom"></a></td>
-<td class="gap" width="10" style="width: 10px"></td>
-<td><a href="https://instagram.com/example"><img src="{{assets_url}}images/social-icons/brand-circle/instagram.png" alt="Instagram" height="24" width="24" style="vertical-align: bottom"></a></td>
-</tr></table>
-</td></tr></table>
-</td><!-- /social:follow -->
-```
-
-Icons: `facebook`, `instagram`, `linkedin`, `pinterest`, `reddit`, `threads`, `tiktok`, `tumblr`, `twitch`, `twitter`, `vimeo`, `whatsapp`, `wordpress`, `youtube`, `github`, `discord`, `bluesky`. Themes: `brand-circle`, `brand-boxed`, `brand-icons`, and `black-`, `dark-grey-`, `grey-`, `white-` with `circle`, `boxed` or `icons`. The icon images are at `{{assets_url}}images/social-icons/{theme}/{icon}.png`.
-
-### html
-
-Raw HTML, for anything the other blocks can't do. No scripts, forms, iframes or video.
-
-```html
-<!-- html:custom {"content":"<p>Raw HTML</p>"} --><td id="b-custom"><p>Raw HTML</p></td><!-- /html:custom -->
-```
-
-### footer
-
-Nothing fills this in for you. Write the business details and links yourself, with merge tags:
-
-```html
-<!-- footer:foot {"style":{"lineHeight":1.4,"fontFamily":"system-ui, sans-serif","fontSize":13,"color":"#999999"},"linkStyle":{"color":"#488aff"},"alignment":"center"} --><td id="b-foot">
-<div id="footer" class="footer">
-<p style="line-height: 1.4;font-family: system-ui, sans-serif;font-size: 13px;color: #999999;text-align: center;margin: 0.5em 0">&copy; {business_name}</p>
-<p style="line-height: 1.4;font-family: system-ui, sans-serif;font-size: 13px;color: #999999;text-align: center;margin: 0.5em 0">{business_address}</p>
-<p style="line-height: 1.4;font-family: system-ui, sans-serif;font-size: 13px;color: #999999;text-align: center;margin: 0.5em 0">Don't want these emails? <a href="{unsubscribe_url}" style="color: #488aff">Unsubscribe</a>.</p>
-</div>
-</td><!-- /footer:foot -->
-```
-
-Leave out the unsubscribe line in a transactional email.
-
-### global
-
-Inserts a saved reusable block (an email whose message type is "global block"). Its content is loaded when the email is sent, so the `<td>` stays empty:
-
-```html
-<!-- global:header {"templateId":"123"} --><td id="b-header"></td><!-- /global:header -->
-```
-
-Only use it with the ID of a global block that exists on the site.
 
 ## Changing an email
 
 Don't read or rewrite the whole email to change part of it. Use `edit-email`, which changes blocks by id:
 
-1. `get-email-template` returns an outline: each block's `id`, `type`, the `parent` and `column` of blocks in columns, and a `summary` of its text, image or link. It also returns the email's `version`.
-2. If you need to see a block's markup, pass its id in `blocks`. Skip this for a simple wording change.
-3. Call `edit-email` with `expected_version` and a list of `operations`, applied in order, all or nothing:
+1. `get-email-template` returns an outline: each block's `id`, `type`, the `parent` and `column` of blocks in columns, and a `summary` of its text, image or link. It also returns the email's `version`. With `view: "specs"` it returns the blocks as specs instead, and with `blocks` (ids) only those.
+2. Call `edit-email` with `expected_version` and a list of `operations`, applied in order, all or nothing:
 
 ```json
 {
@@ -214,19 +83,18 @@ Don't read or rewrite the whole email to change part of it. Use `edit-email`, wh
   "operations": [
     { "op": "replace_text", "find": "Sale ends Friday", "replace": "Sale ends Sunday" },
     { "op": "replace_text", "block": "cta", "find": "https://example.com/old", "replace": "https://example.com/new" },
-    { "op": "set_content", "block": "intro", "html": "<p style=\"…\">New intro paragraph.</p>" },
-    { "op": "add", "at": { "after": "intro" }, "html": "<!--spacer:gap-2 {\"height\":20}--><td id=\"b-gap-2\">…</td><!--/spacer:gap-2-->" },
+    { "op": "replace", "block": "cta", "blocks": [ { "type": "button", "id": "cta", "text": "Shop now", "link": "https://example.com/shop", "size": "lg" } ] },
+    { "op": "add", "at": { "after": "intro" }, "blocks": [ { "type": "spacer", "height": 20 } ] },
     { "op": "move", "block": "footer", "at": { "position": "end" } },
     { "op": "delete", "block": "old-banner" }
   ]
 }
 ```
 
-- `replace_text` is the cheapest change. It must match exactly once (give `block` to narrow it down, or `all: true`), and it matches the HTML as written, so text split by tags like `<strong>` won't match: use `set_content` then.
-- `set_content` replaces the HTML inside a block's `<td>`, keeping its padding, background and settings.
-- `replace` swaps a block for new markup, which can reuse its id.
-- `add` and `move` take `at`: `{"after": id}`, `{"before": id}`, `{"in": id, "column": 0}` for a column of a columns block, or `{"position": "start"}` / `{"position": "end"}`.
-- `set_props` changes settings in a block's comment. The sent HTML isn't rebuilt from them, so use it for settings that are read when sending, like a global block's `templateId` or `include_filters`.
+- `replace_text` is the cheapest change. It must match exactly once (give `block` to narrow it down, or `all: true`), and it matches the HTML as written, so text split by tags like `<strong>` won't match.
+- To change a block's settings, get its spec (`view: "specs"`, `blocks: [id]`), change it, and `replace` the block with it, keeping its id.
+- `add` and `replace` take new blocks as `blocks` (specs). `add` and `move` take `at`: `{"after": id}`, `{"before": id}`, `{"in": id, "column": 0}` for a column of a columns block, or `{"position": "start"}` / `{"position": "end"}`.
+- `set_content` replaces the HTML inside a block's `<td>` as it is, without styling it. `set_props` changes settings in a block's comment that are read when the email is sent, like a global block's `templateId`.
 - Use `dry_run: true` to check a change without saving it.
 
 The result lists the blocks that changed and the new `version` for the next call. Use `update-email-template` for the subject, preview text, sender, status and other settings.
@@ -247,9 +115,19 @@ Merge tags are resolved for each recipient when the email is sent, in the subjec
 
 ## Good practice
 
-- Every marketing email needs an unsubscribe link and the business address. Use a footer block.
-- One clear call to action, usually a button. Keep the email under about 600px wide and the copy short.
+- Every marketing email needs an unsubscribe link and the business address. End it with a footer block.
+- One clear call to action, usually a button. Keep the copy short.
 - Write a subject line under about 50 characters and a `preview_text` that adds to it rather than repeating it.
-- Don't make up facts, prices, dates, testimonials or links. Where something is missing, leave a clear placeholder like `[LINK TO OFFER]`, or a placehold.co image (see the image block), and say where it is.
+- Don't make up facts, prices, dates, testimonials or links. Where something is missing, leave a clear placeholder like `[LINK TO OFFER]`, or a placehold.co image, and say where it is.
 - Save as `status: "draft"` unless asked otherwise, then send a test with `send-test-email` and share the email's edit link. Both kinds of test work on a draft: a design test (the default) shows how it looks; `type: "simulated"` sends it the way a broadcast or flow would, so links, tracking, personalization and conditional blocks can be checked too. Send tests only to the person you're working for.
 - Never send it to contacts (`send-email-template`, `send-email-broadcast`) unless the person you're working for asks you to, with that audience.
+
+## The markup, for reference
+
+You don't need to write it, but this is what the content looks like: a `<table>` with a `<tr>` per block, each block between comments that carry its type, id and the settings that aren't in its HTML, around a `<td id="b-{id}">` with the block's HTML. `get-email-template`'s `blocks` input returns a block's markup, and `edit-email` also takes markup as `html`, in this format:
+
+```html
+<table cellpadding="0" cellspacing="0" width="100%" role="presentation">
+<tr><!--button:cta {"size":"md"}--><td id="b-cta" class="b-button" ...>...</td><!--/button:cta--></tr>
+</table>
+```

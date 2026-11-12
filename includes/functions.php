@@ -7144,6 +7144,33 @@ function enqueue_broadcast_calendar_assets() {
 }
 
 /**
+ * What the email editor's footer block shows: the business name and address, the phone, privacy policy and terms
+ * links, and the unsubscribe line. Also used to write footer blocks without the editor, see Email_Block_Renderer.
+ *
+ * @return array business_name, address, links (tel, privacy, terms: HTML or false), unsubscribe
+ */
+function get_email_editor_footer() {
+
+	$tel            = get_option( 'gh_phone' );
+	$terms          = get_option( 'gh_terms' );
+	$privacy_policy = get_option( 'gh_privacy_policy' ) ?: get_privacy_policy_url();
+
+	return [
+		'business_name' => get_option( 'gh_business_name', get_bloginfo() ),
+		'address'       => do_replacements( '{business_address}' ),
+		'links'         => [
+			'tel'     => $tel ? html()->e( 'a', [ 'href' => 'tel:' . $tel ], $tel ) : false,
+			'privacy' => $privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], esc_html__( 'Privacy Policy', 'groundhogg' ) ) : false,
+			'terms'   => $terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms', 'groundhogg' ) ) : false,
+		],
+		/* translators: %s: the unsubscribe link */
+		'unsubscribe'   => sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
+			'href' => '#unsubscribe_link#'
+		], __( 'Unsubscribe', 'groundhogg' ) ) ),
+	];
+}
+
+/**
  * Enqueue the new block editor
  */
 function enqueue_email_block_editor_assets( $extra = [] ) {
@@ -7161,21 +7188,6 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 
 	wp_enqueue_script( 'htmlhint' );
 	wp_enqueue_script( 'csslint' );
-
-	$business_name  = get_option( 'gh_business_name', get_bloginfo() );
-	$address        = do_replacements( '{business_address}' );
-	$tel            = get_option( 'gh_phone' );
-	$terms          = get_option( 'gh_terms' );
-	$privacy_policy = get_option( 'gh_privacy_policy' ) ?: get_privacy_policy_url();
-	$links          = [
-		'tel'     => $tel ? html()->e( 'a', [ 'href' => 'tel:' . $tel ], $tel ) : false,
-		'privacy' => $privacy_policy ? html()->e( 'a', [ 'href' => $privacy_policy ], esc_html__( 'Privacy Policy', 'groundhogg' ) ) : false,
-		'terms'   => $terms ? html()->e( 'a', [ 'href' => $terms ], __( 'Terms', 'groundhogg' ) ) : false,
-	];
-	/* translators: %s: the unsubscribe link */
-	$unsubscribe    = sprintf( __( 'Don\'t want these emails? %s.', 'groundhogg' ), html()->e( 'a', [
-		'href' => '#unsubscribe_link#'
-	], __( 'Unsubscribe', 'groundhogg' ) ) );
 
 	$post_types = array_map( function ( $post_type ) {
 
@@ -7212,7 +7224,7 @@ function enqueue_email_block_editor_assets( $extra = [] ) {
 	}
 
 	$localized = array_merge( [
-		'footer'        => compact( 'business_name', 'address', 'links', 'unsubscribe' ),
+		'footer'        => get_email_editor_footer(),
 		'colorPalette'  => get_option( 'gh_email_editor_color_palette', [] ),
 		'globalFonts'   => get_option( 'gh_email_editor_global_fonts', [] ),
 		'globalSocials' => get_option( 'gh_email_editor_global_social_accounts', [] ),

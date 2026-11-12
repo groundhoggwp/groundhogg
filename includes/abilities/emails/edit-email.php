@@ -81,7 +81,7 @@ class Edit_Email extends Ability {
 								'op'      => [
 									'type'        => 'string',
 									'enum'        => self::OPERATIONS,
-									'description' => __( '"replace_text": `find` and `replace`, optionally only in `block`; the cheapest way to change wording or a link. It must match exactly once unless `all` is true. It matches the HTML as written, so text split by tags like <strong> won\'t match. Matching text in the block settings (like a button\'s) is changed too. "set_content": `block` and `html`, the new HTML inside the block\'s <td>; the <td> (padding, background) and settings stay. "set_props": `block` and `props`, changes only the given settings in the block\'s comment, null removes one; the email\'s HTML isn\'t rebuilt from them, so this is for settings used when sending (like include_filters or a global block\'s templateId) or only when editing. "add": `html` with one or more new blocks, and `at`. "replace": `block` and `html` with the blocks to put in its place; ids of the blocks being replaced can be reused. "move": `block` and `at`, it moves with the blocks inside it. "delete": `block`, and the blocks inside it.', 'groundhogg' ),
+									'description' => __( '"replace_text": `find` and `replace`, optionally only in `block`; the cheapest way to change wording or a link. It must match exactly once unless `all` is true. It matches the HTML as written, so text split by tags like <strong> won\'t match. Matching text in the block settings (like a button\'s) is changed too. "set_content": `block` and `html`, the new HTML inside the block\'s <td>; the <td> (padding, background) and settings stay. "set_props": `block` and `props`, changes only the given settings in the block\'s comment, null removes one; the email\'s HTML isn\'t rebuilt from them, so this is for settings used when sending (like include_filters or a global block\'s templateId) or only when editing. "add": `blocks` (specs) or `html` with one or more new blocks, and `at`. "replace": `block`, and `blocks` or `html` with the blocks to put in its place; ids of the blocks being replaced can be reused. "move": `block` and `at`, it moves with the blocks inside it. "delete": `block`, and the blocks inside it.', 'groundhogg' ),
 								],
 								'block'   => $block_schema,
 								'find'    => [
@@ -95,9 +95,18 @@ class Edit_Email extends Ability {
 									'default'     => false,
 									'description' => __( 'For "replace_text": replace every match instead of needing exactly one.', 'groundhogg' ),
 								],
+								'blocks'  => [
+									'type'        => 'array',
+									'items'       => [
+										'type'                 => 'object',
+										'required'             => [ 'type' ],
+										'additionalProperties' => true,
+									],
+									'description' => __( 'For "add" and "replace", instead of `html`: the new blocks as block specs, like in groundhogg/create-email-template, which writes their markup. To change a block\'s settings, get its spec from groundhogg/get-email-template (view "specs"), change it, and "replace" the block with it, keeping its id.', 'groundhogg' ),
+								],
 								'html'    => [
 									'type'        => 'string',
-									'description' => __( 'For "add" and "replace": block markup in the same format as the email\'s content, one or more blocks, each <!--type:id {...}--><td id="b-{id}">...</td><!--/type:id-->, with or without the <tr> around it. New ids must not be used by other blocks in the email. For "set_content": the HTML inside the block\'s <td>, without block comments.', 'groundhogg' ),
+									'description' => __( 'For "add" and "replace", instead of `blocks`: block markup in the same format as the email\'s content, one or more blocks, each <!--type:id {...}--><td id="b-{id}">...</td><!--/type:id-->, with or without the <tr> around it. New ids must not be used by other blocks in the email. For "set_content": the HTML inside the block\'s <td>, without block comments.', 'groundhogg' ),
 								],
 								'props'   => [
 									'type'                 => 'object',
@@ -207,10 +216,13 @@ class Edit_Email extends Ability {
 
 		$before  = $doc->ids();
 		$touched = [];
+		$context = Email_Block_Renderer::context_of( $email );
 
 		foreach ( array_values( (array) $input['operations'] ) as $i => $operation ) {
 
-			$result = $this->apply( $doc, (array) $operation );
+			$operation = $this->render_blocks( $doc, (array) $operation, $context );
+
+			$result = is_wp_error( $operation ) ? $operation : $this->apply( $doc, $operation );
 
 			if ( is_wp_error( $result ) ) {
 				return new WP_Error(
@@ -239,11 +251,16 @@ class Edit_Email extends Ability {
 
 		if ( ! $dry_run ) {
 
+			// like the editor, which makes them again whenever it saves
+			$made = ( new Email_Block_Renderer( $context ) )->css_and_plain_text( $doc->html() );
+
 			$email->update( [
 				'content'      => $doc->html(),
-				'plain_text'   => $doc->to_plain_text(),
+				'plain_text'   => $made['plain_text'],
 				'last_updated' => current_time( 'mysql' ),
 			] );
+
+			$email->update_meta( 'css', $made['css'] );
 
 			// Mirrors Emails_Api::do_object_updated_action(), like groundhogg/update-email-template
 			do_action( 'groundhogg/api/email/updated', $email );
@@ -265,6 +282,70 @@ class Edit_Email extends Ability {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * For "add" and "replace" with `blocks`, the block specs written as markup in `html`
+	 *
+	 * @param Email_Block_Document $doc
+	 * @param array                $operation
+	 * @param array                $context the email's template settings
+	 *
+	 * @return array|WP_Error the operation
+	 */
+	protected function render_blocks( Email_Block_Document $doc, array $operation, array $context ) {
+
+		$op = $operation['op'] ?? '';
+
+		if ( ! isset( $operation['blocks'] ) || ! in_array( $op, [ 'add', 'replace' ], true ) ) {
+			return $operation;
+		}
+
+		if ( isset( $operation['html'] ) ) {
+			return new WP_Error( 'groundhogg_blocks_and_html', __( 'Give the new blocks as `blocks` or as `html`, not both.', 'groundhogg' ) );
+		}
+
+		$used      = $doc->ids();
+		$top_level = true;
+
+		if ( $op === 'replace' ) {
+
+			$block = $operation['block'] ?? null;
+
+			if ( ! is_string( $block ) || ! $doc->has( $block ) ) {
+				/* translators: %s: block id */
+				return new WP_Error( 'groundhogg_block_not_found', sprintf( __( 'There\'s no block "%s".', 'groundhogg' ), is_scalar( $block ) ? $block : '' ) );
+			}
+
+			// the ids of the blocks being replaced can be used again
+			$used      = array_diff( $used, array_merge( [ $block ], $doc->descendants( $block ) ) );
+			$top_level = $doc->get( $block )['parent'] === null;
+
+		} else {
+
+			$at = (array) ( $operation['at'] ?? [] );
+
+			if ( isset( $at['in'] ) ) {
+				$top_level = false;
+			} else {
+				foreach ( [ 'after', 'before' ] as $where ) {
+					if ( isset( $at[ $where ] ) && is_string( $at[ $where ] ) && $doc->has( $at[ $where ] ) ) {
+						$top_level = $doc->get( $at[ $where ] )['parent'] === null;
+					}
+				}
+			}
+		}
+
+		$rows = ( new Email_Block_Renderer( $context, $used ) )->render_rows( (array) $operation['blocks'], $top_level );
+
+		if ( is_wp_error( $rows ) ) {
+			return $rows;
+		}
+
+		unset( $operation['blocks'] );
+		$operation['html'] = $rows['html'];
+
+		return $operation;
 	}
 
 	/**
@@ -356,6 +437,7 @@ class Edit_Email extends Ability {
 				return [ 'block', 'props' ];
 			case 'add':
 				return [ 'html', 'at' ];
+			// `blocks` is written as `html` before the fields are checked, see render_blocks()
 			case 'move':
 				return [ 'block', 'at' ];
 			case 'delete':

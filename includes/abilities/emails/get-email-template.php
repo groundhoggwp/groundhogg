@@ -45,6 +45,15 @@ class Get_Email_Template extends Ability {
 			'additionalProperties' => [ 'type' => 'string' ],
 		];
 
+		$schema['properties']['specs'] = [
+			'type'        => 'array',
+			'description' => __( 'With view "specs": the blocks as block specs, the same format groundhogg/create-email-template and groundhogg/edit-email take as `blocks`, with only the settings that aren\'t the defaults. Every top level block in order (with the blocks of a columns block in its `columns`), or the blocks asked for in `blocks`.', 'groundhogg' ),
+			'items'       => [
+				'type'                 => 'object',
+				'additionalProperties' => true,
+			],
+		];
+
 		$schema['properties']['content_length'] = [
 			'type'        => 'integer',
 			'description' => __( 'How many characters the full content has, when it isn\'t returned.', 'groundhogg' ),
@@ -58,7 +67,7 @@ class Get_Email_Template extends Ability {
 
 		return [
 			'label'       => __( 'Get Email Template', 'groundhogg' ),
-			'description' => __( 'Retrieve one saved Groundhogg email by ID. For an email built with the block editor this returns an outline of its blocks (id, type and a summary of each) instead of the whole body, which can be very large: pass block ids in `blocks` to get just those blocks\' markup, and change them with groundhogg/edit-email. view "full" returns the whole body and plain text. Emails that aren\'t built with blocks always include their content. Find IDs with groundhogg/list-email-templates.', 'groundhogg' ),
+			'description' => __( 'Retrieve one saved Groundhogg email by ID. For an email built with the block editor this returns an outline of its blocks (id, type and a summary of each) instead of the whole body, which can be very large: pass block ids in `blocks` to get just those blocks\' markup, and change them with groundhogg/edit-email. view "specs" returns the blocks as compact block specs instead, the format groundhogg/edit-email and groundhogg/create-email-template take as `blocks`. view "full" returns the whole body and plain text. Emails that aren\'t built with blocks always include their content. Find IDs with groundhogg/list-email-templates.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -71,14 +80,14 @@ class Get_Email_Template extends Ability {
 					],
 					'view'     => [
 						'type'        => 'string',
-						'enum'        => [ 'outline', 'full' ],
+						'enum'        => [ 'outline', 'specs', 'full' ],
 						'default'     => 'outline',
-						'description' => __( '"outline": the email\'s settings, custom CSS and an outline of its blocks. "full": also its whole body and plain text - only when you really need all of it, it can be tens of thousands of characters.', 'groundhogg' ),
+						'description' => __( '"outline": the email\'s settings, custom CSS and an outline of its blocks. "specs": its settings and its blocks as block specs, to change and give back to groundhogg/edit-email. "full": also its whole body and plain text - only when you really need all of it, it can be tens of thousands of characters.', 'groundhogg' ),
 					],
 					'blocks'   => [
 						'type'        => 'array',
 						'items'       => [ 'type' => 'string' ],
-						'description' => __( 'Ids of blocks to return the markup of, from the outline.', 'groundhogg' ),
+						'description' => __( 'Ids of blocks to return, from the outline: their markup, or with view "specs" only their specs.', 'groundhogg' ),
 					],
 				],
 			],
@@ -126,7 +135,9 @@ class Get_Email_Template extends Ability {
 			return new WP_Error( 'groundhogg_email_not_found', __( 'Email not found.', 'groundhogg' ) );
 		}
 
-		$full   = ( $input['view'] ?? 'outline' ) === 'full';
+		$view   = $input['view'] ?? 'outline';
+		$full   = $view === 'full';
+		$specs  = $view === 'specs';
 		$blocks = array_values( array_filter( (array) ( $input['blocks'] ?? [] ), 'is_string' ) );
 
 		if ( $email->get_editor_type() !== 'blocks' ) {
@@ -142,29 +153,47 @@ class Get_Email_Template extends Ability {
 		$data = Email_Schema::transform( $email, $full ? [ 'content', 'plain_text', 'css', 'version' ] : [ 'css', 'version' ] );
 		$doc  = new Email_Block_Document( (string) $email->get_content() );
 
-		if ( ! $full ) {
-			$data['outline']        = $doc->outline();
-			$data['content_length'] = strlen( $email->get_content() );
+		$missing = array_values( array_filter( $blocks, function ( $id ) use ( $doc ) {
+			return ! $doc->has( $id );
+		} ) );
+
+		if ( ! empty( $missing ) ) {
+			return new WP_Error(
+				'groundhogg_block_not_found',
+				/* translators: %s: block ids */
+				sprintf( __( 'This email has no blocks with these ids: %s. Get the ids from the outline.', 'groundhogg' ), implode( ', ', $missing ) )
+			);
 		}
 
-		if ( ! empty( $blocks ) ) {
+		if ( $specs ) {
 
-			$missing = array_values( array_filter( $blocks, function ( $id ) use ( $doc ) {
-				return ! $doc->has( $id );
-			} ) );
+			$renderer = new Email_Block_Renderer( Email_Block_Renderer::context_of( $email ) );
 
-			if ( ! empty( $missing ) ) {
-				return new WP_Error(
-					'groundhogg_block_not_found',
-					/* translators: %s: block ids */
-					sprintf( __( 'This email has no blocks with these ids: %s. Get the ids from the outline.', 'groundhogg' ), implode( ', ', $missing ) )
-				);
+			if ( empty( $blocks ) ) {
+				$data['specs'] = $renderer->to_specs( (string) $email->get_content() );
+			} else {
+				$found         = $renderer->specs_of( (string) $email->get_content(), $blocks );
+				$data['specs'] = array_values( array_filter( array_map( function ( $id ) use ( $found ) {
+					return $found[ $id ] ?? null;
+				}, $blocks ) ) );
 			}
 
-			$data['blocks'] = [];
+			$data['content_length'] = strlen( $email->get_content() );
 
-			foreach ( $blocks as $id ) {
-				$data['blocks'][ $id ] = $doc->markup( $id );
+		} else {
+
+			if ( ! $full ) {
+				$data['outline']        = $doc->outline();
+				$data['content_length'] = strlen( $email->get_content() );
+			}
+
+			if ( ! empty( $blocks ) ) {
+
+				$data['blocks'] = [];
+
+				foreach ( $blocks as $id ) {
+					$data['blocks'][ $id ] = $doc->markup( $id );
+				}
 			}
 		}
 

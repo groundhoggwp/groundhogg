@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Utils;
 
 use Groundhogg\Abilities\Ability;
+use Groundhogg\Abilities\Emails\Email_Block_Renderer;
 use WP_Error;
 
 /**
@@ -76,7 +77,14 @@ class Get_Authoring_Guide extends Ability {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- a local file
 		$content = (string) file_get_contents( $guide['file'] );
 
-		return str_replace( '{{assets_url}}', GROUNDHOGG_ASSETS_URL, $content );
+		$content = str_replace( '{{assets_url}}', GROUNDHOGG_ASSETS_URL, $content );
+
+		// this site's palette, fonts and block defaults, for the email guide
+		if ( strpos( $content, '{{email_design}}' ) !== false ) {
+			$content = str_replace( '{{email_design}}', ( new Email_Block_Renderer() )->design_summary(), $content );
+		}
+
+		return $content;
 	}
 
 	protected function get_args(): array {

@@ -1,0 +1,211 @@
+{
+    "gh_business_name": "My Epic Business",
+    "gh_city": "Smallsville",
+    "gh_country": "United States",
+    "gh_email_editor_block_defaults": {
+        "version": 1,
+        "button": {
+            "link": "",
+            "align": "center",
+            "text": "Click me!",
+            "size": "md",
+            "backgroundColor": "#dd9933",
+            "style": {
+                "color": "#000000",
+                "fontSize": 20,
+                "fontWeight": 600,
+                "fontFamily": "Arial, sans-serif"
+            },
+            "borderStyle": {
+                "borderWidth": {
+                    "top": "",
+                    "right": "",
+                    "bottom": "",
+                    "left": "",
+                    "linked": ""
+                },
+                "borderStyle": "solid",
+                "borderColor": "#000000",
+                "borderRadius": {
+                    "top": "",
+                    "right": "",
+                    "bottom": "",
+                    "left": "",
+                    "linked": 1
+                }
+            }
+        },
+        "divider": {
+            "height": 4,
+            "color": "#353535",
+            "width": 80,
+            "lineStyle": "dotted"
+        },
+        "menu": {
+            "links": [
+                [
+                    "Link 1",
+                    ""
+                ],
+                [
+                    "Link 2",
+                    ""
+                ],
+                [
+                    "Link 3",
+                    ""
+                ]
+            ],
+            "align": "center",
+            "fontStyle": {
+                "fontSize": 17,
+                "fontFamily": "system-ui, sans-serif",
+                "fontWeight": 500,
+                "color": "#000000",
+                "use": "custom",
+                "textTransform": "uppercase"
+            },
+            "gap": 20,
+            "separator": "&bull;"
+        },
+        "spacer": {
+            "height": 30
+        },
+        "footer": {
+            "style": {
+                "lineHeight": 1,
+                "fontFamily": "system-ui, sans-serif",
+                "fontWeight": "normal",
+                "fontSize": 13,
+                "fontStyle": "normal",
+                "textTransform": "none",
+                "color": "#999"
+            },
+            "linkStyle": {
+                "color": "#488aff"
+            },
+            "tel": false,
+            "terms": true,
+            "privacyPolicy": true
+        },
+        "image": {
+            "src": "https://placehold.co/600x338?text=Image",
+            "alt": "placeholder image",
+            "title": "placeholder image",
+            "width": 570,
+            "height": 338,
+            "align": "center",
+            "borderStyle": {
+                "borderStyle": "none",
+                "borderColor": "",
+                "borderWidth": {
+                    "top": "",
+                    "right": "",
+                    "bottom": "",
+                    "left": "",
+                    "linked": true
+                },
+                "borderRadius": {
+                    "top": "",
+                    "right": "",
+                    "bottom": "",
+                    "left": "",
+                    "linked": true
+                }
+            }
+        }
+    },
+    "gh_email_editor_color_palette": [
+        "#000",
+        "#fff",
+        "#dd3333",
+        "#DD9933",
+        "#EEEE22",
+        "#81D742",
+        "#1E73BE",
+        "#8224E3"
+    ],
+    "gh_email_editor_global_fonts": [
+        {
+            "name": "Paragraph",
+            "id": "41a7339f-136e-4af2-ab6f-3c1ceb6698e4",
+            "style": {
+                "lineHeight": "1.4",
+                "fontFamily": "system-ui, sans-serif",
+                "fontWeight": "normal",
+                "fontSize": "16",
+                "fontStyle": "normal",
+                "textTransform": "none"
+            }
+        },
+        {
+            "name": "Heading 1",
+            "id": "3345717d-0d18-4ac4-abd8-a7aeb9b9d4b5",
+            "style": {
+                "lineHeight": "1.4",
+                "fontFamily": "system-ui, sans-serif",
+                "fontWeight": "normal",
+                "fontSize": "42",
+                "fontStyle": "normal",
+                "textTransform": "none"
+            }
+        },
+        {
+            "name": "Heading 2",
+            "id": "2597ad3d-8338-48f9-80cc-cb903c217e2b",
+            "style": {
+                "lineHeight": "1.4",
+                "fontFamily": "system-ui, sans-serif",
+                "fontWeight": "normal",
+                "fontSize": "36",
+                "fontStyle": "normal",
+                "textTransform": "none"
+            }
+        },
+        {
+            "name": "Heading 3",
+            "id": "38b15b67-b5cd-4fb0-84f8-e986df503159",
+            "style": {
+                "lineHeight": "1.4",
+                "fontFamily": "system-ui, sans-serif",
+                "fontWeight": "normal",
+                "fontSize": "24",
+                "fontStyle": "normal",
+                "textTransform": "none"
+            }
+        }
+    ],
+    "gh_email_editor_global_social_accounts": [
+        [
+            "",
+            "https://www.facebook.com/groups/groundhoggwp/"
+        ],
+        [
+            "instagram",
+            "https://www.instagram.com/groundhoggwp/"
+        ],
+        [
+            "linkedin",
+            "https://www.linkedin.com/company/groundhogg/"
+        ],
+        [
+            "twitter",
+            "https://twitter.com/groundhoggwp"
+        ],
+        [
+            "youtube",
+            "https://www.youtube.com/Groundhogg"
+        ],
+        [
+            "wordpress",
+            "https://wordpress.org/plugins/groundhogg/"
+        ]
+    ],
+    "gh_phone": "+1 444 3396",
+    "gh_privacy_policy": "#",
+    "gh_region": "WK",
+    "gh_street_address_1": "123 Main Street",
+    "gh_street_address_2": "",
+    "gh_terms": "#",
+    "gh_zip_or_postal": ""
+}

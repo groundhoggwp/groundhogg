@@ -44,7 +44,7 @@ class Update_Email_Template extends Ability {
 
 		return [
 			'label'       => __( 'Update Email Template', 'groundhogg' ),
-			'description' => __( 'Update an existing saved Groundhogg email. Every field is optional - only fields actually provided are changed. Find the id with groundhogg/list-email-templates. `content` replaces the whole body: to change part of an email built with the block editor, use groundhogg/edit-email instead, which only needs the blocks that change. See groundhogg/create-email-template\'s description for a link to block-editor authoring guidance.', 'groundhogg' ),
+			'description' => __( 'Update an existing saved Groundhogg email. Every field is optional - only fields actually provided are changed. Find the id with groundhogg/list-email-templates. `blocks` or `content` replaces the whole body: to change part of an email built with the block editor, use groundhogg/edit-email instead, which only needs the blocks that change. See groundhogg/create-email-template\'s description for block specs.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -68,9 +68,10 @@ class Update_Email_Template extends Ability {
 						'type'        => 'string',
 						'description' => __( 'The internal admin title, shown in the emails list.', 'groundhogg' ),
 					],
+					'blocks' => Create_Email_Template::blocks_input(),
 					'content' => [
 						'type'        => 'string',
-						'description' => __( 'The email body. Sanitized with the same allowed-HTML rules as the email editor. Shape depends on `editor`: plain HTML for "html", or the block editor\'s comment-annotated HTML for "blocks" - see groundhogg/create-email-template\'s description for the exact format. Required if `editor` is given (and vice versa) - changing one without the other would leave the content and the editor-type flag out of sync.', 'groundhogg' ),
+						'description' => __( 'The email body as HTML, instead of `blocks`. Sanitized with the same allowed-HTML rules as the email editor. Shape depends on `editor`: plain HTML for "html", or the block editor\'s comment-annotated HTML for "blocks" - see groundhogg/create-email-template\'s description for the exact format. Required if `editor` is given (and vice versa) - changing one without the other would leave the content and the editor-type flag out of sync.', 'groundhogg' ),
 					],
 					'editor' => [
 						'type'        => 'string',
@@ -154,17 +155,21 @@ class Update_Email_Template extends Ability {
 			return new WP_Error( 'groundhogg_email_changed', __( 'The email was changed since it was read. Read it again with groundhogg/get-email-template and retry.', 'groundhogg' ) );
 		}
 
-		if ( isset( $input['content'] ) !== isset( $input['editor'] ) ) {
+		if ( ! isset( $input['blocks'] ) && isset( $input['content'] ) !== isset( $input['editor'] ) ) {
 			return new WP_Error(
 				'groundhogg_content_editor_mismatch',
 				__( '`content` and `editor` must be given together, so the content and the editor-type flag stay in sync.', 'groundhogg' )
 			);
 		}
 
+		$new_editor = Create_Email_Template::editor_from_input( $input );
+
+		if ( is_wp_error( $new_editor ) ) {
+			return $new_editor;
+		}
+
 		// Checked before anything is written. The editor type is the one this call sets, or the email's current one.
-		$editor_type = isset( $input['editor'] )
-			? ( $input['editor'] === 'blocks' ? 'blocks' : 'html' )
-			: $email->get_editor_type();
+		$editor_type = $new_editor ?: $email->get_editor_type();
 
 		$extra_meta = Create_Email_Template::extra_meta_from_input( $input, $editor_type );
 
@@ -174,9 +179,18 @@ class Update_Email_Template extends Ability {
 
 		$body = null;
 
-		if ( isset( $input['content'] ) ) {
+		if ( $new_editor ) {
 
-			$body = Create_Email_Template::prepare_content( (string) $input['content'], $editor_type );
+			$template_settings = (array) ( $input['template_settings'] ?? [] );
+
+			// the whole body is replaced, so the email's own block ids can be used again
+			$renderer = new Email_Block_Renderer( array_merge( Email_Block_Renderer::context_of( $email ), array_filter( [
+				'template'     => $template_settings['layout'] ?? null,
+				'width'        => $template_settings['width'] ?? null,
+				'message_type' => $input['message_type'] ?? null,
+			] ) ) );
+
+			$body = Create_Email_Template::prepare_body( $input, $editor_type, $renderer );
 
 			if ( is_wp_error( $body ) ) {
 				return $body;
@@ -245,7 +259,7 @@ class Update_Email_Template extends Ability {
 			// Same meta flags groundhogg/create-email-template writes - see that
 			// class's docblock for why these specific keys.
 			$meta_updates = $editor === 'blocks'
-				? [ 'type' => 'blocks', 'blocks' => true ]
+				? [ 'type' => 'blocks', 'blocks' => true, 'css' => $body['css'] ]
 				: [ 'type' => 'html', 'blocks' => false ];
 		}
 
