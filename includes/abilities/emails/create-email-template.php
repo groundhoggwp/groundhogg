@@ -43,19 +43,24 @@ use function Groundhogg\get_sender_profiles;
  *   `<!--text:018f... {"p":{"fontSize":"16"}}-->...<!--/text:018f...-->`.
  *   There's no separate "block tree" to submit - that annotated HTML *is*
  *   the block data; wp-admin parses it back into editable blocks on open
- *   (see email-block-editor.js's parseBlocksFromContent()). Use
- *   groundhogg/list-email-templates with expand: ["content"] on an existing
- *   block-editor email to see the exact format to match, block type by
- *   block type (image, text, columns, spacer, footer, social, button, menu,
- *   ...) - there's no schema for it here since it's an internal editor
- *   format, not a public API contract.
+ *   (see email-block-editor.js's parseBlocksFromContent()). The format, block
+ *   type by block type, is in the authoring guide (groundhogg/get-authoring-guide,
+ *   topic "email"). Block content is checked with Email_Block_Document before
+ *   anything is saved, so content the editor would silently get wrong (invalid
+ *   JSON settings, a missing <td id="b-{id}">, a block outside its own row...)
+ *   is refused with what's wrong, and its plain-text version is made the way
+ *   the editor makes it - see prepare_content().
  *
- * HTML comments are stripped unconditionally by wp_kses() (the sanitizer
- * behind Groundhogg's email_kses()) with no filter to keep them, so for
- * "blocks" content the block comments are swapped for plain-text tokens
- * before sanitizing and restored after - the same swap-sanitize-restore
- * trick email_kses() already uses internally for rgb() colors and quoted
- * font families.
+ * wp_kses() (the sanitizer behind Groundhogg's email_kses()) sanitizes what's
+ * inside HTML comments too, which can mangle the JSON settings in block
+ * comments, so for "blocks" content the block comments are swapped for
+ * plain-text tokens before sanitizing and restored after - the same
+ * swap-sanitize-restore trick email_kses() already uses internally for rgb()
+ * colors and quoted font families.
+ *
+ * The content isn't returned: the caller just wrote it, and it's often tens of
+ * thousands of characters. The block count and the email's version come back
+ * instead - see output().
  *
  * `css`, `custom_headers` and `utm` are the email's custom CSS (`template_css`), its extra
  * headers and its UTM parameters - see extra_meta_from_input().
@@ -81,7 +86,7 @@ class Create_Email_Template extends Ability {
 
 		return [
 			'label'       => __( 'Create Email Template', 'groundhogg' ),
-			'description' => __( 'Create a new saved Groundhogg email (subject + HTML body). Always creates a brand-new email, never returns an existing one. Use the returned id with groundhogg/send-email-template, or attach it to a broadcast/funnel step. Before writing block-editor content (editor: "blocks"), get the guide with groundhogg/get-authoring-guide (topic "email") - it has every block type, merge tags and worked examples.', 'groundhogg' ),
+			'description' => __( 'Create a new saved Groundhogg email (subject + HTML body). Always creates a brand-new email, never returns an existing one. Use the returned id with groundhogg/send-email-template, or attach it to a broadcast/funnel step. Before writing block-editor content (editor: "blocks"), get the guide with groundhogg/get-authoring-guide (topic "email") - it has every block type, merge tags and worked examples. The content isn\'t returned; to change it afterwards, use groundhogg/edit-email to change blocks one at a time instead of rewriting it all.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -104,11 +109,11 @@ class Create_Email_Template extends Ability {
 						'type'        => 'string',
 						'enum'        => [ 'html', 'blocks' ],
 						'default'     => 'html',
-						'description' => __( 'Which editor `content` is written for, and which one wp-admin opens the email in. "html": plain HTML, no structure required. "blocks": `content` must already be in the block editor\'s comment-annotated format - see the class description. Get an example of that format from an existing block-editor email via groundhogg/list-email-templates (expand: ["content"]).', 'groundhogg' ),
+						'description' => __( 'Which editor `content` is written for, and which one wp-admin opens the email in. "html": plain HTML, no structure required. "blocks": `content` must be in the block editor\'s comment-annotated format, described in groundhogg/get-authoring-guide (topic "email"); it\'s checked before saving, and refused with what\'s wrong if the editor couldn\'t open it.', 'groundhogg' ),
 					],
 					'plain_text' => [
 						'type'        => 'string',
-						'description' => __( 'Plain-text alternative body. Omit to fall back to a stripped-down version of the HTML content at send time.', 'groundhogg' ),
+						'description' => __( 'Plain-text alternative body. Omit it to have one made from the content, like the email editor does.', 'groundhogg' ),
 					],
 					'pre_header' => [
 						'type'        => 'string',
@@ -161,7 +166,7 @@ class Create_Email_Template extends Ability {
 				],
 			],
 
-			'output_schema' => Email_Schema::get_schema(),
+			'output_schema' => self::output_schema(),
 		];
 	}
 
@@ -188,13 +193,15 @@ class Create_Email_Template extends Ability {
 			return $extra_meta;
 		}
 
-		$content = $editor === 'blocks'
-			? self::kses_preserving_block_comments( $input['content'] )
-			: email_kses( $input['content'] );
+		$body = self::prepare_content( (string) $input['content'], $editor );
+
+		if ( is_wp_error( $body ) ) {
+			return $body;
+		}
 
 		$data = [
 			'subject'      => sanitize_text_field( $input['subject'] ),
-			'content'      => $content,
+			'content'      => $body['content'],
 			'message_type' => in_array( $message_type, [ 'marketing', 'transactional' ], true ) ? $message_type : 'marketing',
 			'status'       => in_array( $status, [ 'draft', 'ready' ], true ) ? $status : 'draft',
 			'is_template'  => ! empty( $input['is_template'] ) ? 1 : 0,
@@ -207,6 +214,8 @@ class Create_Email_Template extends Ability {
 
 		if ( isset( $input['plain_text'] ) ) {
 			$data['plain_text'] = sanitize_textarea_field( $input['plain_text'] );
+		} else if ( $body['plain_text'] !== '' ) {
+			$data['plain_text'] = $body['plain_text'];
 		}
 
 		if ( isset( $input['pre_header'] ) ) {
@@ -285,7 +294,97 @@ class Create_Email_Template extends Ability {
 		// REST create path (cache busting, integrations, etc.) also fires here.
 		do_action( 'groundhogg/api/email/created', $email );
 
-		return Email_Schema::transform( $email, [ 'content', 'plain_text', 'css' ] );
+		return self::output( $email, $body );
+	}
+
+	/**
+	 * The output of groundhogg/create-email-template and groundhogg/update-email-template
+	 *
+	 * The content isn't sent back: the caller just wrote it, and it can be tens of thousands of characters. What
+	 * comes back is enough to check it worked, and to read or change blocks next.
+	 *
+	 * @return array
+	 */
+	public static function output_schema(): array {
+
+		$schema = Email_Schema::get_schema();
+
+		$schema['properties']['block_count'] = [
+			'type'        => 'integer',
+			'description' => __( 'For an email built with the block editor, how many blocks were found in the content. Read them with groundhogg/get-email-template, change them with groundhogg/edit-email.', 'groundhogg' ),
+		];
+
+		$schema['properties']['warnings'] = [
+			'type'  => 'array',
+			'items' => [ 'type' => 'string' ],
+		];
+
+		return $schema;
+	}
+
+	/**
+	 * @param Email      $email
+	 * @param array|null $body what prepare_content() returned, when the content was changed
+	 *
+	 * @return array
+	 */
+	public static function output( Email $email, $body = null ): array {
+
+		// the custom CSS is small, and set alongside the content
+		$data = Email_Schema::transform( $email, [ 'css', 'version' ] );
+
+		if ( $email->get_editor_type() === 'blocks' ) {
+			$data['block_count'] = $body ? $body['block_count'] : count( ( new Email_Block_Document( (string) $email->get_content() ) )->ids() );
+		}
+
+		if ( ! empty( $body['warnings'] ) ) {
+			$data['warnings'] = $body['warnings'];
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Check and sanitize the content for an email, and make its plain-text version like the editor does when it saves
+	 *
+	 * Block content is checked with Email_Block_Document, so content the editor couldn't open properly is refused
+	 * with what's wrong, instead of saved. For HTML content the plain text is left empty, so it's made from the
+	 * content when the email is sent and can't be out of date.
+	 *
+	 * @param string $content
+	 * @param string $editor 'blocks' or 'html'
+	 *
+	 * @return array|WP_Error content, plain_text, block_count, warnings
+	 */
+	public static function prepare_content( string $content, string $editor ) {
+
+		if ( $editor !== 'blocks' ) {
+			return [
+				'content'     => email_kses( $content ),
+				'plain_text'  => '',
+				'block_count' => 0,
+				'warnings'    => [],
+			];
+		}
+
+		$doc = Email_Block_Document::prepare( $content );
+
+		if ( is_wp_error( $doc ) ) {
+			return $doc;
+		}
+
+		$sanitized = $doc->sanitize();
+
+		if ( is_wp_error( $sanitized ) ) {
+			return $sanitized;
+		}
+
+		return [
+			'content'     => $doc->html(),
+			'plain_text'  => $doc->to_plain_text(),
+			'block_count' => count( $doc->ids() ),
+			'warnings'    => $doc->warnings(),
+		];
 	}
 
 	/**

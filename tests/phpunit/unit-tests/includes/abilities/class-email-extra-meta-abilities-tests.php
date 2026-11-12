@@ -26,12 +26,21 @@ class Email_Extra_Meta_Abilities_Tests extends GH_UnitTestCase {
 		return wp_get_ability( "groundhogg/$name-email-template" )->execute( $input );
 	}
 
+	/**
+	 * The smallest content the block editor can open
+	 */
+	const BLOCKS = '<table><tr><!--text:t1 {}--><td id="b-t1"><p>content</p></td><!--/text:t1--></tr></table>';
+
 	protected function create( array $input = [] ) {
-		return $this->run_ability( 'create', array_merge( [
+
+		$input = array_merge( [
 			'subject' => 'subject',
-			'content' => '<p>content</p>',
 			'editor'  => 'blocks',
-		], $input ) );
+		], $input );
+
+		$input['content'] = $input['content'] ?? ( $input['editor'] === 'blocks' ? self::BLOCKS : '<p>content</p>' );
+
+		return $this->run_ability( 'create', $input );
 	}
 
 	protected function update( int $id, array $input ) {
@@ -120,7 +129,7 @@ class Email_Extra_Meta_Abilities_Tests extends GH_UnitTestCase {
 
 		$id = $this->create( [ 'editor' => 'html' ] )['id'];
 
-		$out = $this->update( $id, [ 'content' => '<p>blocks</p>', 'editor' => 'blocks', 'css' => '.a{color:red}' ] );
+		$out = $this->update( $id, [ 'content' => self::BLOCKS, 'editor' => 'blocks', 'css' => '.a{color:red}' ] );
 
 		$this->assertNotWPError( $out );
 		$this->assertSame( '.a{color:red}', $out['css'] );

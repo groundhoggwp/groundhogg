@@ -4,7 +4,7 @@ Emails on this site are edited in a drag-and-drop block editor. To make an email
 
 ## Before you write
 
-1. Call `list-email-templates` with `expand: ["content"]` and look at one or two existing block emails. Reuse their structure, fonts and colors, so the new email looks like it belongs to this site. Swap in new copy; don't invent new markup when a working example is right there.
+1. Look at one or two existing block emails so the new one looks like it belongs to this site. Find them with `list-email-templates` (without `expand`), get the outline of one with `get-email-template`, then get a few of its blocks (a text block, a button, the footer) with `get-email-template`'s `blocks` input. Reuse their structure, fonts and colors and swap in new copy; don't invent new markup when a working example is right there. Don't read whole emails, they're often tens of thousands of characters.
 2. Call `list-replacement-codes` for the merge tags this site supports. Use them for greetings, sign-offs and compliance links instead of static text.
 3. Call `list-sender-profiles` if the email should come from someone other than the default sender.
 
@@ -22,10 +22,12 @@ The saved content is ordinary HTML in which each block is wrapped in a pair of H
 Rules the parser enforces:
 
 - `{type}` is lowercase letters only (`a-z`). No digits, underscores or camelCase.
-- `{id}` is letters, digits and hyphens, unique within the email. `intro-1` is fine, it doesn't need to be a UUID.
-- Exactly one space between `{id}` and `{json-props}`, and `{json-props}` must be valid JSON. Invalid JSON is not an error: the block is left in the email as literal text. Check it before saving.
-- The closing comment repeats the exact same `{type}:{id}`.
+- `{id}` is letters, digits and hyphens, unique within the email. Keep ids short and meaningful, like `intro` or `cta-1`; they don't need to be UUIDs, and you'll use them to change blocks later.
+- `{json-props}` must be valid JSON.
+- The opening comment is followed directly by `<td id="b-{id}">`, and the closing comment repeats the exact same `{type}:{id}`.
 - Each block is its own `<tr>`, all inside one outer `<table>`.
+
+Content that breaks these rules is refused with a list of what's wrong, and nothing is saved, so fix what it says and save again. Whitespace and spacing in the comments are tidied for you.
 
 **The HTML between the comments is what gets sent.** Only `global` blocks are rebuilt when the email is sent. For every other type the JSON props only matter for editing the block later, so the HTML has to be correct on its own: inline styles, table-based layout, absolute URLs.
 
@@ -196,6 +198,38 @@ Inserts a saved reusable block (an email whose message type is "global block"). 
 ```
 
 Only use it with the ID of a global block that exists on the site.
+
+## Changing an email
+
+Don't read or rewrite the whole email to change part of it. Use `edit-email`, which changes blocks by id:
+
+1. `get-email-template` returns an outline: each block's `id`, `type`, the `parent` and `column` of blocks in columns, and a `summary` of its text, image or link. It also returns the email's `version`.
+2. If you need to see a block's markup, pass its id in `blocks`. Skip this for a simple wording change.
+3. Call `edit-email` with `expected_version` and a list of `operations`, applied in order, all or nothing:
+
+```json
+{
+  "email_id": 12,
+  "expected_version": "…",
+  "operations": [
+    { "op": "replace_text", "find": "Sale ends Friday", "replace": "Sale ends Sunday" },
+    { "op": "replace_text", "block": "cta", "find": "https://example.com/old", "replace": "https://example.com/new" },
+    { "op": "set_content", "block": "intro", "html": "<p style=\"…\">New intro paragraph.</p>" },
+    { "op": "add", "at": { "after": "intro" }, "html": "<!--spacer:gap-2 {\"height\":20}--><td id=\"b-gap-2\">…</td><!--/spacer:gap-2-->" },
+    { "op": "move", "block": "footer", "at": { "position": "end" } },
+    { "op": "delete", "block": "old-banner" }
+  ]
+}
+```
+
+- `replace_text` is the cheapest change. It must match exactly once (give `block` to narrow it down, or `all: true`), and it matches the HTML as written, so text split by tags like `<strong>` won't match: use `set_content` then.
+- `set_content` replaces the HTML inside a block's `<td>`, keeping its padding, background and settings.
+- `replace` swaps a block for new markup, which can reuse its id.
+- `add` and `move` take `at`: `{"after": id}`, `{"before": id}`, `{"in": id, "column": 0}` for a column of a columns block, or `{"position": "start"}` / `{"position": "end"}`.
+- `set_props` changes settings in a block's comment. The sent HTML isn't rebuilt from them, so use it for settings that are read when sending, like a global block's `templateId` or `include_filters`.
+- Use `dry_run: true` to check a change without saving it.
+
+The result lists the blocks that changed and the new `version` for the next call. Use `update-email-template` for the subject, preview text, sender, status and other settings.
 
 ## Merge tags
 

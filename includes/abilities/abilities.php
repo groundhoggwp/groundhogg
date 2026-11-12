@@ -42,6 +42,7 @@ use Groundhogg\Abilities\Funnels\Live_Simulate_Flow;
 use Groundhogg\Abilities\Funnels\Publish_Flow_Changes;
 use Groundhogg\Abilities\Funnels\Simulate_Flow;
 use Groundhogg\Abilities\Emails\Create_Email_Template;
+use Groundhogg\Abilities\Emails\Edit_Email;
 use Groundhogg\Abilities\Emails\Get_Email_Template;
 use Groundhogg\Abilities\Emails\List_Email_Templates;
 use Groundhogg\Abilities\Emails\List_Replacement_Codes;
@@ -416,6 +417,7 @@ class Abilities {
 			List_Sender_Profiles::class,
 			Create_Email_Template::class,
 			Update_Email_Template::class,
+			Edit_Email::class,
 			List_Replacement_Codes::class,
 			Send_Composed_Email::class,
 			Send_Email_Template::class,

@@ -76,7 +76,7 @@ class List_Email_Templates extends Ability {
 							'enum' => [ 'content', 'plain_text', 'css' ],
 						],
 						'default'     => [],
-						'description' => __( 'Extra sections to include on each email. "content" is the full HTML body and can be very large - only request it with a small limit. "css" is the email\'s custom CSS.', 'groundhogg' ),
+						'description' => __( 'Extra sections to include on each email. "content" is the full HTML body and can be very large - only request it with a small limit, and to look at the blocks of an email built with the block editor use groundhogg/get-email-template\'s outline instead. "css" is the email\'s custom CSS.', 'groundhogg' ),
 					],
 					'limit' => [
 						'type'        => 'integer',
