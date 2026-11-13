@@ -353,7 +353,15 @@ class Step_Type_Schema {
 		$form_id = absint( $settings['form_id'] ?? 0 );
 
 		if ( ! $form_id ) {
-			return new WP_Error( 'groundhogg_form_integration_no_form', __( 'form_id is required.', 'groundhogg' ) );
+
+			// a field map needs a form to belong to
+			if ( ! empty( $settings['field_map'] ) ) {
+				return new WP_Error( 'groundhogg_form_integration_no_form', __( 'form_id is required.', 'groundhogg' ) );
+			}
+
+			// no form yet, like send_email without an email_id: the step is created empty and shows a warning until a
+			// form is picked, the same as the flow editor adds it when the type isn't opted in
+			return [ 'settings' => [] ];
 		}
 
 		if ( ! in_array( (string) $form_id, wp_list_pluck( $element->get_forms_for_api(), 'id' ), true ) ) {

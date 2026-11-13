@@ -109,6 +109,22 @@ class Form_Integration_Abilities_Tests extends GH_UnitTestCase {
 		$this->assertSame( [ 'first_name' => 'first_name', 'email' => 'email' ], $step->get_meta( 'field_map' ) );
 	}
 
+	public function test_a_step_without_a_form_is_created_empty() {
+
+		// the flow editor adds it with no settings, and shows the warning until a form is picked
+		$funnel = $this->build( [] );
+
+		$this->assertNotWPError( $funnel );
+
+		$step = $funnel->get_steps()[0];
+
+		$this->assertEmpty( $step->get_meta( 'form_id' ) );
+		$this->assertEmpty( $step->get_meta( 'field_map' ) );
+
+		// an empty map has nothing that needs a form
+		$this->assertNotWPError( $this->build( [ 'field_map' => [] ] ) );
+	}
+
 	public function test_it_comes_back_the_way_it_went_in() {
 
 		$funnel = $this->build( [

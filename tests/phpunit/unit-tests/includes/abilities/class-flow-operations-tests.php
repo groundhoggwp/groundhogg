@@ -1,6 +1,7 @@
 <?php
 
 use Groundhogg\Abilities\Funnels\Flow_Operations;
+use Groundhogg\Abilities\Schemas\Step_Type_Schema;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Step;
@@ -136,6 +137,47 @@ class Flow_Operations_Tests extends GH_UnitTestCase {
 		// but not with settings, which can't be resolved
 		$operation['steps'][0] = [ 'type' => 'undescribed_action', 'settings' => [ 'color' => 'red' ] ];
 		$this->assertWPError( $this->apply( $funnel, [ $operation ] ) );
+	}
+
+	/**
+	 * The editor adds a step with no settings, and the types the abilities describe are resolved, so one that refuses
+	 * empty settings can't be added when something else has set the abilities up in the same request
+	 */
+	public function test_the_editor_adds_every_step_type_with_no_settings_once_the_abilities_are_set_up() {
+
+		Plugin::instance()->step_manager->add_step( new GH_Test_Form_Integration_Step() );
+		Step_Type_Schema::extend_form_integrations();
+
+		$refused = [];
+		$added   = 0;
+
+		foreach ( Plugin::instance()->step_manager->get_elements() as $type => $element ) {
+
+			// placeholders for what's in Pro can't be added without it
+			if ( $element->is_premium() && ! is_pro_features_active() ) {
+				continue;
+			}
+
+			[ $funnel ] = $this->flow();
+
+			$out = $this->apply( $funnel, [
+				[
+					'op'    => 'add',
+					'at'    => [ 'branch' => 'main', 'position' => 'end' ],
+					'steps' => [ [ 'type' => $type, 'id' => 'tmp_x' ] ],
+				],
+			] );
+
+			if ( is_wp_error( $out ) ) {
+				$refused[ $type ] = $out->get_error_message();
+				continue;
+			}
+
+			$added ++;
+		}
+
+		$this->assertSame( [], $refused );
+		$this->assertGreaterThan( 20, $added );
 	}
 
 	/**
