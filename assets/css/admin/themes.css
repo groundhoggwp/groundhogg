@@ -1438,6 +1438,22 @@ body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-se
   background-color: var(--ght-surface);
 }
 
+/* The Triggers / Actions / Logic / All filter. The group is white from an inline style, which the 5% tints sit on, and
+   "All" uses the dark navy of the brand as its color, which can't be read on a dark theme. */
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner #add-steps .steps-select .gh-input-group.full-width {
+  background-color: var(--ght-surface) !important;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter[data-group="all"] {
+  --color: var(--ght-text);
+  --color-5: var(--ght-raised);
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter[data-group="all"].current,
+body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner #add-steps .steps-select .gh-button.step-filter[data-group="all"]:hover {
+  color: var(--ght-surface);
+}
+
 body.groundhogg-admin-page[class*="gh-theme-"] #step-settings-container #step-settings-inner .field-map-wrapper {
   border-color: var(--ght-border-strong);
 }
@@ -1464,6 +1480,13 @@ body.groundhogg-admin-page[class*="gh-theme-"] #step-flow {
 
 body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .fixed-inside .step-branch button.add-step {
   background-color: var(--ght-surface);
+}
+
+/* The add step button the step is being added at inverts: text color fill, surface colored plus */
+body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .fixed-inside .step-branch button.add-step.here {
+  background-color: var(--ght-text);
+  border-color: var(--ght-text);
+  color: var(--ght-surface);
 }
 
 body.groundhogg-admin-page[class*="gh-theme-"] #step-flow .step {
