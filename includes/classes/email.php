@@ -1720,8 +1720,9 @@ class Email extends Base_Object_With_Meta {
 
 		$overrides = array_merge( [
 			/* translators: %s: the asset title being copied */
-			'title'  => sprintf( __( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
-			'status' => 'draft'
+			'title'        => sprintf( __( 'Copy of %s', 'groundhogg' ), $this->get_title() ),
+			'status'       => 'draft',
+			'last_updated' => current_time( 'mysql' ),
 		], $overrides );
 
 		return parent::duplicate( $overrides, $meta_overrides );

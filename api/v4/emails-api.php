@@ -167,6 +167,28 @@ class Emails_Api extends Base_Object_Api {
 	}
 
 	/**
+	 * Nothing else maintains last_updated, and a change to only the meta or campaigns still changes the email, so every
+	 * way an email is updated sets it, the editor's save and a bulk update alike
+	 *
+	 * @param array|null $data
+	 * @param array|null $meta
+	 * @param bool       $campaigns whether the campaigns are being changed
+	 *
+	 * @return array
+	 */
+	protected function prepare_update_data( $data, $meta, $campaigns = false ) {
+
+		if ( empty( $data ) && empty( $meta ) && ! $campaigns ) {
+			return (array) $data;
+		}
+
+		$data                 = is_array( $data ) ? $data : [];
+		$data['last_updated'] = current_time( 'mysql' );
+
+		return $data;
+	}
+
+	/**
 	 * Handle campaigns
 	 *
 	 * With `version`, the version of the email that the caller has (see get_edit_version()), the update is refused if
@@ -204,7 +226,7 @@ class Emails_Api extends Base_Object_Api {
 		$data = $request->get_param( 'data' );
 		$meta = $request->get_param( 'meta' );
 
-		$object->update( $data );
+		$object->update( $this->prepare_update_data( $data, $meta, $request->has_param( 'campaigns' ) ) );
 
 		// If the current object supports meta data...
 		if ( method_exists( $object, 'update_meta' ) ) {

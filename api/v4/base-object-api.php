@@ -549,6 +549,19 @@ abstract class Base_Object_Api extends Base_Api {
 	}
 
 	/**
+	 * What a bulk update writes to each object, for an object type to add to, like a column that is kept up to date by
+	 * whatever saves the object
+	 *
+	 * @param array $data the data the update was given
+	 * @param array $meta the meta the update was given
+	 *
+	 * @return array the data to write
+	 */
+	protected function prepare_update_data( $data, $meta ) {
+		return $data;
+	}
+
+	/**
 	 * Updates an object given an query and new data/meta
 	 * Or updates given an array of objects
 	 *
@@ -585,7 +598,7 @@ abstract class Base_Object_Api extends Base_Api {
 				$data = get_array_var( $item, 'data', [] );
 				$meta = get_array_var( $item, 'meta', [] );
 
-				$object->update( $data );
+				$object->update( $this->prepare_update_data( $data, $meta ) );
 
 				// If the current object supports meta data...
 				if ( method_exists( $object, 'update_meta' ) ) {
@@ -615,7 +628,7 @@ abstract class Base_Object_Api extends Base_Api {
 				continue;
 			}
 
-			$object->update( $data );
+			$object->update( $this->prepare_update_data( $data, $meta ) );
 
 			// If the current object supports meta data...
 			if ( method_exists( $object, 'update_meta' ) ) {
