@@ -145,11 +145,13 @@
 
   const STEPS = [
     {
-      id    : 'start',
-      title : __('Start', 'groundhogg'),
-      // only when the site can serve the setup abilities and this person can use them, see Build_With_AI
-      when  : () => Boolean(Groundhogg.buildWithAI),
-      render: () => StartStep(),
+      id      : 'start',
+      title   : __('Start', 'groundhogg'),
+      // a choice before the steps, set up with AI or by hand, so it isn't numbered in the stepper. Only when the site
+      // can serve the setup abilities and this person can use them, see Build_With_AI
+      junction: true,
+      when    : () => Boolean(Groundhogg.buildWithAI),
+      render  : () => StartStep(),
     },
     {
       id    : 'business',
@@ -267,7 +269,12 @@
 
   const Stepper = () => {
 
-    const steps = visibleSteps()
+    // the choice at the start isn't one of the steps, and nothing's been chosen yet while it shows
+    if (currentStep().junction) {
+      return null
+    }
+
+    const steps = visibleSteps().filter(step => !step.junction)
     const current = steps.findIndex(step => step.id === currentStep().id)
 
     return makeEl('ol', { className: 'gs-stepper' }, steps.map((step, i) => Li({
