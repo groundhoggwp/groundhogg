@@ -4139,8 +4139,41 @@
           })
         },
       },
-      Div({ className: 'block-grid' },
-        Object.values(BlockRegistry.blocks).map(b => Block(b))))
+      Div({ className: 'block-grid' }, [
+        EditWithAI(),
+        ...Object.values(BlockRegistry.blocks).map(b => Block(b)),
+      ]))
+  }
+
+  /**
+   * "Edit with AI", first in the blocks panel, for people who haven't connected an assistant lately, see
+   * Build_With_AI::enqueue(). It looks like a block but isn't one, so it isn't draggable and opens the popup instead.
+   * Only on the email's own edit screen, the flow editor has a card of its own.
+   *
+   * @return {HTMLElement|null}
+   */
+  const EditWithAI = () => {
+
+    if (!Groundhogg.buildWithAI || Groundhogg.buildWithAI.type !== 'edit-email' || !isEmailEditorPage()) {
+      return null
+    }
+
+    return Div({
+      className: 'block-wrap build-with-ai-block',
+      title    : __('Describe the change you want and your AI assistant makes it to this email.', 'groundhogg'),
+      role     : 'button',
+      tabindex : 0,
+      onClick  : () => Groundhogg.buildWithAI.open(),
+      onKeydown: e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          Groundhogg.buildWithAI.open()
+        }
+      },
+    }, [
+      Div({ className: 'ai-block gh-panel' }, Div({ className: 'icon' }, Groundhogg.buildWithAI.icon)),
+      Div({ className: 'block-name' }, __('Edit with AI', 'groundhogg')),
+    ])
   }
 
   const AdvancedBlockControls = () => {

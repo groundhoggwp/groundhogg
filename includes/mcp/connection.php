@@ -86,6 +86,54 @@ class Connection {
 	}
 
 	/**
+	 * Whether this person can use the AI agent tab and the connect steps in the "Build with AI" popup. Anyone who works
+	 * with contacts can connect an assistant of their own, it acts as them and can do only what they can do. The
+	 * steps that change the site, like installing a plugin, check for more.
+	 *
+	 * @return bool
+	 */
+	public static function can_connect(): bool {
+		return self::is_supported() && current_user_can( 'view_contacts' );
+	}
+
+	/**
+	 * Whether this person can get a plugin running: activate it if it's here, or install and activate it if not.
+	 *
+	 * @param string $slug the plugin, the MCP Adapter unless said otherwise
+	 *
+	 * @return bool
+	 */
+	public static function can_install( string $slug = self::PLUGIN_SLUG ): bool {
+
+		$file = self::plugin_file( $slug );
+
+		if ( $file ) {
+			return current_user_can( 'activate_plugin', $file );
+		}
+
+		return current_user_can( 'install_plugins' ) && current_user_can( 'activate_plugins' );
+	}
+
+	/**
+	 * Whether this person's assistant has used the site lately, so there's no need to tell them about AI.
+	 *
+	 * @param int $user_id defaults to the current user
+	 *
+	 * @return bool
+	 */
+	public static function is_in_use( int $user_id = 0 ): bool {
+
+		/**
+		 * Filter how long after an assistant last used the site we still count it as in use.
+		 *
+		 * @param int $seconds 30 days
+		 */
+		$window = (int) apply_filters( 'groundhogg/mcp/in_use_window', 30 * DAY_IN_SECONDS );
+
+		return self::last_seen( $user_id ) > time() - $window;
+	}
+
+	/**
 	 * @param string $slug the plugin, the MCP Adapter unless said otherwise
 	 *
 	 * @return bool
@@ -343,17 +391,145 @@ class Connection {
 	}
 
 	/**
-	 * Whether this person has got as far as connecting an agent: an agent has signed in as them, or the site answers
-	 * to MCP clients and they have a password for an agent to sign in with, which covers agents connected before we
-	 * started noting when one signs in.
+	 * Whether this person has got as far as connecting an agent: the site answers to MCP clients, and an agent has
+	 * signed in as them or they have a password for one to sign in with. The password covers agents connected before
+	 * we started noting when one signs in.
 	 *
 	 * @param int $user_id defaults to the current user
 	 *
 	 * @return bool
 	 */
 	public static function is_connected( int $user_id = 0 ): bool {
-		return self::last_seen( $user_id ) > 0
-		       || ( ! empty( self::application_passwords( $user_id ) ) && ( self::is_active() || self::is_served() ) );
+
+		if ( self::last_seen( $user_id ) === 0 && empty( self::application_passwords( $user_id ) ) ) {
+			return false;
+		}
+
+		// an assistant that connected before the server stopped working can't reach anything now
+		return self::is_serving();
+	}
+
+	/**
+	 * The protocol revision the connection check speaks. Every version of the adapter knows it, older ones know nothing
+	 * newer.
+	 */
+	const CHECK_PROTOCOL = '2025-11-25';
+
+	/**
+	 * Whether the connection check is talking to a server right now, so note_seen() doesn't take it for an agent.
+	 *
+	 * @var bool
+	 */
+	protected static $checking = false;
+
+	/**
+	 * Whether an MCP server on this site actually answers, as the current user, with tools an agent can use. A plugin
+	 * being active isn't enough: the server can fail to register, or another plugin can switch its tools off.
+	 *
+	 * Asks each MCP server the site has, the adapter's default server first, the way an agent would: initialize, list
+	 * the tools, end the session. It goes through the REST API without leaving the server, so it says nothing about
+	 * whether the site can be reached from outside, or whether the host strips the Authorization header.
+	 *
+	 * @return bool
+	 */
+	public static function is_serving(): bool {
+
+		static $serving = null;
+
+		if ( $serving !== null ) {
+			return $serving;
+		}
+
+		$serving = false;
+
+		if ( ! is_user_logged_in() ) {
+			return $serving;
+		}
+
+		$default = '/mcp/mcp-adapter-default-server';
+		$routes  = array_filter( array_keys( rest_get_server()->get_routes() ), function ( $route ) use ( $default ) {
+			// skip routes with parameters, a server's endpoint has none
+			return strpos( $route, '/mcp/' ) === 0 && strpos( $route, '(' ) === false && $route !== $default;
+		} );
+
+		if ( self::is_served() ) {
+			array_unshift( $routes, $default );
+		}
+
+		foreach ( $routes as $route ) {
+			if ( self::lists_tools( $route ) ) {
+				$serving = true;
+				break;
+			}
+		}
+
+		return $serving;
+	}
+
+	/**
+	 * Ask one MCP server for its tools, as an agent would.
+	 *
+	 * @param string $route the server's REST route, e.g. /mcp/mcp-adapter-default-server
+	 *
+	 * @return bool whether it listed at least one tool
+	 */
+	protected static function lists_tools( string $route ): bool {
+
+		self::$checking = true;
+
+		$send = function ( string $method, array $message = [], string $session = '' ) use ( $route ) {
+
+			$request = new \WP_REST_Request( $method, $route );
+			$request->set_header( 'Accept', 'application/json, text/event-stream' );
+
+			if ( $session ) {
+				$request->set_header( 'Mcp-Session-Id', $session );
+				$request->set_header( 'Mcp-Protocol-Version', self::CHECK_PROTOCOL );
+			}
+
+			if ( $message ) {
+				$request->set_header( 'Content-Type', 'application/json' );
+				$request->set_body( wp_json_encode( array_merge( [ 'jsonrpc' => '2.0' ], $message ) ) );
+			}
+
+			// as when serving a real request: older adapters, like the copy WooCommerce bundles, add the session header here
+			return apply_filters( 'rest_post_dispatch', rest_do_request( $request ), rest_get_server(), $request );
+		};
+
+		$tools = [];
+
+		try {
+
+			$initialized = $send( 'POST', [
+				'id'     => 1,
+				'method' => 'initialize',
+				'params' => [
+					'protocolVersion' => self::CHECK_PROTOCOL,
+					'capabilities'    => new \stdClass(),
+					'clientInfo'      => [ 'name' => 'connection-check', 'version' => GROUNDHOGG_VERSION ],
+				],
+			] );
+
+			if ( ! $initialized->is_error() ) {
+
+				$session = (string) ( $initialized->get_headers()['Mcp-Session-Id'] ?? '' );
+				$listed  = $send( 'POST', [ 'id' => 2, 'method' => 'tools/list' ], $session );
+				$data    = json_decode( wp_json_encode( $listed->get_data() ), true );
+				$tools   = $listed->is_error() ? [] : ( $data['result']['tools'] ?? [] );
+
+				// tidy up, the adapter keeps sessions until they expire
+				if ( $session ) {
+					$send( 'DELETE', [], $session );
+				}
+			}
+
+		} catch ( \Throwable $e ) {
+			$tools = [];
+		}
+
+		self::$checking = false;
+
+		return is_array( $tools ) && ! empty( $tools );
 	}
 
 	/**
@@ -383,7 +559,7 @@ class Connection {
 	 */
 	public static function note_seen( $response, $handler, $request ) {
 
-		if ( strpos( $request->get_route(), '/mcp/' ) !== 0 || is_wp_error( $response ) ) {
+		if ( self::$checking || strpos( $request->get_route(), '/mcp/' ) !== 0 || is_wp_error( $response ) ) {
 			return $response;
 		}
 

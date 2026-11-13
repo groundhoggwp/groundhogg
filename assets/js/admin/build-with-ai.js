@@ -1,12 +1,14 @@
 /**
- * "Build with AI" on the add screens of emails and flows, and "Set up with AI" in the guided setup.
+ * "Build with AI" on the add screens of emails and flows, "Set up with AI" in the guided setup, and "Edit with AI" in the
+ * flow and email editors.
  *
  * A card among the templates opens a popup where someone describes what they want, then copies a prompt that has
  * their AI assistant build it over MCP. The prompt comes from the server, see Groundhogg\Mcp\Build_With_AI, with
  * {{goal}} standing in for the description.
  *
  * The email editor and the guided setup draw the card themselves, with Groundhogg.buildWithAI.Card(). On the flow add
- * screen it goes first in the grid of templates marked with data-build-with-ai.
+ * screen it goes first in the grid of templates marked with data-build-with-ai. The flow and email editors draw a card
+ * the size of a step or a block, with Groundhogg.buildWithAI.icon, and call open().
  */
 ( () => {
 
@@ -39,6 +41,8 @@
 
   let { connected } = GroundhoggBuildWithAI
 
+  const { spinner } = Groundhogg.element
+
   const text = {
     email: {
       title      : __( 'Build an email with AI', 'groundhogg' ),
@@ -57,6 +61,17 @@
       description: __( 'Describe the automation you want and your AI assistant builds the flow, ready for you to review and edit.', 'groundhogg' ),
       placeholder: __( 'When someone fills out the contact form, send a thank you email, wait two days, then follow up if they haven\'t booked a call.', 'groundhogg' ),
       after      : __( 'When it\'s done, you\'ll find the flow in your flows list. It stays inactive until you turn it on.', 'groundhogg' ),
+    },
+    // the editor doesn't pick up changes made somewhere else until it's opened again
+    'edit-flow' : {
+      title      : __( 'Edit this flow with AI', 'groundhogg' ),
+      placeholder: __( 'After the welcome email, wait three days and send a follow-up to anyone who hasn\'t clicked yet.', 'groundhogg' ),
+      after      : __( 'When it\'s done, reload this page to see the changes. If the flow is active, they wait for you to publish them.', 'groundhogg' ),
+    },
+    'edit-email': {
+      title      : __( 'Edit this email with AI', 'groundhogg' ),
+      placeholder: __( 'Make it shorter and friendlier, and add a button to book a call after the second paragraph.', 'groundhogg' ),
+      after      : __( 'Save your own changes before you start. When it\'s done, reload this page to see the changes.', 'groundhogg' ),
     },
   }[type]
 
@@ -111,18 +126,77 @@
     return Promise.resolve()
   }
 
-  // the site notes when an assistant first signs in, see Groundhogg\Mcp\Connection::note_seen()
-  const checkConnected = () => {
+  const post = action => {
     const body = new URLSearchParams()
-    body.append( 'action', 'gh_mcp_is_connected' )
+    body.append( 'action', action )
     body.append( 'gh_admin_ajax_nonce', nonce )
 
     return fetch( ajaxUrl, {
       method     : 'POST',
       credentials: 'same-origin',
       body,
-    } ).then( response => response.json() ).then( json => Boolean( json && json.success && json.data.connected ) ).catch( () => false )
+    } ).then( response => response.json() )
   }
+
+  // the site notes when an assistant first signs in, see Groundhogg\Mcp\Connection::note_seen()
+  const checkConnected = () => post( 'gh_mcp_is_connected' ).then( json => Boolean( json && json.success && json.data.connected ) ).catch( () => false )
+
+  // if the steps can't be shown here, the AI agent tab in Tools still can
+  const ConnectLink = () => An( {
+    className: 'gh-button primary',
+    href     : setupUrl,
+    target   : '_blank',
+    rel      : 'noopener',
+  }, __( 'Connect your AI assistant', 'groundhogg' ) )
+
+  /**
+   * Show the steps of the AI agent tab in Tools right here, so connecting an assistant doesn't mean leaving the page.
+   * The tab sends each step in the background and swaps in what comes back, so it works the same in the popup.
+   * See Tools_Page::ajax_mcp_view().
+   */
+  const loadWizard = () => post( 'gh_mcp_view' ).finally( () => {
+    // with the steps (or the way to them) in place, there's something to wait for
+    const waiting = document.getElementById( 'build-with-ai-waiting' )
+
+    if ( waiting ) {
+      waiting.hidden = false
+    }
+  } ).then( json => {
+
+    const holder = document.getElementById( 'build-with-ai-wizard' )
+
+    if ( ! holder ) {
+      return
+    }
+
+    const page = json && json.success ? new DOMParser().parseFromString( json.data.html, 'text/html' ) : null
+    const wizard = page ? page.getElementById( 'gh-mcp' ) : null
+
+    if ( ! wizard ) {
+      throw new Error( 'no steps' )
+    }
+
+    // anything that leaves the page opens in a new tab, so the popup is still here to come back to
+    wizard.querySelectorAll( 'a[href]' ).forEach( link => {
+      link.target = '_blank'
+      link.rel = 'noopener'
+    } )
+
+    holder.replaceChildren( ...page.querySelectorAll( 'style' ), wizard )
+
+    // scripts that come in this way don't run, so run the tab's again
+    page.querySelectorAll( 'script' ).forEach( script => {
+      const run = document.createElement( 'script' )
+      run.textContent = script.textContent
+      holder.appendChild( run )
+    } )
+  } ).catch( () => {
+    const holder = document.getElementById( 'build-with-ai-wizard' )
+
+    if ( holder ) {
+      holder.replaceChildren( ConnectLink() )
+    }
+  } )
 
   // swap the connect step for the prompt, in the popup that's open
   const reveal = ( justConnected = false ) => {
@@ -181,15 +255,12 @@
   }, [
     H2( {}, __( 'First, connect your AI assistant', 'groundhogg' ) ),
     Pg( {}, __( 'Your assistant needs a connection to this site before it can build anything for you. It takes a few minutes, and you only do it once.', 'groundhogg' ) ),
-    An( {
-      className: 'gh-button primary',
-      href     : setupUrl,
-      target   : '_blank',
-      rel      : 'noopener',
-    }, __( 'Connect your AI assistant', 'groundhogg' ) ),
-    Div( { className: 'build-with-ai-waiting' }, [
-      Span( { className: 'spinner is-active' } ),
-      Span( {}, __( 'Waiting for your assistant to connect. Come back to this tab when you\'re done.', 'groundhogg' ) ),
+    // the same spinner as loadingModal(), and only one at a time: this one until the steps are in, then the small one
+    // beside the waiting line
+    Div( { id: 'build-with-ai-wizard', className: 'build-with-ai-wizard' }, spinner( 'gray' ) ),
+    Div( { id: 'build-with-ai-waiting', className: 'build-with-ai-waiting', hidden: true }, [
+      spinner( 'gray' ),
+      Span( {}, __( 'Waiting for your assistant to connect. This moves on by itself once it does.', 'groundhogg' ) ),
     ] ),
     Button( {
       type     : 'button',
@@ -212,6 +283,7 @@
       }
 
       watch()
+      loadWizard()
     },
   }, () => Body() )
 
@@ -287,6 +359,9 @@
   Groundhogg.buildWithAI = {
     Card,
     open,
+    // for editors that draw a card of their own, like the flow editor's add step panel
+    icon: sparkles,
+    type,
   }
 
   const grid = document.querySelector( '[data-build-with-ai]' )

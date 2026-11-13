@@ -377,7 +377,7 @@
     Pg({ className: 'description' }, __('Works with any assistant that supports MCP, like ChatGPT, Claude, Cursor or Gemini. It needs connecting to your site first, which takes a few minutes.', 'groundhogg')),
     Actions({
       primary: {
-        label  : __('Set up step by step', 'groundhogg'),
+        label  : __('Continue with manual setup →', 'groundhogg'),
         onClick: next,
       },
     }),

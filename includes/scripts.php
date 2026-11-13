@@ -447,6 +447,7 @@ class Scripts {
 
 		wp_register_script( 'groundhogg-admin-build-with-ai', GROUNDHOGG_ASSETS_URL . 'js/admin/build-with-ai' . $dot_min . '.js', [
 			'groundhogg-admin',
+			'groundhogg-admin-element', // the spinner
 			'groundhogg-make-el',
 			'wp-i18n',
 		], GROUNDHOGG_VERSION, true );

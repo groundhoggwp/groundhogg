@@ -2161,12 +2161,12 @@ body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel.build-with-ai-card {
     padding: 20px 10px 10px;
     text-align: center;
 
-    h2 {
+    > h2 {
       margin: 0;
       font-size: 20px;
     }
 
-    p {
+    > p {
       margin: 0;
       max-width: 440px;
     }
@@ -2176,15 +2176,55 @@ body.groundhogg-admin-page[class*="gh-theme-"] .gh-panel.build-with-ai-card {
       padding: 4px 20px;
     }
 
+    /* the AI agent tab's steps, see loadWizard() in build-with-ai.js */
+    .build-with-ai-wizard {
+      align-self: stretch;
+      text-align: left;
+
+      // loadingModal()'s spinner while the steps load, a little smaller
+      > .gh-spinner-wrap {
+        padding: 10px;
+
+        object.gh-spinner {
+          width: 80px;
+          height: 80px;
+        }
+      }
+
+      .gh-mcp {
+        max-width: none;
+        padding: 0;
+
+        /* the popup has its own heading and introduction */
+        > h2,
+        > h2 + p {
+          display: none;
+        }
+      }
+
+      .gh-mcp-steps {
+        margin-top: 4px;
+      }
+    }
+
     .build-with-ai-waiting {
       display: flex;
       align-items: center;
       gap: 8px;
       opacity: 0.75;
 
-      .spinner {
-        float: none;
-        margin: 0;
+      &[hidden] {
+        display: none;
+      }
+
+      // the same spinner, the size of the text beside it
+      .gh-spinner-wrap {
+        padding: 0;
+
+        object.gh-spinner {
+          width: 22px;
+          height: 22px;
+        }
       }
     }
 

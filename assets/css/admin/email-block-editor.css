@@ -140,6 +140,39 @@
 #email-block-editor #add-queryloop .block-name {
   font-size: 11px;
 }
+#email-block-editor .build-with-ai-block {
+  cursor: pointer;
+}
+#email-block-editor .build-with-ai-block .ai-block {
+  height: 60px;
+  width: 60px;
+  padding: 10px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  border-radius: var(--gh-border-radius);
+  background: #FFFFFF;
+  border: 1px dashed var(--gh-primary);
+  color: var(--gh-primary);
+}
+#email-block-editor .build-with-ai-block .ai-block .icon {
+  display: flex;
+  height: 100%;
+}
+#email-block-editor .build-with-ai-block .ai-block .icon svg {
+  width: 100%;
+  height: 100%;
+}
+#email-block-editor .build-with-ai-block:hover .ai-block, #email-block-editor .build-with-ai-block:focus-visible .ai-block {
+  border-style: solid;
+  transition: 0.4s;
+  transform: scale(1.05);
+}
+#email-block-editor .build-with-ai-block:focus-visible {
+  outline: none;
+}
+#email-block-editor .build-with-ai-block .block-name {
+  font-size: 11px;
+}
 #email-block-editor .block-wrap#add-global .block-name {
   font-size: 11px;
 }

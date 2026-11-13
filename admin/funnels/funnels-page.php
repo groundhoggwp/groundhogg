@@ -276,6 +276,12 @@ class Funnels_Page extends Admin_Page {
 				wp_enqueue_script( 'groundhogg-admin-funnel-steps' );
 				wp_enqueue_style( 'groundhogg-admin-reporting' );
 
+				// "Edit with AI", first in the add step panel, see StepPicker() in funnel-editor.js
+				Build_With_AI::enqueue( 'edit-flow', [
+					'id'    => $funnel->get_id(),
+					'title' => $funnel->get_title(),
+				] );
+
 				add_filter( 'admin_body_class', function ( $class ) {
 
 					$is_full_screen = get_user_meta( get_current_user_id(), 'gh_funnel_editor_full_screen', true );

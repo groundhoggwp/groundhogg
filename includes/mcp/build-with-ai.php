@@ -7,8 +7,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * "Build with AI" on the add screens of emails and flows, and "Set up with AI" in the guided setup: a card that opens a
- * popup, where someone describes what they want and copies a prompt for their AI assistant.
+ * "Build with AI" on the add screens of emails and flows, "Set up with AI" in the guided setup, and "Edit with AI" in the
+ * flow and email editors: a card that opens a popup, where someone describes what they want and copies a prompt for
+ * their AI assistant. If they haven't connected one yet, the popup walks them through it first.
  *
  * The prompt is short on purpose. It says which abilities to call in which order and sets a few ground rules, and
  * sends the assistant to groundhogg/get-authoring-guide for the detail, so that detail stays in one place, current
@@ -20,26 +21,34 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Build_With_AI {
 
-	const TYPES = [ 'email', 'flow', 'setup' ];
+	/**
+	 * email, flow and setup build something new. edit-email and edit-flow change the one open in the editor.
+	 */
+	const TYPES = [ 'email', 'flow', 'setup', 'edit-email', 'edit-flow' ];
 
 	/**
-	 * Whether there's anything for an assistant to connect to: without the Abilities API (WordPress 6.9+) the prompt
-	 * would point at tools that don't exist.
+	 * Whether to offer AI to the person viewing the page at all. It's decided for each person, not for the site:
+	 *
+	 *  - the site needs the Abilities API (WordPress 6.9+), or the prompt points at tools that don't exist
+	 *  - they need to be able to connect an assistant of their own, see Connection::can_connect()
+	 *  - and an MCP server has to be answering already, unless they can get the adapter running themselves. Someone
+	 *    who can't install or activate plugins would get stuck at the first step.
 	 *
 	 * @return bool
 	 */
 	public static function is_available(): bool {
-		return Connection::is_supported();
+		return Connection::can_connect() && ( Connection::can_install() || Connection::is_serving() );
 	}
 
 	/**
 	 * The prompt for the assistant. The person's own description of what they want replaces {{goal}}.
 	 *
-	 * @param string $type email, flow or setup
+	 * @param string $type    one of TYPES
+	 * @param array  $subject for edit-email and edit-flow, what's being edited: id and title
 	 *
 	 * @return string
 	 */
-	public static function prompt( string $type ): string {
+	public static function prompt( string $type, array $subject = [] ): string {
 
 		$site = sprintf(
 		/* translators: 1: the site's name, 2: the site's address */
@@ -50,7 +59,52 @@ class Build_With_AI {
 
 		$email = wp_get_current_user()->user_email;
 
-		if ( $type === 'setup' ) {
+		$id    = absint( $subject['id'] ?? 0 );
+		$title = wp_specialchars_decode( (string) ( $subject['title'] ?? '' ), ENT_QUOTES );
+
+		if ( $type === 'edit-flow' ) {
+			$lines = [
+				/* translators: 1: the flow's title, 2: the flow's id, 3: the site's name and address */
+				sprintf( __( 'Change the automation flow "%1$s" (ID %2$d) on my website %3$s, using the tools from the MCP connection to that site.', 'groundhogg' ), $title, $id, $site ),
+				'',
+				__( 'What I want changed:', 'groundhogg' ),
+				'{{goal}}',
+				'',
+				__( 'How to do it:', 'groundhogg' ),
+				__( '1. Call the get-authoring-guide ability with topic "flow" and follow it. It explains how flows run and how to design one where every step can be reached.', 'groundhogg' ),
+				/* translators: %d: the flow's id */
+				sprintf( __( '2. Read the flow with get-flow (ID %d) so you know what\'s there before you change anything.', 'groundhogg' ), $id ),
+				__( '3. If you need new steps, call list-step-types with buildable_only true and read the settings_schema of each one you use. Use list-tags, list-custom-fields and list-email-templates to find what already exists.', 'groundhogg' ),
+				__( '4. Make the changes with edit-flow. Try them with dry_run true first, then save. Then tell me in a few lines what changed.', 'groundhogg' ),
+				'',
+				__( 'Rules:', 'groundhogg' ),
+				__( '- If you need something I haven\'t told you, ask me before you change anything.', 'groundhogg' ),
+				__( '- Only change what I asked for. Don\'t delete or rewrite other steps.', 'groundhogg' ),
+				__( '- If the flow is active, your changes are staged. Don\'t publish them, activate or deactivate the flow, or add contacts to it. I\'ll review the changes in the flow editor first.', 'groundhogg' ),
+			];
+		} else if ( $type === 'edit-email' ) {
+			$lines = [
+				/* translators: 1: the email's title, 2: the email's id, 3: the site's name and address */
+				sprintf( __( 'Change the email "%1$s" (ID %2$d) on my website %3$s, using the tools from the MCP connection to that site.', 'groundhogg' ), $title, $id, $site ),
+				'',
+				__( 'What I want changed:', 'groundhogg' ),
+				'{{goal}}',
+				'',
+				__( 'How to do it:', 'groundhogg' ),
+				__( '1. Call the get-authoring-guide ability with topic "email" and follow it. It explains the block format the email editor uses, so I can keep editing the email afterwards.', 'groundhogg' ),
+				/* translators: %d: the email's id */
+				sprintf( __( '2. Read the email with get-email-template (ID %d). Its outline lists the blocks, read only the ones you need to change.', 'groundhogg' ), $id ),
+				__( '3. Make the changes with edit-email, a block or a piece of text at a time, rather than rewriting the whole email. Use update-email-template only for the subject, preview text or other settings.', 'groundhogg' ),
+				/* translators: %s: the email address of the person copying the prompt */
+				sprintf( __( '4. Send a test to me at %s with send-test-email, then tell me in a few lines what changed.', 'groundhogg' ), $email ),
+				'',
+				__( 'Rules:', 'groundhogg' ),
+				__( '- If you need something I haven\'t told you, ask me before you change anything.', 'groundhogg' ),
+				__( '- Only change what I asked for, and keep the rest of the email as it is.', 'groundhogg' ),
+				__( '- Don\'t make up facts, prices, dates or links. Leave a clear placeholder and tell me where it is.', 'groundhogg' ),
+				__( '- Don\'t send it to any contacts or change its status. I\'ll review it in the editor first.', 'groundhogg' ),
+			];
+		} else if ( $type === 'setup' ) {
 			$lines = [
 				/* translators: %s: the site's name and address */
 				sprintf( __( 'Set up the CRM on my website %s, using the tools from the MCP connection to that site.', 'groundhogg' ), $site ),
@@ -113,22 +167,77 @@ class Build_With_AI {
 		/**
 		 * Filter the prompt the "Build with AI" popup gives someone to copy into their AI assistant.
 		 *
-		 * @param string $prompt the prompt, {{goal}} is replaced with what the person describes
-		 * @param string $type   email, flow or setup
+		 * @param string $prompt  the prompt, {{goal}} is replaced with what the person describes
+		 * @param string $type    one of Build_With_AI::TYPES
+		 * @param array  $subject for edit-email and edit-flow, what's being edited: id and title
 		 */
-		return apply_filters( 'groundhogg/build_with_ai/prompt', implode( "\n", $lines ), $type );
+		return apply_filters( 'groundhogg/build_with_ai/prompt', implode( "\n", $lines ), $type, $subject );
 	}
 
 	/**
 	 * Examples someone can start from instead of a blank box. Each fills in the description, which they can then change.
 	 *
-	 * @param string $type email, flow or setup
+	 * @param string $type one of TYPES
 	 *
 	 * @return array[] [ 'label' => string, 'text' => string ]
 	 */
 	public static function examples( string $type ): array {
 
-		if ( $type === 'setup' ) {
+		if ( $type === 'edit-flow' ) {
+			$examples = [
+				[
+					'label' => __( 'Add a reminder', 'groundhogg' ),
+					'text'  => __( 'Before the last email, wait two days and send a short reminder to anyone who hasn\'t clicked yet.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Follow up', 'groundhogg' ),
+					'text'  => __( 'At the end of the flow, wait a week and send a follow-up email asking how it went, with a button to reply.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Tag who clicks', 'groundhogg' ),
+					'text'  => __( 'Tag contacts as "engaged" when they click a link in any email in this flow.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Split by a tag', 'groundhogg' ),
+					'text'  => __( 'After the first email, send customers down one path and everyone else down another, based on their tags.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Change the timing', 'groundhogg' ),
+					'text'  => __( 'Space the emails out so there are three days between each one, and only send during business hours.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Notify me', 'groundhogg' ),
+					'text'  => __( 'Send me a notification email when a contact reaches the end of the flow.', 'groundhogg' ),
+				],
+			];
+		} else if ( $type === 'edit-email' ) {
+			$examples = [
+				[
+					'label' => __( 'Make it shorter', 'groundhogg' ),
+					'text'  => __( 'Make this email about half as long. Keep the main point and the button.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Better subject line', 'groundhogg' ),
+					'text'  => __( 'Write a clearer, more inviting subject line and preview text.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Friendlier tone', 'groundhogg' ),
+					'text'  => __( 'Rewrite the text so it sounds warmer and more personal, like a note from me.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Add a button', 'groundhogg' ),
+					'text'  => __( 'Add a button after the main paragraph that links to our website.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Add an image', 'groundhogg' ),
+					'text'  => __( 'Add an image near the top that fits the topic of the email.', 'groundhogg' ),
+				],
+				[
+					'label' => __( 'Fix the writing', 'groundhogg' ),
+					'text'  => __( 'Fix any spelling, grammar and punctuation mistakes without changing what it says.', 'groundhogg' ),
+				],
+			];
+		} else if ( $type === 'setup' ) {
 			$examples = [
 				[
 					'label' => __( 'Online store', 'groundhogg' ),
@@ -221,15 +330,23 @@ class Build_With_AI {
 	}
 
 	/**
-	 * Load the popup on an add screen.
+	 * Load the popup on an add screen, in the guided setup, or in an editor.
 	 *
-	 * @param string $type email, flow or setup
+	 * In an editor it's a nudge for people who haven't tried AI yet, so it's left out for anyone whose assistant has
+	 * used the site lately: they know where to find it.
+	 *
+	 * @param string $type    one of TYPES
+	 * @param array  $subject for edit-email and edit-flow, what's being edited: id and title
 	 *
 	 * @return void
 	 */
-	public static function enqueue( string $type ) {
+	public static function enqueue( string $type, array $subject = [] ) {
 
-		if ( ! self::is_available() || ! in_array( $type, self::TYPES, true ) ) {
+		if ( ! in_array( $type, self::TYPES, true ) || ! self::is_available() ) {
+			return;
+		}
+
+		if ( strpos( $type, 'edit-' ) === 0 && Connection::is_in_use() ) {
 			return;
 		}
 
@@ -237,7 +354,7 @@ class Build_With_AI {
 
 		wp_add_inline_script( 'groundhogg-admin-build-with-ai', 'var GroundhoggBuildWithAI = ' . wp_json_encode( [
 				'type'      => $type,
-				'prompt'    => self::prompt( $type ),
+				'prompt'    => self::prompt( $type, $subject ),
 				'examples'  => array_values( self::examples( $type ) ),
 				'connected' => Connection::is_connected(),
 				'setupUrl'  => Connection::page_url(),

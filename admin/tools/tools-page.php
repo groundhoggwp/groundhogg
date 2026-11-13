@@ -168,6 +168,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 		add_action( 'wp_ajax_gh_check_cron', [ $this, 'ajax_check_cron' ] );
 		add_action( 'wp_ajax_gh_disable_internal_cron', [ $this, 'ajax_disable_internal_wp_cron' ] );
 		add_action( 'wp_ajax_gh_mcp_step', [ $this, 'ajax_mcp_step' ] );
+		add_action( 'wp_ajax_gh_mcp_view', [ $this, 'ajax_mcp_view' ] );
 	}
 
 	public function ajax_check_cron() {
@@ -301,11 +302,12 @@ class Tools_Page extends Tabbed_Admin_Page {
 				'slug' => Promo::TAB,
 				'cap'  => Promo::is_available_to() ? 'view_contacts' : 'do_not_allow'
 			],
-			// needs the Abilities API, which arrived with WordPress 6.9
+			// needs the Abilities API, which arrived with WordPress 6.9. Anyone who works with contacts can connect an
+			// assistant of their own, the steps that change the site check for more, see Connection::can_connect()
 			[
 				'name' => esc_html__( 'AI agent', 'groundhogg' ),
 				'slug' => Connection::TAB,
-				'cap'  => Connection::is_supported() ? 'manage_options' : 'do_not_allow'
+				'cap'  => Connection::is_supported() ? 'view_contacts' : 'do_not_allow'
 			],
 		];
 
@@ -1279,6 +1281,26 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
+	 * The AI agent tab on its own, so the "Build with AI" popup can walk someone through connecting an assistant
+	 * without sending them off to another page. See assets/js/admin/build-with-ai.js.
+	 */
+	public function ajax_mcp_view() {
+
+		if ( ! verify_admin_ajax_nonce() ) {
+			wp_send_json_error( [ 'message' => __( 'This page has expired, please reload it and try again.', 'groundhogg' ) ] );
+		}
+
+		if ( ! Connection::can_connect() ) {
+			wp_send_json_error( [ 'message' => __( 'You are not allowed to do that.', 'groundhogg' ) ] );
+		}
+
+		ob_start();
+		$this->mcp_view();
+
+		wp_send_json_success( [ 'html' => ob_get_clean() ] );
+	}
+
+	/**
 	 * The password an AI agent signs in with, kept in memory so the page can show it once
 	 *
 	 * @var array|null
@@ -1301,8 +1323,13 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	protected function do_mcp_step( string $step, string $name = '' ) {
 
-		if ( ! current_user_can( 'manage_options' ) || ! Connection::is_supported() || ! in_array( $step, self::MCP_STEPS, true ) ) {
+		if ( ! Connection::can_connect() || ! in_array( $step, self::MCP_STEPS, true ) ) {
 			return new WP_Error( 'error', __( 'You are not allowed to do that.', 'groundhogg' ) );
+		}
+
+		// the plugin steps change the whole site, so they're for people who can manage its plugins
+		if ( $step !== 'create_agent_password' && ! Connection::can_install( $step === 'install_mcp_adapter' ? Connection::PLUGIN_SLUG : Connection::CONNECTOR_PLUGIN_SLUG ) ) {
+			return new WP_Error( 'error', __( 'You are not allowed to install or activate plugins on this site. Ask an administrator who can.', 'groundhogg' ) );
 		}
 
 		switch ( $step ) {
@@ -1380,7 +1407,7 @@ class Tools_Page extends Tabbed_Admin_Page {
 	 */
 	protected function process_mcp_step( string $step ) {
 
-		if ( ! current_user_can( 'manage_options' ) || ! Connection::is_supported() ) {
+		if ( ! Connection::can_connect() ) {
 			$this->wp_die_no_access();
 		}
 

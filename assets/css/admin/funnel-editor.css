@@ -345,6 +345,14 @@ body.gh-screenshot-mode #funnel-form #step-flow button.add-step {
   --color-25: rgba(158, 206, 56, 0.25);
   --color-5: rgba(158, 206, 56, 0.05);
 }
+#step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid .sub-group.build-with-ai-group {
+  --color: var(--gh-primary);
+  --color-25: color-mix(in srgb, var(--gh-primary) 25%, transparent);
+  --color-5: color-mix(in srgb, var(--gh-primary) 5%, transparent);
+}
+#step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid .sub-group.build-with-ai-group .step-icon {
+  color: var(--color);
+}
 #step-settings-container #step-settings-inner #add-steps .steps-select .steps-grid .sub-group svg {
   fill: var(--color);
   width: 100%;

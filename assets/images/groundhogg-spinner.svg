@@ -8,7 +8,7 @@
       stroke-dasharray: 118 410; animation: chase 2.6s linear infinite;
     }
     .hex-a { stroke: #ff7b01; }
-    .hex-b { stroke: #5483cc; animation-delay: -1.3s; }
+    .hex-b { stroke: #ff7b01; animation-delay: -1.3s; }
     @keyframes chase { to { stroke-dashoffset: -528; } }
 
     .hog { animation: pop 2.6s infinite; }

@@ -109,6 +109,13 @@ class Emails_Page extends Admin_Page {
 
 				// before the editor, which draws the card among the templates
 				Build_With_AI::enqueue( 'email' );
+			} else {
+
+				// "Edit with AI", first in the blocks panel, see Blocks() in email-block-editor.js
+				Build_With_AI::enqueue( 'edit-email', [
+					'id'    => $email->get_id(),
+					'title' => $email->get_title(),
+				] );
 			}
 
 			Groundhogg\enqueue_email_block_editor_assets( [

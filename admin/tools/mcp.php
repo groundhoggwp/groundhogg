@@ -34,7 +34,16 @@ $can_use_pw = Connection::can_use_application_passwords( $user );
 $connector_slug      = Connection::CONNECTOR_PLUGIN_SLUG;
 $connector_installed = Connection::is_installed( $connector_slug );
 $connector_active    = Connection::is_active( $connector_slug );
-$can_install_connector = Connection::can_use_connector_plugin() && ( $connector_installed || current_user_can( 'install_plugins' ) );
+
+// the plugin steps change the whole site, so they're only offered to people who can manage its plugins. Anyone who
+// works with contacts can make a password for an assistant of their own, see Connection::can_connect()
+$can_install_adapter = Connection::can_install();
+
+// the sign-in box only shows when there's something this person can do with it: turn sign-in on in the plugin's
+// settings, or get the plugin running
+$show_connector = Connection::can_use_connector_plugin() && ( $connector_active
+		? current_user_can( 'manage_options' )
+		: Connection::can_install( $connector_slug ) );
 
 // where they are: the first step that is not done
 $current = ! $served ? 1 : ( ( $agent || ! empty( $passwords ) ) ? 3 : 2 );
@@ -199,7 +208,7 @@ $marker = function ( int $step ) use ( $step_state ): string {
                     <h3><?php esc_html_e( 'Get your site ready', 'groundhogg' ); ?></h3>
                     <div class="gh-mcp-body">
                         <p><?php esc_html_e( 'Assistants talk to your site through the official MCP Adapter plugin from WordPress.org. We can install it for you.', 'groundhogg' ); ?></p>
-						<?php if ( current_user_can( 'install_plugins' ) ): ?>
+						<?php if ( $can_install_adapter ): ?>
                             <form method="post" action="<?php echo esc_url( Connection::page_url() ); ?>">
 								<?php action_input( 'install_mcp_adapter', true, true ); ?>
                                 <button type="submit" class="gh-button primary">
@@ -210,7 +219,7 @@ $marker = function ( int $step ) use ( $step_state ): string {
                             </form>
 						<?php else: ?>
                             <div class="notice notice-warning inline">
-                                <p><?php esc_html_e( 'You are not allowed to install plugins on this site. Ask an administrator who can, or install the MCP Adapter plugin yourself.', 'groundhogg' ); ?></p>
+                                <p><?php esc_html_e( 'An administrator needs to install and activate the MCP Adapter plugin on this site first. Ask one who can, then come back here to connect your assistant.', 'groundhogg' ); ?></p>
                             </div>
 						<?php endif; ?>
                     </div>
@@ -268,13 +277,13 @@ $marker = function ( int $step ) use ( $step_state ): string {
                             </form>
 						<?php endif; ?>
 
-						<?php if ( $can_install_connector || $connector_installed ): ?>
+						<?php if ( $show_connector ): ?>
                             <div class="gh-mcp-shortcut">
                                 <strong><?php esc_html_e( 'Using the ChatGPT or Claude app? There is an easier way.', 'groundhogg' ); ?></strong>
                                 <p><?php esc_html_e( 'The free Enable Abilities for MCP plugin lets those apps sign in with a login and approval screen, so there is no password to copy. It also adds abilities for the rest of WordPress.', 'groundhogg' ); ?></p>
 								<?php if ( $connector_active ): ?>
                                     <p><a class="gh-button primary" href="<?php echo esc_url( Connection::connector_settings_url() ); ?>"><?php esc_html_e( 'Open its settings to turn on sign-in', 'groundhogg' ); ?></a></p>
-								<?php elseif ( current_user_can( 'install_plugins' ) ): ?>
+								<?php else: ?>
                                     <form method="post" action="<?php echo esc_url( Connection::page_url() ); ?>">
 										<?php action_input( 'install_mcp_connector', true, true ); ?>
                                         <button type="submit" class="gh-button primary">

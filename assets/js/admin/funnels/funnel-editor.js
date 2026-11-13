@@ -217,6 +217,34 @@
       ])
     }))
 
+    // "Edit with AI", for people who haven't connected an assistant lately, see Build_With_AI::enqueue(). It looks like a
+    // step but isn't one, so it isn't draggable and opens the popup instead of adding a step.
+    if (Groundhogg.buildWithAI) {
+      grid.unshift(Div({ className: 'sub-group build-with-ai-group' }, [
+        Span({ className: 'sub-group-label' }, __('AI', 'groundhogg')),
+        Div({
+          className   : 'select-step visible build-with-ai-step',
+          dataGroup   : 'any',
+          dataKeywords: [__('Edit with AI', 'groundhogg'), 'ai', 'assistant', 'agent', 'chatgpt', 'claude', 'gemini', 'cursor'].join(','),
+          role        : 'button',
+          tabindex    : 0,
+          onClick     : () => Groundhogg.buildWithAI.open(),
+          onKeydown   : e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              Groundhogg.buildWithAI.open()
+            }
+          },
+        }, [
+          Div({ className: 'gh-tooltip top' }, __('Describe the change you want and your AI assistant makes it to this flow.', 'groundhogg')),
+          Div({ className: 'step-element' }, [
+            Div({ className: 'step-icon' }, Groundhogg.buildWithAI.icon),
+            Pg({}, __('Edit with AI', 'groundhogg')),
+          ]),
+        ]),
+      ]))
+    }
+
     return Div({ className: 'steps-select' }, [
       Div({ className: 'display-flex gap-10 stretch space-below-10' }, [
         Div({
@@ -1852,7 +1880,8 @@
 
         document.querySelectorAll('#add-steps .select-step').forEach(el => {
 
-          const inGroup = group === 'all' || el.dataset.group === group
+          // "any" is in every group, like the "Edit with AI" card
+          const inGroup = group === 'all' || el.dataset.group === group || el.dataset.group === 'any'
           const matches = !search || el.dataset.keywords.toLowerCase().includes(search)
 
           el.classList.toggle('visible', inGroup && matches)

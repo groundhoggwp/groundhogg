@@ -511,6 +511,17 @@ body.gh-screenshot-mode {
             --color-5: #{$action-green-5};
           }
 
+          // "Edit with AI", see StepPicker() in funnel-editor.js
+          &.build-with-ai-group {
+            --color: var(--gh-primary);
+            --color-25: color-mix(in srgb, var(--gh-primary) 25%, transparent);
+            --color-5: color-mix(in srgb, var(--gh-primary) 5%, transparent);
+
+            .step-icon {
+              color: var(--color);
+            }
+          }
+
           svg {
             fill: var(--color);
             width: 100%;

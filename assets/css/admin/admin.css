@@ -1781,12 +1781,13 @@ body.groundhogg-admin-page[class*=gh-theme-] .gh-panel.build-with-ai-card .build
   gap: 12px;
   padding: 20px 10px 10px;
   text-align: center;
+  /* the AI agent tab's steps, see loadWizard() in build-with-ai.js */
 }
-.build-with-ai-modal .build-with-ai-connect h2 {
+.build-with-ai-modal .build-with-ai-connect > h2 {
   margin: 0;
   font-size: 20px;
 }
-.build-with-ai-modal .build-with-ai-connect p {
+.build-with-ai-modal .build-with-ai-connect > p {
   margin: 0;
   max-width: 440px;
 }
@@ -1794,15 +1795,44 @@ body.groundhogg-admin-page[class*=gh-theme-] .gh-panel.build-with-ai-card .build
   font-size: 16px;
   padding: 4px 20px;
 }
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-wizard {
+  align-self: stretch;
+  text-align: left;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-wizard > .gh-spinner-wrap {
+  padding: 10px;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-wizard > .gh-spinner-wrap object.gh-spinner {
+  width: 80px;
+  height: 80px;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-wizard .gh-mcp {
+  max-width: none;
+  padding: 0;
+  /* the popup has its own heading and introduction */
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-wizard .gh-mcp > h2,
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-wizard .gh-mcp > h2 + p {
+  display: none;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-wizard .gh-mcp-steps {
+  margin-top: 4px;
+}
 .build-with-ai-modal .build-with-ai-connect .build-with-ai-waiting {
   display: flex;
   align-items: center;
   gap: 8px;
   opacity: 0.75;
 }
-.build-with-ai-modal .build-with-ai-connect .build-with-ai-waiting .spinner {
-  float: none;
-  margin: 0;
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-waiting[hidden] {
+  display: none;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-waiting .gh-spinner-wrap {
+  padding: 0;
+}
+.build-with-ai-modal .build-with-ai-connect .build-with-ai-waiting .gh-spinner-wrap object.gh-spinner {
+  width: 22px;
+  height: 22px;
 }
 .build-with-ai-modal .build-with-ai-connect .build-with-ai-next {
   margin-top: 8px;
