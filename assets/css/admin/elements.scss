@@ -4894,6 +4894,87 @@ div:has( > button.hide-panel) {
       }
     }
   }
+
+  // a link to the card doesn't put its title under the sticky header, WP already pads the scroll by the admin bar
+  .gh-settings-section {
+    scroll-margin-top: 80px;
+  }
+}
+
+//
+// A tab with many cards of settings has a table of contents next to them, that stays in view as the page scrolls and
+// highlights the card being looked at, see Settings_Page::sections_toc()
+//
+
+.gh-settings-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  container-type: inline-size;
+
+  > .gh-settings-sections {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.gh-settings-toc {
+  position: sticky;
+
+  // below the admin bar and the sticky header
+  top: 112px;
+  flex: 0 0 200px;
+  margin: 16px 0 24px;
+
+  // a long list scrolls on its own
+  max-height: calc(100vh - 136px);
+  overflow-y: auto;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 2px solid var(--gh-dark-10);
+  }
+
+  li {
+    margin: 0;
+  }
+
+  a {
+    display: block;
+    margin-left: -2px;
+    padding: 6px 12px;
+    border-left: 2px solid transparent;
+    color: var(--gh-dark);
+    font-size: 13px;
+    line-height: 1.4;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--gh-primary);
+    }
+
+    &.danger {
+      color: var(--gh-error-red);
+    }
+
+    &.active {
+      border-left-color: var(--gh-primary);
+      color: var(--gh-primary);
+      font-weight: 600;
+
+      &.danger {
+        border-left-color: var(--gh-error-red);
+        color: var(--gh-error-red);
+      }
+    }
+  }
+
+  // not enough room next to the cards, they keep the whole width
+  @container (max-width: 900px) {
+    display: none;
+  }
 }
 
 // The add/edit field modal sizes itself to its content (fit-content), so a long help text would stretch it.

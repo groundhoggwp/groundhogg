@@ -2549,10 +2549,13 @@ class Settings_Page extends Admin_Page {
 			$registered = get_array_var( $this->sections, substr( $section['id'], 3 ), [] );
 			$is_danger  = (bool) get_array_var( $registered, 'danger' );
 
+			// so the table of contents can link to the card
+			$card_id = 'section-' . sanitize_html_class( substr( $section['id'], 3 ) );
+
 			ob_start();
 
 			// a badge is HTML next to the title, like a pill
-			Card_Sections::section_start( $section['title'], '', get_array_var( $registered, 'badge', '' ), $is_danger ? 'danger' : '' );
+			Card_Sections::section_start( $section['title'], '', get_array_var( $registered, 'badge', '' ), $is_danger ? 'danger' : '', $card_id );
 
 			if ( $intro !== '' ) {
 				Card_Sections::intro( $intro );
@@ -2563,20 +2566,152 @@ class Settings_Page extends Admin_Page {
 
 			Card_Sections::section_end();
 
+			$card = [
+				'id'     => $card_id,
+				'title'  => $section['title'],
+				'danger' => $is_danger,
+				'html'   => ob_get_clean(),
+			];
+
 			if ( $is_danger ) {
-				$danger[] = ob_get_clean();
+				$danger[] = $card;
 			} else {
-				$cards[] = ob_get_clean();
+				$cards[] = $card;
 			}
 		}
 
-		if ( ! $cards && ! $danger ) {
+		$cards = array_merge( $cards, $danger );
+
+		if ( ! $cards ) {
 			return;
 		}
 
+		// a single card has nothing to jump between, more get a table of contents next to the cards
+		$has_toc = count( $cards ) > 1;
+
+		if ( $has_toc ) {
+			echo '<div class="gh-settings-layout">';
+		}
+
 		echo '<div class="gh-settings-sections">';
-		echo implode( '', array_merge( $cards, $danger ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the cards printed above
+		echo implode( '', wp_list_pluck( $cards, 'html' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the cards printed above
 		echo '</div>';
+
+		if ( $has_toc ) {
+			$this->sections_toc( $cards );
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * A sticky list of the cards of a tab that jumps to the card that is clicked, and highlights the card being looked at
+	 *
+	 * @param array $cards the id, title, and whether it's a danger card, of each card in the order they are printed
+	 */
+	private function sections_toc( $cards ) {
+		?>
+        <nav class="gh-settings-toc" aria-label="<?php esc_attr_e( 'Settings sections', 'groundhogg' ); ?>">
+            <ul>
+				<?php foreach ( $cards as $card ): ?>
+                    <li><a href="#<?php echo esc_attr( $card['id'] ); ?>" class="<?php echo $card['danger'] ? 'danger' : ''; ?>"><?php echo esc_html( $card['title'] ); ?></a></li>
+				<?php endforeach; ?>
+            </ul>
+        </nav>
+        <script>
+          ( () => {
+            const toc = document.currentScript.previousElementSibling
+            const links = [...toc.querySelectorAll('a')]
+            const cards = links.map(link => document.getElementById(link.hash.slice(1)))
+
+            // while the page scrolls to a clicked card, that card stays highlighted, even if it can't reach the top
+            let clicked = null
+            let ticking = false
+
+            const highlight = index => {
+
+              links.forEach((link, i) => {
+                link.classList.toggle('active', i === index)
+
+                if (i === index) {
+                  link.setAttribute('aria-current', 'true')
+                } else {
+                  link.removeAttribute('aria-current')
+                }
+              })
+
+              // a long list scrolls on its own, keep the highlighted link in it
+              const link = links[index]
+
+              if (toc.scrollHeight > toc.clientHeight) {
+                if (link.offsetTop < toc.scrollTop) {
+                  toc.scrollTop = link.offsetTop
+                } else if (link.offsetTop + link.offsetHeight > toc.scrollTop + toc.clientHeight) {
+                  toc.scrollTop = link.offsetTop + link.offsetHeight - toc.clientHeight
+                }
+              }
+            }
+
+            const update = () => {
+              ticking = false
+
+              if (clicked !== null) {
+                return
+              }
+
+              // the card being looked at is the last one whose top has gone up to where the list sticks, below the header
+              const line = parseFloat(getComputedStyle(toc).top) + 30
+              let index = 0
+
+              cards.forEach((card, i) => {
+                if (card.getBoundingClientRect().top <= line) {
+                  index = i
+                }
+              })
+
+              // the last cards may be too short to reach the line, at the bottom of the page the last one is it
+              if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+                index = cards.length - 1
+              }
+
+              highlight(index)
+            }
+
+            const onScroll = () => {
+              if (!ticking) {
+                ticking = true
+                requestAnimationFrame(update)
+              }
+            }
+
+            // the page arriving at the card, or the user scrolling again, ends the highlight of the clicked card
+            const release = () => {
+              clicked = null
+            }
+
+            links.forEach((link, i) => {
+              link.addEventListener('click', e => {
+                e.preventDefault()
+
+                clicked = i
+                highlight(i)
+
+                const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                cards[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+                history.replaceState(null, '', link.hash)
+              })
+            })
+
+            window.addEventListener('scroll', onScroll, { passive: true })
+            window.addEventListener('resize', onScroll)
+            window.addEventListener('scrollend', release)
+            window.addEventListener('wheel', release, { passive: true })
+            window.addEventListener('touchstart', release, { passive: true })
+            window.addEventListener('keydown', release)
+
+            update()
+          } )()
+        </script>
+		<?php
 	}
 
 	public function settings_callback( $field ) {
