@@ -391,9 +391,12 @@ class Connection {
 	}
 
 	/**
-	 * Whether this person has got as far as connecting an agent: the site answers to MCP clients, and an agent has
-	 * signed in as them or they have a password for one to sign in with. The password covers agents connected before
-	 * we started noting when one signs in.
+	 * Whether this person has connected an agent: one has signed in as them, and the site still answers to MCP
+	 * clients.
+	 *
+	 * Having a password isn't enough. The connect steps make one before the person has added it to their assistant,
+	 * and counting it would move them on before they've copied it, the only time it's shown. Anyone whose assistant
+	 * connected before we started noting sign-ins counts again the next time it uses the site.
 	 *
 	 * @param int $user_id defaults to the current user
 	 *
@@ -401,7 +404,7 @@ class Connection {
 	 */
 	public static function is_connected( int $user_id = 0 ): bool {
 
-		if ( self::last_seen( $user_id ) === 0 && empty( self::application_passwords( $user_id ) ) ) {
+		if ( self::last_seen( $user_id ) === 0 ) {
 			return false;
 		}
 
@@ -434,27 +437,28 @@ class Connection {
 	 */
 	public static function is_serving(): bool {
 
-		static $serving = null;
-
-		if ( $serving !== null ) {
-			return $serving;
-		}
-
-		$serving = false;
-
 		if ( ! is_user_logged_in() ) {
-			return $serving;
+			return false;
 		}
 
 		$default = '/mcp/mcp-adapter-default-server';
-		$routes  = array_filter( array_keys( rest_get_server()->get_routes() ), function ( $route ) use ( $default ) {
+		$routes  = array_values( array_filter( array_keys( rest_get_server()->get_routes() ), function ( $route ) use ( $default ) {
 			// skip routes with parameters, a server's endpoint has none
 			return strpos( $route, '/mcp/' ) === 0 && strpos( $route, '(' ) === false && $route !== $default;
-		} );
+		} ) );
 
 		if ( self::is_served() ) {
 			array_unshift( $routes, $default );
 		}
+
+		// asked once per request, unless the person or the servers change, like a plugin being activated
+		$key = get_current_user_id() . ':' . implode( ',', $routes );
+
+		if ( isset( self::$serving[ $key ] ) ) {
+			return self::$serving[ $key ];
+		}
+
+		$serving = false;
 
 		foreach ( $routes as $route ) {
 			if ( self::lists_tools( $route ) ) {
@@ -463,8 +467,17 @@ class Connection {
 			}
 		}
 
+		self::$serving[ $key ] = $serving;
+
 		return $serving;
 	}
+
+	/**
+	 * What is_serving() found, by person and servers, see there.
+	 *
+	 * @var bool[]
+	 */
+	protected static $serving = [];
 
 	/**
 	 * Ask one MCP server for its tools, as an agent would.

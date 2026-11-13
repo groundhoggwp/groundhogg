@@ -77,12 +77,39 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$wp_rest_server = null;
 	}
 
-	protected function serve_the_default_server() {
-		$this->route_callback = function () {
+	/**
+	 * Answer on the adapter's default address the way an MCP server does: a session from initialize, and the given tools
+	 * from tools/list. See Connection::is_serving().
+	 *
+	 * @param array $tools what tools/list returns
+	 */
+	protected function serve_the_default_server( array $tools = [ [ 'name' => 'mcp-adapter-discover-abilities' ] ] ) {
+		$this->route_callback = function () use ( $tools ) {
 			register_rest_route( 'mcp', '/mcp-adapter-default-server', [
-				'methods'             => 'POST',
-				'callback'            => '__return_true',
+				'methods'             => [ 'POST', 'DELETE' ],
 				'permission_callback' => '__return_true',
+				'callback'            => function ( \WP_REST_Request $request ) use ( $tools ) {
+
+					if ( $request->get_method() === 'DELETE' ) {
+						return new \WP_REST_Response( null, 202 );
+					}
+
+					$message = json_decode( $request->get_body(), true );
+					$method  = $message['method'] ?? '';
+
+					if ( $method === 'initialize' ) {
+						$response = new \WP_REST_Response( [ 'jsonrpc' => '2.0', 'id' => $message['id'], 'result' => [ 'protocolVersion' => '2025-11-25' ] ] );
+						$response->header( 'Mcp-Session-Id', 'test-session' );
+
+						return $response;
+					}
+
+					if ( $method === 'tools/list' && $request->get_header( 'Mcp-Session-Id' ) === 'test-session' ) {
+						return [ 'jsonrpc' => '2.0', 'id' => $message['id'], 'result' => [ 'tools' => $tools ] ];
+					}
+
+					return new \WP_REST_Response( [ 'jsonrpc' => '2.0', 'id' => $message['id'] ?? null, 'error' => [ 'code' => -32600 ] ], 400 );
+				},
 			] );
 		};
 
@@ -101,17 +128,51 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->reset_rest_server();
 	}
 
-	public function test_a_password_is_not_enough_to_be_connected_without_an_answering_server() {
+	public function test_it_is_connected_once_an_agent_has_signed_in_and_a_server_answers() {
 		$user = $this->user_with_role( 'administrator' );
 		Connection::create_application_password( $user, 'My assistant' );
-		$this->reset_rest_server();
 
+		// another plugin answers, the adapter plugin isn't active
+		$this->serve_the_default_server();
+		$this->assertTrue( Connection::is_serving() );
+
+		// the connect steps make the password before it's in the assistant, so it isn't a connection yet
 		$this->assertFalse( Connection::is_connected( $user ) );
 
+		update_user_meta( $user, Connection::SEEN_META, time() );
+		$this->assertTrue( Connection::is_connected( $user ) );
+
+		// signed in before, but nothing answers now
+		remove_action( 'rest_api_init', $this->route_callback );
+		$this->reset_rest_server();
+		$this->assertFalse( Connection::is_connected( $user ) );
+	}
+
+	public function test_a_server_without_tools_is_not_serving() {
+		$this->user_with_role( 'administrator' );
+
+		$this->serve_the_default_server( [] );
+		$this->assertFalse( Connection::is_serving() );
+
+		remove_action( 'rest_api_init', $this->route_callback );
+		$this->reset_rest_server();
+	}
+
+	public function test_an_agent_signing_in_is_noted_but_the_check_is_not() {
+		$user = $this->user_with_role( 'administrator' );
 		$this->serve_the_default_server();
 
-		// another plugin answers, so the person is connected even though the adapter plugin is not active
-		$this->assertTrue( Connection::is_connected( $user ) );
+		// the site asking its own server
+		Connection::is_serving();
+		$this->assertSame( 0, Connection::last_seen( $user ) );
+
+		// an agent
+		$request = new \WP_REST_Request( 'POST', '/mcp/mcp-adapter-default-server' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( [ 'jsonrpc' => '2.0', 'id' => 1, 'method' => 'initialize', 'params' => [] ] ) );
+		rest_do_request( $request );
+
+		$this->assertGreaterThan( 0, Connection::last_seen( $user ) );
 
 		remove_action( 'rest_api_init', $this->route_callback );
 		$this->reset_rest_server();
@@ -258,13 +319,37 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( 'tab=' . Connection::TAB, Connection::page_url() );
 	}
 
-	public function test_the_tab_is_not_for_people_who_can_not_manage_the_site() {
+	public function test_the_tab_is_for_anyone_who_works_with_contacts() {
+		if ( ! Connection::is_supported() ) {
+			$this->markTestSkipped( 'Needs WordPress 6.9 for the Abilities API.' );
+		}
+
+		// they can connect an assistant of their own, it acts as them
 		$this->user_with_role( 'sales_rep' );
 
 		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
 		$urls  = array_column( $tools->command_palette_tab_commands( [] ), 'url' );
 
+		$this->assertContains( Connection::page_url(), $urls );
+
+		$this->user_with_role( 'subscriber' );
+
+		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+		$urls  = array_column( $tools->command_palette_tab_commands( [] ), 'url' );
+
 		$this->assertNotContains( Connection::page_url(), $urls );
+	}
+
+	public function test_only_people_who_can_manage_plugins_are_offered_the_plugin_steps() {
+		$this->user_with_role( 'sales_rep' );
+
+		$html = $this->render_tab();
+
+		$this->assertStringNotContainsString( 'install_mcp_adapter', $html );
+		$this->assertStringContainsString( 'An administrator needs to install and activate the MCP Adapter', $html );
+
+		// and they can't send the step anyway
+		$this->assertFalse( $this->send_step( 'install_mcp_adapter' )['success'] );
 	}
 
 	/* ---- one step at a time ------------------------------------------------------------------------------ */
@@ -492,7 +577,8 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->assertFalse( $answer['success'] );
 		$this->assertCount( 0, Connection::application_passwords( $user ) );
 
-		$this->user_with_role( 'sales_rep' );
+		// someone who doesn't work with contacts
+		$this->user_with_role( 'subscriber' );
 		$answer = $this->send_step( 'create_agent_password' );
 		$this->assertFalse( $answer['success'] );
 
