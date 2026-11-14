@@ -164,4 +164,45 @@ class Settings_Registry_Tests extends GH_UnitTestCase {
 		update_option( 'gh_email_footer_alignment', 'sideways' );
 		$this->assertSame( 'left', get_option( 'gh_email_footer_alignment' ) );
 	}
+
+	/**
+	 * On a new site most settings were never saved. Reading them gives the default as it is, it isn't run through the
+	 * setting's sanitize callback, which broke groundhogg/list-settings on custom_profile_fields.
+	 */
+	public function test_settings_never_saved_read_as_the_default() {
+
+		$settings = Plugin::instance()->settings;
+
+		delete_option( 'gh_custom_profile_fields' );
+
+		$this->assertFalse( $settings->get_option( 'custom_profile_fields' ) );
+		$this->assertSame( [], $settings->get_option( 'custom_profile_fields', [] ) );
+	}
+
+	public function test_a_form_and_map_that_is_not_one_is_sanitized_to_an_empty_one() {
+
+		foreach ( [ false, null, '', 'nonsense', [], [ 'not a form' ] ] as $value ) {
+			$this->assertSame( [ [], [] ], \Groundhogg\Form\Form_Fields::sanitize_form_and_map( $value ) );
+		}
+	}
+
+	public function test_list_settings_works_on_a_new_site() {
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		foreach ( [ 'gh_custom_profile_fields', 'gh_preferences_profile_fields' ] as $option ) {
+			delete_option( $option );
+		}
+
+		$ability = function_exists( 'wp_get_ability' ) ? wp_get_ability( 'groundhogg/list-settings' ) : null;
+
+		if ( ! $ability ) {
+			$this->markTestSkipped( 'Needs WordPress 6.9 for the Abilities API.' );
+		}
+
+		$result = $ability->execute( [] );
+
+		$this->assertNotWPError( $result );
+		$this->assertNotEmpty( $result['settings'] );
+	}
 }

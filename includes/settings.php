@@ -998,8 +998,10 @@ class Settings {
 		// Coerce to the registered type/enum, same as sanitize_option_{$key} does on write -
 		// so a value stored before the setting was registered (or written some other way)
 		// still comes back matching its declared schema, not whatever shape happens to be
-		// in the DB. See sanitize_registered_setting().
-		if ( isset( $this->registered_settings[ $key ] ) ) {
+		// in the DB. See sanitize_registered_setting(). Not the default for a setting that was
+		// never saved, like on a new site: the caller asked for that as it is, and a sanitize
+		// callback can't be expected to make sense of it (custom_profile_fields broke on false).
+		if ( isset( $this->registered_settings[ $key ] ) && $value !== $default ) {
 			$value = $this->sanitize_registered_setting( $value, $key );
 		}
 
