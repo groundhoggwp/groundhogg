@@ -334,7 +334,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.11 (2026-11-05) =
+= 4.11 (2026-11-16) =
 * ADDED Build, edit and set up with an AI assistant connected over MCP.
  * "Build with AI" on the Add Email and Add Flow screens, and "Edit with AI" in the email and flow editors, give you a prompt to copy into your assistant, after walking you through connecting one.
  * The guided setup can hand the whole setup to an assistant. It finds what's left with `groundhogg/get-setup-status` and does what doesn't need a person: cron, senders, settings, importing contacts and flow templates.
