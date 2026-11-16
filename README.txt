@@ -237,14 +237,8 @@ Recent blog posts from `https://groundhogg.io` are shown in the dashboard and ar
 Important notifications and dashboard notices are pulled from `https://groundho.gg` periodically. No data or information is logged or shared.
 
 ### Telemetry and usage
-Sharing usage data is opt-in. You can turn it on or off from Groundhogg » Settings » Misc » Danger Zone » Share usage data, or in the guided setup. When it is on, the following is sent to `https://telemetry.groundhogg.io`:
-
-* Once, when you opt in: your email address, whether you also asked for the newsletter, and your time zone.
-* Once a week: a random ID for the site and a one-way hash of its address (never the address itself); whether it is a production, staging or development site; the versions of Groundhogg, WordPress, PHP and the database, the site language and time zone; your plan, its expiry date and a one-way hash of your license key (never the key itself); which Groundhogg add-ons are installed and licensed; the folder names of your active plugins; totals of contacts (by opt-in status), tags, flows, emails, campaigns, custom fields, saved searches and team members; for the last 7 days, the number of new contacts, emails sent, automation events, opens, clicks, broadcasts, abilities run by AI agents, and people who used the mobile app; which flow step types are in your active flows and which editors your recent emails were made with; a few settings (GDPR, confirmation, email logging, bounce checking); whether email sending, cron and the event queue are working; and when you installed Groundhogg, finished the setup, and added your first contact, flow and email.
-* When it happens: the plugin being activated, deactivated or updated (with the versions).
-* Once each, the first time it happens on a new site: finishing the setup, adding a contact, importing contacts, a form being submitted, activating a flow, a flow sending an email, sending a broadcast, connecting an AI agent, and using the mobile app (just the name of the milestone and when, nothing about what it was).
-
-Your contacts, what's in your emails, and the names or titles of anything you create are never shared. Nothing is sent when sharing is off, and turning it off sends nothing either.
+Sharing usage data is opt-in. You can turn it on or off from Groundhogg » Settings » Misc » Danger Zone » Share usage data, or in the guided setup. When it is on, the following information will be shared with `https://groundhogg.io` once a week: Your admin email address; Whether your site has a valid and active license from `groundhogg.io`; The license if one exists; Whether Groundhogg is white labelled; System information such as WordPress version, PHP Version, the Groundhogg plugin version, the site time zone, and site language; Usage statistics such as the number of active flows, the number of new contacts, and the number of broadcasts sent; The list of active Groundhogg add-ons on the site;
+No information is shared or collected when telemetry sharing is disabled.
 
 ### Google Recaptcha
 If you have the Google Recaptcha integration enabled, scripts will be loaded from `https://www.google.com/recaptcha/api.js` and requests will be made to `https://www.google.com/recaptcha/api/siteverify` sharing only essential information (such as your recaptcha site key) to facilitate the integration.

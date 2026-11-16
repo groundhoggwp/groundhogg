@@ -209,14 +209,19 @@ class Settings {
 			'group'       => 'telemetry',
 			'type'        => 'boolean',
 			'default'     => false,
-			'description' => __( 'Whether weekly usage stats are sent to Groundhogg Inc.: counts of contacts, emails and automation, which features, flow steps and plugins are in use, whether email and cron are working, and software versions, plus when the site first reaches each step of getting started. telemetry_email is sent once, when the site opts in. Never contact data, email content or the site\'s address.', 'groundhogg' ),
+			// what's sent depends on whether schema 2 telemetry is on
+			'description' => Telemetry::is_v2()
+				? __( 'Whether weekly usage stats are sent to Groundhogg Inc.: counts of contacts, emails and automation, which features, flow steps and plugins are in use, whether email and cron are working, and software versions, plus when the site first reaches each step of getting started. telemetry_email is sent once, when the site opts in. Never contact data, email content or the site\'s address.', 'groundhogg' )
+				: __( 'Whether weekly usage stats (counts of active flows, new contacts and broadcasts, installed add-ons, and software versions) are sent to Groundhogg Inc., along with telemetry_email.', 'groundhogg' ),
 		] );
 
 		$this->add_setting( 'telemetry_email', [
 			'group'             => 'telemetry',
 			'type'              => 'string',
 			'sanitize_callback' => 'sanitize_email',
-			'description'       => __( 'Email address sent once, when the site opts in to telemetry. Falls back to the site admin email when empty.', 'groundhogg' ),
+			'description'       => Telemetry::is_v2()
+				? __( 'Email address sent once, when the site opts in to telemetry. Falls back to the site admin email when empty.', 'groundhogg' )
+				: __( 'Email address that telemetry is sent with. Falls back to the site admin email when empty.', 'groundhogg' ),
 		] );
 
 		$this->add_setting( 'is_send_time_optimization_enabled', [

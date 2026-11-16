@@ -595,6 +595,8 @@ class Guided_Setup extends Admin_Page {
 			'themes'     => $this->themes(),
 			'hasLicense' => (bool) Inbox_Client::license_key(),
 			'telemetry'  => Plugin::instance()->stats_collection->is_enabled(),
+			// what sharing usage data sends, see Telemetry::is_v2()
+			'telemetryV2' => \Groundhogg\Telemetry::is_v2(),
 			'email'      => wp_get_current_user()->user_email,
 			'unsynced'   => $can_sync ? $this->count_unsynced_users() : 0,
 			'team'       => $this->can_manage_team() ? [

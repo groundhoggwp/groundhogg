@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   Only for sites installed since they were recorded, so an old site doesn't report long-past firsts as new.
  * - Sites that opted in before snapshots had this much in them see a notice about it first, and send nothing new until
  *   it has been shown.
+ * - All of the above is behind a flag, is_v2(), off until the endpoint is live. Until then opted-in sites send the old
+ *   weekly ping to the CRM (send_legacy_snapshot()), as they always have.
  */
 class Telemetry {
 
@@ -33,6 +35,18 @@ class Telemetry {
 	 * forwards them.
 	 */
 	const LEGACY_OPTIN_WEBHOOK = 'https://groundhogg.io/wp-json/gh/v4/webhooks/1724-telemetry-optin?token=vNhKt6H';
+
+	/**
+	 * Where the weekly ping went before schema 2, and still goes while the flag below is off
+	 */
+	const LEGACY_WEEKLY_WEBHOOK = 'https://groundhogg.io/wp-json/gh/v4/webhooks/1727-receive-telemetry?token=JVq8f3u';
+
+	/**
+	 * Whether schema 2 (the snapshot, events and milestones sent to ENDPOINT) is on by default. It stays off until the
+	 * endpoint is live; until then sites send what they always have. Turn it on for one site with
+	 * define( 'GROUNDHOGG_TELEMETRY_V2', true ) or the groundhogg/telemetry/v2 filter.
+	 */
+	const V2_DEFAULT = false;
 
 	const CRON_HOOK          = 'groundhogg/telemetry';
 	const SNAPSHOT_SOON_HOOK = 'groundhogg/telemetry/snapshot_soon';
@@ -129,6 +143,25 @@ class Telemetry {
 	}
 
 	/**
+	 * Whether schema 2 is on. While it's off, an opted-in site sends the old weekly ping to the CRM and nothing else
+	 * new: no snapshot, events, milestones or notice. Install dates and milestones are still recorded, so they're
+	 * there when it's turned on.
+	 *
+	 * @return bool
+	 */
+	public static function is_v2() {
+
+		$on = defined( 'GROUNDHOGG_TELEMETRY_V2' ) ? (bool) GROUNDHOGG_TELEMETRY_V2 : self::V2_DEFAULT;
+
+		/**
+		 * Filter whether schema 2 telemetry is on
+		 *
+		 * @param bool $on
+		 */
+		return (bool) apply_filters( 'groundhogg/telemetry/v2', $on );
+	}
+
+	/**
 	 * Whether a value of the opt-in option means opted in, the same way is_option_enabled() reads it
 	 *
 	 * @param mixed $value
@@ -155,7 +188,7 @@ class Telemetry {
 	 * @return bool
 	 */
 	public function can_send() {
-		return $this->is_enabled() && ! $this->needs_notice();
+		return self::is_v2() && $this->is_enabled() && ! $this->needs_notice();
 	}
 
 	/**
@@ -244,6 +277,11 @@ class Telemetry {
 
 		if ( ! get_option( self::EMAIL_OPTION ) && is_email( $email ) ) {
 			update_option( self::EMAIL_OPTION, $email );
+		}
+
+		// no site ID either, so a site that opts in now sees the notice when schema 2 is turned on
+		if ( ! self::is_v2() ) {
+			return;
 		}
 
 		$this->send( 'opted_in', [
@@ -458,11 +496,54 @@ class Telemetry {
 	 * @return void
 	 */
 	public function maybe_send_telemetry() {
-		if ( ! $this->can_send() ) {
+
+		if ( ! $this->is_enabled() ) {
 			return;
 		}
 
-		$this->send_snapshot();
+		if ( ! self::is_v2() ) {
+			$this->send_legacy_snapshot();
+
+			return;
+		}
+
+		if ( $this->can_send() ) {
+			$this->send_snapshot();
+		}
+	}
+
+	/**
+	 * The weekly ping sent before schema 2, unchanged, while schema 2 is off. Remove it with the flag.
+	 *
+	 * @return void
+	 */
+	public function send_legacy_snapshot() {
+
+		$date      = new \DateTime( 'now', wp_timezone() );
+		$_7daysago = clone $date;
+		$_7daysago->modify( '6 days ago 12:00 am' );
+
+		$request = [
+			'email'            => get_option( self::EMAIL_OPTION ) ?: get_bloginfo( 'admin_email' ),
+			'date'             => Ymd_His(),
+			'is_licensed'      => has_premium_features(),
+			'master_license'   => get_master_license(),
+			'is_white_labeled' => is_white_labeled(),
+			'system_info'      => [
+				'php_version' => PHP_VERSION,
+				'wp_version'  => get_bloginfo( 'version' ),
+				'gh_version'  => GROUNDHOGG_VERSION,
+				'site_lang'   => get_bloginfo( 'language' ),
+			],
+			'usage'            => [
+				'funnels'    => get_db( 'funnels' )->count( [ 'status' => 'active' ] ),
+				'contacts'   => get_db( 'contacts' )->count( [ 'after' => $_7daysago->format( 'Y-m-d H:i:s' ) ] ),
+				'broadcasts' => get_db( 'broadcasts' )->count( [ 'after' => $_7daysago->getTimestamp() ] ),
+			],
+			'extensions'       => implode( ',', Extension::$extension_ids ),
+		];
+
+		remote_post_json( self::LEGACY_WEEKLY_WEBHOOK, $request );
 	}
 
 	/**
@@ -504,10 +585,10 @@ class Telemetry {
 	/**
 	 * Continue continuous tracking of the site.
 	 *
-	 * @deprecated use Plugin::instance()->stats_collection->send_snapshot()
+	 * @deprecated use Plugin::instance()->stats_collection->maybe_send_telemetry()
 	 */
 	public static function send_telemetry() {
-		Plugin::instance()->stats_collection->send_snapshot();
+		Plugin::instance()->stats_collection->maybe_send_telemetry();
 	}
 
 	/**
@@ -818,7 +899,8 @@ class Telemetry {
 	 */
 	public function count_ability( $name ) {
 
-		if ( ! is_string( $name ) || ! str_starts_with( $name, 'groundhogg' ) || ! $this->is_enabled() ) {
+		// only while schema 2 is on, the counts are reset by its snapshots
+		if ( ! is_string( $name ) || ! str_starts_with( $name, 'groundhogg' ) || ! self::is_v2() || ! $this->is_enabled() ) {
 			return;
 		}
 
@@ -850,7 +932,7 @@ class Telemetry {
 	 */
 	protected function should_show_notice() {
 
-		if ( ! $this->is_enabled() || ! current_user_can( 'manage_options' ) || ! is_admin_groundhogg_page() ) {
+		if ( ! self::is_v2() || ! $this->is_enabled() || ! current_user_can( 'manage_options' ) || ! is_admin_groundhogg_page() ) {
 			return false;
 		}
 

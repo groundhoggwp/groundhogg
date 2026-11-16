@@ -1,7 +1,45 @@
-# Telemetry payload, schema 2 (draft)
+# Telemetry payload, schema 2
 
 What an opted-in site sends home, where each field comes from, and what that means for the backend that receives it.
-Draft for discussion, nothing here is built yet. Schema 1 is what `includes/telemetry.php` sends today.
+Built in `includes/telemetry.php` and `includes/telemetry-snapshot.php`, behind a flag that is off until the endpoint is
+live (see "Feature flag" below). Schema 1 is the old weekly ping to the CRM, which is still what sites send while the
+flag is off.
+
+## Feature flag
+
+`Telemetry::is_v2()` turns schema 2 on. It's `Telemetry::V2_DEFAULT` (false) unless the `GROUNDHOGG_TELEMETRY_V2`
+constant or the `groundhogg/telemetry/v2` filter says otherwise. Point a test site at a dev backend with
+`GROUNDHOGG_TELEMETRY_URL`.
+
+While it's off:
+
+- **What's sent:** opted-in sites send the old weekly ping to the `1727` CRM webhook (`send_legacy_snapshot()`), plus
+  the old opt-in webhook from the guided setup, as before. Nothing goes to the new endpoint: no snapshot, no events,
+  no milestones.
+- **What's recorded:** install dates, the last version seen and milestones are still recorded, so the dates are right
+  when the flag is turned on. Ability calls aren't counted, because only schema 2 snapshots reset the counts.
+- **Opting in** makes no site ID. A site that opts in while the flag is off agreed to the old wording, so it sees the
+  notice when the flag is turned on, like sites that opted in before.
+- **The wording** in the settings, the setting's description for agents and the guided setup follows the flag. The
+  README describes schema 1.
+
+To ship schema 2:
+
+1. Set `V2_DEFAULT` to true.
+2. Replace the README's "Telemetry and usage" section with the text below.
+3. Once traffic to the old webhooks has died down, remove `send_legacy_snapshot()`, `LEGACY_WEEKLY_WEBHOOK` and the
+   schema 1 wording.
+
+README text for schema 2:
+
+> Sharing usage data is opt-in. You can turn it on or off from Groundhogg » Settings » Misc » Danger Zone » Share usage data, or in the guided setup. When it is on, the following is sent to `https://telemetry.groundhogg.io`:
+>
+> * Once, when you opt in: your email address, whether you also asked for the newsletter, and your time zone.
+> * Once a week: a random ID for the site and a one-way hash of its address (never the address itself); whether it is a production, staging or development site; the versions of Groundhogg, WordPress, PHP and the database, the site language and time zone; your plan, its expiry date and a one-way hash of your license key (never the key itself); which Groundhogg add-ons are installed and licensed; the folder names of your active plugins; totals of contacts (by opt-in status), tags, flows, emails, campaigns, custom fields, saved searches and team members; for the last 7 days, the number of new contacts, emails sent, automation events, opens, clicks, broadcasts, abilities run by AI agents, and people who used the mobile app; which flow step types are in your active flows and which editors your recent emails were made with; a few settings (GDPR, confirmation, email logging, bounce checking); whether email sending, cron and the event queue are working; and when you installed Groundhogg, finished the setup, and added your first contact, flow and email.
+> * When it happens: the plugin being activated, deactivated or updated (with the versions).
+> * Once each, the first time it happens on a new site: finishing the setup, adding a contact, importing contacts, a form being submitted, activating a flow, a flow sending an email, sending a broadcast, connecting an AI agent, and using the mobile app (just the name of the milestone and when, nothing about what it was).
+>
+> Your contacts, what's in your emails, and the names or titles of anything you create are never shared. Nothing is sent when sharing is off, and turning it off sends nothing either.
 
 ## Principles
 

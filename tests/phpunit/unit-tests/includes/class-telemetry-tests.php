@@ -51,6 +51,9 @@ class Telemetry_Tests extends GH_UnitTestCase {
 
 		add_filter( 'pre_http_request', [ $this, 'capture' ], 10, 3 );
 
+		// schema 2 is behind a flag, most tests are about it, the "flag off" ones turn it off again
+		add_filter( 'groundhogg/telemetry/v2', '__return_true' );
+
 		wp_clear_scheduled_hook( Telemetry::SNAPSHOT_SOON_HOOK );
 		wp_clear_scheduled_hook( Telemetry::MILESTONES_HOOK );
 	}
@@ -64,6 +67,8 @@ class Telemetry_Tests extends GH_UnitTestCase {
 
 	public function tearDown(): void {
 		remove_filter( 'pre_http_request', [ $this, 'capture' ] );
+		remove_filter( 'groundhogg/telemetry/v2', '__return_true' );
+		remove_filter( 'groundhogg/telemetry/v2', '__return_false' );
 		wp_set_current_user( 0 );
 		unset( $_REQUEST['page'] );
 		set_current_screen( 'front' );
@@ -130,6 +135,110 @@ class Telemetry_Tests extends GH_UnitTestCase {
 
 		add_action( 'add_option_' . Telemetry::OPTIN_OPTION, [ $this->telemetry(), 'optin_option_added' ], 10, 2 );
 		add_action( 'update_option_' . Telemetry::OPTIN_OPTION, [ $this->telemetry(), 'optin_option_updated' ], 10, 2 );
+	}
+
+	/**
+	 * Requests to an old CRM webhook
+	 *
+	 * @param string $url
+	 *
+	 * @return array[] the bodies
+	 */
+	protected function sent_to( string $url ) {
+		return array_values( array_map( function ( $request ) {
+			return $request['body'];
+		}, array_filter( $this->requests, function ( $request ) use ( $url ) {
+			return $request['url'] === $url;
+		} ) ) );
+	}
+
+	protected function flag_off() {
+		remove_filter( 'groundhogg/telemetry/v2', '__return_true' );
+		add_filter( 'groundhogg/telemetry/v2', '__return_false' );
+	}
+
+	/* ---- the flag ---------------------------------------------------------------------------------------- */
+
+	public function test_schema_2_is_off_by_default() {
+		remove_filter( 'groundhogg/telemetry/v2', '__return_true' );
+
+		$this->assertFalse( defined( 'GROUNDHOGG_TELEMETRY_V2' ) );
+		$this->assertSame( Telemetry::V2_DEFAULT, Telemetry::is_v2() );
+		$this->assertFalse( Telemetry::is_v2() );
+	}
+
+	public function test_with_the_flag_off_the_old_weekly_ping_is_sent_and_nothing_new() {
+		$this->flag_off();
+		$this->opt_in();
+
+		$this->telemetry()->maybe_send_telemetry();
+		$this->telemetry()->activating();
+		$this->telemetry()->activated();
+		$this->telemetry()->deactivated();
+
+		$this->assertEmpty( $this->sent(), 'nothing goes to the new endpoint' );
+		$this->assertFalse( get_option( Telemetry::SITE_ID_OPTION ), 'no site ID' );
+		$this->assertFalse( wp_next_scheduled( Telemetry::SNAPSHOT_SOON_HOOK ) );
+
+		$legacy = $this->sent_to( Telemetry::LEGACY_WEEKLY_WEBHOOK );
+
+		$this->assertCount( 1, $legacy );
+
+		foreach ( [ 'email', 'date', 'is_licensed', 'master_license', 'is_white_labeled', 'system_info', 'usage', 'extensions' ] as $key ) {
+			$this->assertArrayHasKey( $key, $legacy[0] );
+		}
+	}
+
+	public function test_with_the_flag_off_the_guided_setup_opt_in_still_reaches_the_crm() {
+		$this->flag_off();
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator', 'user_email' => 'owner@example.com' ] ) );
+
+		$this->telemetry()->optin( true );
+
+		$this->assertEmpty( $this->sent( 'opted_in' ) );
+		$this->assertCount( 1, $this->sent_to( Telemetry::LEGACY_OPTIN_WEBHOOK ) );
+		$this->assertSame( 'owner@example.com', get_option( Telemetry::EMAIL_OPTION ) );
+	}
+
+	public function test_with_the_flag_off_milestones_are_recorded_but_not_sent_and_abilities_not_counted() {
+		$this->flag_off();
+		$this->new_site();
+		$this->opt_in();
+
+		self::factory()->contacts->create();
+		do_action( 'wp_after_execute_ability', 'groundhogg/search-contacts', [], [], null );
+
+		$this->telemetry()->send_milestones();
+
+		$this->assertArrayHasKey( 'contact_added', $this->telemetry()->get_milestones() );
+		$this->assertEmpty( $this->sent( 'milestone' ) );
+		$this->assertSame( [], $this->telemetry()->get_ability_counts() );
+	}
+
+	public function test_with_the_flag_off_there_is_no_notice() {
+		$this->flag_off();
+		$this->opt_in_before_schema_2();
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		set_current_screen( 'dashboard' );
+		$_REQUEST['page'] = 'gh_contacts';
+
+		ob_start();
+		$this->telemetry()->notice();
+		$this->assertSame( '', ob_get_clean() );
+		$this->assertFalse( get_option( Telemetry::NOTICE_SHOWN_OPTION ) );
+	}
+
+	public function test_a_site_that_opted_in_while_the_flag_was_off_gets_the_notice_when_it_is_turned_on() {
+		$this->flag_off();
+		$this->opt_in();
+
+		remove_filter( 'groundhogg/telemetry/v2', '__return_false' );
+		add_filter( 'groundhogg/telemetry/v2', '__return_true' );
+
+		$this->assertTrue( $this->telemetry()->needs_notice() );
+		$this->assertFalse( $this->telemetry()->can_send() );
 	}
 
 	/* ---- nothing without opting in ----------------------------------------------------------------------- */
