@@ -335,32 +335,56 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 4.11 (2026-11-05) =
-* ADDED A `view_contact_pii` capability that hides contacts' personal information. Users without it, administrators included, can still work with contacts by ID, tags, activity, segments, broadcasts and flows, but see `[redacted]` in place of names, email addresses, phone numbers and other personal details, and can't search, sort or filter by them. Every role that can view contacts gets it on update, so nothing changes until you take it away.
- * It applies to the admin screens, the REST API and the AI abilities, so an AI agent connected as such a user is limited too. Exports, imports and contact files are closed to them. Add-ons redact the columns and cards they add.
- * A Personal information checkbox on a user's profile grants or revokes it, whatever their role. Only a user who has it can change it.
- * Personal details written in a note or a task are redacted, and custom fields marked Contains personal information are hidden.
-* ADDED An opt-in daily My day email with a user's overdue and due tasks, unread replies and new contacts, sent at the time and in the timezone they choose. Tasks can be snoozed or completed from it without signing in, and a sales manager can add their team's. Turn it on from the Notifications card of the user profile.
-* ADDED Every admin notification email has a signed link to unsubscribe from it without signing in.
-* ADDED A dashboard recommendation to turn on the email summaries.
-* ADDED The `groundhogg/edit-email` ability changes part of an email instead of rewriting all of it. In a block email it replaces text, changes a block's content or settings, and adds, moves or deletes blocks. In an HTML email it replaces visible text or an exact piece of HTML. Changes are all or nothing, with `dry_run` and `expected_version`.
-* ADDED The `groundhogg/send-test-email` ability sends a design test of a saved email, and the email abilities return a `preview_url`.
-* TWEAKED `groundhogg/get-email-template` returns an outline of a block email, or the visible text of an HTML email, instead of the whole body. `blocks`, `find`, `view` "specs" and `view` "full" return more.
-* TWEAKED `groundhogg/create-email-template` and `groundhogg/update-email-template` accept `blocks`, each described by its type and settings, and write the same markup the email editor would. Block content the editor couldn't open is refused.
-* TWEAKED `groundhogg/send-email-template`, `groundhogg/add-to-flow` and `groundhogg/simulate-flow` accept `event_args`, so replacement codes that depend on them resolve.
+* ADDED Build, edit and set up with an AI assistant connected over MCP.
+ * "Build with AI" on the Add Email and Add Flow screens, and "Edit with AI" in the email and flow editors, give you a prompt to copy into your assistant, after walking you through connecting one.
+ * The guided setup can hand the whole setup to an assistant. It finds what's left with `groundhogg/get-setup-status` and does what doesn't need a person: cron, senders, settings, importing contacts and flow templates.
+ * Anyone who can view contacts can connect their own assistant. It counts as connected once it signs in, including through the Claude and ChatGPT apps.
+ * The assistant asks before anything reaches contacts, never asks for passwords or keys, and answers how-to questions from the documentation.
+* ADDED A `view_contact_pii` capability. Users without it, administrators included, can still work with contacts but see `[redacted]` in place of names, email addresses, phone numbers and other personal details, and can't search or filter by them. Every role that can view contacts gets it on update, so nothing changes until you take it away.
+ * It covers the admin, the REST API and the AI abilities, so an AI agent connected as such a user is limited too. Exports, imports and contact files are closed to them.
+ * Grant or revoke it from the Personal information checkbox on a user's profile.
+ * Personal details in notes and tasks are redacted, and custom fields marked Contains personal information are hidden.
+* ADDED An opt-in daily My day email with your overdue and due tasks, unread replies and new contacts, at the time you choose. Snooze or complete tasks from it without signing in. Turn it on from the Notifications card of your profile, which a new dashboard recommendation points to.
+* ADDED Every admin notification email has a link to unsubscribe from it without signing in.
+* ADDED Tools › Site Health checks what quietly stops email and automation: late events, cron not running, emails only logged or sent by PHP mail or an SMTP plugin that doesn't report bounces, failed events and emails, stuck background tasks, pending database updates, plain permalinks, safe mode, and unlicensed extensions. Each result links to the fix.
+* ADDED The Email settings tab recommends MailHawk again, installs it and opens its Connect screen.
+* ADDED Settings tabs with several cards have a table of contents that follows you down the page.
+* ADDED Abilities for AI agents.
+ * `groundhogg/edit-email` changes part of an email, all or nothing: text, a block's content or settings, adding, moving or deleting blocks, or a piece of an HTML email.
+ * `groundhogg/update-contacts` and `groundhogg/bulk-update-contacts` update many contacts at once.
+ * `groundhogg/send-test-email` sends a design or simulated test, and the email abilities return a `preview_url`.
+ * Setup: `get-setup-status`, `get-cron-status`, `set-up-cron`, `save-sender-profile`, `delete-sender-profile`, `sync-users`, `import-contacts`, `list-flow-templates` and `import-flow-template`, and about 20 more settings for `update-settings`.
+ * `get-authoring-guide` for writing emails and flows, `search-media` and `upload-media` for images, and `search-docs` for the documentation.
+* TWEAKED Email abilities: `get-email-template` returns an outline of a block email or the text of an HTML email, with `find`, `blocks` and `view` for more. `create-email-template` and `update-email-template` accept `blocks` as short specs and write the markup the editor would, refusing what the editor couldn't open.
+* TWEAKED `send-email-template`, `add-to-flow` and `simulate-flow` accept `event_args`, for replacement codes that need them.
+* TWEAKED The mobile app is named and colored after its site, so apps for different sites are easy to tell apart.
 * SECURITY `{post_title}` could output unescaped HTML from a post title saved by a Contributor. Credit: Wordfence PRISM, via Wordfence.
-* FIXED Excluding several tags only excluded contacts that had all of them, and excluding contacts with all of the tags excluded contacts with any one of them.
-* FIXED Link Click redirects could be stored by a page cache or CDN, which skipped the trigger, and didn't recognize visitors on a site that answers on both `example.com` and `www.example.com`.
-* FIXED Saving in the email editor changed blocks that hadn't been edited, giving links the Arial font and full width contained emails another wrapper table each time. It also replaced changes made while the editor was open, like by an AI agent, and now asks first.
-* FIXED `groundhogg/send-email-broadcast` ignored `exclude_segment`, and its `estimated_recipients` counted contacts that are skipped.
-* FIXED A single step, form submission or page visit couldn't be read, edited or deleted through the REST API, even by administrators.
+* HARDENED Email previews are sandboxed, so a script in an email can't run.
+* FIXED A setting, webhook value, form field or export column named after a method, like `delete` or `unsubscribe`, could run it on the contact, deleting or unsubscribing them.
+* FIXED Excluding contacts with any of several tags only excluded those with all of them, and excluding those with all of them excluded those with any.
+* FIXED Saving in the email editor changed blocks that hadn't been edited, and could overwrite changes an AI agent made while it was open. It now asks first.
+* FIXED Link Click redirects could be cached by a page cache or CDN, skipping the trigger, and missed visitors on sites that answer on both `example.com` and `www.example.com`.
+* FIXED "Disable page tracking" did nothing, and disabling open tracking stopped page tracking instead.
+* FIXED `groundhogg/send-email-broadcast` ignored `exclude_segment` and counted skipped contacts in `estimated_recipients`.
+* FIXED A name like "Malik M" lost letters from the first name when split.
+* FIXED The Last Updated date of an email never changed after it was created.
+* FIXED A single step, form submission or page visit couldn't be read, edited or deleted through the REST API.
 * FIXED The event queue and background tasks put a 60 second limit on processes that had none, like a server cron job.
-* FIXED The AI agent tab said the MCP Adapter plugin was active when another plugin loaded its own copy of it.
-* FIXED Incoming Messages couldn't be turned on for a white labeled subsite that uses the main site's licenses.
-* FIXED Items added with the `groundhogg/admin/checklist_items` and `groundhogg/admin/recommendation_items` filters weren't shown, and the profile of a sales manager who can't delete users raised an error.
-* DEV `Groundhogg\Pii` is the policy for contact personal information, with `Pii::is_restricted()`, `Pii::REDACTED`, `Pii::restricted_error()`, `Pii::scrub_text()`, helpers to redact a screen and `Groundhogg.functions.contactLabel()` in JavaScript. Extend it with the `groundhogg/pii/is_restricted`, `contact_fields`, `meta_keys`, `safe_meta_keys`, `filter_types`, `scrub_text_pairs` and `table_columns` filters. A custom field is personal when `pii` is set.
-* DEV `Main_Roles::map_meta_cap()` maps the step, submission and page visit capabilities.
-* DEV `Email_Block_Document` and `Email_Block_Renderer` parse, edit and render block email content. Add-on block types register with the `groundhogg/email/block_types` and `groundhogg/email/block_renderers` filters.
-* DEV The `groundhogg/email_reports/my_day_sections` filter adds sections to My day.
-* DEV The REST API's email update accepts `version` and refuses a stale one with a `groundhogg_email_changed` 409 error.
+* FIXED The email service recommendation was done once MailHawk was active, before it was connected.
+* FIXED A form integration trigger couldn't be added in the flow editor before a form was picked.
+* FIXED `groundhogg/list-settings` failed on a new site.
+* FIXED The AI agent tab said the MCP Adapter was active when another plugin bundled its own copy.
+* FIXED Incoming Messages couldn't be turned on for a white labeled subsite using the main site's licenses.
+* FIXED Items added with the `groundhogg/admin/checklist_items` and `groundhogg/admin/recommendation_items` filters weren't shown.
+* FIXED The profile of a sales manager who can't delete users raised an error.
+* DEV `Groundhogg\Pii` is the policy for contact personal information: `Pii::is_restricted()`, `Pii::REDACTED`, `Pii::restricted_error()`, `Pii::scrub_text()` and `Groundhogg.functions.contactLabel()`, extended with the `groundhogg/pii/*` filters. A custom field is personal when `pii` is set.
+* DEV `Email_Block_Document`, `Email_Block_Renderer` and `Email_Html_Document` parse, edit and render email content. Add-on blocks register with `groundhogg/email/block_types` and `groundhogg/email/block_renderers`.
+* DEV `Notices::add_notification()` adds a notification to the notifications feed, and `groundhogg/notices/read` and `groundhogg/notices/dismissed` fire when people read or dismiss them.
+* DEV Add Site Health tests and info with `groundhogg/site_health/tests` and `groundhogg/site_health/info_fields`, and run them with `Site_Health::run()`.
+* DEV Reading a method's name as a property of an object now returns false, with a `_doing_it_wrong` notice, instead of calling the method.
+* DEV The REST API's email update refuses a stale `version` with a `groundhogg_email_changed` 409 error, and `Base_Object_Api::prepare_update_data()` lets an object type add to an update.
+* DEV `is_demo_environment()` recognises demo and sandbox sites: InstaWP, TasteWP, WordPress Playground and our own demos.
+* DEV Usage data sharing is rebuilt (weekly snapshot, lifecycle events and getting-started milestones, never the site's address or license key) but stays off until its endpoint is live. Turn it on with `GROUNDHOGG_TELEMETRY_V2`, see `docs/telemetry.md` in the repository.
+* DEV `Main_Roles::map_meta_cap()` maps the step, submission and page visit capabilities, and `groundhogg/email_reports/my_day_sections` adds sections to My day.
 
 Older versions are in the full changelog on [groundhogg.io](https://groundhogg.io/changelog/).
