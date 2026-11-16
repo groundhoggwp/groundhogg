@@ -287,22 +287,25 @@ class Site_Health {
 	}
 
 	/**
-	 * Whether another plugin sends wp_mail() with SMTP or an API, either by replacing it or by setting up PHPMailer
+	 * The plugin that sends wp_mail() with SMTP or an API, either by replacing it or by setting up PHPMailer: its folder
+	 * name, like fluent-smtp, or the path of the file that replaced wp_mail() when that isn't an active plugin. Empty
+	 * when wp_mail() sends the WordPress way.
 	 *
-	 * @return bool
+	 * @return string
 	 */
-	protected function wp_mail_is_handled_by_plugin() {
+	public function wp_mail_plugin(): string {
 
 		$defined_in = extrapolate_wp_mail_plugin();
 
 		if ( $defined_in && wp_normalize_path( $defined_in ) !== wp_normalize_path( ABSPATH . WPINC . '/pluggable.php' ) ) {
-			return true;
+			// an active plugin's basename, or the file it's defined in
+			return is_file( WP_PLUGIN_DIR . '/' . $defined_in ) ? dirname( $defined_in ) : wp_normalize_path( $defined_in );
 		}
 
 		global $wp_filter;
 
 		if ( ! isset( $wp_filter['phpmailer_init'] ) ) {
-			return false;
+			return '';
 		}
 
 		$plugins_dir = trailingslashit( wp_normalize_path( WP_PLUGIN_DIR ) );
@@ -328,24 +331,51 @@ class Site_Health {
 				$slug = strtok( substr( $file, strlen( $plugins_dir ) ), '/' );
 
 				if ( ! str_starts_with( $slug, 'groundhogg' ) && preg_match( '/smtp|mailgun|sendgrid|sparkpost|postmark|mailjet|mailersend|sendinblue|brevo|elastic-?email|resend|\bses\b/i', $slug ) ) {
-					return true;
+					return $slug;
 				}
 			}
 		}
 
-		return false;
+		return '';
 	}
 
 	/**
-	 * Whether marketing email goes through something better than PHP mail()
+	 * A plugin's name from its folder, or the folder when it isn't an installed plugin
+	 *
+	 * @param string $slug
+	 *
+	 * @return string
+	 */
+	protected function plugin_name( string $slug ): string {
+
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		foreach ( get_plugins() as $basename => $plugin ) {
+			if ( dirname( $basename ) === $slug && ! empty( $plugin['Name'] ) ) {
+				return $plugin['Name'];
+			}
+		}
+
+		return basename( $slug );
+	}
+
+	/**
+	 * Whether marketing email goes through something better than PHP mail(), and something that reports bounces and
+	 * spam complaints back, so the contacts they come from stop getting email. MailHawk and the official email service
+	 * integrations do, a third-party SMTP plugin doesn't.
 	 *
 	 * @return array
 	 */
 	public function test_email_service() {
 
 		$marketing = Groundhogg_Email_Services::get_marketing_service();
+		$plugin    = $this->wp_mail_plugin();
+		$folder    = basename( $plugin );
 
-		if ( $marketing !== 'wp_mail' || Mailhawk::is_connected() || $this->wp_mail_is_handled_by_plugin() ) {
+		// an email service of ours sending for wp_mail()
+		if ( $marketing !== 'wp_mail' || Mailhawk::is_connected() || str_starts_with( $folder, 'groundhogg' ) ) {
 			return $this->result( 'email_service', 'good', __( 'Email is sent with an email service', 'groundhogg' ), $this->paragraphs(
 				__( 'Marketing emails are sent with a dedicated email service or SMTP, which helps them reach the inbox.', 'groundhogg' )
 			) );
@@ -355,9 +385,22 @@ class Site_Health {
 			? [ admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) => __( 'Email settings', 'groundhogg' ) ]
 			: [ admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ) => __( 'Send email with MailHawk', 'groundhogg' ) ];
 
+		// MailHawk that isn't connected yet gets the advice to send with MailHawk below
+		if ( $plugin && $folder !== 'mailhawk' ) {
+			return $this->result( 'email_service', 'recommended', __( 'Bounces and spam complaints aren\'t reported', 'groundhogg' ), $this->paragraphs(
+			/* translators: %s: the name of the plugin that sends email */
+				sprintf( __( 'Marketing emails are sent through %s. It sends them, but it doesn\'t report bounces or spam complaints, so contacts whose email bounces, or who mark it as spam, keep getting email. That hurts your sender reputation, and more of your email lands in spam.', 'groundhogg' ), $this->plugin_name( $plugin ) ),
+				Mailhawk::is_disabled()
+					? __( 'Connect an email service in the email settings that reports bounces and complaints.', 'groundhogg' )
+					: __( 'Send email with MailHawk, or connect an email service with an official integration, like Amazon SES, SendGrid or Postmark. They report bounces and complaints, and those contacts stop getting email.', 'groundhogg' )
+			), $actions );
+		}
+
 		return $this->result( 'email_service', 'recommended', __( 'Email is sent by the web server', 'groundhogg' ), $this->paragraphs(
 			__( 'Emails are sent with the WordPress default, which hands them to the web server. Most servers are not set up to send email, so messages often land in spam or are not delivered at all.', 'groundhogg' ),
-			__( 'Connect a dedicated email service, or an SMTP or email API plugin, to improve deliverability.', 'groundhogg' )
+			Mailhawk::is_disabled()
+				? __( 'Connect a dedicated email service in the email settings that reports bounces and complaints, to improve deliverability.', 'groundhogg' )
+				: __( 'Send email with MailHawk, or connect an email service with an official integration, like Amazon SES, SendGrid or Postmark, to improve deliverability. They also report bounces and spam complaints, so those contacts stop getting email.', 'groundhogg' )
 		), $actions );
 	}
 

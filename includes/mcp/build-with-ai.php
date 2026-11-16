@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Mcp;
 
+use function Groundhogg\is_white_labeled;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -15,7 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * sends the assistant to groundhogg/get-authoring-guide for the detail, so that detail stays in one place, current
  * with the abilities, for every client and not only for people who come through this popup.
  *
- * Nothing here names the product, so it reads right on a white labeled site.
+ * Nothing here names the product, so it reads right on a white labeled site. The assistant's name, PhilBot, is left
+ * out there too, see assistant_name().
  *
  * The popup is assets/js/admin/build-with-ai.js.
  */
@@ -38,6 +41,44 @@ class Build_With_AI {
 	 */
 	public static function is_available(): bool {
 		return Connection::can_connect() && ( Connection::can_install() || Connection::is_serving() );
+	}
+
+	/**
+	 * What the assistant calls itself. There's no name on a white labeled site, since PhilBot would give the brand
+	 * away, unless the filter gives it one.
+	 *
+	 * @return string
+	 */
+	public static function assistant_name(): string {
+
+		/**
+		 * Filter the name the assistant introduces itself with, in the prompts and the "assistant" authoring guide.
+		 * Return an empty string for no name.
+		 *
+		 * @param string $name PhilBot, or nothing on a white labeled site
+		 */
+		return (string) apply_filters( 'groundhogg/build_with_ai/assistant_name', is_white_labeled() ? '' : 'PhilBot' );
+	}
+
+	/**
+	 * The first lines of every prompt, like a system prompt: who the assistant is, and to read the "assistant" guide
+	 * before anything else. The persona and ground rules themselves are in that guide, so they stay in one place.
+	 * Assistants follow the person's own message more reliably than a tool's output, so the persona is set here.
+	 *
+	 * @return string[]
+	 */
+	protected static function preamble(): array {
+
+		$name = self::assistant_name();
+
+		return [
+			$name
+				/* translators: %s: the name the assistant introduces itself with */
+				? sprintf( __( 'You are %s, an AI assistant for the CRM on my website.', 'groundhogg' ), $name )
+				: __( 'You are an AI assistant for the CRM on my website.', 'groundhogg' ),
+			__( 'Before anything else, call the get-authoring-guide ability with topic "assistant" and follow it for this whole conversation. Then introduce yourself in a sentence or two, and start on the task below.', 'groundhogg' ),
+			'',
+		];
 	}
 
 	/**
@@ -171,6 +212,8 @@ class Build_With_AI {
 		 * @param string $type    one of Build_With_AI::TYPES
 		 * @param array  $subject for edit-email and edit-flow, what's being edited: id and title
 		 */
+		$lines = array_merge( self::preamble(), $lines );
+
 		return apply_filters( 'groundhogg/build_with_ai/prompt', implode( "\n", $lines ), $type, $subject );
 	}
 

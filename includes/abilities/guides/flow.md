@@ -1,5 +1,7 @@
 # Designing a flow
 
+If you haven't read the `assistant` guide in this conversation yet, read it first. It covers how to work with the person.
+
 A flow is an automation: triggers that pull contacts in, and actions, delays and logic that run for them. It is not a script that runs top to bottom. A contact sits at one position in the flow and can be pulled forward by any trigger below them. Most broken flows aren't badly written, they have steps nobody can reach. Design for that first.
 
 ## Find out what this site can build

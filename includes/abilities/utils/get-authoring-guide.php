@@ -4,7 +4,10 @@ namespace Groundhogg\Abilities\Utils;
 
 use Groundhogg\Abilities\Ability;
 use Groundhogg\Abilities\Emails\Email_Block_Renderer;
+use Groundhogg\Mcp\Build_With_AI;
 use WP_Error;
+use function Groundhogg\admin_page_url;
+use function Groundhogg\is_white_labeled;
 
 /**
  * Returns a how-to guide for building something on this site, e.g. the block format the email editor saves, or how to
@@ -12,8 +15,14 @@ use WP_Error;
  * abilities it describes and every client connected over MCP gets it, instead of living in a document the agent may
  * never see.
  *
- * The guides are Markdown files in includes/abilities/guides. They never name the product, so they suit a white
- * labeled site. Add-ons add their own topics with the groundhogg/abilities/authoring_guides filter.
+ * The guides are Markdown files in includes/abilities/guides. They don't name the product, so they suit a white
+ * labeled site, except inside {{#branded}}...{{/branded}}, which is left out on a white labeled site, the way
+ * {{^branded}}...{{/branded}} is left out everywhere else. Add-ons add their own topics with the
+ * groundhogg/abilities/authoring_guides filter.
+ *
+ * The "assistant" guide is the odd one out: it isn't about building anything, it's the persona and ground rules for
+ * a whole session, what a system prompt would be. The prompts from the "Build with AI" popups send the assistant to it
+ * first, see Groundhogg\Mcp\Build_With_AI::prompt(), and the other guides point to it for sessions that start elsewhere.
  */
 class Get_Authoring_Guide extends Ability {
 
@@ -31,6 +40,11 @@ class Get_Authoring_Guide extends Ability {
 	public static function guides(): array {
 
 		$guides = [
+			'assistant' => [
+				'description' => __( 'Read this first in any session: who you are, how to introduce yourself, the ground rules, and how to answer common questions.', 'groundhogg' ),
+				'file'        => dirname( __DIR__ ) . '/guides/assistant.md',
+				'capability'  => 'view_contacts',
+			],
 			'email' => [
 				'description' => __( 'Writing an email in the block format, so it stays editable in the email editor: the block types, merge tags and good practice.', 'groundhogg' ),
 				'file'        => dirname( __DIR__ ) . '/guides/email.md',
@@ -77,7 +91,17 @@ class Get_Authoring_Guide extends Ability {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- a local file
 		$content = (string) file_get_contents( $guide['file'] );
 
-		$content = str_replace( '{{assets_url}}', GROUNDHOGG_ASSETS_URL, $content );
+		$content = self::apply_branding( $content, ! is_white_labeled() );
+
+		$content = str_replace( [
+			'{{assets_url}}',
+			'{{assistant_name}}',
+			'{{help_url}}',
+		], [
+			GROUNDHOGG_ASSETS_URL,
+			Build_With_AI::assistant_name() ?: __( 'the CRM assistant', 'groundhogg' ),
+			admin_page_url( 'gh_help', [ 'tab' => 'troubleshooting' ] ),
+		], $content );
 
 		// this site's palette, fonts and block defaults, for the email guide
 		if ( strpos( $content, '{{email_design}}' ) !== false ) {
@@ -85,6 +109,24 @@ class Get_Authoring_Guide extends Ability {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * Keep what's in {{#branded}}...{{/branded}} and drop what's in {{^branded}}...{{/branded}}, or the other way round
+	 * on a white labeled site. The blocks can't be nested.
+	 *
+	 * @param string $content
+	 * @param bool   $branded
+	 *
+	 * @return string
+	 */
+	public static function apply_branding( string $content, bool $branded ): string {
+
+		$content = preg_replace( '/\{\{#branded\}\}(.*?)\{\{\/branded\}\}/s', $branded ? '$1' : '', $content );
+		$content = preg_replace( '/\{\{\^branded\}\}(.*?)\{\{\/branded\}\}/s', $branded ? '' : '$1', $content );
+
+		// a block that's left out leaves its blank lines behind
+		return (string) preg_replace( '/\n{3,}/', "\n\n", $content );
 	}
 
 	protected function get_args(): array {
@@ -100,7 +142,7 @@ class Get_Authoring_Guide extends Ability {
 		return [
 			'label'       => __( 'Get Authoring Guide', 'groundhogg' ),
 			/* translators: %s: the topics, each with a description */
-			'description' => sprintf( __( 'Get the guide for building something on this site. Read it before you create or change that kind of thing, it covers the formats, rules and good practice the other abilities expect. Topics: %s', 'groundhogg' ), $list ),
+			'description' => sprintf( __( 'Get a guide for working on this site. Read "assistant" first in any session. Read the others before you create or change that kind of thing, they cover the formats, rules and good practice the other abilities expect. Topics: %s', 'groundhogg' ), $list ),
 
 			'input_schema' => [
 				'type'                 => 'object',

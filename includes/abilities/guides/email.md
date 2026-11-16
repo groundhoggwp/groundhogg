@@ -1,6 +1,8 @@
 # Building an email that stays editable
 
-Emails on this site are edited in a drag-and-drop block editor. To make an email the site owner can open and keep editing there, give `create-email-template` (or `update-email-template`) the body as `blocks`: a JSON array of block specs. The markup, block CSS and plain text are written for you, the same way the editor writes them. Plain HTML (`content` with `editor: "html"`) also sends fine, but it opens in a code editor instead, so use blocks unless you're asked otherwise.
+If you haven't read the `assistant` guide in this conversation yet, read it first. It covers how to work with the person.
+
+Emails on this site are edited in a drag-and-drop block editor. To make an email the site owner can open and keep editing there, give `create-email-template` (or `update-email-template`) the body as `blocks`: a JSON array of block specs. The markup, block CSS and plain text are written for you, the same way the editor writes them. Plain HTML (`content` with `editor: "html"`) also sends fine, but it opens in a code editor instead, and the person can't edit it with blocks. Always use blocks, unless the person asks for an HTML email outright or gives you HTML they want kept as it is.
 
 ## Before you write
 
