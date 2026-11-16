@@ -9904,6 +9904,83 @@ function is_staging_environment() {
 }
 
 /**
+ * Whether this is a demo or a throwaway test site: one of our own demo sites, or a sandbox service like InstaWP,
+ * TasteWP or WordPress Playground. Telemetry reports these as their own environment, apart from production and staging.
+ *
+ * Goes by the site's own address, not the request's, so it also works in cron.
+ *
+ * @return bool
+ */
+function is_demo_environment() {
+
+	// --- 0. Manual override (always respect this) ---
+	if ( defined( 'GROUNDHOGG_IS_DEMO' ) ) {
+		return (bool) GROUNDHOGG_IS_DEMO;
+	}
+
+	// --- 1. WordPress Playground runs PHP compiled to WebAssembly, in the browser ---
+	if ( ( $_SERVER['SERVER_SOFTWARE'] ?? '' ) === 'PHP.wasm' ) { // phpcs:ignore WordPress.Security -- compared, not saved or shown
+		return true;
+	}
+
+	// --- 2. Known demo and sandbox hosts ---
+	$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+
+	/**
+	 * Filter the hosts of demo and sandbox sites. A site whose address ends with one of these is a demo.
+	 *
+	 * @param string[] $suffixes
+	 */
+	$suffixes = apply_filters( 'groundhogg/demo_host_suffixes', [
+		'.groundhogg-demo.com',      // our own demo sites
+		'.instawp.xyz',              // InstaWP, and the other suffixes it offers
+		'.instawp.link',
+		'.instawp.co',
+		'tastewp.com',               // TasteWP, e.g. name.s2-tastewp.com
+		'playground.wordpress.net',  // WordPress Playground
+	] );
+
+	foreach ( (array) $suffixes as $suffix ) {
+		if ( $host && is_string( $suffix ) && $suffix !== '' && str_ends_with( $host, strtolower( $suffix ) ) ) {
+			return true;
+		}
+	}
+
+	// --- 3. InstaWP on a domain of its own, like our demo sites, found by the must-use plugins it installs ---
+	return is_instawp_site();
+}
+
+/**
+ * Whether the site is on InstaWP, whatever its address: InstaWP installs must-use plugins named 0-iwp-*.php, with
+ * InstaWP as the author.
+ *
+ * @return bool
+ */
+function is_instawp_site() {
+
+	if ( ! defined( 'WPMU_PLUGIN_DIR' ) || ! is_dir( WPMU_PLUGIN_DIR ) ) {
+		return false;
+	}
+
+	if ( ! empty( glob( trailingslashit( WPMU_PLUGIN_DIR ) . '0-iwp-*.php' ) ) ) {
+		return true;
+	}
+
+	// renamed, so go by the author in their headers
+	if ( ! function_exists( 'get_mu_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	foreach ( get_mu_plugins() as $plugin ) {
+		if ( strcasecmp( trim( $plugin['Author'] ?? '' ), 'InstaWP' ) === 0 ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Run something as a user, and put the current user back afterwards, even if it throws.
  *
  * What a user is allowed to see is decided by the current user, including what is redacted for a user who can't see the

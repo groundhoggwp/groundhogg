@@ -145,6 +145,15 @@ class Notifications_Feed_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( 'Hello', $feed[1]['content'] );
 	}
 
+	public function test_local_notifications_are_dated_like_the_remote_ones() {
+		notices()->add_notification( 'dated', [ 'title' => 'Dated' ] );
+
+		$feed = $this->notices_with_remote( [] )->get_feed();
+
+		// e.g. "Friday, October 30, 2026"
+		$this->assertSame( wp_date( 'l, F j, Y' ), $feed[0]['sent'] );
+	}
+
 	public function test_local_notifications_still_show_when_the_remote_fetch_fails() {
 		notices()->add_notification( 'local-only', [ 'title' => 'Local' ] );
 

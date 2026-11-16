@@ -82,12 +82,10 @@ class Telemetry {
 		'mobile_app_used',
 	];
 
-	const NOTICE_ID = 'telemetry-schema-2';
-
 	/**
-	 * How long the notice about what's shared keeps showing after it was first shown
+	 * The notification, in the notifications feed, telling sites that opted in before what's shared now
 	 */
-	const NOTICE_DAYS = 30;
+	const NOTICE_ID = 'telemetry-schema-2';
 
 	/**
 	 * @var bool|null whether the opt-in in progress also subscribed to the newsletter
@@ -130,7 +128,10 @@ class Telemetry {
 		// the Abilities API, WordPress 6.9+
 		add_action( 'wp_after_execute_ability', [ $this, 'count_ability' ] );
 
-		add_action( 'admin_notices', [ $this, 'notice' ] );
+		// the notification for sites that opted in before, and knowing an admin has seen it
+		add_action( 'admin_init', [ $this, 'maybe_add_notification' ] );
+		add_action( 'groundhogg/notices/read', [ $this, 'notification_seen' ], 10, 2 );
+		add_action( 'groundhogg/notices/dismissed', [ $this, 'notification_seen' ], 10, 2 );
 	}
 
 	/**
@@ -373,12 +374,18 @@ class Telemetry {
 	}
 
 	/**
-	 * production, staging, development or local. Some hosts leave staging copies set to production, so what
-	 * is_staging_environment() spots counts as staging.
+	 * demo, production, staging, development or local.
+	 *
+	 * - Demo and sandbox sites (is_demo_environment()) are demo whatever WordPress says, they're usually set to production.
+	 * - Some hosts leave staging copies set to production, so what is_staging_environment() spots counts as staging.
 	 *
 	 * @return string
 	 */
 	public static function get_environment() {
+
+		if ( is_demo_environment() ) {
+			return 'demo';
+		}
 
 		$environment = wp_get_environment_type();
 
@@ -926,57 +933,59 @@ class Telemetry {
 	}
 
 	/**
-	 * Whether to show the notice about what's shared now
-	 *
-	 * @return bool
-	 */
-	protected function should_show_notice() {
-
-		if ( ! self::is_v2() || ! $this->is_enabled() || ! current_user_can( 'manage_options' ) || ! is_admin_groundhogg_page() ) {
-			return false;
-		}
-
-		if ( Plugin::instance()->notices->is_dismissed( self::NOTICE_ID ) ) {
-			return false;
-		}
-
-		$shown = absint( get_option( self::NOTICE_SHOWN_OPTION ) );
-
-		// not yet shown and needed, or shown recently
-		return $shown ? $shown > time() - self::NOTICE_DAYS * DAY_IN_SECONDS : $this->needs_notice();
-	}
-
-	/**
-	 * Tell sites that opted in to the old, smaller snapshot what is shared now, and how to stop. Nothing new is sent
-	 * until it has been shown.
+	 * Tell sites that opted in to the old, smaller ping what is shared now, and how to stop, in the notifications
+	 * feed. Nothing new is sent until an admin has read it. It stays in the feed until each person dismisses it, and
+	 * goes when the site opts out.
 	 *
 	 * @return void
 	 */
-	public function notice() {
+	public function maybe_add_notification() {
 
-		if ( ! $this->should_show_notice() ) {
+		$notices = Plugin::instance()->notices;
+
+		// needed, or seen already and kept for whoever hasn't dismissed it
+		if ( ! self::is_v2() || ! $this->is_enabled() || ( ! $this->needs_notice() && ! get_option( self::NOTICE_SHOWN_OPTION ) ) ) {
+			$notices->remove_notification( self::NOTICE_ID );
+
+			return;
+		}
+
+		$notices->add_notification( self::NOTICE_ID, [
+			'title'    => __( 'The usage data you share now includes more detail', 'groundhogg' ),
+			'message'  => sprintf(
+				'<p>%1$s</p><p><a href="%2$s">%3$s</a></p>',
+				esc_html( sprintf(
+					/* translators: %s: the plugin/brand name */
+					__( 'You opted in to sharing usage data to help make %s better. Once a week it now also includes which flow steps, editors and settings you use, totals and weekly counts of contacts, emails and automation, whether email sending and cron are working, and which plugins are active. Never your contacts, what\'s in your emails, or your site\'s address.', 'groundhogg' ),
+					white_labeled_name()
+				) ),
+				// straight to the setting, the same anchor the command palette uses
+				esc_url( admin_page_url( 'gh_settings', [ 'tab' => 'misc' ], Admin\Settings\Settings_Page::setting_anchor( self::OPTIN_OPTION ) ) ),
+				esc_html__( 'Stop sharing', 'groundhogg' )
+			),
+			'type'     => 'info',
+			'cap'      => 'manage_options',
+			'location' => 'feed',
+		] );
+	}
+
+	/**
+	 * Once an admin has read or dismissed the notification, the site can send. When white labeled, the feed is shown
+	 * as a banner, which counts once it's dismissed.
+	 *
+	 * @param string[] $ids
+	 * @param int      $user_id
+	 *
+	 * @return void
+	 */
+	public function notification_seen( $ids, $user_id ) {
+
+		if ( ! in_array( self::NOTICE_ID, (array) $ids, true ) || ! user_can( $user_id, 'manage_options' ) ) {
 			return;
 		}
 
 		if ( ! get_option( self::NOTICE_SHOWN_OPTION ) ) {
 			update_option( self::NOTICE_SHOWN_OPTION, time(), false );
 		}
-
-		$settings = admin_page_url( 'gh_settings', [ 'tab' => 'misc' ] );
-		$dismiss  = wp_nonce_url( add_query_arg( 'notice', self::NOTICE_ID ), 'gh_dismiss_notice' );
-
-		?>
-		<div class="notice notice-info">
-			<p><strong><?php esc_html_e( 'The usage data you share now includes more detail', 'groundhogg' ); ?></strong></p>
-			<p><?php
-				/* translators: %s: the plugin/brand name */
-				echo esc_html( sprintf( __( 'You opted in to sharing usage data to help make %s better. Once a week it now also includes which flow steps, editors and settings you use, totals and weekly counts of contacts, emails and automation, whether email sending and cron are working, and which plugins are active. Never your contacts, what\'s in your emails, or your site\'s address.', 'groundhogg' ), white_labeled_name() ) );
-			?></p>
-			<p>
-				<a class="button button-secondary" href="<?php echo esc_url( $dismiss ); ?>"><?php esc_html_e( 'Got it', 'groundhogg' ); ?></a>
-				<a href="<?php echo esc_url( $settings ); ?>"><?php esc_html_e( 'Stop sharing', 'groundhogg' ); ?></a>
-			</p>
-		</div>
-		<?php
 	}
 }

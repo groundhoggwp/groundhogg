@@ -4,6 +4,7 @@ use Groundhogg\License_Manager;
 use Groundhogg\Plugin;
 use Groundhogg\Telemetry;
 use Groundhogg\Telemetry_Snapshot;
+use function Groundhogg\notices;
 
 /**
  * What an opted-in site sends home, see docs/telemetry-payload.md: nothing without opting in, no site address or
@@ -152,6 +153,15 @@ class Telemetry_Tests extends GH_UnitTestCase {
 		} ) ) );
 	}
 
+	/**
+	 * The current user's notifications feed, the ones added in code
+	 *
+	 * @return array[] by id
+	 */
+	protected function feed() {
+		return notices()->get_notifications( 'feed' );
+	}
+
 	protected function flag_off() {
 		remove_filter( 'groundhogg/telemetry/v2', '__return_true' );
 		add_filter( 'groundhogg/telemetry/v2', '__return_false' );
@@ -216,18 +226,15 @@ class Telemetry_Tests extends GH_UnitTestCase {
 		$this->assertSame( [], $this->telemetry()->get_ability_counts() );
 	}
 
-	public function test_with_the_flag_off_there_is_no_notice() {
+	public function test_with_the_flag_off_there_is_no_notification() {
 		$this->flag_off();
 		$this->opt_in_before_schema_2();
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
-		set_current_screen( 'dashboard' );
-		$_REQUEST['page'] = 'gh_contacts';
 
-		ob_start();
-		$this->telemetry()->notice();
-		$this->assertSame( '', ob_get_clean() );
-		$this->assertFalse( get_option( Telemetry::NOTICE_SHOWN_OPTION ) );
+		$this->telemetry()->maybe_add_notification();
+
+		$this->assertArrayNotHasKey( Telemetry::NOTICE_ID, $this->feed() );
 	}
 
 	public function test_a_site_that_opted_in_while_the_flag_was_off_gets_the_notice_when_it_is_turned_on() {
@@ -317,9 +324,141 @@ class Telemetry_Tests extends GH_UnitTestCase {
 		$this->assertSame( get_option( Telemetry::SITE_ID_OPTION ), $message['site_id'] );
 		$this->assertSame( Telemetry::url_hash(), $message['url_hash'] );
 		$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/', $message['sent_at'] );
-		$this->assertContains( $message['environment'], [ 'production', 'staging', 'development', 'local' ] );
+		$this->assertContains( $message['environment'], [ 'production', 'staging', 'development', 'local', 'demo' ] );
 		$this->assertSame( GROUNDHOGG_VERSION, $message['groundhogg'] );
 		$this->assertNull( $message['cloned_from'] );
+	}
+
+	/**
+	 * Pretend the site lives at an address
+	 *
+	 * @param string $url
+	 *
+	 * @return callable the filter, to remove
+	 */
+	protected function site_at( string $url ) {
+
+		$filter = function () use ( $url ) {
+			return $url;
+		};
+
+		add_filter( 'home_url', $filter );
+
+		return $filter;
+	}
+
+	/**
+	 * @dataProvider demo_sites
+	 */
+	public function test_demo_and_sandbox_sites_are_the_demo_environment( string $url ) {
+
+		$filter = $this->site_at( $url );
+
+		$this->assertTrue( \Groundhogg\is_demo_environment() );
+		$this->assertSame( 'demo', Telemetry::get_environment() );
+
+		remove_filter( 'home_url', $filter );
+	}
+
+	public function demo_sites() {
+		return [
+			'our demo sites' => [ 'https://acme-co.groundhogg-demo.com' ],
+			'instawp'        => [ 'https://quick-test.instawp.xyz' ],
+			'instawp link'   => [ 'https://quick-test.instawp.link' ],
+			'instawp co'     => [ 'https://quick-test.instawp.co' ],
+			'tastewp'        => [ 'https://buildname.s2-tastewp.com' ],
+			'playground'     => [ 'https://playground.wordpress.net/scope:0.123' ],
+		];
+	}
+
+	public function test_a_site_whose_name_only_mentions_a_demo_host_is_not_a_demo() {
+
+		$filter = $this->site_at( 'https://groundhogg-demo.com.example.org' );
+
+		$this->assertFalse( \Groundhogg\is_demo_environment() );
+
+		remove_filter( 'home_url', $filter );
+	}
+
+	public function test_playground_is_a_demo_wherever_it_says_it_is() {
+
+		$software = $_SERVER['SERVER_SOFTWARE'] ?? null;
+
+		$_SERVER['SERVER_SOFTWARE'] = 'PHP.wasm';
+
+		$demo = \Groundhogg\is_demo_environment();
+
+		if ( $software === null ) {
+			unset( $_SERVER['SERVER_SOFTWARE'] );
+		} else {
+			$_SERVER['SERVER_SOFTWARE'] = $software;
+		}
+
+		$this->assertTrue( $demo );
+	}
+
+	/**
+	 * Put a must-use plugin in place for the length of a callback
+	 *
+	 * @param string   $file
+	 * @param string   $headers
+	 * @param callable $callback
+	 */
+	protected function with_mu_plugin( string $file, string $headers, callable $callback ) {
+
+		$made_dir = ! is_dir( WPMU_PLUGIN_DIR ) && wp_mkdir_p( WPMU_PLUGIN_DIR );
+		$path     = trailingslashit( WPMU_PLUGIN_DIR ) . $file;
+
+		file_put_contents( $path, "<?php\n/*\n$headers\n*/\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- test fixture
+
+		try {
+			call_user_func( $callback );
+		} finally {
+			unlink( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- test fixture
+
+			if ( $made_dir ) {
+				rmdir( WPMU_PLUGIN_DIR ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- test fixture
+			}
+		}
+	}
+
+	public function test_a_site_without_instawps_plugins_is_not_on_instawp() {
+		$this->assertFalse( \Groundhogg\is_instawp_site() );
+	}
+
+	public function test_instawp_on_its_own_domain_is_a_demo_by_its_must_use_plugins() {
+		$this->with_mu_plugin( '0-iwp-upgrade-concurrency-guard.php', "Plugin Name: InstaWP — Upgrade concurrency guard\nAuthor: InstaWP", function () {
+			$this->assertTrue( \Groundhogg\is_instawp_site() );
+			$this->assertSame( 'demo', Telemetry::get_environment() );
+		} );
+	}
+
+	public function test_instawp_is_found_by_the_author_when_the_file_is_renamed() {
+		$this->with_mu_plugin( 'cache-guard.php', "Plugin Name: Cache guard\nAuthor: InstaWP", function () {
+			$this->assertTrue( \Groundhogg\is_instawp_site() );
+		} );
+
+		$this->with_mu_plugin( 'someone-else.php', "Plugin Name: Something else\nAuthor: Someone", function () {
+			$this->assertFalse( \Groundhogg\is_instawp_site() );
+		} );
+	}
+
+	public function test_a_site_can_add_its_own_demo_hosts() {
+
+		$filter = $this->site_at( 'https://shop.our-sandbox.test' );
+
+		$hosts = function ( $suffixes ) {
+			$suffixes[] = '.our-sandbox.test';
+
+			return $suffixes;
+		};
+
+		add_filter( 'groundhogg/demo_host_suffixes', $hosts );
+
+		$this->assertTrue( \Groundhogg\is_demo_environment() );
+
+		remove_filter( 'groundhogg/demo_host_suffixes', $hosts );
+		remove_filter( 'home_url', $filter );
 	}
 
 	/* ---- what is never sent ------------------------------------------------------------------------------ */
@@ -394,44 +533,68 @@ class Telemetry_Tests extends GH_UnitTestCase {
 		$this->assertEmpty( $this->sent() );
 		$this->assertFalse( get_option( Telemetry::SITE_ID_OPTION ), 'no site ID made before the notice' );
 
-		// an admin opens one of the plugin's pages
+		// it's in an admin's notifications feed
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
-		set_current_screen( 'dashboard' );
-		$_REQUEST['page'] = 'gh_contacts';
+		$this->telemetry()->maybe_add_notification();
 
-		ob_start();
-		$this->telemetry()->notice();
-		$html = ob_get_clean();
+		$feed = $this->feed();
 
-		$this->assertStringContainsString( 'Stop sharing', $html );
+		$this->assertArrayHasKey( Telemetry::NOTICE_ID, $feed );
+		$this->assertStringContainsString( 'Stop sharing', $feed[ Telemetry::NOTICE_ID ]['message'] );
+		$this->assertStringContainsString( 'tab=misc#setting-gh_opted_in_stats_collection', $feed[ Telemetry::NOTICE_ID ]['message'], 'opens the settings at the setting' );
+		$this->assertFalse( $this->telemetry()->can_send(), 'in the feed is not seen yet' );
+
+		// they open the feed
+		notices()->read_notice( [ Telemetry::NOTICE_ID ] );
+
 		$this->assertNotEmpty( get_option( Telemetry::NOTICE_SHOWN_OPTION ) );
 		$this->assertTrue( $this->telemetry()->can_send() );
 
 		$this->telemetry()->maybe_send_telemetry();
 		$this->assertCount( 1, $this->sent( 'snapshot' ) );
+
+		// it stays for whoever hasn't dismissed it
+		$this->telemetry()->maybe_add_notification();
+		$this->assertArrayHasKey( Telemetry::NOTICE_ID, $this->feed() );
 	}
 
-	public function test_the_notice_is_only_for_admins_on_the_plugins_pages() {
+	public function test_dismissing_the_notification_counts_as_seeing_it() {
 		$this->opt_in_before_schema_2();
-		set_current_screen( 'dashboard' );
 
-		// not an admin
-		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
-		$_REQUEST['page'] = 'gh_contacts';
-
-		ob_start();
-		$this->telemetry()->notice();
-		$this->assertSame( '', ob_get_clean() );
-
-		// an admin, on another page
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
-		$_REQUEST['page'] = 'some-other-plugin';
+		$this->telemetry()->maybe_add_notification();
 
-		ob_start();
-		$this->telemetry()->notice();
-		$this->assertSame( '', ob_get_clean() );
+		notices()->dismiss_notice( Telemetry::NOTICE_ID );
+
+		$this->assertTrue( $this->telemetry()->can_send() );
+	}
+
+	public function test_the_notification_is_only_for_admins() {
+		$this->opt_in_before_schema_2();
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->telemetry()->maybe_add_notification();
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$this->assertArrayNotHasKey( Telemetry::NOTICE_ID, $this->feed() );
+
+		// and someone who can't manage the site reading it doesn't count
+		notices()->read_notice( [ Telemetry::NOTICE_ID ] );
 
 		$this->assertFalse( get_option( Telemetry::NOTICE_SHOWN_OPTION ) );
+	}
+
+	public function test_opting_out_takes_the_notification_away() {
+		$this->opt_in_before_schema_2();
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->telemetry()->maybe_add_notification();
+
+		update_option( Telemetry::OPTIN_OPTION, '' );
+		$this->telemetry()->maybe_add_notification();
+
+		$this->assertArrayNotHasKey( Telemetry::NOTICE_ID, $this->feed() );
 	}
 
 	public function test_new_opt_ins_need_no_notice() {

@@ -350,7 +350,8 @@ class Notices {
 					'id'      => $notification['id'],
 					'title'   => $notification['title'],
 					'content' => wp_kses_post( wpautop( $notification['message'] ) ),
-					'sent'    => wp_date( 'Y-m-d H:i:s', $notification['added'] ),
+					// the remote notices arrive already formatted like "Friday, October 30, 2026"
+					'sent'    => wp_date( 'l, F j, Y', $notification['added'] ),
 				],
 			];
 		}
@@ -524,6 +525,14 @@ class Notices {
 		}
 
 		update_user_meta( get_current_user_id(), self::READ_NOTICES_OPTION, self::$read_notices );
+
+		/**
+		 * After the current user read notices, e.g. by opening the notifications feed
+		 *
+		 * @param string[] $notices the notice ids
+		 * @param int      $user_id
+		 */
+		do_action( 'groundhogg/notices/read', $notices, get_current_user_id() );
 	}
 
 	/**
@@ -544,6 +553,15 @@ class Notices {
 		}
 
 		update_user_meta( get_current_user_id(), self::DISMISSED_NOTICES_OPTION, self::$dismissed_notices );
+
+		/**
+		 * After the current user dismissed notices
+		 *
+		 * @param string[] $notices the notice ids
+		 * @param int      $user_id
+		 * @param int      $days    0 for good
+		 */
+		do_action( 'groundhogg/notices/dismissed', $notices, get_current_user_id(), $days );
 	}
 
 	/**

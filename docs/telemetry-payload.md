@@ -3,7 +3,7 @@
 What an opted-in site sends home, where each field comes from, and what that means for the backend that receives it.
 Built in `includes/telemetry.php` and `includes/telemetry-snapshot.php`, behind a flag that is off until the endpoint is
 live (see "Feature flag" below). Schema 1 is the old weekly ping to the CRM, which is still what sites send while the
-flag is off.
+flag is off. For how the code works, its hooks, and testing and shipping it, see [telemetry.md](telemetry.md).
 
 ## Feature flag
 
@@ -35,7 +35,7 @@ README text for schema 2:
 > Sharing usage data is opt-in. You can turn it on or off from Groundhogg » Settings » Misc » Danger Zone » Share usage data, or in the guided setup. When it is on, the following is sent to `https://telemetry.groundhogg.io`:
 >
 > * Once, when you opt in: your email address, whether you also asked for the newsletter, and your time zone.
-> * Once a week: a random ID for the site and a one-way hash of its address (never the address itself); whether it is a production, staging or development site; the versions of Groundhogg, WordPress, PHP and the database, the site language and time zone; your plan, its expiry date and a one-way hash of your license key (never the key itself); which Groundhogg add-ons are installed and licensed; the folder names of your active plugins; totals of contacts (by opt-in status), tags, flows, emails, campaigns, custom fields, saved searches and team members; for the last 7 days, the number of new contacts, emails sent, automation events, opens, clicks, broadcasts, abilities run by AI agents, and people who used the mobile app; which flow step types are in your active flows and which editors your recent emails were made with; a few settings (GDPR, confirmation, email logging, bounce checking); whether email sending, cron and the event queue are working; and when you installed Groundhogg, finished the setup, and added your first contact, flow and email.
+> * Once a week: a random ID for the site and a one-way hash of its address (never the address itself); whether it is a production, staging, development or demo site; the versions of Groundhogg, WordPress, PHP and the database, the site language and time zone; your plan, its expiry date and a one-way hash of your license key (never the key itself); which Groundhogg add-ons are installed and licensed; the folder names of your active plugins; totals of contacts (by opt-in status), tags, flows, emails, campaigns, custom fields, saved searches and team members; for the last 7 days, the number of new contacts, emails sent, automation events, opens, clicks, broadcasts, abilities run by AI agents, and people who used the mobile app; which flow step types are in your active flows and which editors your recent emails were made with; a few settings (GDPR, confirmation, email logging, bounce checking); whether email sending, cron and the event queue are working; and when you installed Groundhogg, finished the setup, and added your first contact, flow and email.
 > * When it happens: the plugin being activated, deactivated or updated (with the versions).
 > * Once each, the first time it happens on a new site: finishing the setup, adding a contact, importing contacts, a form being submitted, activating a flow, a flow sending an email, sending a broadcast, connecting an AI agent, and using the mobile app (just the name of the milestone and when, nothing about what it was).
 >
@@ -64,9 +64,10 @@ README text for schema 2:
 | `gh_telemetry_url_hash` | `sha256( normalized home_url )` at the time the ID was made | When the current hash differs, the site was cloned or moved: make a new ID and send `cloned_from` once. |
 | `gh_installed_at` | Timestamp, set on activation from now on | Older sites backfill it from the earliest contact or flow, flagged `estimated`. |
 
-Staging and development sites send like any other, marked by `environment` in the envelope. A staging clone gets its
-own ID through the URL hash check, and points back to the live site with `cloned_from`. The backend leaves non-production
-sites out of the default dashboards, and can still report on them (how many customers stage, which hosts clone).
+Staging, development and demo sites send like any other, marked by `environment` in the envelope. A staging clone gets
+its own ID through the URL hash check, and points back to the live site with `cloned_from`. The backend leaves
+non-production sites out of the default dashboards, and can still report on them (how many customers stage, which hosts
+clone, how many people try it in a sandbox).
 
 ## Envelope
 
@@ -86,8 +87,20 @@ Every request has the same envelope. `type` says what kind of message it is.
 }
 ```
 
-`environment` is `wp_get_environment_type()`, except that a site `is_staging_environment()` detects (host signals,
-staging subdomains, `GROUNDHOGG_IS_STAGING`) reports `staging` even when WordPress says `production`.
+`environment` is one of `production`, `staging`, `development`, `local` or `demo`:
+
+- **`demo`:** whatever WordPress says, for a site `is_demo_environment()` recognises, since these are usually set to
+  production. That's our own demo sites (`*.groundhogg-demo.com`), sandbox services (InstaWP's `*.instawp.xyz`,
+  `.link` and `.co`; TasteWP's `*.s2-tastewp.com`), and WordPress Playground (`playground.wordpress.net`, or PHP running
+  as `PHP.wasm`). It goes by `home_url()`, so it works in cron too. `GROUNDHOGG_IS_DEMO` overrides it, and
+  `groundhogg/demo_host_suffixes` adds hosts. An InstaWP site on its own domain is found by the must-use plugins
+  InstaWP installs (`is_instawp_site()`): files named `0-iwp-*.php`, or any must-use plugin with InstaWP as its
+  author. InstaWP also hosts live sites, and those count as demo too.
+- **Otherwise** `wp_get_environment_type()`, except that a site `is_staging_environment()` detects (host signals,
+  staging subdomains, `GROUNDHOGG_IS_STAGING`) reports `staging` even when WordPress says `production`.
+
+Demo sites matter on their own: hundreds of demo sites were handed out over the years, and sandbox sites are mostly
+people trying a plugin. Counted as production, both would inflate active installs and drag down retention.
 
 `message_id` makes retries idempotent. A snapshot is identified by its ISO week, and an event by its type plus a
 timestamp.
@@ -271,12 +284,14 @@ Built in `includes/telemetry.php` (`Telemetry`: identity, sending, lifecycle, th
 - **The old opt-in webhook** (`1724-telemetry-optin`) is still told about opt-ins from the guided setup, for the
   newsletter and the opt-in discount, until the endpoint forwards `opted_in` to the CRM. It goes out without the site
   address in the User-Agent too. The old weekly webhook (`1727`) is no longer used.
-- **The notice for sites already opted in.** A site that is opted in but has no `gh_telemetry_site_id` (new opt-ins
-  get one straight away) opted in to schema 1, so `needs_notice()` holds back everything until it has been shown.
-  - It's shown on the plugin's admin pages to `manage_options` users, with "Got it" (which dismisses it for that
-    user) and a link to the setting to stop sharing.
-  - Showing it records `gh_telemetry_notice_shown`, which lets sending start.
-  - It keeps showing to anyone who hasn't dismissed it for 30 days, then stops.
+- **The notification for sites already opted in.** A site that is opted in but has no `gh_telemetry_site_id` (new
+  opt-ins get one straight away) opted in to schema 1, so `needs_notice()` holds back everything until an admin has
+  seen what's shared now.
+  - It goes in the notifications feed (the bell) for `manage_options` users, with a link to the setting to stop
+    sharing.
+  - An admin reading it (opening the feed) or dismissing it records `gh_telemetry_notice_shown`, through the new
+    `groundhogg/notices/read` and `groundhogg/notices/dismissed` actions. That lets sending start.
+  - It stays in the feed until each person dismisses it, and goes if the site opts out.
 
 ## Example
 
@@ -350,4 +365,5 @@ That's about 3 to 5 KB a week per site.
 2. Send every active plugin slug, not a fixed list. The backend treats it as sensitive.
 3. No `opted_out` message. Opting out just stops the sending.
 4. Sites already opted in get a one-time notice, not a fresh opt-in.
-5. Staging and development sites send too, identified by `environment`.
+5. Staging and development sites send too, identified by `environment`. So do demo and sandbox sites (our
+   `*.groundhogg-demo.com` sites, InstaWP, TasteWP, WordPress Playground), as `demo`.
