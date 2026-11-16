@@ -1010,7 +1010,7 @@
         id         : 'telemetry',
         label      : __('Share how I use Groundhogg', 'groundhogg'),
         description: [
-          __('Once a week, send Groundhogg Inc. the number of active flows, new contacts and broadcasts, which add-ons are installed, and the versions of Groundhogg, WordPress and PHP, along with your email address. Never your contacts or what\'s in your emails.', 'groundhogg'),
+          __('Once a week, send Groundhogg Inc. counts of your contacts, emails and automation, which features and plugins you use, whether email is working, and the versions of Groundhogg, WordPress and PHP, plus when you first reach each step of getting started. Your email address is sent once, now. Never your contacts, what\'s in your emails, or your site\'s address.', 'groundhogg'),
           State.licensed ? null : Bold({}, ' ' + __('Get 15% off your first year of a premium plan.', 'groundhogg')),
         ],
       },

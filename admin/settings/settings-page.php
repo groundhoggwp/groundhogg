@@ -1146,7 +1146,7 @@ class Settings_Page extends Admin_Page {
 				'section' => 'danger_zone',
 				'label'   => _x( 'Share usage data', 'settings', 'groundhogg' ),
 				/* translators: %1$s: the plugin/brand name */
-				'desc'    => sprintf( _x( 'Help us make %1$s better. Once a week, sends the number of active flows, new contacts and broadcasts, which add-ons are installed, and the versions of %1$s, WordPress and PHP, along with your email address. Never your contacts or what\'s in your emails.', 'settings', 'groundhogg' ), white_labeled_name() ),
+				'desc'    => sprintf( _x( 'Help us make %1$s better. Once a week, sends counts of your contacts, emails and automation, which features, flow steps and plugins you use, whether email and cron are working, and the versions of %1$s, WordPress and PHP, plus when you first reach each step of getting started, like your first flow or email. Your email address is sent once, when you turn this on. Never your contacts, what\'s in your emails, or your site\'s address.', 'settings', 'groundhogg' ), white_labeled_name() ),
 				'type'    => 'checkbox',
 				'atts'    => [
 					'label' => __( 'Enable' , 'groundhogg' ),
