@@ -100,6 +100,10 @@ class Assistant_Guide_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( 'WooCommerce', $assistant );
 		$this->assertStringContainsString( 'LearnDash', $assistant );
 		$this->assertStringContainsString( 'BuddyBoss', $assistant );
+
+		// integrations we don't recommend, only mention to people who already use them
+		$this->assertStringContainsString( 'Don\'t recommend them', $assistant );
+		$this->assertStringNotContainsString( 'LifterLMS and Tutor LMS', $assistant );
 		$this->assertStringContainsString( 'Only write an HTML email when the person asks for HTML outright', $assistant );
 	}
 
