@@ -107,6 +107,41 @@ class Assistant_Guide_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( 'Only write an HTML email when the person asks for HTML outright', $assistant );
 	}
 
+	/**
+	 * Upgrades are recommended as plans, never as add-ons bought on their own, and only where the site isn't white
+	 * labeled
+	 */
+	public function test_upgrades_are_recommended_as_plans_when_branded() {
+
+		$markdown = file_get_contents( Get_Authoring_Guide::guides()['assistant']['file'] );
+
+		$branded = Get_Authoring_Guide::apply_branding( $markdown, true );
+		$white   = Get_Authoring_Guide::apply_branding( $markdown, false );
+
+		$this->assertStringContainsString( '## Plans and upgrading', $branded );
+		$this->assertStringContainsString( 'Never recommend buying an add-on on its own', $branded );
+		$this->assertMatchesRegularExpression( '/\*\*Pro\*\*: the store, course and membership integrations \(WooCommerce/', $branded );
+		$this->assertMatchesRegularExpression( '/\*\*Pro\*\*:.*text messaging/', $branded );
+
+		foreach ( [ 'Plans and upgrading', 'pricing', '**Basic**', '**Pro**', 'upgrade' ] as $text ) {
+			$this->assertStringNotContainsString( $text, $white, $text );
+		}
+	}
+
+	/**
+	 * The docs are ours, so the guides only send the assistant to them where the site isn't white labeled
+	 */
+	public function test_the_docs_are_only_mentioned_when_branded() {
+
+		foreach ( [ 'assistant', 'setup' ] as $topic ) {
+
+			$markdown = file_get_contents( Get_Authoring_Guide::guides()[ $topic ]['file'] );
+
+			$this->assertStringContainsString( 'search-docs', Get_Authoring_Guide::apply_branding( $markdown, true ), $topic );
+			$this->assertStringNotContainsString( 'search-docs', Get_Authoring_Guide::apply_branding( $markdown, false ), $topic );
+		}
+	}
+
 	public function test_anyone_who_can_connect_an_assistant_can_read_it() {
 
 		$ability = wp_get_ability( 'groundhogg/get-authoring-guide' );

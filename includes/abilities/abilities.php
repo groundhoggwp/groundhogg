@@ -68,6 +68,7 @@ use Groundhogg\Abilities\Setup\Set_Up_Cron;
 use Groundhogg\Abilities\Tags\Create_Tag;
 use Groundhogg\Abilities\Tags\List_Tags;
 use Groundhogg\Abilities\Utils\Get_Authoring_Guide;
+use Groundhogg\Abilities\Utils\Search_Docs;
 use Groundhogg\Abilities\Utils\Search_Media;
 use Groundhogg\Abilities\Utils\Upload_Media;
 
@@ -466,6 +467,7 @@ class Abilities {
 			Search_Media::class,
 			Upload_Media::class,
 			Get_Authoring_Guide::class,
+			Search_Docs::class,
 			Activate_License::class,
 			Check_License::class,
 			List_Extensions::class,
