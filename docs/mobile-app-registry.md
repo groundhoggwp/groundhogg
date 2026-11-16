@@ -1,8 +1,9 @@
 # Mobile app: feature registry (draft spec)
 
-**Status:** first slice implemented on the `mobile-app` branch: the route, shell, manifest builder, registry (PHP and
-JS), the service worker, and core's own screens (Home, Contacts, contact record, Tasks, notes, quick create). No add-on
-has registered a feature yet. See "Implementation notes" at the end for where it differs from this draft.
+**Status:** shipped in core 4.10: the route, shell, manifest builder, registry (PHP and JS), the service worker, and
+core's own screens (Home, Contacts, contact record, Tasks, notes, messages, quick create). The first add-on feature,
+deals, is built in the pipeline add-on and not released yet, see "Deals (the pipeline add-on)" near the end. See
+"Implementation notes" for where the code differs from this draft.
 
 A mobile-first web app (PWA) for Groundhogg, where core ships the shell and the common screens, and add-ons
 (appointments, pipeline, companies, ...) register their own mobile features into it. This document defines
@@ -85,23 +86,23 @@ add_action( 'groundhogg/mobile/register_features', function ( $features ) {
 		'min_api_version' => 1,                       // lowest mobile API the bundle was written against
 		'cap'             => 'view_deals',            // see section 6
 		'script'          => [                        // the lazy bundle
-			'src'     => GH_PIPELINE_ASSETS_URL . 'js/mobile/pipeline.min.js',
-			'version' => GH_PIPELINE_VERSION,
+			'src'     => GROUNDHOGG_PIPELINE_ASSETS_URL . 'js/mobile/pipeline.min.js',
+			'version' => GROUNDHOGG_PIPELINE_VERSION,
 			'domain'  => 'groundhogg-pipeline',       // text domain, for translations
 		],
-		'style'           => [ 'src' => GH_PIPELINE_ASSETS_URL . 'css/mobile/pipeline.min.css', 'version' => GH_PIPELINE_VERSION ],
+		'style'           => [ 'src' => GROUNDHOGG_PIPELINE_ASSETS_URL . 'css/mobile/pipeline.min.css', 'version' => GROUNDHOGG_PIPELINE_VERSION ],
 
 		'nav' => [
 			[ 'id' => 'deals', 'label' => __( 'Deals', 'groundhogg-pipeline' ), 'icon' => 'deals', 'route' => '/deals', 'placement' => 'more', 'priority' => 30 ],
 		],
 		'home_cards' => [
-			[ 'id' => 'stale-deals', 'priority' => 40 ],
+			[ 'id' => 'deals-attention', 'label' => __( 'Deals needing attention', 'groundhogg-pipeline' ), 'priority' => 12 ],
 		],
 		'contact_panels' => [
-			[ 'id' => 'contact-deals', 'label' => __( 'Deals', 'groundhogg-pipeline' ), 'priority' => 30 ],
+			[ 'id' => 'contact-deals', 'label' => __( 'Deals', 'groundhogg-pipeline' ), 'icon' => 'deals', 'priority' => 25 ],
 		],
 		'quick_create' => [
-			[ 'id' => 'new-deal', 'label' => __( 'New deal', 'groundhogg-pipeline' ), 'icon' => 'deals', 'cap' => 'add_deals' ],
+			[ 'id' => 'new-deal', 'label' => __( 'New deal', 'groundhogg-pipeline' ), 'icon' => 'deals', 'priority' => 30, 'cap' => 'add_deals' ],
 		],
 		'search_providers' => [
 			[ 'id' => 'deals', 'label' => __( 'Deals', 'groundhogg-pipeline' ), 'route' => '/deals/:id' ],
@@ -134,13 +135,17 @@ The shell has a bottom tab bar (core: **Home, Contacts, Tasks**, plus the create
   `priority` and sends the rest to More. Appointments is the one add-on likely to deserve a tab.
 - `route` is the hash path. A feature owns everything under its own prefix.
 - `badge` (optional): a REST route returning `{ "count": n }`. The shell polls it when the app is foregrounded.
+  **Not built yet:** the registry passes `badge` through to the manifest, but the shell doesn't read it.
 
 JS side: `routes: { '/deals': DealsList, '/deals/:id': DealView }`.
 
 ### 5.2 Home cards (`home_cards`)
 
 Cards on **Home**, which is "my day" for a rep and a team glance for a manager. Examples: today's appointments,
-deals needing attention. JS side: `homeCards: { 'stale-deals': StaleDealsCard }`.
+deals needing attention. JS side: `homeCards: { 'deals-attention': DealsAttentionCard }`.
+
+Core's cards sit at priorities 5 (Replies), 10 (My tasks), 15 (Recently viewed) and 20 (Recently added). Pick a
+priority that puts an add-on's card where it belongs among them, not after all of them by default.
 
 A card renders its own loading and empty states, and **must render nothing** (not an empty frame) when it has no data.
 Keep cards to one request each. If a card needs several, that is a case for an aggregate endpoint, not for the card.
@@ -149,6 +154,9 @@ Keep cards to one request each. If a card needs several, that is a case for an a
 
 Sections on the contact record, below the action bar and timeline. Examples: the contact's deals, appointments,
 company. JS side: `contactPanels: { 'contact-deals': ContactDeals }`, receiving the contact as a prop.
+
+Core's panels sit at priorities 5 (Messages), 10 (Notes), 20 (Tasks) and 30 (Activity). Activity is long and pages
+as you scroll, so a panel that should be seen goes before 30. Ties break by feature id, and `core` sorts first.
 
 ### 5.4 Contact actions (`contact_actions`)
 
@@ -179,6 +187,10 @@ disables them otherwise. Writing in the app records an outbound message on the c
 Contribute results to the global search. PHP declares the provider and the route a result opens. JS side:
 `searchProviders: { deals: { search: ( q, ctx ) => Promise<Result[]>, render: ResultRow } }`. A result is
 `{ id, title, subtitle, route }`. Core searches contacts itself.
+
+**Not built yet:** there is no global search screen, so nothing calls `searchProviders`. Today a provider's declared
+`route` is only used to work out which bundle owns a deep link (`featureForPath()` in `core/registry.js`, which reads
+the routes in `nav` and `search_providers`).
 
 ### 5.6 Quick create (`quick_create`)
 
@@ -258,7 +270,7 @@ PHP builds one JSON object per request, already filtered for the current user, a
 GroundhoggMobile.register( 'pipeline', {
 	apiVersion: 1,
 	routes:          { '/deals': DealsList, '/deals/:id': DealView },
-	homeCards:       { 'stale-deals': StaleDealsCard },
+	homeCards:       { 'deals-attention': DealsAttentionCard },
 	contactPanels:   { 'contact-deals': ContactDeals },
 	contactActions:  { /* handler actions only */ },
 	quickCreate:     { 'new-deal': NewDealSheet },
@@ -309,7 +321,7 @@ Rules for bundles:
 
   ```php
   add_action( 'groundhogg/loaded', function () {
-  	if ( ! defined( 'GROUNDHOGG_VERSION' ) || version_compare( GROUNDHOGG_VERSION, '<version-that-ships-this>', '<' ) ) {
+  	if ( ! defined( 'GROUNDHOGG_VERSION' ) || version_compare( GROUNDHOGG_VERSION, '4.10', '<' ) ) {
   		return;
   	}
   	// add the groundhogg/mobile/register_features listener
@@ -354,7 +366,7 @@ missing something.
   sent to it on mobile after login, or only by link/install? (Defer.)
 - **Aggregate endpoints** (`/mobile/feed`): add only when Home is measurably slow, not up front.
 - **Where the registry lives:** `includes/mobile/` in core, with the shell JS under `assets/js/mobile/`.
-- **Core minimum version for add-ons:** fill in the release that ships the action.
+- **Core minimum version for add-ons:** 4.10, the release that shipped `groundhogg/mobile/register_features`.
 - **Disabling the app:** a setting to turn the route off site-wide, and whether it ships in v1.
 
 ---
@@ -537,6 +549,150 @@ Nobody finds an app they were never told about, so the admin points at it (`incl
 
 ---
 
+## Deals (the pipeline add-on)
+
+Deals are the first add-on feature, and the one the registry's examples already use. This section was the plan,
+written against the pipeline add-on as of 3.8.0. **It is now built in the pipeline add-on (not released yet)**: see
+"As built" at the end of this section for where it differs, and the add-on's `mobile-app/README.md` for the code.
+
+### What the pipeline add-on already gives the app
+
+**Endpoints** (`gh/v4`, all `Base_Object_Api`, registered in the add-on's `includes/plugin.php`):
+
+| Route | Read | Create | Edit | Delete |
+|---|---|---|---|---|
+| `deals`, `deals/{id}` | `view_deals`, then `view_deal` per item | `add_deals` | `edit_deal` | `delete_deal` |
+| `deals/{id}/relationships` | `view_deal` | `edit_deal` (to link a contact) | | `edit_deal` |
+| `pipelines` | `view_pipelines` | `add_pipelines` | `edit_pipelines` | `delete_pipelines` |
+| `pipeline_stages` | `view_pipelines` | `add_pipelines` | `edit_pipelines` | `delete_pipelines` |
+
+**Capabilities by role** (`includes/roles.php`):
+
+| | `view_deals` `add_deals` `edit_deals` `delete_deals` | `*_others_deals` | `view_pipelines` | edit/add/delete pipelines |
+|---|---|---|---|---|
+| Sales rep | yes | no | yes | no |
+| Sales manager | yes | yes | yes | no |
+| Marketer | yes | yes | yes | yes, except delete |
+| Administrator | yes | yes | yes | yes |
+
+**Scoping.** `view_deal`, `edit_deal` and `delete_deal` follow the same rule as contacts: someone else's deal needs
+the `*_others_deals` cap and the owner must be in the user's team (`owner_in_team()`). Lists are scoped in
+`Deals::query()` (`db/deals.php`): a rep gets their own deals, a manager with a team gets the team's, and a manager
+with no team or an administrator gets every deal. An `owner_id` in the request narrows that and never widens it. Because
+the query is already scoped, the `Base_Object_Api::read()` overcount noted above does not apply to deals.
+
+**The deal.** A row has `title`, `deal_value`, `close_probability` (0 to 100), `owner_id`, `pipeline_id`, `stage_id`,
+`priority` (1 to 3), `status` (`in_progress`, `won`, `lost`), `projected_close_date`, `last_activity` (unix time),
+`stage_entered_at`, `date_created` and `date_closed`. Products are the `product_interest` meta, rows of
+`[ name, price, quantity ]`. Contacts are related objects (the deal is the parent, the contact the child), and a deal
+can have several. Notes and tasks attach with `object_type = 'deal'`.
+
+The REST item (`Deal::get_as_array()`) adds `related.contacts`, `is_past_close`, `days_to_close`, `progress`
+(`current_stage`, `all_stages`, `stages_remaining`), `locale` (human time differences) and `admin` (the desktop link,
+for "open on desktop").
+
+**Changing a deal.** `PATCH deals/{id}` with `{ data: { stage_id } }` moves it (and stamps `stage_entered_at`), and
+`{ data: { status: 'won' | 'lost' | 'in_progress' } }` closes or reopens it (and sets or clears `date_closed`).
+Both run the same hooks as the desktop board, so flows that start on "deal moved", "won" or "lost" fire from the app
+too. Moving to another pipeline also needs `pipeline_id` in the same request: `Deal::move()` sets both, a bare
+`stage_id` does not.
+
+### What the feature contributes
+
+The registration is the example in section 4. In detail:
+
+| Contribution | What it shows | Request |
+|---|---|---|
+| Nav `deals` (More, 30) → `#/deals` | My open deals, newest activity first, with the desktop "My deals" widget's filters (open, closing soon, past close, won, lost, all) and a pipeline picker | `GET deals?status=in_progress&orderby=last_activity&order=DESC&limit=25` |
+| Route `#/deals/:id` | The deal: title, value, stage with progress, owner, close date, probability, products, its contacts (tap through to the contact record), notes, tasks. Actions: move stage, won, lost, reopen, open on desktop | `GET deals/{id}`, `GET pipeline_stages?pipeline_id=…&orderby=stage_order&order=ASC` for the stage picker |
+| Home card `deals-attention` (12, after My tasks) | Open deals past their projected close date or closing in the next 7 days. Renders nothing when there are none | One `GET deals` with `status=in_progress` and a `projected_close_date` filter |
+| Contact panel `contact-deals` (25, after Tasks, before Activity) | The contact's deals, open first, with a "New deal" button that opens the quick create sheet with the contact filled in | `GET deals?child[ID]={contact}&child[type]=contact&status[]=in_progress&status[]=won&status[]=lost`, the same query as the desktop contact card |
+| Quick create `new-deal` (`add_deals`) | Title, pipeline and stage, value, projected close date, contact | `POST deals`, then `POST deals/{id}/relationships` with `{ other_type: 'contact', other_id }` |
+| Recent kind `deal` | Recently opened deals at the top of the list | `groundhogg/mobile/recent_kinds`, and the client keeps the id alone, like contacts, since a deal's title often names a person or company |
+| Activity entries | "Moved to {stage}" on each contact of a deal | `groundhogg/mobile/activity_feed`, see below |
+
+`cap` is `view_deals` on the feature, which every role above has, plus `add_deals` on quick create. Moving, closing
+and editing are shown by `ctx.can( 'edit_deals' )` and enforced per deal by the endpoint.
+
+### What has to change first
+
+In core (additive, no `apiVersion` bump):
+
+- **Reusable notes and tasks lists.** `NotesPanel` and `ContactTasksPanel` (`mobile-app/src/views/panels.jsx`) are
+  hard-wired to `object_type: 'contact'`, and neither is in `ctx.ui`. A deal (and later a company) needs the same
+  lists for its own object. Generalize them to take `{ objectType, objectId }` and export them as `ctx.ui.Notes` and
+  `ctx.ui.Tasks`, rather than have every add-on copy them.
+- **A contact picker** in `ctx.ui` (search, recent contacts first, returns a contact), for the new deal sheet when it
+  isn't opened from a contact. Core has none yet: its sheets that need a contact are opened from one.
+
+In the pipeline add-on:
+
+- **`Deals::query()` replaced `owner_id`** for a rep and for a manager with a team, instead of narrowing what was asked
+  for. So "my deals" for a manager with a team (`owner_id = me`) returned the whole team's, and a team toggle couldn't
+  pick out one person. The desktop "My deals" widget had the same problem. **Fixed in the pipeline add-on after 3.8.0:**
+  a requested `owner_id` is now intersected with the owners the user may see, and a request for none of them returns
+  nothing (`tests/phpunit/unit-tests/test-deals-query-scoping.php`).
+- **Deal list items are heavy.** Each item embeds its contacts in full (the same item the contacts endpoint returns)
+  and looks up its stage and pipeline one deal at a time. Fine for a board, too much for a phone list. Like the
+  activity feed, give the app a lean list: either a `gh/v4/mobile/deals` route or a slimmer item shape on request,
+  with contact name and id only.
+- **Activity for won and lost.** Stage moves are logged on the deal (`Other_Activity`, `deal_stage_changed`) but
+  changes of status are not. The `activity_feed` filter has to find the contact's deals (child relationship), then read
+  their stage moves and use `date_closed` for won and lost. Keep it to the batches and cursor rules described for the
+  activity feed.
+- **Version gate.** The add-on requires core 4.9, the registry shipped in 4.10, so register behind the
+  `GROUNDHOGG_VERSION` check in section 9.
+- **A JS build** for the bundle (Preact external, IIFE, Safari 15), from the add-on build template in section 10. The
+  add-on's current scripts are plain files minified with uglifyjs and don't have one.
+
+### Open questions for deals
+
+- **Linking a contact the user can't see.** `POST deals/{id}/relationships` checks `edit_deal` on the deal, not
+  `view_contact` on the contact. The picker only offers contacts the user can see, but the endpoint should check too.
+- **A Deals tab?** For a team that lives in its pipeline, Deals may deserve a tab over Tasks. It stays in More until
+  `placement` is a per-site or per-user choice.
+- **Products.** Show `product_interest` read-only first. Editing the rows on a phone is a later step.
+- **Drag between stages.** Not on a phone. A stage picker (and won, lost) does the same thing with one tap and no
+  scroll-versus-drag confusion.
+
+### As built
+
+The deals feature shipped from the plan above with these differences. None of them needed a change to core.
+
+- **Its own lean routes**, `gh/v4/mobile/pipeline/…` (`includes/mobile/deals-endpoint.php` in the add-on), instead of
+  the desktop `deals` endpoint: `GET deals` (with `status`, `view=attention`, `owner=me`, `pipeline_id`, `contact_id`,
+  `include[]`, `search`, `limit`, `offset`), `POST deals`, `GET` / `PATCH deals/{id}`, `POST deals/{id}/contacts`, and
+  `GET pipelines` (active pipelines with their stages, and the currency symbol). List rows carry contact names only;
+  money comes formatted the way the site writes it. Writes go through `Deal::update()` and
+  `Deal::create_relationship()`, so the same hooks and flow triggers run as on the desktop.
+- **The contact check is done.** Creating a deal with a contact, and linking a contact, need `view_contact` on that
+  contact, so the open question above is closed for the app (the desktop relationships route still doesn't check).
+  On the deal screen, a contact the user can't see shows its name with no email, phone or link.
+- **A deal with products** shows them read-only, and its value can't be changed directly (409), since it is their total.
+- **Notes, tasks and the contact picker live in the add-on's bundle**, because core's are not in `ctx.ui`. Exporting
+  them from core is still the better long-term shape; the add-on can switch when that lands.
+- **The status pill and "due soon"** use the projected close date: open deals already past it, or closing within 7
+  days. Deals with no date never need attention.
+- **Activity entries** are "Deal created", "Deal moved to {stage}", "Deal won" and "Deal lost" (with the value), from
+  the deals the user can see (up to 50 per contact).
+
+Things add-on authors will run into, found while building it:
+
+- **Caps the bundle asks `ctx.can()` about must be named somewhere.** The manifest only carries caps a registration
+  names (plus core's set), so `edit_deals` and `view_others_deals` would read `false`. The add-on adds them with the
+  `groundhogg/mobile/manifest` filter, only when its feature is in the manifest.
+- **`ctx` has no manifest**, so data an add-on needs on the client (its currency, say) comes from one of its own
+  endpoints, not from extra manifest keys.
+- **Open sheets with `feature` in their props** (`ctx.sheet( Sheet, { title, feature: 'pipeline', … } )`). Without it
+  the shell hands the sheet core's `ctx`, with core's text domain.
+- **`ctx.confirm()` is `window.confirm()`.** Fine on a phone, but it blocks browser automation, so test won/lost and
+  other confirmed actions through the endpoint.
+- **Preact as an external** takes an esbuild `alias` for `preact` and `preact/hooks` to a file that reads
+  `window.GroundhoggMobile.preact`, plus classic JSX (`jsxFactory: 'h'`) with an `inject` for `h` and `Fragment`. The
+  add-on's `mobile-app/build.mjs` is a working template for the build in section 10.
+
+---
+
 ## Checklist for an add-on adding a mobile feature
 
 - [ ] Registered on `groundhogg/mobile/register_features`, gated on the core version that ships it.
@@ -547,3 +703,5 @@ Nobody finds an app they were never told about, so the admin points at it (`incl
 - [ ] All requests go through `ctx.api`.
 - [ ] Strings use the feature's own text domain and `ctx.i18n`.
 - [ ] Verified as admin, manager and rep.
+- [ ] Contribution priorities chosen against core's (sections 5.2 and 5.3), not left to fall after them.
+- [ ] Labels are generic, with no product name (see White labeling).
