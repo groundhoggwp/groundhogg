@@ -290,7 +290,8 @@ abstract class Tabbed_Admin_Page extends Admin_Page {
 				];
 
 				foreach ( $methods as $method ) {
-					if ( method_exists( $this, $method ) ) {
+					// The action alone is a candidate, so action=process_system_reset would otherwise run that handler
+					if ( $this->is_view_method( $method ) ) {
 						call_user_func( [ $this, $method ] );
 						break;
 					} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}" ) ) {

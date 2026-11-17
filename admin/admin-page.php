@@ -424,6 +424,45 @@ abstract class Admin_Page extends Supports_Errors {
 	}
 
 	/**
+	 * Whether a method named by the request (from the action or the tab) may be called to display the page.
+	 *
+	 * page() dispatches to a method named by $_REQUEST['action'], and process_action() is the only place that
+	 * checks the nonce. Without this guard, ?action=process_delete reached Contacts_Page::process_delete()
+	 * from page() with no nonce at all (CSRF). Handlers, AJAX callbacks and the page's own plumbing are never
+	 * views, so they are refused here. PHP method names are case-insensitive, so the checks are too.
+	 *
+	 * @param string $method
+	 *
+	 * @return bool
+	 */
+	protected function is_view_method( $method ) {
+
+		if ( ! is_string( $method ) || $method === '' || ! method_exists( $this, $method ) ) {
+			return false;
+		}
+
+		$method = strtolower( $method );
+
+		if ( $method === 'view' ) {
+			return true;
+		}
+
+		if ( str_starts_with( $method, 'process_' )
+		     || str_ends_with( $method, '_process' )
+		     || str_starts_with( $method, 'ajax_' )
+		     || str_starts_with( $method, '__' ) ) {
+			return false;
+		}
+
+		// page(), process_action(), scripts(), register() and the rest of the base classes aren't views
+		if ( method_exists( Admin_Page::class, $method ) || method_exists( Tabbed_Admin_Page::class, $method ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Die if no access
 	 */
 	protected function wp_die_no_access() {
@@ -694,7 +733,7 @@ abstract class Admin_Page extends Supports_Errors {
             <hr class="wp-header-end">
 			<?php
 
-			if ( method_exists( $this, $this->get_current_action() ) ) {
+			if ( $this->is_view_method( $this->get_current_action() ) ) {
 				call_user_func( [ $this, $this->get_current_action() ] );
 			} else if ( has_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}" ) ) {
 				do_action( "groundhogg/admin/{$this->get_slug()}/display/{$this->get_current_action()}", $this );

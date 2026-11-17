@@ -443,7 +443,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				$tab_args = get_array_var( $this->custom_tabs, $this->get_current_tab() );
 				call_user_func( $tab_args['callback'] );
 
-			} else if ( method_exists( $this, $method ) ) {
+			} else if ( $this->is_view_method( $method ) ) {
 				// Standard method
 				call_user_func( [ $this, $method ] );
 
@@ -451,7 +451,7 @@ class Reports_Page extends Tabbed_Admin_Page {
 				// Action
 				do_action( "groundhogg/admin/{$this->get_slug()}/display/{$method}", $this );
 
-			} else if ( method_exists( $this, $backup_method ) ) {
+			} else if ( $this->is_view_method( $backup_method ) ) {
 				// Backup method
 				call_user_func( [ $this, $backup_method ] );
 
