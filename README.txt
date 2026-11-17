@@ -334,6 +334,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 4.11.1 =
+* SECURITY Admin pages could run an action, like deleting contacts, emails or flows, from a link or form on another site without the security check that normally stops this. Opening such a link while logged in was enough. Admin pages now only show views from the URL, and actions only run with a valid security token. Credit: Wordfence PRISM, via Wordfence.
+
 = 4.11 (2026-11-16) =
 * ADDED Build, edit and set up with an AI assistant connected over MCP.
  * "Build with AI" on the Add Email and Add Flow screens, and "Edit with AI" in the email and flow editors, give you a prompt to copy into your assistant, after walking you through connecting one.
