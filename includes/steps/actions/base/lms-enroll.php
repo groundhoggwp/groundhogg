@@ -155,6 +155,10 @@ abstract class LMS_Enroll extends Action {
 
 		if ( ! $user_id ) {
 			$user_id = create_user_from_contact( $contact, $this->get_student_role(), 'user' );
+
+			if ( ! $user_id ) {
+				return new \WP_Error( 'no_user', __( 'A user could not be created for the contact.', 'groundhogg' ) );
+			}
 		}
 
 		switch ( $action ) {

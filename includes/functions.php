@@ -1676,7 +1676,8 @@ function create_user_from_contact( $contact, $role = 'subscriber', $notification
 	// May need this action, restore it.
 	add_action( 'user_register', __NAMESPACE__ . '\convert_user_to_contact_when_user_registered' );
 
-	if ( ! $user_id ) {
+	// an existing user with the same email or login makes it an error, which is no user to link the contact to
+	if ( ! $user_id || is_wp_error( $user_id ) ) {
 		return false;
 	}
 
