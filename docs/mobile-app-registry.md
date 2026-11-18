@@ -651,7 +651,7 @@ In the pipeline add-on:
   `view_contact` on the contact. The picker only offers contacts the user can see, but the endpoint should check too.
 - **A Deals tab?** For a team that lives in its pipeline, Deals may deserve a tab over Tasks. It stays in More until
   `placement` is a per-site or per-user choice.
-- **Products.** Show `product_interest` read-only first. Editing the rows on a phone is a later step.
+- **Products.** Settled: editable on the phone, see "As built".
 - **Drag between stages.** Not on a phone. A stage picker (and won, lost) does the same thing with one tap and no
   scroll-versus-drag confusion.
 
@@ -668,7 +668,13 @@ The deals feature shipped from the plan above with these differences. None of th
 - **The contact check is done.** Creating a deal with a contact, and linking a contact, need `view_contact` on that
   contact, so the open question above is closed for the app (the desktop relationships route still doesn't check).
   On the deal screen, a contact the user can't see shows its name with no email, phone or link.
-- **A deal with products** shows them read-only, and its value can't be changed directly (409), since it is their total.
+- **Products can be edited** (name, price, quantity, add and remove), with names suggested from the pipeline's product
+  list and its deals the user can see, like the desktop editor. Saving replaces the list and sets the value to their
+  total (0 when none are left). **The value is never typed in:** "New deal" takes products, the edit sheet has no value
+  field, and the routes refuse a `deal_value` (400). The rules live in `GroundhoggPipeline\Classes\Deal_Products`,
+  which the deal abilities use too.
+- **Win probability** (`close_probability`, a whole number from 0 to 100) is editable in the edit sheet, next to the
+  title and expected close date.
 - **Notes, tasks and the contact picker live in the add-on's bundle**, because core's are not in `ctx.ui`. Exporting
   them from core is still the better long-term shape; the add-on can switch when that lands.
 - **The status pill and "due soon"** use the projected close date: open deals already past it, or closing within 7
