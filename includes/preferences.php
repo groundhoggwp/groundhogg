@@ -146,6 +146,13 @@ class Preferences {
 			}
 		}
 
+		// Another plugin or custom code made the contact unmarketable through the groundhogg/contact/is_marketable filter.
+		// The reasons below only know about the contact's own status and the site settings, so they would wrongly say
+		// the contact will receive marketing.
+		if ( $this->is_marketable( $contact ) && ! $contact->is_marketable() ) {
+			return apply_filters( 'groundhogg/preferences/optin_status_text', _x( 'This contact will not receive marketing because another plugin or custom code marked them as unmarketable.', 'optin_status', 'groundhogg' ), $contact );
+		}
+
 		switch ( $contact->get_optin_status() ) {
 			default:
 			case self::UNCONFIRMED:

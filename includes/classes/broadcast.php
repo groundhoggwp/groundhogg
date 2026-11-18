@@ -606,19 +606,24 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 		 */
 		$inserts = apply_filters( 'groundhogg/broadcast/pre_insert_batch', $inserts, $this );
 
-		// add all batch inserts
-		foreach ( $inserts as $insert ) {
-			event_queue_db()->batch_insert( $insert );
-		}
+		// Every contact in this batch can be skipped (not deliverable or not marketable), in which case there is
+		// nothing to insert. That's not a failure, so move past the batch rather than retrying it forever.
+		if ( ! empty( $inserts ) ) {
 
-		$inserted = event_queue_db()->commit_batch_insert();
+			// add all batch inserts
+			foreach ( $inserts as $insert ) {
+				event_queue_db()->batch_insert( $insert );
+			}
 
-		// Failed to add an events, but there are contacts to enqueue
-		if ( ! $inserted ) {
-			// Reset the lock
-			$this->delete_meta( 'schedule_lock' );
+			$inserted = event_queue_db()->commit_batch_insert();
 
-			return 0;
+			// Failed to add the events, but there are contacts to enqueue
+			if ( ! $inserted ) {
+				// Reset the lock
+				$this->delete_meta( 'schedule_lock' );
+
+				return 0;
+			}
 		}
 
 		$time_elapsed = $timer->time_elapsed();
@@ -696,6 +701,8 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			return false;
 		}
 
+		$queued = 0;
+
 		foreach ( $contacts as $contact ) {
 
 			$offset ++;
@@ -748,16 +755,21 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			}
 
 			event_queue_db()->batch_insert( $args );
+			$queued ++;
 		}
 
-		$inserted = event_queue_db()->commit_batch_insert();
+		// A batch where every contact was skipped has nothing to insert. That's not a failure, so move past it.
+		if ( $queued > 0 ) {
 
-		// Failed to add an events, but there are contacts to send to
-		if ( $total > 0 && ! $inserted ) {
-			// Reset the lock
-			$this->delete_meta( 'schedule_lock' );
+			$inserted = event_queue_db()->commit_batch_insert();
 
-			return 0;
+			// Failed to add the events, but there are contacts to send to
+			if ( ! $inserted ) {
+				// Reset the lock
+				$this->delete_meta( 'schedule_lock' );
+
+				return 0;
+			}
 		}
 
 		$time_elapsed = $timer->time_elapsed();
@@ -1404,6 +1416,16 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			// schedule 5 seconds worth. Should cover most small broadcasts
 			while ( $broadcast->is_pending() && $tracker->time_elapsed() < 5 ) {
 				$broadcast->enqueue_batch();
+			}
+
+			// Every matching contact was skipped when scheduling, so nobody would get it. The count above can
+			// include them because it can't know about plugins that filter groundhogg/contact/is_marketable.
+			if ( $broadcast->is_scheduled() && $broadcast->get_num_queued() === 0 ) {
+
+				$broadcast->cancel();
+				$broadcast->delete();
+
+				throw new NoContactsException( sprintf( 'None of the %s matching contacts can receive this broadcast. They are undeliverable, or another plugin or custom code marked them as unmarketable.', number_format_i18n( $num_contacts ) ) );
 			}
 		}
 
