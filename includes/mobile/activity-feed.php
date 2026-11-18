@@ -32,16 +32,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  * bodies and flow definitions, which is megabytes for a busy contact. This is the opposite: a handful of plain lines
  * ("Email sent", "Opened an email", "Visited /pricing"), newest first, a page at a time.
  *
- * `GET gh/v4/mobile/contacts/{id}/activity?limit=15&before=<unix time>`
+ * `GET gh/v4/mobile/contacts/{id}/activity?limit=15&before=<unix time>&exclude=<entry ids>`
  *
  * Entries have: id, type, icon, title, detail, time, time_diff and tone ('', or 'negative' for failures,
  * bounces and unsubscribes). `before` is inclusive, so the last entry of a page comes back first on the next one and
- * the client drops it by id. Add-ons add their own entries with the `groundhogg/mobile/activity_feed` filter.
+ * the client drops it by id. When more than a page of entries share a second that would give the same ones for ever,
+ * so the client says which it has with `exclude`, a comma separated list of entry ids, and gets the ones after them.
+ * Add-ons add their own entries with the `groundhogg/mobile/activity_feed` filter.
  */
 class Activity_Feed {
 
 	const DEFAULT_LIMIT = 15;
 	const MAX_LIMIT     = 50;
+
+	/**
+	 * How many entry ids a request can leave out, see for_contact()
+	 */
+	const MAX_EXCLUDE = 300;
 
 	/**
 	 * How many batches one source reads through to find enough entries, see collect().
@@ -77,6 +84,9 @@ class Activity_Feed {
 						'default'           => 0,
 						'sanitize_callback' => 'absint',
 					],
+					'exclude' => [
+						'default' => '',
+					],
 				],
 			],
 		] );
@@ -109,22 +119,43 @@ class Activity_Feed {
 
 		$limit   = max( 1, min( self::MAX_LIMIT, absint( $request->get_param( 'limit' ) ) ?: self::DEFAULT_LIMIT ) );
 		$before  = absint( $request->get_param( 'before' ) );
+		$exclude = $this->ids_in( $request->get_param( 'exclude' ) );
 		$contact = get_contactdata( absint( $request->get_param( 'id' ) ) );
 
-		return new WP_REST_Response( $this->for_contact( $contact, $limit, $before ) );
+		return new WP_REST_Response( $this->for_contact( $contact, $limit, $before, $exclude ) );
 	}
 
 	/**
-	 * @param Contact $contact
-	 * @param int     $limit
-	 * @param int     $before unix time, 0 for the newest
+	 * The entry ids in a request's `exclude`, a comma separated list or an array, no more than MAX_EXCLUDE of them
+	 *
+	 * @param mixed $value
+	 *
+	 * @return string[]
+	 */
+	protected function ids_in( $value ): array {
+
+		$ids = is_array( $value ) ? $value : explode( ',', (string) $value );
+		$ids = array_map( 'sanitize_text_field', array_map( 'strval', $ids ) );
+
+		return array_slice( array_values( array_unique( array_filter( $ids ) ) ), 0, self::MAX_EXCLUDE );
+	}
+
+	/**
+	 * @param Contact  $contact
+	 * @param int      $limit
+	 * @param int      $before  unix time, 0 for the newest
+	 * @param string[] $exclude ids of entries the caller has already, which are left out. It is what moves the cursor on
+	 *                          when more than a page of entries share the second `before` is, since `before` alone
+	 *                          would give the same ones back.
 	 *
 	 * @return array{items: array[], has_more: bool, next_before: int|null}
 	 */
-	public function for_contact( Contact $contact, int $limit = self::DEFAULT_LIMIT, int $before = 0 ): array {
+	public function for_contact( Contact $contact, int $limit = self::DEFAULT_LIMIT, int $before = 0, array $exclude = [] ): array {
 
-		// one more than a page from each source, so we know whether there is another page
-		$fetch = $limit + 1;
+		// one more than a page from each source, so we know whether there is another page. Each source may also give
+		// back the entries that are left out, so it reads that many more.
+		$exclude = array_slice( array_values( array_unique( array_map( 'strval', $exclude ) ) ), 0, self::MAX_EXCLUDE );
+		$fetch   = $limit + 1 + count( $exclude );
 
 		$entries = array_merge(
 			$this->events( $contact, $fetch, $before ),
@@ -146,6 +177,12 @@ class Activity_Feed {
 		 * @param int     $before
 		 */
 		$entries = apply_filters( 'groundhogg/mobile/activity_feed', $entries, $contact, $limit, $before );
+
+		if ( $exclude ) {
+			$entries = array_values( array_filter( $entries, function ( $entry ) use ( $exclude ) {
+				return ! in_array( (string) $entry['id'], $exclude, true );
+			} ) );
+		}
 
 		// newest first, and a stable order for entries in the same second
 		usort( $entries, function ( $a, $b ) {

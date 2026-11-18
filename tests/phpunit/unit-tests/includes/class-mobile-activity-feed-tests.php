@@ -211,6 +211,62 @@ class Mobile_Activity_Feed_Tests extends GH_UnitTestCase {
 		$this->assertTrue( $second['has_more'] );
 	}
 
+	/**
+	 * Importing or a burst of sends puts more than a page of entries in one second. The cursor is that second, so
+	 * without being told what it already has the feed gives the same page back and "Show older" never gets past it.
+	 */
+	public function test_more_than_a_page_of_entries_in_one_second_can_all_be_reached() {
+		$contact = $this->contact();
+		$now     = time();
+
+		for ( $i = 1; $i <= 7; $i ++ ) {
+			$this->activity( $contact, 'email_opened', $now - 100 );
+		}
+
+		$this->visit( $contact, '/older/', $now - 500 );
+
+		// what the app does: the next page is from the second the last one ended on, leaving out what it has from it
+		$items = [];
+		$page  = $this->feed->for_contact( $contact, 3 );
+
+		for ( $guard = 0; $guard < 10; $guard ++ ) {
+			$items = array_merge( $items, $page['items'] );
+
+			if ( ! $page['has_more'] ) {
+				break;
+			}
+
+			$at   = $page['next_before'];
+			$have = array_column( array_filter( $items, function ( $item ) use ( $at ) {
+				return $item['time'] === $at;
+			} ), 'id' );
+
+			$page = $this->feed->for_contact( $contact, 3, $at, $have );
+		}
+
+		$ids = array_column( $items, 'id' );
+
+		$this->assertLessThan( 10, $guard, 'It never got to the end' );
+		$this->assertCount( 8, $ids );
+		$this->assertCount( 8, array_unique( $ids ), 'Each entry comes once' );
+		$this->assertFalse( $page['has_more'] );
+	}
+
+	public function test_excluded_entries_are_left_out_and_do_not_count_against_the_page() {
+		$contact = $this->contact();
+		$now     = time();
+
+		for ( $i = 1; $i <= 4; $i ++ ) {
+			$this->visit( $contact, "/p-$i/", $now - $i * 10 );
+		}
+
+		$all  = $this->feed->for_contact( $contact )['items'];
+		$feed = $this->feed->for_contact( $contact, 2, 0, [ $all[0]['id'], $all[1]['id'] ] );
+
+		$this->assertSame( [ '/p-3/', '/p-4/' ], array_column( $feed['items'], 'detail' ) );
+		$this->assertFalse( $feed['has_more'] );
+	}
+
 	public function test_an_empty_feed() {
 		$feed = $this->feed->for_contact( $this->contact() );
 

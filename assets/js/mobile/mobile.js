@@ -1737,6 +1737,14 @@
     ] });
   }
 
+  // src/core/text.js
+  function escapeHtml(text) {
+    return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+  function plainToHtml(text) {
+    return String(text || "").replace(/\r\n?/g, "\n").trim().split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean).map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`).join("\n");
+  }
+
   // src/views/tasks.jsx
   function DuePill({ task, ctx }) {
     const { __, sprintf: sprintf2 } = ctx.i18n;
@@ -1770,6 +1778,7 @@
   function useTaskList(ctx, query, deps) {
     const { data, error, loading, reload } = useFetch(() => ctx.api.get("tasks", query), deps);
     const [done, setDone] = d2({});
+    A2(() => ctx.on("task:created", reload), [reload]);
     const complete = (task) => {
       setDone((d3) => ({ ...d3, [task.ID]: true }));
       ctx.api.patch(`tasks/${task.ID}/complete`).then(
@@ -1851,7 +1860,8 @@
       }
       setSaving(true);
       const data = {
-        content: content.trim(),
+        // tasks are HTML, the desktop writes them in the editor, so the line breaks have to be markup
+        content: plainToHtml(content),
         type: "task",
         user_id: ctx.user.id,
         due_date: toApiDate(due)
@@ -1863,6 +1873,7 @@
       try {
         await ctx.api.post("tasks", { data });
         ctx.toast(__("Task added"));
+        ctx.emit("task:created", { contact: contact ? contact.ID : 0 });
         onCreated && onCreated();
         close();
       } catch (err) {
@@ -1912,7 +1923,7 @@
 
   // src/views/panels.jsx
   function NotesPanel({ ctx, contact }) {
-    const { __ } = ctx.i18n;
+    const { __, sprintf: sprintf2 } = ctx.i18n;
     const [text, setText] = d2("");
     const [saving, setSaving] = d2(false);
     const { data, error, loading, reload } = useFetch(() => ctx.api.get("notes", {
@@ -1930,7 +1941,7 @@
       }
       setSaving(true);
       try {
-        await ctx.api.post("notes", { data: { object_id: contact.ID, object_type: "contact", content: text.trim(), type: "note", context: "user" } });
+        await ctx.api.post("notes", { data: { object_id: contact.ID, object_type: "contact", content: plainToHtml(text), type: "note", context: "user" } });
         setText("");
         ctx.toast(__("Note added"));
         await reload();
@@ -1949,11 +1960,7 @@
       !loading && !error && !notes.length ? /* @__PURE__ */ u3(Empty, { children: __("No notes yet.") }) : null,
       notes.map((n2) => /* @__PURE__ */ u3("div", { class: "ghm-note", children: [
         /* @__PURE__ */ u3("p", { children: plainText(n2.data.content) }),
-        /* @__PURE__ */ u3("small", { children: [
-          n2.i18n.time_diff,
-          " ",
-          __("ago")
-        ] })
+        /* @__PURE__ */ u3("small", { children: sprintf2(__("%s ago"), n2.i18n.time_diff) })
       ] }, n2.ID))
     ] });
   }
@@ -1970,7 +1977,8 @@
     const loadMore = async () => {
       setMore((m3) => ({ ...m3, busy: true }));
       try {
-        const page = await ctx.api.get(path, { limit: PAGE, before: cursor.next_before });
+        const have = items.filter((i3) => i3.time === cursor.next_before).map((i3) => i3.id);
+        const page = await ctx.api.get(path, { limit: PAGE, before: cursor.next_before, exclude: have.join(",") });
         setMore((m3) => ({ items: [...m3.items, ...page.items], cursor: { has_more: page.has_more, next_before: page.next_before }, busy: false }));
       } catch (err) {
         setMore((m3) => ({ ...m3, busy: false }));
@@ -1996,7 +2004,7 @@
   }
   function ContactTasksPanel({ ctx, contact }) {
     const { __ } = ctx.i18n;
-    const { tasks, error, loading, reload, complete } = useTaskList(ctx, {
+    const { tasks, error, loading, complete } = useTaskList(ctx, {
       object_id: contact.ID,
       object_type: "contact",
       incomplete: true,
@@ -2009,7 +2017,7 @@
       loading && !tasks.length ? /* @__PURE__ */ u3(SkeletonList, { variant: "check", rows: 2 }) : null,
       !loading && !error && !tasks.length ? /* @__PURE__ */ u3(Empty, { children: __("No open tasks.") }) : null,
       tasks.length ? /* @__PURE__ */ u3(List, { children: tasks.map((t3) => /* @__PURE__ */ u3(TaskRow, { task: t3, ctx, onComplete: complete }, t3.ID)) }) : null,
-      ctx.can("add_tasks") ? /* @__PURE__ */ u3("div", { style: "padding:12px 16px", children: /* @__PURE__ */ u3(Button, { block: true, icon: "plus", onClick: () => ctx.sheet(NewTaskSheet, { title: __("New task"), contact, onCreated: reload }), children: __("Add a task") }) }) : null
+      ctx.can("add_tasks") ? /* @__PURE__ */ u3("div", { style: "padding:12px 16px", children: /* @__PURE__ */ u3(Button, { block: true, icon: "plus", onClick: () => ctx.sheet(NewTaskSheet, { title: __("New task"), contact }), children: __("Add a task") }) }) : null
     ] });
   }
   function NewContactSheet({ ctx, close }) {
@@ -2043,14 +2051,6 @@
       /* @__PURE__ */ u3(Field, { label: __("Mobile phone"), children: /* @__PURE__ */ u3(Input, { type: "tel", value: f3.mobile_phone, onInput: set("mobile_phone"), autocomplete: "off" }) }),
       /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add contact") }) })
     ] });
-  }
-
-  // src/core/text.js
-  function escapeHtml(text) {
-    return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-  }
-  function plainToHtml(text) {
-    return String(text || "").replace(/\r\n?/g, "\n").trim().split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean).map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`).join("\n");
   }
 
   // src/views/email.jsx

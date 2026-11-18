@@ -4,10 +4,11 @@
 import { useState } from 'preact/hooks'
 import { Button, Empty, ErrorMessage, Field, Input, List, ListItem, SheetFooter, SkeletonList, Textarea, Icon } from '../ui/index.jsx'
 import { TaskRow, useTaskList, NewTaskSheet } from './tasks.jsx'
+import { plainToHtml } from '../core/text.js'
 import { itemOf, plainText, useFetch } from '../util.js'
 
 export function NotesPanel ( { ctx, contact } ) {
-  const { __ } = ctx.i18n
+  const { __, sprintf } = ctx.i18n
   const [ text, setText ] = useState( '' )
   const [ saving, setSaving ] = useState( false )
 
@@ -31,7 +32,8 @@ export function NotesPanel ( { ctx, contact } ) {
     setSaving( true )
 
     try {
-      await ctx.api.post( 'notes', { data: { object_id: contact.ID, object_type: 'contact', content: text.trim(), type: 'note', context: 'user' } } )
+      // notes are HTML, the desktop writes them in the editor, so the line breaks have to be markup
+      await ctx.api.post( 'notes', { data: { object_id: contact.ID, object_type: 'contact', content: plainToHtml( text ), type: 'note', context: 'user' } } )
       setText( '' )
       ctx.toast( __( 'Note added' ) )
       await reload()
@@ -56,7 +58,7 @@ export function NotesPanel ( { ctx, contact } ) {
       { notes.map( n => (
         <div class="ghm-note" key={ n.ID }>
           <p>{ plainText( n.data.content ) }</p>
-          <small>{ n.i18n.time_diff } { __( 'ago' ) }</small>
+          <small>{ sprintf( __( '%s ago' ), n.i18n.time_diff ) }</small>
         </div>
       ) ) }
     </>
@@ -89,7 +91,10 @@ export function ActivityPanel ( { ctx, contact } ) {
     setMore( m => ( { ...m, busy: true } ) )
 
     try {
-      const page = await ctx.api.get( path, { limit: PAGE, before: cursor.next_before } )
+      // the page starts at the second the last one ended on, and says which of that second it has, since more than
+      // a page can share one and it would otherwise give the same ones back
+      const have = items.filter( i => i.time === cursor.next_before ).map( i => i.id )
+      const page = await ctx.api.get( path, { limit: PAGE, before: cursor.next_before, exclude: have.join( ',' ) } )
       setMore( m => ( { items: [ ...m.items, ...page.items ], cursor: { has_more: page.has_more, next_before: page.next_before }, busy: false } ) )
     } catch ( err ) {
       setMore( m => ( { ...m, busy: false } ) )
@@ -124,7 +129,7 @@ export function ActivityPanel ( { ctx, contact } ) {
 
 export function ContactTasksPanel ( { ctx, contact } ) {
   const { __ } = ctx.i18n
-  const { tasks, error, loading, reload, complete } = useTaskList( ctx, {
+  const { tasks, error, loading, complete } = useTaskList( ctx, {
     object_id: contact.ID,
     object_type: 'contact',
     incomplete: true,
@@ -141,7 +146,7 @@ export function ContactTasksPanel ( { ctx, contact } ) {
       { tasks.length ? <List>{ tasks.map( t => <TaskRow task={ t } ctx={ ctx } onComplete={ complete } key={ t.ID }/> ) }</List> : null }
       { ctx.can( 'add_tasks' ) ? (
         <div style="padding:12px 16px">
-          <Button block icon="plus" onClick={ () => ctx.sheet( NewTaskSheet, { title: __( 'New task' ), contact, onCreated: reload } ) }>{ __( 'Add a task' ) }</Button>
+          <Button block icon="plus" onClick={ () => ctx.sheet( NewTaskSheet, { title: __( 'New task' ), contact } ) }>{ __( 'Add a task' ) }</Button>
         </div>
       ) : null }
     </>

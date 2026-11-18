@@ -1,4 +1,5 @@
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
+import { plainToHtml } from '../core/text.js'
 import { Avatar, Button, Card, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
 import { avatarUrl, contactName, plainText, useDebounced, useFetch, useRecentContacts, toApiDate, tomorrowMorning } from '../util.js'
 
@@ -47,10 +48,15 @@ export function TaskRow ( { task, ctx, onComplete, showContact } ) {
 
 /**
  * Complete a task. The row leaves the list straight away and comes back if the server refuses.
+ *
+ * The list loads again when a task is created, from wherever it was, so one made from the Create menu shows up in
+ * the Tasks screen and the My tasks card without leaving and coming back.
  */
 export function useTaskList ( ctx, query, deps ) {
   const { data, error, loading, reload } = useFetch( () => ctx.api.get( 'tasks', query ), deps )
   const [ done, setDone ] = useState( {} )
+
+  useEffect( () => ctx.on( 'task:created', reload ), [ reload ] )
 
   const complete = task => {
     setDone( d => ( { ...d, [ task.ID ]: true } ) )
@@ -172,7 +178,8 @@ export function NewTaskSheet ( { ctx, close, contact: given, onCreated } ) {
     setSaving( true )
 
     const data = {
-      content: content.trim(),
+      // tasks are HTML, the desktop writes them in the editor, so the line breaks have to be markup
+      content: plainToHtml( content ),
       type: 'task',
       user_id: ctx.user.id,
       due_date: toApiDate( due ),
@@ -186,6 +193,7 @@ export function NewTaskSheet ( { ctx, close, contact: given, onCreated } ) {
     try {
       await ctx.api.post( 'tasks', { data } )
       ctx.toast( __( 'Task added' ) )
+      ctx.emit( 'task:created', { contact: contact ? contact.ID : 0 } )
       onCreated && onCreated()
       close()
     } catch ( err ) {
