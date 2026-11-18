@@ -64,7 +64,8 @@ class Pii_Rest {
 	 */
 	public function pre_dispatch( $result, $server, $request ) {
 
-		$route = $request->get_route();
+		// WordPress matches routes case-insensitively, so /gh/v4/Contacts reaches the same handler as /gh/v4/contacts
+		$route = strtolower( $request->get_route() );
 
 		if ( ! str_starts_with( $route, '/gh/' ) || ! Pii::is_restricted() ) {
 			return $result;

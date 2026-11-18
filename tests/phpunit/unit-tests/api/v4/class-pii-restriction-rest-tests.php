@@ -151,6 +151,41 @@ class Pii_Restriction_Rest_Tests extends GH_UnitTestCase {
 		$this->assertRestricted( $this->request( 'GET', '/gh/v4/contacts', [ 'orderby' => 'email' ] ) );
 	}
 
+	/**
+	 * WordPress matches a route without regard to its case, so the same handler answers all of these
+	 */
+	public function test_the_letter_case_of_the_route_does_not_get_round_the_restriction() {
+		$this->admin( false );
+
+		$this->assertRestricted( $this->request( 'GET', '/gh/v4/Contacts', [ 'query' => [ 'email' => self::EMAIL ] ] ) );
+		$this->assertRestricted( $this->request( 'GET', '/gh/v4/CONTACTS', [ 'query' => [ 'search' => 'jane' ] ] ) );
+		$this->assertRestricted( $this->request( 'GET', '/GH/V4/contacts', [ 'search' => 'jane' ] ) );
+		$this->assertRestricted( $this->request( 'GET', "/gh/v4/Contacts/{$this->contact_id}/Inbox" ) );
+		$this->assertRestricted( $this->request( 'GET', "/gh/v4/CONTACTS/{$this->contact_id}/files" ) );
+		$this->assertRestricted( $this->request( 'GET', '/gh/v4/Files/Exports' ) );
+		$this->assertRestricted( $this->request( 'GET', '/gh/v4/Messages', [ 'search' => 'Jane' ] ) );
+		$this->assertRestricted( $this->request( 'GET', '/gh/v3/Contacts', [ 'email' => self::EMAIL ] ) );
+		$this->assertRestricted( $this->request( 'POST', '/gh/v4/Searches', [], [
+			'name'  => 'Janes',
+			'query' => [ 'email_like' => 'jane' ],
+		] ) );
+
+		// creating a contact that exists must not say that it does
+		$response = $this->request( 'POST', '/gh/v4/CONTACTS', [], [ 'email' => self::EMAIL ] );
+
+		$this->assertSame( 422, $response->get_status() );
+		$this->assertSame( 'groundhogg_contact_not_created', $response->get_data()['code'] ?? '' );
+	}
+
+	public function test_the_letter_case_of_the_route_does_not_change_what_an_unrestricted_user_gets() {
+		$this->admin( true );
+
+		$response = $this->request( 'GET', '/gh/v4/Contacts', [ 'search' => 'jane' ] );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 1, $response->get_data()['total_items'] );
+	}
+
 	public function test_restricted_user_cannot_filter_contacts_by_pii() {
 		$this->admin( false );
 
