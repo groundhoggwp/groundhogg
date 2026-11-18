@@ -384,20 +384,43 @@ class Main_Updater extends Old_Updater {
 				'callback'    => function () {
 
 					self::move_interface_settings_to_users();
-
-					$roles = wp_roles();
-
-					foreach ( array_keys( $roles->roles ) as $role_name ) {
-
-						$role = $roles->get_role( $role_name );
-
-						if ( $role && $role->has_cap( 'view_contacts' ) && ! array_key_exists( Pii::CAP, $role->capabilities ) ) {
-							$roles->add_cap( $role_name, Pii::CAP );
-						}
-					}
+					self::grant_view_contact_pii();
 				},
 			],
 		];
+	}
+
+	/**
+	 * Give every role and every user that can view contacts the capability to see their personal information, so that
+	 * nothing changes until it is taken away. One that has it set already, granted or not, is left as it is.
+	 *
+	 * Roles that add-ons register later don't get it, and the caps of a user aren't kept up to date, so this is for the
+	 * update only.
+	 *
+	 * @return void
+	 */
+	public static function grant_view_contact_pii() {
+
+		foreach ( wp_roles()->role_objects as $role ) {
+
+			// WP_Role::add_cap() changes the role the caps of the current user were worked out from, WP_Roles::add_cap() doesn't
+			if ( $role->has_cap( 'view_contacts' ) && ! array_key_exists( Pii::CAP, $role->capabilities ) ) {
+				$role->add_cap( Pii::CAP );
+			}
+		}
+
+		// view_contacts can be given to a user, not by their role
+		foreach ( get_users( [ 'capability' => 'view_contacts' ] ) as $user ) {
+
+			if ( ! array_key_exists( Pii::CAP, (array) $user->caps ) && ! $user->has_cap( Pii::CAP ) ) {
+				$user->add_cap( Pii::CAP );
+			}
+		}
+
+		// updates run after the caps of the current user were worked out, so they would be without it until the next request
+		if ( is_user_logged_in() ) {
+			wp_get_current_user()->for_site( get_current_blog_id() );
+		}
 	}
 
 	/**
