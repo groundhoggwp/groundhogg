@@ -336,6 +336,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 4.11.1 =
 * SECURITY Admin pages could run an action, like deleting contacts, emails or flows, from a link or form on another site without the security check that normally stops this. Opening such a link while logged in was enough. Admin pages now only show views from the URL, and actions only run with a valid security token. Credit: Wordfence PRISM, via Wordfence.
+* SECURITY A user without the `view_contact_pii` capability could get round it by changing the letter case of a REST route, like `/gh/v4/Contacts`, to search contacts, read their details and check whether an email address is a contact.
 * FIXED Broadcasts stopped scheduling when a whole batch of contacts was skipped, for example as unmarketable. Sending failed with "Unable to schedule events" or never finished.
 * FIXED Contacts made unmarketable by another plugin showed "Will receive marketing." under a red status. They now say another plugin or custom code made them unmarketable.
 * TWEAKED A broadcast none of its contacts can receive is refused with the reason, instead of being created empty.
