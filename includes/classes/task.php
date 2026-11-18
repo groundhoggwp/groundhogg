@@ -281,7 +281,8 @@ class Task extends Note {
 
 		$associated = [
 			'link' => '',
-			'name' => $this->object_type . ' #' . $this->object_id,
+			// a task about nothing has no name, not " #0"
+			'name' => $this->object_id ? $this->object_type . ' #' . $this->object_id : '',
 			'type' => $this->object_type,
 		];
 

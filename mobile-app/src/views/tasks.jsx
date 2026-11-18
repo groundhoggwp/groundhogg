@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
-import { Avatar, Button, Card, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
-import { plainText, useFetch, toApiDate, tomorrowMorning } from '../util.js'
+import { Avatar, Button, Card, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
+import { avatarUrl, contactName, plainText, useDebounced, useFetch, useRecentContacts, toApiDate, tomorrowMorning } from '../util.js'
 
 /**
  * How soon a task is due, as a pill.
@@ -102,10 +102,62 @@ export function TasksView ( { ctx } ) {
 }
 
 /**
- * The "New task" sheet, optionally attached to a contact.
+ * Choose the contact a task is about: the ones they opened lately until they type, then the ones that match.
+ * It isn't a Field, whose label would take a tap on a result as a tap on the search box.
  */
-export function NewTaskSheet ( { ctx, close, contact, onCreated } ) {
+function ContactField ( { ctx, value, onChange } ) {
   const { __ } = ctx.i18n
+  const [ query, setQuery ] = useState( '' )
+  const search = useDebounced( query.trim() )
+  const recent = useRecentContacts( ctx, 5 )
+
+  const { data, loading } = useFetch( () => search
+    ? ctx.api.get( 'contacts', { search, limit: 6 } )
+    : Promise.resolve( { items: [] } ), [ search ] )
+
+  if ( value ) {
+    return (
+      <div class="ghm-field">
+        <span>{ __( 'Contact' ) }</span>
+        <Chip onRemove={ () => onChange( null ) } removeLabel={ __( 'Remove' ) }>{ contactName( value ) }</Chip>
+      </div>
+    )
+  }
+
+  const options = search ? ( ( data && data.items ) || [] ) : recent.contacts
+
+  return (
+    <div class="ghm-field">
+      <span>{ __( 'Contact (optional)' ) }</span>
+      <Input type="search" placeholder={ __( 'Search contacts' ) } value={ query } onInput={ e => setQuery( e.currentTarget.value ) } onKeyDown={ e => e.key === 'Enter' && e.preventDefault() } enterkeyhint="search"/>
+      { options.length ? (
+        <List>
+          { options.map( c => (
+            <ListItem
+              key={ c.ID }
+              leading={ <Avatar name={ contactName( c ) } src={ avatarUrl( c ) }/> }
+              title={ contactName( c ) }
+              subtitle={ c.data.email && c.data.email !== contactName( c ) ? c.data.email : '' }
+              onClick={ () => {
+                onChange( c )
+                setQuery( '' )
+              } }
+            />
+          ) ) }
+        </List>
+      ) : null }
+      { search && ! loading && ! options.length ? <Empty>{ __( 'No contacts found.' ) }</Empty> : null }
+    </div>
+  )
+}
+
+/**
+ * The "New task" sheet, attached to the contact it is given, or to one chosen in it.
+ */
+export function NewTaskSheet ( { ctx, close, contact: given, onCreated } ) {
+  const { __ } = ctx.i18n
+  const [ chosen, setChosen ] = useState( null )
+  const contact = given || chosen
   const [ content, setContent ] = useState( '' )
   const [ due, setDue ] = useState( tomorrowMorning() )
   const [ saving, setSaving ] = useState( false )
@@ -150,6 +202,7 @@ export function NewTaskSheet ( { ctx, close, contact, onCreated } ) {
       <Field label={ __( 'Due' ) }>
         <Input type="datetime-local" value={ due } onInput={ e => setDue( e.currentTarget.value ) }/>
       </Field>
+      { given ? null : <ContactField ctx={ ctx } value={ chosen } onChange={ setChosen }/> }
       <SheetFooter>
         <Button variant="primary" block type="submit" disabled={ saving }>{ __( 'Add task' ) }</Button>
       </SheetFooter>

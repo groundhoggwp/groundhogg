@@ -1805,8 +1805,42 @@
       groups.map(([title, items]) => /* @__PURE__ */ u3(Card, { title, children: /* @__PURE__ */ u3(List, { children: items.map((t3) => /* @__PURE__ */ u3(TaskRow, { task: t3, ctx, onComplete: complete, showContact: true }, t3.ID)) }) }, title))
     ] });
   }
-  function NewTaskSheet({ ctx, close, contact, onCreated }) {
+  function ContactField({ ctx, value, onChange }) {
     const { __ } = ctx.i18n;
+    const [query, setQuery] = d2("");
+    const search = useDebounced(query.trim());
+    const recent = useRecentContacts(ctx, 5);
+    const { data, loading } = useFetch(() => search ? ctx.api.get("contacts", { search, limit: 6 }) : Promise.resolve({ items: [] }), [search]);
+    if (value) {
+      return /* @__PURE__ */ u3("div", { class: "ghm-field", children: [
+        /* @__PURE__ */ u3("span", { children: __("Contact") }),
+        /* @__PURE__ */ u3(Chip, { onRemove: () => onChange(null), removeLabel: __("Remove"), children: contactName(value) })
+      ] });
+    }
+    const options = search ? data && data.items || [] : recent.contacts;
+    return /* @__PURE__ */ u3("div", { class: "ghm-field", children: [
+      /* @__PURE__ */ u3("span", { children: __("Contact (optional)") }),
+      /* @__PURE__ */ u3(Input, { type: "search", placeholder: __("Search contacts"), value: query, onInput: (e3) => setQuery(e3.currentTarget.value), onKeyDown: (e3) => e3.key === "Enter" && e3.preventDefault(), enterkeyhint: "search" }),
+      options.length ? /* @__PURE__ */ u3(List, { children: options.map((c3) => /* @__PURE__ */ u3(
+        ListItem,
+        {
+          leading: /* @__PURE__ */ u3(Avatar, { name: contactName(c3), src: avatarUrl(c3) }),
+          title: contactName(c3),
+          subtitle: c3.data.email && c3.data.email !== contactName(c3) ? c3.data.email : "",
+          onClick: () => {
+            onChange(c3);
+            setQuery("");
+          }
+        },
+        c3.ID
+      )) }) : null,
+      search && !loading && !options.length ? /* @__PURE__ */ u3(Empty, { children: __("No contacts found.") }) : null
+    ] });
+  }
+  function NewTaskSheet({ ctx, close, contact: given, onCreated }) {
+    const { __ } = ctx.i18n;
+    const [chosen, setChosen] = d2(null);
+    const contact = given || chosen;
     const [content, setContent] = d2("");
     const [due, setDue] = d2(tomorrowMorning());
     const [saving, setSaving] = d2(false);
@@ -1839,6 +1873,7 @@
     return /* @__PURE__ */ u3("form", { onSubmit: save2, children: [
       /* @__PURE__ */ u3(Field, { label: __("What needs doing?"), children: /* @__PURE__ */ u3(Textarea, { value: content, onInput: (e3) => setContent(e3.currentTarget.value), required: true, autofocus: true }) }),
       /* @__PURE__ */ u3(Field, { label: __("Due"), children: /* @__PURE__ */ u3(Input, { type: "datetime-local", value: due, onInput: (e3) => setDue(e3.currentTarget.value) }) }),
+      given ? null : /* @__PURE__ */ u3(ContactField, { ctx, value: chosen, onChange: setChosen }),
       /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add task") }) })
     ] });
   }

@@ -339,6 +339,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * SECURITY A user without the `view_contact_pii` capability could get round it by changing the letter case of a REST route, like `/gh/v4/Contacts`, to search contacts, read their details and check whether an email address is a contact.
 * FIXED The request that ran the 4.11 update showed `[redacted]` and refused exports and imports to everyone, administrators included, until the next page load. The update also now gives the `view_contact_pii` capability to users who were given `view_contacts` themselves instead of by their role.
 * FIXED A contact was linked to the first administrator when a user couldn't be created for them, for example because a user with their email address already existed, and the LMS enroll actions then enrolled that administrator. The contact stays unlinked and the action fails with a message.
+* FIXED In the mobile app, a task made from the Create menu can be assigned to a contact. A task with no contact no longer shows `#0` under it.
 * FIXED Broadcasts stopped scheduling when a whole batch of contacts was skipped, for example as unmarketable. Sending failed with "Unable to schedule events" or never finished.
 * FIXED Contacts made unmarketable by another plugin showed "Will receive marketing." under a red status. They now say another plugin or custom code made them unmarketable.
 * TWEAKED A broadcast none of its contacts can receive is refused with the reason, instead of being created empty.
