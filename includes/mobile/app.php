@@ -23,7 +23,7 @@ class App {
 	/**
 	 * Bump when the rewrite rules below change, so sites flush once without waiting for an update routine.
 	 */
-	const REWRITES_VERSION = 1;
+	const REWRITES_VERSION = 2;
 
 	/**
 	 * @var Activity_Feed
@@ -130,6 +130,7 @@ class App {
 		add_managed_rewrite_rule( 'app/?$', 'subpage=app' );
 		add_managed_rewrite_rule( 'app/manifest\.webmanifest$', 'subpage=app_manifest' );
 		add_managed_rewrite_rule( 'app/sw\.js$', 'subpage=app_sw' );
+		add_managed_rewrite_rule( 'app/icon\.svg$', 'subpage=app_icon' );
 	}
 
 	/**
@@ -196,6 +197,9 @@ class App {
 			case 'app_sw':
 				$this->render_service_worker();
 				break;
+			case 'app_icon':
+				$this->render_icon();
+				break;
 		}
 	}
 
@@ -245,9 +249,13 @@ class App {
 	/**
 	 * Icons for the install prompt and the home screen. A site icon wins, since it is the site's own mark.
 	 *
+	 * @param bool|null $white_labeled whether the brand's mark is kept out, by default whether the site is white labeled
+	 *
 	 * @return array[]
 	 */
-	protected function get_icons() {
+	public function get_icons( $white_labeled = null ) {
+
+		$white_labeled = $white_labeled ?? is_white_labeled();
 
 		$icons = [];
 
@@ -259,20 +267,48 @@ class App {
 			}
 		}
 
-		// the brand's mark is only a fallback for a site that isn't white labeled
-		if ( ! $icons && ! is_white_labeled() ) {
-			$icons[] = [
-				'src'   => GROUNDHOGG_ASSETS_URL . 'images/groundhogg-icon-small.png',
-				'sizes' => '200x226',
-				'type'  => 'image/png',
+		if ( $icons ) {
+			return $icons;
+		}
+
+		// Browsers need a square icon of 192 and 512 to offer to install the app. The brand's mark is the fallback for
+		// a site that isn't white labeled, and a white labeled one gets its domain's letter in the app's color.
+		if ( ! $white_labeled ) {
+			$images = GROUNDHOGG_ASSETS_URL . 'images/mobile/';
+
+			return [
+				[ 'src' => $images . 'app-icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any' ],
+				[ 'src' => $images . 'app-icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any' ],
+				[ 'src' => $images . 'app-icon-maskable-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable' ],
 			];
 		}
 
-		return $icons;
+		$svg = self::url() . 'icon.svg';
+
+		return [
+			[ 'src' => $svg, 'sizes' => 'any', 'type' => 'image/svg+xml', 'purpose' => 'any' ],
+			[ 'src' => $svg, 'sizes' => 'any', 'type' => 'image/svg+xml', 'purpose' => 'maskable' ],
+		];
 	}
 
 	/**
-	 * @return string the URL of the icon the iOS home screen uses, empty when there isn't one to use
+	 * The icon of a site that is white labeled and has no site icon: the first letter of its domain, in white on the
+	 * app's color. The letter stays well inside the middle of the square, so a phone can crop it to a circle.
+	 *
+	 * @return string
+	 */
+	public static function generated_icon_svg(): string {
+
+		$letter = strtoupper( mb_substr( self::domain(), 0, 1 ) );
+
+		return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
+		       . '<rect width="512" height="512" fill="' . esc_attr( self::color() ) . '"/>'
+		       . '<text x="256" y="256" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="260" font-weight="700" text-anchor="middle" dominant-baseline="central">' . esc_html( $letter ) . '</text>'
+		       . '</svg>';
+	}
+
+	/**
+	 * @return string the URL of the icon the iOS home screen uses, empty when there isn't one to use (iOS can't use an SVG)
 	 */
 	public static function touch_icon_url() {
 		$icon = get_site_icon_url( 180 );
@@ -281,7 +317,16 @@ class App {
 			return $icon;
 		}
 
-		return is_white_labeled() ? '' : GROUNDHOGG_ASSETS_URL . 'images/groundhogg-icon-small.png';
+		return is_white_labeled() ? '' : GROUNDHOGG_ASSETS_URL . 'images/mobile/app-icon-180.png';
+	}
+
+	protected function render_icon() {
+
+		header( 'Content-Type: image/svg+xml; charset=utf-8' );
+		header( 'Cache-Control: public, max-age=3600' );
+
+		echo self::generated_icon_svg(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts
+		exit;
 	}
 
 	protected function render_web_manifest() {
