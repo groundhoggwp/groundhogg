@@ -4,6 +4,7 @@
     disable_page_tracking = false,
     unnecessary_cookies_disabled,
     has_accepted_cookies,
+    consent_api = {},
     settings,
     cookies,
     routes,
@@ -280,6 +281,22 @@
       this.isLoggedIn = document.body.classList.contains('logged-in')
       this.has_accepted_cookies = has_accepted_cookies
 
+      // A consent plugin is reporting through the WP Consent API, ask it now, the value from when the page was
+      // generated might be cached from another visitor
+      if (this.usesConsentApi()) {
+
+        // Listen for consent changes, in either direction
+        document.addEventListener('wp_listen_for_consent_change', () => {
+          this.onConsentChange()
+        })
+
+        if (this.checkCookieConsent()) {
+          this.doTracking()
+        }
+
+        return
+      }
+
       // Cookies have not been accepted yet, quit out
       if (!has_accepted_cookies && !this.checkCookieConsent()) {
 
@@ -294,6 +311,27 @@
       }
 
       this.doTracking()
+    },
+
+    /**
+     * Whether the consent plugin on this site can be asked using the WP Consent API
+     *
+     * @returns {boolean}
+     */
+    usesConsentApi () {
+      return !!consent_api.active && typeof window.wp_has_consent === 'function'
+    },
+
+    /**
+     * Start tracking once the visitor allows the category, doTracking() only runs once per page load
+     */
+    onConsentChange () {
+
+      this.has_accepted_cookies = this.checkCookieConsent()
+
+      if (this.has_accepted_cookies) {
+        this.doTracking()
+      }
     },
 
     doTracking () {
@@ -340,6 +378,11 @@
     },
 
     checkCookieConsent () {
+
+      if (this.usesConsentApi()) {
+        return !!window.wp_has_consent(consent_api.category || 'marketing')
+      }
+
       return getCookie(consent_cookie_name || 'viewed_cookie_policy') ===
         (consent_cookie_value || 'yes')
     },

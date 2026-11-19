@@ -160,6 +160,11 @@ class Scripts {
 			// Cookies can be disabled form via the settings
 			'unnecessary_cookies_disabled' => is_option_enabled( 'gh_disable_unnecessary_cookies' ),
 			'has_accepted_cookies'         => has_accepted_cookies(),
+			// When a consent plugin reports through the WP Consent API the browser asks it directly, so a cached page can't carry one visitor's answer to another
+			'consent_api'                  => [
+				'active'   => Plugin::$instance->preferences->is_gdpr_enabled() && is_wp_consent_api_active(),
+				'category' => get_wp_consent_api_category(),
+			],
 			// page tracking
 			'disable_page_tracking'        => is_option_enabled( 'gh_disable_page_tracking' ),
 			//deprecated

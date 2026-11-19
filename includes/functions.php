@@ -7735,6 +7735,35 @@ function collapse_string( $str, $size = 30 ) {
 }
 
 /**
+ * Is a consent plugin that supports the WP Consent API managing consent on this site?
+ *
+ * The API says everything is allowed when nothing is managing consent, so this is only true when the API is installed
+ * and a consent plugin has declared a consent type, otherwise the consent cookie setting still decides.
+ *
+ * @return bool
+ */
+function is_wp_consent_api_active() {
+	return function_exists( 'wp_has_consent' )
+	       && function_exists( 'wp_get_consent_type' )
+	       && wp_get_consent_type() !== false;
+}
+
+/**
+ * The WP Consent API category that tracking cookies are checked against
+ *
+ * @return string
+ */
+function get_wp_consent_api_category() {
+
+	/**
+	 * Filter the WP Consent API category visitors must allow before tracking cookies are set.
+	 *
+	 * @param string $category functional, preferences, statistics, statistics-anonymous or marketing
+	 */
+	return apply_filters( 'groundhogg/consent_category', 'marketing' );
+}
+
+/**
  * Has the current visitor accepted cookies
  *
  * @return bool|mixed|void
@@ -7744,6 +7773,11 @@ function has_accepted_cookies() {
 	// GDPR features are not enabled, so consent is implicit
 	if ( ! Plugin::$instance->preferences->is_gdpr_enabled() ) {
 		return apply_filters( 'groundhogg/has_accepted_cookies', true );
+	}
+
+	// A consent plugin is reporting consent through the WP Consent API
+	if ( is_wp_consent_api_active() ) {
+		return apply_filters( 'groundhogg/has_accepted_cookies', (bool) wp_has_consent( get_wp_consent_api_category() ) );
 	}
 
 	$cookie_name  = get_option( 'gh_consent_cookie_name' );
