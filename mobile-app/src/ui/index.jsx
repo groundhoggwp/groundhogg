@@ -177,4 +177,13 @@ export const Sheet = ( { title, onClose, children } ) => {
  */
 export const SheetFooter = ( { children, ...props } ) => <div class="ghm-sheet-footer" { ...props }>{ children }</div>
 
-export const Toast = ( { message, type } ) => message ? <div class={ `ghm-toast ${ type || '' }` } role="status">{ message }</div> : null
+/**
+ * @param {{message: string, type?: string, action?: {label: string, onClick: Function}}} props the action is a button
+ *   in the toast, for what a person may want to do about what just happened
+ */
+export const Toast = ( { message, type, action } ) => message ? (
+  <div class={ `ghm-toast ${ type || '' }` } role="status">
+    <span>{ message }</span>
+    { action ? <button type="button" class="ghm-toast-action" onClick={ action.onClick }>{ action.label }</button> : null }
+  </div>
+) : null

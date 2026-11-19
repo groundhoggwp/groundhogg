@@ -1077,7 +1077,10 @@
     ] });
   };
   var SheetFooter = ({ children, ...props }) => /* @__PURE__ */ u3("div", { class: "ghm-sheet-footer", ...props, children });
-  var Toast = ({ message, type }) => message ? /* @__PURE__ */ u3("div", { class: `ghm-toast ${type || ""}`, role: "status", children: message }) : null;
+  var Toast = ({ message, type, action }) => message ? /* @__PURE__ */ u3("div", { class: `ghm-toast ${type || ""}`, role: "status", children: [
+    /* @__PURE__ */ u3("span", { children: message }),
+    action ? /* @__PURE__ */ u3("button", { type: "button", class: "ghm-toast-action", onClick: action.onClick, children: action.label }) : null
+  ] }) : null;
 
   // src/runtime.jsx
   var RuntimeContext = K(null);
@@ -1136,7 +1139,7 @@
           navigate: (path, query) => {
             window.location.hash = toHash(path, query);
           },
-          toast: (message, type) => shell.toast && shell.toast(message, type),
+          toast: (message, type, action) => shell.toast && shell.toast(message, type, action),
           sheet: (Component, props) => shell.sheet && shell.sheet(Component, props),
           confirm: (message) => Promise.resolve(window.confirm(message))
         };
@@ -1741,6 +1744,15 @@
   function escapeHtml(text) {
     return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
+  function splitSummary(text) {
+    const lines = String(text || "").replace(/\r\n?/g, "\n").trim().split("\n");
+    const first = lines[0].trim();
+    if (first.length > SUMMARY_MAX) {
+      return { summary: first.slice(0, SUMMARY_MAX - 1).trim() + "\u2026", content: lines.join("\n").trim() };
+    }
+    return { summary: first, content: lines.slice(1).join("\n").trim() };
+  }
+  var SUMMARY_MAX = 120;
   function plainToHtml(text) {
     return String(text || "").replace(/\r\n?/g, "\n").trim().split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean).map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`).join("\n");
   }
@@ -1781,8 +1793,10 @@
     A2(() => ctx.on("task:created", reload), [reload]);
     const complete = (task) => {
       setDone((d3) => ({ ...d3, [task.ID]: true }));
+      const { __ } = ctx.i18n;
       ctx.api.patch(`tasks/${task.ID}/complete`).then(
-        () => ctx.toast(ctx.i18n.__("Task completed")),
+        // completing is one tap, as it was, and how it went is there for whoever wants to say, which is what the desktop asks
+        () => ctx.toast(__("Task completed"), "", { label: __("Add note"), onClick: () => ctx.sheet(TaskOutcomeSheet, { title: __("How did it go?"), task }) }),
         (e3) => {
           setDone((d3) => ({ ...d3, [task.ID]: false }));
           ctx.toast(e3.message, "error");
@@ -1846,12 +1860,51 @@
       search && !loading && !options.length ? /* @__PURE__ */ u3(Empty, { children: __("No contacts found.") }) : null
     ] });
   }
+  function TaskOutcomeSheet({ ctx, close, task }) {
+    const { __ } = ctx.i18n;
+    const [outcome, setOutcome] = d2("");
+    const [note, setNote] = d2("");
+    const [saving, setSaving] = d2(false);
+    const { data } = useFetch(() => ctx.api.get("tasks/outcomes").catch(() => ({ outcomes: [] })), []);
+    const outcomes = data && data.outcomes || [];
+    const save2 = async (e3) => {
+      e3.preventDefault();
+      if (!outcome && !note.trim()) {
+        close();
+        return;
+      }
+      setSaving(true);
+      try {
+        await ctx.api.patch(`tasks/${task.ID}`, { data: { activity: 1, type: "task_complete", outcome, note: note.trim() ? plainToHtml(note) : "" } });
+        ctx.toast(__("Note added"));
+        close();
+      } catch (err) {
+        setSaving(false);
+        ctx.toast(err.message, "error");
+      }
+    };
+    return /* @__PURE__ */ u3("form", { onSubmit: save2, children: [
+      outcomes.length ? /* @__PURE__ */ u3(Field, { label: __("What happened?"), children: /* @__PURE__ */ u3(Select, { value: outcome, onChange: (e3) => setOutcome(e3.currentTarget.value), placeholder: __("Select an outcome"), options: outcomes.map((o4) => ({ value: o4, label: o4 })) }) }) : null,
+      /* @__PURE__ */ u3(Field, { label: __("Any more to add?"), children: /* @__PURE__ */ u3(Textarea, { value: note, onInput: (e3) => setNote(e3.currentTarget.value), autofocus: true }) }),
+      /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Save") }) })
+    ] });
+  }
+  function AssignTo({ ctx, value, onChange }) {
+    const { __ } = ctx.i18n;
+    const { data } = useFetch(() => ctx.api.get("mobile/task-assignees"), []);
+    const people = data && data.items || [];
+    if (people.length < 2) {
+      return null;
+    }
+    return /* @__PURE__ */ u3(Field, { label: __("Assign to"), children: /* @__PURE__ */ u3(Select, { value: String(value), onChange: (e3) => onChange(Number(e3.currentTarget.value)), options: people.map((p3) => ({ value: String(p3.id), label: p3.id === ctx.user.id ? __("Me") : p3.name })) }) });
+  }
   function NewTaskSheet({ ctx, close, contact: given, onCreated }) {
     const { __ } = ctx.i18n;
     const [chosen, setChosen] = d2(null);
     const contact = given || chosen;
     const [content, setContent] = d2("");
     const [due, setDue] = d2(tomorrowMorning());
+    const [assignee, setAssignee] = d2(ctx.user.id);
     const [saving, setSaving] = d2(false);
     const save2 = async (e3) => {
       e3.preventDefault();
@@ -1859,11 +1912,13 @@
         return;
       }
       setSaving(true);
+      const { summary, content: details } = splitSummary(content);
       const data = {
+        summary,
         // tasks are HTML, the desktop writes them in the editor, so the line breaks have to be markup
-        content: plainToHtml(content),
+        content: plainToHtml(details),
         type: "task",
-        user_id: ctx.user.id,
+        user_id: assignee,
         due_date: toApiDate(due)
       };
       if (contact) {
@@ -1884,6 +1939,7 @@
     return /* @__PURE__ */ u3("form", { onSubmit: save2, children: [
       /* @__PURE__ */ u3(Field, { label: __("What needs doing?"), children: /* @__PURE__ */ u3(Textarea, { value: content, onInput: (e3) => setContent(e3.currentTarget.value), required: true, autofocus: true }) }),
       /* @__PURE__ */ u3(Field, { label: __("Due"), children: /* @__PURE__ */ u3(Input, { type: "datetime-local", value: due, onInput: (e3) => setDue(e3.currentTarget.value) }) }),
+      ctx.can("edit_others_tasks") ? /* @__PURE__ */ u3(AssignTo, { ctx, value: assignee, onChange: setAssignee }) : null,
       given ? null : /* @__PURE__ */ u3(ContactField, { ctx, value: chosen, onChange: setChosen }),
       /* @__PURE__ */ u3(SheetFooter, { children: /* @__PURE__ */ u3(Button, { variant: "primary", block: true, type: "submit", disabled: saving, children: __("Add task") }) })
     ] });
@@ -2696,10 +2752,18 @@
     const [failed, setFailed] = d2({});
     A2(() => {
       let timer;
-      runtime.shell.toast = (message, type) => {
-        setToast({ message, type });
+      runtime.shell.toast = (message, type, action) => {
+        const dismiss = () => setToast(null);
+        setToast({
+          message,
+          type,
+          action: action ? { label: action.label, onClick: () => {
+            dismiss();
+            action.onClick();
+          } } : null
+        });
         clearTimeout(timer);
-        timer = setTimeout(() => setToast(null), 2800);
+        timer = setTimeout(dismiss, action ? 6e3 : 2800);
       };
       runtime.shell.sheet = (Component, props) => setSheet({ Component, props });
       return () => clearTimeout(timer);

@@ -34,6 +34,7 @@ class Manifest {
 		'add_tasks',
 		'edit_tasks',
 		'view_others_tasks',
+		'edit_others_tasks',
 	];
 
 	/**

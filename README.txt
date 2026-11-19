@@ -345,6 +345,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED In the mobile app, "Show older" on a contact's activity loaded the same entries again when more than a page of them happened in the same second.
 * FIXED In the mobile app, the "ago" on a note can be translated.
 * FIXED The mobile app's install prompt could be withheld on sites without a Site Icon, because the fallback icon wasn't square and the manifest had no 192 and 512 sizes. The app now has square fallback icons, and a white labeled site gets its domain's first letter on the app's color.
+* TWEAKED In the mobile app, completing a task offers to add an outcome and a note, as the desktop does. A new task takes its summary from the first line, and someone who can edit others' tasks can assign it to another user.
 * FIXED Broadcasts stopped scheduling when a whole batch of contacts was skipped, for example as unmarketable. Sending failed with "Unable to schedule events" or never finished.
 * FIXED Contacts made unmarketable by another plugin showed "Will receive marketing." under a red status. They now say another plugin or custom code made them unmarketable.
 * TWEAKED A broadcast none of its contacts can receive is refused with the reason, instead of being created empty.

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
-import { plainToHtml } from '../core/text.js'
-import { Avatar, Button, Card, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
+import { plainToHtml, splitSummary } from '../core/text.js'
+import { Avatar, Button, Card, Chip, Empty, ErrorMessage, Field, Icon, Input, List, ListItem, Pill, Select, SheetFooter, SkeletonList, Textarea } from '../ui/index.jsx'
 import { avatarUrl, contactName, plainText, useDebounced, useFetch, useRecentContacts, toApiDate, tomorrowMorning } from '../util.js'
 
 /**
@@ -61,8 +61,11 @@ export function useTaskList ( ctx, query, deps ) {
   const complete = task => {
     setDone( d => ( { ...d, [ task.ID ]: true } ) )
 
+    const { __ } = ctx.i18n
+
     ctx.api.patch( `tasks/${ task.ID }/complete` ).then(
-      () => ctx.toast( ctx.i18n.__( 'Task completed' ) ),
+      // completing is one tap, as it was, and how it went is there for whoever wants to say, which is what the desktop asks
+      () => ctx.toast( __( 'Task completed' ), '', { label: __( 'Add note' ), onClick: () => ctx.sheet( TaskOutcomeSheet, { title: __( 'How did it go?' ), task } ) } ),
       e => {
         setDone( d => ( { ...d, [ task.ID ]: false } ) )
         ctx.toast( e.message, 'error' )
@@ -158,6 +161,76 @@ function ContactField ( { ctx, value, onChange } ) {
 }
 
 /**
+ * What happened with a task that was just completed: an outcome from the site's list and a note, which go on the task
+ * the way the desktop's completion prompt puts them.
+ */
+export function TaskOutcomeSheet ( { ctx, close, task } ) {
+  const { __ } = ctx.i18n
+  const [ outcome, setOutcome ] = useState( '' )
+  const [ note, setNote ] = useState( '' )
+  const [ saving, setSaving ] = useState( false )
+
+  // a site without outcomes just has the note
+  const { data } = useFetch( () => ctx.api.get( 'tasks/outcomes' ).catch( () => ( { outcomes: [] } ) ), [] )
+  const outcomes = ( data && data.outcomes ) || []
+
+  const save = async e => {
+    e.preventDefault()
+
+    if ( ! outcome && ! note.trim() ) {
+      close()
+      return
+    }
+
+    setSaving( true )
+
+    try {
+      await ctx.api.patch( `tasks/${ task.ID }`, { data: { activity: 1, type: 'task_complete', outcome, note: note.trim() ? plainToHtml( note ) : '' } } )
+      ctx.toast( __( 'Note added' ) )
+      close()
+    } catch ( err ) {
+      setSaving( false )
+      ctx.toast( err.message, 'error' )
+    }
+  }
+
+  return (
+    <form onSubmit={ save }>
+      { outcomes.length ? (
+        <Field label={ __( 'What happened?' ) }>
+          <Select value={ outcome } onChange={ e => setOutcome( e.currentTarget.value ) } placeholder={ __( 'Select an outcome' ) } options={ outcomes.map( o => ( { value: o, label: o } ) ) }/>
+        </Field>
+      ) : null }
+      <Field label={ __( 'Any more to add?' ) }>
+        <Textarea value={ note } onInput={ e => setNote( e.currentTarget.value ) } autofocus/>
+      </Field>
+      <SheetFooter>
+        <Button variant="primary" block type="submit" disabled={ saving }>{ __( 'Save' ) }</Button>
+      </SheetFooter>
+    </form>
+  )
+}
+
+/**
+ * Who a task is for. It is only offered to someone who can give tasks to others, and starts as themselves.
+ */
+function AssignTo ( { ctx, value, onChange } ) {
+  const { __ } = ctx.i18n
+  const { data } = useFetch( () => ctx.api.get( 'mobile/task-assignees' ), [] )
+  const people = ( data && data.items ) || []
+
+  if ( people.length < 2 ) {
+    return null
+  }
+
+  return (
+    <Field label={ __( 'Assign to' ) }>
+      <Select value={ String( value ) } onChange={ e => onChange( Number( e.currentTarget.value ) ) } options={ people.map( p => ( { value: String( p.id ), label: p.id === ctx.user.id ? __( 'Me' ) : p.name } ) ) }/>
+    </Field>
+  )
+}
+
+/**
  * The "New task" sheet, attached to the contact it is given, or to one chosen in it.
  */
 export function NewTaskSheet ( { ctx, close, contact: given, onCreated } ) {
@@ -166,6 +239,7 @@ export function NewTaskSheet ( { ctx, close, contact: given, onCreated } ) {
   const contact = given || chosen
   const [ content, setContent ] = useState( '' )
   const [ due, setDue ] = useState( tomorrowMorning() )
+  const [ assignee, setAssignee ] = useState( ctx.user.id )
   const [ saving, setSaving ] = useState( false )
 
   const save = async e => {
@@ -177,11 +251,15 @@ export function NewTaskSheet ( { ctx, close, contact: given, onCreated } ) {
 
     setSaving( true )
 
+    // the first line is the task's title on the desktop, and the rest is what it says
+    const { summary, content: details } = splitSummary( content )
+
     const data = {
+      summary,
       // tasks are HTML, the desktop writes them in the editor, so the line breaks have to be markup
-      content: plainToHtml( content ),
+      content: plainToHtml( details ),
       type: 'task',
-      user_id: ctx.user.id,
+      user_id: assignee,
       due_date: toApiDate( due ),
     }
 
@@ -210,6 +288,7 @@ export function NewTaskSheet ( { ctx, close, contact: given, onCreated } ) {
       <Field label={ __( 'Due' ) }>
         <Input type="datetime-local" value={ due } onInput={ e => setDue( e.currentTarget.value ) }/>
       </Field>
+      { ctx.can( 'edit_others_tasks' ) ? <AssignTo ctx={ ctx } value={ assignee } onChange={ setAssignee }/> : null }
       { given ? null : <ContactField ctx={ ctx } value={ chosen } onChange={ setChosen }/> }
       <SheetFooter>
         <Button variant="primary" block type="submit" disabled={ saving }>{ __( 'Add task' ) }</Button>

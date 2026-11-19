@@ -90,7 +90,7 @@ export function createRuntime ( manifest, shell = {} ) {
         navigate: ( path, query ) => {
           window.location.hash = toHash( path, query )
         },
-        toast: ( message, type ) => shell.toast && shell.toast( message, type ),
+        toast: ( message, type, action ) => shell.toast && shell.toast( message, type, action ),
         sheet: ( Component, props ) => shell.sheet && shell.sheet( Component, props ),
         confirm: message => Promise.resolve( window.confirm( message ) ),
       }

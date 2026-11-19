@@ -290,6 +290,9 @@ body.ghm {
 
 .ghm-toast { position: fixed; left: 50%; bottom: calc(var(--ghm-tab-h) + var(--ghm-safe-b) + 16px); z-index: 60; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 99px; background: var(--ghm-text); color: var(--ghm-bg); font-weight: 600; box-shadow: var(--ghm-shadow); animation: ghm-fade .15s ease-out; }
 .ghm-toast.error { background: var(--ghm-danger); color: #fff; }
+.ghm-toast { display: flex; align-items: center; gap: 12px; }
+.ghm-toast-action { border: 0; background: none; padding: 4px 2px; font-weight: 700; color: var(--ghm-accent); cursor: pointer; }
+.ghm-toast.error .ghm-toast-action { color: inherit; text-decoration: underline; }
 
 @keyframes ghm-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ghm-rise { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }

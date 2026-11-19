@@ -118,10 +118,20 @@ export function App ( { runtime } ) {
   useEffect( () => {
     let timer
 
-    runtime.shell.toast = ( message, type ) => {
-      setToast( { message, type } )
+    runtime.shell.toast = ( message, type, action ) => {
+      const dismiss = () => setToast( null )
+
+      // one with a button stays long enough to be read and tapped, and goes once it has been
+      setToast( {
+        message,
+        type,
+        action: action ? { label: action.label, onClick: () => {
+          dismiss()
+          action.onClick()
+        } } : null,
+      } )
       clearTimeout( timer )
-      timer = setTimeout( () => setToast( null ), 2800 )
+      timer = setTimeout( dismiss, action ? 6000 : 2800 )
     }
     runtime.shell.sheet = ( Component, props ) => setSheet( { Component, props } )
 
