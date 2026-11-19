@@ -21,8 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
-/* Auto link the account before we see the create account form. */
-$contact->auto_link_account();
+// A user with the contact's email address isn't linked until someone says so: nothing proves the email address is theirs
+$matching_user = ! $contact->get_userdata() && current_user_can( 'edit_users' ) && ! Pii::is_restricted() ?get_user_by( 'email', $contact->get_email() ) : false;
 
 if ( $contact->get_userdata() ):
 
@@ -57,6 +57,21 @@ if ( $contact->get_userdata() ):
 			'href' => action_url( 'unlink_user', [ 'contact' => $contact->get_id() ] )
 		], esc_html__( 'Unlink this user', 'groundhogg' ) ) ?></p>
 <?php endif; ?>
+<?php elseif ( $matching_user ): ?>
+    <p><?php esc_html_e( 'This contact is not linked to a WordPress user, but there is a user with the same email address.', 'groundhogg' ); ?></p>
+    <table>
+        <tr>
+            <th><?php esc_html_e( 'Username', 'groundhogg' ) ?></th>
+            <td><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $matching_user->ID ) ); ?>"><?php echo esc_html( Pii::display( $matching_user->user_login ) ); ?></a></td>
+        </tr>
+    </table>
+    <p><?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo html()->e( 'a', [
+			'class' => 'gh-button secondary',
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'href'  => action_url( 'link_user', [ 'contact' => $contact->get_id() ] )
+		], esc_html__( 'Link this user', 'groundhogg' ) ) ?></p>
 <?php else: ?>
     <p><?php esc_html_e( 'This contact does not have a WordPress user account.', 'groundhogg' ); ?></p>
     <?php // the form would carry the contact's name and email address to the new user screen

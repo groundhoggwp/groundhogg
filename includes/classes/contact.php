@@ -1077,6 +1077,9 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * This will find a WP account with the same email and update the user_id accordingly
 	 *
+	 * Nothing calls this any more. Nothing proves the email address is the user's, so the contact record offers a "Link
+	 * this user" button instead of doing it on a page view.
+	 *
 	 * @return bool true if we found a relevant user account, false otherwise.
 	 */
 	public function auto_link_account() {

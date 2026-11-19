@@ -1561,12 +1561,58 @@ function create_contact_from_user( $user = false, $sync_meta = false ) {
 
 	$contact = get_contactdata( $user->ID, true );
 
+	// a contact that was already the user's, as opposed to one that only has the same email address
+	$adopted = false;
+
 	// If not available by user ID try by email
 	if ( ! is_a_contact( $contact ) ) {
+
 		$contact = get_contactdata( $user->user_email );
+
+		/**
+		 * Whether a contact that already has the new user's email address becomes that user's contact.
+		 *
+		 * WordPress doesn't know the email address of a user is theirs, since a registration can set the password
+		 * without confirming it, and a user can change their own address through the REST API. A site like that can
+		 * return false so that a visitor can't take over the record of whoever has the address they typed.
+		 *
+		 * @param bool     $adopt
+		 * @param \WP_User $user
+		 * @param Contact  $contact
+		 */
+		if ( is_a_contact( $contact ) ) {
+
+			// no contact for this user, and nothing is done to one that isn't theirs
+			if ( ! apply_filters( 'groundhogg/create_contact_from_user/adopt_existing_contact', true, $user, $contact ) ) {
+				return false;
+			}
+
+			// it is another user's, who still exists
+			if ( $contact->get_user_id() && $contact->get_user_id() !== $user->ID && get_userdata( $contact->get_user_id() ) ) {
+				return false;
+			}
+
+			$adopted = true;
+		}
 	}
 
-	if ( is_a_contact( $contact ) ) {
+	if ( is_a_contact( $contact ) && $adopted ) {
+
+		// The contact has a history that the user didn't write, so it keeps what it says about the person. What the user
+		// has is filled in where the contact has nothing.
+		$args = [ 'user_id' => $user->ID ];
+
+		if ( ! $contact->get_first_name() ) {
+			$args['first_name'] = $user->first_name ?: $user->display_name;
+		}
+
+		if ( ! $contact->get_last_name() ) {
+			$args['last_name'] = $user->last_name;
+		}
+
+		$contact->update( $args );
+
+	} else if ( is_a_contact( $contact ) ) {
 
 		/**
 		 * Setup the initial args..
@@ -1625,13 +1671,20 @@ function create_contact_from_user( $user = false, $sync_meta = false ) {
 				continue;
 			}
 
+			// a contact that was adopted keeps what it already has
+			if ( $adopted && $contact->get_meta( $key ) ) {
+				continue;
+			}
+
 			$contact->update_meta( $key, array_shift( $values ) );
 		}
 
 	}
 
-	// Update the locale of the contact
-	$contact->set_locale( $user->locale );
+	// Update the locale of the contact, unless an adopted contact already has one
+	if ( ! $adopted || ! $contact->get_meta( 'locale' ) ) {
+		$contact->set_locale( $user->locale );
+	}
 
 	/**
 	 * Runs after the contact is created from the create user function

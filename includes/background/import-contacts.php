@@ -197,6 +197,14 @@ class Import_Contacts extends Task {
 			return true;
 		}
 
+		// Nobody is logged in while this runs, which is when anyone may link a contact to a user, so a column that
+		// maps to a user can only link to the users whoever started the import could edit.
+		$can_link = function ( $can, $user_id ) {
+			return $can && user_can( $this->user_id, 'edit_user', $user_id );
+		};
+
+		add_filter( 'groundhogg/contact/can_link_to_user', $can_link, 10, 2 );
+
 		foreach ( $items as $item ) {
 
 			if ( isset_not_empty( $this->settings, 'is_confirmed' ) ) {
@@ -241,6 +249,8 @@ class Import_Contacts extends Task {
 				do_action( 'groundhogg/contact/imported', $contact );
 			}
 		}
+
+		remove_filter( 'groundhogg/contact/can_link_to_user', $can_link, 10 );
 
 		$this->batch ++;
 

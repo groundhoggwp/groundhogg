@@ -644,6 +644,41 @@ class Contacts_Page extends Admin_Page {
 	}
 
 	/**
+	 * Link the contact to the user with the same email address, when someone chooses to
+	 *
+	 * @return string
+	 */
+	public function process_link_user() {
+
+		if ( ! current_user_can( 'edit_users' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$contact = new Contact( get_url_var( 'contact' ) );
+
+		if ( ! $contact->exists() || ! current_user_can( 'edit_contact', $contact ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$user = $contact->user_id ? false : get_user_by( 'email', $contact->get_email() );
+
+		if ( ! $user ) {
+			return $contact->admin_link();
+		}
+
+		// whether it is allowed is decided where the link is made, which drops it for a user they can't edit
+		$contact->update( [ 'user_id' => $user->ID ] );
+
+		if ( ( new Contact( $contact->get_id() ) )->get_user_id() === $user->ID ) {
+			$this->add_notice( 'success', 'User linked!' );
+		} else {
+			$this->add_notice( 'failed', 'That user could not be linked.', 'error' );
+		}
+
+		return $contact->admin_link();
+	}
+
+	/**
 	 * Unlink a user from the contact record but only if they don't match
 	 *
 	 * @return string
