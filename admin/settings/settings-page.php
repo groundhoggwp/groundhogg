@@ -1441,7 +1441,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_consent_cookie_name',
 				'section' => 'cookies',
 				'label'   => _x( 'Consent cookie name', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'The name of the cookie that records consent to allow cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The name of the cookie that records consent to allow cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled, and it is ignored when your consent plugin reports consent through the WP Consent API.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
 					'placeholder' => 'viewed_cookie_policy',
@@ -1453,7 +1453,7 @@ class Settings_Page extends Admin_Page {
 				'id'      => 'gh_consent_cookie_value',
 				'section' => 'cookies',
 				'label'   => _x( 'Consent cookie value', 'settings', 'groundhogg' ),
-				'desc'    => _x( 'The value of the consent cookie indicating acceptance to use cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled.', 'settings', 'groundhogg' ),
+				'desc'    => _x( 'The value of the consent cookie indicating acceptance to use cookies. This is provided by a third party plugin. This has no effect unless GDPR features are enabled, and it is ignored when your consent plugin reports consent through the WP Consent API.', 'settings', 'groundhogg' ),
 				'type'    => 'input',
 				'atts'    => [
 					'placeholder' => 'yes',

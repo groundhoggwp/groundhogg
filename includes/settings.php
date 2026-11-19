@@ -438,7 +438,7 @@ class Settings {
 		$this->add_setting( 'consent_cookie_name', [
 			'group'       => 'cookies',
 			'type'        => 'string',
-			'description' => __( 'The name of the cookie a cookie consent plugin sets when a visitor accepts cookies, e.g. "viewed_cookie_policy". Used with disable_unnecessary_cookies, so tracking cookies are only set after consent.', 'groundhogg' ),
+			'description' => __( 'The name of the cookie a cookie consent plugin sets when a visitor accepts cookies, e.g. "viewed_cookie_policy". Used with disable_unnecessary_cookies, so tracking cookies are only set after consent. Ignored when the consent plugin reports consent through the WP Consent API.', 'groundhogg' ),
 		] );
 
 		$this->add_setting( 'consent_cookie_value', [
