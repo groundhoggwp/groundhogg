@@ -135,17 +135,19 @@ class Search_Docs extends Ability {
 			return new WP_Error( 'missing_search', __( 'Give `search`, some words to look for, or the `id` of an article to read.', 'groundhogg' ) );
 		}
 
-		return $this->search( $search, ! empty( $input['developer'] ), absint( $input['limit'] ?? 5 ) ?: 5 );
+		return self::find( $search, ! empty( $input['developer'] ), absint( $input['limit'] ?? 5 ) ?: 5 );
 	}
 
 	/**
+	 * Search the docs, for the ability or anywhere else that does, like the troubleshooter
+	 *
 	 * @param string $search
-	 * @param bool   $developer
+	 * @param bool   $developer whether to include the developer docs
 	 * @param int    $limit
 	 *
-	 * @return array|WP_Error
+	 * @return array|WP_Error [ results => [ id, title, url, categories, updated, excerpt ][], all_docs => string ]
 	 */
-	protected function search( string $search, bool $developer, int $limit ) {
+	public static function find( string $search, bool $developer = false, int $limit = 5 ) {
 
 		$docs = self::fetch( 'doc', [
 			'search'   => $search,

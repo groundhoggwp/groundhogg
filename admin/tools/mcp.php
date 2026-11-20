@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin\Tools;
 
+use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Mcp\Connection;
 use function Groundhogg\action_input;
 use function Groundhogg\is_white_labeled;
@@ -44,6 +45,28 @@ $can_install_adapter = Connection::can_install();
 $show_connector = Connection::can_use_connector_plugin() && ( $connector_active
 		? current_user_can( 'manage_options' )
 		: Connection::can_install( $connector_slug ) );
+
+// the things the assistant can look into, see Build_With_AI::examples() for strategy: beside the steps on a wide
+// screen, and under them on a narrow one, or above them once it's connected, since then they're what's next. Not in
+// the popup that shows these steps, see Tools_Page::ajax_mcp_view()
+$show_missions = ! wp_doing_ajax() && Build_With_AI::is_available();
+$connected     = $show_missions && Connection::is_connected();
+
+$missions = function () use ( $connected ) {
+	?>
+    <div class="gh-panel gh-mcp-missions">
+        <div class="inside">
+            <h2><?php $connected
+					? esc_html_e( 'Put your assistant to work', 'groundhogg' )
+					: esc_html_e( 'Then put your assistant to work', 'groundhogg' ); ?></h2>
+            <p><?php $connected
+					? esc_html_e( 'Pick something for your assistant to do. It builds what you describe as drafts for you to review, looks at your flows, emails and reports and tells you what to improve, or finds out why something isn\'t working.', 'groundhogg' )
+					: esc_html_e( 'Once your assistant is connected, pick something for it to do. It builds what you describe as drafts for you to review, looks at your flows, emails and reports and tells you what to improve, or finds out why something isn\'t working.', 'groundhogg' ); ?></p>
+            <div data-build-with-ai-missions></div>
+        </div>
+    </div>
+	<?php
+};
 
 // where they are: the first step that is not done
 $current = ! $served ? 1 : ( ( $agent || ! empty( $passwords ) ) ? 3 : 2 );
@@ -190,8 +213,22 @@ $marker = function ( int $step ) use ( $step_state ): string {
     #gh-mcp-client-<?php echo (int) $i; ?>:focus-visible ~ .gh-mcp-tablist label[for="gh-mcp-client-<?php echo (int) $i; ?>"] { outline: 2px solid var(--gh-primary, #0075ff); outline-offset: 2px; }
     #gh-mcp-client-<?php echo (int) $i; ?>:checked ~ .gh-mcp-panels .gh-mcp-panel-<?php echo (int) $i; ?> { display: block; }
 	<?php endforeach; ?>
+    /* the steps and the missions side by side on a wide screen, one above the other on a narrow one */
+    .gh-mcp-layout { display: flex; flex-direction: column; gap: 20px; }
+    .gh-mcp-layout > .gh-panel { margin: 0; min-width: 0; }
+    .gh-mcp-layout.is-connected .gh-mcp-missions { order: -1; }
+    .gh-mcp-missions h2 { margin-top: 0; }
+    @media (min-width: 1400px) {
+        .gh-mcp-layout { flex-direction: row; align-items: flex-start; }
+        .gh-mcp-layout > .gh-panel:first-child { flex: 0 1 720px; }
+        .gh-mcp-layout > .gh-mcp-missions { flex: 1 1 0; position: sticky; top: 50px; }
+        .gh-mcp-layout.is-connected .gh-mcp-missions { order: 0; }
+    }
 </style>
 <p></p>
+<?php if ( $show_missions ): ?>
+<div class="gh-mcp-layout<?php echo $connected ? ' is-connected' : ''; ?>">
+<?php endif; ?>
 <div class="gh-panel">
     <div class="inside gh-mcp" id="gh-mcp" data-nonce="<?php echo esc_attr( wp_create_nonce( 'admin_ajax' ) ); ?>">
         <h2><?php esc_html_e( 'Connect an AI assistant', 'groundhogg' ); ?></h2>
@@ -340,6 +377,10 @@ $marker = function ( int $step ) use ( $step_state ): string {
         </div>
     </div>
 </div>
+<?php if ( $show_missions ): ?>
+	<?php $missions(); ?>
+</div>
+<?php endif; ?>
 <script>
     /*
      * Each step is a form that works with a page load. With script it is sent in the background instead, and the page

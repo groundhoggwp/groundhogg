@@ -8,6 +8,7 @@ use Groundhogg\Mcp\Connection;
 use Groundhogg\Mobile\Promo;
 use Groundhogg\Notifications\Subscriptions;
 use Groundhogg_Email_Services;
+use Groundhogg\Mcp\Build_With_AI;
 use function Groundhogg\admin_page_url;
 use function Groundhogg\andList;
 use function Groundhogg\db;
@@ -419,6 +420,9 @@ class Welcome_Page extends Admin_Page {
 
 		wp_enqueue_script( 'groundhogg-admin-dashboard' );
 		wp_enqueue_editor();
+
+		// the AI assistant widget, which adds itself to the dashboard's, see build-with-ai.js
+		Build_With_AI::enqueue( 'strategy', [], [ 'email', 'flow', 'setup' ] );
 
 
 	}

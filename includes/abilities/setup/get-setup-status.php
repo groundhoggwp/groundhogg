@@ -318,6 +318,7 @@ class Get_Setup_Status extends Ability {
 			'database'         => [ 'person', __( 'A person runs the installation again from the link, which creates missing tables and runs pending updates.', 'groundhogg' ) ],
 			'permalinks'       => [ 'person', __( 'A person changes Settings › Permalinks to anything but Plain.', 'groundhogg' ) ],
 			'safe_mode'        => [ 'person', __( 'A person turns off safe mode from the link, once whatever it was turned on for is solved.', 'groundhogg' ) ],
+			'updates'          => [ 'person', __( 'A person updates them from Dashboard › Updates, ideally after a backup. Updates fix many bugs and conflicts, so when something isn\'t working, suggest updating before looking further.', 'groundhogg' ) ],
 			'bounces'          => [ 'person', __( 'Checking bounces needs the PHP IMAP extension, which the person\'s host turns on.', 'groundhogg' ) ],
 			'licenses'         => [ 'either', __( 'Check them with groundhogg/check-license. A person renews or buys a license and gives you the key to activate with groundhogg/activate-license.', 'groundhogg' ), [ 'groundhogg/check-license', 'groundhogg/activate-license' ] ],
 		];

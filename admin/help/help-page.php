@@ -7,6 +7,9 @@ use DateTimeZone;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\Contact;
 use Groundhogg\License_Manager;
+use Groundhogg\Abilities\Setup\Get_Cron_Status;
+use Groundhogg\Abilities\Utils\Search_Docs;
+use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Plugin;
 use Groundhogg_Email_Services;
 use WP_Error;
@@ -40,6 +43,7 @@ class Help_Page extends Tabbed_Admin_Page {
 	 */
 	protected function add_ajax_actions() {
 		add_action( 'wp_ajax_groundhogg_doc_search', [ $this, 'get_docs_ajax' ] );
+		add_action( 'wp_ajax_groundhogg_troubleshooter_cron_status', [ $this, 'cron_status_ajax' ] );
 		add_action( 'wp_ajax_groundhogg_fix_missing_tables', [ $this, 'fix_missing_tables' ] );
 		add_action( 'wp_ajax_groundhogg_enable_safe_mode', [ $this, 'enable_safe_mode' ] );
 		add_action( 'wp_ajax_groundhogg_disable_safe_mode', [ $this, 'disable_safe_mode' ] );
@@ -129,15 +133,28 @@ class Help_Page extends Tabbed_Admin_Page {
 			return;
 		}
 
-		$query = sanitize_text_field( get_post_var( 'query' ) );
+		// the same search as the AI assistant's, see groundhogg/search-docs
+		$results = Search_Docs::find( sanitize_text_field( get_post_var( 'query' ) ), false, 8 );
 
-		$json = remote_post_json( 'https://groundhogg.io/wp-json/wp/v2/doc', [
-			'search'   => $query,
-			'per_page' => 20,
-            'context'  => 'view',
-		], 'GET', [], false, DAY_IN_SECONDS );
+		if ( is_wp_error( $results ) ) {
+			wp_send_json_error( $results );
+		}
 
-		wp_send_json( $json );
+		wp_send_json_success( $results );
+	}
+
+	/**
+	 * The cron jobs' status, for the troubleshooter to check again once someone has set theirs up
+	 *
+	 * @return void
+	 */
+	public function cron_status_ajax() {
+
+		if ( ! current_user_can( 'manage_options' ) || ! verify_admin_ajax_nonce() ) {
+			return;
+		}
+
+		wp_send_json_success( Get_Cron_Status::status() );
 	}
 
 	/**
@@ -465,36 +482,79 @@ class Help_Page extends Tabbed_Admin_Page {
 					'after'   => time() - ( 30 * DAY_IN_SECONDS ),
 					'groupby' => 'error_code'
 				] ),
-				'required_updates'     => get_plugin_updates(),
+				'health'               => self::health_problems(),
+				// what the cron job should call, with paths on the server, only for those who can set it up
+				'cron'                 => current_user_can( 'manage_options' ) ? Get_Cron_Status::status() : null,
+				'cron_setup_url'       => admin_page_url( 'gh_tools', [ 'tab' => 'cron' ] ),
 				'missing_db_tables'    => $missing_tables,
-				'helper_installed'     => defined( 'GROUNDHOGG_HELPER_VERSION' ),
 				'smtp'                 => [
-					'wordpress'             => Groundhogg_Email_Services::get_wordpress_service(),
-					'transactional'         => Groundhogg_Email_Services::get_transactional_service(),
-					'marketing'             => Groundhogg_Email_Services::get_marketing_service(),
-					'any_service_installed' => defined( 'MAILHAWK_VERSION' ) ||
-					                           defined( 'GROUNDHOGG_SMTP_VERSION' ) ||
-					                           defined( 'GROUNDHOGG_SENDGRID_VERSION' ) ||
-					                           defined( 'GROUNDHOGG_ELASTIC_EMAIL_VERSION' ) ||
-					                           defined( 'GROUNDHOGG_AWS_VERSION' )
+					'wordpress'     => Groundhogg_Email_Services::get_wordpress_service(),
+					'transactional' => Groundhogg_Email_Services::get_transactional_service(),
+					'marketing'     => Groundhogg_Email_Services::get_marketing_service(),
 				],
+				// the only check that isn't in Site Health, since it's about the person, not the site
 				'timezone'             => [
 					'site'    => $wp_tz->getName(),
 					'user'    => $user_tz->getName(),
 					'matches' => $user_date->getOffset() === $wp_date->getOffset(),
 				],
 				'safe_mode_enabled'    => is_option_enabled( 'gh_safe_mode_enabled' ),
-				'php'                  => [
-					'recommended'    => '7.4',
-					'is_recommended' => version_compare( PHP_VERSION, '7.4', '>=' )
-				],
 			];
 
 			wp_enqueue_script( 'groundhogg-troubleshooter' );
 			wp_enqueue_style( 'groundhogg-admin-guided-setup' );
 			wp_localize_script( 'groundhogg-troubleshooter', 'GroundhoggTroubleshooter', $status );
 
+			// the troubleshooter offers to have an AI assistant look into each problem on the site, for the problems this
+			// person's assistant could look into, see Build_With_AI::examples()
+			if ( Build_With_AI::can_offer( 'troubleshoot' ) ) {
+				Build_With_AI::enqueue( 'troubleshoot' );
+			}
+
 		}
+	}
+
+	/**
+	 * What the troubleshooter shows as possible issues: the Site Health tests that aren't good, the same ones Tools ›
+	 * Site Health and groundhogg/get-setup-status report, so a check fixed or added there shows here too. The most
+	 * serious come first.
+	 *
+	 * @return array[] [ id, status, label, description (HTML), links: [ url, text ][] ]
+	 */
+	public static function health_problems(): array {
+
+		$problems = [];
+
+		foreach ( Plugin::instance()->site_health->run() as $id => $result ) {
+
+			if ( ! is_array( $result ) || ( $result['status'] ?? 'good' ) === 'good' ) {
+				continue;
+			}
+
+			$links = [];
+
+			foreach ( $result['links'] ?? [] as $url => $text ) {
+				$links[] = [
+					'url'  => esc_url_raw( $url ),
+					'text' => wp_strip_all_tags( $text ),
+				];
+			}
+
+			$problems[] = [
+				'id'          => $id,
+				'status'      => $result['status'] === 'critical' ? 'critical' : 'recommended',
+				'label'       => wp_strip_all_tags( (string) ( $result['label'] ?? $id ) ),
+				'description' => wp_kses_post( (string) ( $result['description'] ?? '' ) ),
+				'links'       => $links,
+			];
+		}
+
+		// in Site Health's order otherwise, which usort() doesn't keep before PHP 8
+		$critical = array_filter( $problems, function ( $problem ) {
+			return $problem['status'] === 'critical';
+		} );
+
+		return array_values( array_merge( $critical, array_diff_key( $problems, $critical ) ) );
 	}
 
 	/**

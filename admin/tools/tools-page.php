@@ -14,6 +14,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Files;
 use Groundhogg\Plugin;
 use Groundhogg\Properties;
+use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Mcp\Connection;
 use Groundhogg\Mobile\Promo;
 use Groundhogg\Queue\Event_Queue;
@@ -96,6 +97,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin-element' );
+
+		// what the assistant can build and look into once it's connected, see admin/tools/mcp.php
+		if ( $this->get_current_tab() === Connection::TAB ) {
+			Build_With_AI::enqueue( 'strategy', [], [ 'email', 'flow', 'setup', 'troubleshoot' ] );
+		}
 
 		if ( $this->get_current_tab() === 'cron' ) {
 			wp_enqueue_script( 'groundhogg-admin-cron-jobs' );

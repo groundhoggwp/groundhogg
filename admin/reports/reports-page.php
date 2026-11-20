@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Reports;
 
 use DateTime;
 use Groundhogg\Admin\Tabbed_Admin_Page;
+use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Reports;
 use Groundhogg\Utils\DateTimeHelper;
 use function Groundhogg\enqueue_filter_assets;
@@ -133,6 +134,9 @@ class Reports_Page extends Tabbed_Admin_Page {
 	 * Enqueue any scripts
 	 */
 	public function scripts() {
+
+		// Analyze with AI, in the header, see page()
+		Build_With_AI::enqueue( 'strategy' );
 
 		switch ( $this->get_current_tab() ) {
 			default:
@@ -418,6 +422,9 @@ class Reports_Page extends Tabbed_Admin_Page {
 			<?php header_icon(); ?>
             <h1><?php echo esc_html( $this->get_title() ); ?></h1>
 			<?php $this->range_picker(); ?>
+			<?php if ( Build_With_AI::is_available() ): ?>
+                <button type="button" class="gh-button secondary build-with-ai-open" data-build-with-ai-open><?php esc_html_e( 'Analyze with AI', 'groundhogg' ); ?></button>
+			<?php endif; ?>
         </div>
 		<?php $this->do_page_tabs(); ?>
         <script>

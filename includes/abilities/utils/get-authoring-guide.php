@@ -60,6 +60,16 @@ class Get_Authoring_Guide extends Ability {
 				'file'        => dirname( __DIR__ ) . '/guides/setup.md',
 				'capability'  => 'manage_options',
 			],
+			'strategy'  => [
+				'description' => __( 'Finding what to improve: taking stock of the site, which reports answer which question, where contacts drop out of flows, gaps in the marketing and sales, tidying up, and how to report findings.', 'groundhogg' ),
+				'file'        => dirname( __DIR__ ) . '/guides/strategy.md',
+				'capability'  => 'view_contacts',
+			],
+			'troubleshoot' => [
+				'description' => __( 'Fixing something that isn\'t working: email that doesn\'t send, flows that don\'t run or do the wrong thing, cron, unsubscribe and tracking links, integrations, what the errors on failed events mean, and writing it up for support.', 'groundhogg' ),
+				'file'        => dirname( __DIR__ ) . '/guides/troubleshoot.md',
+				'capability'  => 'view_contacts',
+			],
 		];
 
 		/**

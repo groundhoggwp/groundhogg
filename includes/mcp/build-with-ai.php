@@ -25,9 +25,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Build_With_AI {
 
 	/**
-	 * email, flow and setup build something new. edit-email and edit-flow change the one open in the editor.
+	 * email, flow and setup build something new. edit-email and edit-flow change the one open in the editor. strategy
+	 * looks at what the site has and how it performs, finds what to improve, and fixes it: on the AI agent tab and the
+	 * Reports page. troubleshoot finds out why something isn't working: in the troubleshooter and on the AI agent tab.
 	 */
-	const TYPES = [ 'email', 'flow', 'setup', 'edit-email', 'edit-flow' ];
+	const TYPES = [ 'email', 'flow', 'setup', 'edit-email', 'edit-flow', 'strategy', 'troubleshoot' ];
 
 	/**
 	 * Whether to offer AI to the person viewing the page at all. It's decided for each person, not for the site:
@@ -145,6 +147,44 @@ class Build_With_AI {
 				__( '- Don\'t make up facts, prices, dates or links. Leave a clear placeholder and tell me where it is.', 'groundhogg' ),
 				__( '- Don\'t send it to any contacts or change its status. I\'ll review it in the editor first.', 'groundhogg' ),
 			];
+		} else if ( $type === 'strategy' ) {
+			$lines = [
+				/* translators: %s: the site's name and address */
+				sprintf( __( 'Help me get more out of the CRM on my website %s, using the tools from the MCP connection to that site. Find what\'s working, what isn\'t and what\'s missing in my marketing and sales, and help me fix it.', 'groundhogg' ), $site ),
+				'',
+				__( 'What I want you to look at:', 'groundhogg' ),
+				'{{goal}}',
+				'',
+				__( 'How to do it:', 'groundhogg' ),
+				__( '1. Call the get-authoring-guide ability with topic "strategy" and follow it. It explains what to look at, which reports answer which question, and how to tell me what you found.', 'groundhogg' ),
+				__( '2. Look at the site before you ask me anything: my flows, forms, emails, broadcasts, tags and saved searches, and the reports that answer the question.', 'groundhogg' ),
+				__( '3. Then ask me what you can\'t find out yourself, all at once: what I sell, who to, and what I want more of.', 'groundhogg' ),
+				__( '4. Give me a short list of findings, most important first. For each one, the numbers behind it, why it matters and what you\'d do about it.', 'groundhogg' ),
+				__( '5. Offer to fix them one at a time. Build anything new as a draft or an inactive flow, and change what I already have only after I say yes.', 'groundhogg' ),
+				'',
+				__( 'Rules:', 'groundhogg' ),
+				__( '- Until I agree to a change, only look. Don\'t email contacts, change contacts or tags, activate or deactivate flows, or delete anything.', 'groundhogg' ),
+				__( '- Base every finding on my site\'s own numbers, and say when there isn\'t enough data to tell.', 'groundhogg' ),
+			];
+		} else if ( $type === 'troubleshoot' ) {
+			$lines = [
+				/* translators: %s: the site's name and address */
+				sprintf( __( 'Help me fix a problem with the CRM on my website %s, using the tools from the MCP connection to that site.', 'groundhogg' ), $site ),
+				'',
+				__( 'What\'s wrong:', 'groundhogg' ),
+				'{{goal}}',
+				'',
+				__( 'How to do it:', 'groundhogg' ),
+				__( '1. Call the get-authoring-guide ability with topic "troubleshoot" and follow it. It explains where to look for each kind of problem and what the errors mean.', 'groundhogg' ),
+				__( '2. Call get-setup-status to rule out the usual causes, then look into the problem itself: the flows, events, emails and settings it involves. Look before you ask me anything.', 'groundhogg' ),
+				__( '3. Ask me only what you can\'t find out yourself, like what I expected to happen and when it last worked.', 'groundhogg' ),
+				__( '4. Tell me the cause, the evidence for it, and how to fix it. Fix what you can after I say yes, and give me exact steps for what only I or my host can do.', 'groundhogg' ),
+				__( '5. If you can\'t find the cause, write a short summary of what you checked and found that I can send to support.', 'groundhogg' ),
+				'',
+				__( 'Rules:', 'groundhogg' ),
+				__( '- Until I agree to a change, only look. Don\'t email contacts, change settings, contacts or tags, activate or deactivate flows, or delete anything.', 'groundhogg' ),
+				__( '- Never ask me for a password, API key or other secret in chat. Tell me where to enter it myself.', 'groundhogg' ),
+			];
 		} else if ( $type === 'setup' ) {
 			$lines = [
 				/* translators: %s: the site's name and address */
@@ -220,13 +260,130 @@ class Build_With_AI {
 	/**
 	 * Examples someone can start from instead of a blank box. Each fills in the description, which they can then change.
 	 *
+	 * For strategy and troubleshoot they're the missions on the AI agent tab, so each also has a summary for its card,
+	 * and the capabilities the work needs, like view_reports to read the reports. Only the ones the person viewing the
+	 * page has every capability for are returned, so nobody is offered something their assistant would be refused.
+	 *
 	 * @param string $type one of TYPES
 	 *
-	 * @return array[] [ 'label' => string, 'text' => string ]
+	 * @return array[] [ 'label' => string, 'text' => string, 'summary' => string, 'caps' => string[], 'id' => string ]
+	 *                 summary and caps for strategy and troubleshoot, and id for troubleshoot
 	 */
 	public static function examples( string $type ): array {
 
-		if ( $type === 'edit-flow' ) {
+		if ( $type === 'strategy' ) {
+			$examples = [
+				[
+					'caps'    => [ 'view_funnels', 'view_emails' ],
+					'label'   => __( 'Find gaps in my marketing', 'groundhogg' ),
+					'summary' => __( 'The lead magnets, welcome emails, follow-ups and win-backs you don\'t have yet.', 'groundhogg' ),
+					'text'    => __( 'Audit my marketing from first visit to repeat customer. Tell me which stages I\'m missing, like a lead magnet, a welcome series, follow-up after a form or a purchase, or winning back people who went quiet, and which to build first.', 'groundhogg' ),
+				],
+				[
+					'caps'    => [ 'view_funnels', 'view_reports' ],
+					'label'   => __( 'Find where contacts drop out', 'groundhogg' ),
+					'summary' => __( 'The flow steps that lose the most people, and why.', 'groundhogg' ),
+					'text'    => __( 'Look at my active flows and find where contacts drop out or get stuck: the steps that lose the most people, goals few reach, and emails nobody clicks. Tell me why you think it happens and how to fix it.', 'groundhogg' ),
+				],
+				[
+					'caps'    => [ 'view_reports' ],
+					'label'   => __( 'Review the last 30 days', 'groundhogg' ),
+					'summary' => __( 'What changed, what\'s working and what needs attention.', 'groundhogg' ),
+					'text'    => __( 'Review the last 30 days compared to the 30 before: new contacts and where they came from, email performance, flow conversions and unsubscribes. Tell me what changed, what\'s working and what needs attention.', 'groundhogg' ),
+				],
+				[
+					'caps'    => [ 'view_reports', 'edit_emails' ],
+					'label'   => __( 'Improve my weakest emails', 'groundhogg' ),
+					'summary' => __( 'Why your lowest performing emails fall flat, and better versions.', 'groundhogg' ),
+					'text'    => __( 'Find my worst performing emails, in flows and broadcasts. Tell me why each one underperforms, and suggest better subject lines and changes. Make the changes only after I agree.', 'groundhogg' ),
+				],
+				[
+					'caps'    => [ 'view_reports' ],
+					'label'   => __( 'Check my list health', 'groundhogg' ),
+					'summary' => __( 'Bounces, complaints, unsubscribes and contacts who stopped reading.', 'groundhogg' ),
+					'text'    => __( 'Check the health of my list: bounces, spam complaints, unsubscribes and why people leave, contacts who haven\'t opened or clicked anything in months, and how my email is sent. Tell me the risks to my deliverability and what to do about them.', 'groundhogg' ),
+				],
+				[
+					'caps'    => [ 'view_funnels' ],
+					'label'   => __( 'Review my sales follow-up', 'groundhogg' ),
+					'summary' => __( 'How fast leads hear back, and who falls through the cracks.', 'groundhogg' ),
+					'text'    => __( 'Review how I follow up with leads and customers: what happens after someone fills out a form or books a call, whether new leads get an owner, tasks and notes, and who never hears back. Suggest a follow-up process and the flows to run it.', 'groundhogg' ),
+				],
+				[
+					'caps'    => [ 'manage_tags' ],
+					'label'   => __( 'Tidy up my tags and segments', 'groundhogg' ),
+					'summary' => __( 'Duplicate, unused and confusing tags and saved searches.', 'groundhogg' ),
+					'text'    => __( 'Look at my tags and saved searches. Find duplicates, ones nobody uses and ones that are hard to understand, and suggest a simpler way to organize my contacts. Don\'t change or delete anything until I agree.', 'groundhogg' ),
+				],
+				[
+					'caps'    => [ 'view_reports', 'view_funnels' ],
+					'label'   => __( 'Plan my next 90 days', 'groundhogg' ),
+					'summary' => __( 'A marketing and sales plan built on what you already have.', 'groundhogg' ),
+					'text'    => __( 'Based on what\'s on my site and how it\'s performing, write me a marketing and sales plan for the next 90 days: what to fix, what to build and in what order, and what to measure.', 'groundhogg' ),
+				],
+			];
+		} else if ( $type === 'troubleshoot' ) {
+			// the id is the troubleshooter step for the same problem, which offers it, see features/troubleshooter.js.
+			// Most of the checks need an administrator: get-setup-status, get-cron-status and query-table
+			$examples = [
+				[
+					'id'      => 'emails-not-sending',
+					'caps'    => [ 'manage_options' ],
+					'label'   => __( 'Emails aren\'t sending', 'groundhogg' ),
+					'summary' => __( 'Why emails or broadcasts aren\'t going out, or aren\'t arriving.', 'groundhogg' ),
+					'text'    => __( 'My emails aren\'t sending. Find out why: whether the queue and cron job are running, whether emails are failing and with what errors, how email is sent from this site, and whether the emails are ready to send.', 'groundhogg' ),
+				],
+				[
+					'id'      => 'failed-events',
+					'caps'    => [ 'manage_options' ],
+					'label'   => __( 'Fix failed events', 'groundhogg' ),
+					'summary' => __( 'What the errors in the event queue mean, and how to stop them.', 'groundhogg' ),
+					'text'    => __( 'Look at the failed events from the last 30 days. Group them by error, tell me what each one means and which flows, emails and steps they come from, and how to fix the cause.', 'groundhogg' ),
+				],
+				[
+					'id'      => 'cron',
+					'caps'    => [ 'manage_options' ],
+					'label'   => __( 'Get the cron job working', 'groundhogg' ),
+					'summary' => __( 'Set up or fix the cron job that runs flows and sends broadcasts.', 'groundhogg' ),
+					'text'    => __( 'Check whether the cron job that runs my flows and broadcasts is working. If it isn\'t, tell me exactly how to set it up with my host, and check again once I have.', 'groundhogg' ),
+				],
+				[
+					'id'      => 'funnel-not-running',
+					'caps'    => [ 'manage_options', 'view_funnels' ],
+					'label'   => __( 'A flow isn\'t running', 'groundhogg' ),
+					'summary' => __( 'Contacts don\'t start the flow, or get stuck partway.', 'groundhogg' ),
+					'text'    => __( 'One of my flows isn\'t running. Find out why: whether it\'s active, whether what starts it is happening, and whether contacts are stuck waiting at a step or failing. Ask me which flow if you can\'t tell.', 'groundhogg' ),
+				],
+				[
+					'id'      => 'funnel-not-working',
+					'caps'    => [ 'view_funnels' ],
+					'label'   => __( 'A flow does the wrong thing', 'groundhogg' ),
+					'summary' => __( 'Contacts take the wrong path, or get the wrong emails.', 'groundhogg' ),
+					'text'    => __( 'One of my flows isn\'t doing what I expect. Ask me which flow and what should happen, then find out where and why it does something else, and how to fix it.', 'groundhogg' ),
+				],
+				[
+					'id'      => 'cant-unsubscribe',
+					'caps'    => [ 'manage_options' ],
+					'label'   => __( 'Contacts can\'t unsubscribe', 'groundhogg' ),
+					'summary' => __( 'The unsubscribe link or preferences page doesn\'t work.', 'groundhogg' ),
+					'text'    => __( 'Contacts tell me they can\'t unsubscribe. Find out why: my permalinks, caching on my site, host or CDN, and the unsubscribe settings. Send me a test email so I can try the link.', 'groundhogg' ),
+				],
+				[
+					'id'      => 'tracking-links-not-working',
+					'caps'    => [ 'manage_options' ],
+					'label'   => __( 'Links in emails don\'t work', 'groundhogg' ),
+					'summary' => __( 'Links that go to an error, or clicks that aren\'t counted.', 'groundhogg' ),
+					'text'    => __( 'The links in my emails don\'t work, or clicks aren\'t being tracked. Find out why: the tracking settings, my permalinks, caching on my site, host or CDN, and whether my email service rewrites links.', 'groundhogg' ),
+				],
+				[
+					'id'      => 'integration-not-working',
+					'caps'    => [ 'manage_options' ],
+					'label'   => __( 'An integration isn\'t working', 'groundhogg' ),
+					'summary' => __( 'A form, store, course or other plugin that isn\'t doing its part.', 'groundhogg' ),
+					'text'    => __( 'One of my integrations isn\'t working the way it should. Ask me which one and what I expected, then check that it\'s active and licensed, the flows that use it, and recent errors from it.', 'groundhogg' ),
+				],
+			];
+		} else if ( $type === 'edit-flow' ) {
 			$examples = [
 				[
 					'label' => __( 'Add a reminder', 'groundhogg' ),
@@ -369,7 +526,17 @@ class Build_With_AI {
 		 * @param array[] $examples [ 'label' => string, 'text' => string ]
 		 * @param string  $type     email, flow or setup
 		 */
-		return apply_filters( 'groundhogg/build_with_ai/examples', $examples, $type );
+		$examples = apply_filters( 'groundhogg/build_with_ai/examples', $examples, $type );
+
+		return array_values( array_filter( $examples, function ( $example ) {
+			foreach ( $example['caps'] ?? [] as $cap ) {
+				if ( ! current_user_can( $cap ) ) {
+					return false;
+				}
+			}
+
+			return true;
+		} ) );
 	}
 
 	/**
@@ -378,12 +545,14 @@ class Build_With_AI {
 	 * In an editor it's a nudge for people who haven't tried AI yet, so it's left out for anyone whose assistant has
 	 * used the site lately: they know where to find it.
 	 *
-	 * @param string $type    one of TYPES
-	 * @param array  $subject for edit-email and edit-flow, what's being edited: id and title
+	 * @param string   $type    one of TYPES
+	 * @param array    $subject for edit-email and edit-flow, what's being edited: id and title
+	 * @param string[] $also    other types the page can open the popup for, like the AI agent tab's build cards. Only
+	 *                          the ones offered to this person are included, see can_offer()
 	 *
 	 * @return void
 	 */
-	public static function enqueue( string $type, array $subject = [] ) {
+	public static function enqueue( string $type, array $subject = [], array $also = [] ) {
 
 		if ( ! in_array( $type, self::TYPES, true ) || ! self::is_available() ) {
 			return;
@@ -393,16 +562,64 @@ class Build_With_AI {
 			return;
 		}
 
+		$others = [];
+
+		foreach ( array_intersect( $also, [ 'email', 'flow', 'setup', 'strategy', 'troubleshoot' ] ) as $other ) {
+			if ( $other !== $type && self::can_offer( $other ) ) {
+				$others[ $other ] = [
+					'prompt'   => self::prompt( $other ),
+					'examples' => array_values( self::examples( $other ) ),
+				];
+			}
+		}
+
 		wp_enqueue_script( 'groundhogg-admin-build-with-ai' );
 
 		wp_add_inline_script( 'groundhogg-admin-build-with-ai', 'var GroundhoggBuildWithAI = ' . wp_json_encode( [
 				'type'      => $type,
 				'prompt'    => self::prompt( $type, $subject ),
 				'examples'  => array_values( self::examples( $type ) ),
+				'also'      => (object) $others,
 				'connected' => Connection::is_connected(),
 				'setupUrl'  => Connection::page_url(),
 				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
 				'nonce'     => wp_create_nonce( 'admin_ajax' ),
 			] ), 'before' );
+	}
+
+	/**
+	 * Whether the person viewing the page can build this, so it's only offered to people who can: the same capability
+	 * as the add screen, or the guided setup, and the authoring guide the prompt sends the assistant to.
+	 *
+	 * @param string $type email, flow or setup
+	 *
+	 * @return bool
+	 */
+	public static function can_build( string $type ): bool {
+
+		$caps = [
+			'email' => 'add_emails',
+			'flow'  => 'add_funnels',
+			'setup' => 'manage_options',
+		];
+
+		return isset( $caps[ $type ] ) && current_user_can( $caps[ $type ] );
+	}
+
+	/**
+	 * Whether to offer this to the person viewing the page: what they can build, and for strategy and troubleshoot, if
+	 * there's at least one mission they have the capabilities for.
+	 *
+	 * @param string $type one of TYPES, other than edit-email and edit-flow
+	 *
+	 * @return bool
+	 */
+	public static function can_offer( string $type ): bool {
+
+		if ( in_array( $type, [ 'strategy', 'troubleshoot' ], true ) ) {
+			return ! empty( self::examples( $type ) );
+		}
+
+		return self::can_build( $type );
 	}
 }

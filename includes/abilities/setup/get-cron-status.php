@@ -116,7 +116,7 @@ class Get_Cron_Status extends Ability {
 	 *
 	 * @return array
 	 */
-	protected function last_run( string $option ) {
+	protected static function last_run( string $option ) {
 
 		$time = absint( get_option( $option ) );
 
@@ -133,7 +133,7 @@ class Get_Cron_Status extends Ability {
 	 *
 	 * @return array
 	 */
-	protected function job( string $file ) {
+	protected static function job( string $file ) {
 		return [
 			'url'      => site_url( $file ),
 			'command'  => sprintf( 'php "%s" >/dev/null 2>&1', wp_normalize_path( ABSPATH . $file ) ),
@@ -141,20 +141,24 @@ class Get_Cron_Status extends Ability {
 		];
 	}
 
-	public function __invoke( $input ) {
+	/**
+	 * The status of both cron jobs, without the next steps, for somewhere other than an agent, like the troubleshooter
+	 *
+	 * @return array[] [ event_queue_cron, wordpress_cron ], see the output schema
+	 */
+	public static function status(): array {
 
 		$installed = gh_cron_installed();
-		$working   = $installed && is_event_queue_processing();
 
 		$queue_cron = array_merge( [
 			'installed' => $installed,
-			'working'   => $working,
-			'job'       => $this->job( 'gh-cron.php' ),
-		], $this->last_run( 'gh_cron_last_ping' ) );
+			'working'   => $installed && is_event_queue_processing(),
+			'job'       => self::job( 'gh-cron.php' ),
+		], self::last_run( 'gh_cron_last_ping' ) );
 
 		$in_config     = defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON && ! defined( 'GH_SHOW_DISABLE_WP_CRON_OPTION' );
 		$by_setting    = is_option_enabled( 'gh_disable_wp_cron' );
-		$wp_last_run   = $this->last_run( 'wp_cron_last_ping' );
+		$wp_last_run   = self::last_run( 'wp_cron_last_ping' );
 		$wp_on_time    = $wp_last_run['seconds_since_last_run'] !== null && $wp_last_run['seconds_since_last_run'] < self::WP_CRON_LATE_AFTER;
 		$on_page_loads = ! $in_config && ! $by_setting;
 
@@ -162,8 +166,24 @@ class Get_Cron_Status extends Ability {
 			'runs_on_page_loads' => $on_page_loads,
 			'turned_off_by'      => $in_config ? 'wp-config' : ( $by_setting ? 'setting' : null ),
 			'on_time'            => $wp_on_time,
-			'job'                => $this->job( 'wp-cron.php' ),
+			'job'                => self::job( 'wp-cron.php' ),
 		], $wp_last_run );
+
+		return [
+			'event_queue_cron' => $queue_cron,
+			'wordpress_cron'   => $wp_cron,
+		];
+	}
+
+	public function __invoke( $input ) {
+
+		[ 'event_queue_cron' => $queue_cron, 'wordpress_cron' => $wp_cron ] = self::status();
+
+		$installed     = $queue_cron['installed'];
+		$working       = $queue_cron['working'];
+		$wp_on_time    = $wp_cron['on_time'];
+		$on_page_loads = $wp_cron['runs_on_page_loads'];
+		$by_setting    = $wp_cron['turned_off_by'] === 'setting';
 
 		$steps = [];
 

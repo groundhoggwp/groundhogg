@@ -489,6 +489,7 @@ class Scripts {
 		], GROUNDHOGG_VERSION, true );
 
 		wp_register_script( 'groundhogg-troubleshooter', GROUNDHOGG_ASSETS_URL . 'js/admin/features/troubleshooter' . $dot_min . '.js', [
+			'groundhogg-make-el',
 			'groundhogg-admin-element',
 			'groundhogg-admin-data',
 		], GROUNDHOGG_VERSION, true );

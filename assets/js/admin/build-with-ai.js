@@ -27,13 +27,12 @@
     Pg,
     An,
     H2,
+    H3,
     ModalWithHeader,
   } = MakeEl
 
   const {
     type,
-    prompt,
-    examples = [],
     setupUrl,
     ajaxUrl,
     nonce,
@@ -43,7 +42,23 @@
 
   const { spinner } = Groundhogg.element
 
-  const text = {
+  // the page's own type, and any others it can open the popup for, like the AI agent tab's build cards. See the $also
+  // of Build_With_AI::enqueue()
+  const configs = {
+    ...( GroundhoggBuildWithAI.also || {} ),
+    [type]: {
+      prompt  : GroundhoggBuildWithAI.prompt,
+      examples: GroundhoggBuildWithAI.examples || [],
+    },
+  }
+
+  // which one the popup is showing
+  let active = type
+
+  const prompt = () => configs[active].prompt
+  const examples = () => configs[active].examples || []
+
+  const texts = {
     email: {
       title      : __( 'Build an email with AI', 'groundhogg' ),
       description: __( 'Describe the email you want and your AI assistant writes it, ready for you to review and edit.', 'groundhogg' ),
@@ -73,26 +88,43 @@
       placeholder: __( 'Make it shorter and friendlier, and add a button to book a call after the second paragraph.', 'groundhogg' ),
       after      : __( 'Save your own changes before you start. When it\'s done, reload this page to see the changes.', 'groundhogg' ),
     },
-  }[type]
+    strategy    : {
+      title      : __( 'Improve your marketing with AI', 'groundhogg' ),
+      description: __( 'Your AI assistant looks at your flows, emails and reports, tells you what\'s working, what isn\'t and what\'s missing, and fixes what you agree to.', 'groundhogg' ),
+      placeholder: __( 'Find out why so few people who download our free guide go on to book a call.', 'groundhogg' ),
+      after      : __( 'Your assistant only looks until you agree to a change. Anything new it builds is a draft, or a flow that stays inactive until you turn it on.', 'groundhogg' ),
+    },
+    troubleshoot: {
+      title      : __( 'Troubleshoot with AI', 'groundhogg' ),
+      description: __( 'Your AI assistant checks your site, finds what\'s causing the problem, and tells you how to fix it.', 'groundhogg' ),
+      placeholder: __( 'New subscribers stopped getting the welcome email a few days ago.', 'groundhogg' ),
+      after      : __( 'Your assistant only looks until you agree to a fix. If it can\'t find the cause, it writes up what it checked for you to send to support.', 'groundhogg' ),
+    },
+  }
+
+  // the page's own, for its card
+  const text = texts[type]
 
   const sparkles = `<svg class="build-with-ai-icon" width="48" height="48" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10 2l1.9 5.6L17.5 9.5l-5.6 1.9L10 17l-1.9-5.6L2.5 9.5l5.6-1.9L10 2zm8 10l.95 2.55L21.5 15.5l-2.55.95L18 19l-.95-2.55-2.55-.95 2.55-.95L18 12zM5 16l.7 1.8 1.8.7-1.8.7L5 21l-.7-1.8-1.8-.7 1.8-.7L5 16z"/></svg>`
 
-  // kept between openings, so closing the popup by accident doesn't lose what was typed
-  let goal = ''
+  // kept between openings, one for each type, so closing the popup by accident doesn't lose what was typed
+  const goals = {}
 
-  const fullPrompt = () => prompt.split( '{{goal}}' ).join( goal.trim() || __( 'Ask me what I want before you start.', 'groundhogg' ) )
+  const goal = () => goals[active] || ''
+
+  const fullPrompt = () => prompt().split( '{{goal}}' ).join( goal().trim() || __( 'Ask me what I want before you start.', 'groundhogg' ) )
 
   const setGoal = value => {
-    goal = value
+    goals[active] = value
     document.getElementById( 'build-with-ai-prompt' ).value = fullPrompt()
   }
 
   // start from an example instead of a blank box, then change it as they like
-  const Examples = () => examples.length ? Div( {
+  const Examples = () => examples().length ? Div( {
     className: 'build-with-ai-examples',
   }, [
     Span( { className: 'build-with-ai-examples-label' }, __( 'Start from an example:', 'groundhogg' ) ),
-    ...examples.map( example => Button( {
+    ...examples().map( example => Button( {
       type     : 'button',
       className: 'gh-button secondary small',
       title    : example.text,
@@ -254,7 +286,7 @@
     className: 'build-with-ai-connect',
   }, [
     H2( {}, __( 'First, connect your AI assistant', 'groundhogg' ) ),
-    Pg( {}, __( 'Your assistant needs a connection to this site before it can build anything for you. It takes a few minutes, and you only do it once.', 'groundhogg' ) ),
+    Pg( {}, __( 'Your assistant needs a connection to this site before it can work on it for you. It takes a few minutes, and you only do it once.', 'groundhogg' ) ),
     // the same spinner as loadingModal(), and only one at a time: this one until the steps are in, then the small one
     // beside the waiting line
     Div( { id: 'build-with-ai-wizard', className: 'build-with-ai-wizard' }, spinner( 'gray' ) ),
@@ -272,8 +304,24 @@
 
   const Body = ( justConnected = false ) => connected ? PromptStep( justConnected ) : ConnectStep()
 
-  const open = () => ModalWithHeader( {
-    header   : text.title,
+  /**
+   * @param {string} [startWith] a description to start from, like a mission's. Anything else, like the click event
+   *                             when it's a handler, keeps what was typed before.
+   * @param {string} [which]     another type the page can open, see configs. The page's own by default.
+   */
+  const open = ( startWith, which = type ) => {
+
+    active = configs[ which ] ? which : type
+
+    if ( typeof startWith === 'string' ) {
+      goals[ active ] = startWith
+    }
+
+    return Modal()
+  }
+
+  const Modal = () => ModalWithHeader( {
+    header   : texts[ active ].title,
     width    : '640px',
     className: 'build-with-ai-modal',
     onOpen   : () => {
@@ -298,8 +346,8 @@
       id         : 'build-with-ai-goal',
       className  : 'full-width',
       rows       : 4,
-      placeholder: text.placeholder,
-      value      : goal,
+      placeholder: texts[ active ].placeholder,
+      value      : goal(),
       onInput    : e => setGoal( e.target.value ),
     } ),
     Label( { for: 'build-with-ai-prompt' }, __( '2. Copy this prompt into your AI assistant', 'groundhogg' ) ),
@@ -329,7 +377,7 @@
         },
       }, __( 'Copy prompt', 'groundhogg' ) ),
     ] ),
-    Pg( { className: 'no-margin' }, text.after ),
+    Pg( { className: 'no-margin' }, texts[ active ].after ),
   ] )
 
   /**
@@ -356,8 +404,133 @@
     Span( { className: 'gh-button primary' }, __( 'Get started', 'groundhogg' ) ),
   ] )
 
+  const MissionCard = ( label, summary, onClick, className = '' ) => Button( {
+    type     : 'button',
+    className: `gh-panel build-with-ai-mission ${ className }`,
+    onClick,
+  }, [
+    Span( { className: 'build-with-ai-mission-label' }, label ),
+    Span( { className: 'build-with-ai-mission-summary' }, summary || '' ),
+  ] )
+
+  // what the assistant can build from scratch, for each of the other types the page has, see configs
+  const builds = [
+    {
+      which  : 'email',
+      label  : __( 'Write an email', 'groundhogg' ),
+      summary: __( 'A newsletter, announcement or offer, ready for you to review.', 'groundhogg' ),
+    },
+    {
+      which  : 'flow',
+      label  : __( 'Build a flow', 'groundhogg' ),
+      summary: __( 'An automation like a welcome series or a follow-up, left inactive.', 'groundhogg' ),
+    },
+    {
+      which  : 'setup',
+      label  : __( 'Set up the CRM', 'groundhogg' ),
+      summary: __( 'Your business details, email sending, and the emails and flows you need.', 'groundhogg' ),
+    },
+  ].filter( build => build.which !== type && configs[ build.which ] )
+
+  // problems the assistant can look into, when the page offers troubleshooting as well, see Build_With_AI::examples()
+  const fixes = type !== 'troubleshoot' && configs.troubleshoot ? configs.troubleshoot.examples : []
+
+  /**
+   * On the AI agent tab: a card for each thing the assistant can build, see the $also of Build_With_AI::enqueue(), then
+   * one for each thing it can look into, see Build_With_AI::examples() for strategy, and one to describe something
+   * else, then the same for problems it can troubleshoot. Each opens the popup with its description filled in, to
+   * change as they like.
+   */
+  const Missions = () => {
+
+    const headings = builds.length || fixes.length
+
+    return Div( {
+      className: 'build-with-ai-missions-groups',
+    }, [
+      builds.length ? H3( {}, __( 'Build something new', 'groundhogg' ) ) : null,
+      builds.length ? Div( {
+        className: 'build-with-ai-missions',
+      }, builds.map( build => MissionCard( build.label, build.summary, () => open( undefined, build.which ) ) ) ) : null,
+      headings ? H3( {}, __( 'Find what to improve', 'groundhogg' ) ) : null,
+      Div( {
+        className: 'build-with-ai-missions',
+      }, [
+        ...configs[ type ].examples.map( mission => MissionCard( mission.label, mission.summary, () => open( mission.text ) ) ),
+        MissionCard( __( 'Something else', 'groundhogg' ), __( 'Describe what you want your assistant to look into.', 'groundhogg' ), () => open( '' ), 'build-with-ai-mission-other' ),
+      ] ),
+      fixes.length ? H3( {}, __( 'Fix a problem', 'groundhogg' ) ) : null,
+      fixes.length ? Div( {
+        className: 'build-with-ai-missions',
+      }, [
+        ...fixes.map( mission => MissionCard( mission.label, mission.summary, () => open( mission.text, 'troubleshoot' ) ) ),
+        MissionCard( __( 'Something else isn\'t working', 'groundhogg' ), __( 'Describe the problem, and your assistant finds the cause.', 'groundhogg' ), () => open( '', 'troubleshoot' ), 'build-with-ai-mission-other' ),
+      ] ) : null,
+    ] )
+  }
+
+  /**
+   * A mission by its id, from any type the page has, like the troubleshooter's for the problem it's showing.
+   *
+   * @param {string} id
+   * @return {{which: string, label: string, text: string}|null}
+   */
+  const mission = id => {
+
+    for ( const which of Object.keys( configs ) ) {
+
+      const found = ( configs[ which ].examples || [] ).find( example => example.id === id )
+
+      if ( found ) {
+        return { ...found, which }
+      }
+    }
+
+    return null
+  }
+
+  /**
+   * The lighter version for the dashboard: a few of the same things as a list, and the way to the AI agent tab for
+   * the rest, or to connect an assistant first.
+   */
+  const DashboardWidget = () => Div( {
+    className: 'inside build-with-ai-widget',
+  }, [
+    Pg( { className: 'no-margin' }, connected
+      ? __( 'Have your AI assistant build something, or find what to improve in your marketing.', 'groundhogg' )
+      : __( 'Connect an AI assistant like ChatGPT, Claude, Gemini or Cursor, and have it build emails and flows and find what to improve in your marketing.', 'groundhogg' ) ),
+    Div( { className: 'gh-choices' }, [
+      // the setup has its own way in, the guided setup
+      ...builds.filter( build => build.which !== 'setup' ).map( build => Button( {
+        type     : 'button',
+        className: 'gh-choice',
+        onClick  : () => open( undefined, build.which ),
+      }, build.label ) ),
+      ...configs[ type ].examples.slice( 0, 3 ).map( mission => Button( {
+        type     : 'button',
+        className: 'gh-choice',
+        onClick  : () => open( mission.text ),
+      }, mission.label ) ),
+    ] ),
+    An( {
+      className: connected ? '' : 'gh-button primary',
+      href     : setupUrl,
+    }, connected ? __( 'See everything your assistant can do', 'groundhogg' ) : __( 'Connect your assistant', 'groundhogg' ) ),
+  ] )
+
+  // the dashboard registers its widgets before it draws them, on ready, see features/dashboard.js
+  if ( Groundhogg.dashboard && Groundhogg.dashboard.Widgets && ( builds.length || configs[ type ].examples.length ) ) {
+    Groundhogg.dashboard.Widgets.add( 'build-with-ai', {
+      name  : __( 'AI assistant', 'groundhogg' ),
+      col   : 1,
+      render: DashboardWidget,
+    } )
+  }
+
   Groundhogg.buildWithAI = {
     Card,
+    Missions,
+    mission,
     open,
     // for editors that draw a card of their own, like the flow editor's add step panel
     icon: sparkles,
@@ -369,5 +542,23 @@
   if ( grid ) {
     grid.prepend( Card() )
   }
+
+  // the AI agent tab, see admin/tools/mcp.php. Its own steps are how to connect, so the popup goes straight to the
+  // prompt, rather than show those steps a second time
+  const missions = document.querySelectorAll( '[data-build-with-ai-missions]' )
+
+  if ( missions.length ) {
+    connected = true
+    missions.forEach( holder => holder.replaceChildren( Missions() ) )
+  }
+
+  // a button of the page's own, like Analyze with AI on the Reports page
+  document.querySelectorAll( '[data-build-with-ai-open]' ).forEach( button => {
+    button.insertAdjacentHTML( 'afterbegin', sparkles )
+    button.addEventListener( 'click', e => {
+      e.preventDefault()
+      open()
+    } )
+  } )
 
 } )()

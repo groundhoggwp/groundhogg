@@ -50,6 +50,7 @@ class Site_Health {
 			'database'         => [ __( 'The database is up to date', 'groundhogg' ), 'test_database' ],
 			'permalinks'       => [ __( 'Permalinks work with tracking and the preferences center', 'groundhogg' ), 'test_permalinks' ],
 			'safe_mode'        => [ __( 'Safe mode is off', 'groundhogg' ), 'test_safe_mode' ],
+			'updates'          => [ __( 'The plugin and its extensions are up to date', 'groundhogg' ), 'test_updates' ],
 		];
 
 		if ( Email_Logger::is_enabled() ) {
@@ -642,6 +643,51 @@ class Site_Health {
 			sprintf( __( 'Safe mode turns off plugins that are not related to %s for the person who turned it on, to help find conflicts. Turn it off when you are done troubleshooting.', 'groundhogg' ), white_labeled_name() )
 		), [
 			admin_page_url( 'gh_tools', [ 'tab' => 'system' ] ) => __( 'Turn off safe mode', 'groundhogg' ),
+		] );
+	}
+
+	/**
+	 * The plugin and its extensions, by plugin basename => name
+	 *
+	 * @return string[]
+	 */
+	protected function get_own_plugins(): array {
+
+		$plugins = [ GROUNDHOGG_PLUGIN_BASE => white_labeled_name() ];
+
+		foreach ( Extension::get_extensions() as $extension ) {
+			$plugins[ plugin_basename( $extension->get_plugin_file() ) ] = $extension->get_display_name();
+		}
+
+		return $plugins;
+	}
+
+	/**
+	 * Updates for the plugin and its extensions, which fix bugs and conflicts, so they're the first thing to try. Site
+	 * Health's own tests cover every other plugin, and the PHP version.
+	 *
+	 * @return array
+	 */
+	public function test_updates() {
+
+		$available = get_site_transient( 'update_plugins' );
+		$available = is_object( $available ) && ! empty( $available->response ) ? (array) $available->response : [];
+
+		$outdated = array_intersect_key( $this->get_own_plugins(), $available );
+
+		if ( empty( $outdated ) ) {
+			return $this->result( 'updates', 'good', __( 'The plugin and its extensions are up to date', 'groundhogg' ), $this->paragraphs(
+				/* translators: %s: the plugin/brand name */
+				sprintf( __( '%s and its extensions are running their latest versions.', 'groundhogg' ), white_labeled_name() )
+			) );
+		}
+
+		return $this->result( 'updates', 'recommended', __( 'Updates are available', 'groundhogg' ), $this->paragraphs(
+			/* translators: %s: list of plugin and extension names */
+			sprintf( _n( 'An update is available for %s.', 'Updates are available for %s.', count( $outdated ), 'groundhogg' ), andList( array_values( $outdated ) ) ),
+			__( 'Updates fix bugs and conflicts with other plugins, so if something isn\'t working, update first. Consider backing up your site before you do.', 'groundhogg' )
+		), [
+			admin_url( 'update-core.php' ) => __( 'See updates', 'groundhogg' ),
 		] );
 	}
 

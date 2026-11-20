@@ -146,6 +146,14 @@ class Search_Docs_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( 'orderby=relevance', $this->requests[0] );
 	}
 
+	/**
+	 * The troubleshooter searches the docs the same way, see Help_Page::get_docs_ajax()
+	 */
+	public function test_the_troubleshooter_gets_the_same_results() {
+
+		$this->assertSame( $this->run_ability( [ 'search' => 'cron job' ] ), Search_Docs::find( 'cron job' ) );
+	}
+
 	public function test_developer_docs_when_asked_and_the_limit() {
 
 		$result = $this->run_ability( [ 'search' => 'event', 'developer' => true, 'limit' => 1 ] );
