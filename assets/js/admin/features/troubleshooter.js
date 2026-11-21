@@ -980,7 +980,8 @@
 
           const { results: articles, all_docs } = r.data
 
-          results.replaceChildren(
+          // replaceChildren() would add a null as the text "null", unlike MakeEl, so leave it out
+          results.replaceChildren(...[
             articles.length ? null : Pg({}, __('Nothing in the documentation matches that. Try other words, or browse it all.', 'groundhogg')),
             Choices([
               ...articles.map(article => ( {
@@ -995,7 +996,7 @@
               } )),
               articles.length ? null : allDocs(all_docs),
             ]),
-          )
+          ].filter(Boolean))
         }, 500)
 
         return [
