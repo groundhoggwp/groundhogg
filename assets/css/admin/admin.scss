@@ -2239,13 +2239,125 @@ body.groundhogg-admin-page[class*="gh-theme-"] .gh-choices .gh-choice:focus-visi
 }
 
 /* the AI assistant widget on the dashboard, see DashboardWidget() in build-with-ai.js */
+$build-with-ai-sparkle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 2l1.9 5.6L17.5 9.5l-5.6 1.9L10 17l-1.9-5.6L2.5 9.5l5.6-1.9L10 2zm8 10l.95 2.55L21.5 15.5l-2.55.95L18 19l-.95-2.55-2.55-.95 2.55-.95L18 12zM5 16l.7 1.8 1.8.7-1.8.7L5 21l-.7-1.8-1.8-.7 1.8-.7L5 16z'/%3E%3C/svg%3E");
+
+/* the colours the sparkles fade between, the admin theme's accent on a themed admin */
+#build-with-ai-widget,
+.build-with-ai-widget {
+  --build-with-ai-from: var(--gh-primary, #0075ff);
+  --build-with-ai-to: #a855f7;
+}
+
+body.groundhogg-admin-page[class*="gh-theme-"] {
+
+  #build-with-ai-widget,
+  .build-with-ai-widget {
+    --build-with-ai-from: var(--ght-accent);
+  }
+}
+
+/* a sparkle in the colours above, the icon is a mask so it can take a gradient */
+.build-with-ai-sparkle {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--build-with-ai-from), var(--build-with-ai-to));
+  -webkit-mask: $build-with-ai-sparkle center / contain no-repeat;
+  mask: $build-with-ai-sparkle center / contain no-repeat;
+}
+
+/* the panel around it, from the dashboard: a gradient along the top, and a sparkle by the name */
+#build-with-ai-widget.gh-panel {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    background: linear-gradient(90deg, var(--build-with-ai-from), var(--build-with-ai-to));
+  }
+
+  > .gh-panel-header h2::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: -3px;
+    background: linear-gradient(135deg, var(--build-with-ai-from), var(--build-with-ai-to));
+    -webkit-mask: $build-with-ai-sparkle center / contain no-repeat;
+    mask: $build-with-ai-sparkle center / contain no-repeat;
+  }
+}
+
 .build-with-ai-widget {
   display: flex;
   flex-direction: column;
   gap: 12px;
 
+  .build-with-ai-widget-intro {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--gh-border-radius, 4px);
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--build-with-ai-from) 8%, transparent),
+      color-mix(in srgb, var(--build-with-ai-to) 8%, transparent));
+  }
+
+  .gh-choices {
+    overflow: hidden;
+  }
+
+  .gh-choice {
+    transition: background-color .15s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: color-mix(in srgb, var(--build-with-ai-from) 6%, transparent);
+
+      // the arrow turns into a sparkle
+      &::after {
+        content: '\2726';
+        color: var(--build-with-ai-to);
+        animation: build-with-ai-twinkle .3s ease-out;
+      }
+    }
+  }
+
   > a {
     align-self: flex-start;
+  }
+}
+
+@keyframes build-with-ai-twinkle {
+  from {
+    transform: scale(.4) rotate(-45deg);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .build-with-ai-widget .gh-choice {
+    transition: none;
+
+    &:hover::after,
+    &:focus-visible::after {
+      animation: none;
+    }
   }
 }
 

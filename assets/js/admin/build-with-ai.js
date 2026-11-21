@@ -496,9 +496,12 @@
   const DashboardWidget = () => Div( {
     className: 'inside build-with-ai-widget',
   }, [
-    Pg( { className: 'no-margin' }, connected
-      ? __( 'Have your AI assistant build something, or find what to improve in your marketing.', 'groundhogg' )
-      : __( 'Connect an AI assistant like ChatGPT, Claude, Gemini or Cursor, and have it build emails and flows and find what to improve in your marketing.', 'groundhogg' ) ),
+    Div( { className: 'build-with-ai-widget-intro' }, [
+      Span( { className: 'build-with-ai-sparkle', 'aria-hidden': 'true' } ),
+      Pg( { className: 'no-margin' }, connected
+        ? __( 'Have your AI assistant build something, or find what to improve in your marketing.', 'groundhogg' )
+        : __( 'Connect an AI assistant like ChatGPT, Claude, Gemini or Cursor, and have it build emails and flows and find what to improve in your marketing.', 'groundhogg' ) ),
+    ] ),
     Div( { className: 'gh-choices' }, [
       // the setup has its own way in, the guided setup
       ...builds.filter( build => build.which !== 'setup' ).map( build => Button( {
