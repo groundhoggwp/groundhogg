@@ -13,6 +13,9 @@
 
   const SOURCE = 'groundhogg-plugin'
 
+  // utm_source values from our older schemes, still in add-on plugin headers. Mirrors UTM_LEGACY_SOURCES in PHP.
+  const LEGACY_SOURCES = ['wp-plugins', 'plugin', 'admin-menu']
+
   const isGroundhoggIo = host => host === 'groundhogg.io' || host.endsWith('.groundhogg.io')
 
   const slug = value => String(value ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').substring(0, 60)
@@ -75,8 +78,19 @@
       return href
     }
 
+    let source = url.searchParams.get('utm_source')
+    let changed = false
+
+    if ( LEGACY_SOURCES.includes(source) ) {
+      // the old campaign named the placement, e.g. the plugin-uri of an add-on's header
+      content = content || url.searchParams.get('utm_campaign') || ''
+      for ( let key of [...url.searchParams.keys()].filter(key => key.startsWith('utm_')) ) {
+        url.searchParams.delete(key)
+      }
+      changed = true
+    }
     // someone else's scheme, such as the affiliate links
-    if ( url.searchParams.has('utm_source') && url.searchParams.get('utm_source') !== SOURCE ) {
+    else if ( source && source !== SOURCE ) {
       return href
     }
 
@@ -93,8 +107,6 @@
       params.utm_content = slug(content)
     }
 
-    let changed = false
-
     for ( let [key, value] of Object.entries(params) ) {
       if ( value && !url.searchParams.has(key) ) {
         url.searchParams.set(key, value)
@@ -107,18 +119,18 @@
 
   const closestData = (el, key) => el.closest(`[data-utm-${ key }]`)?.getAttribute(`data-utm-${ key }`) ?? ''
 
-  const tagLink = e => {
+  /**
+   * Links being written rather than followed: an editor would save the tags into the content.
+   * The email editor's canvas, anything contenteditable, and whatever opts out with data-utm-skip.
+   */
+  const SKIP = '[contenteditable]:not([contenteditable="false"]), #builder-content, [data-utm-skip]'
 
-    let link = e.composedPath().find(el => el instanceof HTMLAnchorElement && el.hasAttribute('href'))
-
-    if ( !link ) {
-      return
-    }
+  const tagAnchor = link => {
 
     let href = link.getAttribute('href')
 
     // cheap check before parsing
-    if ( !href.includes('groundhogg.io') ) {
+    if ( !href || !href.includes('groundhogg.io') || link.closest(SKIP) ) {
       return
     }
 
@@ -133,7 +145,48 @@
     }
   }
 
+  const SELECTOR = 'a[href*="groundhogg.io"]'
+
+  const tagWithin = node => {
+    if ( node.nodeType !== Node.ELEMENT_NODE ) {
+      return
+    }
+
+    if ( node.matches(SELECTOR) ) {
+      tagAnchor(node)
+    }
+
+    node.querySelectorAll(SELECTOR).forEach(tagAnchor)
+  }
+
+  // Tag links as they appear, so the tags are there on hover and when copied
+  tagWithin(document.documentElement)
+
+  new MutationObserver(records => {
+    for ( let record of records ) {
+      if ( record.type === 'attributes' ) {
+        tagWithin(record.target)
+        continue
+      }
+      record.addedNodes.forEach(tagWithin)
+    }
+  }).observe(document.documentElement, {
+    childList      : true,
+    subtree        : true,
+    attributes     : true,
+    attributeFilter: ['href'],
+  })
+
+  // Links the observer can't see, such as in a shadow root, are tagged when they're used.
   // mousedown and contextmenu run before "open in new tab" and "copy link", click covers the keyboard
+  const tagLink = e => {
+    let link = e.composedPath().find(el => el instanceof HTMLAnchorElement && el.hasAttribute('href'))
+
+    if ( link ) {
+      tagAnchor(link)
+    }
+  }
+
   for ( let event of ['mousedown', 'click', 'auxclick', 'contextmenu'] ) {
     document.addEventListener(event, tagLink, true)
   }

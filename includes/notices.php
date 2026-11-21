@@ -456,6 +456,7 @@ class Notices {
 
             $content = wp_kses_post( markdown2html( $item['plain'] ) );
             $content = $replacer->replace( $content );
+            $content = utm_links_in_html( $content, 'notice-' . absint( $item['ID'] ), 'notifications' );
 
 			return [
 				'id'      => absint( $item['ID'] ),

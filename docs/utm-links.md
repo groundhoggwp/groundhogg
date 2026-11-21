@@ -47,13 +47,17 @@ Outside wp-admin the campaign is set by the caller: `notification` for notificat
 
 There are two paths, and both use the same rules.
 
-**In the browser (wp-admin).** `assets/js/admin/utm-links.js` loads on every admin page. It
-listens for `mousedown`, `click`, `auxclick` and `contextmenu` in the capture phase. When the
-target is a link to groundhogg.io without `utm_` parameters, it adds them just before the browser
-follows it (or before the context menu opens, so "Open in new tab" and "Copy link" get them too).
-This covers links in translated strings, links built by JS components, and content loaded from
-groundhogg.io (blog posts, docs search results, remote notices) without changing any markup or
-translation strings.
+**In the browser (wp-admin).** `assets/js/admin/utm-links.js` loads on every admin page. It tags
+the groundhogg.io links already on the page and, through a `MutationObserver`, every one added or
+changed later, so the tags show on hover and when a link is copied. Links the observer can't see,
+such as inside a shadow root, are tagged on `mousedown`, `click`, `auxclick` and `contextmenu`
+(capture phase), before the browser follows them or opens the context menu. This covers links in
+translated strings, links built by JS components, and content loaded from groundhogg.io (the News
+widget's posts, docs search results) without changing any markup or translation strings.
+
+Links that are being written rather than followed are never touched: anything inside a
+`contenteditable` element, the email editor's canvas (`#builder-content`), or an element with
+`data-utm-skip`. Otherwise an editor could save the tags into an email or post.
 
 A link (or any ancestor) can set its own values:
 
@@ -66,12 +70,24 @@ JS can also build a tagged URL directly with
 `GroundhoggUTM.url( 'https://groundhogg.io/pricing/', { content: 'upgrade-button' } )`.
 
 **On the server.** `Groundhogg\utm_url( $url, $content = '', $campaign = '', $medium = 'wp-admin' )`
-tags a URL in PHP. Use it where no browser script runs: emails, server-side redirects, and URLs
-handed to AI assistants. It is also fine for admin markup, where it adds a `utm_content` the script
+tags a URL in PHP, and `Groundhogg\utm_links_in_html()` tags the `href`s in a piece of HTML
+(images keep their `src`). Use them where no browser script runs: emails, server-side redirects,
+and URLs handed to AI assistants. The remote notifications from groundhogg.io are tagged this way
+with `utm_campaign=notifications&utm_content=notice-<ID>`, so each notice's clicks can be told
+apart. It is also fine for admin markup, where it adds a `utm_content` the script
 would not know about.
 
 Both paths only touch groundhogg.io hosts, keep any `utm_` parameter already in the URL and only
 fill in the missing ones, and leave a URL alone when its `utm_source` is not `groundhogg-plugin`.
+
+The exception is our own older schemes, `utm_source` `wp-plugins`, `plugin` or `admin-menu`
+(`UTM_LEGACY_SOURCES`). Every add-on's plugin header still has
+`Plugin URI: …?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash`. Those links get
+their `utm_` parameters replaced, and the old `utm_campaign` (`plugin-uri`, `author-uri`) becomes
+the `utm_content`. So an add-on's "Visit plugin site" link on the plugins screen arrives as
+`utm_campaign=plugins&utm_content=plugin-uri`, with the add-on's download page as the landing page,
+without a new release of the add-on. Fix the headers whenever an add-on is next released, but
+nothing depends on it.
 Links that send traffic from somewhere else keep their own scheme, such as the "Powered by"
 affiliate links in contact-facing emails and pages (`utm_source=email`,
 `utm_campaign=email-affiliate`).

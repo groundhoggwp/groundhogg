@@ -453,8 +453,9 @@
     }, News)
 
     return Div({
-      id   : 'my-news',
-      style: {
+      id            : 'my-news',
+      dataUtmContent: 'news',
+      style         : {
         maxHeight: '500px',
         overflow : 'auto',
       },
@@ -1117,7 +1118,8 @@
         const makeLinks = links => links.map(makeLink)
 
         return Div({
-          className: 'inside display-flex gap-20',
+          className     : 'inside display-flex gap-20',
+          dataUtmContent: 'helpful-links',
         }, [
           Nav({ className: 'display-flex column gap-10' }, [
             `<b>${ __('Resources', 'groundhogg') }</b>`,

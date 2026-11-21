@@ -72,6 +72,34 @@ class Utm_Links_Tests extends GH_UnitTestCase {
 		$this->assertSame( $url, utm_url( $url, 'x', 'y' ) );
 	}
 
+	public function test_legacy_add_on_header_links_are_retagged() {
+		global $pagenow;
+
+		set_current_screen( 'plugins' );
+		$this->request( [] );
+		$pagenow = 'plugins.php';
+
+		$url = utm_url( 'https://www.groundhogg.io/downloads/woocommerce/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash&aff=3' );
+
+		$this->assertStringStartsWith( 'https://www.groundhogg.io/downloads/woocommerce/?', $url );
+		$this->assertSame( [
+			'aff'          => '3',
+			'utm_source'   => 'groundhogg-plugin',
+			'utm_medium'   => 'wp-admin',
+			'utm_campaign' => 'plugins',
+			'utm_content'  => 'plugin-uri',
+		], $this->query( $url ) );
+	}
+
+	public function test_legacy_links_keep_an_explicit_content() {
+		$query = $this->query( utm_url( 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=button&utm_campaign=troubleshooter&utm_content=license', 'support-license', 'help' ) );
+
+		$this->assertSame( 'groundhogg-plugin', $query['utm_source'] );
+		$this->assertSame( 'wp-admin', $query['utm_medium'] );
+		$this->assertSame( 'help', $query['utm_campaign'] );
+		$this->assertSame( 'support-license', $query['utm_content'] );
+	}
+
 	public function test_own_params_are_kept_and_missing_ones_filled() {
 		$query = $this->query( utm_url( 'https://groundhogg.io/?utm_source=groundhogg-plugin&utm_content=keep', 'replace', 'campaign' ) );
 
@@ -133,6 +161,30 @@ class Utm_Links_Tests extends GH_UnitTestCase {
 		add_filter( 'groundhogg/utm_params', '__return_empty_array' );
 
 		$this->assertSame( 'https://groundhogg.io/pricing/', utm_url( 'https://groundhogg.io/pricing/', 'x', 'y' ) );
+	}
+
+	public function test_links_in_html() {
+		$html = '<p><a href="https://groundhogg.io/doc/sender-profiles/">Docs</a> <a class="x" href=\'https://wordpress.org/plugins/groundhogg/#developers\'>wp.org</a></p>'
+		        . '<img src="https://groundhogg.io/wp-content/uploads/a.png">'
+		        . '<a href="https://groundhogg.io/?a=1&amp;b=2">Home</a>';
+
+		$tagged = \Groundhogg\utm_links_in_html( $html, 'notice-745', 'notifications' );
+
+		preg_match_all( '/href=["\']([^"\']+)/', $tagged, $hrefs );
+		$hrefs = array_map( 'html_entity_decode', $hrefs[1] );
+
+		$this->assertSame( [
+			'utm_source'   => 'groundhogg-plugin',
+			'utm_medium'   => 'wp-admin',
+			'utm_campaign' => 'notifications',
+			'utm_content'  => 'notice-745',
+		], $this->query( $hrefs[0] ) );
+
+		$this->assertSame( 'https://wordpress.org/plugins/groundhogg/#developers', $hrefs[1] );
+		$this->assertSame( '2', $this->query( $hrefs[2] )['b'] );
+		$this->assertSame( 'notice-745', $this->query( $hrefs[2] )['utm_content'] );
+		$this->assertStringContainsString( '<img src="https://groundhogg.io/wp-content/uploads/a.png">', $tagged );
+		$this->assertSame( 'no links here', \Groundhogg\utm_links_in_html( 'no links here' ) );
 	}
 
 	public function test_license_manager_urls() {

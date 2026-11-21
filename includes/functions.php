@@ -222,6 +222,12 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 }
 
 /**
+ * utm_source values from our older schemes, still in add-on plugin headers (Plugin URI, Author URI).
+ * A link with one of these is re-tagged. Mirrors LEGACY_SOURCES in assets/js/admin/utm-links.js.
+ */
+const UTM_LEGACY_SOURCES = [ 'wp-plugins', 'plugin', 'admin-menu' ];
+
+/**
  * Whether a URL points at groundhogg.io or one of its subdomains.
  *
  * @param string $url
@@ -315,8 +321,8 @@ function utm_params( $params, $url ) {
 /**
  * Add UTM parameters to a link to groundhogg.io, see docs/utm-links.md.
  *
- * Other hosts are returned unchanged, as are URLs that already carry their own utm_source.
- * Parameters already in the URL are kept.
+ * Other hosts are returned unchanged, as are URLs that already carry someone else's utm_source.
+ * Parameters already in the URL are kept, except an older scheme of ours, which is replaced.
  *
  * @param string $url
  * @param string $content  the placement, e.g. 'upgrade-button'
@@ -333,7 +339,15 @@ function utm_url( $url, $content = '', $campaign = '', $medium = 'wp-admin' ) {
 
 	wp_parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $existing );
 
-	if ( isset( $existing['utm_source'] ) && $existing['utm_source'] !== 'groundhogg-plugin' ) {
+	$source = $existing['utm_source'] ?? '';
+
+	if ( in_array( $source, UTM_LEGACY_SOURCES, true ) ) {
+		// the old campaign named the placement, e.g. the plugin-uri of an add-on's header
+		$content  = $content ?: (string) ( $existing['utm_campaign'] ?? '' );
+		$old_keys = preg_grep( '/^utm_/', array_keys( $existing ) );
+		$url      = remove_query_arg( $old_keys, $url );
+		$existing = array_diff_key( $existing, array_flip( $old_keys ) );
+	} else if ( $source && $source !== 'groundhogg-plugin' ) {
 		return $url;
 	}
 
@@ -350,6 +364,36 @@ function utm_url( $url, $content = '', $campaign = '', $medium = 'wp-admin' ) {
 	}
 
 	return add_query_arg( urlencode_deep( $params ), $url );
+}
+
+/**
+ * Add UTM parameters to the links to groundhogg.io in some HTML, see utm_url().
+ * Only href attributes are changed, so images from groundhogg.io keep their src.
+ *
+ * @param string $html
+ * @param string $content  the placement
+ * @param string $campaign the screen or feature, defaults to the current admin screen
+ * @param string $medium   'wp-admin', 'email' or 'ai'
+ *
+ * @return string
+ */
+function utm_links_in_html( $html, $content = '', $campaign = '', $medium = 'wp-admin' ) {
+
+	if ( ! is_string( $html ) || strpos( $html, 'groundhogg.io' ) === false ) {
+		return $html;
+	}
+
+	return preg_replace_callback( '/(<a\s[^>]*?\bhref\s*=\s*)(["\'])(.*?)\2/i', function ( $matches ) use ( $content, $campaign, $medium ) {
+
+		$url    = html_entity_decode( $matches[3], ENT_QUOTES );
+		$tagged = utm_url( $url, $content, $campaign, $medium );
+
+		if ( $tagged === $url ) {
+			return $matches[0];
+		}
+
+		return $matches[1] . $matches[2] . esc_url( $tagged ) . $matches[2];
+	}, $html );
 }
 
 function report_link( $content, $params ) {
