@@ -4,6 +4,7 @@ namespace Groundhogg\Steps\Premium;
 
 use function Groundhogg\html;
 use function Groundhogg\is_pro_features_active;
+use function Groundhogg\utm_url;
 
 trait Trait_Premium_Step {
 
@@ -37,7 +38,7 @@ trait Trait_Premium_Step {
 
 		html( 'p', [], sprintf( 'The %s step is a paid feature. Upgrade to unlock it along with 20+ other premium steps!', esc_html( $this->get_name() ) ) );
 		html( 'a', [
-			'href'   => 'https://groundhogg.io/pricing/',
+			'href'   => utm_url( 'https://groundhogg.io/pricing/', 'premium-step', 'funnel-editor' ),
 			'target' => '_blank',
 			'class'  => 'gh-button primary'
 		], 'Upgrade now!' );

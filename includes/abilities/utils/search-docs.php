@@ -6,6 +6,7 @@ use Groundhogg\Abilities\Ability;
 use WP_Error;
 use function Groundhogg\html2markdown;
 use function Groundhogg\is_white_labeled;
+use function Groundhogg\utm_url;
 
 /**
  * Searches the documentation on groundhogg.io, and reads an article, so an agent can answer from the docs and link the
@@ -28,6 +29,17 @@ class Search_Docs extends Ability {
 	const API = 'https://groundhogg.io/wp-json/wp/v2/';
 
 	const DOCS_URL = 'https://groundhogg.io/documentation/';
+
+	/**
+	 * A link handed to the AI assistant, tagged so groundhogg.io can tell the visit came from an assistant.
+	 *
+	 * @param string $url
+	 *
+	 * @return string
+	 */
+	protected static function link( string $url ): string {
+		return utm_url( $url, '', 'search-docs', 'ai' );
+	}
 
 	/**
 	 * Categories for people writing code. Their articles are left out of a search unless it asks for them.
@@ -185,7 +197,7 @@ class Search_Docs extends Ability {
 
 		return [
 			'results'  => $results,
-			'all_docs' => self::DOCS_URL,
+			'all_docs' => self::link( self::DOCS_URL ),
 		];
 	}
 
@@ -214,7 +226,7 @@ class Search_Docs extends Ability {
 			'article'  => self::describe( $doc, self::categories() ) + [
 					'content' => $content,
 				],
-			'all_docs' => self::DOCS_URL,
+			'all_docs' => self::link( self::DOCS_URL ),
 		];
 	}
 
@@ -234,7 +246,7 @@ class Search_Docs extends Ability {
 			'id'         => absint( $doc['id'] ?? 0 ),
 			'title'      => self::text( $doc['title']['rendered'] ?? '' ),
 			// only ever a link to the docs
-			'url'        => strpos( $url, 'https://groundhogg.io/' ) === 0 ? esc_url_raw( $url ) : self::DOCS_URL,
+			'url'        => self::link( strpos( $url, 'https://groundhogg.io/' ) === 0 ? esc_url_raw( $url ) : self::DOCS_URL ),
 			'categories' => array_values( array_filter( array_map( function ( $id ) use ( $categories ) {
 				return $categories[ $id ]['name'] ?? '';
 			}, (array) ( $doc['doc-category'] ?? [] ) ) ) ),
@@ -352,7 +364,7 @@ class Search_Docs extends Ability {
 		$unavailable = new WP_Error( 'docs_unavailable', sprintf(
 		/* translators: %s: the documentation's home page */
 			__( 'The documentation couldn\'t be reached just now. Link %s instead, and don\'t make up a link to an article.', 'groundhogg' ),
-			self::DOCS_URL
+			self::link( self::DOCS_URL )
 		) );
 
 		if ( is_wp_error( $response ) ) {

@@ -604,6 +604,17 @@ class Scripts {
 
 		wp_enqueue_script( 'groundhogg-admin-functions' );
 
+		// UTM tags on links to groundhogg.io, see docs/utm-links.md
+		$utm_params = utm_params( [], 'https://groundhogg.io/' );
+
+		if ( ! empty( $utm_params ) ) {
+			wp_register_script( 'groundhogg-utm-links', GROUNDHOGG_ASSETS_URL . 'js/admin/utm-links' . $dot_min . '.js', [], GROUNDHOGG_VERSION, true );
+			wp_localize_script( 'groundhogg-utm-links', 'GroundhoggUTM', [
+				'params' => $utm_params,
+			] );
+			wp_enqueue_script( 'groundhogg-utm-links' );
+		}
+
 		if ( ! is_admin_groundhogg_page() && ! is_user_preference_enabled( 'gh_disable_email_detection' ) && current_user_can( 'view_others_contacts' ) ){
 			wp_enqueue_script( 'groundhogg-admin-email-detector' );
 		}

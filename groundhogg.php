@@ -1,11 +1,11 @@
 <?php
 /*
  * Plugin Name: Groundhogg
- * Plugin URI: https://groundhogg.io/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
+ * Plugin URI: https://groundhogg.io/?utm_source=groundhogg-plugin&utm_medium=wp-admin&utm_campaign=plugins&utm_content=plugin-uri
  * Description: CRM and marketing automation for WordPress
  * Version: 4.11
  * Author: Groundhogg Inc.
- * Author URI: https://groundhogg.io/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
+ * Author URI: https://groundhogg.io/?utm_source=groundhogg-plugin&utm_medium=wp-admin&utm_campaign=plugins&utm_content=author-uri
  * Text Domain: groundhogg
  * Domain Path: /languages
  * Requires at least: 6.9

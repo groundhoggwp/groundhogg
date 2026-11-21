@@ -1287,8 +1287,9 @@
         ]),
         Div({ className: 'display-flex column gap-20 inside align-center' }, An({
           className: 'gh-button primary medium',
-          href     : 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=button&utm_campaign=troubleshooter&utm_content=license',
-          target   : '_blank',
+          href          : 'https://groundhogg.io/pricing/',
+          target        : '_blank',
+          dataUtmContent: 'support-license-button',
         }, Bold({}, __('Purchase a License Now!', 'groundhogg')))),
         ...otherHelp(__('Watch a training on Groundhogg.', 'groundhogg')),
       ],

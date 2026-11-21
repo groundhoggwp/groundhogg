@@ -23,6 +23,7 @@ use function Groundhogg\is_white_labeled;
 use function Groundhogg\notices;
 use function Groundhogg\remote_post_json;
 use function Groundhogg\utils;
+use function Groundhogg\utm_url;
 use function Groundhogg\verify_admin_ajax_nonce;
 
 /**
@@ -608,10 +609,10 @@ class Guided_Setup extends Admin_Page {
 				'import'     => current_user_can( 'import_contacts' ) ? admin_page_url( 'gh_tools', [ 'tab' => 'import', 'action' => 'add' ] ) : false,
 				'flow'       => current_user_can( 'add_funnels' ) ? admin_page_url( 'gh_funnels', [ 'action' => 'add' ] ) : false,
 				'settings'   => admin_page_url( 'gh_settings', [ 'tab' => 'email' ] ),
-				'pricing'    => 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=link&utm_campaign=guided_setup&utm_content=license',
-				'licenses'   => 'https://groundhogg.io/account/licenses/',
+				'pricing'    => utm_url( 'https://groundhogg.io/pricing/', 'license' ),
+				'licenses'   => utm_url( 'https://groundhogg.io/account/licenses/', 'find-license' ),
 				// the agent is set up in Tools for the people that can, everyone else gets the doc
-				'ai'         => $ai_in_admin ? Connection::page_url() : 'https://groundhogg.io/doc/working-with-the-abilities-api-mcp/?utm_source=plugin&utm_medium=link&utm_campaign=guided_setup&utm_content=ai',
+				'ai'         => $ai_in_admin ? Connection::page_url() : utm_url( 'https://groundhogg.io/doc/working-with-the-abilities-api-mcp/', 'ai' ),
 				'ai_in_admin' => $ai_in_admin,
 			],
 		];

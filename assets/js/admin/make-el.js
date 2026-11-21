@@ -2602,7 +2602,7 @@
 
     let {
       pillText = 'Pro Feature',
-      toolTipText = 'This feature requires a <a href="https://groundhogg.io/pricing/">paid license</a>.',
+      toolTipText = 'This feature requires a <a href="https://groundhogg.io/pricing/" data-utm-content="requires-pro">paid license</a>.',
     } = props
 
     return Div({

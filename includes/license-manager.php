@@ -623,11 +623,10 @@ class License_Manager {
 	 * @return string
 	 */
 	public static function groundhogg_io_url( string $path = '', array $query = [] ) {
-		return add_query_arg( array_merge( [
-			'utm_source'   => 'plugin',
-			'utm_medium'   => 'wp-dash',
-			'utm_campaign' => 'license-management',
-		], $query ), 'https://groundhogg.io/' . ltrim( $path, '/' ) );
+		$content = $query['utm_content'] ?? '';
+		unset( $query['utm_content'] );
+
+		return utm_url( add_query_arg( $query, 'https://groundhogg.io/' . ltrim( $path, '/' ) ), $content );
 	}
 
 	/**

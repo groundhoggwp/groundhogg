@@ -6,6 +6,7 @@ use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\utm_url;
 
 /**
  * Add Funnel
@@ -144,7 +145,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php $template->flow_preview() ?>
                         <p><?php echo wp_kses_post( $template->get_meta( 'description' ) ); ?></p>
 						<?php if ( $template->is_premium ): ?>
-                            <a style="margin-top: auto" class="gh-button primary text" href="https://groundhogg.io/pricing/" target="_blank"><?php echo esc_html_x( '🔓 Upgrade to unlock!', 'action', 'groundhogg' ); ?></a>
+                            <a style="margin-top: auto" class="gh-button primary text" href="<?php echo esc_url( utm_url( 'https://groundhogg.io/pricing/', 'premium-template' ) ); ?>" target="_blank"><?php echo esc_html_x( '🔓 Upgrade to unlock!', 'action', 'groundhogg' ); ?></a>
 						<?php else: ?>
                             <button style="margin-top: auto" class="gh-button primary" name="funnel_template"
                                     value="<?php echo esc_attr( $template->ID ) ?>"><?php echo esc_html_x( 'Use Template', 'action', 'groundhogg' ); ?></button>

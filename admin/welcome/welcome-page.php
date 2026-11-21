@@ -21,6 +21,7 @@ use function Groundhogg\is_option_enabled;
 use function Groundhogg\is_white_labeled;
 use function Groundhogg\notices;
 use function Groundhogg\remote_post_json;
+use function Groundhogg\utm_url;
 use function Groundhogg\verify_admin_ajax_nonce;
 use function Groundhogg\white_labeled_name;
 
@@ -217,7 +218,7 @@ class Welcome_Page extends Admin_Page {
 				'title'       => __( 'Upgrade to premium for powerful features', 'groundhogg' ),
 				'description' => __( 'Get a premium plan and activate more powerful features that will help you grow and scale.', 'groundhogg' ),
 				'completed'   => has_premium_features(),
-				'fix'         => 'https://groundhogg.io/pricing/?utm_source=plugin&utm_medium=checklist&utm_campaign=welcome&utm_content=fix',
+				'fix'         => utm_url( 'https://groundhogg.io/pricing/', 'checklist-upgrade' ),
 				'cap'         => is_white_labeled() ? 'do_not_allow' : 'manage_options'
 			],
 			[
@@ -272,7 +273,7 @@ class Welcome_Page extends Admin_Page {
 				'title'       => __( 'Install the Extension Manager', 'groundhogg' ),
 				'description' => __( 'The extension manager makes is easier to install your premium add-ons and integrations.', 'groundhogg' ),
 				'completed'   => defined( 'GROUNDHOGG_HELPER_VERSION' ),
-				'fix'         => 'https://groundhogg.io/account/all-access-downloads/',
+				'fix'         => utm_url( 'https://groundhogg.io/account/all-access-downloads/', 'checklist-extension-manager' ),
 				'cap'         => is_white_labeled() ? 'manage_gh_licenses' : 'install_plugins',
 				'more'        => ''
 			];

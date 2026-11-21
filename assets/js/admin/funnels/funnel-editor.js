@@ -2119,8 +2119,9 @@
                 },
               }, Dashicon('no-alt')),
               An({
-                href  : 'https://groundhogg.io/pricing/',
-                target: '_blank',
+                href          : 'https://groundhogg.io/pricing/',
+                target        : '_blank',
+                dataUtmContent: 'premium-step-modal',
               }, Img({
                 style    : {
                   borderRadius: '10px',

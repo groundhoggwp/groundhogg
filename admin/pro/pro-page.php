@@ -4,6 +4,7 @@ namespace Groundhogg\Admin\Pro;
 
 use Groundhogg\Admin\Admin_Page;
 use function Groundhogg\dashicon;
+use function Groundhogg\utm_url;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,18 +27,15 @@ class Pro_Page extends Admin_Page {
 	 * @return void
 	 */
 	protected function add_additional_actions() {
-		$pricing_url = add_query_arg( [
-			'utm_source'   => 'admin-menu',
-			'utm_medium'   => 'wp-dash',
-			'utm_campaign' => 'go-pro',
-			'utm_content'  => 'go-pro-link',
-		], 'https://groundhogg.io/pricing/' );
+		$pricing_url = 'https://groundhogg.io/pricing/';
 
 		$discount = get_user_meta( wp_get_current_user()->ID, 'gh_free_extension_discount', true );
 
 		if ( $discount ) {
 			$pricing_url = add_query_arg( [ 'discount' => $discount ], $pricing_url );
 		}
+
+		$pricing_url = utm_url( $pricing_url, 'go-pro', 'admin-menu' );
 
 		// phpcs:ignore WordPress.Security.SafeRedirect -- goes to https://groundhogg.io
 		wp_redirect( $pricing_url );

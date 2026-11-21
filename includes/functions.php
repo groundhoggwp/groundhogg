@@ -221,6 +221,137 @@ function admin_page_url( $page, $args = [], $fragment = '' ) {
 	return $url;
 }
 
+/**
+ * Whether a URL points at groundhogg.io or one of its subdomains.
+ *
+ * @param string $url
+ *
+ * @return bool
+ */
+function is_groundhogg_io_url( $url ) {
+	$host = strtolower( (string) wp_parse_url( (string) $url, PHP_URL_HOST ) );
+
+	return $host === 'groundhogg.io' || str_ends_with( $host, '.groundhogg.io' );
+}
+
+/**
+ * Lower case, hyphenated value for a UTM parameter.
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function utm_slug( $value ) {
+	return substr( trim( preg_replace( '/[^a-z0-9]+/', '-', strtolower( (string) $value ) ), '-' ), 0, 60 );
+}
+
+/**
+ * The utm_campaign for links on the current admin screen.
+ *
+ * Groundhogg pages are named from page, tab and action (gh_funnels&action=edit → funnels-edit).
+ * Other plugins' pages are never named, so their slugs don't reach groundhogg.io.
+ * Mirrors screenCampaign() in assets/js/admin/utm-links.js, see docs/utm-links.md.
+ *
+ * @return string
+ */
+function utm_campaign_for_screen() {
+
+	if ( ! is_admin() ) {
+		return '';
+	}
+
+	if ( is_admin_groundhogg_page() ) {
+		$page  = get_url_var( 'page' );
+		$parts = [ $page === 'groundhogg' ? 'dashboard' : preg_replace( '/^gh_/', '', $page ) ];
+
+		foreach ( [ 'tab', 'action' ] as $var ) {
+			$value = get_url_var( $var );
+			if ( $value && is_string( $value ) ) {
+				$parts[] = $value;
+			}
+		}
+
+		return utm_slug( implode( '-', $parts ) );
+	}
+
+	global $pagenow;
+
+	$core_screens = [
+		'plugins.php'        => 'plugins',
+		'plugin-install.php' => 'plugin-install',
+		'update-core.php'    => 'update-core',
+		'index.php'          => 'wp-dashboard',
+		'profile.php'        => 'profile',
+		'users.php'          => 'users',
+	];
+
+	return $core_screens[ $pagenow ] ?? 'other-screen';
+}
+
+/**
+ * The base UTM parameters, filtered.
+ *
+ * @param array  $params utm_* => value
+ * @param string $url    the URL being tagged
+ *
+ * @return array
+ */
+function utm_params( $params, $url ) {
+
+	$params = wp_parse_args( array_filter( $params ), [
+		'utm_source' => 'groundhogg-plugin',
+		'utm_medium' => 'wp-admin',
+	] );
+
+	/**
+	 * Filter the UTM parameters added to links to groundhogg.io. Return an empty array to leave links untagged.
+	 *
+	 * @param array  $params utm_* => value
+	 * @param string $url    the URL being tagged
+	 */
+	return (array) apply_filters( 'groundhogg/utm_params', $params, $url );
+}
+
+/**
+ * Add UTM parameters to a link to groundhogg.io, see docs/utm-links.md.
+ *
+ * Other hosts are returned unchanged, as are URLs that already carry their own utm_source.
+ * Parameters already in the URL are kept.
+ *
+ * @param string $url
+ * @param string $content  the placement, e.g. 'upgrade-button'
+ * @param string $campaign the screen or feature, defaults to the current admin screen
+ * @param string $medium   'wp-admin', 'email' or 'ai'
+ *
+ * @return string
+ */
+function utm_url( $url, $content = '', $campaign = '', $medium = 'wp-admin' ) {
+
+	if ( ! is_groundhogg_io_url( $url ) ) {
+		return $url;
+	}
+
+	wp_parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $existing );
+
+	if ( isset( $existing['utm_source'] ) && $existing['utm_source'] !== 'groundhogg-plugin' ) {
+		return $url;
+	}
+
+	$params = utm_params( [
+		'utm_medium'   => utm_slug( $medium ),
+		'utm_campaign' => utm_slug( $campaign ?: utm_campaign_for_screen() ),
+		'utm_content'  => utm_slug( $content ),
+	], $url );
+
+	$params = array_diff_key( array_filter( $params ), $existing );
+
+	if ( empty( $params ) ) {
+		return $url;
+	}
+
+	return add_query_arg( urlencode_deep( $params ), $url );
+}
+
 function report_link( $content, $params ) {
 
 	return html()->e( 'a', [
