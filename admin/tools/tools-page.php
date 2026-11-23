@@ -31,6 +31,7 @@ use function Groundhogg\export_header_pretty_name;
 use function Groundhogg\files;
 use function Groundhogg\get_db;
 use function Groundhogg\get_exportable_fields;
+use function Groundhogg\get_mappable_fields;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_query;
 use function Groundhogg\get_request_uri;
@@ -581,8 +582,11 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		wp_enqueue_script( 'groundhogg-admin-big-file-upload' );
 		wp_localize_script( 'groundhogg-admin-big-file-upload', 'BigFileUploader', [
-			'location' => 'imports',
-			'selector' => '#import_file'
+			'location'      => 'imports',
+			'selector'      => '#import_file',
+			// files bigger than the host allows in one request are sent in chunks
+			'maxUploadSize' => wp_max_upload_size(),
+			'canChunk'      => current_user_can( 'big_uploads' ),
 		] );
 
 		include __DIR__ . '/add-import.php';
@@ -636,6 +640,17 @@ class Tools_Page extends Tabbed_Admin_Page {
 
 		if ( ! is_array( $map ) ) {
 			wp_die( esc_html__( 'Invalid map provided.', 'groundhogg' ) );
+		}
+
+		// Columns left on "Do Not Map" are skipped, as are fields that don't exist
+		$fields = array_merge( ...array_values( get_mappable_fields() ) );
+		$map    = array_filter( $map, function ( $field ) use ( $fields ) {
+			return is_string( $field ) && key_exists( $field, $fields );
+		} );
+
+		// Rows are matched to contacts by one of these, without one every row is skipped
+		if ( empty( array_intersect( $map, [ 'email', 'contact_id', 'user_id', 'user_email' ] ) ) ) {
+			return new WP_Error( 'invalid_map', __( 'Map a column to "Email Address" so contacts can be created and matched.', 'groundhogg' ) );
 		}
 
 		$file_name = sanitize_file_name( get_post_var( 'import' ) );

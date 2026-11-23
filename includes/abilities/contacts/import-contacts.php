@@ -7,6 +7,7 @@ use Groundhogg\Background\Import_Contacts as Import_Contacts_Task;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Contact_Query;
 use WP_Error;
+use function Groundhogg\clean_csv_headers;
 use function Groundhogg\count_csv_rows;
 use function Groundhogg\files;
 use function Groundhogg\get_csv_delimiter;
@@ -91,6 +92,10 @@ class Import_Contacts extends Ability {
 						'type'        => [ 'integer', 'null' ],
 						'description' => __( 'Contacts with the import tag once it finished, or null when it runs in the background or there\'s no import tag.', 'groundhogg' ),
 					],
+					'skipped'       => [
+						'type'        => [ 'integer', 'null' ],
+						'description' => __( 'Rows that made no contact, e.g. no valid email address, or null when it runs in the background.', 'groundhogg' ),
+					],
 					'background'    => [
 						'type'        => 'boolean',
 						'description' => __( 'Whether it runs in the background. It needs WordPress cron, see groundhogg/get-cron-status.', 'groundhogg' ),
@@ -145,6 +150,7 @@ class Import_Contacts extends Ability {
 		$result = [
 			'rows'          => (int) $rows,
 			'imported'      => null,
+			'skipped'       => null,
 			'background'    => true,
 			'import_tag_id' => $import_tag ? (int) $import_tag : null,
 		];
@@ -172,6 +178,7 @@ class Import_Contacts extends Ability {
 			$result['imported'] = (int) $query->count();
 		}
 
+		$result['skipped']    = $task->get_skipped();
 		$result['background'] = false;
 
 		return $result;
@@ -254,7 +261,7 @@ class Import_Contacts extends Ability {
 	protected function check_map( string $file, array $map ) {
 
 		$handle = fopen( $file, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
-		$headers = $handle ? fgetcsv( $handle, 0, get_csv_delimiter( $file ) ?: ',' ) : false;
+		$headers = $handle ? clean_csv_headers( fgetcsv( $handle, 0, get_csv_delimiter( $file ) ?: ',' ) ) : [];
 
 		if ( $handle ) {
 			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose

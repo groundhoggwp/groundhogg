@@ -2411,6 +2411,11 @@ function get_csv_delimiter( $file_path ) {
 	foreach ( $delimiters as $d ) {
 		$data_1 = fgetcsv( $handle, 4096, $d );
 
+		// an empty file
+		if ( ! is_array( $data_1 ) ) {
+			break;
+		}
+
 		if ( count( $data_1 ) > count( $data_2 ) ) {
 			$delimiter = $d;
 			$data_2    = $data_1;
@@ -2438,20 +2443,54 @@ function count_csv_rows( $file_path ) {
 		return 0;
 	}
 
-	$file = new \SplFileObject( $file_path, 'r' );
+	$delimiter = get_csv_delimiter( $file_path ) ?: ',';
+	$file      = new \SplFileObject( $file_path, 'r' );
 
 	$rows = 0;
 
+	// Count records, not lines: a quoted cell can hold line breaks
 	while ( ! $file->eof() ) {
-		$line = $file->fgets();
-		if ( ! empty( $line ) ) {
+		if ( ! is_blank_csv_row( $file->fgetcsv( $delimiter ) ) ) {
 			$rows ++;
 		}
 	}
 
 	$file = null;
 
-	return $rows - 1; // -1 to account for the header row
+	return max( 0, $rows - 1 ); // -1 to account for the header row
+}
+
+/**
+ * Whether a row read by fgetcsv() is empty, i.e. a blank line or the end of the file
+ *
+ * @param mixed $row
+ *
+ * @return bool
+ */
+function is_blank_csv_row( $row ) {
+	return ! is_array( $row ) || $row === [ null ] || $row === [ '' ];
+}
+
+/**
+ * Tidy a CSV's header row: drop the byte order mark Excel puts at the start of a "CSV UTF-8" file and trim each label
+ *
+ * @param mixed $headers the first row, from fgetcsv()
+ *
+ * @return array
+ */
+function clean_csv_headers( $headers ) {
+
+	if ( ! is_array( $headers ) ) {
+		return [];
+	}
+
+	if ( isset( $headers[0] ) && is_string( $headers[0] ) && strpos( $headers[0], "\xEF\xBB\xBF" ) === 0 ) {
+		$headers[0] = substr( $headers[0], 3 );
+	}
+
+	return array_map( function ( $header ) {
+		return trim( (string) $header );
+	}, $headers );
 }
 
 /**
@@ -2481,18 +2520,21 @@ function get_items_from_csv( string $file_path = '', int $rows = 0, int $offset 
 	$file = new \SplFileObject( $file_path, 'r' );
 
 	// Headers are always the first row
-	$header       = $file->fgetcsv( $delimiter );
+	$header       = clean_csv_headers( $file->fgetcsv( $delimiter ) );
 	$header_count = count( $header );
+
+	if ( ! $header_count ) {
+		return [];
+	}
 
 	// Get all rows
 	if ( ! $rows ) {
 		$rows = 999999999;
 	}
 
-	// Advance the file pointer
-	if ( $offset > 0 ) {
-		while ( ! $file->eof() && $offset > 0 ) {
-			$file->fgets();
+	// Advance the file pointer a record at a time, a quoted cell can hold line breaks
+	while ( ! $file->eof() && $offset > 0 ) {
+		if ( ! is_blank_csv_row( $file->fgetcsv( $delimiter ) ) ) {
 			$offset --;
 		}
 	}
@@ -2500,6 +2542,10 @@ function get_items_from_csv( string $file_path = '', int $rows = 0, int $offset 
 	while ( ! $file->eof() && count( $data ) < $rows ) {
 
 		$row = $file->fgetcsv( $delimiter );
+
+		if ( is_blank_csv_row( $row ) ) {
+			continue;
+		}
 
 		if ( $associative ) {
 			if ( count( $row ) > $header_count ) {
@@ -2910,7 +2956,7 @@ function maybe_string_to_bool( $bool_or_string ) {
  *
  * @return false|Contact
  */
-function update_contact_with_map( mixed $contact, array $fields, array $map = [], array $submission = [] ) {
+function update_contact_with_map( $contact, array $fields, array $map = [], array $submission = [] ) {
 	return generate_contact_with_map( $fields, $map, $submission, $contact );
 }
 
@@ -2926,7 +2972,7 @@ function update_contact_with_map( mixed $contact, array $fields, array $map = []
  *
  * @return Contact|false
  */
-function generate_contact_with_map( array $fields, array $map = [], array $submission = [], mixed $contact = null ) {
+function generate_contact_with_map( array $fields, array $map = [], array $submission = [], $contact = null ) {
 
 	if ( empty( $map ) ) {
 		$keys = array_keys( $fields );

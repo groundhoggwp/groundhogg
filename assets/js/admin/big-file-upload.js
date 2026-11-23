@@ -13,9 +13,10 @@
   const { ProgressBar, Div } = MakeEl
   const { __ } = wp.i18n
   const { _adminajax: AdminAjaxNonce } = groundhogg_nonces
-  const { location, selector } = BigFileUploader
+  const { location, selector, maxUploadSize = 0, canChunk = true } = BigFileUploader
 
-  console.log({location, selector})
+  // Leave room for the rest of the request, a file right at the limit still fails
+  const chunkAbove = maxUploadSize ? Math.min(maxUploadSize * 0.9, 10 * MEGABYTE) : 10 * MEGABYTE
 
   const el = document.querySelector(selector)
 
@@ -30,7 +31,12 @@
     reader = new FileReader();
     file = el.files[0];
 
-    if ( file.size > ( 10 * MEGABYTE ) ){
+    if ( ! file ){
+      e.preventDefault()
+      return false
+    }
+
+    if ( canChunk && file.size > chunkAbove ){
       e.preventDefault()
       pre_file_upload()
 
@@ -39,6 +45,22 @@
       return false
     }
   })
+
+  /**
+   * Show that the upload failed
+   */
+  function upload_failed() {
+    morphdom( document.querySelector( '#big-file-uploading' ), Div({
+      id: 'big-file-uploading'
+    }, [
+      `<h3>${__('Upload failed.', 'groundhogg')}</h3>`,
+      `<p>${__('Something went wrong while uploading your file. Please try again.', 'groundhogg')}</p>`,
+      ProgressBar({
+        error: true,
+        percent: percentComplete
+      })
+    ] ) )
+  }
 
   /**
    * Do stuff before uploading the file
@@ -55,13 +77,16 @@
         location,
         file_name: file.name
       },
+      error: upload_failed,
       success: function( response ) {
-        if ( typeof response.success !== 'undefined' ){
-
-          file_name = response.data.file_name
-
-          upload_file(0 );
+        if ( ! response.success ){
+          upload_failed()
+          return
         }
+
+        file_name = response.data.file_name
+
+        upload_file(0 );
       }
     } );
   }
@@ -89,10 +114,14 @@
         location,
         file_name
       },
+      error: upload_failed,
       success: function( response ) {
-        if ( typeof response.success !== 'undefined' ) {
-          window.location.href = response.data.return_url;
+        if ( ! response.success ) {
+          upload_failed()
+          return
         }
+
+        window.location.href = response.data.return_url;
       }
     } );
   }
@@ -132,19 +161,18 @@
             return
           }
 
-          morphdom( document.querySelector( '#big-file-uploading' ), Div({
-            id: 'big-file-uploading'
-          }, [
-            `<h3>${__('Upload failed.', 'groundhogg')}</h3>`,
-            `<p>${__('Something went wrong while uploading your file. Please try again.', 'groundhogg')}</p>`,
-            ProgressBar({
-              error: true,
-              percent: percentComplete
-            })
-          ] ) )
+          upload_failed()
         },
-        success: function( data ) {
-          const size_done = start + slice_size;
+        success: function( response ) {
+
+          if ( ! response.success ){
+            upload_failed()
+            return
+          }
+
+          retries = 0
+
+          const size_done = Math.min( start + slice_size, file.size );
           const percent = Math.floor( ( size_done / file.size ) * 100 );
           percentComplete = percent
 

@@ -58,26 +58,58 @@ function guess_column_map_to( $column ) {
 	$column = get_key_from_column_label( $column );
 
 	$guesses = [
-		'address1'      => 'line1',
-		'address_1'     => 'line1',
-		'address2'      => 'line2',
-		'address_2'     => 'line2',
-		'province'      => 'region',
-		'state'         => 'region',
-		'postal_code'   => 'postal_zip',
-		'postal'        => 'postal_zip',
-		'zip'           => 'postal_zip',
-		'zip_code'      => 'postal_zip',
-		'first'         => 'first_name',
-		'last'          => 'last_name',
-		'email_address' => 'email',
+		'address'        => 'street_address_1',
+		'address1'       => 'street_address_1',
+		'address_1'      => 'street_address_1',
+		'address_line_1' => 'street_address_1',
+		'street_address' => 'street_address_1',
+		'address2'       => 'street_address_2',
+		'address_2'      => 'street_address_2',
+		'address_line_2' => 'street_address_2',
+		'province'       => 'region',
+		'state'          => 'region',
+		'postal_code'    => 'postal_zip',
+		'postal'         => 'postal_zip',
+		'zip'            => 'postal_zip',
+		'zip_code'       => 'postal_zip',
+		'first'          => 'first_name',
+		'firstname'      => 'first_name',
+		'last'           => 'last_name',
+		'lastname'       => 'last_name',
+		'surname'        => 'last_name',
+		'name'           => 'full_name',
+		'email_address'  => 'email',
+		'e_mail'         => 'email',
+		'phone'          => 'primary_phone',
+		'phone_number'   => 'primary_phone',
+		'mobile'         => 'mobile_phone',
+		'cell'           => 'mobile_phone',
+		'company'        => 'company_name',
+		'tag'            => 'tags',
 	];
 
 	if ( key_exists( $column, $guesses ) ) {
 		return $guesses[ $column ];
 	}
 
-	return $column;
+	static $fields;
+
+	if ( ! isset( $fields ) ) {
+		$fields = array_merge( ...array_values( get_mappable_fields() ) );
+	}
+
+	if ( key_exists( $column, $fields ) ) {
+		return $column;
+	}
+
+	// match a field's label, e.g. "Mobile Phone Number"
+	foreach ( $fields as $key => $label ) {
+		if ( get_key_from_column_label( $label ) === $column ) {
+			return $key;
+		}
+	}
+
+	return '';
 }
 
 ?>

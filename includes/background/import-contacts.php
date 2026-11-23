@@ -7,6 +7,7 @@ use Groundhogg\Contact_Query;
 use Groundhogg\Preferences;
 use function Groundhogg\_nf;
 use function Groundhogg\bold_it;
+use function Groundhogg\clean_csv_headers;
 use function Groundhogg\code_it;
 use function Groundhogg\contact_filters_link;
 use function Groundhogg\count_csv_rows;
@@ -15,6 +16,7 @@ use function Groundhogg\generate_contact_with_map;
 use function Groundhogg\get_array_var;
 use function Groundhogg\get_csv_delimiter;
 use function Groundhogg\is_a_contact;
+use function Groundhogg\is_blank_csv_row;
 use function Groundhogg\isset_not_empty;
 use function Groundhogg\notices;
 use function Groundhogg\percentage;
@@ -31,6 +33,20 @@ class Import_Contacts extends Task {
 	protected string $delimiter;
 	protected array $headers;
 	protected int $rows = 0;
+
+	/**
+	 * Where in the file the next batch starts, in bytes. 0 until the first batch is done.
+	 *
+	 * @var int
+	 */
+	protected int $position = 0;
+
+	/**
+	 * Rows that didn't make a contact, e.g. no valid email address
+	 *
+	 * @var int
+	 */
+	protected int $skipped = 0;
 
 	protected ?\SplFileObject $file;
 
@@ -88,7 +104,7 @@ class Import_Contacts extends Task {
 	/**
 	 * Advance the file to where we need to be
 	 *
-	 * Seek does not work with cells that contain "\n" !!!!
+	 * Lines aren't rows, a quoted cell can hold line breaks, so the task remembers the byte where the next batch starts.
 	 *
 	 * @return void
 	 */
@@ -98,17 +114,21 @@ class Import_Contacts extends Task {
 		$this->file      = new \SplFileObject( $this->filePath, 'r' );
 
 		// Advance past the headers
-		$this->headers = $this->file->fgetcsv( $this->delimiter );
-		$offset        = $this->batch * self::BATCH_LIMIT;
+		$this->headers = clean_csv_headers( $this->file->fgetcsv( $this->delimiter ) );
 
-		if ( $offset === 0 ) {
+		if ( $this->position > 0 ) {
+			$this->file->fseek( $this->position );
+
 			return;
 		}
 
+		// A task queued before positions were kept only knows its batch, skip that many rows
+		$offset = $this->batch * self::BATCH_LIMIT;
+
 		while ( ! $this->file->eof() && $offset > 0 ) {
-			// Advance row
-			$this->file->fgets();
-			$offset --;
+			if ( ! is_blank_csv_row( $this->file->fgetcsv( $this->delimiter ) ) ) {
+				$offset --;
+			}
 		}
 	}
 
@@ -120,9 +140,20 @@ class Import_Contacts extends Task {
 		return [
 			'fileName' => $this->fileName,
 			'batch'    => $this->batch,
+			'position' => $this->position,
+			'skipped'  => $this->skipped,
 			'user_id'  => $this->user_id,
 			'settings' => $this->settings,
 		];
+	}
+
+	/**
+	 * Rows that didn't make a contact so far
+	 *
+	 * @return int
+	 */
+	public function get_skipped() {
+		return $this->skipped;
 	}
 
 	/**
@@ -135,9 +166,17 @@ class Import_Contacts extends Task {
 		$data         = [];
 		$header_count = count( $this->headers );
 
+		if ( ! $header_count ) {
+			return $data;
+		}
+
 		while ( ! $this->file->eof() && count( $data ) < self::BATCH_LIMIT ) {
 
 			$row = $this->file->fgetcsv( $this->delimiter );
+
+			if ( is_blank_csv_row( $row ) ) {
+				continue;
+			}
 
 			if ( count( $row ) > $header_count ) {
 				$row = array_slice( $row, 0, $header_count );
@@ -147,6 +186,9 @@ class Import_Contacts extends Task {
 
 			$data[] = array_combine( $this->headers, $row );
 		}
+
+		// where the next batch starts
+		$this->position = $this->file->ftell();
 
 		return $data;
 
@@ -184,6 +226,14 @@ class Import_Contacts extends Task {
 
 			/* translators: 1: number of contacts (as a link), 2: file name */
 			$message = sprintf( __( '%1$s contacts have been imported from %2$s!', 'groundhogg' ), bold_it( $contacts_link ), code_it( $this->fileName ) );
+
+			if ( $this->skipped > 0 ) {
+				$message .= ' ' . sprintf(
+					/* translators: %s: number of rows */
+						_n( '%s row was skipped because it had no valid email address or contact to update.', '%s rows were skipped because they had no valid email address or contact to update.', $this->skipped, 'groundhogg' ),
+						bold_it( _nf( $this->skipped ) )
+					);
+			}
 
 			notices()->add_user_notice( $message, 'success', true, $this->user_id );
 
@@ -228,10 +278,13 @@ class Import_Contacts extends Task {
 					'name' => $this->fileName
 				] );
 			} catch ( \Exception $e ) {
+				$this->skipped ++;
 				continue;
 			}
 
-			if ( is_a_contact( $contact ) ) {
+			if ( ! is_a_contact( $contact ) ) {
+				$this->skipped ++;
+			} else {
 
 				$contact->apply_tag( $tags );
 

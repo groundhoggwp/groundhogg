@@ -84,13 +84,28 @@ class Imports_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_file( $import ) {
-		$download_url = $import['file_url'];
 
-		$html = "<strong>";
-		$html .= "<a class='row-title' href='$download_url'>{$import['file']}</a>";
-		$html .= "</strong>";
+		if ( ! current_user_can( 'import_contacts' ) ) {
+			return sprintf( '<strong>%s</strong>', esc_html( $import['file'] ) );
+		}
 
-		return $html;
+		return sprintf( '<strong><a class="row-title" href="%s">%s</a></strong>', esc_url( $this->get_map_url( $import ) ), esc_html( $import['file'] ) );
+	}
+
+	/**
+	 * Link to the map step for an import
+	 *
+	 * @param array $import
+	 *
+	 * @return string
+	 */
+	protected function get_map_url( $import ) {
+		return add_query_arg( [
+			'page'   => 'gh_tools',
+			'tab'    => 'import',
+			'action' => 'map',
+			'import' => rawurlencode( $import['file'] ),
+		], admin_url( 'admin.php' ) );
 	}
 
 	/**
@@ -114,7 +129,7 @@ class Imports_Table extends WP_List_Table {
 	protected function column_date( $import ) {
 		$strdate = date_i18n( 'Y-m-d H:i:s', intval( $import['date'] ) );
 
-		return '<abbr title="' . $strdate . '">' . $strdate . '</abbr>';
+		return '<abbr title="' . esc_attr( $strdate ) . '">' . esc_html( $strdate ) . '</abbr>';
 	}
 
 	/**
@@ -126,9 +141,7 @@ class Imports_Table extends WP_List_Table {
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 	protected function column_default( $import, $column_name ) {
-
-		return print_r( $import[ $column_name ], true );
-
+		return esc_html( $import[ $column_name ] ?? '' );
 	}
 
 	/**
@@ -139,8 +152,8 @@ class Imports_Table extends WP_List_Table {
 	protected function column_cb( $import ) {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			$this->_args['singular'],  // Let's simply repurpose the table's singular label ("movie").
-			$import['file']               // The value of the checkbox should be the record's ID.
+			esc_attr( $this->_args['singular'] ),
+			esc_attr( $import['file'] )
 		);
 	}
 
@@ -189,17 +202,31 @@ class Imports_Table extends WP_List_Table {
 
 				$filepath = Plugin::$instance->utils->files->get_csv_imports_dir( $filename );
 
-				$file = [
+				if ( ! is_file( $filepath ) ) {
+					continue;
+				}
+
+				$data[] = [
 					'file'      => $filename,
 					'file_path' => $filepath,
 					'file_url'  => file_access_url( '/imports/' . $filename, true ),
 					'date'      => filemtime( $filepath ),
-					'rows'      => count_csv_rows( $filepath ),
+					'rows'      => null,
 				];
-
-				$data[] = $file;
-
 			}
+		}
+
+		// Counting rows reads the whole file, so only do it for every file when sorting by rows
+		$count_rows = function ( $import ) {
+			if ( $import['rows'] === null ) {
+				$import['rows'] = count_csv_rows( $import['file_path'] );
+			}
+
+			return $import;
+		};
+
+		if ( $this->get_orderby() === 'rows' ) {
+			$data = array_map( $count_rows, $data );
 		}
 
 		/*
@@ -213,7 +240,7 @@ class Imports_Table extends WP_List_Table {
 
 		$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
 
-		$this->items = $data;
+		$this->items = array_map( $count_rows, $data );
 
 		$this->set_pagination_args( array(
 			'total_items' => $total_items,                     // WE have to calculate the total number of items.
@@ -231,16 +258,31 @@ class Imports_Table extends WP_List_Table {
 	 * @return int
 	 */
 	protected function usort_reorder( $a, $b ) {
-		$a = (array) $a;
-		$b = (array) $b;
-		// If no sort, default to title.
-		$orderby = get_request_var( 'orderby', 'file' ); // WPCS: Input var ok.
-		// If no order, default to asc.
-		$order = get_request_var( 'order', 'asc' ); // WPCS: Input var ok.
-		// Determine sort order.
-		$result = strnatcmp( $a[ $orderby ], $b[ $orderby ] );
+		$orderby = $this->get_orderby();
+		$result  = strnatcmp( (string) $a[ $orderby ], (string) $b[ $orderby ] );
 
-		return ( 'desc' === $order ) ? $result : - $result;
+		return $this->get_order() === 'asc' ? $result : - $result;
+	}
+
+	/**
+	 * The column to sort by, newest uploads first by default
+	 *
+	 * @return string
+	 */
+	protected function get_orderby() {
+		$orderby = get_request_var( 'orderby', 'date' );
+
+		return in_array( $orderby, [ 'file', 'rows', 'date' ], true ) ? $orderby : 'date';
+	}
+
+	/**
+	 * @return string asc or desc
+	 */
+	protected function get_order() {
+		// with no column picked, the default sort (date) is newest first
+		$default = get_request_var( 'orderby' ) ? 'asc' : 'desc';
+
+		return get_request_var( 'order', $default ) === 'asc' ? 'asc' : 'desc';
 	}
 
 	/**
@@ -261,31 +303,25 @@ class Imports_Table extends WP_List_Table {
 
 		if ( current_user_can( 'import_contacts' ) ) {
 			$actions['import'] = sprintf(
-				'<a href="%s" class="edit" aria-label="%s">%s</a>',
-				/* translators: %s: title */
-				admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
-				esc_attr( 'Import' ),
+				'<a href="%s" class="edit">%s</a>',
+				esc_url( $this->get_map_url( $import ) ),
 				esc_html__( 'Import', 'groundhogg' )
 			);
 		}
 
 		if ( current_user_can( 'download_imports' ) ) {
-			$actions['import'] = sprintf(
-				'<a href="%s" class="edit" aria-label="%s">%s</a>',
-				/* translators: %s: title */
-				admin_url( 'admin.php?page=gh_tools&tab=import&action=map&import=' . $import['file'] ),
-				esc_attr( 'Import' ),
-				esc_html__( 'Import', 'groundhogg' )
+			$actions['download'] = sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( $import['file_url'] ),
+				esc_html__( 'Download', 'groundhogg' )
 			);
 		}
 
-		if ( current_user_can( 'delete_files' ) ) {
+		if ( current_user_can( 'delete_imports' ) ) {
 			$actions['delete'] = sprintf(
-				'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
-				wp_nonce_url( admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . $import['file'] ) ),
-				/* translators: %s: title */
-				esc_attr( 'Delete Permanently' ),
-				esc_html__( 'Delete Import' , 'groundhogg' )
+				'<a href="%s" class="submitdelete">%s</a>',
+				esc_url( wp_nonce_url( admin_url( 'admin.php?page=gh_tools&tab=import&action=delete&import=' . rawurlencode( $import['file'] ) ) ) ),
+				esc_html__( 'Delete Import', 'groundhogg' )
 			);
 		}
 
