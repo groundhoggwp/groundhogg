@@ -9346,6 +9346,12 @@
             name: __('Video', 'groundhogg'),
           },
           [
+            Div({
+              className: 'video-block-notice',
+            }, [
+              Dashicon('info-outline'),
+              Pg({}, __('Videos can\'t play inside an email. Readers see the video\'s thumbnail in their inbox, and clicking it opens the video in their browser.', 'groundhogg')),
+            ]),
             Control({
                 label  : __('Video link', 'groundhogg'),
                 stacked: true,

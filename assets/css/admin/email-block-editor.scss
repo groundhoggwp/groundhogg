@@ -1608,6 +1608,27 @@ body {
   }
 }
 
+.video-block-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border-left: 3px solid var(--gh-primary);
+  border-radius: 4px;
+  background: var(--gh-primary-7);
+
+  .dashicons {
+    flex-shrink: 0;
+    color: var(--gh-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+}
+
 .video-block-hint,
 .video-block-error {
   margin: 0;
