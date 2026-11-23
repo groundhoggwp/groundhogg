@@ -355,6 +355,27 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * FIXED Broadcasts stopped scheduling when a whole batch of contacts was skipped, for example as unmarketable. Sending failed with "Unable to schedule events" or never finished.
 * FIXED Contacts made unmarketable by another plugin showed "Will receive marketing." under a red status. They now say another plugin or custom code made them unmarketable.
 * TWEAKED A broadcast none of its contacts can receive is refused with the reason, instead of being created empty.
+* TWEAKED The contact importer has a cleaner, step-by-step look.
+ * The upload screen has a drop zone for your CSV that shows the file you picked, and tips for preparing it.
+ * The match columns screen shows each column with a sample value and the field it goes into, and fades out columns that won't be imported.
+ * The tags and the confirmed and consent options have Yes/No switches with a short explanation each.
+ * If the import can't start, the columns and options you chose are kept.
+* FIXED Importing a CSV with line breaks inside a cell, such as a multi-line note or address, could import some rows twice and skip others in larger files. The row count shown before importing was also wrong for these files.
+* FIXED The first column of a CSV saved by Excel as "CSV UTF-8" wasn't recognized, so an Email column there wasn't matched automatically.
+* FIXED Address columns like "Address 1" weren't matched to the address fields when mapping an import. More common column names, and the fields' own names, are now matched automatically.
+* FIXED An import with no column matched to an email address, contact ID or user started anyway and skipped every row. It's now refused with a message.
+* FIXED Rows skipped during an import, for example without a valid email address, weren't reported. The import finished notice now says how many were skipped.
+* FIXED A CSV of a few megabytes could fail to upload on hosts with a low upload limit. Files bigger than the limit are now uploaded in pieces, and a failed upload says so.
+* FIXED On the list of previous imports, the Download link was missing, Delete was shown to users who couldn't delete, and sorting went the wrong way. The list now shows the newest uploads first.
+* DEV The `groundhogg/import-contacts` ability returns how many rows were `skipped`.
+* DEV `generate_contact_with_map()` and `update_contact_with_map()` no longer use the PHP 8 `mixed` type, which broke passing a contact on PHP 7.4. New `is_blank_csv_row()` and `clean_csv_headers()` functions.
+* ADDED A Video block for the email editor. Paste a YouTube, Vimeo, Wistia or Rumble link and it shows the video's thumbnail, linked to the video, since emails can't play video.
+ * Pick a play button (circle, outline, pill, box or triangle) and set its color, icon color, size and opacity.
+ * Add a progress bar (line, scrubber or a player with controls) and set its color and how far along it is.
+ * Darken the thumbnail, use your own image instead, or get the video's thumbnail again if it changed.
+ * The overlays are drawn into the image, so they look the same in every email client. The alt text is the video's title unless you write your own.
+ * AI assistants can add video blocks too, with just the link and the overlay settings.
+* DEV New `Email_Video_Thumbnail` class, `POST gh/v4/emails/video-thumbnail` REST route, and `groundhogg/email/video_thumbnails/dir` filter for where the thumbnails are saved (`uploads/email-video-thumbnails` by default). Making thumbnails needs the PHP GD extension.
 
 = 4.11 (2026-11-16) =
 * ADDED Build, edit and set up with an AI assistant connected over MCP.
