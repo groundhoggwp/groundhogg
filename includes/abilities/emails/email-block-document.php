@@ -45,6 +45,7 @@ class Email_Block_Document {
 		'text',
 		'heading',
 		'image',
+		'video',
 		'button',
 		'spacer',
 		'divider',
@@ -1377,6 +1378,10 @@ class Email_Block_Document {
 				$file    = wp_basename( (string) wp_parse_url( $src, PHP_URL_PATH ) ) ?: $src;
 				$alt     = preg_match( '/<img\b[^>]*\balt\s*=\s*(["\'])(.*?)\1/i', $inner, $img_alt ) ? self::decode( $img_alt[2] ) : '';
 				$summary = $alt !== '' ? $alt . ' (' . $file . ')' : $file;
+				break;
+
+			case 'video':
+				$summary = trim( ( $props['title'] ?? '' ) . ' ' . ( $props['url'] ?? '' ) );
 				break;
 
 			case 'button':

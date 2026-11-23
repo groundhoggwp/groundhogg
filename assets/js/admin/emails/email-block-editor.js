@@ -9020,6 +9020,644 @@
     },
   })
 
+  /**
+   * The video block's defaults, also used for missing overlay settings
+   */
+  const videoDefaults = {
+    url        : '',
+    src        : 'https://placehold.co/600x338/png?text=Video',
+    alt        : '',
+    title      : '',
+    provider   : '',
+    width      : 600,
+    align      : 'center',
+    link       : '',
+    thumbnail  : '',
+    playButton : {
+      style    : 'circle',
+      color    : '#000000',
+      iconColor: '#ffffff',
+      size     : 18,
+      opacity  : 70,
+    },
+    progressBar: {
+      style   : 'none',
+      color   : '#ff0000',
+      progress: 30,
+    },
+    darken     : 0,
+  }
+
+  const videoPlayButtons = {
+    none    : __('None', 'groundhogg'),
+    circle  : __('Circle', 'groundhogg'),
+    outline : __('Outline', 'groundhogg'),
+    pill    : __('Pill', 'groundhogg'),
+    box     : __('Box', 'groundhogg'),
+    triangle: __('Triangle', 'groundhogg'),
+  }
+
+  // what picking a play button style changes its colors to, so each looks right to start with
+  const videoPlayButtonPresets = {
+    circle  : {
+      color  : '#000000',
+      opacity: 70,
+    },
+    outline : {
+      color  : '#000000',
+      opacity: 0,
+    },
+    pill    : {
+      color  : '#ff0000',
+      opacity: 100,
+    },
+    box     : {
+      color  : '#1e73be',
+      opacity: 90,
+    },
+    triangle: {},
+  }
+
+  const videoProgressBars = {
+    none    : __('None', 'groundhogg'),
+    line    : __('Line', 'groundhogg'),
+    scrubber: __('Scrubber', 'groundhogg'),
+    player  : __('Player', 'groundhogg'),
+  }
+
+  /**
+   * A small picture of a thumbnail with an overlay, for picking a style
+   */
+  const videoPreviewSvg = inner => `<svg viewBox="0 0 64 36" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="36" rx="3" fill="#8b9bb4"/>${ inner }</svg>`
+
+  const videoPreviewTriangle = (cx, cy, size, fill = '#fff') => {
+    let width = size * 0.88
+    let left = cx - width / 3
+    return `<path d="M${ left } ${ cy - size / 2 }L${ left + width } ${ cy }L${ left } ${ cy + size / 2 }Z" fill="${ fill }"/>`
+  }
+
+  const videoPlayButtonSvgs = {
+    none    : '',
+    circle  : `<circle cx="32" cy="18" r="9" fill="#000" fill-opacity=".7"/>${ videoPreviewTriangle(32, 18, 7) }`,
+    outline : `<circle cx="32" cy="18" r="8.4" fill="none" stroke="#fff" stroke-width="1.2"/>${ videoPreviewTriangle(32, 18, 7) }`,
+    pill    : `<rect x="19.2" y="9" width="25.6" height="18" rx="5.4" fill="#f00"/>${ videoPreviewTriangle(32, 18, 7.5) }`,
+    box     : `<rect x="17.6" y="9" width="28.8" height="18" rx="1.8" fill="#1e73be"/>${ videoPreviewTriangle(32, 18, 7.5) }`,
+    triangle: videoPreviewTriangle(32, 18, 14),
+  }
+
+  const videoProgressBarSvgs = {
+    none    : '',
+    line    : `<rect y="34" width="64" height="2" fill="#fff" fill-opacity=".4"/><rect y="34" width="22" height="2" fill="#f00"/>`,
+    scrubber: `<rect x="2" y="31.4" width="60" height="1.2" rx=".6" fill="#fff" fill-opacity=".4"/><rect x="2" y="31.4" width="20" height="1.2" rx=".6" fill="#f00"/><circle cx="22" cy="32" r="1.6" fill="#f00"/>`,
+    player  : `<path d="M0 26h64v7a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3z" fill="#000" fill-opacity=".45"/><rect x="2" y="28.4" width="60" height="1.2" rx=".6" fill="#fff" fill-opacity=".4"/><rect x="2" y="28.4" width="20" height="1.2" rx=".6" fill="#f00"/><circle cx="22" cy="29" r="1.6" fill="#f00"/>${ videoPreviewTriangle(3.4, 33, 3) }<path d="M58 31.5h1.5M60.5 31.5h1.5M58 34.5h1.5M60.5 34.5h1.5" stroke="#fff" stroke-width=".8"/>`,
+  }
+
+  /**
+   * A button for picking a play button or progress bar style
+   */
+  const VideoOverlayOption = ({
+    id,
+    label,
+    svg,
+    selected,
+    onSelect,
+  }) => Button({
+    id,
+    title    : label,
+    className: `gh-button ${ selected ? 'primary' : 'secondary text' } video-overlay-option`,
+    onClick  : onSelect,
+  }, [
+    videoPreviewSvg(svg),
+    Span({}, label),
+  ])
+
+  // blocks whose thumbnail is being made, and the last error for each
+  const videoGenerating = {}
+  const videoErrors = {}
+
+  /**
+   * The settings that go into a video block's thumbnail, to tell when it's out of date
+   */
+  const videoThumbnailKey = ({
+    url = '',
+    thumbnail = '',
+    playButton = {},
+    progressBar = {},
+    darken = 0,
+  }) => JSON.stringify({
+    url,
+    thumbnail,
+    playButton : { ...videoDefaults.playButton, ...playButton },
+    progressBar: { ...videoDefaults.progressBar, ...progressBar },
+    darken,
+  })
+
+  /**
+   * Update any block, not just the active one, for changes that arrive after it might have been deselected
+   */
+  const updateBlockById = (id, settings) => {
+
+    let block = __findBlock(id, getBlocks())
+
+    if (!block) {
+      return
+    }
+
+    setBlocks(__updateBlocks(getBlocksCopy(), {
+      ...jsonCopy(block),
+      ...settings,
+    }))
+
+    morphBlocks()
+
+    if (isActiveBlock(id)) {
+      morphControls()
+    }
+
+    updateStyles()
+  }
+
+  /**
+   * Show or hide that a video block's thumbnail is being made
+   */
+  const refreshVideoBlock = id => {
+    morphBlocks()
+
+    if (isActiveBlock(id)) {
+      morphControls()
+    }
+  }
+
+  /**
+   * Make a video block's thumbnail with its overlays, then put it in the block
+   *
+   * @param id
+   * @param refresh get the video's thumbnail again
+   */
+  const makeVideoThumbnail = async (id, refresh = false) => {
+
+    let block = __findBlock(id, getBlocks())
+
+    if (!block || block.type !== 'video') {
+      return
+    }
+
+    block = {
+      ...BlockRegistry.defaults(block),
+      ...block,
+    }
+
+    if (!block.url) {
+      return
+    }
+
+    let key = videoThumbnailKey(block)
+
+    videoGenerating[id] = key
+    delete videoErrors[id]
+    refreshVideoBlock(id)
+
+    try {
+
+      let {
+        src,
+        title,
+        provider,
+      } = await post(`${ EmailsStore.route }/video-thumbnail`, {
+        url        : block.url,
+        thumbnail  : block.thumbnail,
+        options    : {
+          playButton : block.playButton,
+          progressBar: block.progressBar,
+          darken     : block.darken,
+        },
+        refresh,
+      })
+
+      let current = __findBlock(id, getBlocks())
+
+      // the block was changed again while this was being made, the newer thumbnail is on its way
+      if (!current || videoGenerating[id] !== key) {
+        return
+      }
+
+      let changes = {
+        src,
+        title,
+        provider,
+      }
+
+      // the video's title is a good alt text, unless one was written
+      if (!current.alt || current.alt === current.title) {
+        changes.alt = title
+      }
+
+      delete videoGenerating[id]
+      updateBlockById(id, changes)
+    }
+    catch (e) {
+
+      if (videoGenerating[id] !== key) {
+        return
+      }
+
+      delete videoGenerating[id]
+      videoErrors[id] = e.message
+      refreshVideoBlock(id)
+    }
+  }
+
+  // wait for the typing or color dragging to stop
+  const makeVideoThumbnailDebounced = debounce(makeVideoThumbnail, 600)
+
+  // Register the video block
+  registerBlock('video', 'Video', {
+    attributes: {
+      src        : el => el.querySelector('img').getAttribute('src'),
+      width      : el => parseInt(el.querySelector('img').width),
+      alt        : el => el.querySelector('img').alt,
+      borderStyle: el => parseBorderStyle(el.querySelector('img').style),
+      align      : el => el.querySelector('.img-container').style.getPropertyValue('text-align'),
+    },
+    //language=HTML
+    svg      : `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <rect x="1.5" y="4" width="21" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path fill="currentColor" d="M10 8.5v7l6-3.5z"/>
+        </svg>`,
+    controls : ({
+      id,
+      url = '',
+      thumbnail = '',
+      width,
+      alt = '',
+      link = '',
+      align = 'center',
+      playButton = {},
+      progressBar = {},
+      darken = 0,
+      borderStyle = {},
+      updateBlock,
+    }) => {
+
+      playButton = { ...videoDefaults.playButton, ...playButton }
+      progressBar = { ...videoDefaults.progressBar, ...progressBar }
+
+      let blockEl = document.getElementById(`b-${ id }`)
+      let maxWidth = blockEl ? blockEl.getBoundingClientRect().width : getEmailWidth()
+
+      // read the current settings rather than the ones these controls were made with, color pickers don't morph them
+      const current = () => getActiveBlock()
+
+      /**
+       * Change the settings that go into the thumbnail, then make it again
+       */
+      const updateVideo = (changes, morphControls = true) => {
+        updateBlock({
+          ...changes,
+          morphControls,
+        })
+
+        let block = current()
+
+        if (block && block.id) {
+          makeVideoThumbnailDebounced(block.id)
+        }
+      }
+
+      const updatePlayButton = (changes, morphControls = false) => updateVideo({
+        playButton: {
+          ...videoDefaults.playButton,
+          ...current().playButton,
+          ...changes,
+        },
+      }, morphControls)
+
+      const updateProgressBar = (changes, morphControls = false) => updateVideo({
+        progressBar: {
+          ...videoDefaults.progressBar,
+          ...current().progressBar,
+          ...changes,
+        },
+      }, morphControls)
+
+      return Fragment([
+        ControlGroup({
+            name: __('Video', 'groundhogg'),
+          },
+          [
+            Control({
+                label  : __('Video link', 'groundhogg'),
+                stacked: true,
+              },
+              Input({
+                id         : 'video-url',
+                type       : 'url',
+                className  : 'full-width',
+                value      : url,
+                placeholder: 'https://www.youtube.com/watch?v=…',
+                onInput    : e => updateVideo({ url: e.target.value.trim() }, false),
+              })),
+            videoErrors[id] ? Pg({
+              className: 'video-block-error',
+            }, escHTML(videoErrors[id])) : Pg({
+              className: 'video-block-hint',
+            }, videoGenerating[id] ? __('Making the thumbnail…', 'groundhogg') : __('Paste a link to a YouTube, Vimeo, Wistia or Rumble video.', 'groundhogg')),
+            Control({
+                label: __('Width', 'groundhogg'),
+              },
+              NumberControl({
+                id       : 'video-width',
+                className: 'control-input',
+                max      : maxWidth,
+                value    : width,
+                unit     : 'px',
+                step     : 10,
+                onChange : e => updateBlock({ width: parseInt(e.target.value) }),
+              })),
+            Control({
+                label: __('Alignment', 'groundhogg'),
+              },
+              AlignmentButtons({
+                id       : 'video-align',
+                alignment: align,
+                onChange : align => updateBlock({
+                  align,
+                  morphControls: true,
+                }),
+              })),
+            Control({
+                label: __('Alt Text', 'groundhogg'),
+              },
+              Input({
+                id       : 'video-alt',
+                className: 'input',
+                value    : alt,
+                onChange : e => updateBlock({ alt: e.target.value }),
+              })),
+            Control({
+                label  : __('Link', 'groundhogg'),
+                stacked: true,
+                tooltip: __('Where the thumbnail links to. Leave it empty to link to the video.', 'groundhogg'),
+              },
+              InputWithReplacements({
+                inputCallback: LinkPicker,
+                type         : 'text',
+                id           : 'video-link',
+                className    : 'full-width',
+                value        : link,
+                placeholder  : url,
+                onChange     : e => updateBlock({ link: e.target.value }),
+              })),
+          ]),
+        ControlGroup({
+            name: __('Play Button', 'groundhogg'),
+          },
+          [
+            Div({
+                className: 'video-overlay-grid',
+              },
+              Object.keys(videoPlayButtons).map(style => VideoOverlayOption({
+                id      : `video-play-${ style }`,
+                label   : videoPlayButtons[style],
+                svg     : videoPlayButtonSvgs[style],
+                selected: playButton.style === style,
+                onSelect: e => updatePlayButton({
+                  style,
+                  ...videoPlayButtonPresets[style] ?? {},
+                }, true),
+              }))),
+            ['circle', 'outline', 'pill', 'box'].includes(playButton.style) ? Control({
+                label: __('Color', 'groundhogg'),
+              },
+              ColorPicker({
+                id      : 'video-play-color',
+                value   : playButton.color,
+                onChange: color => updatePlayButton({ color }),
+              })) : null,
+            ['circle', 'outline', 'pill', 'box'].includes(playButton.style) ? Control({
+                label: __('Opacity', 'groundhogg'),
+              },
+              NumberControl({
+                id       : 'video-play-opacity',
+                className: 'control-input',
+                value    : playButton.opacity,
+                unit     : '%',
+                step     : 10,
+                max      : 100,
+                onChange : e => updatePlayButton({ opacity: parseInt(e.target.value) }),
+              })) : null,
+            playButton.style !== 'none' ? Control({
+                label: __('Icon color', 'groundhogg'),
+              },
+              ColorPicker({
+                id      : 'video-play-icon-color',
+                value   : playButton.iconColor,
+                onChange: iconColor => updatePlayButton({ iconColor }),
+              })) : null,
+            playButton.style !== 'none' ? Control({
+                label: __('Size', 'groundhogg'),
+              },
+              NumberControl({
+                id       : 'video-play-size',
+                className: 'control-input',
+                value    : playButton.size,
+                unit     : '%',
+                step     : 1,
+                min      : 5,
+                max      : 50,
+                onChange : e => updatePlayButton({ size: parseInt(e.target.value) }),
+              })) : null,
+          ]),
+        ControlGroup({
+            name: __('Progress Bar', 'groundhogg'),
+          },
+          [
+            Div({
+                className: 'video-overlay-grid',
+              },
+              Object.keys(videoProgressBars).map(style => VideoOverlayOption({
+                id      : `video-progress-${ style }`,
+                label   : videoProgressBars[style],
+                svg     : videoProgressBarSvgs[style],
+                selected: progressBar.style === style,
+                onSelect: e => updateProgressBar({ style }, true),
+              }))),
+            progressBar.style !== 'none' ? Control({
+                label: __('Color', 'groundhogg'),
+              },
+              ColorPicker({
+                id      : 'video-progress-color',
+                value   : progressBar.color,
+                onChange: color => updateProgressBar({ color }),
+              })) : null,
+            progressBar.style !== 'none' ? Control({
+                label: __('Progress', 'groundhogg'),
+              },
+              NumberControl({
+                id       : 'video-progress',
+                className: 'control-input',
+                value    : progressBar.progress,
+                unit     : '%',
+                step     : 5,
+                max      : 100,
+                onChange : e => updateProgressBar({ progress: parseInt(e.target.value) }),
+              })) : null,
+          ]),
+        ControlGroup({
+            name: __('Thumbnail', 'groundhogg'),
+          },
+          [
+            Control({
+                label  : __('Darken', 'groundhogg'),
+                tooltip: __('Darken the thumbnail so the play button stands out.', 'groundhogg'),
+              },
+              NumberControl({
+                id       : 'video-darken',
+                className: 'control-input',
+                value    : darken,
+                unit     : '%',
+                step     : 5,
+                max      : 90,
+                onChange : e => updateVideo({ darken: parseInt(e.target.value) }, false),
+              })),
+            Control({
+                label  : __('Custom thumbnail', 'groundhogg'),
+                stacked: true,
+                tooltip: __('Use your own image instead of the video\'s thumbnail. The play button and progress bar are added to it.', 'groundhogg'),
+              },
+              ImageInput({
+                id      : 'video-thumbnail',
+                value   : thumbnail,
+                onChange: (src, attachment = null) => updateVideo({ thumbnail: attachment ? attachment.url : src }),
+              })),
+            Button({
+              id       : 'video-refresh-thumbnail',
+              className: 'gh-button secondary small',
+              disabled : !url,
+              onClick  : e => makeVideoThumbnail(id, true),
+            }, __('Get the video\'s thumbnail again', 'groundhogg')),
+          ]),
+        BorderControlGroup({
+          ...borderStyle,
+          onChange: newStyle => updateBlock({
+            borderStyle  : {
+              ...getActiveBlock().borderStyle, ...newStyle,
+            },
+            morphControls: true,
+          }),
+        }),
+      ])
+    },
+    edit     : ({
+      id,
+      src,
+      width,
+      alt = '',
+      align = 'center',
+      borderStyle = {},
+    }) => Div({
+        className: `img-container full-width ${ videoGenerating[id] ? 'video-generating' : '' }`,
+        style    : {
+          textAlign: align,
+        },
+      },
+      makeEl('img', {
+        src,
+        alt,
+        width,
+        style: {
+          verticalAlign: 'bottom',
+          height       : 'auto',
+          maxWidth     : '100%',
+          width, ...addBorderStyle(borderStyle),
+        },
+      })),
+    // the same as an image's, linked to the video
+    html     : ({
+      src,
+      width,
+      url = '',
+      link = '',
+      alt = '',
+      align = 'center',
+      borderStyle = {},
+    }) => {
+
+      let img = makeEl('img', {
+        src,
+        alt,
+        width,
+        style: {
+          boxSizing    : 'border-box',
+          verticalAlign: 'bottom',
+          height       : 'auto',
+          maxWidth     : '100%',
+          width,
+          ...addBorderStyle(borderStyle),
+        },
+      })
+
+      link = link || url
+
+      if (link) {
+        img = makeEl('a', {
+          href: link,
+        }, img)
+      }
+
+      return Div({
+        className: 'img-container',
+        style    : {
+          textAlign: align,
+        },
+      }, img)
+    },
+    plainText: ({
+      url = '',
+      link = '',
+      alt = '',
+      title = '',
+    }) => {
+      link = link || url
+
+      if (!link) {
+        return ''
+      }
+
+      return `[${ alt || title || __('Watch the video', 'groundhogg') }](${ link })`
+    },
+    gutenberg: ({
+      url = '',
+      provider = '',
+    }) => {
+
+      if (!url) {
+        return ''
+      }
+
+      let attrs = {
+        url,
+        type      : 'video',
+        responsive: true,
+        className : 'wp-embed-aspect-16-9 wp-has-aspect-ratio',
+      }
+
+      if (provider) {
+        attrs.providerNameSlug = provider
+      }
+
+      return Div({}, [
+        `<!-- wp:embed ${ JSON.stringify(attrs) } -->`,
+        makeEl('figure', {
+          className: `wp-block-embed is-type-video ${ provider ? `is-provider-${ provider } wp-block-embed-${ provider }` : '' } wp-embed-aspect-16-9 wp-has-aspect-ratio`,
+        }, Div({ className: 'wp-block-embed__wrapper' }, `\n${ escHTML(url) }\n`)),
+        `<!-- /wp:embed -->`,
+      ]).innerHTML
+    },
+    defaults : videoDefaults,
+  })
+
   // Register the spacer block
   registerBlock('spacer', 'Spacer', {
     attributes: {

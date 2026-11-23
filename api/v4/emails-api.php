@@ -10,6 +10,7 @@ use Groundhogg\Classes\Message;
 use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Email_Logger;
+use Groundhogg\Email_Video_Thumbnail;
 use Groundhogg\Event;
 use Groundhogg\Library_Email;
 use Groundhogg\Plugin;
@@ -116,6 +117,32 @@ class Emails_Api extends Base_Object_Api {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'render_block' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
+		register_rest_route( self::NAME_SPACE, "/{$route}/video-thumbnail", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'video_thumbnail' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ],
+				'args'                => [
+					'url'       => [
+						'type'     => 'string',
+						'required' => true,
+					],
+					'thumbnail' => [
+						'type'    => 'string',
+						'default' => '',
+					],
+					'options'   => [
+						'type'    => 'object',
+						'default' => [],
+					],
+					'refresh'   => [
+						'type'    => 'boolean',
+						'default' => false,
+					],
+				],
 			],
 		] );
 
@@ -321,6 +348,31 @@ class Emails_Api extends Base_Object_Api {
 	 *
 	 * @param $request
 	 */
+	/**
+	 * The thumbnail of a video with a play button and/or progress bar on it, for the email editor's video block
+	 *
+	 * @param WP_REST_Request $request url, thumbnail, options, refresh
+	 *
+	 * @return \WP_Error|\WP_REST_Response src, width, height, title, provider
+	 */
+	public function video_thumbnail( WP_REST_Request $request ) {
+
+		$result = Email_Video_Thumbnail::make(
+			(string) $request->get_param( 'url' ),
+			(array) $request->get_param( 'options' ),
+			(string) $request->get_param( 'thumbnail' ),
+			(bool) $request->get_param( 'refresh' )
+		);
+
+		if ( is_wp_error( $result ) ) {
+			$result->add_data( [ 'status' => 400 ] );
+
+			return $result;
+		}
+
+		return self::SUCCESS_RESPONSE( $result );
+	}
+
 	public function overlay_play_button( \WP_REST_Request $request ) {
 
 		$thumb_url = $request->get_param( 'url' );

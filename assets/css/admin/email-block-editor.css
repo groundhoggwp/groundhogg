@@ -1194,6 +1194,52 @@ body iframe#preview.desktop {
   background-color: var(--gh-dark-15);
 }
 
+.video-overlay-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+.video-overlay-grid .video-overlay-option {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 5px !important;
+  font-size: 12px;
+  line-height: 1;
+}
+.video-overlay-grid .video-overlay-option svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.video-block-hint,
+.video-block-error {
+  margin: 0;
+  font-size: 12px;
+}
+
+.video-block-hint {
+  color: var(--gh-dark-50, #666);
+}
+
+.video-block-error {
+  color: var(--gh-red, #d63638);
+}
+
+.img-container.video-generating img {
+  animation: video-generating 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes video-generating {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
 .social-icon-picker.white-icons, .social-icon-picker.white-circle, .social-icon-picker.white-boxed {
   background-color: var(--gh-dark-10);
 }

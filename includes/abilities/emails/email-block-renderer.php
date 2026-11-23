@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Emails;
 
 use Groundhogg\Email;
+use Groundhogg\Email_Video_Thumbnail;
 use WP_Error;
 use WP_HTML_Processor;
 use WP_HTML_Tag_Processor;
@@ -41,6 +42,11 @@ class Email_Block_Renderer {
 	/**
 	 * Props that aren't kept in the block's comment, see blockCommentProps() in the editor
 	 */
+	/**
+	 * What a video block shows before it has a video, like videoDefaults in the editor
+	 */
+	const VIDEO_PLACEHOLDER = 'https://placehold.co/600x338/png?text=Video';
+
 	const NOT_IN_COMMENT = [ 'advancedStyle', 'type', 'id', 'hide_on_mobile', 'hide_on_desktop', 'hide_in_plain', 'hide_in_browser' ];
 
 	/**
@@ -291,6 +297,22 @@ class Email_Block_Renderer {
 				'attributes' => [ 'src', 'height', 'width', 'alt', 'link', 'borderStyle', 'align' ],
 				'html'       => [ $this, 'image_html' ],
 				'parse'      => [ $this, 'image_parse' ],
+			],
+			'video'   => [
+				'defaults'   => array_merge( [
+					'url'       => '',
+					'src'       => self::VIDEO_PLACEHOLDER,
+					'alt'       => '',
+					'title'     => '',
+					'provider'  => '',
+					'width'     => 600,
+					'align'     => 'center',
+					'link'      => '',
+					'thumbnail' => '',
+				], Email_Video_Thumbnail::default_options() ),
+				'attributes' => [ 'src', 'width', 'alt', 'borderStyle', 'align' ],
+				'html'       => [ $this, 'video_html' ],
+				'parse'      => [ $this, 'video_parse' ],
 			],
 			'spacer'  => [
 				'defaults'   => [ 'height' => 20 ],
@@ -625,6 +647,13 @@ class Email_Block_Renderer {
 
 				return $link ? "[$image]($link)" : $image;
 
+			case 'video':
+				// like the editor's plainText(), a link to the video named by its alt text or title
+				$link = ( $props['link'] ?? '' ) ?: ( $props['url'] ?? '' );
+				$text = ( $props['alt'] ?? '' ) ?: ( ( $props['title'] ?? '' ) ?: __( 'Watch the video', 'groundhogg' ) );
+
+				return $link ? "[$text]($link)" : '';
+
 			case 'divider':
 				return '---';
 
@@ -804,6 +833,10 @@ class Email_Block_Renderer {
 
 			case 'footer':
 				$block['style'] = $this->normalize_font( (array) $block['style'], true );
+				break;
+
+			case 'video':
+				$block = $this->normalize_video( $block, $path );
 				break;
 
 			case 'columns':
@@ -1847,6 +1880,74 @@ class Email_Block_Renderer {
 			'borderStyle' => self::parse_border_style( new Email_Block_Style( (string) ( $attributes['style'] ?? '' ) ) ),
 			'align'       => ( new Email_Block_Style( (string) ( $container['attributes']['style'] ?? '' ) ) )->get( 'text-align' ),
 		];
+	}
+
+	/**
+	 * Check a video block's overlays and make its thumbnail, which the editor does when the video's link is entered
+	 *
+	 * The thumbnail's file name comes from the video and the overlays, so making it again for the same settings gives
+	 * the same src. That keeps rendering stable, and lets specs leave src out.
+	 *
+	 * @param array  $block
+	 * @param string $path where it is in the specs, for errors
+	 *
+	 * @return array
+	 */
+	protected function normalize_video( array $block, string $path ): array {
+
+		$options = Email_Video_Thumbnail::normalize_options( $block );
+
+		$block = array_merge( $block, $options );
+
+		$block['url']       = trim( (string) $block['url'] );
+		$block['thumbnail'] = trim( (string) $block['thumbnail'] );
+
+		if ( ! $block['url'] || ( $block['src'] && $block['src'] !== self::VIDEO_PLACEHOLDER ) ) {
+			return $block;
+		}
+
+		$thumbnail = Email_Video_Thumbnail::make( $block['url'], $options, $block['thumbnail'] );
+
+		if ( is_wp_error( $thumbnail ) ) {
+			/* translators: 1: where the block is, 2: why the thumbnail couldn't be made */
+			$this->errors[] = sprintf( __( 'Block %1$s: couldn\'t make the video\'s thumbnail. %2$s', 'groundhogg' ), $path, $thumbnail->get_error_message() );
+
+			return $block;
+		}
+
+		$block['src']      = $thumbnail['src'];
+		$block['title']    = $thumbnail['title'];
+		$block['provider'] = $thumbnail['provider'];
+
+		if ( ! $block['alt'] ) {
+			$block['alt'] = $thumbnail['title'];
+		}
+
+		return $block;
+	}
+
+	/**
+	 * The same as an image, linked to the video unless it has its own link
+	 *
+	 * @param array $props
+	 *
+	 * @return string
+	 */
+	public function video_html( array $props ): string {
+
+		$props['link'] = ( $props['link'] ?? '' ) ?: ( $props['url'] ?? '' );
+
+		return $this->image_html( $props );
+	}
+
+	/**
+	 * @param string $inner
+	 *
+	 * @return array
+	 */
+	public function video_parse( string $inner ): array {
+		// the link and height aren't read back, the link is kept in the comment so an empty one still means the video
+		return array_intersect_key( $this->image_parse( $inner ), array_flip( $this->types()['video']['attributes'] ) );
 	}
 
 	/**
