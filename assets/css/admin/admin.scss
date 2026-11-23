@@ -618,21 +618,467 @@ table.wp-list-table {
   vertical-align: middle;
 }
 
-.import-table.tablenav,
-.import-table.wp-list-table {
-  max-width: 800px;
-}
+// Contact importer: the upload and map steps
+.gh-importer {
+  --gh-import-muted: color-mix(in srgb, var(--gh-dark) 65%, transparent);
+  --gh-import-line: var(--gh-dark-10);
 
-.import-table.wp-list-table th:first-child {
-  width: 200px;
-}
+  max-width: 640px;
+  margin: 24px auto 60px;
 
-.import-table.wp-list-table th:last-child {
-  width: 210px;
-}
+  &.gh-importer-wide {
+    max-width: 960px;
+  }
 
-.import-table td .regular-text {
-  width: 100%;
+  > form > .gh-panel,
+  > .gh-panel {
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  h2 {
+    font-size: 18px;
+    line-height: 1.3;
+    margin: 0 0 4px;
+  }
+
+  .gh-import-lead {
+    color: var(--gh-import-muted);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  // the numbered steps across the top
+  .gh-import-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 14px;
+      color: var(--gh-dark-50);
+
+      &:not(:last-child)::after {
+        content: '';
+        width: 40px;
+        height: 1px;
+        margin-left: 4px;
+        background: var(--gh-dark-15);
+      }
+
+      &.done,
+      &.current {
+        color: var(--gh-dark);
+      }
+
+      &.current {
+        font-weight: 600;
+      }
+    }
+
+    .gh-import-step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      font-size: 12px;
+      font-weight: 600;
+
+      .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .done .gh-import-step-number {
+      border-color: var(--gh-action-green);
+      background: var(--gh-action-green);
+      color: #fff;
+    }
+
+    .current .gh-import-step-number {
+      border-color: var(--gh-primary);
+      background: var(--gh-primary);
+      color: #fff;
+    }
+  }
+
+  // the upload form
+  .gh-import-upload {
+    padding: 32px;
+  }
+
+  .gh-import-dropzone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 24px 0 20px;
+    padding: 40px 20px;
+    border: 2px dashed var(--gh-dark-15);
+    border-radius: var(--gh-panel-border-radius);
+    background: var(--gh-dark-5);
+    text-align: center;
+    transition: border-color .15s, background-color .15s;
+
+    &:hover,
+    &:focus-within,
+    &.is-dragover {
+      border-color: var(--gh-primary);
+      background: var(--gh-primary-7);
+    }
+
+    &.has-file {
+      border-style: solid;
+      border-color: var(--gh-action-green);
+      background: var(--gh-action-green-5);
+
+      .dashicons {
+        color: var(--gh-action-green-dark);
+      }
+    }
+
+    // the real input covers the whole box, so clicking or dropping a file anywhere works
+    input[type="file"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .dashicons {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+      margin-bottom: 8px;
+      color: var(--gh-primary);
+    }
+
+    .gh-import-dropzone-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gh-dark);
+    }
+
+    .gh-import-dropzone-hint {
+      color: var(--gh-import-muted);
+    }
+
+    .gh-import-file-name {
+      margin-top: 8px;
+      font-weight: 600;
+      color: var(--gh-dark);
+      word-break: break-all;
+
+      &:empty {
+        display: none;
+      }
+    }
+  }
+
+  .gh-import-tips {
+    margin: 0 0 24px 18px;
+    padding: 0;
+    list-style: disc;
+    color: var(--gh-import-muted);
+    font-size: 13px;
+
+    li {
+      margin: 0 0 4px;
+    }
+  }
+
+  #big-file-uploading {
+    text-align: center;
+
+    h2, h3 {
+      margin: 0 0 16px;
+    }
+  }
+
+  .gh-import-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    .gh-button.primary {
+      margin-left: auto;
+    }
+  }
+
+  // the map step
+  .gh-import-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid var(--gh-import-line);
+
+    code {
+      font-size: 13px;
+    }
+  }
+
+  .gh-import-count {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--gh-primary-10);
+    color: var(--gh-primary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .gh-import-map-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--gh-import-line);
+      background: var(--gh-dark-5);
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--gh-import-muted);
+    }
+
+    td {
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--gh-import-line);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: var(--gh-dark-5);
+    }
+
+    .col-column {
+      width: 28%;
+
+      label {
+        font-weight: 600;
+        color: var(--gh-dark);
+        cursor: pointer;
+      }
+    }
+
+    // max-width: 0 lets a long value be cut off with an ellipsis instead of widening the table
+    td.col-sample {
+      max-width: 0;
+      width: 36%;
+    }
+
+    .gh-import-sample {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--gh-import-muted);
+    }
+
+    .gh-import-empty {
+      font-style: italic;
+      color: var(--gh-dark-30);
+    }
+
+    .col-field select {
+      width: 100%;
+      max-width: none;
+    }
+
+    // columns that won't be imported fade back
+    tbody tr:has(.col-field option[value=""]:checked) {
+      .col-column label,
+      .col-sample {
+        opacity: .5;
+      }
+    }
+
+    .gh-import-preview-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: 8px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+
+      > span {
+        margin-right: 4px;
+      }
+
+      a {
+        display: inline-flex;
+        border-radius: 4px;
+        color: inherit;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+          color: var(--gh-primary);
+          background: var(--gh-dark-5);
+        }
+      }
+
+      .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .gh-import-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--gh-import-line);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gh-dark);
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--gh-import-muted);
+    }
+
+    .gh-import-option-control {
+      flex: 0 0 auto;
+    }
+
+    // the tag picker gets room to grow
+    .gh-import-option-control:has(select) {
+      flex: 0 1 360px;
+      min-width: 0;
+
+      .select2-container {
+        width: 100% !important;
+      }
+    }
+  }
+
+  @media (max-width: 782px) {
+    margin-top: 16px;
+
+    .gh-import-upload {
+      padding: 20px;
+    }
+
+    .gh-import-panel-head {
+      flex-direction: column;
+      padding: 20px 16px 16px;
+    }
+
+    .gh-import-steps li:not(:last-child)::after {
+      width: 16px;
+    }
+
+    // each column becomes a small card
+    .gh-import-map-table {
+      &,
+      tbody {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        display: none;
+      }
+
+      .col-field select {
+        min-width: 0;
+      }
+
+      tr {
+        display: block;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--gh-import-line);
+      }
+
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        display: block;
+        padding: 2px 0;
+        border: none;
+      }
+
+      td.col-sample,
+      .col-column {
+        width: auto;
+        max-width: none;
+      }
+
+      td.col-field {
+        padding-top: 8px;
+      }
+
+      tbody tr:hover td {
+        background: none;
+      }
+    }
+
+    .gh-import-option {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      padding: 16px;
+
+      .gh-import-option-control:has(select) {
+        flex-basis: auto;
+      }
+    }
+
+    .gh-import-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+
+      .gh-button,
+      .gh-button.primary {
+        margin-left: 0;
+        text-align: center;
+      }
+    }
+  }
 }
 
 .export-table.wp-list-table {

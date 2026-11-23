@@ -27,6 +27,47 @@
   const $el = $(el);
   const $form = $el.closest( 'form' )
 
+  /**
+   * A file size people can read, e.g. 2.4 MB
+   *
+   * @param bytes
+   * @return {string}
+   */
+  const readableSize = bytes => {
+    if ( bytes < MEGABYTE ) {
+      return `${Math.max( 1, Math.round( bytes / 1000 ) )} KB`
+    }
+
+    return `${( bytes / MEGABYTE ).toFixed( 1 )} MB`
+  }
+
+  // The drop zone shows which file was picked, and highlights while a file is dragged over it
+  const dropzone = el.closest( '.gh-import-dropzone' )
+
+  if ( dropzone ) {
+    const fileName = dropzone.querySelector( '.gh-import-file-name' )
+
+    const showFile = () => {
+      const chosen = el.files[0]
+      dropzone.classList.toggle( 'has-file', Boolean( chosen ) )
+
+      if ( fileName ) {
+        fileName.textContent = chosen ? `${chosen.name} (${readableSize( chosen.size )})` : ''
+      }
+    }
+
+    const dragging = on => () => dropzone.classList.toggle( 'is-dragover', on )
+
+    el.addEventListener( 'change', showFile )
+    el.addEventListener( 'dragenter', dragging( true ) )
+    el.addEventListener( 'dragover', dragging( true ) )
+    el.addEventListener( 'dragleave', dragging( false ) )
+    el.addEventListener( 'drop', dragging( false ) )
+
+    // the browser may keep the file when coming back to the page
+    showFile()
+  }
+
   $form.on( 'submit', e => {
     reader = new FileReader();
     file = el.files[0];

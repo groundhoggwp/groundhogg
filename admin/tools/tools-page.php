@@ -576,6 +576,38 @@ class Tools_Page extends Tabbed_Admin_Page {
 	}
 
 	/**
+	 * The import's steps, numbered across the top of the upload and map screens
+	 *
+	 * @param int $current 1 upload, 2 map
+	 */
+	protected function import_steps( $current = 1 ) {
+
+		$steps = [
+			1 => __( 'Upload', 'groundhogg' ),
+			2 => __( 'Match columns', 'groundhogg' ),
+			3 => __( 'Import', 'groundhogg' ),
+		];
+
+		?>
+        <ol class="gh-import-steps">
+			<?php foreach ( $steps as $number => $label ):
+				$state = $number < $current ? 'done' : ( $number === (int) $current ? 'current' : '' );
+				?>
+                <li class="<?php echo esc_attr( $state ); ?>"<?php echo $state === 'current' ? ' aria-current="step"' : ''; ?>>
+                    <span class="gh-import-step-number"><?php
+						if ( $state === 'done' ) {
+							echo '<span class="dashicons dashicons-yes" aria-hidden="true"></span>';
+						} else {
+							echo esc_html( number_format_i18n( $number ) );
+						} ?></span>
+                    <span class="gh-import-step-label"><?php echo esc_html( $label ); ?></span>
+                </li>
+			<?php endforeach; ?>
+        </ol>
+		<?php
+	}
+
+	/**
 	 * Add new import view
 	 */
 	public function import_add() {
