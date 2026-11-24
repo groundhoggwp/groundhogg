@@ -66,13 +66,15 @@ class Pii_Admin {
 	}
 
 	/**
-	 * Whether the current user may give or take away another user's access to contact PII. Only someone who has it
-	 * themselves can, or a restricted user could lift their own restriction.
+	 * Whether the current user may give or take away a user's access to contact PII. Someone who has it themselves can,
+	 * and so can whoever manages the site (manage_options), so an administrator who took it away from themselves, or was
+	 * missed by an update, can give it back. Managing the site doesn't give access to PII: that is only ever what the
+	 * checkbox says, and a user who can't edit users can't change it at all.
 	 *
 	 * @return bool
 	 */
 	public static function can_manage_access() {
-		return current_user_can( 'edit_users' ) && current_user_can( Pii::CAP );
+		return current_user_can( 'edit_users' ) && ( current_user_can( Pii::CAP ) || current_user_can( 'manage_options' ) );
 	}
 
 	/**

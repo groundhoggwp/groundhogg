@@ -789,12 +789,64 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		$this->assertTrue( user_can( $user_id, Pii::CAP ) );
 	}
 
-	public function test_only_a_user_with_access_can_manage_access() {
+	/**
+	 * Someone who can edit users but doesn't manage the site, like a manager who was given that by a role editor
+	 */
+	protected function user_editor( bool $pii ): int {
+
+		$user_id = self::factory()->user->create( [ 'role' => 'editor' ] );
+
+		$user = get_userdata( $user_id );
+		$user->add_cap( 'edit_users', true );
+		$user->add_cap( Pii::CAP, $pii );
+
+		wp_set_current_user( $user_id );
+
+		return $user_id;
+	}
+
+	public function test_a_user_with_access_can_manage_access() {
 
 		$this->admin( true );
 		$this->assertTrue( Pii_Admin::can_manage_access() );
 
-		$this->admin( false );
+		$this->user_editor( true );
+		$this->assertTrue( Pii_Admin::can_manage_access() );
+	}
+
+	public function test_a_restricted_user_who_does_not_manage_the_site_can_not_manage_access() {
+
+		$this->user_editor( false );
+		$this->assertFalse( Pii_Admin::can_manage_access() );
+	}
+
+	public function test_a_restricted_administrator_can_manage_access_so_they_can_give_it_back_to_themselves() {
+
+		$user_id = $this->admin( false );
+
+		$this->assertTrue( Pii_Admin::can_manage_access() );
+
+		// managing the site doesn't give them access to anything
+		$this->assertFalse( user_can( $user_id, Pii::CAP ) );
+		$this->assertTrue( Pii::is_restricted() );
+
+		Pii_Admin::set_user_access( $user_id, true );
+		wp_set_current_user( 0 );
+		wp_set_current_user( $user_id );
+
+		$this->assertFalse( Pii::is_restricted() );
+	}
+
+	public function test_without_edit_users_nobody_can_manage_access() {
+
+		$user_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $user_id );
+		get_userdata( $user_id )->remove_cap( 'edit_users' );
+		get_userdata( $user_id )->add_cap( 'edit_users', false );
+		wp_set_current_user( 0 );
+		wp_set_current_user( $user_id );
+
+		$this->assertFalse( current_user_can( 'edit_users' ) );
 		$this->assertFalse( Pii_Admin::can_manage_access() );
 	}
 
@@ -817,9 +869,13 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		$this->assertDoesNotMatchRegularExpression( '/name="gh_pii_access"[^>]*checked/', $html );
 		$this->assertDoesNotMatchRegularExpression( '/name="gh_pii_access"[^>]*disabled/', $html );
 
-		// a restricted user sees it, but can't change it
-		$this->admin( false );
+		// a restricted user who doesn't manage the site sees it, but can't change it
+		$this->user_editor( false );
 		$this->assertMatchesRegularExpression( '/name="gh_pii_access"[^>]*disabled/', $this->profile_fields( $profile_id ) );
+
+		// a restricted administrator can, so they can give access back
+		$this->admin( false );
+		$this->assertDoesNotMatchRegularExpression( '/name="gh_pii_access"[^>]*disabled/', $this->profile_fields( $profile_id ) );
 	}
 
 	public function test_saving_the_profile_sets_access_only_for_a_user_who_can_manage_it() {
@@ -832,9 +888,9 @@ class Pii_Admin_Tests extends GH_UnitTestCase {
 		// the field was on the form and unchecked
 		$_POST = [ 'gh_pii_access_present' => '1' ];
 
-		$this->admin( false );
+		$this->user_editor( false );
 		$admin->save_fields( $profile_id );
-		$this->assertTrue( user_can( $profile_id, Pii::CAP ), 'a restricted user can not take it away or give it' );
+		$this->assertTrue( user_can( $profile_id, Pii::CAP ), 'a restricted user who doesn\'t manage the site can not take it away or give it' );
 
 		$this->admin( true );
 		$admin->save_fields( $profile_id );
