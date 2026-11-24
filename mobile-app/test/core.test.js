@@ -20,6 +20,39 @@ test( 'buildUrl joins a pretty root and a plain-permalink root', () => {
   assert.equal( buildUrl( 'https://x.test/wp-json/gh/v4/', 'contacts' ), 'https://x.test/wp-json/gh/v4/contacts' )
 })
 
+test( 'buildUrl refuses a path that could reach another route', () => {
+  const root = 'https://x.test/index.php?rest_route=/gh/v4/'
+
+  assert.equal( buildUrl( root, 'mobile/contacts/12/activity' ), 'https://x.test/index.php?rest_route=/gh/v4/mobile/contacts/12/activity' )
+  assert.equal( buildUrl( root, 'tasks/7/complete' ), 'https://x.test/index.php?rest_route=/gh/v4/tasks/7/complete' )
+
+  const bad = [
+    'contacts/1?x=1&rest_route=/wp/v2/users&_method=POST&roles=administrator',
+    'contacts/1&rest_route=/wp/v2/users',
+    'contacts/1#x',
+    'contacts/../../wp/v2/users',
+    'contacts/./1',
+    'contacts/1%2F..%2F..%2Fwp%2Fv2%2Fusers',
+    'contacts//1',
+    'contacts/1/',
+    'contacts/a b',
+    'contacts/1\\..',
+  ]
+
+  bad.forEach( path => assert.throws( () => buildUrl( root, path ), e => e instanceof ApiError && e.code === 'invalid_path', path ) )
+})
+
+test( 'api never sends a request for a refused path', async () => {
+  let n = 0
+  const api = createApi( {
+    root: 'https://x.test/wp-json/gh/v4/', nonce: 'abc123', nonceUrl: 'x',
+    fetch: async () => { n++; return res( 200, {} ) },
+  } )
+
+  await assert.rejects( api.get( 'contacts/1?rest_route=/wp/v2/users' ), e => e.code === 'invalid_path' )
+  assert.equal( n, 0 )
+})
+
 const res = ( status, body ) => ( { ok: status < 400, status, json: async () => { if ( body === undefined ) throw new Error( 'no json' ); return body }, text: async () => String( body ) } )
 
 test( 'api sends the nonce and parses JSON', async () => {
@@ -94,6 +127,15 @@ test( 'matchRoute prefers static segments over parameters and decodes params', (
   assert.equal( matchRoute( routes, '/contacts/' ).route.path, '/contacts' )
   assert.equal( matchRoute( routes, '/nope' ), null )
   assert.equal( matchRoute( routes, '/contacts/1/extra' ), null )
+})
+
+test( 'matchRoute does not match a parameter that decodes to a slash or does not decode', () => {
+  const routes = [ { path: '/contacts/:id' } ]
+
+  assert.equal( matchRoute( routes, '/contacts/1%2F..%2F..%2Fwp%2Fv2%2Fusers' ), null )
+  assert.equal( matchRoute( routes, '/contacts/%E0%A4%A' ), null )
+  // still decoded once, the request layer is what refuses ? and &
+  assert.deepEqual( matchRoute( routes, '/contacts/1%3Fx%3D1%26rest_route%3D1' ).params, { id: '1?x=1&rest_route=1' } )
 })
 
 // ---- template --------------------------------------------------------------------------------------------------

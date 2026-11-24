@@ -305,6 +305,11 @@ Rules for bundles:
 - **A throwing component is contained.** The shell wraps each contribution in an error boundary, so one add-on's bug
   shows a small "couldn't load" card instead of taking the app down.
 - Use `ctx.api`, never `fetch()` directly, so nonce handling and error shapes stay uniform.
+- **A request path is plain segments** (letters, digits, `-`, `_`, `.`, `~`; no `.` or `..` segment). `ctx.api`
+  refuses anything else with an `ApiError` whose code is `invalid_path`, without sending it. Put values in the query
+  argument, which is encoded, and check route params before building a path from them: a route param comes from the
+  address, which anyone can link to, so an unchecked `` `deals/${ params.id }` `` would let a link add its own
+  `?rest_route=` and send the user's nonce to another endpoint.
 
 ---
 

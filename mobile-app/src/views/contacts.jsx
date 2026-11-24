@@ -119,7 +119,19 @@ function ContactActions ( { contact, ctx } ) {
   )
 }
 
-export function ContactView ( { ctx, params } ) {
+/**
+ * The id comes from the address, which anyone can write a link to, so only a contact ID is let through to the
+ * request. Anything else is shown as not found without asking the server.
+ */
+export function ContactView ( props ) {
+  if ( ! /^[1-9]\d{0,19}$/.test( String( props.params.id ) ) ) {
+    return <ErrorMessage error={ { message: props.ctx.i18n.__( 'Contact not found.' ) } }/>
+  }
+
+  return <ContactScreen { ...props }/>
+}
+
+function ContactScreen ( { ctx, params } ) {
   const { __, _x } = ctx.i18n
   const { registry } = useRuntime()
 

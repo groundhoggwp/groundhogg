@@ -576,7 +576,14 @@
     Object.keys(params).forEach((k3) => add(k3, params[k3]));
     return parts.join("&");
   }
+  function isSafePath(path) {
+    const segments = String(path).replace(/^\/+/, "").split("/");
+    return segments.every((s3) => /^[A-Za-z0-9_.~-]+$/.test(s3) && s3 !== "." && s3 !== "..");
+  }
   function buildUrl(root, path, query) {
+    if (!isSafePath(path)) {
+      throw new ApiError("That request is not allowed.", { code: "invalid_path" });
+    }
     const url = root.replace(/\/+$/, "") + "/" + String(path).replace(/^\/+/, "");
     const qs = buildQuery(query);
     if (!qs) {
@@ -619,9 +626,10 @@
           init.body = JSON.stringify(body);
         }
       }
+      const url = buildUrl(root, path, query);
       let res;
       try {
-        res = await fetchFn(buildUrl(root, path, query), init);
+        res = await fetchFn(url, init);
       } catch (e3) {
         throw new ApiError("Could not reach the server.", { code: "network" });
       }
@@ -693,9 +701,17 @@
         continue;
       }
       const params = {};
-      keys.forEach((key, i3) => {
-        params[key] = decodeURIComponent(m3[i3 + 1]);
+      const ok = keys.every((key, i3) => {
+        try {
+          params[key] = decodeURIComponent(m3[i3 + 1]);
+        } catch (e3) {
+          return false;
+        }
+        return !params[key].includes("/");
       });
+      if (!ok) {
+        continue;
+      }
       matches.push({ route, params, score: keys.length });
     }
     matches.sort((a3, b3) => a3.score - b3.score);
@@ -1650,7 +1666,13 @@
       ] }) : null
     ] });
   }
-  function ContactView({ ctx, params }) {
+  function ContactView(props) {
+    if (!/^[1-9]\d{0,19}$/.test(String(props.params.id))) {
+      return /* @__PURE__ */ u3(ErrorMessage, { error: { message: props.ctx.i18n.__("Contact not found.") } });
+    }
+    return /* @__PURE__ */ u3(ContactScreen, { ...props });
+  }
+  function ContactScreen({ ctx, params }) {
     const { __, _x } = ctx.i18n;
     const { registry } = useRuntime();
     const { data, error, loading } = useFetch(() => ctx.api.get(`contacts/${params.id}`), [params.id]);
@@ -2749,7 +2771,7 @@
     A2(() => registry.subscribe(bump), [registry]);
     const [sheet, setSheet] = d2(null);
     const [toast, setToast] = d2(null);
-    const [failed, setFailed] = d2({});
+    const [settled, setSettled] = d2({});
     A2(() => {
       let timer;
       runtime.shell.toast = (message, type, action) => {
@@ -2775,8 +2797,8 @@
     const match = matchRoute(registry.routes(), route.path);
     const owner = match ? null : registry.featureForPath(route.path);
     A2(() => {
-      if (!match && owner && !failed[owner]) {
-        loader.ensure(owner).then((ok) => ok || setFailed((f3) => ({ ...f3, [owner]: true })));
+      if (!match && owner && !settled[owner]) {
+        loader.ensure(owner).then(() => setSettled((s3) => ({ ...s3, [owner]: true })));
       }
     }, [route.path, owner, !!match]);
     const atRoot = nav.some((i3) => normalizePath(i3.route) === route.path) || route.path === "/more";
@@ -2799,7 +2821,7 @@
       content = /* @__PURE__ */ u3(ErrorBoundary, { label: title, children: /* @__PURE__ */ u3(Page, { ctx: ctxFor(match.route.feature), params: match.params, query: route.query }) }, route.path);
     } else if (route.path === "/more") {
       content = /* @__PURE__ */ u3(MoreView, { moreItems: more });
-    } else if (owner && !failed[owner]) {
+    } else if (owner && !settled[owner]) {
       content = /* @__PURE__ */ u3(Card, { children: /* @__PURE__ */ u3(SkeletonList, { rows: 4 }) });
     } else {
       content = /* @__PURE__ */ u3(Empty, { children: [

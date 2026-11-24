@@ -112,7 +112,8 @@ export function App ( { runtime } ) {
 
   const [ sheet, setSheet ] = useState( null )
   const [ toast, setToast ] = useState( null )
-  const [ failed, setFailed ] = useState( {} )
+  // feature bundles that have been asked for and answered, loaded or not
+  const [ settled, setSettled ] = useState( {} )
 
   // the shell hooks features reach through ctx
   useEffect( () => {
@@ -149,8 +150,9 @@ export function App ( { runtime } ) {
 
   // a deep link into an add-on's area loads its bundle first
   useEffect( () => {
-    if ( ! match && owner && ! failed[ owner ] ) {
-      loader.ensure( owner ).then( ok => ok || setFailed( f => ( { ...f, [ owner ]: true } ) ) )
+    // once the bundle is in (or could not be loaded), a path that still matches nothing is not a page
+    if ( ! match && owner && ! settled[ owner ] ) {
+      loader.ensure( owner ).then( () => setSettled( s => ( { ...s, [ owner ]: true } ) ) )
     }
   }, [ route.path, owner, !! match ] )
 
@@ -182,7 +184,7 @@ export function App ( { runtime } ) {
     )
   } else if ( route.path === '/more' ) {
     content = <MoreView moreItems={ more }/>
-  } else if ( owner && ! failed[ owner ] ) {
+  } else if ( owner && ! settled[ owner ] ) {
     content = <Card><SkeletonList rows={ 4 }/></Card>
   } else {
     content = <Empty>{ __( 'There is nothing here.' ) } <a href="#/" style="color:var(--ghm-accent)">{ __( 'Go home' ) }</a></Empty>

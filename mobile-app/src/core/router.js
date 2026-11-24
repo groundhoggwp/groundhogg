@@ -63,10 +63,21 @@ export function matchRoute ( routes, path ) {
       continue
     }
 
+    // a parameter is one segment, so one that decodes to a `/` (or does not decode) is not a match
     const params = {}
-    keys.forEach( ( key, i ) => {
-      params[ key ] = decodeURIComponent( m[ i + 1 ] )
+    const ok = keys.every( ( key, i ) => {
+      try {
+        params[ key ] = decodeURIComponent( m[ i + 1 ] )
+      } catch ( e ) {
+        return false
+      }
+
+      return ! params[ key ].includes( '/' )
     } )
+
+    if ( ! ok ) {
+      continue
+    }
 
     matches.push( { route, params, score: keys.length } )
   }

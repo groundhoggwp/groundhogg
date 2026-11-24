@@ -44,9 +44,28 @@ export function buildQuery ( params = {} ) {
 }
 
 /**
+ * A request path is plain segments under the gh/v4 root: letters, digits, `-`, `_`, `.` and `~`, with no `.` or `..`
+ * segment. Paths are often built from values (`contacts/${ id }`), and a value carrying `?`, `&`, `#`, `%` or `../`
+ * could otherwise send the request, with the nonce, to a different route than the one the code asked for.
+ *
+ * @param {string} path
+ * @returns {boolean}
+ */
+export function isSafePath ( path ) {
+  const segments = String( path ).replace( /^\/+/, '' ).split( '/' )
+
+  return segments.every( s => /^[A-Za-z0-9_.~-]+$/.test( s ) && s !== '.' && s !== '..' )
+}
+
+/**
  * Plain permalinks make the REST root `index.php?rest_route=/gh/v4/`, which already has a query string.
+ * Values belong in `query`, which is encoded; a path that is not plain segments is refused (see isSafePath).
  */
 export function buildUrl ( root, path, query ) {
+  if ( ! isSafePath( path ) ) {
+    throw new ApiError( 'That request is not allowed.', { code: 'invalid_path' } )
+  }
+
   const url = root.replace( /\/+$/, '' ) + '/' + String( path ).replace( /^\/+/, '' )
   const qs = buildQuery( query )
 
@@ -116,10 +135,13 @@ export function createApi ( { root, nonce, nonceUrl, fetch: fetchFn = ( ...a ) =
       }
     }
 
+    // outside the try below, so a refused path is reported as itself and not as a network failure
+    const url = buildUrl( root, path, query )
+
     let res
 
     try {
-      res = await fetchFn( buildUrl( root, path, query ), init )
+      res = await fetchFn( url, init )
     } catch ( e ) {
       throw new ApiError( 'Could not reach the server.', { code: 'network' } )
     }
