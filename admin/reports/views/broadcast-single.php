@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
-$broadcast = new Broadcast( get_url_var( 'broadcast' ) );
+$broadcast = new Broadcast( absint( get_url_var( 'broadcast' ) ) );
 
 
 ?>

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
-$step = new Step( get_url_var( 'step' ) );
+$step = new Step( absint( get_url_var( 'step' ) ) );
 
 ?>
 <div class="display-flex gap-20 align-center">

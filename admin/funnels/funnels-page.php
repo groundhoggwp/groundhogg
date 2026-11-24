@@ -227,7 +227,7 @@ class Funnels_Page extends Admin_Page {
 		switch ( $this->get_current_action() ) {
 			case 'edit':
 
-				$funnel = new Funnel( get_url_var( 'funnel' ) );
+				$funnel = new Funnel( absint( get_url_var( 'funnel' ) ) );
 
 				if ( ! $funnel->exists() ) {
 					return;

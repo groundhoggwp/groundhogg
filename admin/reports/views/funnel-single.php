@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
-$funnel = new Funnel( get_url_var( 'funnel' ) );
+$funnel = new Funnel( absint( get_url_var( 'funnel' ) ) );
 
 if ( ! $funnel->exists() ) {
 	wp_die( esc_html__( 'Flow does not exist!', 'groundhogg' ) );

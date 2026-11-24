@@ -654,7 +654,7 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$contact = new Contact( get_url_var( 'contact' ) );
+		$contact = new Contact( absint( get_url_var( 'contact' ) ) );
 
 		if ( ! $contact->exists() || ! current_user_can( 'edit_contact', $contact ) ) {
 			$this->wp_die_no_access();
@@ -689,7 +689,7 @@ class Contacts_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$contact = new Contact( get_url_var( 'contact' ) );
+		$contact = new Contact( absint( get_url_var( 'contact' ) ) );
 
 		if ( ! $contact->user_id || contact_and_user_match( $contact, $contact->user ) ) {
 			return $contact->admin_link();

@@ -74,13 +74,21 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 				return;
 			}
 
-			$query = $identifier_or_args;
+			// Only look up by the object's own columns. Otherwise query vars like operation, data or orderby could be
+			// passed in and turn the lookup into an UPDATE or DELETE.
+			$query = array_intersect_key( $identifier_or_args, $this->get_db()->get_columns() );
+
+			// Nothing to look up by, an empty query would match the first row of the table
+			if ( empty( $query ) ) {
+				return;
+			}
 
 			// Get a result treating the args as query
 			$query['limit'] = 1;
 			$results        = $this->get_db()->query( $query );
 
-			// Create it if no results
+			// Create it if no results, with all the data given, create() may use keys that aren't columns
+			// (Contact::create() reads consents)
 			if ( empty( $results ) ) {
 				$this->create( $identifier_or_args );
 

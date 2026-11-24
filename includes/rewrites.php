@@ -130,22 +130,31 @@ class Rewrites {
 	 * @return array
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[] = 'subpage';
-		$vars[] = 'action';
-		$vars[] = 'slug';
-		$vars[] = 'file_path';
-		$vars[] = 'funnel_id';
-		$vars[] = 'enc_funnel_id';
-		$vars[] = 'enc_form_id';
-		$vars[] = 'form_id';
-		$vars[] = 'email_id';
-		$vars[] = 'event_id';
-		$vars[] = 'link_id';
-		$vars[] = 'use_queued';
-		$vars[] = 'campaign';
-		$vars[] = 'broadcast';
+		return array_merge( $vars, self::get_query_var_names() );
+	}
 
-		return $vars;
+	/**
+	 * The query vars of the managed page. The rewrite rules only ever give each of them a single value.
+	 *
+	 * @return string[]
+	 */
+	public static function get_query_var_names() {
+		return [
+			'subpage',
+			'action',
+			'slug',
+			'file_path',
+			'funnel_id',
+			'enc_funnel_id',
+			'enc_form_id',
+			'form_id',
+			'email_id',
+			'event_id',
+			'link_id',
+			'use_queued',
+			'campaign',
+			'broadcast',
+		];
 	}
 
 	/**
@@ -156,6 +165,15 @@ class Rewrites {
 	 * @return mixed
 	 */
 	public function parse_query( $query ) {
+
+		// These are public, so WordPress fills them from the URL too, and ?campaign[ID]=1&campaign[name]=x makes an array.
+		// The objects built from them (Campaign, Broadcast, Step) save an array they're given, so drop any that aren't a
+		// single value.
+		foreach ( self::get_query_var_names() as $var ) {
+			if ( isset( $query[ $var ] ) && ! is_scalar( $query[ $var ] ) ) {
+				unset( $query[ $var ] );
+			}
+		}
 
 		switch ( get_array_var( $query, 'subpage' ) ){
 			case 'emails':
@@ -308,7 +326,7 @@ class Rewrites {
 					break;
 				}
 
-				$broadcast_id = get_query_var( 'broadcast' );
+				$broadcast_id = absint( get_query_var( 'broadcast' ) );
 
 				if ( $broadcast_id ) {
 					$broadcast = new Broadcast( $broadcast_id );
