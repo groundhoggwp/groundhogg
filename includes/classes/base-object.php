@@ -314,7 +314,7 @@ abstract class Base_Object extends Supports_Errors implements Serializable, Arra
 		_doing_it_wrong(
 			esc_html( static::class . '::__get' ),
 			sprintf( 'Reading $%1$s as a property no longer calls %1$s(). Call the method instead.', esc_html( $name ) ),
-			'4.11.1'
+			'4.12'
 		);
 	}
 
