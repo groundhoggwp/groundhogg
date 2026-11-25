@@ -394,6 +394,14 @@ class Main_Updater extends Old_Updater {
 					Email_Video_Thumbnail::copy_legacy_images();
 				},
 			],
+			'4.14' => [
+				'automatic'   => true,
+				'description' => __( 'Add the AI usage table, and the <code>use_ai</code> capability for administrators and marketers.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'ai_usage' )->create_table();
+					Plugin::instance()->roles->add_caps();
+				},
+			],
 		];
 	}
 

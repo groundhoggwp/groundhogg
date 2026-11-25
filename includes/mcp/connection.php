@@ -21,11 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *  - where the adapter's default server answers
  *  - creating the application password an agent signs in with, tagged so we can tell it apart from the rest
  *
- * The page that walks someone through it is the AI agent tab in Tools, see admin/tools/mcp.php.
+ * The page that walks someone through it is the AI assistant tab of the AI page, see admin/ai/assistant.php.
  */
 class Connection {
 
-	const PAGE = 'gh_tools';
+	const PAGE = 'gh_ai';
 	const TAB  = 'mcp';
 
 	const PLUGIN_SLUG = 'mcp-adapter';

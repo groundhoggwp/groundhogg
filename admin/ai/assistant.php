@@ -1,6 +1,6 @@
 <?php
 
-namespace Groundhogg\Admin\Tools;
+namespace Groundhogg\Admin\AI;
 
 use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Mcp\Connection;
@@ -12,13 +12,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 /**
- * The AI agent tab: gets the MCP Adapter plugin installed, makes the application password an agent signs in with, and
- * shows how to add the connection to an AI client. See Groundhogg\Mcp\Connection.
+ * The AI assistant tab of the AI page: gets the MCP Adapter plugin installed, makes the application password an agent
+ * signs in with, and shows how to add the connection to an AI client. See Groundhogg\Mcp\Connection.
  *
  * It shows one step at a time, the one that is next, so there is only ever one thing to do. The steps before it
  * collapse to a line and the ones after it wait as titles.
  *
- * Included by Tools_Page::mcp_view(), so $this is the Tools page.
+ * Included by AI_Page::mcp_view(), so $this is the AI page.
  */
 
 // the password just made, WordPress can show it only this once
@@ -48,7 +48,7 @@ $show_connector = Connection::can_use_connector_plugin() && ( $connector_active
 
 // the things the assistant can look into, see Build_With_AI::examples() for strategy: beside the steps on a wide
 // screen, and under them on a narrow one, or above them once it's connected, since then they're what's next. Not in
-// the popup that shows these steps, see Tools_Page::ajax_mcp_view()
+// the popup that shows these steps, see AI_Page::ajax_mcp_view()
 $show_missions = ! wp_doing_ajax() && Build_With_AI::is_available();
 $connected     = $show_missions && Connection::is_connected();
 
@@ -394,7 +394,7 @@ $marker = function ( int $step ) use ( $step_state ): string {
             return;
         }
 
-        var steps = <?php echo wp_json_encode( Tools_Page::MCP_STEPS ); ?>;
+        var steps = <?php echo wp_json_encode( AI_Page::MCP_STEPS ); ?>;
         var text = <?php echo wp_json_encode( [
 			// the dots come from the loading-dots class, which animates them
 			'working' => __( 'Working', 'groundhogg' ),

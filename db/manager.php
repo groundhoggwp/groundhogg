@@ -92,6 +92,7 @@ class Manager {
 		$this->logs                 = new Logs();
 		$this->background_tasks     = new Background_Tasks();
 		$this->user_agents          = new User_Agents();
+		$this->ai_usage             = new AI_Usage();
 
 		/**
 		 * Runs when the DB Manager is setup and all the standard DBs have been initialized.

@@ -1885,6 +1885,22 @@
             })
           },
         })) : null,
+      // the site's own AI writes it, see Groundhogg\AI\Jobs\Alt_Text
+      supports.alt && src && Groundhogg.ai.can && Groundhogg.ai.can('text') ? Div({
+          className: 'gh-ai-alt-text',
+        },
+        Groundhogg.ai.AiButton({
+          id     : `${ id }-alt-ai`,
+          job    : 'alt-text',
+          label  : __('Write alt text', 'groundhogg'),
+          // the image as it is when clicked: the controls are morphed when the image changes, which keeps this
+          // button, and the src it was made with, from the first time they were drawn
+          input  : () => ( {
+            src    : document.getElementById(`${ id }-src`)?.value || src,
+            context: getEmailData().subject || '',
+          } ),
+          onDone : ({ alt }) => onChange({ alt }),
+        })) : null,
     ])
   }
 

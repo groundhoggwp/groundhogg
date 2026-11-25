@@ -242,8 +242,12 @@ class Scripts {
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-ai', GROUNDHOGG_ASSETS_URL . 'js/admin/ai' . $dot_min . '.js', [
-			'groundhogg-admin-data'
+			'groundhogg-admin-data',
+			'groundhogg-make-el',
+			'wp-i18n',
 		], GROUNDHOGG_VERSION, true );
+
+		wp_set_script_translations( 'groundhogg-ai', 'groundhogg', GROUNDHOGG_PATH . 'languages' );
 
 		wp_register_script( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'js/admin/element' . $dot_min . '.js', [
 			'groundhogg-admin',

@@ -2307,6 +2307,92 @@ body.groundhogg-admin-page[class*=gh-theme-] .build-with-ai-widget {
     animation: none;
   }
 }
+/* a button that has the site's own AI do a job, see AiButton() in ai.js */
+.gh-button.gh-ai-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.gh-button.gh-ai-button .gh-ai-icon {
+  flex-shrink: 0;
+  color: var(--gh-primary);
+}
+.gh-button.gh-ai-button.gh-ai-working .gh-ai-icon {
+  animation: gh-ai-pulse 1s ease-in-out infinite alternate;
+}
+
+body.groundhogg-admin-page[class*=gh-theme-] .gh-button.gh-ai-button .gh-ai-icon {
+  color: var(--ght-accent);
+}
+
+@keyframes gh-ai-pulse {
+  from {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-button.gh-ai-button.gh-ai-working .gh-ai-icon {
+    animation: none;
+  }
+}
+/* under an image's alt text in the email editor */
+.gh-ai-alt-text {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -4px;
+}
+
+/* the Overview tab of the AI page: a card for each way of using AI, side by side when there's room */
+.gh-ai-overview {
+  max-width: 960px;
+  margin: 16px 0 24px;
+}
+.gh-ai-overview .gh-ai-overview-intro {
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+.gh-ai-overview .gh-ai-overview-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.gh-ai-overview .gh-ai-overview-card {
+  margin: 0;
+}
+.gh-ai-overview .gh-ai-overview-card .inside {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+.gh-ai-overview .gh-ai-overview-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 16px;
+}
+.gh-ai-overview .gh-ai-overview-card h2 .pill {
+  font-size: 12px;
+  font-weight: 500;
+}
+.gh-ai-overview .gh-ai-overview-card .gh-ai-overview-status {
+  font-weight: 500;
+}
+.gh-ai-overview .gh-ai-overview-card .gh-ai-overview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: auto 0 0;
+  padding-top: 8px;
+}
+
 /* Analyze with AI, in the Reports page's header */
 .gh-header .build-with-ai-open {
   display: inline-flex;
