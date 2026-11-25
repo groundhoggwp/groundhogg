@@ -116,6 +116,7 @@ class Manager {
 		// Premium steps, don't include if white labeled
 		if ( ! is_pro_features_active() && ! is_white_labeled() ) {
 			// actions
+			$this->add_step( new Premium\Actions\AI_Agent() );
 			$this->add_step( new Premium\Actions\Apply_Owner() );
 			$this->add_step( new Premium\Actions\Create_User() );
 			$this->add_step( new Premium\Actions\Edit_Meta() );
