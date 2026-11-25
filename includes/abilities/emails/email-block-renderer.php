@@ -798,6 +798,15 @@ class Email_Block_Renderer {
 
 		$block['advancedStyle'] = $this->normalize_advanced_style( $this->resolve_tokens( (array) ( $spec['advancedStyle'] ?? [] ) ) );
 
+		// an image, video or button's own border, where a number like {"borderRadius": 8} means every side too
+		if ( isset( $block['borderStyle'] ) && is_array( $block['borderStyle'] ) ) {
+			foreach ( [ 'borderWidth', 'borderRadius' ] as $key ) {
+				if ( isset( $block['borderStyle'][ $key ] ) ) {
+					$block['borderStyle'][ $key ] = self::four_sides( $block['borderStyle'][ $key ] );
+				}
+			}
+		}
+
 		foreach ( array_keys( self::VISIBILITY ) as $flag ) {
 			if ( ! empty( $spec[ $flag ] ) ) {
 				$block[ $flag ] = true;

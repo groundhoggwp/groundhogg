@@ -377,7 +377,7 @@ class Create_Email_Template extends Ability {
 				'properties'           => [
 					'type' => [
 						'type'        => 'string',
-						'description' => __( 'text, heading, image, button, spacer, divider, columns, menu, social, html, footer or global.', 'groundhogg' ),
+						'description' => __( 'text, heading, image, video, button, spacer, divider, columns, menu, social, html, footer or global.', 'groundhogg' ),
 					],
 					'id'   => [
 						'type'        => 'string',
