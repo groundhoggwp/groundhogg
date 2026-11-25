@@ -1065,6 +1065,8 @@ class Funnel extends Base_Object_With_Meta {
 	/**
 	 * Snapshot the steps as the editor sees them, with their changes merged, for restore()
 	 * Same shape as the steps the flow editor keeps for undo/redo.
+	 * Meta a step writes for itself while contacts go through it isn't part of it, see Step::get_runtime_meta_keys(),
+	 * so it doesn't change the flow's revision and restore() doesn't roll it back.
 	 *
 	 * @return array[] [ [ 'ID' => int, 'data' => array, 'meta' => array ], ... ]
 	 */
@@ -1074,7 +1076,7 @@ class Funnel extends Base_Object_With_Meta {
 				return [
 					'ID'   => $step->get_id(),
 					'data' => $step->get_data(),
-					'meta' => $step->get_meta(),
+					'meta' => $step->get_meta_without_runtime(),
 				];
 			}, $this->get_steps() ) );
 		} );
@@ -1112,7 +1114,8 @@ class Funnel extends Base_Object_With_Meta {
 					$step->create( $step_state['data'] );
 				}
 
-				$step->update_meta( $step_state['meta'] );
+				// a snapshot the editor kept has what the step wrote for itself back then, keep what it is now
+				$step->update_meta( $step->get_meta_without_runtime( (array) ( $step_state['meta'] ?? [] ) ) );
 			}
 		} );
 	}

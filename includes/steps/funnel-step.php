@@ -1150,6 +1150,18 @@ abstract class Funnel_Step extends Supports_Errors implements \JsonSerializable 
 	}
 
 	/**
+	 * Meta this step writes for itself while contacts go through it, like a counter or the last result,
+	 * usually with Step::update_meta_bypass_changes(). It isn't a setting, so it doesn't count as an edit:
+	 * it's left out of the flow's revision, which tells an open editor the flow changed, and out of the
+	 * snapshots undo/redo puts back, so they don't roll it back.
+	 *
+	 * @return string[] meta keys
+	 */
+	public function get_runtime_meta_keys() {
+		return [];
+	}
+
+	/**
 	 * Given a setting and a value, find it in the schema then apply sanitization
 	 *
 	 * @param string $setting

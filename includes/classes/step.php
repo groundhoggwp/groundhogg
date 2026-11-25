@@ -2325,6 +2325,46 @@ class Step extends Base_Object_With_Meta implements Event_Process {
 	}
 
 	/**
+	 * Meta the step writes for itself while contacts go through it, which isn't a setting,
+	 * see Funnel_Step::get_runtime_meta_keys()
+	 *
+	 * @return string[] meta keys
+	 */
+	public function get_runtime_meta_keys() {
+
+		/**
+		 * Meta a step writes for itself while contacts go through it, left out of the flow's revision and
+		 * undo/redo snapshots, see Funnel_Step::get_runtime_meta_keys()
+		 *
+		 * @param string[] $keys
+		 * @param Step     $step
+		 */
+		$keys = apply_filters( 'groundhogg/steps/runtime_meta_keys', (array) $this->get_step_element()->get_runtime_meta_keys(), $this );
+
+		return array_values( array_unique( array_map( 'strval', (array) $keys ) ) );
+	}
+
+	/**
+	 * The step's meta without what it writes for itself while contacts go through it, see get_runtime_meta_keys()
+	 *
+	 * @param array|null $meta the meta to filter, the step's own by default
+	 *
+	 * @return array
+	 */
+	public function get_meta_without_runtime( $meta = null ) {
+
+		$meta = $meta ?? $this->get_meta();
+
+		$runtime = $this->get_runtime_meta_keys();
+
+		if ( empty( $runtime ) || ! is_array( $meta ) ) {
+			return $meta;
+		}
+
+		return array_diff_key( $meta, array_flip( $runtime ) );
+	}
+
+	/**
 	 * Add meta, but bypass changes by setting the committing flag
 	 *
 	 * @param $key
