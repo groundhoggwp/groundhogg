@@ -2,6 +2,8 @@
 
 namespace Groundhogg\Abilities\Emails;
 
+use Groundhogg\Email_Fonts;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -58,8 +60,9 @@ class Email_Block_Style {
 	];
 
 	/**
-	 * Fonts the editor knows, see `fonts` in email-block-editor.js. Any other font is read as the first one of these
-	 * that shares a family with it, or Arial.
+	 * Fonts the editor has built in, see `fonts` in email-block-editor.js. Fonts uploaded in the editor are added to
+	 * these, see Email_Fonts::stacks(). Any other font is read as the first known one that shares a family with it, or
+	 * Arial.
 	 */
 	const FONTS = [
 		'Arial, sans-serif',
@@ -577,12 +580,13 @@ class Email_Block_Style {
 	 */
 	public static function normalize_font( string $font ): string {
 
-		static $lookup;
+		$lookup = [];
 
-		if ( ! $lookup ) {
-			$lookup = [];
-			foreach ( self::FONTS as $known ) {
-				$lookup[ self::font_id( $known ) ] = $known;
+		// The built-in fonts and the uploaded ones; a built-in font wins when they share a family
+		foreach ( Email_Fonts::stacks() as $known ) {
+			$id = self::font_id( $known );
+			if ( ! isset( $lookup[ $id ] ) ) {
+				$lookup[ $id ] = $known;
 			}
 		}
 

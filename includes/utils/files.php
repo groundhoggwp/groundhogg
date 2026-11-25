@@ -41,6 +41,180 @@ class Files {
 	}
 
 	/**
+	 * Folders in the uploads folder whose files anyone can load, because mail apps load them, and the types of file
+	 * that are public in each
+	 *
+	 * @return array[] folder => [ file extension => content type ]
+	 */
+	public function public_dirs(): array {
+
+		/**
+		 * Filter the folders in the uploads folder that have public files
+		 *
+		 * @param array[] $dirs folder => [ file extension => content type ]
+		 */
+		return apply_filters( 'groundhogg/files/public_dirs', [
+			Email_Fonts::FOLDER           => Email_Fonts::TYPES,
+			Email_Video_Thumbnail::FOLDER => Email_Video_Thumbnail::TYPES,
+		] );
+	}
+
+	/**
+	 * The .htaccess of a folder with public files. The uploads folder denies everything, so this lets files of the given
+	 * types through, and only those. They get their content type, which some servers don't know, and
+	 * Access-Control-Allow-Origin, which mail apps need to use fonts.
+	 *
+	 * Access is allowed the way each Apache version reads it: Require for 2.4, Order and Allow for 2.2 and for 2.4's
+	 * mod_access_compat, which is what reads the parent folder's "Deny from all". Order Deny,Allow lets "Allow from all"
+	 * win over that inherited Deny.
+	 *
+	 * @param string[] $types file extension => content type
+	 *
+	 * @return string
+	 */
+	public function public_htaccess( array $types ): string {
+
+		$add_types  = '';
+		$extensions = [];
+
+		foreach ( $types as $extension => $type ) {
+			$extension    = sanitize_key( $extension );
+			$add_types    .= "\tAddType " . preg_replace( '/[^a-z0-9.+\/-]/', '', strtolower( $type ) ) . " .$extension\n";
+			$extensions[] = $extension;
+		}
+
+		$extensions = implode( '|', $extensions );
+
+		return <<<HTACCESS
+# Mail apps load these files, so they are public, unlike the rest of the uploads folder
+<IfModule mod_mime.c>
+$add_types</IfModule>
+<FilesMatch "\.($extensions)$">
+	<IfModule mod_authz_core.c>
+		Require all granted
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order Deny,Allow
+		Allow from all
+	</IfModule>
+	<IfModule mod_access_compat.c>
+		Order Deny,Allow
+		Allow from all
+	</IfModule>
+	<IfModule mod_headers.c>
+		Header set Access-Control-Allow-Origin "*"
+	</IfModule>
+</FilesMatch>
+
+HTACCESS;
+	}
+
+	/**
+	 * Make a folder in the uploads folder whose files of the given types are public, see public_htaccess(). The
+	 * .htaccess is written again if it was changed. Only Apache and LiteSpeed read it, see nginx_rules().
+	 *
+	 * @param string $subdir the folder, one of public_dirs()
+	 *
+	 * @return string the folder's path, empty if it couldn't be made
+	 */
+	public function make_public_dir( string $subdir ): string {
+
+		$types = $this->public_dirs()[ $subdir ] ?? [];
+		$path  = $this->get_uploads_dir( $subdir );
+
+		if ( ! $types || ! $path ) {
+			return '';
+		}
+
+		if ( ! is_dir( $this->get_base_uploads_dir() ) ) {
+			$this->mk_dir();
+		}
+
+		if ( ! wp_mkdir_p( $path ) ) {
+			return '';
+		}
+
+		$htaccess = $path . '/.htaccess';
+		$content  = $this->public_htaccess( $types );
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- a local file
+		if ( ! is_file( $htaccess ) || file_get_contents( $htaccess ) !== $content ) {
+			$this->put( $htaccess, $content );
+		}
+
+		return $path;
+	}
+
+	/**
+	 * The nginx config that does what the .htaccess files do on Apache: deny the uploads folder, except the public files
+	 *
+	 * The folder is a ^~ location so other locations in the config, like one that caches images, can't serve its files.
+	 *
+	 * @return string
+	 */
+	public function nginx_rules(): string {
+
+		$base = untrailingslashit( (string) wp_parse_url( $this->get_base_uploads_url(), PHP_URL_PATH ) );
+
+		$rules = "location ^~ $base/ {\n\tdeny all;\n";
+
+		foreach ( $this->public_dirs() as $subdir => $types ) {
+
+			$extensions = implode( '|', array_map( 'sanitize_key', array_keys( $types ) ) );
+
+			// a - outside [] needs no escaping, and wp\-content is harder to read
+			$path = str_replace( '\-', '-', preg_quote( "$base/$subdir/" ) );
+
+			$rules .= "\n\tlocation ~ ^$path" . "[^/]+\.($extensions)$ {\n";
+			$rules .= "\t\tallow all;\n";
+			$rules .= "\t\tadd_header Access-Control-Allow-Origin \"*\";\n";
+			$rules .= "\t}\n";
+		}
+
+		return $rules . "}\n";
+	}
+
+	/**
+	 * Whether anyone can download the files in the uploads folder, found by putting a file there and asking the site
+	 * for it. The folder's .htaccess is what stops it, which servers that don't read .htaccess files, like nginx, ignore.
+	 *
+	 * @return bool|null null if it couldn't be checked
+	 */
+	public function is_private_dir_public() {
+
+		$this->mk_dir();
+
+		$token = wp_generate_password( 32, false );
+		$file  = 'access-check-' . wp_generate_password( 12, false ) . '.txt';
+		$path  = $this->get_uploads_dir( '', $file );
+
+		if ( ! $path || ! $this->put( $path, $token ) ) {
+			return null;
+		}
+
+		$response = wp_remote_get( $this->get_uploads_url( '', $file ), [
+			'timeout'     => 5,
+			'redirection' => 0,
+			// the same as WordPress' own loopback requests
+			'sslverify'   => apply_filters( 'https_local_ssl_verify', false ),
+		] );
+
+		wp_delete_file( $path );
+
+		if ( is_wp_error( $response ) ) {
+			return null;
+		}
+
+		$code = wp_remote_retrieve_response_code( $response );
+
+		if ( $code === 200 ) {
+			return trim( wp_remote_retrieve_body( $response ) ) === $token;
+		}
+
+		return in_array( $code, [ 401, 403, 404 ], true ) ? false : null;
+	}
+
+	/**
 	 *
 	 *
 	 * @return \WP_Filesystem_Base

@@ -387,6 +387,13 @@ class Main_Updater extends Old_Updater {
 					self::grant_view_contact_pii();
 				},
 			],
+			'4.13' => [
+				'automatic'   => true,
+				'description' => __( 'Copy the thumbnails of email video blocks into the plugin\'s uploads folder, and update the emails that show them. The old copies are kept for emails that were already sent.', 'groundhogg' ),
+				'callback'    => function () {
+					Email_Video_Thumbnail::copy_legacy_images();
+				},
+			],
 		];
 	}
 

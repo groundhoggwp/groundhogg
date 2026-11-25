@@ -41,7 +41,7 @@ Colors are hex (`#1e73be`), or `palette:N` for this site's palette colors. Specs
 - `hide_on_mobile`, `hide_on_desktop`, `hide_in_plain`, `hide_in_browser`: true to hide it there.
 - `css`: custom CSS for the block, where `selector` stands for the block, like `selector p { letter-spacing: 1px; }`.
 
-Font settings (`p`, `fontStyle`, `style`...) are objects of `fontSize` (pixels), `fontFamily`, `fontWeight`, `lineHeight`, `fontStyle` (`normal`, `italic`), `textTransform` and `color`. `fontFamily` is one of the editor's fonts (Arial, Arial Black, Arial Narrow, Book Antiqua, Calibri, Century Gothic, Comic Sans MS, Copperplate, Courier New, Futura, Garamond, Georgia, Helvetica, Impact, Lucida Grande, Lucida Sans, Palatino, system-ui, Tahoma, Times New Roman, Trebuchet MS, Verdana); others become Arial. `use` takes the name of one of the site's global fonts instead.
+Font settings (`p`, `fontStyle`, `style`...) are objects of `fontSize` (pixels), `fontFamily`, `fontWeight`, `lineHeight`, `fontStyle` (`normal`, `italic`), `textTransform` and `color`. `fontFamily` is one of the editor's fonts (Arial, Arial Black, Arial Narrow, Book Antiqua, Calibri, Century Gothic, Comic Sans MS, Copperplate, Courier New, Futura, Garamond, Georgia, Helvetica, Impact, Lucida Grande, Lucida Sans, Palatino, system-ui, Tahoma, Times New Roman, Trebuchet MS, Verdana) or a font uploaded on this site (see "This site's design"); others become Arial. `use` takes the name of one of the site's global fonts instead.
 
 ### Types
 

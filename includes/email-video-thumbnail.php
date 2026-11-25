@@ -12,8 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Thumbnails for the email editor's video block
  *
  * Email clients can't play video or reliably layer one image over another, so the block shows a still: the video's
- * thumbnail with a play button and/or a progress bar drawn on it, saved as a JPEG in the uploads folder and linked to
- * the video. YouTube thumbnails come straight from YouTube, the others (Vimeo, Wistia, Rumble, or any oEmbed provider WordPress
+ * thumbnail with a play button and/or a progress bar drawn on it, saved as a JPEG in Groundhogg's uploads folder and
+ * linked to the video. YouTube thumbnails come straight from YouTube, the others (Vimeo, Wistia, Rumble, or any oEmbed provider WordPress
  * knows that has thumbnails) from oEmbed.
  *
  * The file name is a hash of the thumbnail and the overlay options, so making the same image again returns the same
@@ -35,6 +35,18 @@ class Email_Video_Thumbnail {
 	 * Overlays are drawn this many times bigger and then scaled down, which smooths their edges
 	 */
 	const SCALE = 4;
+
+	/**
+	 * The folder in Groundhogg's uploads folder the images go in
+	 */
+	const FOLDER = 'email-video-thumbnails';
+
+	/**
+	 * The files that are public in the folder, by extension => content type
+	 */
+	const TYPES = [
+		'jpg' => 'image/jpeg',
+	];
 
 	const PLAY_BUTTONS = [ 'none', 'circle', 'outline', 'pill', 'box', 'triangle' ];
 
@@ -281,13 +293,12 @@ class Email_Video_Thumbnail {
 	}
 
 	/**
-	 * Where the images are saved: in the uploads folder, but not Groundhogg's, which isn't public
+	 * Where the images are saved: the email-video-thumbnails folder of Groundhogg's uploads folder, with an .htaccess
+	 * that makes them public
 	 *
 	 * @return array path, url
 	 */
 	public static function output_dir(): array {
-
-		$uploads = wp_get_upload_dir();
 
 		/**
 		 * Where the email video block's thumbnails are saved
@@ -295,9 +306,96 @@ class Email_Video_Thumbnail {
 		 * @param array $dir path and url of the folder
 		 */
 		return apply_filters( 'groundhogg/email/video_thumbnails/dir', [
-			'path' => wp_normalize_path( $uploads['basedir'] . '/email-video-thumbnails' ),
-			'url'  => $uploads['baseurl'] . '/email-video-thumbnails',
+			'path' => files()->get_uploads_dir( self::FOLDER ),
+			'url'  => files()->get_uploads_url( self::FOLDER ),
 		] );
+	}
+
+	/**
+	 * Make the folder the images are saved in, with the .htaccess that makes them public if it's the usual one
+	 *
+	 * @param array $dir from output_dir()
+	 *
+	 * @return bool
+	 */
+	protected static function make_output_dir( array $dir ): bool {
+
+		if ( $dir['path'] === files()->get_uploads_dir( self::FOLDER ) ) {
+			return files()->make_public_dir( self::FOLDER ) !== '';
+		}
+
+		return wp_mkdir_p( $dir['path'] );
+	}
+
+	/**
+	 * Before 4.13 the images were saved in the uploads folder itself, in email-video-thumbnails, because Groundhogg's
+	 * isn't public. Copy them into output_dir() and point the emails that show them at the copies.
+	 *
+	 * The old files stay where they are, because emails that were sent already still show them.
+	 *
+	 * @return void
+	 */
+	public static function copy_legacy_images() {
+
+		$uploads = wp_get_upload_dir();
+		$old     = [
+			'path' => wp_normalize_path( $uploads['basedir'] . '/' . self::FOLDER ),
+			'url'  => $uploads['baseurl'] . '/' . self::FOLDER,
+		];
+
+		if ( ! is_dir( $old['path'] ) ) {
+			return;
+		}
+
+		$new = self::output_dir();
+
+		if ( $new['path'] === $old['path'] || ! self::make_output_dir( $new ) ) {
+			return;
+		}
+
+		foreach ( glob( $old['path'] . '/*.jpg' ) ?: [] as $file ) {
+
+			$to = $new['path'] . '/' . basename( $file );
+
+			if ( ! file_exists( $to ) ) {
+				files()->copy( $file, $to );
+			}
+		}
+
+		self::replace_in_emails( $old['url'] . '/', $new['url'] . '/' );
+	}
+
+	/**
+	 * Replace the folder of the images in the content of every email
+	 *
+	 * Only the path is replaced, so links saved with another scheme or domain than the site has now are found too.
+	 *
+	 * @param string $old_url
+	 * @param string $new_url
+	 *
+	 * @return int how many emails were changed
+	 */
+	public static function replace_in_emails( string $old_url, string $new_url ): int {
+
+		global $wpdb;
+
+		$old = (string) wp_parse_url( $old_url, PHP_URL_PATH ) ?: $old_url;
+		$new = (string) wp_parse_url( $new_url, PHP_URL_PATH ) ?: $new_url;
+
+		if ( $old === $new ) {
+			return 0;
+		}
+
+		$emails = get_db( 'emails' );
+		$table  = $emails->get_table_name();
+		$like   = '%' . $wpdb->esc_like( $old ) . '%';
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- the table name is ours, a one-off update
+		$changed = $wpdb->query( $wpdb->prepare( "UPDATE $table SET content = REPLACE(content, %s, %s), plain_text = REPLACE(plain_text, %s, %s) WHERE content LIKE %s OR plain_text LIKE %s", $old, $new, $old, $new, $like, $like ) );
+
+		$emails->cache_set_last_changed();
+
+		return (int) $changed;
 	}
 
 	/**
@@ -352,7 +450,7 @@ class Email_Video_Thumbnail {
 			imagejpeg( $image, null, 85 );
 			$jpeg = ob_get_clean();
 
-			if ( ! wp_mkdir_p( $dir['path'] ) || ! files()->put( $path, $jpeg ) ) {
+			if ( ! self::make_output_dir( $dir ) || ! files()->put( $path, $jpeg ) ) {
 				return new WP_Error( 'not_saved', __( 'Couldn\'t save the thumbnail in the uploads folder. Check that it\'s writable.', 'groundhogg' ) );
 			}
 		}

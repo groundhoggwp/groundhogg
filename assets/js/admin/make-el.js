@@ -1748,6 +1748,83 @@
     return Div({ className: `gh-tooltip ${ position }` }, content)
   }
 
+  /**
+   * Tooltips are absolutely positioned, so a parent that hides its overflow (a modal, a scrolling panel) cuts them
+   * off. When that happens, show the tooltip in the top layer instead, pinned where it would have been.
+   */
+  const tooltipIsClipped = tip => {
+    let rect = tip.getBoundingClientRect()
+
+    for ( let el = tip.parentElement; el && el !== document.body; el = el.parentElement ) {
+      let { overflowX, overflowY } = getComputedStyle(el)
+
+      if ( overflowX === 'visible' && overflowY === 'visible' ) {
+        continue
+      }
+
+      let box = el.getBoundingClientRect()
+
+      if ( rect.left < box.left - 1 || rect.right > box.right + 1 || rect.top < box.top - 1 || rect.bottom > box.bottom + 1 ) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  const liftClippedTooltip = e => {
+
+    let parent = e.target instanceof Element ? e.target.closest('.gh-has-tooltip, :has(> .gh-tooltip)') : null
+
+    if ( !parent || parent.dataset.tooltipLifted ) {
+      return
+    }
+
+    let tip = parent.querySelector(':scope > .gh-tooltip') ?? parent.querySelector('.gh-tooltip')
+    let rect = tip?.getBoundingClientRect()
+
+    if ( !rect?.width || !tooltipIsClipped(tip) ) {
+      return
+    }
+
+    parent.dataset.tooltipLifted = '1'
+
+    let style = tip.getAttribute('style')
+
+    // keep it on screen
+    let left = Math.max(8, Math.min(rect.left, window.innerWidth - rect.width - 8))
+    let top = Math.max(8, Math.min(rect.top, window.innerHeight - rect.height - 8))
+
+    tip.popover = 'manual'
+    Object.assign(tip.style, {
+      position : 'fixed',
+      inset    : 'auto',
+      top      : `${ top }px`,
+      left     : `${ left }px`,
+      width    : `${ Math.ceil(rect.width) }px`,
+      boxSizing: 'border-box',
+      margin   : 0,
+      border   : 0,
+      overflow : 'visible',
+      transform: 'none',
+    })
+    tip.showPopover()
+
+    parent.addEventListener('mouseleave', () => {
+      delete parent.dataset.tooltipLifted
+      if ( tip.matches(':popover-open') ) {
+        tip.hidePopover()
+      }
+      tip.removeAttribute('popover')
+      style === null ? tip.removeAttribute('style') : tip.setAttribute('style', style)
+    }, { once: true })
+  }
+
+  if ( typeof HTMLElement.prototype.showPopover === 'function' && CSS.supports('selector(:has(> a))') && !window.ghLiftClippedTooltips ) {
+    window.ghLiftClippedTooltips = true
+    document.addEventListener('mouseover', liftClippedTooltip)
+  }
+
   const MultiButtonToggle = ({
     id = '',
     options = [],

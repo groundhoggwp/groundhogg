@@ -201,6 +201,8 @@ function filter_option_sanitize_callback( $callback, $option, $value ) {
 			return function ( $value ) {
 				return map_deep( $value, 'sanitize_text_field' );
 			};
+		case Email_Fonts::OPTION:
+			return [ Email_Fonts::class, 'sanitize' ];
 		case 'gh_custom_reports':
 		case 'gh_email_editor_block_defaults':
 			return __NAMESPACE__ . '\sanitize_payload';

@@ -50,6 +50,7 @@ use Groundhogg\Abilities\Emails\Edit_Email;
 use Groundhogg\Abilities\Emails\Get_Email_Template;
 use Groundhogg\Abilities\Emails\List_Email_Templates;
 use Groundhogg\Abilities\Emails\List_Replacement_Codes;
+use Groundhogg\Abilities\Emails\Add_Site_Font;
 use Groundhogg\Abilities\Emails\Delete_Sender_Profile;
 use Groundhogg\Abilities\Emails\List_Sender_Profiles;
 use Groundhogg\Abilities\Emails\Save_Sender_Profile;
@@ -434,6 +435,7 @@ class Abilities {
 			List_Sender_Profiles::class,
 			Save_Sender_Profile::class,
 			Delete_Sender_Profile::class,
+			Add_Site_Font::class,
 			Create_Email_Template::class,
 			Update_Email_Template::class,
 			Edit_Email::class,

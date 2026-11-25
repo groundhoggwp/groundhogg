@@ -2729,6 +2729,7 @@ button:has(.gh-dropdown-menu) {
 .gh-has-tooltip .gh-tooltip,
 :has(> .gh-tooltip) .gh-tooltip {
   width: max-content;
+  max-width: min(300px, 100vw - 32px);
   display: none;
   position: absolute;
   background-color: var(--gh-dark);

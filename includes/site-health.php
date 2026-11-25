@@ -49,6 +49,7 @@ class Site_Health {
 			'background_tasks' => [ __( 'Background tasks are running', 'groundhogg' ), 'test_background_tasks' ],
 			'database'         => [ __( 'The database is up to date', 'groundhogg' ), 'test_database' ],
 			'permalinks'       => [ __( 'Permalinks work with tracking and the preferences center', 'groundhogg' ), 'test_permalinks' ],
+			'private_files'    => [ __( 'Private files can\'t be downloaded', 'groundhogg' ), 'test_private_files' ],
 			'safe_mode'        => [ __( 'Safe mode is off', 'groundhogg' ), 'test_safe_mode' ],
 			'updates'          => [ __( 'The plugin and its extensions are up to date', 'groundhogg' ), 'test_updates' ],
 		];
@@ -622,6 +623,38 @@ class Site_Health {
 		), [
 			admin_url( 'options-permalink.php' ) => __( 'Change permalinks', 'groundhogg' ),
 		] );
+	}
+
+	/**
+	 * The uploads folder has imports, exports and files uploaded for contacts. Its .htaccess keeps them private, but only
+	 * servers that read .htaccess files do what it says, nginx doesn't.
+	 *
+	 * @return array
+	 */
+	public function test_private_files() {
+
+		$public = files()->is_private_dir_public();
+
+		if ( $public === false ) {
+			return $this->result( 'private_files', 'good', __( 'Private files can\'t be downloaded', 'groundhogg' ), $this->paragraphs(
+				__( 'Imports, exports and files uploaded for contacts can only be downloaded by people who are allowed to see them.', 'groundhogg' )
+			) );
+		}
+
+		if ( $public === null ) {
+			return $this->result( 'private_files', 'recommended', __( 'Couldn\'t check that private files are protected', 'groundhogg' ), $this->paragraphs(
+				__( 'The site couldn\'t download a test file from its own uploads folder to check whether imports, exports and files uploaded for contacts are protected. Site Health\'s loopback test shows whether the site can make requests to itself.', 'groundhogg' )
+			) );
+		}
+
+		return $this->result( 'private_files', 'critical', __( 'Private files can be downloaded by anyone', 'groundhogg' ),
+			$this->paragraphs(
+				/* translators: %s: the folder, like /wp-content/uploads/groundhogg/ */
+				sprintf( __( 'Anyone who knows or guesses the link to a file in %s can download it. That folder has imports, exports and files uploaded for contacts.', 'groundhogg' ), wp_parse_url( files()->get_base_uploads_url(), PHP_URL_PATH ) . '/' ),
+				__( 'The folder has an .htaccess file that denies access, but the server isn\'t using it. nginx never reads .htaccess files, and on Apache AllowOverride has to allow them.', 'groundhogg' ),
+				__( 'On nginx, add these rules to the site\'s server block and reload nginx. They keep the folder private and let mail apps load email fonts and video thumbnails. Your host can do this for you.', 'groundhogg' )
+			) . '<pre style="overflow-x:auto;white-space:pre"><code>' . esc_html( files()->nginx_rules() ) . '</code></pre>'
+		);
 	}
 
 	/**

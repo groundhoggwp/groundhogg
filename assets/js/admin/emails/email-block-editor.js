@@ -98,6 +98,9 @@
   let {
     colorPalette = [],
     globalFonts = [],
+    customFonts = [],
+    canManageFonts = false,
+    siteFonts = [],
     globalSocials = [],
     blockDefaults = {},
     imageSizes = [],
@@ -120,7 +123,8 @@
     'bolder',
   ]
 
-  let fonts = [
+  // The editor's own fonts, see Email_Block_Style::FONTS. Uploaded fonts (CustomFonts) are added to these in fonts.
+  const builtInFonts = [
     'Arial, sans-serif',
     'Arial Black, Arial, sans-serif',
     'Arial Narrow, Arial, sans-serif',
@@ -155,10 +159,208 @@
     return fontParts[0].trim().toLowerCase().replaceAll(' ', '-')
   }
 
-  const fontLookupObject = fonts.reduce((fontLookUp, font) => {
-    fontLookUp[fontId(font)] = font
-    return fontLookUp
-  }, {})
+  /**
+   * Fonts uploaded to the site's fonts folder, see Email_Fonts. Saved with the options API like the other editor
+   * settings, but right away, because the email previews and sent emails need them saved.
+   */
+  const CustomFonts = {
+    fonts: Array.isArray(customFonts) ? customFonts : [],
+
+    // A variable font file has all of them
+    weights: ['variable', '100', '200', '300', '400', '500', '600', '700', '800', '900'],
+
+    formats: {
+      woff2: 'woff2',
+      woff : 'woff',
+      ttf  : 'truetype',
+      otf  : 'opentype',
+    },
+
+    // Same as Email_Fonts::sanitize_name()
+    cleanName: name => name.replace(/[^\p{L}\p{N} \-]/gu, '').replace(/\s+/g, ' ').trim().substring(0, 60),
+
+    stack: font => `${ font.name }, ${ font.fallback }`,
+
+    stacks () {
+      return this.fonts.filter(font => font.name).map(font => this.stack(font))
+    },
+
+    get (id) {
+      return this.fonts.find(font => font.id === id)
+    },
+
+    // Whether a name is free, not a built-in font or another uploaded font
+    nameIsFree (name, id = null) {
+      let newId = fontId(name)
+      return newId && !builtInFonts.some(font => fontId(font) === newId) &&
+        !this.fonts.some(font => font.id !== id && fontId(font.name) === newId)
+    },
+
+    add (name, fallback = 'Helvetica, Arial, sans-serif') {
+      let font = {
+        id   : fontId(name),
+        name,
+        fallback,
+        files: [],
+      }
+
+      this.fonts.push(font)
+
+      return font
+    },
+
+    rename (id, name) {
+      let font = this.get(id)
+      font.name = name
+      font.id = fontId(name)
+      return font
+    },
+
+    delete (id) {
+      this.fonts = this.fonts.filter(font => font.id !== id)
+    },
+
+    /**
+     * Upload a font file
+     *
+     * @param file {File}
+     * @return {Promise<{file, url, name, weight, style}>}
+     */
+    async upload (file) {
+      let fd = new FormData()
+      fd.append('file', file, file.name)
+
+      let response = await Groundhogg.api.postFormData(`${ EmailsStore.route }/fonts`, fd)
+
+      if (!response.item) {
+        throw new Error(response.message || __('The font could not be uploaded.', 'groundhogg'))
+      }
+
+      return response.item
+    },
+
+    async save () {
+      let items = await Groundhogg.stores.options.patch({
+        gh_email_editor_custom_fonts: this.fonts.map(({ name, fallback, files }) => ( {
+          name,
+          fallback,
+          files: files.map(({ file, weight, style }) => ( { file, weight, style } )),
+        } )),
+      })
+
+      let saved = items?.gh_email_editor_custom_fonts
+
+      if (Array.isArray(saved)) {
+
+        // Update the fonts and files in place rather than replacing them. Morphing keeps the controls' elements, so
+        // their change handlers still hold the objects they were made with, and edits to replaced copies would be lost.
+        // The saved list doesn't have the urls, so those are kept too.
+        let current = this.fonts
+
+        this.fonts = saved.map(font => {
+          let existing = current.find(f => f.id === font.id) ?? {}
+
+          let files = font.files.map(file => {
+            let existingFile = existing.files?.find(f => f.file === file.file) ?? {}
+            return Object.assign(existingFile, file, { url: existingFile.url })
+          })
+
+          return Object.assign(existing, font, { files })
+        })
+      }
+
+      rebuildFonts()
+    },
+
+    // Fonts the site has already, like the theme's, that can be added without uploading them, see Email_Fonts::site_fonts()
+    siteFonts: Array.isArray(siteFonts) ? siteFonts : [],
+
+    /**
+     * Add one of the site's fonts, which copies its files to the fonts folder and saves it
+     *
+     * @param id {string}
+     * @return {Promise<void>}
+     */
+    async addSiteFont (id) {
+      let response = await Groundhogg.api.post(`${ EmailsStore.route }/fonts/site`, { id })
+
+      if (!response.item) {
+        throw new Error(response.message || __('The font could not be added.', 'groundhogg'))
+      }
+
+      this.fonts.push(response.item)
+      this.siteFonts = this.siteFonts.filter(font => font.id !== id)
+
+      rebuildFonts()
+    },
+
+    // The @font-face rules, like Email_Fonts::font_face_css(), of the uploaded fonts or the ones given
+    faceCSS (fonts = this.fonts) {
+      return fonts.map(font => font.files.map(file => {
+        let ext = ( file.file ?? file.url.split(/[?#]/)[0] ).split('.').pop().toLowerCase()
+        let format = this.formats[ext] ?? 'woff2'
+        let weight = file.weight === 'variable' ? '100 900' : file.weight
+        return `@font-face { font-family: '${ font.name }'; src: url('${ file.url }') format('${ format }'); font-weight: ${ weight }; font-style: ${ file.style }; font-display: swap; }`
+      }).join('\n')).join('\n')
+    },
+  }
+
+  let fontLookupObject = {}
+  let subFonts = []
+  let subFontsWithSpaces = []
+  const fontFamilies = {}
+  let fonts = []
+
+  const fontName = font => font.split(',')[0]
+
+  /**
+   * Make the font list from the built-in fonts and the uploaded ones, and load the uploaded ones into the page
+   */
+  const rebuildFonts = () => {
+
+    fonts = [...builtInFonts, ...CustomFonts.stacks()]
+
+    // A built-in font wins when they share a family, like Email_Block_Style::normalize_font()
+    fontLookupObject = fonts.reduce((fontLookUp, font) => {
+      if (!fontLookUp[fontId(font)]) {
+        fontLookUp[fontId(font)] = font
+      }
+      return fontLookUp
+    }, {})
+
+    subFonts = fonts.reduce((fonts, font) => {
+        let subFonts = font.split(',').map(f => f.trim())
+        subFonts.forEach(f => {
+          if (!fonts.includes(f)) {
+            fonts.push(f)
+          }
+        })
+
+        return fonts
+      },
+      [])
+
+    subFontsWithSpaces = subFonts.filter(font => font.includes(' '))
+
+    Object.keys(fontFamilies).forEach(font => delete fontFamilies[font])
+
+    Object.values(fontLookupObject).sort((a, b) => fontName(a).localeCompare(fontName(b))).forEach(font => {
+      fontFamilies[font] = fontName(font)
+    })
+
+    let style = document.getElementById('gh-email-custom-fonts')
+
+    if (!style) {
+      style = document.createElement('style')
+      style.id = 'gh-email-custom-fonts'
+      document.head.append(style)
+    }
+
+    // The site's fonts too, so they show in their own font where they're offered
+    style.innerHTML = CustomFonts.faceCSS([...CustomFonts.fonts, ...CustomFonts.siteFonts])
+  }
+
+  rebuildFonts()
 
   const normalizeFont = ( font ) => {
     let fontStack = removeQuotes(font).split(',').map(f => f.trim())
@@ -173,31 +375,9 @@
     return 'Arial, sans-serif'
   }
 
-  const subFonts = fonts.reduce((fonts, font) => {
-      let subFonts = font.split(',').map(f => f.trim())
-      subFonts.forEach(f => {
-        if (!fonts.includes(f)) {
-          fonts.push(f)
-        }
-      })
-
-      return fonts
-    },
-    [])
-
-  const subFontsWithSpaces = subFonts.filter(font => font.includes(' '))
-
   const removeFontQuotesFromCommentData = data => data.replaceAll(new RegExp(`["'](${ subFontsWithSpaces.join('|') })["']`,
       'g'),
     '$1')
-
-  const fontFamilies = {}
-
-  const fontName = font => font.split(',')[0]
-
-  fonts.sort((a, b) => fontName(a).localeCompare(fontName(b))).forEach(font => {
-    fontFamilies[font] = fontName(font)
-  })
 
   function onlyUnique (value, index, array) {
     return array.indexOf(value) === index
@@ -4897,6 +5077,434 @@
     ])
   }
 
+  /**
+   * Open the file picker for font files
+   *
+   * @param onFiles {function(File[])}
+   */
+  const pickFontFiles = onFiles => {
+    let input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.woff2,.woff,.ttf,.otf'
+    input.multiple = true
+    input.addEventListener('change', e => onFiles([...e.target.files]))
+    input.click()
+  }
+
+  const fontWeightNames = {
+    100: __('Thin', 'groundhogg'),
+    200: __('Extra Light', 'groundhogg'),
+    300: __('Light', 'groundhogg'),
+    400: __('Regular', 'groundhogg'),
+    500: __('Medium', 'groundhogg'),
+    600: __('Semi Bold', 'groundhogg'),
+    700: __('Bold', 'groundhogg'),
+    800: __('Extra Bold', 'groundhogg'),
+    900: __('Black', 'groundhogg'),
+  }
+
+  /**
+   * After the uploaded fonts change: save them, and show them
+   *
+   * @return {Promise<void>}
+   */
+  const saveCustomFonts = () => CustomFonts.save().then(() => {
+    morphControls()
+    morphBlocks()
+  }).catch(err => {
+    dialog({
+      message: err.message,
+      type   : 'error',
+    })
+  })
+
+  /**
+   * Upload font files, to a font if one is given, otherwise to the font the file name suggests, which is added if
+   * there isn't one
+   *
+   * @param files {File[]}
+   * @param toFontId {string|null}
+   * @return {Promise<void>}
+   */
+  const uploadFontFiles = async (files, toFontId = null) => {
+
+    if (!files.length) {
+      return
+    }
+
+    const { close } = loadingModal()
+
+    try {
+      for (let file of files) {
+
+        let uploaded = await CustomFonts.upload(file)
+
+        let font = toFontId ? CustomFonts.get(toFontId) : CustomFonts.fonts.find(f => f.name.toLowerCase() === uploaded.name.toLowerCase())
+
+        if (!font) {
+          let name = CustomFonts.cleanName(uploaded.name) || __('Uploaded font', 'groundhogg')
+
+          // A name like a built-in font's, Arial, is taken
+          for (let i = 2; !CustomFonts.nameIsFree(name); i++) {
+            name = `${ CustomFonts.cleanName(uploaded.name) || __('Uploaded font', 'groundhogg') } ${ i }`
+          }
+
+          font = CustomFonts.add(name)
+        }
+
+        // One file per weight and style
+        font.files = [
+          ...font.files.filter(f => f.weight !== uploaded.weight || f.style !== uploaded.style),
+          {
+            file  : uploaded.file,
+            url   : uploaded.url,
+            weight: uploaded.weight,
+            style : uploaded.style,
+          },
+        ].sort((a, b) => `${ a.weight }${ a.style }`.localeCompare(`${ b.weight }${ b.style }`))
+      }
+    }
+    catch (err) {
+      dialog({
+        message: err.message,
+        type   : 'error',
+      })
+    }
+
+    await saveCustomFonts()
+
+    close()
+  }
+
+  /**
+   * What a font file is, like "Bold Italic", or "All weights" for a variable font
+   *
+   * @param file {{weight: string, style: string}}
+   * @return {string}
+   */
+  const fontFileName = file => {
+
+    if (file.weight === 'variable') {
+      return file.style === 'italic' ? __('All weights, italic', 'groundhogg') : __('All weights', 'groundhogg')
+    }
+
+    let weight = fontWeightNames[file.weight] ?? file.weight
+
+    return file.style === 'italic' ? sprintf(__('%s Italic', 'groundhogg'), weight) : weight
+  }
+
+  const mutedText = {
+    fontSize: '13px',
+    color   : 'var(--gh-dark-50, #646970)',
+  }
+
+  const deleteUploadedFont = font => dangerConfirmationModal({
+    //language=HTML
+    alert: `<p>${ sprintf(__('Delete %s and its files?', 'groundhogg'), escHTML(font.name)) }</p>
+    <p>${ __('Emails that use it will show its fallback instead, even ones already sent.', 'groundhogg') }</p>`,
+
+    confirmText: __('Delete', 'groundhogg'),
+    onConfirm  : () => {
+      CustomFonts.delete(font.id)
+      saveCustomFonts()
+    },
+  })
+
+  /**
+   * Edit an uploaded font: its name, its fallback, and which weight and style each of its files is
+   *
+   * @param font
+   */
+  const editUploadedFont = font => Modal({
+    width: '500px',
+  }, ({ close, morph }) => {
+
+    const saveAndMorph = () => saveCustomFonts().then(() => morph())
+
+    const FontFile = file => Div({
+        className: 'display-flex gap-5 align-center',
+      },
+      [
+        Span({
+            title: file.file,
+            style: {
+              ...mutedText,
+              flexGrow    : 1,
+              minWidth    : 0,
+              overflow    : 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace  : 'nowrap',
+            },
+          },
+          file.file),
+        Select({
+          id      : `font-file-${ file.file }-weight`,
+          options : CustomFonts.weights.map(weight => ( {
+            value: weight,
+            text : weight === 'variable' ? __('All weights', 'groundhogg') : `${ weight } ${ fontWeightNames[weight] }`,
+          } )),
+          selected: file.weight,
+          onChange: e => {
+            file.weight = e.target.value
+            saveAndMorph()
+          },
+        }),
+        Select({
+          id      : `font-file-${ file.file }-style`,
+          options : {
+            normal: __('Normal', 'groundhogg'),
+            italic: __('Italic', 'groundhogg'),
+          },
+          selected: file.style,
+          onChange: e => {
+            file.style = e.target.value
+            saveAndMorph()
+          },
+        }),
+        Button({
+            id       : `font-file-${ file.file }-delete`,
+            className: 'gh-button danger text icon small',
+            onClick  : e => {
+              font.files = font.files.filter(f => f.file !== file.file)
+              saveAndMorph()
+            },
+          },
+          [
+            Dashicon('trash'),
+            ToolTip(__('Delete this file', 'groundhogg'), 'left'),
+          ]),
+      ])
+
+    return Div({
+        className: 'display-flex column gap-20',
+      },
+      [
+        Div({
+            className: 'gh-header modal-header',
+          },
+          [
+            MakeEl.H3({
+                style: {
+                  fontFamily: CustomFonts.stack(font),
+                },
+              },
+              font.name),
+            Button({
+                className: 'gh-button icon secondary text',
+                onClick  : close,
+              },
+              Dashicon('no-alt')),
+          ]),
+        Control({
+            label  : __('Name', 'groundhogg'),
+            stacked: true,
+          },
+          Input({
+            className: 'full-width',
+            id       : 'edit-font-name',
+            value    : font.name,
+            onChange : e => {
+
+              let name = CustomFonts.cleanName(e.target.value)
+
+              if (!CustomFonts.nameIsFree(name, font.id)) {
+                dialog({
+                  message: __('Another font already has that name.', 'groundhogg'),
+                  type   : 'error',
+                })
+                return
+              }
+
+              CustomFonts.rename(font.id, name)
+              saveAndMorph()
+            },
+          })),
+        Div({
+            className: 'display-flex column gap-5',
+          },
+          [
+            Control({
+                label  : __('Fallback', 'groundhogg'),
+                stacked: true,
+              },
+              Select({
+                id       : 'edit-font-fallback',
+                className: 'full-width',
+                options  : builtInFonts.map(stack => ( {
+                  value: stack,
+                  text : fontName(stack),
+                } )),
+                selected : font.fallback,
+                onChange : e => {
+                  font.fallback = e.target.value
+                  saveAndMorph()
+                },
+              })),
+            Span({ style: mutedText },
+              __('Gmail, Outlook on Windows and Yahoo don\'t show uploaded fonts, they show this one instead.', 'groundhogg')),
+          ]),
+        Div({
+            className: 'display-flex column gap-10',
+          },
+          [
+            Div({
+                className: 'display-flex column gap-5',
+              },
+              [
+                makeEl('label', {}, __('Files', 'groundhogg')),
+                Span({ style: mutedText },
+                  __('Each file is one weight and style of the font, like Bold or Italic. A variable font file has all the weights in one file, those say "All weights".', 'groundhogg')),
+              ]),
+            ...font.files.map(FontFile),
+            Button({
+                id       : 'edit-font-upload',
+                className: 'gh-button secondary',
+                onClick  : e => pickFontFiles(files => uploadFontFiles(files, font.id).then(() => morph())),
+              },
+              __('Upload more files', 'groundhogg')),
+          ]),
+      ])
+  })
+
+  /**
+   * Add a font the site has already
+   *
+   * @param font {{id: string}}
+   * @return {Promise<void>}
+   */
+  const addSiteFont = async font => {
+
+    const { close } = loadingModal()
+
+    try {
+      await CustomFonts.addSiteFont(font.id)
+      morphControls()
+      morphBlocks()
+    }
+    catch (err) {
+      dialog({
+        message: err.message,
+        type   : 'error',
+      })
+    }
+
+    close()
+  }
+
+  const siteFontSources = {
+    theme  : __('Your theme', 'groundhogg'),
+    library: __('Font Library', 'groundhogg'),
+  }
+
+  /**
+   * The fonts the site has already, with a button to add each
+   *
+   * @return {HTMLElement|null}
+   */
+  const SiteFonts = () => CustomFonts.siteFonts.length ? Div({
+      className: 'display-flex column gap-10',
+    },
+    [
+      Div({
+          className: 'display-flex column gap-5',
+        },
+        [
+          makeEl('label', {}, __('Fonts on this site', 'groundhogg')),
+          Span({ style: mutedText },
+            __('Your site uses these already. Add one to use it in emails.', 'groundhogg')),
+        ]),
+      ...CustomFonts.siteFonts.map(font => Div({
+          id       : `site-font-${ font.id }`,
+          className: 'space-between gap-10',
+        },
+        [
+          Div({
+              className: 'display-flex column',
+              style    : {
+                minWidth: 0,
+              },
+            },
+            [
+              Span({
+                  style: {
+                    fontFamily: CustomFonts.stack(font),
+                    fontSize  : '16px',
+                  },
+                },
+                font.name),
+              Span({ style: mutedText },
+                [siteFontSources[font.source] ?? __('This site', 'groundhogg'), font.files.map(fontFileName).join(', ')].join(' · ')),
+            ]),
+          Button({
+              id       : `site-font-${ font.id }-add`,
+              className: 'gh-button secondary small',
+              onClick  : e => addSiteFont(font),
+            },
+            __('Add', 'groundhogg')),
+        ])),
+    ]) : null
+
+  const UploadedFontsControls = () => ControlGroup({
+      id  : 'uploaded-fonts',
+      name: __('Uploaded Fonts', 'groundhogg'),
+    },
+    [
+      `<p>${ __('Use your own font files. Apple Mail, iOS Mail and Thunderbird show them, other mail apps show the font\'s fallback.', 'groundhogg') }</p>`,
+      ...CustomFonts.fonts.map(font => Div({
+          id       : `uploaded-font-${ font.id }`,
+          className: 'space-between gap-10',
+        },
+        [
+          Div({
+              className: 'display-flex column',
+              style    : {
+                minWidth: 0,
+              },
+            },
+            [
+              Span({
+                  style: {
+                    fontFamily: CustomFonts.stack(font),
+                    fontSize  : '16px',
+                  },
+                },
+                font.name),
+              Span({ style: mutedText },
+                font.files.length ? font.files.map(fontFileName).join(', ') : __('No files yet', 'groundhogg')),
+            ]),
+          Button({
+              id       : `uploaded-font-${ font.id }-more`,
+              className: 'gh-button secondary text icon small',
+              title    : __('Font options', 'groundhogg'),
+              onClick  : e => moreMenu(e.currentTarget, [
+                {
+                  key     : 'edit',
+                  text    : __('Edit', 'groundhogg'),
+                  onSelect: () => editUploadedFont(font),
+                },
+                {
+                  key     : 'upload',
+                  text    : __('Upload more files', 'groundhogg'),
+                  onSelect: () => pickFontFiles(files => uploadFontFiles(files, font.id)),
+                },
+                {
+                  key     : 'delete',
+                  text    : __('Delete', 'groundhogg'),
+                  onSelect: () => deleteUploadedFont(font),
+                },
+              ]),
+            },
+            Dashicon('ellipsis')),
+        ])),
+      Button({
+          id       : 'upload-font',
+          className: 'gh-button grey',
+          onClick  : e => pickFontFiles(files => uploadFontFiles(files)),
+        },
+        __('Upload Font', 'groundhogg')),
+      SiteFonts(),
+    ])
+
   const EditorControls = () => {
 
     const DisplayFont = font => Div({
@@ -4993,6 +5601,7 @@
             'Add Font'),
 
         ]),
+      canManageFonts ? UploadedFontsControls() : null,
       ControlGroup({
           id  : 'global-socials',
           name: 'Social Accounts',
@@ -7425,6 +8034,7 @@
 
     // language=CSS
     return `
+        ${ CustomFonts.faceCSS() }
         ${ getTemplateMceCSS() }
         body {
             ${ objectToStyle(bodyStyle) }

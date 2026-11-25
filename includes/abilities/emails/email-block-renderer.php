@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Emails;
 
 use Groundhogg\Email;
+use Groundhogg\Email_Fonts;
 use Groundhogg\Email_Video_Thumbnail;
 use WP_Error;
 use WP_HTML_Processor;
@@ -488,6 +489,26 @@ class Email_Block_Renderer {
 		}
 
 		$lines[] = '- Global fonts, for `use`: ' . implode( ', ', $fonts ) . '.';
+
+		$uploaded = array_map( function ( $font ) {
+			return sprintf( '"%s" (falls back to %s)', $font['name'], $font['fallback'] );
+		}, Email_Fonts::get() );
+
+		if ( ! empty( $uploaded ) ) {
+			$lines[] = '- Uploaded fonts, also usable as `fontFamily` by name: ' . implode( ', ', $uploaded ) . '. They show in Apple Mail and some other apps; Gmail and Outlook show the fallback.';
+		}
+
+		$on_site = array_map( function ( $font ) {
+			$files = array_map( function ( $file ) {
+				return ( $file['weight'] === Email_Fonts::VARIABLE ? 'all weights' : $file['weight'] ) . ( $file['style'] === 'italic' ? ' italic' : '' );
+			}, $font['files'] );
+
+			return sprintf( '"%s" (%s)', $font['name'], implode( ', ', $files ) );
+		}, Email_Fonts::site_fonts() );
+
+		if ( ! empty( $on_site ) ) {
+			$lines[] = '- Fonts the site\'s theme or Font Library has, which emails can\'t use until `add-site-font` adds them: ' . implode( ', ', $on_site ) . '. Add one when it suits the email, like the site\'s own heading font, then use it by name.';
+		}
 
 		$lines[] = empty( $site['socials'] )
 			? '- No social accounts are set up, so a `social` block needs `use: "custom"` and its own `socials`.'

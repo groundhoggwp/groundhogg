@@ -9,6 +9,7 @@ use Groundhogg\Classes\Inbox;
 use Groundhogg\Classes\Message;
 use Groundhogg\Contact;
 use Groundhogg\Email;
+use Groundhogg\Email_Fonts;
 use Groundhogg\Email_Logger;
 use Groundhogg\Email_Video_Thumbnail;
 use Groundhogg\Event;
@@ -152,6 +153,87 @@ class Emails_Api extends Base_Object_Api {
 				'callback'            => [ $this, 'overlay_play_button' ],
 				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
+		] );
+
+		// Uploading a font file for the editor's uploaded fonts, which are saved with the other editor settings
+		register_rest_route( self::NAME_SPACE, "/{$route}/fonts", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'upload_font' ],
+				'permission_callback' => [ $this, 'upload_font_permissions_callback' ]
+			],
+		] );
+
+		// Adding a font the site has already, like the theme's, to the uploaded fonts
+		register_rest_route( self::NAME_SPACE, "/{$route}/fonts/site", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'add_site_font' ],
+				'permission_callback' => [ $this, 'upload_font_permissions_callback' ],
+				'args'                => [
+					'id' => [
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				],
+			],
+		] );
+	}
+
+	/**
+	 * Add a font the site has already to the uploaded fonts
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function add_site_font( WP_REST_Request $request ) {
+
+		$font = Email_Fonts::add_site_font( (string) $request->get_param( 'id' ) );
+
+		if ( is_wp_error( $font ) ) {
+			return $font;
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $font,
+		] );
+	}
+
+	/**
+	 * The editor's settings, which the uploaded fonts are, are saved through the options API, which needs
+	 * manage_options
+	 *
+	 * @return bool
+	 */
+	public function upload_font_permissions_callback() {
+		return current_user_can( 'manage_options' ) && current_user_can( 'edit_emails' );
+	}
+
+	/**
+	 * Upload a font file
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_Error|\WP_REST_Response
+	 */
+	public function upload_font( WP_REST_Request $request ) {
+
+		$files = $request->get_file_params();
+
+		if ( empty( $files['file'] ) || ! is_array( $files['file'] ) ) {
+			return self::ERROR_422( 'error', __( 'Choose a font file to upload.', 'groundhogg' ) );
+		}
+
+		$uploaded = Email_Fonts::upload( $files['file'] );
+
+		if ( is_wp_error( $uploaded ) ) {
+			return $uploaded;
+		}
+
+		return self::SUCCESS_RESPONSE( [
+			'item' => $uploaded,
 		] );
 	}
 
