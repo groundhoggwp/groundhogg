@@ -23,12 +23,12 @@ class Email_AB_Tests extends GH_UnitTestCase {
 		Email_Variations::flush();
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 		$this->factory()->truncate(); // the user got a contact
-		wp_clear_scheduled_hook( Email_Variations::FINISH_BROADCAST_TEST_HOOK );
+		wp_unschedule_hook( Email_Variations::FINISH_BROADCAST_TEST_HOOK );
 	}
 
 	public function tearDown(): void {
 		Email_Variations::flush();
-		wp_clear_scheduled_hook( Email_Variations::FINISH_BROADCAST_TEST_HOOK );
+		wp_unschedule_hook( Email_Variations::FINISH_BROADCAST_TEST_HOOK );
 		parent::tearDown();
 	}
 
@@ -259,11 +259,13 @@ class Email_AB_Tests extends GH_UnitTestCase {
 		// only one test at a time
 		$this->assertWPError( Email_Variations::start_broadcast_test( $email, [ 'include' => wp_list_pluck( $contacts, 'ID' ) ], [ 'send_now' => true ], [] ) );
 
-		// B did better on the sample
+		// B did better on the sample, which was all sent more than the wait ago
+		$this->sample_sent( $sample, $sampled, time() - 3 * HOUR_IN_SECONDS, function ( $id ) use ( $email, $b ) {
+			return $id % 2 ? $b->get_id() : $email->get_id();
+		} );
+
 		foreach ( $sampled as $id ) {
-			$version = new Email( $id % 2 ? $b->get_id() : $email->get_id() );
-			get_db( 'events' )->add( [ 'time' => time(), 'contact_id' => $id, 'email_id' => $version->get_id(), 'funnel_id' => Broadcast::FUNNEL_ID, 'step_id' => $sample->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::COMPLETE ] );
-			if ( $version->get_id() === $b->get_id() ) {
+			if ( $id % 2 ) {
 				get_db( 'activity' )->add( [ 'timestamp' => time(), 'contact_id' => $id, 'email_id' => $b->get_id(), 'funnel_id' => Broadcast::FUNNEL_ID, 'step_id' => $sample->get_id(), 'activity_type' => Activity::EMAIL_CLICKED ] );
 			}
 		}
@@ -284,6 +286,130 @@ class Email_AB_Tests extends GH_UnitTestCase {
 		// and running it again does nothing
 		Email_Variations::finish_broadcast_test( $email->get_id() );
 		$this->assertSame( $record['rest_broadcast_id'], ( new Email( $email->get_id() ) )->get_meta( Email_Variations::BROADCAST_TEST_KEY )['rest_broadcast_id'] );
+	}
+
+	/**
+	 * Take the sample's events out of the queue and record them as sent at a time
+	 *
+	 * @param Broadcast $sample
+	 * @param int[]     $ids     contact IDs
+	 * @param int       $time
+	 * @param callable  $version the email ID each contact got
+	 */
+	protected function sample_sent( Broadcast $sample, array $ids, int $time, callable $version ) {
+
+		$queued = new \Groundhogg\DB\Query\Table_Query( 'event_queue' );
+		$queued->where()->equals( 'step_id', $sample->get_id() )->equals( 'funnel_id', Broadcast::FUNNEL_ID );
+		$queued->delete();
+
+		foreach ( $ids as $id ) {
+			get_db( 'events' )->add( [ 'time' => $time, 'contact_id' => $id, 'email_id' => $version( $id ), 'funnel_id' => Broadcast::FUNNEL_ID, 'step_id' => $sample->get_id(), 'event_type' => Event::BROADCAST, 'status' => Event::COMPLETE ] );
+		}
+	}
+
+	protected function record( Email $email ) {
+		return ( new Email( $email->get_id() ) )->get_meta( Email_Variations::BROADCAST_TEST_KEY );
+	}
+
+	public function test_a_batched_sample_waits_for_its_last_batch() {
+
+		$email    = $this->email();
+		$this->test_version( $email );
+		$contacts = $this->contacts( 20 );
+
+		// 5 in the sample, one an hour: the last goes out 4 hours after the first
+		$sample = Email_Variations::start_broadcast_test( $email, [ 'include' => wp_list_pluck( $contacts, 'ID' ) ], [
+			'send_now'              => true,
+			'batching'              => true,
+			'batch_amount'          => 1,
+			'batch_interval'        => 'hours',
+			'batch_interval_length' => 1,
+		], [ 'sample_percent' => 25, 'wait_hours' => 2 ] );
+
+		$this->assertInstanceOf( Broadcast::class, $sample );
+		$this->assertEqualsWithDelta( time() + 6 * HOUR_IN_SECONDS, $this->record( $email )['finish_at'], 120 );
+
+		// what's still queued has to go out, and then wait: the last event is due in 4 hours
+		$last = new \Groundhogg\DB\Query\Table_Query( 'event_queue' );
+		$last->add_safe_column( 'MAX(time)' );
+		$last->setSelect( [ 'MAX(time)', 'last' ] )->where()->equals( 'step_id', $sample->get_id() )->equals( 'funnel_id', Broadcast::FUNNEL_ID );
+		$last_due = absint( $last->get_var() );
+		$this->assertGreaterThan( time() + 3 * HOUR_IN_SECONDS, $last_due );
+
+		// like cron, which takes the event off the schedule before running it
+		wp_unschedule_hook( Email_Variations::FINISH_BROADCAST_TEST_HOOK );
+		Email_Variations::finish_broadcast_test( $email->get_id() );
+
+		$record = $this->record( $email );
+		$this->assertSame( 'testing', $record['status'] );
+		$this->assertSame( $last_due + 2 * HOUR_IN_SECONDS, $record['finish_at'] );
+		$this->assertSame( $record['finish_at'], wp_next_scheduled( Email_Variations::FINISH_BROADCAST_TEST_HOOK, [ $email->get_id() ] ) );
+
+		// all sent an hour ago: another hour to go
+		$sent_at = time() - HOUR_IN_SECONDS;
+		$this->sample_sent( $sample, wp_parse_id_list( $sample->get_query()['include'] ), $sent_at, fn() => $email->get_id() );
+
+		wp_unschedule_hook( Email_Variations::FINISH_BROADCAST_TEST_HOOK );
+		Email_Variations::finish_broadcast_test( $email->get_id() );
+
+		$record = $this->record( $email );
+		$this->assertSame( 'testing', $record['status'] );
+		$this->assertSame( $sent_at + 2 * HOUR_IN_SECONDS, $record['finish_at'] );
+
+		// sent long enough ago: the winner goes to the rest
+		$this->sample_sent( $sample, [], 0, fn() => 0 );
+		get_db( 'events' )->update( [ 'step_id' => $sample->get_id() ], [ 'time' => time() - 3 * HOUR_IN_SECONDS ] );
+
+		Email_Variations::finish_broadcast_test( $email->get_id() );
+		$this->assertSame( 'done', $this->record( $email )['status'] );
+	}
+
+	public function test_a_sample_in_local_time_waits_for_the_day_to_come_round() {
+
+		$email = $this->email();
+		$this->test_version( $email );
+
+		$tomorrow = gmdate( 'Y-m-d', time() + DAY_IN_SECONDS );
+
+		$sample = Email_Variations::start_broadcast_test( $email, [ 'include' => wp_list_pluck( $this->contacts( 10 ), 'ID' ) ], [
+			'date'               => $tomorrow,
+			'time'               => '09:00:00',
+			'send_in_local_time' => true,
+		], [ 'sample_percent' => 20, 'wait_hours' => 4 ] );
+
+		$this->assertInstanceOf( Broadcast::class, $sample );
+		$this->assertSame( $sample->get_send_time() + DAY_IN_SECONDS + 4 * HOUR_IN_SECONDS, $this->record( $email )['finish_at'] );
+
+		// the whole sample went out long enough ago
+		$sample->update_meta( 'is_scheduled', true );
+		$this->sample_sent( $sample, wp_parse_id_list( $sample->get_query()['include'] ), time() - 5 * HOUR_IN_SECONDS, fn() => $email->get_id() );
+
+		Email_Variations::finish_broadcast_test( $email->get_id() );
+
+		$record = $this->record( $email );
+		$this->assertSame( 'done', $record['status'], $record['error'] ?? '' );
+
+		// the rest at 9:00 in their own time too, the next time it's 9:00
+		$rest = new Broadcast( $record['rest_broadcast_id'] );
+		$this->assertTrue( (bool) $rest->get_meta( 'send_in_local_time' ) );
+		$this->assertSame( '09:00:00', wp_date( 'H:i:s', $rest->get_send_time() ) );
+		$this->assertGreaterThan( time(), $rest->get_send_time() );
+		$this->assertLessThanOrEqual( time() + DAY_IN_SECONDS, $rest->get_send_time() );
+	}
+
+	public function test_a_cancelled_sample_sends_nothing_more() {
+
+		$email = $this->email();
+		$this->test_version( $email );
+
+		$sample = Email_Variations::start_broadcast_test( $email, [ 'include' => wp_list_pluck( $this->contacts( 10 ), 'ID' ) ], [ 'send_now' => true ], [] );
+		$sample->cancel();
+
+		Email_Variations::finish_broadcast_test( $email->get_id() );
+
+		$record = $this->record( $email );
+		$this->assertSame( 'cancelled', $record['status'] );
+		$this->assertArrayNotHasKey( 'rest_broadcast_id', $record );
 	}
 
 	public function test_a_broadcast_test_needs_test_versions() {

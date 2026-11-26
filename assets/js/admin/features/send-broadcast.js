@@ -248,7 +248,7 @@
           style    : { width: '60px', paddingRight: 0 },
           onInput  : e => setState({ ab_wait_hours: parseInt(e.target.value) }, false),
         }),
-        __('hours, then send the version with the most', 'groundhogg'),
+        __('hours after the last of them is sent, then send the version with the most', 'groundhogg'),
         Select({
           id      : 'ab-metric',
           selected: getState().ab_metric,
@@ -265,6 +265,9 @@
         __('The sample is split between %s by their weights.', 'groundhogg'),
         andList([ getObject().data.title, ...versions.map(v => v.title) ].map(t => bold(t))),
       )) : null,
+      // batches and local time spread the sample out, and the wait starts after the last of it
+      getState().ab_test && ( getState().batching || ( getState().send_in_local_time && getState().when === 'later' ) ) ? Span({ className: 'gh-text small' },
+        __('The sample goes out in batches or in each contact\'s local time, so it takes longer to send. The wait starts once the last of it is sent, and the rest are sent the same way after that.', 'groundhogg')) : null,
     ])
   }
 
@@ -651,7 +654,7 @@
       `<p>${ preview }</p>`,
       abTest ? `<p>${ sprintf(
         /* translators: 1: a percentage, 2: a number of hours, 3: clicks or opens */
-        __('A/B test: first to a random %1$s of them, then %2$s later the version with the most %3$s to the rest.', 'groundhogg'),
+        __('A/B test: first to a random %1$s of them, then %2$s after the last of those is sent, the version with the most %3$s to the rest.', 'groundhogg'),
         bold(`${ getState().ab_sample_percent }%`),
         bold(sprintf(_n('%d hour', '%d hours', getState().ab_wait_hours, 'groundhogg'), getState().ab_wait_hours)),
         getState().ab_metric === 'opens' ? __('opens', 'groundhogg') : __('clicks', 'groundhogg'),

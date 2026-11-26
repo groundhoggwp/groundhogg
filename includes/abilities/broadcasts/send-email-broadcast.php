@@ -123,7 +123,7 @@ class Send_Email_Broadcast extends Ability {
 					'ab_test' => [
 						'type'                 => 'object',
 						'additionalProperties' => false,
-						'description'          => __( 'Test the email\'s versions on a random sample of the audience first, then send the one that did best to everyone else. The email needs ready test versions, see groundhogg/create-email-variation with kind "test". This call sends to the sample; after wait_hours the winner is declared and the email is broadcast to the rest, who all get it. groundhogg/get-email-variation-report shows how it\'s going. Always a fixed segment.', 'groundhogg' ),
+						'description'          => __( 'Test the email\'s versions on a random sample of the audience first, then send the one that did best to everyone else. The email needs ready test versions, see groundhogg/create-email-variation with kind "test". This call sends to the sample, with the batching and local time given; wait_hours after the last of it goes out, the winner is declared and the email is broadcast to the rest, who all get it, batched the same way. groundhogg/get-email-variation-report shows how it\'s going. Always a fixed segment.', 'groundhogg' ),
 						'properties'           => [
 							'sample_percent' => [
 								'type'        => 'integer',
@@ -137,7 +137,7 @@ class Send_Email_Broadcast extends Ability {
 								'minimum'     => 1,
 								'maximum'     => 168,
 								'default'     => 4,
-								'description' => __( 'How long after the sample is sent to pick the winner and send it to the rest.', 'groundhogg' ),
+								'description' => __( 'How long to wait after the last email of the sample is sent before picking the winner and sending it to the rest. With batching or the contact\'s local time the sample takes longer to go out, and the wait only starts once it has, so every contact in it gets the whole wait.', 'groundhogg' ),
 							],
 							'metric'         => [
 								'type'        => 'string',
@@ -197,7 +197,7 @@ class Send_Email_Broadcast extends Ability {
 					],
 					'ab_test' => [
 						'type'        => 'object',
-						'description' => __( 'With ab_test: this broadcast is the sample, and when the winner is sent to the rest.', 'groundhogg' ),
+						'description' => __( 'With ab_test: this broadcast is the sample. winner_sent_at is the earliest the winner goes to the rest, and later if the sample takes longer to go out.', 'groundhogg' ),
 						'properties'  => [
 							'sample'         => [ 'type' => 'integer' ],
 							'rest'           => [ 'type' => 'integer' ],

@@ -350,10 +350,19 @@ no plugin at all.
    - `declare_winner()` stores `variation_winner` on the email; everyone in the
      test gets it. Winner 0 restarts.
    - Broadcast: `start_broadcast_test()` sends a shuffled sample (5–50% of the
-     marketable audience) and schedules `finish_broadcast_test()` with WP cron
-     after `wait_hours`, which declares the leader on the sample (sure or not) and
-     broadcasts the email to the audience minus the sample's IDs. Stored as
+     marketable audience) and schedules `finish_broadcast_test()` with WP cron,
+     which declares the leader on the sample (sure or not) and broadcasts the
+     email to the audience minus the sample's IDs. Stored as
      `variation_broadcast_test` on the email; one at a time.
+   - The wait counts from the sample's last send, not its start, so batching and
+     the contact's local time don't cut it short (and late sample emails don't go
+     out as the winner). The first check is estimated (batches × interval, plus a
+     day for local time); `finish_broadcast_test()` then looks again while the
+     sample is still being queued (every 15 minutes), while any of it is still in
+     the queue (a wait after the last one is due), or until a wait has passed
+     since the last one was sent. A cancelled sample cancels the rest. The rest
+     keeps the batching, and in local time goes out at the sample's time of day,
+     the next time it comes round.
    - Abilities: `create-email-variation` `kind: test` + `weight`,
      `update-email-variation` `weight`, `get-email-variation-report`,
      `declare-email-winner`, `send-email-broadcast` `ab_test`,

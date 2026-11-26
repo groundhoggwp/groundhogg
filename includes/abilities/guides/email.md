@@ -148,7 +148,7 @@ A test version is a variation with no audience: `create-email-variation` with `k
 2. `get-email-variation-report` shows each version's sent, opened and clicked, from when the test started, which one is ahead, and how confident that is. It suggests a winner once it's 95% sure; until then, keep the test running. Judge by clicks unless asked otherwise: some email apps open every email.
 3. `declare-email-winner` ends it: everyone in the test gets the winner from then on. Only declare one the report suggests, or that the person you're working for picks. `winner_id: 0` starts the test over.
 
-For a broadcast, `send-email-broadcast` with `ab_test: {"sample_percent": 20, "wait_hours": 4}` sends the test to a random sample, then picks the version that did best and broadcasts it to everyone else on its own.
+For a broadcast, `send-email-broadcast` with `ab_test: {"sample_percent": 20, "wait_hours": 4}` sends the test to a random sample, then picks the version that did best and broadcasts it to everyone else on its own. The wait starts once the last of the sample has gone out, so with batching or the contact's local time the winner goes out later than `wait_hours` after the start.
 
 ## Merge tags
 

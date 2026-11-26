@@ -958,10 +958,17 @@ class Email_Variations {
 			'query'        => [ 'include' => $sample ],
 		] ) );
 
-		$finish = max( time(), $broadcast->get_send_time() ) + $hours * HOUR_IN_SECONDS;
+		// the wait starts once the last of the sample is sent, so a first guess at when that is: batches and local
+		// time spread it out. finish_broadcast_test() checks, and waits longer if it isn't.
+		$finish = max( time(), $broadcast->get_send_time() ) + self::sample_spread( $size, $schedule ) + $hours * HOUR_IN_SECONDS;
 
 		// what the broadcast to the rest is scheduled with, everything but when
 		$rest = array_diff_key( $schedule, array_flip( [ 'date', 'time', 'dates', 'send_now', 'is_recurring' ] ) );
+
+		// in the contact's local time, the rest go out at the same time of day as the sample did, in the site's timezone
+		if ( ! empty( $schedule['send_in_local_time'] ) && empty( $schedule['send_now'] ) ) {
+			$rest['time_of_day'] = wp_date( 'H:i:s', $broadcast->get_send_time() );
+		}
 
 		self::fresh( $email )->update_meta( self::BROADCAST_TEST_KEY, [
 			'status'       => 'testing',
@@ -997,6 +1004,27 @@ class Email_Variations {
 			return;
 		}
 
+		$sample = new Broadcast( absint( $record['broadcast_id'] ) );
+
+		// the sample was stopped, so the rest isn't sent either
+		if ( ! $sample->exists() || $sample->is_cancelled() ) {
+			$record['status'] = 'cancelled';
+			$email->update_meta( self::BROADCAST_TEST_KEY, $record );
+
+			return;
+		}
+
+		// every contact in the sample gets the whole wait, however the sample is batched or timed
+		$next = self::when_sample_is_done( $sample, absint( $record['wait_hours'] ?? 4 ) * HOUR_IN_SECONDS );
+
+		if ( $next > time() ) {
+			$record['finish_at'] = $next;
+			$email->update_meta( self::BROADCAST_TEST_KEY, $record );
+			wp_schedule_single_event( $next, self::FINISH_BROADCAST_TEST_HOOK, [ $email->get_id() ] );
+
+			return;
+		}
+
 		// so a second run can't send it twice
 		$record['status'] = 'finishing';
 		$email->update_meta( self::BROADCAST_TEST_KEY, $record );
@@ -1015,20 +1043,39 @@ class Email_Variations {
 			self::declare_winner( $email, $winner );
 		}
 
-		$sample = new Broadcast( absint( $record['broadcast_id'] ) );
-		$query  = (array) $record['query'];
+		$query = (array) $record['query'];
 
 		$query['exclude'] = array_values( array_unique( array_merge(
 			wp_parse_id_list( $query['exclude'] ?? [] ),
 			wp_parse_id_list( $sample->exists() ? ( $sample->get_query()['include'] ?? [] ) : [] )
 		) ) );
 
+		$schedule = (array) $record['schedule'];
+		$when     = [ 'send_now' => true ];
+
+		// in the contact's local time: the next time it's that time of day, each contact at their own
+		if ( ! empty( $schedule['time_of_day'] ) ) {
+
+			$at = new \DateTime( 'today ' . $schedule['time_of_day'], wp_timezone() );
+
+			if ( $at->getTimestamp() <= time() ) {
+				$at->modify( '+1 day' );
+			}
+
+			$when = [
+				'send_now' => false,
+				'date'     => $at->format( 'Y-m-d' ),
+				'time'     => $at->format( 'H:i:s' ),
+			];
+		}
+
+		unset( $schedule['time_of_day'] );
+
 		try {
-			$rest = Broadcast::schedule( array_merge( (array) $record['schedule'], [
+			$rest = Broadcast::schedule( array_merge( $schedule, $when, [
 				'object_id'    => $email->get_id(),
 				'object_type'  => 'email',
 				'segment_type' => 'fixed',
-				'send_now'     => true,
 				'query'        => $query,
 			] ) );
 
@@ -1043,6 +1090,83 @@ class Email_Variations {
 		}
 
 		$email->update_meta( self::BROADCAST_TEST_KEY, $record );
+	}
+
+	/**
+	 * About how long after it starts the last of a sample goes out: batches go out one interval apart, and in the
+	 * contact's local time it can take up to a day for the send time to come round everywhere
+	 *
+	 * @param int   $size     how many contacts are in the sample
+	 * @param array $schedule Broadcast::schedule() args
+	 *
+	 * @return int seconds
+	 */
+	protected static function sample_spread( int $size, array $schedule ): int {
+
+		$spread = 0;
+
+		if ( ! empty( $schedule['send_in_local_time'] ) && empty( $schedule['send_now'] ) ) {
+			$spread += DAY_IN_SECONDS;
+		}
+
+		if ( ! empty( $schedule['batching'] ) ) {
+
+			$units = [
+				'minutes' => MINUTE_IN_SECONDS,
+				'hours'   => HOUR_IN_SECONDS,
+				'days'    => DAY_IN_SECONDS,
+			];
+
+			$batches  = (int) ceil( $size / max( 1, absint( $schedule['batch_amount'] ?? 100 ) ) );
+			$interval = max( 1, absint( $schedule['batch_interval_length'] ?? 10 ) ) * ( $units[ $schedule['batch_interval'] ?? 'minutes' ] ?? MINUTE_IN_SECONDS );
+
+			$spread += max( 0, $batches - 1 ) * $interval;
+		}
+
+		return $spread;
+	}
+
+	/**
+	 * When a test's sample has had its wait: a wait after the last of it was sent. Until then, when to look again.
+	 *
+	 * @param Broadcast $sample
+	 * @param int       $wait in seconds
+	 *
+	 * @return int a timestamp, in the past once the wait is over
+	 */
+	protected static function when_sample_is_done( Broadcast $sample, int $wait ): int {
+
+		// still putting the sample in the queue, a big one is done a batch at a time in the background
+		if ( $sample->is_schedulable() ) {
+			return time() + 15 * MINUTE_IN_SECONDS;
+		}
+
+		$last_queued = new Table_Query( 'event_queue' );
+		$last_queued->add_safe_column( 'MAX(time)' );
+		$last_queued->setSelect( [ 'MAX(time)', 'last' ] )
+		            ->where()
+		            ->equals( 'step_id', $sample->get_id() )
+		            ->equals( 'funnel_id', Broadcast::FUNNEL_ID )
+		            ->equals( 'event_type', Event::BROADCAST )
+		            // anything still to go out, whatever it's waiting on
+		            ->notIn( 'status', [ Event::COMPLETE, Event::CANCELLED, Event::SKIPPED, Event::FAILED ] );
+
+		$last_queued = absint( $last_queued->get_var() );
+
+		// some of it hasn't gone out yet: a wait after the last of it is due, or after now if the queue is behind
+		if ( $last_queued ) {
+			return max( $last_queued, time() ) + $wait;
+		}
+
+		$last_sent = new Table_Query( 'events' );
+		$last_sent->add_safe_column( 'MAX(time)' );
+		$last_sent->setSelect( [ 'MAX(time)', 'last' ] )
+		          ->where()
+		          ->equals( 'step_id', $sample->get_id() )
+		          ->equals( 'funnel_id', Broadcast::FUNNEL_ID )
+		          ->equals( 'event_type', Event::BROADCAST );
+
+		return absint( $last_sent->get_var() ) + $wait;
 	}
 
 	/**
