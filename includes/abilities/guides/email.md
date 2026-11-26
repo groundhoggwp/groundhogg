@@ -129,8 +129,11 @@ To translate an email:
 
 1. `get-setup-status` lists the site's languages under `languages`, with how many contacts speak each one. A contact's language is their `locale`, like `fr_FR`.
 2. `create-email-variation` with the `email_id` and `audience: {"locales": ["fr_FR"]}`. It returns a draft copy of the email with the same block ids.
-3. Translate it with `edit-email`, passing the variation's `id` as `email_id`: `get-email-template` on the variation for its outline, then `set_content` or `replace_text` on each text block, and the button text, alt text and links that need it. Translate the subject and preview text with `update-email-template`. Keep merge tags and links as they are.
-4. Check it with `send-test-email` on the variation, then make it ready with `update-email-template` and `status: "ready"`. A draft variation is never sent.
+3. `get-email-strings` on the variation's `id` gives its text as strings by key: the subject, preview text, each paragraph, heading, list item, button and menu label, and image alt text. Inline tags are placeholders like `<1>bold</1>` and `<2/>`.
+4. Translate them all in one `set-email-strings` call: `{"email_id": 41, "strings": {"subject": "…", "text-cc143b": "Bonjour <1>{first}</1>,"}}`. Keep every placeholder exactly once, around the words it belongs to, and keep merge tags like `{first}` as they are. A string that's the same in both languages, like a name, is given its own text to mark it translated. Links and images are changed with `edit-email`, if they need to be.
+5. Check it with `send-test-email` on the variation, then make it ready with `update-email-template` and `status: "ready"`. A draft variation is never sent.
+
+Keeping translations up to date: after the original email changes, `get-email-strings` with `needs_translation: true` on a variation lists only what to translate again (`status: "changed"`, with the new `source`), and `missing` lists text in blocks the email has that the variation doesn't; add those blocks to the variation with `edit-email`. `set-email-strings` says how many are `left_to_translate`.
 
 - The audience takes the same filters as a segment in `search-contacts`, for a variation that isn't about language, like `{"tags_include": ["VIP"]}`. Everything given must match. A contact in more than one audience gets the one with the lowest `priority`.
 - `get-email-template` on an email lists its `variations`; on a variation it gives `variation_of` and its `variation` settings. `update-email-variation` changes the audience, priority or language, and `delete-email-variation` removes one.

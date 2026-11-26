@@ -11,10 +11,13 @@ use Groundhogg\Contact;
 use Groundhogg\Email;
 use Groundhogg\Email_Fonts;
 use Groundhogg\Email_Logger;
+use Groundhogg\Email_Variations;
 use Groundhogg\Email_Video_Thumbnail;
 use Groundhogg\Event;
 use Groundhogg\Library_Email;
+use Groundhogg\Multilingual;
 use Groundhogg\Plugin;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
 use function Groundhogg\array_map_to_contacts;
@@ -78,6 +81,20 @@ class Emails_Api extends Base_Object_Api {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'sent_test' ],
 				'permission_callback' => [ $this, 'send_permissions_callback' ]
+			],
+		] );
+
+		// an email's variations, like the email in other languages, for the email editor
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/variations", [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_variations' ],
+				'permission_callback' => [ $this, 'read_permissions_callback' ]
+			],
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'create_variation' ],
+				'permission_callback' => [ $this, 'create_permissions_callback' ]
 			],
 		] );
 
@@ -969,6 +986,71 @@ class Emails_Api extends Base_Object_Api {
 		$email->enable_test_mode();
 
 		return self::SUCCESS_RESPONSE( [ 'item' => $email ] );
+	}
+
+	/**
+	 * An email's variations, and the site's languages to add one for. For a variation, the email it's a variation of.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function read_variations( WP_REST_Request $request ) {
+
+		$email = new Email( absint( $request->get_param( $this->get_primary_key() ) ) );
+
+		if ( ! $email->exists() ) {
+			return self::ERROR_404();
+		}
+
+		return self::SUCCESS_RESPONSE( Email_Variations::editor_data( $email ) );
+	}
+
+	/**
+	 * Add a variation of an email for a language, starting as a copy of it
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function create_variation( WP_REST_Request $request ) {
+
+		$email = new Email( absint( $request->get_param( $this->get_primary_key() ) ) );
+
+		if ( ! $email->exists() ) {
+			return self::ERROR_404();
+		}
+
+		if ( ! current_user_can( 'edit_email', $email ) ) {
+			return self::ERROR_403();
+		}
+
+		$locale = Multilingual::sanitize_locale( $request->get_param( 'locale' ) );
+
+		if ( ! $locale ) {
+			return self::ERROR_400( 'invalid_locale', __( 'Pick a language for the variation.', 'groundhogg' ) );
+		}
+
+		$variation = Email_Variations::create( $email, [
+			'audience' => [ 'locales' => [ $locale ] ],
+			'title'    => sprintf(
+				/* translators: 1: the email's title, 2: a language, like Français */
+				__( '%1$s (%2$s)', 'groundhogg' ),
+				$email->get_title(),
+				Multilingual::get_locale_name( $locale )
+			),
+			'copy'     => true,
+		] );
+
+		if ( is_wp_error( $variation ) ) {
+			$variation->add_data( [ 'status' => 400 ] );
+
+			return $variation;
+		}
+
+		return self::SUCCESS_RESPONSE( array_merge( Email_Variations::editor_data( $email ), [
+			'created' => $variation->get_id(),
+		] ) );
 	}
 
 	public function read( WP_REST_Request $request ) {

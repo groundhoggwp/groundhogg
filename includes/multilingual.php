@@ -251,7 +251,7 @@ class Multilingual {
 		}
 
 		foreach ( $languages as $locale => &$language ) {
-			$language['name'] = $language['name'] ? sanitize_text_field( $language['name'] ) : self::get_locale_name( $locale );
+			$language['name'] = $language['name'] ? sanitize_text_field( $language['name'] ) : self::native_name( $locale );
 		}
 
 		/**
@@ -309,20 +309,29 @@ class Multilingual {
 			return '';
 		}
 
-		foreach ( is_array( self::$site_languages ) ? self::$site_languages : [] as $language ) {
+		// the multilingual plugin's name for it
+		foreach ( self::get_site_languages() as $language ) {
 			if ( $language['locale'] === $locale && $language['name'] ) {
 				return $language['name'];
 			}
 		}
 
-		$name = '';
+		return self::native_name( $locale );
+	}
 
-		if ( class_exists( '\Locale' ) ) {
-			$name = \Locale::getDisplayName( $locale, $locale );
-		}
+	/**
+	 * A language's name in that language from PHP's intl extension, or the locale when it isn't installed
+	 *
+	 * @param string $locale
+	 *
+	 * @return string
+	 */
+	protected static function native_name( string $locale ): string {
+
+		$name = class_exists( '\Locale' ) ? \Locale::getDisplayName( $locale, $locale ) : '';
 
 		if ( ! $name || $name === $locale ) {
-			$name = $locale === 'en_US' ? 'English (United States)' : $locale;
+			return $locale === 'en_US' ? 'English (United States)' : $locale;
 		}
 
 		return function_exists( 'mb_strtoupper' ) ? mb_strtoupper( mb_substr( $name, 0, 1 ) ) . mb_substr( $name, 1 ) : ucfirst( $name );

@@ -1,6 +1,6 @@
 # Email variations: multilingual sends and A/B tests
 
-Status: proposal (2026-11-26). Phases 1 (locale foundation) and 2 (variation core) are built; phases 3–4 are not.
+Status: proposal (2026-11-26). Phases 1 (locale foundation), 2 (variation core) and 3 (translation workflow) are built; phase 4 (A/B tests) is not.
 
 ## The problem
 
@@ -301,6 +301,35 @@ no plugin at all.
    - Tests: `tests/phpunit/unit-tests/includes/class-email-variations-tests.php`.
 3. **Translation workflow:** `get-`/`set-email-strings`; staleness tracking;
    AI translate job; a language switcher (tabs) in the email editor for humans.
+
+   **Built (2026-11-26).** `Groundhogg\Email_Strings` (`includes/email-strings.php`):
+   - A string is the text between block-level tags; inline tags become numbered
+     placeholders (`<1>bold</1>`, `<2/>`) that are put back as the original tags,
+     styles and URLs included, so translating can't break formatting. Keys are
+     `subject`, `preview`, the block id (`{id}`, `{id}.2`…, `{id}.alt`) for
+     text, heading, button and menu blocks and image alt text, and `text.N` in HTML
+     emails. Footer, HTML, global and dynamic blocks aren't read.
+   - Staleness is per string, not the whole-email `strings_hash` planned above:
+     meta `variation_sources` holds a short hash of the email's text each string
+     was translated from. Written on `set()` (agents, the AI job, and strings
+     confirmed unchanged like names) and, for strings translated by hand, when the
+     editor saves the variation. Statuses: `untranslated`, `changed`, `translated`,
+     `not_in_email`; `missing` lists text in blocks the variation doesn't have.
+   - Abilities `get-email-strings` (`needs_translation` filter) and
+     `set-email-strings` (all or nothing, `expected_version`, edit lock).
+   - AI job `translate-email` on the site's key: sends only strings that need it
+     (up to 12,000 characters a request, the rest on the next click), saves what
+     comes back, and leaves any string that lost a placeholder for the next try.
+   - Editor: instead of language tabs, a "Variations" panel in Email Settings
+     (`GET/POST gh/v4/emails/{id}/variations`, `Email_Variations::editor_data()`):
+     the variations with status, languages and strings left to translate, a
+     Translate button (AI), and "Add a language" for the site's other languages,
+     which makes a draft copy. On a variation it links back to the email. Tabs
+     that switch the canvas between versions in place would mean the editor
+     holding several emails at once; the panel opens each in its own editor.
+   - Tests: `tests/phpunit/unit-tests/includes/class-email-strings-tests.php`.
+     Checked on groundhogg.dev: email #35 got a French variation (#44) that the AI
+     translated in one click, with every placeholder back on the right words.
 4. **A/B tests:** test variations with sticky weights; variation report with
    confidence; `declare-email-winner`; broadcast test-then-send-winner.
 

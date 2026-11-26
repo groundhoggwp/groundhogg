@@ -4954,6 +4954,246 @@
 
   }
 
+  // what the Variations panel shows, fetched the first time it's drawn, see Email_Variations::editor_data()
+  const VariationsState = Groundhogg.createState({
+    loaded : false,
+    loading: false,
+    data   : null,
+    error  : '',
+    locale : '',
+    adding : false,
+  })
+
+  const variationsRoute = () => `${ EmailsStore.route }/${ getEmail().ID }/variations`
+
+  const fetchVariations = () => {
+
+    VariationsState.set({ loading: true })
+
+    return get(variationsRoute()).then(data => VariationsState.set({
+      loaded : true,
+      loading: false,
+      data,
+      error  : '',
+    })).catch(err => VariationsState.set({
+      loaded : true,
+      loading: false,
+      error  : err.message,
+    }))
+  }
+
+  /**
+   * The language names of a variation's audience, or that it's for other contacts
+   *
+   * @param {Object} variation
+   * @return {string}
+   */
+  const variationAudienceLabel = (variation) => {
+
+    const { locales = [], include_filters = [], exclude_filters = [] } = variation.audience || {}
+    const names = variation.languages || locales
+
+    if (!names.length) {
+      return __('Contacts that match its filters', 'groundhogg')
+    }
+
+    if (include_filters.length || exclude_filters.length) {
+      // translators: %s: a list of languages, like fr_FR, de_DE
+      return sprintf(__('%s, matching its filters', 'groundhogg'), names.join(', '))
+    }
+
+    return names.join(', ')
+  }
+
+  /**
+   * The Translate button of a variation, when the site's AI can translate. The open email is reloaded after, since
+   * the translation is saved to it.
+   *
+   * @param {Object}   variation
+   * @param {Function} morph
+   * @return {HTMLElement|null}
+   */
+  const TranslateVariationButton = (variation, morph) => {
+
+    if (!Groundhogg.ai.has || !Groundhogg.ai.has('translate-email') || !variation.locale || !variation.to_translate) {
+      return null
+    }
+
+    const isOpen = variation.id === getEmail().ID
+
+    const button = Groundhogg.ai.AiButton({
+      id       : `translate-variation-${ variation.id }`,
+      job      : 'translate-email',
+      label    : __('Translate', 'groundhogg'),
+      working  : __('Translating', 'groundhogg'),
+      className: 'gh-button secondary small',
+      input    : { email_id: variation.id },
+      onDone   : ({ translated = 0, left_to_translate = 0 }) => {
+
+        if (isOpen) {
+          window.location.reload()
+          return
+        }
+
+        dialog({
+          message: left_to_translate
+            // translators: 1: how many strings were translated, 2: how many are left
+            ? sprintf(__('Translated %1$d. %2$d left, translate again to do the rest.', 'groundhogg'), translated, left_to_translate)
+            // translators: %d: how many strings were translated
+            : sprintf(__('Translated %d. Open the variation to check it, then make it ready.', 'groundhogg'), translated),
+        })
+
+        fetchVariations().then(morph)
+      },
+    })
+
+    // the translation is saved to the email, and reloading it would lose unsaved changes. Capturing runs before the
+    // button's own click handler.
+    if (isOpen) {
+      button.addEventListener('click', e => {
+        if (State.hasChanges) {
+          e.stopImmediatePropagation()
+          dialog({
+            type   : 'error',
+            message: __('Save your changes first, the translation is saved to this email.', 'groundhogg'),
+          })
+        }
+      }, true)
+    }
+
+    return button
+  }
+
+  /**
+   * Other versions of the email, like the email in other languages: each contact gets the one for them, or this one.
+   * On a variation, the email it's a version of.
+   */
+  const VariationsControls = () => {
+
+    if (!getEmail().ID || isGlobalBlockEditor()) {
+      return null
+    }
+
+    return ControlGroup({
+        id  : 'variations',
+        name: __('Variations', 'groundhogg'),
+      },
+      [
+        Div({
+          id       : 'email-variations',
+          className: 'display-flex column gap-10',
+        }, morph => {
+
+          if (!VariationsState.loaded) {
+
+            if (!VariationsState.loading) {
+              fetchVariations().then(morph)
+            }
+
+            return Span({ className: 'loading-dots' }, __('Loading', 'groundhogg'))
+          }
+
+          if (VariationsState.error) {
+            return Pg({}, escHTML(VariationsState.error))
+          }
+
+          const {
+            supported,
+            is_variation,
+            original,
+            variations = [],
+            languages = [],
+          } = VariationsState.data
+
+          if (!supported) {
+            return Pg({}, __('Templates and global blocks can\'t have variations.', 'groundhogg'))
+          }
+
+          const Row = variation => Div({
+            className: 'gh-panel outlined display-flex column gap-5',
+            style    : { padding: '10px' },
+          }, [
+            Div({ className: 'display-flex gap-5 align-center space-between' }, [
+              variation.id === getEmail().ID
+                ? makeEl('b', {}, escHTML(variation.title))
+                : An({ href: variation.edit_url }, escHTML(variation.title)),
+              Span({ className: `pill ${ variation.status === 'ready' ? 'green' : 'orange' }` },
+                variation.status === 'ready' ? __('Ready', 'groundhogg') : __('Draft', 'groundhogg')),
+            ]),
+            Span({ className: 'gh-text small' }, escHTML(variationAudienceLabel(variation))),
+            variation.to_translate ? Div({ className: 'display-flex gap-5 align-center space-between' }, [
+              Span({ className: 'gh-text small' },
+                // translators: %d: how many pieces of text aren't translated
+                sprintf(_n('%d string to translate', '%d strings to translate', variation.to_translate, 'groundhogg'), variation.to_translate)),
+              TranslateVariationButton(variation, morph),
+            ]) : null,
+          ])
+
+          if (is_variation) {
+
+            const current = variations.find(v => v.id === getEmail().ID)
+
+            return Fragment([
+              Pg({}, sprintf(
+                // translators: %s: a link to the email this is a variation of
+                __('This is a version of %s. Contacts in its audience get it instead, once it\'s ready.', 'groundhogg'),
+                `<a href="${ original.edit_url }">${ escHTML(original.title) }</a>`,
+              )),
+              current ? Row(current) : null,
+            ])
+          }
+
+          return Fragment([
+            Pg({}, __('Send other versions of this email, like the email in other languages. Each contact gets the first ready version they\'re in the audience of, or this email.', 'groundhogg')),
+            ...variations.map(Row),
+            languages.length ? Div({ className: 'display-flex gap-5' }, [
+              Select({
+                id      : 'add-variation-language',
+                className: 'full-width',
+                selected: VariationsState.locale,
+                options : [
+                  { value: '', text: __('Add a language', 'groundhogg') },
+                  ...languages.map(({ locale, name }) => ( { value: locale, text: escHTML(name) } )),
+                ],
+                onChange: e => VariationsState.set({ locale: e.target.value }),
+              }),
+              Button({
+                id       : 'add-variation',
+                className: `gh-button secondary${ VariationsState.adding ? ' loading-dots' : '' }`,
+                disabled : !VariationsState.locale || VariationsState.adding,
+                onClick  : () => {
+
+                  if (State.hasChanges) {
+                    dialog({
+                      type   : 'error',
+                      message: __('Save your changes first, the new version starts as a copy of this email.', 'groundhogg'),
+                    })
+                    return
+                  }
+
+                  VariationsState.set({ adding: true })
+                  morph()
+
+                  post(variationsRoute(), { locale: VariationsState.locale }).then(data => {
+                    VariationsState.set({ data, adding: false, locale: '' })
+                    dialog({
+                      message: __('Added a draft copy. Translate it, then make it ready.', 'groundhogg'),
+                    })
+                  }).catch(err => {
+                    VariationsState.set({ adding: false })
+                    dialog({ type: 'error', message: escHTML(err.message) })
+                  }).finally(morph)
+                },
+              }, __('Add', 'groundhogg')),
+            ]) : null,
+            !languages.length && !variations.length
+              ? Pg({ className: 'gh-text small' }, __('The site is in one language. With a multilingual plugin like WPML or Polylang, its other languages can be added here. AI agents can add versions for other audiences too.', 'groundhogg'))
+              : null,
+          ])
+        }),
+      ])
+  }
+
   const BasicEmailControls = () => {
     let {
       reply_to_override = '',
@@ -5113,6 +5353,7 @@
 
         ]),
       isBlockEditor() ? TemplateControls() : null,
+      VariationsControls(),
       isGlobalBlockEditor() ? null : ControlGroup({
           id  : 'campaigns',
           name: 'Campaigns',

@@ -363,6 +363,7 @@ class Plugin {
 		new Plugin_Compatibility();
 		new Multilingual();
 		new Email_Variations();
+		new Email_Strings();
 		new License_Manager();
 		new Background_Tasks();
 		new Big_File_Uploader();

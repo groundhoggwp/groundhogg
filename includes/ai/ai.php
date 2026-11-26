@@ -6,6 +6,7 @@ use Groundhogg\AI\Jobs\Alt_Text;
 use Groundhogg\AI\Jobs\Contact_Summary;
 use Groundhogg\AI\Jobs\Preview_Text;
 use Groundhogg\AI\Jobs\Subject_Lines;
+use Groundhogg\AI\Jobs\Translate_Email;
 use Groundhogg\DB\Query\Table_Query;
 use WP_Error;
 use function Groundhogg\admin_page_url;
@@ -280,6 +281,7 @@ class AI {
 			new Subject_Lines(),
 			new Preview_Text(),
 			new Contact_Summary(),
+			new Translate_Email(),
 		] );
 
 		self::$jobs = [];

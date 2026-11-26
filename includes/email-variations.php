@@ -538,6 +538,61 @@ class Email_Variations {
 	}
 
 	/**
+	 * What the email editor shows about an email's variations: the email they're variations of, each one with how much
+	 * of it is left to translate, and the site's languages there's no variation for yet
+	 *
+	 * @param Email $email the email, or one of its variations
+	 *
+	 * @return array
+	 */
+	public static function editor_data( Email $email ): array {
+
+		$original = $email->is_variation() ? $email->get_parent() : $email;
+
+		if ( ! $original || ! $original->exists() ) {
+			$original = $email;
+		}
+
+		$can_have = self::supported() && ! $original->is_template() && $original->get_message_type() !== 'global_block';
+
+		$variations = array_map( function ( Email $variation ) {
+			$describe = self::describe( $variation );
+
+			return array_merge( $describe, [
+				'languages'    => array_map( [ Multilingual::class, 'get_locale_name' ], $describe['audience']['locales'] ),
+				'subject'      => $variation->get_subject_line(),
+				'edit_url'     => $variation->admin_link(),
+				'to_translate' => Email_Strings::supports( $variation ) ? Email_Strings::count_to_translate( $variation ) : null,
+			] );
+		}, $can_have ? self::get_variations( $original ) : [] );
+
+		$taken = [ Multilingual::get_default_locale() ];
+
+		foreach ( $variations as $variation ) {
+			array_push( $taken, ...$variation['audience']['locales'] );
+		}
+
+		$languages = array_values( array_filter( Multilingual::get_site_languages(), function ( $language ) use ( $taken ) {
+			return ! in_array( $language['locale'], $taken, true );
+		} ) );
+
+		return [
+			'supported'    => $can_have,
+			'email_id'     => $email->get_id(),
+			'is_variation' => $email->is_variation(),
+			'original'     => [
+				'id'       => $original->get_id(),
+				'title'    => $original->get_title(),
+				'edit_url' => $original->admin_link(),
+			],
+			'variations'   => $variations,
+			'languages'    => array_map( function ( $language ) {
+				return [ 'locale' => $language['locale'], 'name' => $language['name'] ];
+			}, $languages ),
+		];
+	}
+
+	/**
 	 * A variation, for the abilities and the API
 	 *
 	 * @param Email $variation
