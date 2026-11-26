@@ -681,12 +681,14 @@ class Pii {
 	 *
 	 * @param string           $text
 	 * @param Contact|int|null $contact the contact the text is about
+	 * @param bool             $always  for anyone, not only a restricted user, like before the text leaves the site for
+	 *                                  an AI provider, see Groundhogg\Markdown\Contact_Markdown
 	 *
 	 * @return string
 	 */
-	public static function scrub_text( string $text, $contact = null ): string {
+	public static function scrub_text( string $text, $contact = null, bool $always = false ): string {
 
-		if ( $text === '' || ! self::is_restricted() ) {
+		if ( $text === '' || ( ! $always && ! self::is_restricted() ) ) {
 			return $text;
 		}
 

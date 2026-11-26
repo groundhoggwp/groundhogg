@@ -395,6 +395,14 @@ class Main_Updater extends Old_Updater {
 					get_db( 'emails' )->create_table(); // add parent_id
 				},
 			],
+			'4.14' => [
+				'automatic'   => true,
+				'description' => __( 'Add the AI usage table, and the <code>use_ai</code> capability for administrators and marketers.', 'groundhogg' ),
+				'callback'    => function () {
+					get_db( 'ai_usage' )->create_table();
+					Plugin::instance()->roles->add_caps();
+				},
+			],
 		];
 	}
 

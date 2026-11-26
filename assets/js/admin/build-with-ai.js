@@ -173,7 +173,7 @@
   // the site notes when an assistant first signs in, see Groundhogg\Mcp\Connection::note_seen()
   const checkConnected = () => post( 'gh_mcp_is_connected' ).then( json => Boolean( json && json.success && json.data.connected ) ).catch( () => false )
 
-  // if the steps can't be shown here, the AI agent tab in Tools still can
+  // if the steps can't be shown here, the AI assistant tab of the AI page still can
   const ConnectLink = () => An( {
     className: 'gh-button primary',
     href     : setupUrl,
@@ -182,9 +182,9 @@
   }, __( 'Connect your AI assistant', 'groundhogg' ) )
 
   /**
-   * Show the steps of the AI agent tab in Tools right here, so connecting an assistant doesn't mean leaving the page.
+   * Show the steps of the AI assistant tab right here, so connecting an assistant doesn't mean leaving the page.
    * The tab sends each step in the background and swaps in what comes back, so it works the same in the popup.
-   * See Tools_Page::ajax_mcp_view().
+   * See AI_Page::ajax_mcp_view().
    */
   const loadWizard = () => post( 'gh_mcp_view' ).finally( () => {
     // with the steps (or the way to them) in place, there's something to wait for
@@ -546,7 +546,7 @@
     grid.prepend( Card() )
   }
 
-  // the AI agent tab, see admin/tools/mcp.php. Its own steps are how to connect, so the popup goes straight to the
+  // the AI assistant tab, see admin/ai/assistant.php. Its own steps are how to connect, so the popup goes straight to the
   // prompt, rather than show those steps a second time
   const missions = document.querySelectorAll( '[data-build-with-ai-missions]' )
 

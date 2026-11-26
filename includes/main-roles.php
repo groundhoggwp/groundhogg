@@ -937,7 +937,9 @@ class Main_Roles extends Roles {
 			'perform_bulk_actions',
 			'manage_gh_licenses',
 			'edit_custom_properties',
-			'manage_campaigns'
+			'manage_campaigns',
+			// AI features on the site's own key, see Groundhogg\AI\AI
+			'use_ai',
 		);
 
 		return apply_filters( 'groundhogg/roles/caps/other', $caps );

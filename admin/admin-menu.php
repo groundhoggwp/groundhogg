@@ -2,6 +2,7 @@
 
 namespace Groundhogg\Admin;
 
+use Groundhogg\Admin\AI\AI_Page;
 use Groundhogg\Admin\Broadcasts\Broadcasts_Page;
 use Groundhogg\Admin\Bulk_Jobs\Bulk_Job_Page;
 use Groundhogg\Admin\Campaigns\Campaigns_Page;
@@ -166,6 +167,7 @@ class Admin_Menu {
 		$this->campaigns  = new Campaigns_Page();
 
 		$this->events    = new Events_Page();
+		$this->ai        = new AI_Page();
 		$this->tools     = new Tools_Page();
 		$this->settings  = new Settings_Page();
 		$this->bulk_jobs = new Bulk_Job_Page();

@@ -4,6 +4,8 @@ namespace Groundhogg\Admin\Contacts;
 
 use Groundhogg\Admin\Admin_Page;
 use Groundhogg\Admin\Contacts\Tables\Contact_Table_Columns;
+use Groundhogg\AI\AI;
+use Groundhogg\AI\Jobs\Contact_Summary;
 use Groundhogg\Contact;
 use Groundhogg\DB\Query\Filters;
 use Groundhogg\Pii;
@@ -223,8 +225,15 @@ class Contacts_Page extends Admin_Page {
 				wp_enqueue_script( 'postbox' );
 				wp_enqueue_script( 'groundhogg-admin-contact-editor' );
 				wp_enqueue_script( 'groundhogg-admin-contact-info-cards' );
+
+				// the summarize button, when the site's AI can do it, see Groundhogg\AI\Jobs\Contact_Summary
+				if ( AI::is_supported() ) {
+					wp_enqueue_script( 'groundhogg-ai' );
+				}
+
 				wp_localize_script( 'groundhogg-admin-contact-editor', 'ContactEditor', [
 					'contact_id'                   => $contact->get_id(),
+					'aiSummary'                    => Contact_Summary::get_saved( $contact ),
 					'contact'                      => $contact,
 					'default_tab'                  => get_default_contact_tab(),
 					'meta_exclusions'              => $this->get_meta_key_exclusions(),
@@ -419,6 +428,8 @@ class Contacts_Page extends Admin_Page {
 	 */
 	public function get_meta_key_exclusions() {
 		return apply_filters( 'groundhogg/admin/contacts/exclude_meta_list', [
+			// shown above the tags, see Groundhogg\AI\Jobs\Contact_Summary
+			'ai_summary',
 			'alternate_emails',
 			'alternate_phones',
 			'birthday',

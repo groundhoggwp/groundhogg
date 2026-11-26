@@ -129,7 +129,7 @@ Here are the tools you can use to launch your funnel, grow your list, and scale 
 
 Groundhogg is an AI CRM: let ChatGPT, Claude, Gemini, Cursor and other AI agents work inside it, safely.
 
-* **Set up in a few clicks.** The AI agent tab in Tools installs the MCP Adapter plugin, creates an application password, and has setup steps for ChatGPT, Claude, Codex, Cursor, Gemini CLI, VS Code and custom connectors. _(WordPress 6.9 or later.)_
+* **Set up in a few clicks.** The AI page installs the MCP Adapter plugin, creates an application password, and has setup steps for ChatGPT, Claude, Codex, Cursor, Gemini CLI, VS Code and custom connectors. _(WordPress 6.9 or later.)_
 * **Build flows by asking for them.** Agents can build a flow with branches from scratch, activate it, and read and edit an existing one. Changes to a live flow are staged until they're published.
 * **Try before you publish.** Agents can simulate what a flow would do for a contact, with no side effects, before anything goes live.
 * **Contacts:** find, create, update and search contacts, read and add notes, and manage tags, owners, custom fields and saved searches.
@@ -282,7 +282,7 @@ Groundhogg will attempt (if licensed) to geolocate a contact (country, region, t
 == Frequently Asked Questions ==
 
 = Is Groundhogg an AI CRM? =
-Yes. AI agents like ChatGPT, Claude, Gemini and Cursor connect to Groundhogg through MCP from the AI agent tab in Tools, then build flows, write emails, schedule broadcasts and manage contacts for you. They can only do what the WordPress user they connect as is allowed to do.
+Yes. AI agents like ChatGPT, Claude, Gemini and Cursor connect to Groundhogg through MCP from the AI page, then build flows, write emails, schedule broadcasts and manage contacts for you. They can only do what the WordPress user they connect as is allowed to do.
 
 = Does Groundhogg need any additional marketing software like MailChimp? =
 No, Groundhogg is a completely standalone, lightweight CRM and marketing automation system designed to save you $1,000s while helping you generate more revenue.

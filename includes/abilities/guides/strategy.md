@@ -18,7 +18,7 @@ Until they agree to a change, only read: no emailing contacts, no changing conta
 - **Flows:** `list-flows` for what exists and what's active, and `get-flow` for the steps of the ones that matter: what starts them, what they send, and where they end.
 - **Forms and lead capture:** forms are steps in flows (form triggers), so look for them with `get-flow`. `get-reports` `table_form_activity` shows which forms get submissions and impressions.
 - **Emails and broadcasts:** `list-email-templates`, `list-broadcasts`, and `list-campaigns` for how they're grouped.
-- **Contacts:** `search-contacts` for counts by tag, opt-in status, owner or date added. `list-tags`, `list-saved-searches`, `list-custom-fields` and `list-owners` for how they're organized.
+- **Contacts:** `search-contacts` for counts by tag, opt-in status, owner or date added. `list-tags`, `list-saved-searches`, `list-custom-fields` and `list-owners` for how they're organized. `get-contact-history` for everything about one contact, like a typical customer or a lead that went cold, in one call, with the summary someone saved before. When you sum a contact up, save it with `save-contact-summary` so the team sees it on their record.
 - **Integrations:** `list-step-types` shows which triggers exist, like purchases, course enrollments or bookings, which tells you which plugins they integrate with.
 - **Setup:** `get-setup-status` for anything broken that skews the numbers, like email that isn't sending or a queue that isn't running.
 - **Anything else:** `query-table` for the raw rows: `events` (what ran or failed in each flow), `event_queue` (what's waiting), `activity` (opens, clicks, logins), `page_visits`, `submissions`, `tasks` and `notes`. `describe-table` gives the columns.

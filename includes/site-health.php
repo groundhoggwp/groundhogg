@@ -62,6 +62,11 @@ class Site_Health {
 			$direct['bounces'] = [ __( 'Bounces can be checked', 'groundhogg' ), 'test_bounces' ];
 		}
 
+		// WordPress 7.0's AI client, with the keys in Settings › Connectors
+		if ( AI\AI::is_supported() ) {
+			$direct['ai'] = [ __( 'AI features are ready', 'groundhogg' ), 'test_ai' ];
+		}
+
 		if ( ! is_white_labeled() && ! empty( Extension::get_extensions() ) ) {
 			$direct['licenses'] = [ __( 'Extensions are licensed', 'groundhogg' ), 'test_licenses' ];
 		}
@@ -677,6 +682,48 @@ class Site_Health {
 		), [
 			admin_page_url( 'gh_tools', [ 'tab' => 'system' ] ) => __( 'Turn off safe mode', 'groundhogg' ),
 		] );
+	}
+
+	/**
+	 * Whether AI features on the site's own key can work: a provider with a key in Settings › Connectors, and this
+	 * month's limit not used up. Turning them off is a choice, not a problem.
+	 *
+	 * @return array
+	 */
+	public function test_ai() {
+
+		$settings = [ AI\AI::page_url() => __( 'AI settings', 'groundhogg' ) ];
+
+		if ( ! AI\AI::is_enabled() ) {
+			return $this->result( 'ai', 'good', __( 'AI features are turned off', 'groundhogg' ), $this->paragraphs(
+				__( 'AI features that use this site\'s own key are turned off in the settings. An AI assistant people connect themselves keeps working.', 'groundhogg' )
+			), $settings );
+		}
+
+		if ( ! AI\AI::can_generate( AI\Job::TEXT ) ) {
+			return $this->result( 'ai', 'recommended', __( 'AI features need a key for an AI provider', 'groundhogg' ), $this->paragraphs(
+				__( 'Features like writing alt text and subject lines ask an AI provider, using a key the site owner adds in Settings › Connectors. Each request is billed to that key.', 'groundhogg' ),
+				__( 'Add a key for a provider, or turn AI features off in the settings if they\'re not wanted.', 'groundhogg' )
+			), [
+				admin_url( 'options-connectors.php' ) => __( 'Add a key', 'groundhogg' ),
+			] + $settings );
+		}
+
+		if ( AI\AI::limit_reached() ) {
+			return $this->result( 'ai', 'recommended', __( 'AI features are paused for the rest of the month', 'groundhogg' ), $this->paragraphs(
+				sprintf(
+					/* translators: %s: the number of requests allowed a month */
+					__( 'This month\'s limit of %s AI requests is used up. AI features start again on the first of next month, or the limit can be raised in the settings.', 'groundhogg' ),
+					number_format_i18n( AI\AI::get_limit() )
+				)
+			), $settings );
+		}
+
+		return $this->result( 'ai', 'good', __( 'AI features are ready', 'groundhogg' ), $this->paragraphs(
+			AI\AI::can_generate( AI\Job::IMAGE )
+				? __( 'The AI providers this site has keys for can write text and make images.', 'groundhogg' )
+				: __( 'The AI providers this site has keys for can write text. None of them makes images.', 'groundhogg' )
+		) );
 	}
 
 	/**

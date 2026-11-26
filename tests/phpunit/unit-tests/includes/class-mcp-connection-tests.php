@@ -185,8 +185,8 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 	 * The tab as the page prints it. Without its script by default, which lists every step, so what is left is the
 	 * forms and text that are really on the page.
 	 */
-	protected function render_tab( ?\Groundhogg\Admin\Tools\Tools_Page $tools = null, bool $with_script = false ): string {
-		$tools = $tools ?: new \Groundhogg\Admin\Tools\Tools_Page();
+	protected function render_tab( ?\Groundhogg\Admin\AI\AI_Page $tools = null, bool $with_script = false ): string {
+		$tools = $tools ?: new \Groundhogg\Admin\AI\AI_Page();
 
 		ob_start();
 		$tools->mcp_view();
@@ -302,16 +302,16 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->assertFalse( Connection::is_connected( $user ) );
 	}
 
-	/* ---- the tab in Tools -------------------------------------------------------------------------------- */
+	/* ---- the tab on the AI page -------------------------------------------------------------------------- */
 
-	public function test_the_tab_is_in_tools_for_administrators() {
+	public function test_the_tab_is_on_the_ai_page_for_administrators() {
 		if ( ! Connection::is_supported() ) {
 			$this->markTestSkipped( 'Needs WordPress 6.9 for the Abilities API.' );
 		}
 
 		$this->user_with_role( 'administrator' );
 
-		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+		$tools = new \Groundhogg\Admin\AI\AI_Page();
 		$urls  = array_column( $tools->command_palette_tab_commands( [] ), 'url' );
 
 		$this->assertContains( Connection::page_url(), $urls );
@@ -327,14 +327,14 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		// they can connect an assistant of their own, it acts as them
 		$this->user_with_role( 'sales_rep' );
 
-		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+		$tools = new \Groundhogg\Admin\AI\AI_Page();
 		$urls  = array_column( $tools->command_palette_tab_commands( [] ), 'url' );
 
 		$this->assertContains( Connection::page_url(), $urls );
 
 		$this->user_with_role( 'subscriber' );
 
-		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+		$tools = new \Groundhogg\Admin\AI\AI_Page();
 		$urls  = array_column( $tools->command_palette_tab_commands( [] ), 'url' );
 
 		$this->assertNotContains( Connection::page_url(), $urls );
@@ -484,7 +484,7 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 	 */
 	protected function send_step( string $step, bool $with_nonce = true, string $name = '' ): array {
 
-		$tools = new \Groundhogg\Admin\Tools\Tools_Page();
+		$tools = new \Groundhogg\Admin\AI\AI_Page();
 
 		$die = function () {
 			return function () {
@@ -525,7 +525,7 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$this->assertStringContainsString( 'id="gh-mcp-content"', $html, 'what is swapped' );
 		$this->assertStringContainsString( 'gh_mcp_step', $html );
 		$this->assertStringContainsString( 'data-nonce=', $html );
-		foreach ( \Groundhogg\Admin\Tools\Tools_Page::MCP_STEPS as $step ) {
+		foreach ( \Groundhogg\Admin\AI\AI_Page::MCP_STEPS as $step ) {
 			$this->assertStringContainsString( $step, $html );
 		}
 
@@ -591,7 +591,7 @@ class Mcp_Connection_Tests extends GH_UnitTestCase {
 		$user = $this->user_with_role( 'administrator' );
 		$this->serve_the_default_server();
 
-		$tools                     = new \Groundhogg\Admin\Tools\Tools_Page();
+		$tools                     = new \Groundhogg\Admin\AI\AI_Page();
 		$tools->new_agent_password = Connection::create_application_password( $user, 'Claude' );
 
 		$html = $this->render_tab( $tools );

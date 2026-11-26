@@ -374,6 +374,7 @@ class Plugin {
 		new Abilities();
 		new Email_Fonts();
 		Mcp\Connection::init();
+		AI\AI::init();
 		$this->site_health = new Site_Health();
 	}
 

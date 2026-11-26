@@ -36,6 +36,8 @@ $active_tab = sanitize_key( get_request_var( 'active_tab', $cookie_tab ) );
         <div class="contact-details">
 			<?php include __DIR__ . '/details-card.php'; ?>
         </div>
+        <!-- the AI summary, drawn by contact-editor.js when there is one -->
+        <div id="gh-ai-contact-summary"></div>
         <div class="gh-panel tags-panel">
             <div class="gh-panel-header">
                 <h2 class="hndle"><?php dashicon_e( 'tag' ); ?><?php esc_html_e( 'Tags', 'groundhogg' ); ?></h2>
