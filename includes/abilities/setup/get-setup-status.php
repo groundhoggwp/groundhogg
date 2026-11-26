@@ -3,7 +3,6 @@
 namespace Groundhogg\Abilities\Setup;
 
 use Groundhogg\Abilities\Ability;
-use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Multilingual;
 use Groundhogg\Plugin;
 use function Groundhogg\get_primary_owner;
@@ -183,24 +182,7 @@ class Get_Setup_Status extends Ability {
 	protected function languages(): array {
 
 		$default = Multilingual::get_default_locale();
-
-		$query = new Table_Query( 'contacts' );
-		$alias = $query->joinMeta( 'locale' );
-
-		// sanitize_locale() only lets through letters, numbers and underscores, so $default is safe in SQL
-		$col = "COALESCE(NULLIF($alias.meta_value,''),'$default')";
-		$query->add_safe_column( $col );
-		$query->setSelect( [ $col, 'locale' ], [ 'COUNT(*)', 'contacts' ] )->setGroupby( 'locale' );
-
-		$counts = [];
-
-		foreach ( $query->get_results() as $row ) {
-			$locale = Multilingual::sanitize_locale( $row->locale );
-
-			if ( $locale ) {
-				$counts[ $locale ] = ( $counts[ $locale ] ?? 0 ) + absint( $row->contacts );
-			}
-		}
+		$counts  = Multilingual::count_contacts_by_locale();
 
 		$site = array_map( function ( $language ) use ( &$counts ) {
 

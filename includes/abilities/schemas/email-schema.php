@@ -150,6 +150,15 @@ class Email_Schema extends Schema {
 	 */
 	public static function variation_properties(): array {
 		return [
+			'kind'     => [
+				'type'        => 'string',
+				'enum'        => [ 'audience', 'test' ],
+				'description' => __( '"audience": for the contacts in its audience, like a language. "test": an A/B test version, which gets `weight` percent of the contacts no audience version is for.', 'groundhogg' ),
+			],
+			'weight'   => [
+				'type'        => 'integer',
+				'description' => __( 'For a test version: its share of the test, in percent.', 'groundhogg' ),
+			],
 			'audience' => [
 				'type'        => 'object',
 				'description' => __( 'Contacts get the variation when they speak one of `locales` (if any) and match `include_filters` and not `exclude_filters` (if any), in Groundhogg\'s segment filter format.', 'groundhogg' ),

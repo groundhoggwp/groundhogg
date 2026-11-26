@@ -140,6 +140,16 @@ Keeping translations up to date: after the original email changes, `get-email-st
 - `resolve-email-variation` says which version a contact would get, and why each variation was or wasn't chosen.
 - A variation can't have variations of its own, and templates and global blocks can't have any.
 
+### A/B tests
+
+A test version is a variation with no audience: `create-email-variation` with `kind: "test"`. The contacts no audience version is for are split between the email (version A) and its ready test versions by `weight`, evenly unless you say otherwise, and each contact always gets the same one.
+
+1. Create the test version, change what's being tested (often just the subject, with `update-email-template`), and make it ready.
+2. `get-email-variation-report` shows each version's sent, opened and clicked, from when the test started, which one is ahead, and how confident that is. It suggests a winner once it's 95% sure; until then, keep the test running. Judge by clicks unless asked otherwise: some email apps open every email.
+3. `declare-email-winner` ends it: everyone in the test gets the winner from then on. Only declare one the report suggests, or that the person you're working for picks. `winner_id: 0` starts the test over.
+
+For a broadcast, `send-email-broadcast` with `ab_test: {"sample_percent": 20, "wait_hours": 4}` sends the test to a random sample, then picks the version that did best and broadcasts it to everyone else on its own.
+
 ## Merge tags
 
 Merge tags are resolved for each recipient when the email is sent, in the subject, preview text and content.

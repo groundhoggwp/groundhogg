@@ -1,6 +1,6 @@
 # Email variations: multilingual sends and A/B tests
 
-Status: proposal (2026-11-26). Phases 1 (locale foundation), 2 (variation core) and 3 (translation workflow) are built; phase 4 (A/B tests) is not.
+Status: built (2026-11-26). Phases 1 (locale foundation), 2 (variation core), 3 (translation workflow) and 4 (A/B tests) are done; see each phase's notes below.
 
 ## The problem
 
@@ -332,6 +332,45 @@ no plugin at all.
      translated in one click, with every placeholder back on the right words.
 4. **A/B tests:** test variations with sticky weights; variation report with
    confidence; `declare-email-winner`; broadcast test-then-send-winner.
+
+   **Built (2026-11-26).** Decisions taken as defaults for the open questions:
+   in core; no tests nested inside an audience version (audience versions are
+   checked first, everyone else is in the test); winners are declared by a person
+   or an agent, never automatically for flows.
+   - A test version is a variation with meta `variation_kind = test` and
+     `variation_weight` (percent). New ones split evenly with the email and each
+     other unless given a weight, and adding one restarts the test
+     (`variation_test_started`, winner cleared). `bucket()` is
+     `crc32(contact:email) % 100`, so a contact always lands in the same version.
+     Draft test versions get nothing until ready; the email keeps their share.
+   - `report()`: sent / opened / clicked / unsubscribed per version since the
+     test started (optionally one broadcast), rates, the leader on clicks or opens,
+     two-proportion z-test confidence against the runner-up, and a suggested winner
+     at 95% (filter `groundhogg/email/variation/confidence_threshold`).
+   - `declare_winner()` stores `variation_winner` on the email; everyone in the
+     test gets it. Winner 0 restarts.
+   - Broadcast: `start_broadcast_test()` sends a shuffled sample (5–50% of the
+     marketable audience) and schedules `finish_broadcast_test()` with WP cron
+     after `wait_hours`, which declares the leader on the sample (sure or not) and
+     broadcasts the email to the audience minus the sample's IDs. Stored as
+     `variation_broadcast_test` on the email; one at a time.
+   - Abilities: `create-email-variation` `kind: test` + `weight`,
+     `update-email-variation` `weight`, `get-email-variation-report`,
+     `declare-email-winner`, `send-email-broadcast` `ab_test`,
+     `resolve-email-variation` reasons `other_share` / `lost`. Guide section
+     "A/B tests".
+   - Editor: an "A/B test" section in the Variations panel: each version's share
+     and results, who's ahead and how sure, "Pick as winner", "Start over", and
+     "Add a test version". Route `POST gh/v4/emails/{id}/variations/winner`.
+   - Broadcast scheduler: "A/B test on a sample first?" under the batching
+     settings, shown when the email has ready test versions (otherwise a link to
+     add one): sample %, wait hours, and clicks or opens. Turning it on hides
+     recurring and extra dates. `POST gh/v4/broadcasts` takes `ab_test`
+     `{sample_percent, wait_hours, metric}` and returns the sample's broadcast.
+   - Gotcha found: `Base_Object_With_Meta::update_meta()` passes the object's
+     cached value as `prev_value`, so writing through a stale object silently does
+     nothing. The variation code writes through a fresh `Email` (`fresh()`).
+   - Tests: `tests/phpunit/unit-tests/includes/class-email-ab-tests.php`.
 
 ## Open questions
 

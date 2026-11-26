@@ -51,7 +51,9 @@ use Groundhogg\Abilities\Emails\Create_Email_Template;
 use Groundhogg\Abilities\Emails\Create_Email_Variation;
 use Groundhogg\Abilities\Emails\Delete_Email_Variation;
 use Groundhogg\Abilities\Emails\Edit_Email;
+use Groundhogg\Abilities\Emails\Declare_Email_Winner;
 use Groundhogg\Abilities\Emails\Get_Email_Strings;
+use Groundhogg\Abilities\Emails\Get_Email_Variation_Report;
 use Groundhogg\Abilities\Emails\Set_Email_Strings;
 use Groundhogg\Abilities\Emails\Resolve_Email_Variation;
 use Groundhogg\Abilities\Emails\Update_Email_Variation;
@@ -455,6 +457,8 @@ class Abilities {
 			Resolve_Email_Variation::class,
 			Get_Email_Strings::class,
 			Set_Email_Strings::class,
+			Get_Email_Variation_Report::class,
+			Declare_Email_Winner::class,
 			List_Replacement_Codes::class,
 			Send_Composed_Email::class,
 			Send_Email_Template::class,

@@ -5,6 +5,8 @@ namespace Groundhogg\Api\V4;
 use Groundhogg\Broadcast;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\DraftException;
+use Groundhogg\Email;
+use Groundhogg\Email_Variations;
 use Groundhogg\NoContactsException;
 use Groundhogg\SchedulingException;
 use Groundhogg\Utils\DateTimeHelper;
@@ -216,6 +218,12 @@ class Broadcasts_Api extends Base_Object_Api {
 	 */
 	public function create( WP_REST_Request $request ) {
 
+		$ab_test = $request->get_param( 'ab_test' );
+
+		if ( is_array( $ab_test ) && ! empty( $ab_test ) ) {
+			return $this->create_ab_test( $request, $ab_test );
+		}
+
 		try {
 
 			$broadcast = Broadcast::schedule( [
@@ -267,6 +275,84 @@ class Broadcasts_Api extends Base_Object_Api {
 			return self::ERROR_400( 'date_error', $e->getMessage() );
 
 		}
+	}
+
+	/**
+	 * Broadcast an email that has test versions to a random sample first, and the winner to everyone else after a
+	 * wait, see Email_Variations::start_broadcast_test(). Returns the sample's broadcast.
+	 *
+	 * @param WP_REST_Request $request
+	 * @param array           $ab_test sample_percent, wait_hours, metric
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	protected function create_ab_test( WP_REST_Request $request, array $ab_test ) {
+
+		if ( $request->get_param( 'object_type' ) !== 'email' ) {
+			return self::ERROR_400( 'ab_test_error', __( 'Only an email can be A/B tested.', 'groundhogg' ) );
+		}
+
+		// a test is one send: the sample, then the winner
+		if ( $request->get_param( 'is_recurring' ) || count( (array) $request->get_param( 'dates' ) ) > 1 ) {
+			return self::ERROR_400( 'ab_test_error', __( 'An A/B tested broadcast is sent once, so it can\'t repeat or go out on several dates.', 'groundhogg' ) );
+		}
+
+		$email = new Email( absint( $request->get_param( 'object_id' ) ) );
+
+		if ( ! $email->exists() ) {
+			return self::ERROR_404();
+		}
+
+		$schedule = [
+			'date'                  => sanitize_text_field( $request->get_param( 'date' ) ),
+			'time'                  => sanitize_text_field( $request->get_param( 'time' ) ),
+			'send_now'              => (bool) $request->get_param( 'send_now' ),
+			'send_in_local_time'    => (bool) $request->get_param( 'send_in_local_time' ),
+			'batching'              => (bool) $request->get_param( 'batching' ),
+			'batch_interval'        => sanitize_text_field( $request->get_param( 'batch_interval' ) ),
+			'batch_interval_length' => absint( $request->get_param( 'batch_interval_length' ) ),
+			'batch_amount'          => absint( $request->get_param( 'batch_amount' ) ),
+			'campaigns'             => wp_parse_id_list( $request->get_param( 'campaigns' ) ),
+		];
+
+		// one date given as a list, like the scheduler does when more dates could be added
+		$dates = (array) $request->get_param( 'dates' );
+
+		if ( count( $dates ) === 1 && is_array( $dates[0] ) && count( $dates[0] ) === 2 ) {
+			$schedule['date'] = sanitize_text_field( $dates[0][0] );
+			$schedule['time'] = sanitize_text_field( $dates[0][1] );
+		}
+
+		try {
+			$broadcast = Email_Variations::start_broadcast_test( $email, sanitize_payload( $request->get_param( 'query' ) ) ?: [], $schedule, [
+				'sample_percent' => absint( $ab_test['sample_percent'] ?? 20 ),
+				'wait_hours'     => absint( $ab_test['wait_hours'] ?? 4 ),
+				'metric'         => sanitize_text_field( $ab_test['metric'] ?? 'clicks' ),
+			] );
+		} catch ( DraftException $e ) {
+			return self::ERROR_400( 'draft_error', $e->getMessage() );
+		} catch ( NoContactsException $e ) {
+			return self::ERROR_400( 'no_contacts', $e->getMessage() );
+		} catch ( SchedulingException $e ) {
+			return self::ERROR_400( 'scheduling_error', $e->getMessage() );
+		} catch ( \DateException $e ) {
+			return self::ERROR_400( 'date_error', $e->getMessage() );
+		}
+
+		if ( is_wp_error( $broadcast ) ) {
+			return self::ERROR_400( 'ab_test_error', $broadcast->get_error_message() );
+		}
+
+		$test = ( new Email( $email->get_id() ) )->get_meta( Email_Variations::BROADCAST_TEST_KEY );
+
+		return self::SUCCESS_RESPONSE( [
+			'item'    => $broadcast,
+			'ab_test' => [
+				'sample'         => absint( $test['sample'] ?? 0 ),
+				'rest'           => absint( $test['rest'] ?? 0 ),
+				'winner_sent_at' => absint( $test['finish_at'] ?? 0 ),
+			],
+		] );
 	}
 
 	/**

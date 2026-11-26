@@ -71,8 +71,8 @@ class Resolve_Email_Variation extends Ability {
 								'chosen'  => [ 'type' => 'boolean' ],
 								'reason'  => [
 									'type'        => 'string',
-									'enum'        => [ 'chosen', 'not_ready', 'language', 'filters', 'not_checked', 'filtered' ],
-									'description' => __( '"chosen": the contact gets it. "not_ready": it\'s a draft, so nobody gets it. "language": the contact doesn\'t speak one of its languages. "filters": the contact doesn\'t match its filters. "not_checked": a variation before it was chosen. "filtered": the contact is in its audience, but code on the site picked another version.', 'groundhogg' ),
+									'enum'        => [ 'chosen', 'not_ready', 'language', 'filters', 'not_checked', 'filtered', 'other_share', 'lost' ],
+									'description' => __( '"chosen": the contact gets it. "not_ready": it\'s a draft, so nobody gets it. "language": the contact doesn\'t speak one of its languages. "filters": the contact doesn\'t match its filters. "not_checked": a variation before it was chosen. "filtered": the contact is in its audience, but code on the site picked another version. "other_share": a test version, and the contact is in another version\'s share of the test. "lost": a test version that didn\'t win the test.', 'groundhogg' ),
 								],
 							],
 						],
@@ -121,6 +121,9 @@ class Resolve_Email_Variation extends Ability {
 				$reason = 'not_checked';
 			} else if ( ! $variation->is_ready() ) {
 				$reason = 'not_ready';
+			} else if ( Email_Variations::is_test( $variation ) ) {
+				// a contact gets one share of the test, or the winner once there is one
+				$reason = Email_Variations::get_winner_id( $email ) ? 'lost' : 'other_share';
 			} else {
 				$audience = Email_Variations::get_audience( $variation );
 

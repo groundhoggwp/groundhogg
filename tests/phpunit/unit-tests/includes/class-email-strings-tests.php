@@ -336,6 +336,33 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 		$this->assertSame( $email->get_id(), $response->get_data()['original']['id'] );
 	}
 
+	public function test_the_languages_to_add() {
+
+		add_filter( 'groundhogg/multilingual/plugin', fn() => 'test' );
+		add_filter( 'groundhogg/multilingual/site_languages', fn() => [
+			'en_US' => [ 'locale' => 'en_US', 'name' => 'English', 'default' => true ],
+			'es_ES' => [ 'locale' => 'es_ES', 'name' => 'Español', 'default' => false ],
+		] );
+		Multilingual::flush();
+
+		$email = $this->block_email();
+
+		// only the site's languages, with how many contacts speak each
+		foreach ( [ 'es_ES', 'es_ES', 'ja' ] as $locale ) {
+			( new \Groundhogg\Contact( self::factory()->contacts->create() ) )->set_locale( $locale );
+		}
+
+		$data = Email_Variations::editor_data( $email );
+		$this->assertSame( [ [ 'locale' => 'es_ES', 'name' => 'Español', 'contacts' => 2 ] ], $data['languages'] );
+
+		// a template has none to offer, it can't have variations
+		$template = $this->block_email();
+		$template->update( [ 'is_template' => 1 ] );
+		$data = Email_Variations::editor_data( new Email( $template->get_id() ) );
+		$this->assertFalse( $data['supported'] );
+		$this->assertSame( [], $data['languages'] );
+	}
+
 	/* the AI job */
 
 	protected static function result( string $text ): GenerativeAiResult {

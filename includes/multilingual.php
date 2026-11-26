@@ -2,6 +2,7 @@
 
 namespace Groundhogg;
 
+use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Form\Form_v2;
 use Groundhogg\Form\Submission_Handler;
 
@@ -270,6 +271,38 @@ class Multilingual {
 		}
 
 		return $languages;
+	}
+
+	/**
+	 * How many contacts get emails in each language. Contacts without a locale speak the default language.
+	 *
+	 * @return int[] locale => contacts, most first
+	 */
+	public static function count_contacts_by_locale(): array {
+
+		$default = self::get_default_locale();
+
+		$query = new Table_Query( 'contacts' );
+		$alias = $query->joinMeta( 'locale' );
+
+		// sanitize_locale() only lets through letters, numbers and underscores, so $default is safe in SQL
+		$col = "COALESCE(NULLIF($alias.meta_value,''),'$default')";
+		$query->add_safe_column( $col );
+		$query->setSelect( [ $col, 'locale' ], [ 'COUNT(*)', 'contacts' ] )->setGroupby( 'locale' );
+
+		$counts = [];
+
+		foreach ( $query->get_results() as $row ) {
+			$locale = self::sanitize_locale( $row->locale );
+
+			if ( $locale ) {
+				$counts[ $locale ] = ( $counts[ $locale ] ?? 0 ) + absint( $row->contacts );
+			}
+		}
+
+		arsort( $counts );
+
+		return $counts;
 	}
 
 	/**

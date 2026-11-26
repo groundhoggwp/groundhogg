@@ -30,7 +30,7 @@ class Update_Email_Variation extends Ability {
 
 		return [
 			'label'       => __( 'Update Email Variation', 'groundhogg' ),
-			'description' => __( 'Change who gets a variation of an email: its audience, its priority or the language it\'s written in. Only the fields you pass change. Change its content, subject and status (draft or ready) with groundhogg/edit-email and groundhogg/update-email-template, like any email.', 'groundhogg' ),
+			'description' => __( 'Change who gets a variation of an email: its audience, its priority or the language it\'s written in, or a test version\'s weight. Only the fields you pass change. Change its content, subject and status (draft or ready) with groundhogg/edit-email and groundhogg/update-email-template, like any email.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -50,6 +50,12 @@ class Update_Email_Variation extends Ability {
 					'priority'     => [
 						'type'        => 'integer',
 						'description' => __( 'For a contact in the audience of more than one variation: the lowest goes first, then the oldest.', 'groundhogg' ),
+					],
+					'weight'       => [
+						'type'        => 'integer',
+						'minimum'     => 0,
+						'maximum'     => 100,
+						'description' => __( 'For a test version: its share of the test, in percent. The test versions\' weights can add up to 100 at most; the email gets the rest.', 'groundhogg' ),
 					],
 				],
 			],
@@ -77,6 +83,10 @@ class Update_Email_Variation extends Ability {
 
 		$args = [];
 
+		if ( array_key_exists( 'audience', $input ) && Email_Variations::is_test( $variation ) ) {
+			return new WP_Error( 'groundhogg_is_test', __( 'A test version has no audience, it gets a share of the contacts the email is for. Change its weight instead.', 'groundhogg' ) );
+		}
+
 		if ( array_key_exists( 'audience', $input ) ) {
 
 			$audience = Create_Email_Variation::audience_from_input( is_array( $input['audience'] ) ? $input['audience'] : [] );
@@ -88,14 +98,14 @@ class Update_Email_Variation extends Ability {
 			$args['audience'] = $audience;
 		}
 
-		foreach ( [ 'locale', 'priority' ] as $key ) {
+		foreach ( [ 'locale', 'priority', 'weight' ] as $key ) {
 			if ( array_key_exists( $key, $input ) ) {
 				$args[ $key ] = $input[ $key ];
 			}
 		}
 
 		if ( empty( $args ) ) {
-			return new WP_Error( 'groundhogg_no_changes', __( 'Nothing to change was given. Pass audience, locale or priority.', 'groundhogg' ) );
+			return new WP_Error( 'groundhogg_no_changes', __( 'Nothing to change was given. Pass audience, locale, priority or weight.', 'groundhogg' ) );
 		}
 
 		$updated = Email_Variations::update( $variation, $args );

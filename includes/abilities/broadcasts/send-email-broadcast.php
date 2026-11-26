@@ -8,6 +8,7 @@ use Groundhogg\Abilities\Schemas\Segment_Schema;
 use Groundhogg\Broadcast;
 use Groundhogg\DraftException;
 use Groundhogg\Email;
+use Groundhogg\Email_Variations;
 use Groundhogg\NoContactsException;
 use Groundhogg\SchedulingException;
 use Throwable;
@@ -119,6 +120,33 @@ class Send_Email_Broadcast extends Ability {
 						'items'       => [ 'type' => 'integer' ],
 						'description' => __( 'Campaign IDs to associate the broadcast with, for reporting.', 'groundhogg' ),
 					],
+					'ab_test' => [
+						'type'                 => 'object',
+						'additionalProperties' => false,
+						'description'          => __( 'Test the email\'s versions on a random sample of the audience first, then send the one that did best to everyone else. The email needs ready test versions, see groundhogg/create-email-variation with kind "test". This call sends to the sample; after wait_hours the winner is declared and the email is broadcast to the rest, who all get it. groundhogg/get-email-variation-report shows how it\'s going. Always a fixed segment.', 'groundhogg' ),
+						'properties'           => [
+							'sample_percent' => [
+								'type'        => 'integer',
+								'minimum'     => 5,
+								'maximum'     => 50,
+								'default'     => 20,
+								'description' => __( 'How much of the audience the test is sent to, in percent, split between the versions by their weights.', 'groundhogg' ),
+							],
+							'wait_hours'     => [
+								'type'        => 'integer',
+								'minimum'     => 1,
+								'maximum'     => 168,
+								'default'     => 4,
+								'description' => __( 'How long after the sample is sent to pick the winner and send it to the rest.', 'groundhogg' ),
+							],
+							'metric'         => [
+								'type'        => 'string',
+								'enum'        => [ 'clicks', 'opens' ],
+								'default'     => 'clicks',
+								'description' => __( 'What the winner is picked by. Clicks are more reliable, since some email apps open every email.', 'groundhogg' ),
+							],
+						],
+					],
 				] ),
 			],
 
@@ -166,6 +194,15 @@ class Send_Email_Broadcast extends Ability {
 					'scheduling_complete' => [
 						'type'        => 'boolean',
 						'description' => __( 'True if all send events were enqueued synchronously; false if a background task will finish enqueueing a larger audience.', 'groundhogg' ),
+					],
+					'ab_test' => [
+						'type'        => 'object',
+						'description' => __( 'With ab_test: this broadcast is the sample, and when the winner is sent to the rest.', 'groundhogg' ),
+						'properties'  => [
+							'sample'         => [ 'type' => 'integer' ],
+							'rest'           => [ 'type' => 'integer' ],
+							'winner_sent_at' => Broadcast_Schema::datetime_schema(),
+						],
 					],
 				],
 			],
@@ -243,8 +280,24 @@ class Send_Email_Broadcast extends Ability {
 			$args['batch_interval_length'] = max( 1, absint( $batching['interval_length'] ?? 10 ) );
 		}
 
+		$ab_test = is_array( $input['ab_test'] ?? null ) ? $input['ab_test'] : null;
+
 		try {
-			$broadcast = Broadcast::schedule( $args );
+
+			if ( $ab_test ) {
+
+				// the sample now, the winner to everyone else later
+				$schedule = array_diff_key( $args, array_flip( [ 'object_id', 'object_type', 'query', 'segment_type' ] ) );
+				$broadcast = Email_Variations::start_broadcast_test( $email, $query, $schedule, $ab_test );
+
+				if ( is_wp_error( $broadcast ) ) {
+					return new WP_Error( 'groundhogg_' . $broadcast->get_error_code(), $broadcast->get_error_message() );
+				}
+
+				$args['segment_type'] = 'fixed';
+			} else {
+				$broadcast = Broadcast::schedule( $args );
+			}
 		} catch ( DraftException $e ) {
 			return new WP_Error( 'groundhogg_email_is_draft', $e->getMessage() );
 		} catch ( NoContactsException $e ) {
@@ -259,7 +312,7 @@ class Send_Email_Broadcast extends Ability {
 			return new WP_Error( 'groundhogg_broadcast_not_scheduled', $e->getMessage() );
 		}
 
-		return [
+		$output = [
 			'broadcast_id'         => $broadcast->get_id(),
 			'status'               => $broadcast->get_status(),
 			'email'                => [
@@ -283,5 +336,17 @@ class Send_Email_Broadcast extends Ability {
 				: absint( $broadcast->get_meta( 'total_contacts' ) ),
 			'scheduling_complete'  => $broadcast->is_scheduled(),
 		];
+
+		if ( $ab_test ) {
+			$test = ( new Email( $email->get_id() ) )->get_meta( Email_Variations::BROADCAST_TEST_KEY );
+
+			$output['ab_test'] = [
+				'sample'         => absint( $test['sample'] ?? 0 ),
+				'rest'           => absint( $test['rest'] ?? 0 ),
+				'winner_sent_at' => Broadcast_Schema::datetime( absint( $test['finish_at'] ?? 0 ) ),
+			];
+		}
+
+		return $output;
 	}
 }

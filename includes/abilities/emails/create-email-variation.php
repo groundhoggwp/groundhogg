@@ -109,19 +109,31 @@ class Create_Email_Variation extends Ability {
 
 		return [
 			'label'       => __( 'Create Email Variation', 'groundhogg' ),
-			'description' => __( 'Add another version of an email, like the email in another language, that is sent instead of it to the contacts in the variation\'s audience. Flows, broadcasts and notifications keep sending the original email, and each contact gets the first ready variation they\'re in the audience of, or the original. By default it starts as a copy of the email with the same block ids: then change its text with groundhogg/edit-email (and its subject with groundhogg/update-email-template), passing the variation\'s id as email_id. It starts as a draft, which nobody is sent; make it "ready" with groundhogg/update-email-template once it\'s done. See groundhogg/get-authoring-guide topic "email", section "Variations".', 'groundhogg' ),
+			'description' => __( 'Add another version of an email: one for an audience, like the email in another language, that is sent instead of it to the contacts in that audience, or a test version for an A/B test, which gets a share of everyone else. Flows, broadcasts and notifications keep sending the original email, and each contact gets the first ready audience version they\'re in, otherwise their share of the test. By default it starts as a copy of the email with the same block ids: then change it with groundhogg/edit-email or groundhogg/set-email-strings (and its subject with groundhogg/update-email-template), passing the variation\'s id as email_id. It starts as a draft, which nobody is sent; make it "ready" with groundhogg/update-email-template once it\'s done. See groundhogg/get-authoring-guide topic "email", section "Variations".', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
 				'additionalProperties' => false,
-				'required'             => [ 'email_id', 'audience' ],
+				'required'             => [ 'email_id' ],
 				'properties'           => [
 					'email_id' => [
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'description' => __( 'The email to add a variation to, the one flows and broadcasts send. Not a template, a global block or another variation.', 'groundhogg' ),
 					],
+					'kind'     => [
+						'type'        => 'string',
+						'enum'        => [ 'audience', 'test' ],
+						'default'     => 'audience',
+						'description' => __( '"audience": for the contacts in `audience`, which is required. "test": an A/B test version, which gets `weight` percent of the contacts no audience version is for; the email keeps the rest.', 'groundhogg' ),
+					],
 					'audience' => self::audience_input_schema(),
+					'weight'   => [
+						'type'        => 'integer',
+						'minimum'     => 1,
+						'maximum'     => 99,
+						'description' => __( 'For a test version: its share of the test, in percent. Leave it out to split the test evenly between the email and its test versions.', 'groundhogg' ),
+					],
 					'title'    => [
 						'type'        => 'string',
 						'description' => __( 'The internal title. Defaults to the email\'s title with the language.', 'groundhogg' ),
@@ -164,20 +176,37 @@ class Create_Email_Variation extends Ability {
 			return new WP_Error( 'groundhogg_cannot_edit_email', __( 'You are not allowed to edit this email.', 'groundhogg' ) );
 		}
 
-		$audience = self::audience_from_input( is_array( $input['audience'] ?? null ) ? $input['audience'] : [] );
-
-		if ( is_wp_error( $audience ) ) {
-			return $audience;
-		}
-
-		$variation = Email_Variations::create( $email, [
-			'audience' => $audience,
+		$is_test = ( $input['kind'] ?? 'audience' ) === 'test';
+		$args    = [
+			'kind'     => $is_test ? 'test' : 'audience',
 			'title'    => $input['title'] ?? '',
 			'locale'   => $input['locale'] ?? '',
 			'priority' => $input['priority'] ?? 0,
 			'copy'     => $input['copy'] ?? true,
 			'status'   => 'draft',
-		] );
+		];
+
+		if ( $is_test ) {
+
+			if ( ! empty( $input['audience'] ) ) {
+				return new WP_Error( 'groundhogg_test_has_no_audience', __( 'A test version has no audience, it gets a share of the contacts the email is for. Give it a `weight`, or leave that out for an even split.', 'groundhogg' ) );
+			}
+
+			if ( isset( $input['weight'] ) ) {
+				$args['weight'] = $input['weight'];
+			}
+		} else {
+
+			$audience = self::audience_from_input( is_array( $input['audience'] ?? null ) ? $input['audience'] : [] );
+
+			if ( is_wp_error( $audience ) ) {
+				return $audience;
+			}
+
+			$args['audience'] = $audience;
+		}
+
+		$variation = Email_Variations::create( $email, $args );
 
 		if ( is_wp_error( $variation ) ) {
 			return new WP_Error( 'groundhogg_' . $variation->get_error_code(), $variation->get_error_message() );

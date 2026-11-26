@@ -291,7 +291,8 @@ class Email_Strings {
 				$data['content']    = $content;
 				$data['plain_text'] = $made['plain_text'];
 
-				$email->update_meta( 'css', $made['css'] );
+				// a fresh copy, see Email_Variations::fresh()
+				( new Email( $email->get_id() ) )->update_meta( 'css', $made['css'] );
 			} else {
 				$data['content']    = email_kses( $content );
 				$data['plain_text'] = '';
@@ -806,7 +807,9 @@ class Email_Strings {
 			return;
 		}
 
-		$hashes = self::source_hashes( $variation );
+		// a fresh copy, see Email_Variations::fresh()
+		$variation = new Email( $variation->get_id() );
+		$hashes    = self::source_hashes( $variation );
 
 		foreach ( $keys as $key ) {
 			if ( isset( $source[ $key ] ) && ( $overwrite || ! isset( $hashes[ $key ] ) ) ) {

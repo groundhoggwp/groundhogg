@@ -96,6 +96,12 @@
     batch_interval               : 'minutes',
     batch_interval_length        : 30,
     batch_amount                 : 100,
+    // test the email's versions on a sample first, see Email_Variations::start_broadcast_test()
+    ab_test                      : false,
+    ab_sample_percent            : 20,
+    ab_wait_hours                : 4,
+    ab_metric                    : 'clicks',
+    abVersions                   : null, // the email's ready test versions, fetched for the email that's picked
     send_in_local_time           : false,
     use_optimized_send_time      : false,
     is_recurring                 : false,
@@ -140,7 +146,126 @@
       batch_interval         : getState().batch_interval,
       batch_interval_length  : getState().batch_interval_length,
       batch_amount           : getState().batch_amount,
+      ab_sample_percent      : getState().ab_sample_percent,
+      ab_wait_hours          : getState().ab_wait_hours,
+      ab_metric              : getState().ab_metric,
     }))
+  }
+
+  /**
+   * The ready test versions of the email being broadcast, which an A/B test needs. Fetched once for each email, and
+   * the schedule step is drawn again when they're in.
+   *
+   * @return {Object[]|null} null while fetching
+   */
+  const getTestVersions = () => {
+
+    const email = getObject()
+
+    if (!email || !isEmailObject()) {
+      return []
+    }
+
+    const known = getState().abVersions
+
+    // fetched, or being fetched (null)
+    if (known && known.emailId === email.ID) {
+      return known.versions
+    }
+
+    setState({ abVersions: { emailId: email.ID, versions: null } }, false)
+
+    Groundhogg.api.get(`${ routes.v4.emails }/${ email.ID }/variations`).then(data => {
+      const versions = data.test ? data.test.versions.filter(v => v.kind === 'test' && v.status === 'ready') : []
+      setState({ abVersions: { emailId: email.ID, versions } })
+    }).catch(() => setState({ abVersions: { emailId: email.ID, versions: [] } }))
+
+    return null
+  }
+
+  /**
+   * Test the email's versions on a sample of the audience first, then send the one that did best to everyone else
+   */
+  const ABTestControls = () => {
+
+    const versions = getTestVersions()
+
+    // still finding out
+    if (versions === null) {
+      return null
+    }
+
+    if (!versions.length) {
+      return Pg({ className: 'gh-text small' }, sprintf(
+        // translators: %s: a link to edit the email
+        __('To A/B test this broadcast, %s and make it ready.', 'groundhogg'),
+        `<a href="${ adminPageURL('gh_emails', { action: 'edit', email: getObject().ID }) }" target="_blank">${ __('add a test version to the email', 'groundhogg') }</a>`,
+      ))
+    }
+
+    return Fragment([
+      Div({
+        className: 'display-flex gap-10 align-center',
+      }, [
+        `<label for="ab-test"><p>${ __('A/B test on a sample first?', 'groundhogg') }</p></label>`,
+        Toggle({
+          id      : 'ab-test',
+          checked : getState().ab_test,
+          onLabel : __('Yes', 'groundhogg'),
+          offLabel: __('No', 'groundhogg'),
+          // a test is one send, so not repeating or on several dates
+          onChange: e => setState({
+            ab_test     : e.target.checked,
+            is_recurring: e.target.checked ? false : getState().is_recurring,
+            dates       : e.target.checked ? [] : getState().dates,
+          }),
+        }),
+      ]),
+      getState().ab_test ? Pg({
+        className: 'display-flex gap-5 align-center',
+        style    : { flexWrap: 'wrap' },
+      }, [
+        __('Send to', 'groundhogg'),
+        Input({
+          id       : 'ab-sample-percent',
+          type     : 'number',
+          className: 'number',
+          min      : 5,
+          max      : 50,
+          step     : 5,
+          value    : getState().ab_sample_percent,
+          style    : { width: '70px', paddingRight: 0 },
+          onInput  : e => setState({ ab_sample_percent: parseInt(e.target.value) }, false),
+        }),
+        __('% of the contacts first, wait', 'groundhogg'),
+        Input({
+          id       : 'ab-wait-hours',
+          type     : 'number',
+          className: 'number',
+          min      : 1,
+          max      : 168,
+          value    : getState().ab_wait_hours,
+          style    : { width: '60px', paddingRight: 0 },
+          onInput  : e => setState({ ab_wait_hours: parseInt(e.target.value) }, false),
+        }),
+        __('hours, then send the version with the most', 'groundhogg'),
+        Select({
+          id      : 'ab-metric',
+          selected: getState().ab_metric,
+          options : {
+            clicks: __('clicks', 'groundhogg'),
+            opens : __('opens', 'groundhogg'),
+          },
+          onChange: e => setState({ ab_metric: e.target.value }, false),
+        }),
+        __('to the rest.', 'groundhogg'),
+      ]) : null,
+      getState().ab_test ? Span({ className: 'gh-text small' }, sprintf(
+        // translators: 1: the email's versions, like A, B
+        __('The sample is split between %s by their weights.', 'groundhogg'),
+        andList([ getObject().data.title, ...versions.map(v => v.title) ].map(t => bold(t))),
+      )) : null,
+    ])
   }
 
   function get_weekday_occurrence (date) {
@@ -520,8 +645,17 @@
           getState().totalContacts)), sendDatesPreview() )
     }
 
+    const abTest = getState().ab_test && isEmailObject() && ( getTestVersions() || [] ).length
+
     return Fragment([
       `<p>${ preview }</p>`,
+      abTest ? `<p>${ sprintf(
+        /* translators: 1: a percentage, 2: a number of hours, 3: clicks or opens */
+        __('A/B test: first to a random %1$s of them, then %2$s later the version with the most %3$s to the rest.', 'groundhogg'),
+        bold(`${ getState().ab_sample_percent }%`),
+        bold(sprintf(_n('%d hour', '%d hours', getState().ab_wait_hours, 'groundhogg'), getState().ab_wait_hours)),
+        getState().ab_metric === 'opens' ? __('opens', 'groundhogg') : __('clicks', 'groundhogg'),
+      ) }</p>` : null,
       getState().is_recurring
       ? `<p>${ sprintf(
         /* translators: %s: description of the recurring schedule. */
@@ -560,6 +694,10 @@
             repeats_until_date = '',
             repeats_until_occurrences = 1,
             use_optimized_send_time = false,
+            ab_test = false,
+            ab_sample_percent = 20,
+            ab_wait_hours = 4,
+            ab_metric = 'clicks',
           } = getState()
 
           post(routes.v4.broadcasts, {
@@ -588,6 +726,12 @@
             repeats_until_date,
             repeats_until_occurrences,
             use_optimized_send_time: false, // temporarily disabled, ignores any saved default
+            // only when the email can still be tested, it may have changed since the toggle was turned on
+            ab_test                : ab_test && isEmailObject() && ( getTestVersions() || [] ).length ? {
+              sample_percent: ab_sample_percent,
+              wait_hours    : ab_wait_hours,
+              metric        : ab_metric,
+            } : null,
             ...args
           }).then(r => {
 
@@ -1016,7 +1160,7 @@
                 }, getState().tzDisplay ),
               ]),
               hasValidDates() ? null : Span({className: 'pill yellow'}, __('⚠️ Select a date and time in the future!', 'groundhogg')),
-              An({
+              getState().ab_test ? null : An({
                 onClick: e => {
                   e.preventDefault()
                   setState({
@@ -1175,7 +1319,12 @@
               formatNumber(getState().totalContacts)))
             : Span({ className: 'loading-dots' }, __('Estimating', 'groundhogg')),
           ]) : null,
-          getState().when === 'later' ? Fragment([
+          isEmailObject() ? Fragment([
+            '<div><hr></div>',
+            ABTestControls(),
+          ]) : null,
+          // a test is one send, so it can't repeat
+          getState().when === 'later' && !getState().ab_test ? Fragment([
             '<div><hr></div>',
             Div({
               className: 'display-flex gap-10 align-center',

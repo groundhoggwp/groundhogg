@@ -4990,6 +4990,11 @@
    */
   const variationAudienceLabel = (variation) => {
 
+    if (variation.kind === 'test') {
+      // translators: %d: a percentage of the contacts in the test
+      return sprintf(__('A/B test version, %d%% of the test', 'groundhogg'), variation.weight)
+    }
+
     const { locales = [], include_filters = [], exclude_filters = [] } = variation.audience || {}
     const names = variation.languages || locales
 
@@ -5065,12 +5070,122 @@
   }
 
   /**
+   * The email's A/B test: each version's results, which is ahead, picking the winner, and adding a test version
+   *
+   * @param {Object}   data  what the variations route returns
+   * @param {Function} morph
+   * @return {HTMLElement}
+   */
+  const ABTestSection = (data, morph) => {
+
+    const { test } = data
+    const percent = rate => `${ Math.round(rate * 1000) / 10 }%`
+
+    const pick = winner_id => {
+      post(`${ variationsRoute() }/winner`, { winner_id }).then(data => {
+        VariationsState.set({ data })
+        morph()
+      }).catch(err => dialog({ type: 'error', message: escHTML(err.message) }))
+    }
+
+    const versions = test ? test.versions.filter(v => v.kind !== 'audience') : []
+    const titleOf = id => ( versions.find(v => v.id === id) || {} ).title || ''
+
+    let summary = __('No results yet. Make the test version ready to start the test.', 'groundhogg')
+
+    if (test && test.winner) {
+      // translators: %s: the title of the winning version
+      summary = sprintf(__('%s won. Everyone in the test gets it now.', 'groundhogg'), `<b>${ escHTML(titleOf(test.winner)) }</b>`)
+    }
+    else if (test && test.leader) {
+      summary = sprintf(
+        // translators: 1: the title of the version that's ahead, 2: clicks or opens, 3: how confident, like 87%
+        __('%1$s is ahead on %2$s, %3$s sure.', 'groundhogg'),
+        `<b>${ escHTML(titleOf(test.leader)) }</b>`,
+        test.metric === 'opens' ? __('opens', 'groundhogg') : __('clicks', 'groundhogg'),
+        percent(test.confidence),
+      ) + ' ' + ( test.suggested_winner
+        ? __('That\'s enough to pick it.', 'groundhogg')
+        : __('Keep the test running until it\'s 95% sure.', 'groundhogg') )
+    }
+
+    return Div({ className: 'display-flex column gap-5' }, [
+      makeEl('hr', { style: { margin: '5px 0', width: '100%' } }),
+      makeEl('b', {}, __('A/B test', 'groundhogg')),
+      !test ? Pg({ className: 'gh-text small' }, __('Test another subject line or design: add a test version, change it, and make it ready. Contacts are split between the versions, and each one always gets the same version.', 'groundhogg')) : null,
+      ...versions.map(version => Div({
+        className: 'gh-panel outlined display-flex column gap-5',
+        style    : { padding: '10px' },
+      }, [
+        Div({ className: 'display-flex gap-5 align-center space-between' }, [
+          version.id === getEmail().ID
+            ? makeEl('b', {}, escHTML(version.title))
+            : An({ href: version.kind === 'email' ? data.original.edit_url : ( data.variations.find(v => v.id === version.id) || {} ).edit_url }, escHTML(version.title)),
+          test.winner === version.id
+            ? Span({ className: 'pill green' }, __('Winner', 'groundhogg'))
+            : ( version.status === 'ready' ? null : Span({ className: 'pill orange' }, __('Draft', 'groundhogg')) ),
+        ]),
+        Span({ className: 'gh-text small' }, sprintf(
+          // translators: 1: share of the test, 2: how many it was sent to, 3: open rate, 4: click rate
+          __('%1$s of the test · Sent %2$s · Opened %3$s · Clicked %4$s', 'groundhogg'),
+          `${ version.weight }%`, version.sent.toLocaleString(), percent(version.open_rate), percent(version.click_rate),
+        )),
+        !test.winner && version.status === 'ready' && test.leader ? Button({
+          className: 'gh-button secondary small',
+          onClick  : () => pick(version.id),
+        }, __('Pick as winner', 'groundhogg')) : null,
+      ])),
+      test ? Pg({ className: 'gh-text small' }, summary) : null,
+      Div({ className: 'display-flex gap-5' }, [
+        Button({
+          id       : 'add-test-version',
+          className: `gh-button secondary small${ VariationsState.adding ? ' loading-dots' : '' }`,
+          disabled : VariationsState.adding,
+          onClick  : () => {
+
+            if (State.hasChanges) {
+              dialog({
+                type   : 'error',
+                message: __('Save your changes first, the test version starts as a copy of this email.', 'groundhogg'),
+              })
+              return
+            }
+
+            VariationsState.set({ adding: true })
+            morph()
+
+            post(variationsRoute(), { kind: 'test' }).then(data => {
+              VariationsState.set({ data, adding: false })
+              dialog({
+                message: __('Added a draft copy. Change what you want to test, then make it ready.', 'groundhogg'),
+              })
+            }).catch(err => {
+              VariationsState.set({ adding: false })
+              dialog({ type: 'error', message: escHTML(err.message) })
+            }).finally(morph)
+          },
+        }, __('Add a test version', 'groundhogg')),
+        test && test.winner ? Button({
+          className: 'gh-button secondary text small',
+          onClick  : () => pick(0),
+        }, __('Start over', 'groundhogg')) : null,
+      ]),
+    ])
+  }
+
+  /**
    * Other versions of the email, like the email in other languages: each contact gets the one for them, or this one.
    * On a variation, the email it's a version of.
    */
   const VariationsControls = () => {
 
-    if (!getEmail().ID || isGlobalBlockEditor()) {
+    // templates and global blocks can't have variations, and an email that isn't saved yet has nothing to copy
+    if (!getEmail().ID || isGlobalBlockEditor() || Number(getEmailData().is_template) === 1) {
+      return null
+    }
+
+    // the server says when it can't have any either, like before the database update that adds them
+    if (VariationsState.loaded && VariationsState.data && !VariationsState.data.supported) {
       return null
     }
 
@@ -5087,7 +5202,8 @@
           if (!VariationsState.loaded) {
 
             if (!VariationsState.loading) {
-              fetchVariations().then(morph)
+              // the whole panel, which hides the group when the email can't have variations
+              fetchVariations().then(() => VariationsState.data && !VariationsState.data.supported ? morphControls() : morph())
             }
 
             return Span({ className: 'loading-dots' }, __('Loading', 'groundhogg'))
@@ -5106,7 +5222,7 @@
           } = VariationsState.data
 
           if (!supported) {
-            return Pg({}, __('Templates and global blocks can\'t have variations.', 'groundhogg'))
+            return null
           }
 
           const Row = variation => Div({
@@ -5135,8 +5251,11 @@
 
             return Fragment([
               Pg({}, sprintf(
-                // translators: %s: a link to the email this is a variation of
-                __('This is a version of %s. Contacts in its audience get it instead, once it\'s ready.', 'groundhogg'),
+                current && current.kind === 'test'
+                  // translators: %s: a link to the email this is a variation of
+                  ? __('This is a version of %s for its A/B test. It gets its share of the test once it\'s ready.', 'groundhogg')
+                  // translators: %s: a link to the email this is a variation of
+                  : __('This is a version of %s. Contacts in its audience get it instead, once it\'s ready.', 'groundhogg'),
                 `<a href="${ original.edit_url }">${ escHTML(original.title) }</a>`,
               )),
               current ? Row(current) : null,
@@ -5145,7 +5264,7 @@
 
           return Fragment([
             Pg({}, __('Send other versions of this email, like the email in other languages. Each contact gets the first ready version they\'re in the audience of, or this email.', 'groundhogg')),
-            ...variations.map(Row),
+            ...variations.filter(v => v.kind !== 'test').map(Row),
             languages.length ? Div({ className: 'display-flex gap-5' }, [
               Select({
                 id      : 'add-variation-language',
@@ -5153,7 +5272,14 @@
                 selected: VariationsState.locale,
                 options : [
                   { value: '', text: __('Add a language', 'groundhogg') },
-                  ...languages.map(({ locale, name }) => ( { value: locale, text: escHTML(name) } )),
+                  // the site's other languages, with how many contacts speak each
+                  ...languages.map(({ locale, name, contacts }) => ( {
+                    value: locale,
+                    text : contacts
+                      // translators: 1: a language, 2: how many contacts speak it
+                      ? sprintf(_n('%1$s (%2$s contact)', '%1$s (%2$s contacts)', contacts, 'groundhogg'), escHTML(name), contacts.toLocaleString())
+                      : escHTML(name),
+                  } )),
                 ],
                 onChange: e => VariationsState.set({ locale: e.target.value }),
               }),
@@ -5186,9 +5312,10 @@
                 },
               }, __('Add', 'groundhogg')),
             ]) : null,
-            !languages.length && !variations.length
+            !languages.length && !variations.some(v => v.kind !== 'test')
               ? Pg({ className: 'gh-text small' }, __('The site is in one language. With a multilingual plugin like WPML or Polylang, its other languages can be added here. AI agents can add versions for other audiences too.', 'groundhogg'))
               : null,
+            ABTestSection(VariationsState.data, morph),
           ])
         }),
       ])

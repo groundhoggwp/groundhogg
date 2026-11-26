@@ -98,6 +98,15 @@ class Emails_Api extends Base_Object_Api {
 			],
 		] );
 
+		// end an email's A/B test, or start it over
+		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/variations/winner", [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'declare_variation_winner' ],
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
+			],
+		] );
+
 		register_rest_route( self::NAME_SPACE, "/{$route}/(?P<{$key}>\d+)/preview", [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -1025,22 +1034,33 @@ class Emails_Api extends Base_Object_Api {
 			return self::ERROR_403();
 		}
 
-		$locale = Multilingual::sanitize_locale( $request->get_param( 'locale' ) );
+		if ( $request->get_param( 'kind' ) === 'test' ) {
 
-		if ( ! $locale ) {
-			return self::ERROR_400( 'invalid_locale', __( 'Pick a language for the variation.', 'groundhogg' ) );
+			// a test version, sharing the test evenly with the email and its other test versions
+			$variation = Email_Variations::create( $email, [
+				'kind' => 'test',
+				'copy' => true,
+			] );
+
+		} else {
+
+			$locale = Multilingual::sanitize_locale( $request->get_param( 'locale' ) );
+
+			if ( ! $locale ) {
+				return self::ERROR_400( 'invalid_locale', __( 'Pick a language for the variation.', 'groundhogg' ) );
+			}
+
+			$variation = Email_Variations::create( $email, [
+				'audience' => [ 'locales' => [ $locale ] ],
+				'title'    => sprintf(
+					/* translators: 1: the email's title, 2: a language, like Français */
+					__( '%1$s (%2$s)', 'groundhogg' ),
+					$email->get_title(),
+					Multilingual::get_locale_name( $locale )
+				),
+				'copy'     => true,
+			] );
 		}
-
-		$variation = Email_Variations::create( $email, [
-			'audience' => [ 'locales' => [ $locale ] ],
-			'title'    => sprintf(
-				/* translators: 1: the email's title, 2: a language, like Français */
-				__( '%1$s (%2$s)', 'groundhogg' ),
-				$email->get_title(),
-				Multilingual::get_locale_name( $locale )
-			),
-			'copy'     => true,
-		] );
 
 		if ( is_wp_error( $variation ) ) {
 			$variation->add_data( [ 'status' => 400 ] );
@@ -1051,6 +1071,43 @@ class Emails_Api extends Base_Object_Api {
 		return self::SUCCESS_RESPONSE( array_merge( Email_Variations::editor_data( $email ), [
 			'created' => $variation->get_id(),
 		] ) );
+	}
+
+	/**
+	 * End an email's A/B test with a winner, or start it over with winner_id 0
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function declare_variation_winner( WP_REST_Request $request ) {
+
+		$email = new Email( absint( $request->get_param( $this->get_primary_key() ) ) );
+
+		if ( ! $email->exists() ) {
+			return self::ERROR_404();
+		}
+
+		if ( ! current_user_can( 'edit_email', $email ) ) {
+			return self::ERROR_403();
+		}
+
+		$winner = absint( $request->get_param( 'winner_id' ) );
+
+		if ( $winner === 0 ) {
+			Email_Variations::restart_test( $email );
+		} else {
+
+			$declared = Email_Variations::declare_winner( $email, $winner );
+
+			if ( is_wp_error( $declared ) ) {
+				$declared->add_data( [ 'status' => 400 ] );
+
+				return $declared;
+			}
+		}
+
+		return self::SUCCESS_RESPONSE( Email_Variations::editor_data( new Email( $email->get_id() ) ) );
 	}
 
 	public function read( WP_REST_Request $request ) {
