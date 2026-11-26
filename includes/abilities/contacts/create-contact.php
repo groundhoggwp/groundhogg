@@ -74,6 +74,7 @@ class Create_Contact extends Ability {
 						'minimum'     => 1,
 						'description' => __( 'A WordPress user ID to assign as the contact owner - see groundhogg/list-owners for valid IDs. Defaults to the current user if they can add contacts, otherwise the site\'s primary owner.', 'groundhogg' ),
 					],
+					'locale' => Contact_Schema::locale_input_schema(),
 					'tags' => [
 						'type'        => 'array',
 						'items'       => [ 'type' => [ 'string', 'integer' ] ],
@@ -176,12 +177,27 @@ class Create_Contact extends Ability {
 			$data['owner_id'] = $owner_id;
 		}
 
+		$locale = '';
+
+		if ( ! empty( $input['locale'] ) ) {
+
+			$locale = Contact_Schema::resolve_locale( $input['locale'] );
+
+			if ( is_wp_error( $locale ) ) {
+				return $locale;
+			}
+		}
+
 		// Upserts by email: creates if $email doesn't exist yet, updates if it does -
 		// see \Groundhogg\Contact::__construct().
 		$contact = new Contact( $data );
 
 		if ( ! $contact->exists() ) {
 			return new WP_Error( 'groundhogg_contact_not_created', __( 'Unable to create the contact record.', 'groundhogg' ) );
+		}
+
+		if ( $locale ) {
+			$contact->set_locale( $locale );
 		}
 
 		if ( ! empty( $input['tags'] ) ) {

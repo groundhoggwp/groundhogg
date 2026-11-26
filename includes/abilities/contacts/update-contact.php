@@ -68,6 +68,7 @@ class Update_Contact extends Ability {
 				'minimum'     => 1,
 				'description' => __( 'A WordPress user ID to reassign as the contact owner - see groundhogg/list-owners for valid IDs.', 'groundhogg' ),
 			],
+			'locale' => Contact_Schema::locale_input_schema(),
 			'tags_add' => [
 				'type'        => 'array',
 				'items'       => [ 'type' => [ 'string', 'integer' ] ],
@@ -177,6 +178,7 @@ class Update_Contact extends Ability {
 			|| array_key_exists( 'last_name', $changes )
 			|| array_key_exists( 'optin_status', $changes )
 			|| ! empty( $changes['owner'] )
+			|| ! empty( $changes['locale'] )
 			|| ! empty( $changes['tags_add'] )
 			|| ! empty( $changes['tags_remove'] )
 			|| ! empty( $changes['meta'] );
@@ -227,8 +229,23 @@ class Update_Contact extends Ability {
 			$data['owner_id'] = $owner_id;
 		}
 
+		$locale = '';
+
+		if ( ! empty( $changes['locale'] ) ) {
+
+			$locale = Contact_Schema::resolve_locale( $changes['locale'] );
+
+			if ( is_wp_error( $locale ) ) {
+				return $locale;
+			}
+		}
+
 		if ( ! empty( $data ) ) {
 			$contact->update( $data );
+		}
+
+		if ( $locale ) {
+			$contact->set_locale( $locale );
 		}
 
 		if ( ! empty( $changes['tags_add'] ) ) {

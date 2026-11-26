@@ -478,19 +478,24 @@ class Contact extends Base_Object_With_Meta {
 	/**
 	 * Set the contact's locale
 	 *
-	 * @param  string|bool  $locale
+	 * @param  string|bool  $locale a WordPress locale like fr_FR, defaults to the language the site is being viewed in
+	 *
+	 * @return bool
 	 */
 	public function set_locale( $locale = false ) {
-		$this->update_meta( 'locale', $locale ?: get_locale() );
+
+		$locale = Multilingual::sanitize_locale( $locale ) ?: Multilingual::get_current_locale() ?: Multilingual::get_default_locale();
+
+		return $this->update_meta( 'locale', $locale );
 	}
 
 	/**
 	 * Get the contact's locale
 	 *
-	 * @return string en_US if undefined
+	 * @return string the site's default language if undefined
 	 */
 	public function get_locale() {
-		return $this->get_meta( 'locale' ) ?: get_locale();
+		return Multilingual::sanitize_locale( $this->get_meta( 'locale' ) ) ?: Multilingual::get_default_locale();
 	}
 
 	/**

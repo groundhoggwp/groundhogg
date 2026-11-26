@@ -1369,12 +1369,21 @@ class Email extends Base_Object_With_Meta {
 		is_sending( true );
 		the_email( $this );
 
+		// Build the email in the contact's language, so Groundhogg's own text in it (like the footer) is in it too.
+		// The event queue already switches for queued sends, this covers sending right away.
+		$contact  = get_contactdata( $contact_id_or_email );
+		$switched = is_a_contact( $contact ) && $contact->get_locale() !== get_locale() && switch_to_locale( $contact->get_locale() );
+
 		// Every way out of sending has to turn the flag back off. It gates things like minting auto-login
 		// keys, so it must not be left on by an early return (undeliverable, not ready...) or an exception.
 		try {
 			return $this->send_to( $contact_id_or_email, $event );
 		} finally {
 			is_sending( false );
+
+			if ( $switched ) {
+				restore_previous_locale();
+			}
 		}
 	}
 

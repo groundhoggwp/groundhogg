@@ -5,6 +5,7 @@ namespace Groundhogg\Abilities\Schemas;
 use Groundhogg\Abilities\Traits\Has_Optin_Status;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact_Query;
+use Groundhogg\Multilingual;
 use Groundhogg\Pii;
 use WP_Error;
 use function Groundhogg\admin_page_url;
@@ -147,7 +148,7 @@ class Segment_Schema {
 	 * Used by has_audience().
 	 */
 	private const AUDIENCE_KEYS = [
-		'search', 'include', 'tags_include', 'saved_search', 'owner', 'users_include', 'meta',
+		'search', 'include', 'tags_include', 'saved_search', 'owner', 'users_include', 'meta', 'locales',
 		'email_activity', 'page_visits', 'form_submissions', 'flow_conversions', 'activity',
 	];
 
@@ -320,6 +321,11 @@ class Segment_Schema {
 				'type'        => 'boolean',
 				'description' => __( 'true = only contacts with a linked WordPress user, false = only those without.', 'groundhogg' ),
 			],
+			'locales' => [
+				'type'        => 'array',
+				'items'       => [ 'type' => 'string' ],
+				'description' => __( 'Only contacts who get emails in one of these languages, as WordPress locales like fr_FR. A contact without a language set speaks the site\'s default language. groundhogg/get-setup-status lists the site\'s languages.', 'groundhogg' ),
+			],
 			'created_after' => [
 				'type'        => 'string',
 				'format'      => 'date',
@@ -483,6 +489,38 @@ class Segment_Schema {
 			'minimum'     => 1,
 			'default'     => 1,
 			'description' => $description,
+		];
+	}
+
+	/**
+	 * Turn `locales` into a Filters-DSL condition, for merging into to_query()'s `include_filters` or
+	 * to_filters()'s AND-group. There is no query var for it, and the locale filter knows that a contact
+	 * without a locale speaks the site's default language.
+	 *
+	 * @param array $input
+	 *
+	 * @return array|WP_Error
+	 */
+	private static function locale_filter_conditions( array $input ) {
+
+		if ( empty( $input['locales'] ) ) {
+			return [];
+		}
+
+		$locales = array_values( array_unique( array_filter( array_map( [ Multilingual::class, 'sanitize_locale' ], (array) $input['locales'] ) ) ) );
+
+		if ( empty( $locales ) ) {
+			return new WP_Error(
+				'groundhogg_invalid_locale',
+				__( 'None of the locales are WordPress locales. Use locales like fr_FR or de_DE.', 'groundhogg' )
+			);
+		}
+
+		return [
+			[
+				'type'    => 'locale',
+				'locales' => $locales,
+			]
 		];
 	}
 
@@ -889,7 +927,13 @@ class Segment_Schema {
 			return $extension_conditions;
 		}
 
-		$filter_conditions = array_merge( $behaviour_conditions, $extension_conditions );
+		$locale_conditions = self::locale_filter_conditions( $input );
+
+		if ( is_wp_error( $locale_conditions ) ) {
+			return $locale_conditions;
+		}
+
+		$filter_conditions = array_merge( $locale_conditions, $behaviour_conditions, $extension_conditions );
 
 		if ( ! empty( $filter_conditions ) ) {
 			// Merged into the same single AND-group `include_filters` already uses
@@ -1214,6 +1258,14 @@ class Segment_Schema {
 				array_push( $conditions, ...$meta_conditions );
 			}
 		}
+
+		$locale_conditions = self::locale_filter_conditions( $input );
+
+		if ( is_wp_error( $locale_conditions ) ) {
+			return $locale_conditions;
+		}
+
+		array_push( $conditions, ...$locale_conditions );
 
 		$behaviour_conditions = self::behaviour_filter_conditions( $input );
 

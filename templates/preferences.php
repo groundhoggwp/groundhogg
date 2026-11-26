@@ -509,6 +509,14 @@ switch ( $action ):
 					add_notice( 'notice_profile_updated' );
 				}
 			}
+
+			// The language they want emails in, only if the site is in more than one
+			$locale = get_post_var( 'locale' );
+
+			if ( is_string( $locale ) && Multilingual::is_site_locale( $locale ) && Multilingual::sanitize_locale( $locale ) !== $contact->get_locale() ) {
+				$contact->set_locale( $locale );
+				add_notice( 'notice_profile_updated' );
+			}
 		}
 
 		if ( wp_verify_nonce( get_url_var( '_wpnonce' ), 'send_archive_link' ) ) {
@@ -569,6 +577,20 @@ switch ( $action ):
 					'value' => $contact->get_email()
 				] ) );
 
+				endif;
+
+				$site_languages = Multilingual::get_site_languages();
+
+				if ( count( $site_languages ) > 1 ):
+					?>
+                    <label for="locale"><?php esc_html_e( 'Language', 'groundhogg' ); ?></label>
+					<?php html( html()->dropdown( [
+					'id'          => 'locale',
+					'name'        => 'locale',
+					'options'     => array_combine( wp_list_pluck( $site_languages, 'locale' ), wp_list_pluck( $site_languages, 'name' ) ),
+					'selected'    => $contact->get_locale(),
+					'option_none' => false,
+				] ) );
 				endif;
 
 				if ( current_contact_and_logged_in_user_match() ):

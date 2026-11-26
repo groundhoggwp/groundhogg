@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Contacts;
 
 use Groundhogg\Abilities\Ability;
+use Groundhogg\Abilities\Schemas\Contact_Schema;
 use Groundhogg\Abilities\Schemas\Segment_Schema;
 use Groundhogg\Abilities\Traits\Has_Optin_Status;
 use Groundhogg\Abilities\Traits\Has_Owner_Validation;
@@ -102,6 +103,7 @@ class Bulk_Update_Contacts extends Ability {
 								'minimum'     => 1,
 								'description' => __( 'A WordPress user ID to assign as the owner - see groundhogg/list-owners for valid IDs.', 'groundhogg' ),
 							],
+							'locale' => Contact_Schema::locale_input_schema(),
 							'meta' => [
 								'type'                 => 'object',
 								'additionalProperties' => true,
@@ -149,10 +151,22 @@ class Bulk_Update_Contacts extends Ability {
 			|| ! empty( $changes['tags_remove'] )
 			|| isset( $changes['optin_status'] )
 			|| ! empty( $changes['owner'] )
+			|| ! empty( $changes['locale'] )
 			|| ! empty( $changes['meta'] );
 
 		if ( ! $has_changes ) {
-			return new WP_Error( 'groundhogg_no_changes', __( 'No fields to update were given. Pass tags_add, tags_remove, optin_status, owner or meta in changes.', 'groundhogg' ) );
+			return new WP_Error( 'groundhogg_no_changes', __( 'No fields to update were given. Pass tags_add, tags_remove, optin_status, owner, locale or meta in changes.', 'groundhogg' ) );
+		}
+
+		$locale = '';
+
+		if ( ! empty( $changes['locale'] ) ) {
+
+			$locale = Contact_Schema::resolve_locale( $changes['locale'] );
+
+			if ( is_wp_error( $locale ) ) {
+				return $locale;
+			}
 		}
 
 		if ( ! Segment_Schema::has_audience( $input ) && empty( $input['all_contacts'] ) ) {
@@ -217,6 +231,11 @@ class Bulk_Update_Contacts extends Ability {
 		$add_tags    = empty( $changes['tags_add'] ) ? [] : parse_tag_list( $changes['tags_add'], 'ID', true );
 		$remove_tags = empty( $changes['tags_remove'] ) ? [] : parse_tag_list( $changes['tags_remove'], 'ID', false );
 		$meta        = empty( $changes['meta'] ) ? [] : Update_Contact::sanitize_meta( $changes['meta'] );
+
+		// The locale is contact meta, so it goes with the rest of it, background task included
+		if ( $locale ) {
+			$meta['locale'] = $locale;
+		}
 
 		if ( empty( $data ) && empty( $meta ) && empty( $add_tags ) && empty( $remove_tags ) ) {
 			return new WP_Error( 'groundhogg_no_changes', __( 'None of the tags in tags_remove match an existing tag, so there is nothing to change.', 'groundhogg' ) );

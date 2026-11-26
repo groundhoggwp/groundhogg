@@ -674,16 +674,26 @@ class Contact_Query extends Table_Query {
 	 */
 	public static function filter_locale( $filter, Where $where, Contact_Query $query ) {
 
+		// Contacts without a locale speak the site's default language
+		$default = Multilingual::get_default_locale();
+
 		$filter = wp_parse_args( $filter, [
-			'locales' => [ get_locale() ]
+			'locales' => [ $default ]
 		] );
 
-		$alias   = $where->query->joinMeta( 'locale' );
-		$default = get_locale();
-		$col     = "COALESCE($alias.meta_value,'$default')";
+		// sanitize_locale() only lets through letters, numbers and underscores, so $default is safe in SQL
+		$alias = $where->query->joinMeta( 'locale' );
+		$col   = "COALESCE(NULLIF($alias.meta_value,''),'$default')";
 		$query->add_safe_column( $col );
 
-		$locales = array_intersect( maybe_explode( $filter['locales'] ), array_keys( wp_get_available_translations() ) );
+		// Not limited to wp_get_available_translations(): it leaves out en_US, only loads in the admin and can make a remote request
+		$locales = array_values( array_filter( array_map( [ Multilingual::class, 'sanitize_locale' ], maybe_explode( $filter['locales'] ) ) ) );
+
+		if ( empty( $locales ) ) {
+			$where->addCondition( '1=0' ); // short circuit false
+
+			return;
+		}
 
 		$where->in( $col, $locales );
 	}

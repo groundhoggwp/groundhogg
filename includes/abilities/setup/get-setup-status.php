@@ -3,6 +3,8 @@
 namespace Groundhogg\Abilities\Setup;
 
 use Groundhogg\Abilities\Ability;
+use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Multilingual;
 use Groundhogg\Plugin;
 use function Groundhogg\get_primary_owner;
 
@@ -78,6 +80,41 @@ class Get_Setup_Status extends Ability {
 							'critical'    => [ 'type' => 'integer' ],
 						],
 					],
+					'languages' => [
+						'type'        => 'object',
+						'description' => __( 'The languages the site is in and the languages contacts get emails in, as WordPress locales like fr_FR. A contact without a language set gets the default one.', 'groundhogg' ),
+						'properties'  => [
+							'plugin'  => [
+								'type'        => 'string',
+								'description' => __( 'The multilingual plugin the languages come from: wpml, polylang or translatepress. Empty when the site is in one language.', 'groundhogg' ),
+							],
+							'default' => [ 'type' => 'string' ],
+							'site'    => [
+								'type'  => 'array',
+								'items' => [
+									'type'       => 'object',
+									'properties' => [
+										'locale'   => [ 'type' => 'string' ],
+										'name'     => [ 'type' => 'string' ],
+										'default'  => [ 'type' => 'boolean' ],
+										'contacts' => [ 'type' => 'integer' ],
+									],
+								],
+							],
+							'other'   => [
+								'type'        => 'array',
+								'description' => __( 'Languages contacts have that the site isn\'t in, for example from their WordPress user profile.', 'groundhogg' ),
+								'items'       => [
+									'type'       => 'object',
+									'properties' => [
+										'locale'   => [ 'type' => 'string' ],
+										'name'     => [ 'type' => 'string' ],
+										'contacts' => [ 'type' => 'integer' ],
+									],
+								],
+							],
+						],
+					],
 					'checks'  => [
 						'type'  => 'array',
 						'items' => [
@@ -132,8 +169,64 @@ class Get_Setup_Status extends Ability {
 		}
 
 		return [
-			'summary' => $summary,
-			'checks'  => $checks,
+			'summary'   => $summary,
+			'languages' => $this->languages(),
+			'checks'    => $checks,
+		];
+	}
+
+	/**
+	 * The site's languages and how many contacts get emails in each
+	 *
+	 * @return array
+	 */
+	protected function languages(): array {
+
+		$default = Multilingual::get_default_locale();
+
+		$query = new Table_Query( 'contacts' );
+		$alias = $query->joinMeta( 'locale' );
+
+		// sanitize_locale() only lets through letters, numbers and underscores, so $default is safe in SQL
+		$col = "COALESCE(NULLIF($alias.meta_value,''),'$default')";
+		$query->add_safe_column( $col );
+		$query->setSelect( [ $col, 'locale' ], [ 'COUNT(*)', 'contacts' ] )->setGroupby( 'locale' );
+
+		$counts = [];
+
+		foreach ( $query->get_results() as $row ) {
+			$locale = Multilingual::sanitize_locale( $row->locale );
+
+			if ( $locale ) {
+				$counts[ $locale ] = ( $counts[ $locale ] ?? 0 ) + absint( $row->contacts );
+			}
+		}
+
+		$site = array_map( function ( $language ) use ( &$counts ) {
+
+			$language['contacts'] = $counts[ $language['locale'] ] ?? 0;
+			unset( $counts[ $language['locale'] ] );
+
+			return $language;
+		}, Multilingual::get_site_languages() );
+
+		arsort( $counts );
+
+		$other = [];
+
+		foreach ( $counts as $locale => $count ) {
+			$other[] = [
+				'locale'   => $locale,
+				'name'     => Multilingual::get_locale_name( $locale ),
+				'contacts' => $count,
+			];
+		}
+
+		return [
+			'plugin'  => Multilingual::get_plugin(),
+			'default' => $default,
+			'site'    => $site,
+			'other'   => $other,
 		];
 	}
 

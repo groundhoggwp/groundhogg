@@ -361,6 +361,7 @@ class Plugin {
 		\Groundhogg_Email_Services::init();
 
 		new Plugin_Compatibility();
+		new Multilingual();
 		new License_Manager();
 		new Background_Tasks();
 		new Big_File_Uploader();

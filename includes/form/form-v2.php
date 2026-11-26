@@ -4,6 +4,7 @@ namespace Groundhogg\Form;
 
 
 use Groundhogg\Contact;
+use Groundhogg\Multilingual;
 use Groundhogg\Properties;
 use Groundhogg\Replacements;
 use Groundhogg\Step;
@@ -2072,6 +2073,11 @@ class Form_v2 extends Step {
 
 		if ( ! empty( $this->hidden_fields ) ) {
 			$form .= do_replacements( $this->get_hidden_fields(), $this->contact ?: get_contactdata() );
+		}
+
+		// The language the form is shown in, except when an admin fills it in for a contact
+		if ( empty( $this->shortcode_attrs['contact'] ) ) {
+			$form .= Multilingual::get_form_input();
 		}
 
 		$form .= '</form>';

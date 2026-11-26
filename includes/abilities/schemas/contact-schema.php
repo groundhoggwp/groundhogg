@@ -6,8 +6,10 @@ use DateTime;
 use Exception;
 use Groundhogg\Abilities\Traits\Extensible_Schema;
 use Groundhogg\Contact;
+use Groundhogg\Multilingual;
 use Groundhogg\Pii;
 use Groundhogg\Preferences;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,7 +60,41 @@ class Contact_Schema extends Schema {
 	}
 
 	protected static function builtin_property_keys(): array {
-		return [ 'id', 'email', 'first_name', 'last_name', 'date_created', 'optin_status', 'tags', 'meta' ];
+		return [ 'id', 'email', 'first_name', 'last_name', 'date_created', 'optin_status', 'locale', 'tags', 'meta' ];
+	}
+
+	/**
+	 * The `locale` input of the abilities that create and update contacts
+	 *
+	 * @return array
+	 */
+	public static function locale_input_schema(): array {
+		return [
+			'type'        => 'string',
+			'description' => __( 'The language the contact wants emails in, as a WordPress locale like fr_FR or de_DE. Use one of the site languages groundhogg/get-setup-status lists.', 'groundhogg' ),
+		];
+	}
+
+	/**
+	 * Validate a `locale` input
+	 *
+	 * @param mixed $locale
+	 *
+	 * @return string|WP_Error the locale
+	 */
+	public static function resolve_locale( $locale ) {
+
+		$sanitized = Multilingual::sanitize_locale( $locale );
+
+		if ( ! $sanitized ) {
+			return new WP_Error( 'groundhogg_invalid_locale', sprintf(
+				/* translators: %s: the locale that was given */
+				__( '"%s" is not a WordPress locale. Use a locale like fr_FR or de_DE.', 'groundhogg' ),
+				is_scalar( $locale ) ? (string) $locale : ''
+			) );
+		}
+
+		return $sanitized;
 	}
 
 	public static function get_schema(): array {
@@ -95,6 +131,10 @@ class Contact_Schema extends Schema {
 						'type' => 'string',
 					],
 				],
+			],
+			'locale' => [
+				'type'        => 'string',
+				'description' => __( 'The language the contact gets emails in, as a WordPress locale like fr_FR. The site\'s default language unless one was set for them.', 'groundhogg' ),
 			],
 			'tags' => [
 				'type'        => 'array',
@@ -155,6 +195,7 @@ class Contact_Schema extends Schema {
 				'value' => $optin_status,
 				'label' => Preferences::get_preference_pretty_name( $optin_status ),
 			],
+			'locale'       => $object->get_locale(),
 		];
 
 		if ( Pii::is_restricted() ) {
