@@ -14,6 +14,8 @@ use Groundhogg\Abilities\Contacts\Add_Custom_Field;
 use Groundhogg\Abilities\Contacts\Bulk_Update_Contacts;
 use Groundhogg\Abilities\Contacts\Create_Contact;
 use Groundhogg\Abilities\Contacts\Get_Contact;
+use Groundhogg\Abilities\Contacts\Get_Contact_History;
+use Groundhogg\Abilities\Contacts\Save_Contact_Summary;
 use Groundhogg\Abilities\Contacts\Import_Contacts;
 use Groundhogg\Abilities\Contacts\List_Contact_Notes;
 use Groundhogg\Abilities\Contacts\List_Custom_Fields;
@@ -411,6 +413,8 @@ class Abilities {
 
 		$abilities = array_merge( [
 			Get_Contact::class,
+			Get_Contact_History::class,
+			Save_Contact_Summary::class,
 			Create_Contact::class,
 			Update_Contact::class,
 			Update_Contacts::class,

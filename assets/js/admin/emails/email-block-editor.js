@@ -1803,6 +1803,76 @@
       ])
   }
 
+  /**
+   * A sparkle next to one line of the email, like its subject: the site's AI suggests a few from what the email says,
+   * and the one picked replaces the line. See Groundhogg\AI\Jobs\Email_Ideas.
+   *
+   * @param {Object} props
+   * @param {string} props.job     the job's name
+   * @param {string} props.field   the email data it changes, like subject
+   * @param {string} props.inputId the id of the line's input
+   * @param {string} props.label
+   * @param {string} props.working the label while it works
+   * @return {HTMLElement|null}
+   */
+  const EmailIdeas = ({
+    job,
+    field,
+    inputId,
+    label,
+    working,
+  }) => {
+
+    if (!Groundhogg.ai.has || !Groundhogg.ai.has(job)) {
+      return null
+    }
+
+    const use = idea => {
+      setEmailData({
+        [field]: idea,
+      })
+
+      // the subject has a field with this id in both editors, only one is on the page
+      document.querySelectorAll(`#${ inputId }`).forEach(input => input.value = idea)
+    }
+
+    return Groundhogg.ai.AiButton({
+      id       : `${ inputId }-ideas`,
+      job,
+      label,
+      working,
+      showLabel: false,
+      className: 'gh-button secondary text icon small',
+      // the email as it is when clicked, saved or not
+      input    : () => ( {
+        content: getEmailData().plain_text || ( isHTMLEditor() ? '' : renderBlocksPlainText(getBlocks()) ),
+        subject: getEmailData().subject || '',
+        preview: getEmailData().pre_header || '',
+      } ),
+      onDone   : ({ ideas = [] }, button) => moreMenu(button, ideas.map((idea, i) => ( {
+        key     : i,
+        text    : escHTML(idea),
+        onSelect: () => use(idea),
+      } ))),
+    })
+  }
+
+  const SubjectLineIdeas = () => EmailIdeas({
+    job    : 'subject-lines',
+    field  : 'subject',
+    inputId: 'subject-line',
+    label  : __('Subject line ideas', 'groundhogg'),
+    working: __('Thinking of subject lines', 'groundhogg'),
+  })
+
+  const PreviewTextIdeas = () => EmailIdeas({
+    job    : 'preview-text',
+    field  : 'pre_header',
+    inputId: 'preview-text',
+    label  : __('Preview text ideas', 'groundhogg'),
+    working: __('Thinking of preview text', 'groundhogg'),
+  })
+
   const ImageControls = ({
     id = '',
     maxWidth = 0,
@@ -1886,7 +1956,7 @@
           },
         })) : null,
       // the site's own AI writes it, see Groundhogg\AI\Jobs\Alt_Text
-      supports.alt && src && Groundhogg.ai.can && Groundhogg.ai.can('text') ? Div({
+      supports.alt && src && Groundhogg.ai.has && Groundhogg.ai.has('alt-text') ? Div({
           className: 'gh-ai-alt-text',
         },
         Groundhogg.ai.AiButton({
@@ -4917,14 +4987,19 @@
               label  : 'Subject line',
               stacked: true,
             },
-            InputWithReplacements({
-              type     : 'text',
-              id       : 'subject-line',
-              className: 'full-width',
-              value    : getEmailData().subject,
-              onInput  : e => setEmailData({ subject: e.target.value }),
+            Div({
+              className: 'gh-ai-subject-row display-flex gap-5 align-center',
+            }, [
+              InputWithReplacements({
+                type     : 'text',
+                id       : 'subject-line',
+                className: 'full-width',
+                value    : getEmailData().subject,
+                onInput  : e => setEmailData({ subject: e.target.value }),
 
-            })) : null,
+              }),
+              SubjectLineIdeas(),
+            ])) : null,
           Control({
               label  : 'Send this email from...',
               stacked: true,
@@ -6026,7 +6101,7 @@
                       })
                     },
                   }),
-
+                  SubjectLineIdeas(),
                 ]),
               Div({
                   className: 'inline-label',
@@ -6044,7 +6119,7 @@
                       })
                     },
                   }),
-
+                  PreviewTextIdeas(),
                 ]),
 
             ]),

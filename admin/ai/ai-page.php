@@ -8,7 +8,9 @@ use Groundhogg\AI\AI;
 use Groundhogg\AI\Job;
 use Groundhogg\Mcp\Build_With_AI;
 use Groundhogg\Mcp\Connection;
+use Groundhogg\DB\Query\Table_Query;
 use WP_Error;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_url_var;
 use function Groundhogg\html;
@@ -33,6 +35,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AI_Page extends Tabbed_Admin_Page {
 
 	const OVERVIEW = 'overview';
+	const USAGE    = 'usage';
+
+	/**
+	 * Requests a page of the usage tab shows
+	 */
+	const USAGE_PER_PAGE = 50;
 
 	public function __construct() {
 		parent::__construct();
@@ -119,6 +127,12 @@ class AI_Page extends Tabbed_Admin_Page {
 			[
 				'name' => __( 'AI features', 'groundhogg' ),
 				'slug' => AI::TAB,
+				'cap'  => AI::is_supported() ? 'manage_options' : 'do_not_allow',
+			],
+			// what AI features asked for on the site's key, and who asked
+			[
+				'name' => __( 'Usage', 'groundhogg' ),
+				'slug' => self::USAGE,
 				'cap'  => AI::is_supported() ? 'manage_options' : 'do_not_allow',
 			],
 		];
@@ -381,6 +395,10 @@ class AI_Page extends Tabbed_Admin_Page {
 				echo esc_html( number_format_i18n( AI::tokens_this_month() ) );
 			}, __( 'What providers bill by. Your provider\'s dashboard has the cost.', 'groundhogg' ) );
 
+			Card_Sections::row( '', '', function () {
+				?><a href="<?php echo esc_url( self::usage_url() ); ?>"><?php esc_html_e( 'See each feature\'s use, and every request', 'groundhogg' ); ?></a><?php
+			} );
+
 			Card_Sections::section_end();
 
 			?>
@@ -393,6 +411,163 @@ class AI_Page extends Tabbed_Admin_Page {
 				?></p>
         </div>
 		<?php
+	}
+
+	/* ---- Usage ------------------------------------------------------------------------------------------------- */
+
+	/**
+	 * What each feature used this month, then every request, newest first: who asked, for what, the model, and the
+	 * tokens. Providers bill by tokens, their dashboards have the cost.
+	 *
+	 * @return void
+	 */
+	public function usage_view() {
+
+		$jobs  = AI::jobs();
+		$usage = AI::usage_by_job();
+		$limit = AI::get_limit();
+
+		$job_label = function ( string $name ) use ( $jobs ) {
+			return isset( $jobs[ $name ] ) ? $jobs[ $name ]->get_label() : $name;
+		};
+
+		?>
+        <div class="gh-settings-sections gh-ai-usage">
+			<?php
+
+			Card_Sections::section_start( __( 'This month', 'groundhogg' ), $limit
+				? sprintf(
+				/* translators: 1: requests made this month, 2: the monthly limit */
+					__( '%1$s of this month\'s %2$s requests used, for everyone together.', 'groundhogg' ),
+					number_format_i18n( AI::requests_this_month() ),
+					number_format_i18n( $limit )
+				)
+				: __( 'Since the first of the month, for everyone together. Only requests that worked count toward the monthly limit.', 'groundhogg' ) );
+
+			if ( empty( $usage ) ) {
+				Card_Sections::intro( esc_html__( 'Nothing yet this month.', 'groundhogg' ) );
+			}
+
+			foreach ( $usage as $name => $use ) {
+				Card_Sections::row( esc_html( $job_label( $name ) ), '', function () use ( $use ) {
+
+					printf(
+					/* translators: 1: number of requests, 2: number of tokens */
+						esc_html( _n( '%1$s request, %2$s tokens', '%1$s requests, %2$s tokens', $use['requests'], 'groundhogg' ) ),
+						esc_html( number_format_i18n( $use['requests'] ) ),
+						esc_html( number_format_i18n( $use['tokens'] ) )
+					);
+
+					if ( $use['failed'] ) {
+						echo ' <span class="pill orange">' . esc_html( sprintf(
+							/* translators: %s: number of requests */
+								_n( '%s failed', '%s failed', $use['failed'], 'groundhogg' ),
+								number_format_i18n( $use['failed'] )
+							) ) . '</span>';
+					}
+				} );
+			}
+
+			Card_Sections::section_end();
+
+			$this->usage_table( $job_label );
+
+			?>
+        </div>
+		<?php
+	}
+
+	/**
+	 * Every request, newest first, a page at a time
+	 *
+	 * @param callable $job_label the label of a job, by name
+	 *
+	 * @return void
+	 */
+	protected function usage_table( callable $job_label ) {
+
+		$page = max( 1, absint( get_url_var( 'paged', 1 ) ) );
+
+		// counting changes what a query selects, so the rows get a query of their own
+		$total = absint( ( new Table_Query( 'ai_usage' ) )->count() );
+		$query = new Table_Query( 'ai_usage' );
+
+		$query->setOrderby( 'ID' )
+		      ->setOrder( 'DESC' )
+		      ->setLimit( self::USAGE_PER_PAGE )
+		      ->setOffset( ( $page - 1 ) * self::USAGE_PER_PAGE );
+
+		$rows   = $query->get_results();
+		$format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+
+		?>
+        <div class="gh-panel gh-ai-usage-requests">
+            <div class="gh-panel-header">
+                <h2><?php esc_html_e( 'Requests', 'groundhogg' ); ?></h2>
+            </div>
+			<?php if ( empty( $rows ) ): ?>
+                <div class="inside">
+                    <p><?php esc_html_e( 'No AI feature has been used yet. Requests show up here as people use them.', 'groundhogg' ); ?></p>
+                </div>
+			<?php else: ?>
+                <table class="wp-list-table widefat striped">
+                    <thead>
+                    <tr>
+                        <th scope="col"><?php esc_html_e( 'When', 'groundhogg' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Feature', 'groundhogg' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Person', 'groundhogg' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Model', 'groundhogg' ); ?></th>
+                        <th scope="col" class="num"><?php esc_html_e( 'Tokens', 'groundhogg' ); ?></th>
+                        <th scope="col"><?php esc_html_e( 'Result', 'groundhogg' ); ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+					<?php foreach ( $rows as $row ):
+						$user = get_userdata( absint( $row->user_id ) );
+						$model = trim( $row->provider . ' / ' . $row->model, ' /' );
+						?>
+                        <tr>
+                            <td><?php echo esc_html( get_date_from_gmt( $row->date_created, $format ) ); ?></td>
+                            <td><?php echo esc_html( $job_label( $row->job ) ); ?></td>
+                            <td><?php echo esc_html( $user ? $user->display_name : __( 'Deleted user', 'groundhogg' ) ); ?></td>
+                            <td><?php echo esc_html( $model ?: '—' ); ?></td>
+                            <td class="num"><?php echo esc_html( number_format_i18n( absint( $row->total_tokens ) ) ); ?></td>
+                            <td><?php if ( $row->status === 'complete' ): ?>
+                                    <span class="pill green"><?php esc_html_e( 'Done', 'groundhogg' ); ?></span>
+								<?php else: ?>
+                                    <span class="pill red" title="<?php echo esc_attr( $row->error_code ); ?>"><?php esc_html_e( 'Failed', 'groundhogg' ); ?></span>
+								<?php endif; ?></td>
+                        </tr>
+					<?php endforeach; ?>
+                    </tbody>
+                </table>
+				<?php
+
+				$links = paginate_links( [
+					'base'      => add_query_arg( 'paged', '%#%', AI_Page::usage_url() ),
+					'format'    => '',
+					'current'   => $page,
+					'total'     => (int) ceil( $total / self::USAGE_PER_PAGE ),
+					'prev_text' => __( '&larr; Newer', 'groundhogg' ),
+					'next_text' => __( 'Older &rarr;', 'groundhogg' ),
+				] );
+
+				if ( $links ) {
+					echo '<div class="inside gh-ai-usage-pages">' . wp_kses_post( $links ) . '</div>';
+				}
+
+			endif; ?>
+        </div>
+		<?php
+	}
+
+	/**
+	 * The usage tab
+	 *
+	 * @return string
+	 */
+	public static function usage_url(): string {
+		return admin_page_url( AI::PAGE, [ 'tab' => self::USAGE ] );
 	}
 
 	/* ---- AI assistant ------------------------------------------------------------------------------------------ */

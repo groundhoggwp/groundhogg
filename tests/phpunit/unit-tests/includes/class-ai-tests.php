@@ -15,6 +15,7 @@ use WordPress\AiClient\Results\DTO\Candidate;
 use WordPress\AiClient\Results\DTO\GenerativeAiResult;
 use WordPress\AiClient\Results\DTO\TokenUsage;
 use WordPress\AiClient\Results\Enums\FinishReasonEnum;
+use function Groundhogg\get_contactdata;
 use function Groundhogg\get_db;
 
 /**
@@ -353,7 +354,7 @@ class AI_Tests extends GH_UnitTestCase {
 	public function test_the_ai_page_has_a_tab_for_each_way_in() {
 
 		// administrators see both, and the settings
-		$this->assertSame( [ AI_Page::OVERVIEW, Connection::TAB, AI::TAB ], $this->tabs() );
+		$this->assertSame( [ AI_Page::OVERVIEW, Connection::TAB, AI::TAB, AI_Page::USAGE ], $this->tabs() );
 
 		// anyone who works with contacts can connect an assistant of their own, the settings are for administrators
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'sales_rep' ] ) );
@@ -414,6 +415,241 @@ class AI_Tests extends GH_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/name=.option_page. value=.' . AI::SETTINGS_GROUP . './', $features );
 		$this->assertStringContainsString( 'name="' . AI::LIMIT_OPTION . '"', $features );
 		$this->assertStringContainsString( esc_url( Connection::page_url() ), $features, 'the way to the other tab' );
+	}
+
+	/* ---- jobs one at a time ------------------------------------------------------------------------------------ */
+
+	public function test_a_job_can_be_turned_off_on_its_own() {
+
+		$off = function ( $on, $name ) {
+			return $name === 'fake-job' ? false : $on;
+		};
+
+		add_filter( 'groundhogg/ai/job_is_on', $off, 10, 2 );
+
+		$result = AI::run( 'fake-job', [] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'ai_job_off', $result->get_error_code() );
+		$this->assertSame( 0, $this->job->asked, 'nothing is sent' );
+		$this->assertSame( 0, get_db( 'ai_usage' )->count() );
+
+		// the browser hides its button, the others stay
+		$jobs = AI::client_data()['jobs'];
+		$this->assertFalse( $jobs['fake-job'] );
+		$this->assertTrue( $jobs['alt-text'] );
+		$this->assertTrue( $jobs['subject-lines'] );
+
+		remove_filter( 'groundhogg/ai/job_is_on', $off );
+
+		$this->assertNotWPError( AI::run( 'fake-job', [] ) );
+	}
+
+	public function test_the_browser_only_gets_the_jobs_a_person_can_use() {
+
+		// can upload files, can't edit emails
+		$user = self::factory()->user->create( [ 'role' => 'author' ] );
+		get_userdata( $user )->add_cap( AI::CAP );
+		wp_set_current_user( $user );
+
+		$jobs = AI::client_data()['jobs'];
+
+		$this->assertTrue( $jobs['alt-text'] );
+		$this->assertFalse( $jobs['subject-lines'] );
+	}
+
+	/* ---- subject line ideas ------------------------------------------------------------------------------------ */
+
+	public function test_subject_lines_need_something_to_go_on() {
+
+		$job = AI::get_job( 'subject-lines' );
+
+		$this->assertSame( 'ai_no_content', $job->validate( [ 'content' => '<p>Hi {first}</p>' ] )->get_error_code() );
+
+		$input = $job->validate( [
+			'content' => '<h1>Spring sale</h1><p>Everything is 20% off   until Friday.</p>' . str_repeat( 'More words here. ', 1000 ),
+			'subject' => '<b>Our spring sale</b>',
+			'preview' => 'Ends Friday',
+		] );
+
+		$this->assertNotWPError( $input );
+		$this->assertStringStartsWith( "Spring sale\nEverything is 20% off until Friday.", $input['content'] );
+		$this->assertSame( Groundhogg\AI\Jobs\Subject_Lines::MAX_CONTENT, mb_strlen( $input['content'] ) );
+		$this->assertSame( 'Our spring sale', $input['subject'] );
+	}
+
+	public function test_subject_lines_are_cleaned_up() {
+
+		$job = AI::get_job( 'subject-lines' );
+
+		// as asked for
+		$this->assertSame(
+			[ 'ideas' => [ 'Spring sale: 20% off everything', 'Ends Friday: your spring savings' ] ],
+			$job->respond( self::result( '{"ideas":["Spring sale: 20% off everything","\"Ends Friday: your spring savings\""," "]}', 1, 1 ), [] )
+		);
+
+		// a provider that answers with a list, with doubles and too many
+		$list = "1. One\n2) Two\n- Three\n* one\n• Four\nFive\nSix";
+		$this->assertSame( [ 'ideas' => [ 'One', 'Two', 'Three', 'Four', 'Five' ] ], $job->respond( self::result( $list, 1, 1 ), [] ) );
+
+		$this->assertSame( 'ai_empty', $job->respond( self::result( '{"ideas":[]}', 1, 1 ), [] )->get_error_code() );
+	}
+
+	/**
+	 * Do an email ideas job with an answer instead of a provider
+	 *
+	 * @param string $class  the job
+	 * @param string $answer what the provider would have said
+	 * @param array  $input
+	 *
+	 * @return array|\WP_Error
+	 */
+	protected function run_ideas( string $class, string $answer, array $input ) {
+
+		$job = $this->getMockBuilder( $class )->onlyMethods( [ 'generate' ] )->getMock();
+		$job->method( 'generate' )->willReturn( self::result( $answer, 300, 40 ) );
+
+		$name = $job->get_name();
+
+		add_filter( 'groundhogg/ai/jobs', $replace = function ( $jobs ) use ( $job, $name ) {
+			return array_merge( array_filter( $jobs, function ( $j ) use ( $name ) {
+				return $j->get_name() !== $name;
+			} ), [ $job ] );
+		}, 20 );
+		AI::reset_jobs();
+
+		$result = AI::run( $name, $input );
+
+		remove_filter( 'groundhogg/ai/jobs', $replace, 20 );
+		AI::reset_jobs();
+
+		return $result;
+	}
+
+	public function test_subject_lines_run_end_to_end() {
+
+		$result = $this->run_ideas( Groundhogg\AI\Jobs\Subject_Lines::class, '{"ideas":["A","B"]}', [ 'content' => 'Our spring sale starts today and runs until Friday.' ] );
+
+		$this->assertNotWPError( $result );
+		$this->assertSame( [ 'A', 'B' ], $result['ideas'] );
+		$this->assertSame( 340, $result['usage']['tokens'] );
+	}
+
+	public function test_preview_text_ideas() {
+
+		$job = AI::get_job( 'preview-text' );
+
+		$this->assertNotNull( $job );
+		$this->assertSame( 'edit_emails', $job->get_capability() );
+		$this->assertTrue( AI::client_data()['jobs']['preview-text'] );
+
+		$result = $this->run_ideas( Groundhogg\AI\Jobs\Preview_Text::class, '{"ideas":["Everything is 20% off until Friday"]}', [
+			'content' => 'Our spring sale starts today and runs until Friday.',
+			'subject' => 'Our spring sale',
+		] );
+
+		$this->assertNotWPError( $result );
+		$this->assertSame( [ 'Everything is 20% off until Friday' ], $result['ideas'] );
+
+		// it's logged as its own feature, for the usage tab
+		$this->assertArrayHasKey( 'preview-text', AI::usage_by_job() );
+		$this->assertSame( 'ai_empty', $job->respond( self::result( '{"ideas":[]}', 1, 1 ), [] )->get_error_code() );
+	}
+
+	/* ---- contact summaries ------------------------------------------------------------------------------------- */
+
+	public function test_a_contact_summary_is_made_from_their_history_without_who_they_are() {
+
+		$job = AI::get_job( 'contact-summary' );
+
+		$this->assertSame( 'ai_no_contact', $job->validate( [ 'contact_id' => 999999999 ] )->get_error_code() );
+
+		$contact = get_contactdata( self::factory()->contacts->create( [ 'email' => 'summary-' . uniqid() . '@example.com', 'first_name' => 'Casey' ] ) );
+		$contact->add_tag( 'Summary test tag' );
+
+		$input = $job->validate( [ 'contact_id' => $contact->get_id() ] );
+
+		$this->assertNotWPError( $input );
+		$this->assertStringContainsString( 'Summary test tag', $input['markdown'] );
+		$this->assertStringNotContainsString( $contact->get_email(), $input['markdown'] );
+		$this->assertStringNotContainsString( 'Casey', $input['markdown'] );
+		$this->assertNotContains( 'personal', Groundhogg\AI\Jobs\Contact_Summary::sections() );
+
+		// the same check as opening the contact
+		$deny = function ( $caps, $cap ) {
+			return $cap === 'view_contact' ? [ 'do_not_allow' ] : $caps;
+		};
+		add_filter( 'map_meta_cap', $deny, 10, 2 );
+		$denied = $job->validate( [ 'contact_id' => $contact->get_id() ] );
+		remove_filter( 'map_meta_cap', $deny, 10 );
+
+		$this->assertSame( 'ai_forbidden', $denied->get_error_code() );
+		$this->assertSame( 403, $denied->get_error_data()['status'] );
+	}
+
+	public function test_a_contact_summary_is_cleaned_up() {
+
+		$this->assertFalse( Groundhogg\AI\Jobs\Contact_Summary::clean( 'nope' ) );
+		$this->assertFalse( Groundhogg\AI\Jobs\Contact_Summary::clean( [ 'summary' => '' ] ) );
+
+		$clean = Groundhogg\AI\Jobs\Contact_Summary::clean( [
+			'temperature' => 'lukewarm',
+			'reason'      => '<b>Opens</b> every email',
+			'summary'     => 'A long-time customer.',
+			'interests'   => [ 'Email', 'Flows', '', 3, 'Reports', 'SMS', 'Forms', 'Too many' ],
+			'next_step'   => 'Offer the annual plan.',
+		] );
+
+		$this->assertSame( 'cold', $clean['temperature'], 'what it doesn\'t know is cold' );
+		$this->assertSame( 'Opens every email', $clean['reason'] );
+		$this->assertSame( [ 'Email', 'Flows', 'Reports', 'SMS', 'Forms' ], $clean['interests'] );
+	}
+
+	public function test_a_contact_summary_is_kept_on_the_contact() {
+
+		$contact = get_contactdata( self::factory()->contacts->create( [ 'email' => 'summary-' . uniqid() . '@example.com' ] ) );
+
+		$this->assertNull( Groundhogg\AI\Jobs\Contact_Summary::get_saved( $contact ) );
+
+		$result = $this->run_ideas( Groundhogg\AI\Jobs\Contact_Summary::class, wp_json_encode( [
+			'temperature' => 'warm',
+			'reason'      => 'Clicked twice this week.',
+			'summary'     => 'A new lead who is reading about pricing.',
+			'interests'   => [ 'Pricing' ],
+			'next_step'   => 'Send the pricing guide.',
+		] ), [ 'contact_id' => $contact->get_id() ] );
+
+		$this->assertNotWPError( $result );
+		$this->assertSame( 'warm', $result['summary']['temperature'] );
+		$this->assertSame( wp_get_current_user()->display_name, $result['summary']['by'] );
+
+		$saved = Groundhogg\AI\Jobs\Contact_Summary::get_saved( get_contactdata( $contact->get_id() ) );
+
+		$this->assertSame( 'Send the pricing guide.', $saved['next_step'] );
+		$this->assertNotEmpty( $saved['when'] );
+	}
+
+	/* ---- the usage tab ----------------------------------------------------------------------------------------- */
+
+	public function test_the_usage_tab_shows_each_feature_and_request() {
+
+		AI::run( 'fake-job', [] );
+		AI::run( 'fake-job', [] );
+
+		$this->job->result = new \WP_Error( 'boom', 'Nope' );
+		AI::run( 'fake-job', [] );
+
+		$this->assertSame( [ 'fake-job' => [ 'requests' => 2, 'tokens' => 40, 'failed' => 1 ] ], AI::usage_by_job() );
+
+		ob_start();
+		( new AI_Page() )->usage_view();
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( '2 requests, 40 tokens', $html );
+		$this->assertStringContainsString( '1 failed', $html );
+		$this->assertSame( 2, substr_count( $html, '>Done<' ) );
+		$this->assertSame( 1, substr_count( $html, '>Failed<' ) );
+		$this->assertStringContainsString( wp_get_current_user()->display_name, $html );
 	}
 
 	public function test_links_to_the_old_tabs_still_work() {

@@ -2340,6 +2340,121 @@ body.groundhogg-admin-page[class*=gh-theme-] .gh-button.gh-ai-button .gh-ai-icon
     animation: none;
   }
 }
+/* just the sparkle, like next to the subject line: as big as the icons beside it */
+.gh-button.gh-ai-button.icon .gh-ai-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* why a job couldn't run, under the button that asked, see showError() in ai.js */
+.gh-ai-error {
+  position: fixed;
+  z-index: 100001;
+  box-sizing: border-box;
+  max-width: min(340px, 100vw - 16px);
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--gh-dark-15, #dcdcde);
+  border-left: 4px solid #d63638;
+  border-radius: var(--gh-border-radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  color: var(--gh-dark, #1d2327);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* in place of the AI summary until the contact has one: a card that's a button */
+.gh-panel.gh-ai-summarize {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 2px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 16px;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  color: var(--gh-dark, #1d2327);
+  cursor: pointer;
+}
+.gh-panel.gh-ai-summarize .gh-ai-icon {
+  color: var(--gh-primary);
+}
+.gh-panel.gh-ai-summarize .gh-ai-summarize-hint {
+  grid-column: 2;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gh-dark-50, #646970);
+}
+.gh-panel.gh-ai-summarize:hover, .gh-panel.gh-ai-summarize:focus-visible {
+  border-color: var(--gh-primary);
+}
+
+body.groundhogg-admin-page[class*=gh-theme-] .gh-panel.gh-ai-summarize .gh-ai-icon {
+  color: var(--ght-accent);
+}
+
+/* the AI summary on a contact's record, above their tags, see renderSummary() in contact-editor.js */
+.gh-ai-summary .gh-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.gh-ai-summary .gh-panel-header h2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.gh-ai-summary .gh-panel-header h2 .gh-ai-icon {
+  flex-shrink: 0;
+  color: var(--gh-primary);
+}
+.gh-ai-summary .gh-panel-header h2 .pill {
+  font-size: 12px;
+  font-weight: 500;
+}
+.gh-ai-summary .inside p {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+.gh-ai-summary .inside p:last-child {
+  margin-bottom: 0;
+}
+.gh-ai-summary .gh-ai-summary-reason {
+  font-weight: 600;
+}
+.gh-ai-summary .gh-ai-summary-interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.gh-ai-summary .gh-ai-summary-meta {
+  color: var(--gh-dark-50, #646970);
+  font-size: 12px;
+}
+.gh-ai-summary.gh-ai-working .gh-ai-icon {
+  animation: gh-ai-pulse 1s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-ai-summary.gh-ai-working .gh-ai-icon {
+    animation: none;
+  }
+}
+
+body.groundhogg-admin-page[class*=gh-theme-] .gh-ai-summary .gh-panel-header h2 .gh-ai-icon {
+  color: var(--ght-accent);
+}
+
+/* the subject line ideas sparkle next to the subject in the HTML editor's settings */
+.gh-ai-subject-row > .input-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 /* under an image's alt text in the email editor */
 .gh-ai-alt-text {
   display: flex;

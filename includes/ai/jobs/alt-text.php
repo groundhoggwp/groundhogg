@@ -35,6 +35,10 @@ class Alt_Text extends Job {
 		return __( 'Alt text', 'groundhogg' );
 	}
 
+	public function get_description(): string {
+		return __( 'The "Write alt text" button under an image\'s alt text in the email editor.', 'groundhogg' );
+	}
+
 	public function get_capability(): string {
 		return 'upload_files';
 	}
@@ -190,8 +194,8 @@ class Alt_Text extends Job {
 		            ->using_system_instruction( 'You write alt text for images in emails, for people using screen readers and for email apps that block images. Describe what matters about the image in one short sentence of under 125 characters, in the language of the request. Don\'t start with "Image of" or "Picture of", and don\'t mention that it is an image unless that is the point. If it contains important words, include them. Reply with the alt text only, without quotes.' )
 		            ->with_text( $ask )
 		            ->with_file( $input['file'], $input['mime'] )
-		            ->using_max_tokens( 200 )
-		            ->using_temperature( 0.2 );
+		            // no temperature: models that reason before they answer refuse one
+		            ->using_max_tokens( 200 );
 	}
 
 	public function respond( $result, array $input ) {

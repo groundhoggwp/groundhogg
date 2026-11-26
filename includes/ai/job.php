@@ -38,6 +38,15 @@ abstract class Job {
 	abstract public function get_label(): string;
 
 	/**
+	 * A line on what it does and where, for when features can be turned on and off one at a time
+	 *
+	 * @return string
+	 */
+	public function get_description(): string {
+		return '';
+	}
+
+	/**
 	 * The capability someone needs besides use_ai, the one for what the job changes, like upload_files for an image's
 	 * alt text
 	 *

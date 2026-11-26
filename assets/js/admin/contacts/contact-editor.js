@@ -368,8 +368,127 @@
         })
       },
     },
-
   ]
+
+  // whether the site's AI can summarize contacts for this person, see Groundhogg\AI\Jobs\Contact_Summary
+  const canSummarize = () => Boolean(Groundhogg.ai && Groundhogg.ai.has && Groundhogg.ai.has('contact-summary'))
+
+  /**
+   * When a summary was made and by whom, through the summarize button or with their own AI assistant, see the
+   * save-contact-summary ability
+   *
+   * @param {Object} summary
+   * @return {string}
+   */
+  const summarizedBy = summary => {
+
+    let line
+
+    if (summary.source === 'assistant') {
+      line = summary.by
+        /* translators: 1: how long ago, 2: who */
+        ? sprintf(__('Summarized %1$s by %2$s\'s AI assistant.', 'groundhogg'), summary.when, summary.by)
+        /* translators: %s: how long ago */
+        : sprintf(__('Summarized %s by an AI assistant.', 'groundhogg'), summary.when)
+    }
+    else {
+      line = summary.by
+        /* translators: 1: how long ago, 2: who */
+        ? sprintf(__('Summarized %1$s by %2$s.', 'groundhogg'), summary.when, summary.by)
+        /* translators: %s: how long ago */
+        : sprintf(__('Summarized %s.', 'groundhogg'), summary.when)
+    }
+
+    return `${ line } ${ __('AI can get things wrong, so check before acting on it.', 'groundhogg') }`
+  }
+
+  const temperatures = {
+    hot : [ 'red', __('Hot lead', 'groundhogg') ],
+    warm: [ 'orange', __('Warm lead', 'groundhogg') ],
+    cold: [ 'blue', __('Cold lead', 'groundhogg') ],
+  }
+
+  /**
+   * The AI summary above the tags: how warm a lead they are and why, what they've done, what interests them, and what
+   * to do next. Until there is one, a button to make one. It's here rather than with the actions under the contact's
+   * name, which have no room for another.
+   *
+   * @param {Object|null} summary
+   * @param {boolean}     working while a new one is being made
+   */
+  const renderSummary = (summary, working = false) => {
+
+    const $holder = $('#gh-ai-contact-summary')
+    const sparkle = Groundhogg.ai && Groundhogg.ai.sparkle ? Groundhogg.ai.sparkle : ''
+
+    // a summary someone made before is still shown to those who can't make a new one
+    if (!summary && !working) {
+
+      // language=HTML
+      $holder.html(canSummarize() ? `
+          <button type="button" id="gh-ai-summarize" class="gh-panel gh-ai-summarize gh-ai-button">
+              ${ sparkle }
+              <span>${ __('Summarize with AI', 'groundhogg') }</span>
+              <span class="gh-ai-summarize-hint">${ __('How warm a lead they are, what they\'re into, and what to do next', 'groundhogg') }</span>
+          </button>` : '')
+
+      $('#gh-ai-summarize').on('click', e => summarize(e.currentTarget))
+      return
+    }
+    const [ color, label ] = summary ? temperatures[ summary.temperature ] || temperatures.cold : []
+
+    // language=HTML
+    $holder.html(`
+        <div class="gh-panel gh-ai-summary ${ working ? 'gh-ai-working' : '' }">
+            <div class="gh-panel-header">
+                <h2>${ sparkle } ${ __('AI summary', 'groundhogg') }
+                    ${ summary ? `<span class="pill ${ color }">${ escHTML(label) }</span>` : '' }</h2>
+                ${ canSummarize() ? `
+                <button type="button" id="gh-ai-summary-again" class="gh-button secondary text small" ${ working ? 'disabled' : '' }>
+                    ${ working ? `<span class="loading-dots">${ __('Summarizing', 'groundhogg') }</span>` : __('Summarize again', 'groundhogg') }
+                </button>` : '' }
+            </div>
+            <div class="inside">
+                ${ summary ? `
+                    <p class="gh-ai-summary-reason">${ escHTML(summary.reason) }</p>
+                    <p>${ escHTML(summary.summary) }</p>
+                    ${ summary.interests.length ? `<p class="gh-ai-summary-interests">${ summary.interests.map(i => `<span class="pill colorless">${ escHTML(i) }</span>`).join(' ') }</p>` : '' }
+                    ${ summary.next_step ? `<p><b>${ __('Next step:', 'groundhogg') }</b> ${ escHTML(summary.next_step) }</p>` : '' }
+                    <p class="gh-ai-summary-meta">${ escHTML(summarizedBy(summary)) }</p>
+                ` : `<p class="loading-dots">${ __('Reading their history and writing a summary', 'groundhogg') }</p>` }
+            </div>
+        </div>`)
+
+    $('#gh-ai-summary-again').on('click', e => summarize(e.currentTarget))
+  }
+
+  /**
+   * Have the site's AI summarize the contact, and show it
+   *
+   * @param {HTMLElement} button what was clicked, to say what went wrong next to it
+   */
+  const summarize = async button => {
+
+    if (button.disabled) {
+      return
+    }
+
+    const previous = editor.aiSummary
+
+    button.disabled = true
+    renderSummary(previous, true)
+
+    try {
+      const { summary } = await Groundhogg.ai.run('contact-summary', { contact_id: getContact().ID })
+      editor.aiSummary = summary
+      renderSummary(summary)
+    }
+    catch (err) {
+      renderSummary(previous)
+      // under what was clicked, which is drawn again by now
+      Groundhogg.ai.showError(err.message, document.getElementById(previous ? 'gh-ai-summary-again' : 'gh-ai-summarize'))
+    }
+  }
 
   const contactMoreActions = () => {
 
@@ -3204,6 +3323,7 @@
       handleGeoLocate()
       handleFormSubmit()
       contactMoreActions()
+      renderSummary(editor.aiSummary)
       manageTags()
       managePrimaryTabs()
       otherContactStuff()

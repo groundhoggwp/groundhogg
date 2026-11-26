@@ -3,6 +3,9 @@
 namespace Groundhogg\AI;
 
 use Groundhogg\AI\Jobs\Alt_Text;
+use Groundhogg\AI\Jobs\Contact_Summary;
+use Groundhogg\AI\Jobs\Preview_Text;
+use Groundhogg\AI\Jobs\Subject_Lines;
 use Groundhogg\DB\Query\Table_Query;
 use WP_Error;
 use function Groundhogg\admin_page_url;
@@ -220,6 +223,32 @@ class AI {
 	}
 
 	/**
+	 * This month's use of each job: the requests that worked, their tokens, and the ones that failed
+	 *
+	 * @return array[] by job name, each [ requests, tokens, failed ]
+	 */
+	public static function usage_by_job(): array {
+		global $wpdb;
+
+		$table = get_db( 'ai_usage' )->table_name;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the table name is ours, the values are prepared
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT job, SUM(status = 'complete') AS requests, SUM(CASE WHEN status = 'complete' THEN total_tokens ELSE 0 END) AS tokens, SUM(status = 'failed') AS failed FROM {$table} WHERE date_created >= %s GROUP BY job ORDER BY requests DESC", self::month_start() ) );
+
+		$usage = [];
+
+		foreach ( (array) $rows as $row ) {
+			$usage[ $row->job ] = [
+				'requests' => absint( $row->requests ),
+				'tokens'   => absint( $row->tokens ),
+				'failed'   => absint( $row->failed ),
+			];
+		}
+
+		return $usage;
+	}
+
+	/**
 	 * Whether this month's limit is used up
 	 *
 	 * @return bool
@@ -248,6 +277,9 @@ class AI {
 		 */
 		$jobs = apply_filters( 'groundhogg/ai/jobs', [
 			new Alt_Text(),
+			new Subject_Lines(),
+			new Preview_Text(),
+			new Contact_Summary(),
 		] );
 
 		self::$jobs = [];
@@ -280,6 +312,42 @@ class AI {
 	}
 
 	/**
+	 * Whether a job is switched on. They all are: this is where a setting to turn single features off goes, or a
+	 * snippet in the meantime.
+	 *
+	 * @param Job $job
+	 *
+	 * @return bool
+	 */
+	public static function job_is_on( Job $job ): bool {
+
+		/**
+		 * Filter whether an AI job is switched on
+		 *
+		 * @param bool   $on
+		 * @param string $name the job's name, like alt-text
+		 * @param Job    $job
+		 */
+		return (bool) apply_filters( 'groundhogg/ai/job_is_on', true, $job->get_name(), $job );
+	}
+
+	/**
+	 * Whether the current user can use a job right now: AI and the job are on, they're allowed, and a provider can do
+	 * it. The monthly limit is left to run(), which says so when it's used up.
+	 *
+	 * @param Job $job
+	 *
+	 * @return bool
+	 */
+	public static function can_use_job( Job $job ): bool {
+		return self::is_enabled()
+		       && self::job_is_on( $job )
+		       && current_user_can( self::CAP )
+		       && current_user_can( $job->get_capability() )
+		       && self::can_generate( $job->get_kind() );
+	}
+
+	/**
 	 * Do a job for the current user
 	 *
 	 * @param string $name  the job's name
@@ -297,6 +365,10 @@ class AI {
 
 		if ( ! self::is_enabled() ) {
 			return new WP_Error( 'ai_unavailable', __( 'AI features aren\'t turned on for this site.', 'groundhogg' ), [ 'status' => 503 ] );
+		}
+
+		if ( ! self::job_is_on( $job ) ) {
+			return new WP_Error( 'ai_job_off', __( 'This AI feature is turned off for this site.', 'groundhogg' ), [ 'status' => 403 ] );
 		}
 
 		if ( ! current_user_can( self::CAP ) || ! current_user_can( $job->get_capability() ) ) {
@@ -318,7 +390,11 @@ class AI {
 		$input = $job->validate( $input );
 
 		if ( is_wp_error( $input ) ) {
-			$input->add_data( [ 'status' => 400 ] );
+
+			// unless the job said, like 403 for a contact they can't see
+			if ( empty( $input->get_error_data()['status'] ) ) {
+				$input->add_data( [ 'status' => 400 ] );
+			}
 
 			return $input;
 		}
@@ -421,6 +497,10 @@ class AI {
 			'text'          => $can_use && self::can_generate( Job::TEXT ),
 			'image'         => $can_use && self::can_generate( Job::IMAGE ),
 			'limitReached'  => $can_use && self::limit_reached(),
+			// the jobs this person can use, a feature shows its button when its job is here, see Groundhogg.ai.has()
+			'jobs'          => array_map( function ( Job $job ) use ( $can_use ) {
+				return $can_use && self::can_use_job( $job );
+			}, self::jobs() ),
 			'connectorsUrl' => admin_url( 'options-connectors.php' ),
 			'settingsUrl'   => self::page_url(),
 		];

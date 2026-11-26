@@ -19,6 +19,7 @@ Several of the tools here need an administrator: `get-setup-status`, `get-cron-s
 
 ## Where to look
 
+- **One contact:** `get-contact-history` gives everything about them in one call: activity, the emails sent to them and whether they opened them, the flows they went through and what's waiting for them, notes, messages and more. Start there when the problem is about a person, before querying tables.
 - **Waiting events:** `query-table` on `event_queue`. Every flow step and broadcast email waiting to run is a row: `status` "waiting" or "paused", `time` (when it's due, a Unix timestamp), `funnel_id`, `step_id`, `contact_id` and `email_id`. Rows whose `time` is well in the past mean the queue isn't keeping up.
 - **What already ran:** `query-table` on `events`, with the same columns plus `error_code` and `error_message`. `status` is "complete", "failed", "skipped" or "cancelled". Filter by `funnel_id`, `contact_id` or `email_id`, order by `time` DESC, and keep the `limit` small.
 - **Emails sent and failed:** `query-table` on `email_log`, when the site keeps an email log: `recipients`, `subject`, `status`, `error_code`, `error_message`, `email_service` and `date_sent`. Don't read the `content`.
