@@ -2573,6 +2573,140 @@
     ...cellAttributes
   })))
 
+  /**
+   * What's shown while an AI model works on something, instead of a skeleton: a sparkle, and a word for what it's
+   * doing that changes every so often, like "Thinking..." then "Pondering...". It stops once it's off the page.
+   *
+   *     AiThinking({ note: __( 'This can take a little while.', 'groundhogg' ) })
+   *
+   * @param {Object}   props
+   * @param {string[]} props.phrases  what it says, the first one first and the rest in any order. Its own when left out.
+   * @param {number}   props.interval how long each one shows, in milliseconds
+   * @param {string}   props.note     a line under it, like how long it can take
+   *
+   * @return {HTMLElement}
+   */
+  const AiThinking = ({
+    phrases = [],
+    interval = 2200,
+    note = '',
+    className = '',
+    ...attributes
+  } = {}) => {
+
+    const { __ } = i18n()
+
+    let words = phrases.length ? [...phrases] : [
+      __('Thinking', 'groundhogg'),
+      __('Pondering', 'groundhogg'),
+      __('Mulling it over', 'groundhogg'),
+      __('Weighing the options', 'groundhogg'),
+      __('Connecting the dots', 'groundhogg'),
+      __('Considering', 'groundhogg'),
+      __('Brainstorming', 'groundhogg'),
+      __('Reasoning', 'groundhogg'),
+      __('Puzzling it out', 'groundhogg'),
+      __('Deliberating', 'groundhogg'),
+      __('Contemplating', 'groundhogg'),
+      __('Figuring it out', 'groundhogg'),
+    ]
+
+    // the first one first, the rest shuffled so it isn't the same every time
+    const [first, ...rest] = words
+
+    for (let i = rest.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * ( i + 1 ));
+      [rest[i], rest[j]] = [rest[j], rest[i]]
+    }
+
+    words = [first, ...rest]
+
+    const sparkle = Span({
+      className    : 'build-with-ai-sparkle',
+      'aria-hidden': 'true',
+    })
+
+    // the dots come from loading-dots, the word changing isn't read out, the status is
+    const phrase = Span({
+      className    : 'gh-ai-thinking-phrase loading-dots',
+      'aria-hidden': 'true',
+    }, words[0])
+
+    const el = Div({
+      role        : 'status',
+      'aria-label': __('Working on it', 'groundhogg'),
+      ...attributes,
+      className   : `gh-ai-thinking ${ className }`.trim(),
+    }, [
+      sparkle,
+      phrase,
+      note ? Pg({ className: 'gh-ai-thinking-note' }, note) : null,
+    ])
+
+    const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+    let at = 0
+    let seen = false
+    let ticks = 0
+
+    const timer = setInterval(() => {
+
+      ticks++
+
+      // taken off the page, or never put on it, like a copy a redraw made and threw away
+      if (!el.isConnected) {
+        if (seen || ticks > 2) {
+          clearInterval(timer)
+        }
+        return
+      }
+
+      seen = true
+      at = ( at + 1 ) % words.length
+
+      if (still || !phrase.animate) {
+        phrase.textContent = words[at]
+        return
+      }
+
+      phrase.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 150,
+        easing  : 'ease-in',
+      }).onfinish = () => {
+        phrase.textContent = words[at]
+        phrase.animate([
+          {
+            opacity  : 0,
+            transform: 'translateY(4px)',
+          },
+          {
+            opacity  : 1,
+            transform: 'none',
+          },
+        ], {
+          duration: 200,
+          easing  : 'ease-out',
+        })
+      }
+
+      sparkle.animate([
+        {
+          opacity  : .5,
+          transform: 'scale(.75) rotate(-30deg)',
+        },
+        {
+          opacity  : 1,
+          transform: 'none',
+        },
+      ], {
+        duration: 400,
+        easing  : 'ease-out',
+      })
+    }, interval)
+
+    return el
+  }
+
   const useState = (initialState, id) => {
     const el = document.getElementById(id)
     if (el && el.State) {
@@ -2748,6 +2882,7 @@
 
   window.MakeEl = {
     Skeleton,
+    AiThinking,
     TinyMCE,
     InputGroup,
     Ellipses,

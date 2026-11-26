@@ -2689,7 +2689,8 @@ $build-with-ai-sparkle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 /* the colours the sparkles fade between, the admin theme's accent on a themed admin */
 #build-with-ai-widget,
-.build-with-ai-widget {
+.build-with-ai-widget,
+.gh-ai-thinking {
   --build-with-ai-from: var(--gh-primary, #0075ff);
   --build-with-ai-to: #a855f7;
 }
@@ -2697,8 +2698,46 @@ $build-with-ai-sparkle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 body.groundhogg-admin-page[class*="gh-theme-"] {
 
   #build-with-ai-widget,
-  .build-with-ai-widget {
+  .build-with-ai-widget,
+  .gh-ai-thinking {
     --build-with-ai-from: var(--ght-accent);
+  }
+}
+
+/* an AI model working on something, see AiThinking() in make-el.js: a sparkle, and what it's doing in a word */
+.gh-ai-thinking {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  text-align: center;
+
+  .build-with-ai-sparkle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gh-ai-thinking-phrase {
+    font-size: 16px;
+    font-weight: 500;
+
+    // the dots take the same room before and after, so the word stays centered as they come and go
+    &::before,
+    &::after {
+      display: inline-block;
+      width: 1.2em;
+      text-align: left;
+    }
+
+    &::before {
+      content: '';
+    }
+  }
+
+  .gh-ai-thinking-note {
+    margin: 0;
+    color: #646970;
   }
 }
 

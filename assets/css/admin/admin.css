@@ -2210,14 +2210,46 @@ body.groundhogg-admin-page[class*=gh-theme-] .gh-choices .gh-choice:focus-visibl
 /* the AI assistant widget on the dashboard, see DashboardWidget() in build-with-ai.js */
 /* the colours the sparkles fade between, the admin theme's accent on a themed admin */
 #build-with-ai-widget,
-.build-with-ai-widget {
+.build-with-ai-widget,
+.gh-ai-thinking {
   --build-with-ai-from: var(--gh-primary, #0075ff);
   --build-with-ai-to: #a855f7;
 }
 
 body.groundhogg-admin-page[class*=gh-theme-] #build-with-ai-widget,
-body.groundhogg-admin-page[class*=gh-theme-] .build-with-ai-widget {
+body.groundhogg-admin-page[class*=gh-theme-] .build-with-ai-widget,
+body.groundhogg-admin-page[class*=gh-theme-] .gh-ai-thinking {
   --build-with-ai-from: var(--ght-accent);
+}
+
+/* an AI model working on something, see AiThinking() in make-el.js: a sparkle, and what it's doing in a word */
+.gh-ai-thinking {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  text-align: center;
+}
+.gh-ai-thinking .build-with-ai-sparkle {
+  width: 40px;
+  height: 40px;
+}
+.gh-ai-thinking .gh-ai-thinking-phrase {
+  font-size: 16px;
+  font-weight: 500;
+}
+.gh-ai-thinking .gh-ai-thinking-phrase::before, .gh-ai-thinking .gh-ai-thinking-phrase::after {
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+}
+.gh-ai-thinking .gh-ai-thinking-phrase::before {
+  content: "";
+}
+.gh-ai-thinking .gh-ai-thinking-note {
+  margin: 0;
+  color: #646970;
 }
 
 /* a sparkle in the colours above, the icon is a mask so it can take a gradient */
