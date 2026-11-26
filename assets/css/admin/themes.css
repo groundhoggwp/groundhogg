@@ -434,6 +434,14 @@ body.groundhogg-admin-page[class*="gh-theme-"] textarea::placeholder {
   opacity: 0.8;
 }
 
+/* Fields that can't be typed in. The rule above paints every field the surface color, which hides
+   WordPress's grey for readonly fields, so they looked editable. */
+body.groundhogg-admin-page[class*="gh-theme-"] :is(input, textarea)[readonly],
+body.groundhogg-admin-page[class*="gh-theme-"] :is(input, textarea, select):disabled {
+  background-color: var(--ght-bg);
+  color: var(--ght-muted);
+}
+
 body.groundhogg-admin-page[class*="gh-theme-"] input:focus,
 body.groundhogg-admin-page[class*="gh-theme-"] textarea:focus,
 body.groundhogg-admin-page[class*="gh-theme-"] select:focus,
