@@ -351,6 +351,135 @@ class Markdown_Tests extends GH_UnitTestCase {
 		remove_filter( 'map_meta_cap', $own, 10 );
 	}
 
+	/* ---- narrowing a section ---------------------------------------------------------------------------------- */
+
+	public function test_a_section_gets_only_the_options_it_offers_cleaned_up() {
+
+		$got = null;
+
+		add_action( 'groundhogg/markdown/contact/sections', function () use ( &$got ) {
+			Markdown::register( 'contact', 'probe', [
+				'label'    => 'Probe',
+				'callback' => function ( $contact, $args ) use ( &$got ) {
+					$got = $args;
+
+					return '';
+				},
+				'options'  => Markdown::list_options() + [
+						'funnel_ids' => [ 'type' => 'ids', 'label' => 'Flows' ],
+						'kinds'      => [ 'type' => 'strings', 'label' => 'Kinds', 'choices' => [ 'a' => 'Kind A', 'b' => 'Kind B' ] ],
+					],
+			] );
+		} );
+
+		$markdown = Contact_Markdown::render( $this->contact(), [
+			'probe' => [
+				'funnel_ids' => '3, 4,x',
+				'kinds'      => [ 'a', 'evil' ],
+				'since'      => '2026-11-01',
+				'limit'      => 5000,
+				'unknown'    => 'dropped',
+			],
+		], [ 'until' => '2026-11-20' ] );
+
+		$this->assertSame( [ 3, 4 ], $got['funnel_ids'] );
+		$this->assertSame( [ 'a' ], $got['kinds'], 'only the choices offered' );
+		$this->assertSame( 200, $got['limit'] );
+		$this->assertSame( Markdown::time( '2026-11-01' ), $got['since'] );
+		$this->assertSame( Markdown::time( '2026-11-20' ), $got['until'], 'the time range of every list' );
+		$this->assertArrayNotHasKey( 'unknown', $got );
+
+		// an empty list that was narrowed says so, so it isn't read as never
+		$this->assertStringContainsString( 'Only what was asked for, so there may be more: Since: 2026-11-01; Until: 2026-11-20; Flows: 3, 4; Kinds: Kind A.', $markdown );
+		$this->assertStringContainsString( Markdown::none(), $markdown );
+
+		// a section without a time range doesn't get one
+		$this->assertStringNotContainsString( 'Only what was asked for', Contact_Markdown::render( $this->contact(), [ 'tags' ], [ 'since' => '30 days ago' ] ) );
+	}
+
+	public function test_activity_can_be_narrowed_to_flows_broadcasts_kinds_and_time() {
+
+		$contact = $this->contact();
+		$email   = new \Groundhogg\Email( [ 'title' => 'Narrowing', 'subject' => 'Narrowing test', 'status' => 'ready' ] );
+
+		$add = function ( $type, $funnel, $step, $ago ) use ( $contact, $email ) {
+			get_db( 'activity' )->add( [
+				'contact_id'    => $contact->get_id(),
+				'email_id'      => $email->get_id(),
+				'funnel_id'     => $funnel,
+				'step_id'       => $step,
+				'activity_type' => $type,
+				'referer'       => $type === Activity::EMAIL_CLICKED ? "https://example.com/{$funnel}-{$step}" : '',
+				'timestamp'     => time() - $ago * DAY_IN_SECONDS,
+			] );
+		};
+
+		$add( Activity::EMAIL_CLICKED, 7, 70, 1 );     // flow 7
+		$add( Activity::EMAIL_CLICKED, 8, 80, 2 );     // flow 8
+		$add( Activity::EMAIL_CLICKED, 1, 55, 3 );     // broadcast 55
+		$add( Activity::EMAIL_OPENED, 7, 70, 4 );      // flow 7, an open
+		$add( Activity::EMAIL_CLICKED, 7, 70, 60 );    // flow 7, long ago
+
+		$activity = function ( array $options ) use ( $contact ) {
+			return Contact_Markdown::render( $contact, [ 'activity' => $options ] );
+		};
+
+		$flow7 = $activity( [ 'funnel_ids' => [ 7 ] ] );
+		$this->assertSame( 3, substr_count( $flow7, "\n- " ) );
+		$this->assertStringNotContainsString( '8-80', $flow7 );
+
+		$broadcast = $activity( [ 'broadcast_ids' => [ 55 ] ] );
+		$this->assertStringContainsString( '1-55', $broadcast );
+		$this->assertSame( 1, substr_count( $broadcast, "\n- " ) );
+
+		// a flow or a broadcast
+		$this->assertSame( 4, substr_count( $activity( [ 'funnel_ids' => [ 7 ], 'broadcast_ids' => [ 55 ] ] ), "\n- " ) );
+
+		$recent_clicks = $activity( [ 'types' => [ Activity::EMAIL_CLICKED ], 'since' => '10 days ago' ] );
+		$this->assertSame( 3, substr_count( $recent_clicks, "\n- " ) );
+		$this->assertStringNotContainsString( 'Opened', $recent_clicks );
+	}
+
+	public function test_the_scope_line_names_what_it_was_narrowed_to() {
+
+		$funnel = new \Groundhogg\Funnel( [ 'title' => 'Long Term Nurture test', 'status' => 'inactive' ] );
+
+		$markdown = Contact_Markdown::render( $this->contact(), [ 'flows' => [ 'funnel_ids' => [ $funnel->get_id(), 999999 ] ] ] );
+
+		$this->assertStringContainsString( sprintf( 'Flows: "Long Term Nurture test" (%d), 999999.', $funnel->get_id() ), $markdown, 'a deleted one by its ID' );
+
+		// a picker gets the options without how they're named, so they can be sent to the browser
+		$options = Markdown::section_options( 'contact' );
+		$this->assertNotFalse( wp_json_encode( $options ) );
+		$this->assertArrayNotHasKey( 'name', wp_list_pluck( $options, 'options', 'key' )['flows']['funnel_ids'] );
+	}
+
+	public function test_their_latest_message_can_be_sent_whole() {
+
+		$contact = $this->contact();
+		$long    = str_repeat( 'I would like to cancel my plan because it costs too much. ', 30 );
+
+		foreach ( [ [ 'inbound', 'Older question', 'Do you have a discount?' ], [ 'outbound', 'Our reply', 'Here is 10% off.' ], [ 'inbound', 'Cancel', $long ] ] as $i => $message ) {
+			get_db( 'messages' )->add( [
+				'object_id'    => $contact->get_id(),
+				'object_type'  => 'contact',
+				'direction'    => $message[0],
+				'subject'      => $message[1],
+				'content'      => $message[2],
+				'date_created' => gmdate( 'Y-m-d H:i:s', time() - ( 10 - $i ) * HOUR_IN_SECONDS ),
+			] );
+		}
+
+		$latest = Contact_Markdown::render( $contact, [ 'messages' => [ 'direction' => [ 'inbound' ], 'limit' => 1 ] ] );
+
+		$this->assertStringContainsString( '"Cancel"', $latest );
+		$this->assertStringNotContainsString( 'discount', $latest );
+		$this->assertGreaterThan( 1500, strlen( $latest ), 'whole, not cut at 400 characters' );
+
+		// many are cut short
+		$this->assertLessThan( 1200, strlen( Contact_Markdown::render( $contact, [ 'messages' ] ) ) );
+	}
+
 	public function test_text_is_made_one_tidy_line() {
 		$this->assertSame( 'Hello there. New paragraph', Markdown::text( '<p>Hello there.</p><p>New   paragraph</p>' ) );
 		$this->assertSame( 'Hello & there', Markdown::text( 'Hello &amp; there' ) );

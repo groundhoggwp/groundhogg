@@ -75,6 +75,15 @@ class Get_Contact_History extends Ability {
 						'default'     => 20,
 						'description' => __( 'The most items in each list, like notes or activity.', 'groundhogg' ),
 					],
+					'since'    => [
+						'type'        => [ 'string', 'integer' ],
+						'description' => __( 'Only what happened since then, in every list: a date like 2026-11-01, a time ago like "30 days ago", or a Unix timestamp. All time when left out.', 'groundhogg' ),
+					],
+					'until'    => [
+						'type'        => [ 'string', 'integer' ],
+						'description' => __( 'Only what happened before then, in every list. Up to now when left out.', 'groundhogg' ),
+					],
+					'options'  => self::options_schema( $sections ),
 				],
 			],
 
@@ -102,6 +111,31 @@ class Get_Contact_History extends Ability {
 		];
 	}
 
+	/**
+	 * What each section can be narrowed to, by section, like only some flows in activity
+	 *
+	 * @param array[] $sections from Markdown::section_options()
+	 *
+	 * @return array
+	 */
+	protected static function options_schema( array $sections ): array {
+
+		$properties = [];
+
+		foreach ( $sections as $section ) {
+			if ( ! empty( $section['options'] ) ) {
+				$properties[ $section['key'] ] = Markdown::options_schema( $section['options'] );
+			}
+		}
+
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'properties'           => $properties,
+			'description'          => __( 'Narrow a section to what you need, by its key, like {"activity": {"funnel_ids": [3], "since": "30 days ago"}, "messages": {"direction": ["inbound"], "limit": 1}}. A narrowed section says what it was narrowed to. Everything when left out.', 'groundhogg' ),
+		];
+	}
+
 	public function __invoke( $input ) {
 
 		$contact = get_contactdata( absint( $input['id'] ?? 0 ) );
@@ -117,9 +151,20 @@ class Get_Contact_History extends Ability {
 
 		$personal = ( $input['personal'] ?? true ) && ! Pii::is_restricted();
 
-		$markdown = Contact_Markdown::render( $contact, array_map( 'strval', (array) ( $input['sections'] ?? [] ) ), [
+		// each section asked for, all of them when none are, with what it's narrowed to
+		$options = is_array( $input['options'] ?? null ) ? $input['options'] : [];
+		$keys    = array_map( 'strval', (array) ( $input['sections'] ?? [] ) ) ?: array_keys( Markdown::sections( 'contact' ) );
+		$wanted  = [];
+
+		foreach ( $keys as $key ) {
+			$wanted[ $key ] = is_array( $options[ $key ] ?? null ) ? $options[ $key ] : [];
+		}
+
+		$markdown = Contact_Markdown::render( $contact, $wanted, [
 			'personal' => $personal,
 			'limit'    => min( self::MAX_LIMIT, max( 1, absint( $input['limit'] ?? 20 ) ) ),
+			'since'    => $input['since'] ?? 0,
+			'until'    => $input['until'] ?? 0,
 		] );
 
 		$summary = Contact_Summary::get_saved( $contact );

@@ -51,6 +51,33 @@ class Add_On_Markdown {
 				'description' => __( 'Their deals: pipeline, stage, value, whether they were won or lost, and when they\'re expected to close.', 'groundhogg' ),
 				'callback'    => [ __CLASS__, 'deals' ],
 				'can'         => [ __CLASS__, 'can_see_deals' ],
+				'options'     => [
+					'limit'        => Markdown::list_options()['limit'],
+					'pipeline_ids' => [
+						'type'        => 'ids',
+						'label'       => __( 'Pipelines', 'groundhogg' ),
+						'description' => __( 'Only deals in these pipelines, by ID.', 'groundhogg' ),
+						'name'        => function ( $id ) {
+							if ( ! class_exists( '\GroundhoggPipeline\Classes\Pipeline' ) ) {
+								return '';
+							}
+
+							$pipeline = new \GroundhoggPipeline\Classes\Pipeline( absint( $id ) );
+
+							return $pipeline->exists() ? Markdown::text( $pipeline->get_title(), 100 ) : '';
+						},
+					],
+					'status'       => [
+						'type'        => 'strings',
+						'label'       => __( 'Status', 'groundhogg' ),
+						'description' => __( 'Only open, won or lost deals.', 'groundhogg' ),
+						'choices'     => [
+							'open' => __( 'Open', 'groundhogg' ),
+							'won'  => __( 'Won', 'groundhogg' ),
+							'lost' => __( 'Lost', 'groundhogg' ),
+						],
+					],
+				],
 			] );
 		}
 
@@ -60,6 +87,18 @@ class Add_On_Markdown {
 				'description' => __( 'The appointments they booked, past and upcoming, and whether they were cancelled.', 'groundhogg' ),
 				'callback'    => [ __CLASS__, 'appointments' ],
 				'can'         => [ __CLASS__, 'can_see_appointments' ],
+				'options'     => Markdown::list_options() + [
+						'calendar_ids' => [
+							'type'        => 'ids',
+							'label'       => __( 'Calendars', 'groundhogg' ),
+							'description' => __( 'Only appointments on these calendars, by ID.', 'groundhogg' ),
+							'name'        => function ( $id ) {
+								$calendar = new \GroundhoggBookingCalendar\Classes\Calendar( absint( $id ) );
+
+								return $calendar->exists() ? Markdown::text( $calendar->get_name(), 100 ) : '';
+							},
+						],
+					],
 			] );
 		}
 
@@ -72,6 +111,7 @@ class Add_On_Markdown {
 				'can'         => function () {
 					return self::can( 'manage_woocommerce' );
 				},
+				'options'     => Markdown::list_options(),
 			] );
 		}
 
@@ -84,6 +124,7 @@ class Add_On_Markdown {
 				'can'         => function () {
 					return self::can( 'edit_shop_payments' );
 				},
+				'options'     => Markdown::list_options(),
 			] );
 		}
 
@@ -141,8 +182,26 @@ class Add_On_Markdown {
 
 		$owners = self::deal_owners();
 
-		$deals = array_filter( $contact->get_related_objects( 'deal', false ), function ( $deal ) use ( $owners ) {
-			return $deal && ( $owners === null || in_array( absint( $deal->get_owner_id() ), $owners, true ) );
+		$pipelines = $args['pipeline_ids'] ?? [];
+		$statuses  = $args['status'] ?? [];
+
+		$deals = array_filter( $contact->get_related_objects( 'deal', false ), function ( $deal ) use ( $owners, $pipelines, $statuses ) {
+
+			if ( ! $deal || ( $owners !== null && ! in_array( absint( $deal->get_owner_id() ), $owners, true ) ) ) {
+				return false;
+			}
+
+			if ( $pipelines && ! in_array( absint( $deal->pipeline_id ), $pipelines, true ) ) {
+				return false;
+			}
+
+			if ( $statuses ) {
+				$status = $deal->is_won() ? 'won' : ( $deal->is_lost() ? 'lost' : 'open' );
+
+				return in_array( $status, $statuses, true );
+			}
+
+			return true;
 		} );
 
 		$items = [];
@@ -248,17 +307,25 @@ class Add_On_Markdown {
 			return '';
 		}
 
+		$narrowed = ! empty( $args['since'] ) || ! empty( $args['until'] ) || ! empty( $args['calendar_ids'] );
+
+		// through the add-on's own query, then narrowed down here, so more are fetched when it will be
 		$rows = get_db( 'appointments' )->query( [
 			'contact_id' => $contact->get_id(),
 			'orderby'    => 'start_time',
 			'order'      => 'DESC',
-			'limit'      => $args['limit'],
+			'limit'      => $narrowed ? 500 : $args['limit'],
 		] );
+
+		$rows = array_slice( array_filter( (array) $rows, function ( $row ) use ( $args ) {
+			return Markdown::in_range( absint( $row->start_time ), $args )
+			       && ( empty( $args['calendar_ids'] ) || in_array( absint( $row->calendar_id ?? 0 ), $args['calendar_ids'], true ) );
+		} ), 0, $args['limit'] );
 
 		$items     = [];
 		$calendars = [];
 
-		foreach ( (array) $rows as $row ) {
+		foreach ( $rows as $row ) {
 
 			$calendar_id = absint( $row->calendar_id ?? 0 );
 
@@ -314,6 +381,11 @@ class Add_On_Markdown {
 			'orderby' => 'date',
 			'order'   => 'DESC',
 		];
+
+		// WooCommerce takes a range of timestamps as from...to
+		if ( ! empty( $args['since'] ) || ! empty( $args['until'] ) ) {
+			$query['date_created'] = absint( $args['since'] ?? 0 ) . '...' . ( empty( $args['until'] ) ? time() : absint( $args['until'] ) );
+		}
 
 		if ( $user ) {
 			$query['customer_id'] = $user->ID;
@@ -400,13 +472,24 @@ class Add_On_Markdown {
 			),
 		];
 
-		$orders = edd_get_orders( [
+		$query = [
 			'customer_id' => $customer->id,
 			'type'        => 'sale',
 			'number'      => $args['limit'],
 			'orderby'     => 'date_created',
 			'order'       => 'DESC',
-		] );
+		];
+
+		// EDD stores dates in UTC
+		if ( ! empty( $args['since'] ) || ! empty( $args['until'] ) ) {
+			$query['date_created_query'] = array_filter( [
+				'after'     => empty( $args['since'] ) ? null : gmdate( 'Y-m-d H:i:s', $args['since'] ),
+				'before'    => empty( $args['until'] ) ? null : gmdate( 'Y-m-d H:i:s', $args['until'] ),
+				'inclusive' => true,
+			] );
+		}
+
+		$orders = edd_get_orders( $query );
 
 		foreach ( (array) $orders as $order ) {
 

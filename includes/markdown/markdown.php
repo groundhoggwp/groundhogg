@@ -77,7 +77,275 @@ class Markdown {
 			'callback'    => null,
 			'can'         => null,
 			'personal'    => false,
+			'options'     => [],
 		] );
+	}
+
+	/**
+	 * The options of a list, like notes or activity: how many, and when. A section that is a list should offer them,
+	 * merged with its own, like which flows. They're in the $args its callback gets, see render().
+	 *
+	 * An option is type (ids, strings, time or integer), label and description, choices for strings when there's a
+	 * set to pick from, value => label, and name for ids: a function that gives an ID's title, for the line that says
+	 * what a section was narrowed to. Left out, an option means everything.
+	 *
+	 * @return array[]
+	 */
+	public static function list_options(): array {
+		return [
+			'limit' => [
+				'type'        => 'integer',
+				'label'       => __( 'How many', 'groundhogg' ),
+				'description' => __( 'The most items, newest first.', 'groundhogg' ),
+			],
+			'since' => [
+				'type'        => 'time',
+				'label'       => __( 'Since', 'groundhogg' ),
+				'description' => __( 'Only what happened since then: a date, like 2026-11-01, or a time ago, like "30 days ago". All time when left out.', 'groundhogg' ),
+			],
+			'until' => [
+				'type'        => 'time',
+				'label'       => __( 'Until', 'groundhogg' ),
+				'description' => __( 'Only what happened before then: a date, or a time ago. Up to now when left out.', 'groundhogg' ),
+			],
+		];
+	}
+
+	/**
+	 * A moment someone wrote, like 2026-11-01 or "30 days ago", in the site's time zone
+	 *
+	 * @param mixed $value a timestamp, a date or a relative time
+	 *
+	 * @return int a timestamp, 0 when there isn't one
+	 */
+	public static function time( $value ): int {
+
+		if ( is_numeric( $value ) ) {
+			return absint( $value );
+		}
+
+		$value = trim( (string) $value );
+
+		if ( $value === '' ) {
+			return 0;
+		}
+
+		try {
+			$date = new \DateTime( $value, wp_timezone() );
+		} catch ( \Exception $e ) {
+			return 0;
+		}
+
+		return max( 0, $date->getTimestamp() );
+	}
+
+	/**
+	 * Options as given, kept to what a section offers, each as its type
+	 *
+	 * @param array $offered the section's options
+	 * @param array $given
+	 *
+	 * @return array
+	 */
+	public static function clean_options( array $offered, array $given ): array {
+
+		$clean = [];
+
+		foreach ( $offered as $name => $option ) {
+
+			if ( ! isset( $given[ $name ] ) ) {
+				continue;
+			}
+
+			$value = $given[ $name ];
+
+			switch ( $option['type'] ?? '' ) {
+
+				case 'ids':
+					// what isn't a number is 0, which is no ID
+					$value = array_values( array_filter( wp_parse_id_list( $value ) ) );
+					break;
+
+				case 'strings':
+					$value = array_values( array_filter( array_map( function ( $string ) {
+						return is_scalar( $string ) ? sanitize_text_field( (string) $string ) : '';
+					}, (array) $value ), 'strlen' ) );
+
+					if ( ! empty( $option['choices'] ) ) {
+						$value = array_values( array_intersect( $value, array_map( 'strval', array_keys( $option['choices'] ) ) ) );
+					}
+					break;
+
+				case 'time':
+					$value = self::time( $value );
+					break;
+
+				case 'integer':
+					$value = min( 200, max( 1, absint( $value ) ) );
+					break;
+
+				default:
+					$value = null;
+			}
+
+			// nothing left means everything, as if it wasn't given
+			if ( $value === null || $value === [] || $value === 0 ) {
+				continue;
+			}
+
+			$clean[ $name ] = $value;
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * The options as a JSON schema, for an ability's input
+	 *
+	 * @param array[] $options
+	 *
+	 * @return array
+	 */
+	public static function options_schema( array $options ): array {
+
+		$properties = [];
+
+		foreach ( $options as $name => $option ) {
+
+			$description = trim( ( $option['label'] ?? $name ) . ': ' . ( $option['description'] ?? '' ), ': ' );
+
+			switch ( $option['type'] ?? '' ) {
+				case 'ids':
+					$schema = [ 'type' => 'array', 'items' => [ 'type' => 'integer', 'minimum' => 1 ] ];
+					break;
+				case 'strings':
+					$schema = [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ];
+
+					if ( ! empty( $option['choices'] ) ) {
+						$schema['items']['enum'] = array_map( 'strval', array_keys( $option['choices'] ) );
+					}
+					break;
+				case 'time':
+					$schema = [ 'type' => [ 'string', 'integer' ] ];
+					break;
+				case 'integer':
+					$schema = [ 'type' => 'integer', 'minimum' => 1, 'maximum' => 200 ];
+					break;
+				default:
+					continue 2;
+			}
+
+			$properties[ $name ] = $schema + [ 'description' => $description ];
+		}
+
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'properties'           => $properties,
+		];
+	}
+
+	/**
+	 * What a section was narrowed to, like "Only since 2026-10-27, Flows: 3", or nothing when it has everything. The
+	 * number of items isn't said: lists are newest first, and that's what limit cuts.
+	 *
+	 * @param array[] $offered the section's options
+	 * @param array   $args    the section's $args
+	 *
+	 * @return string
+	 */
+	public static function scope( array $offered, array $args ): string {
+
+		$parts = [];
+
+		foreach ( $offered as $name => $option ) {
+
+			if ( $name === 'limit' || empty( $args[ $name ] ) ) {
+				continue;
+			}
+
+			$value = $args[ $name ];
+
+			switch ( $option['type'] ?? '' ) {
+				case 'time':
+					$value = wp_date( 'Y-m-d', $value );
+					break;
+				case 'ids':
+					// by name when the option knows how, a model does better with "Long Term Nurture" than with 45
+					$value = implode( ', ', array_map( function ( $id ) use ( $option ) {
+						$name = is_callable( $option['name'] ?? null ) ? trim( (string) call_user_func( $option['name'], $id ) ) : '';
+
+						return $name !== '' ? sprintf( '"%s" (%d)', $name, $id ) : (string) $id;
+					}, (array) $value ) );
+					break;
+				case 'strings':
+					$value = implode( ', ', array_map( function ( $choice ) use ( $option ) {
+						return $option['choices'][ $choice ] ?? $choice;
+					}, (array) $value ) );
+					break;
+				default:
+					$value = implode( ', ', (array) $value );
+			}
+
+			$parts[] = ( $option['label'] ?? $name ) . ': ' . $value;
+		}
+
+		if ( empty( $parts ) ) {
+			return '';
+		}
+
+		/* translators: %s: what the list was narrowed to, like "Since: 2026-10-27; Flows: 3" */
+		return sprintf( __( 'Only what was asked for, so there may be more: %s.', 'groundhogg' ), implode( '; ', $parts ) );
+	}
+
+	/**
+	 * Keep a query to the time range in $args
+	 *
+	 * @param \Groundhogg\DB\Query\Where $where
+	 * @param string                     $column
+	 * @param array                      $args   a section's
+	 * @param string                     $format unix for a timestamp column, mysql for a UTC datetime one, local for a
+	 *                                           datetime in the site's time zone
+	 *
+	 * @return void
+	 */
+	public static function where_in_range( $where, string $column, array $args, string $format = 'unix' ) {
+
+		foreach ( [ 'since' => '>=', 'until' => '<=' ] as $key => $compare ) {
+
+			if ( empty( $args[ $key ] ) ) {
+				continue;
+			}
+
+			switch ( $format ) {
+				case 'mysql':
+					$value = gmdate( 'Y-m-d H:i:s', $args[ $key ] );
+					break;
+				case 'local':
+					$value = wp_date( 'Y-m-d H:i:s', $args[ $key ] );
+					break;
+				default:
+					$value = $args[ $key ];
+			}
+
+			if ( $compare === '>=' ) {
+				$where->greaterThanEqualTo( $column, $value );
+			} else {
+				$where->lessThanEqualTo( $column, $value );
+			}
+		}
+	}
+
+	/**
+	 * Whether a moment is in the time range in $args, for what isn't queried from a table
+	 *
+	 * @param int   $time
+	 * @param array $args a section's
+	 *
+	 * @return bool
+	 */
+	public static function in_range( int $time, array $args ): bool {
+		return ( empty( $args['since'] ) || $time >= $args['since'] ) && ( empty( $args['until'] ) || $time <= $args['until'] );
 	}
 
 	/**
@@ -145,6 +413,11 @@ class Markdown {
 		return array_values( array_map( function ( $section ) {
 			unset( $section['callback'], $section['can'] );
 
+			// how an option names an ID is for the scope line, not for a picker
+			foreach ( $section['options'] as $name => $option ) {
+				unset( $section['options'][ $name ]['name'] );
+			}
+
 			return $section;
 		}, self::sections( $type ) ) );
 	}
@@ -166,9 +439,12 @@ class Markdown {
 	 *
 	 * @param string $type   the type of record, like contact
 	 * @param mixed  $object the record
-	 * @param array  $keys   the sections, in this order, all of them when empty
+	 * @param array  $keys   the sections, in this order, all of them when empty. A section's options go in as
+	 *                       key => options, like [ 'details', 'activity' => [ 'funnel_ids' => [ 3 ], 'since' => '30
+	 *                       days ago' ] ], see each section's options.
 	 * @param array  $args   personal: include personal details, only kept when the current person can see them, or
 	 *                       when nobody is signed in, like in a flow. limit: the most items in a list, like notes.
+	 *                       since and until: the time range of every list, a section's own options go first.
 	 *
 	 * @return string
 	 */
@@ -177,17 +453,34 @@ class Markdown {
 		$args = wp_parse_args( $args, [
 			'personal' => false,
 			'limit'    => 20,
+			'since'    => 0,
+			'until'    => 0,
 		] );
 
 		$asked_personal   = (bool) $args['personal'];
 		$args['personal'] = $asked_personal && ! Pii::is_restricted();
-		$args['limit']    = max( 1, absint( $args['limit'] ) );
+		$args['limit']    = min( 200, max( 1, absint( $args['limit'] ) ) );
+		$args['since']    = self::time( $args['since'] );
+		$args['until']    = self::time( $args['until'] );
 
 		$sections = self::sections( $type );
-		$keys     = $keys ?: array_keys( $sections );
-		$parts    = [];
+		$wanted   = [];
 
-		foreach ( array_unique( $keys ) as $key ) {
+		foreach ( $keys as $key => $options ) {
+			if ( is_int( $key ) ) {
+				$wanted[ (string) $options ] = [];
+			} else {
+				$wanted[ (string) $key ] = is_array( $options ) ? $options : [];
+			}
+		}
+
+		if ( empty( $wanted ) ) {
+			$wanted = array_fill_keys( array_keys( $sections ), [] );
+		}
+
+		$parts = [];
+
+		foreach ( $wanted as $key => $options ) {
 
 			$section = $sections[ $key ] ?? null;
 
@@ -207,19 +500,33 @@ class Markdown {
 				continue;
 			}
 
-			$can = is_callable( $section['can'] ) ? call_user_func( $section['can'], $object, $args ) : true;
+			// the time range of every list, then the section's own options, kept to what it offers
+			$section_args = $args;
+
+			if ( ! isset( $section['options']['since'] ) ) {
+				$section_args['since'] = 0;
+				$section_args['until'] = 0;
+			}
+
+			$section_args = array_merge( $section_args, self::clean_options( $section['options'], $options ) );
+
+			$can = is_callable( $section['can'] ) ? call_user_func( $section['can'], $object, $section_args ) : true;
 
 			if ( $can === false ) {
 				$parts[] = $heading . self::hidden();
 				continue;
 			}
 
-			$body = trim( (string) call_user_func( $section['callback'], $object, $args ) );
+			$body = trim( (string) call_user_func( $section['callback'], $object, $section_args ) );
 
-			// what they can't see of it, like other people's deals
-			$partial = is_string( $can ) && $can !== '' ? $can . "\n\n" : '';
+			// what they can't see of it, like other people's deals, and what it was narrowed to, so an empty list
+			// isn't read as never
+			$notes = array_filter( [
+				is_string( $can ) ? $can : '',
+				self::scope( $section['options'], $section_args ),
+			] );
 
-			$parts[] = $heading . $partial . ( $body !== '' ? $body : self::none() );
+			$parts[] = $heading . ( $notes ? implode( "\n\n", $notes ) . "\n\n" : '' ) . ( $body !== '' ? $body : self::none() );
 		}
 
 		/**
@@ -300,13 +607,20 @@ class Markdown {
 	/**
 	 * A moment in the site's time zone, the way the lists write it
 	 *
-	 * @param int|string $time a timestamp, or a date in UTC like the tables store
+	 * @param int|string $time  a timestamp, or a date in UTC like most tables store
+	 * @param bool       $local the date is in the site's time zone, like a form submission's
 	 *
 	 * @return string
 	 */
-	public static function date( $time ): string {
+	public static function date( $time, bool $local = false ): string {
 
-		if ( ! is_numeric( $time ) ) {
+		if ( ! is_numeric( $time ) && $local ) {
+			try {
+				$time = ( new \DateTime( (string) $time, wp_timezone() ) )->getTimestamp();
+			} catch ( \Exception $e ) {
+				$time = 0;
+			}
+		} else if ( ! is_numeric( $time ) ) {
 			$time = strtotime( (string) $time . ' UTC' );
 		}
 

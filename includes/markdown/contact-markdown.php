@@ -4,6 +4,7 @@ namespace Groundhogg\Markdown;
 
 use Groundhogg\Classes\Activity;
 use Groundhogg\Classes\Message;
+use Groundhogg\Broadcast;
 use Groundhogg\Contact;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Email;
@@ -104,13 +105,162 @@ class Contact_Markdown {
 			],
 		];
 
+		$options = self::section_options();
+
 		foreach ( $sections as $key => $section ) {
 			Markdown::register( 'contact', $key, [
 				'label'       => $section[0],
 				'description' => $section[1],
 				'personal'    => $section[2] ?? false,
 				'callback'    => [ __CLASS__, $key ],
+				'options'     => $options[ $key ] ?? [],
 			] );
+		}
+	}
+
+	/**
+	 * What each section can be narrowed to, see Markdown::list_options(). Everything when left out.
+	 *
+	 * @return array[] by section
+	 */
+	protected static function section_options(): array {
+
+		$list = Markdown::list_options();
+
+		$ids = function ( string $label, string $description, string $type ) {
+			return [
+				'type'        => 'ids',
+				'label'       => $label,
+				'description' => $description,
+				'name'        => function ( $id ) use ( $type ) {
+					return self::title( $type, absint( $id ) );
+				},
+			];
+		};
+
+		$flows      = $ids( __( 'Flows', 'groundhogg' ), __( 'Only these flows, by ID.', 'groundhogg' ), 'funnel' );
+		$broadcasts = $ids( __( 'Broadcasts', 'groundhogg' ), __( 'Only these broadcasts, by ID.', 'groundhogg' ), 'broadcast' );
+		$emails     = $ids( __( 'Emails', 'groundhogg' ), __( 'Only these emails, by ID, wherever they were sent from.', 'groundhogg' ), 'email' );
+
+		$fields = [];
+
+		foreach ( Properties::instance()->get_fields() as $field ) {
+			if ( ! empty( $field['name'] ) ) {
+				$fields[ $field['name'] ] = $field['label'] ?? $field['name'];
+			}
+		}
+
+		return [
+			'fields'      => [
+				'fields' => [
+					'type'        => 'strings',
+					'label'       => __( 'Fields', 'groundhogg' ),
+					'description' => __( 'Only these custom fields, by name.', 'groundhogg' ),
+					'choices'     => $fields,
+				],
+			],
+			'notes'       => $list,
+			'tasks'       => $list,
+			'messages'    => $list + [
+					'direction' => [
+						'type'        => 'strings',
+						'label'       => __( 'Direction', 'groundhogg' ),
+						'description' => __( 'Only the ones they wrote, or only the ones sent to them.', 'groundhogg' ),
+						'choices'     => [
+							Message::INBOUND  => __( 'They wrote', 'groundhogg' ),
+							Message::OUTBOUND => __( 'Sent to them', 'groundhogg' ),
+						],
+					],
+				],
+			'activity'    => $list + [
+					'types'         => [
+						'type'        => 'strings',
+						'label'       => __( 'Kinds', 'groundhogg' ),
+						'description' => __( 'Only these kinds of activity.', 'groundhogg' ),
+						'choices'     => self::activity_types(),
+					],
+					'funnel_ids'    => $flows,
+					'broadcast_ids' => $broadcasts,
+					'email_ids'     => $emails,
+				],
+			'emails'      => $list + [
+					'funnel_ids'    => $flows,
+					'broadcast_ids' => $broadcasts,
+					'email_ids'     => $emails,
+				],
+			'flows'       => $list + [
+					'funnel_ids' => $flows,
+				],
+			'submissions' => $list + [
+					'form_ids' => $ids( __( 'Forms', 'groundhogg' ), __( 'Only these forms, by the ID of their step in a flow.', 'groundhogg' ), 'step' ),
+				],
+			'page_visits' => $list,
+		];
+	}
+
+	/**
+	 * The kinds of activity to pick from, by what's in the activity table
+	 *
+	 * @return string[] type => label
+	 */
+	public static function activity_types(): array {
+
+		/**
+		 * Filter the kinds of activity a contact's activity can be narrowed to, type => label. Add an add-on's own.
+		 *
+		 * @param string[] $types
+		 */
+		return apply_filters( 'groundhogg/markdown/contact/activity_types', [
+			Activity::EMAIL_OPENED    => __( 'Opened an email', 'groundhogg' ),
+			Activity::EMAIL_CLICKED   => __( 'Clicked a link in an email', 'groundhogg' ),
+			Activity::SMS_CLICKED     => __( 'Clicked a link in a text message', 'groundhogg' ),
+			Activity::FORM_SUBMISSION => __( 'Filled in a form', 'groundhogg' ),
+			Activity::UNSUBSCRIBED    => __( 'Unsubscribed', 'groundhogg' ),
+			Activity::PAGE_VIEW       => __( 'Viewed a page', 'groundhogg' ),
+			Activity::LOGIN           => __( 'Logged in', 'groundhogg' ),
+			Activity::LOGOUT          => __( 'Logged out', 'groundhogg' ),
+			Activity::BOUNCE          => __( 'Bounced', 'groundhogg' ),
+			Activity::SOFT_BOUNCE     => __( 'Soft bounced', 'groundhogg' ),
+			Activity::COMPLAINT       => __( 'Marked as spam', 'groundhogg' ),
+			'funnel_conversion'       => __( 'Reached a flow\'s goal', 'groundhogg' ),
+			'clicked_superlink'       => __( 'Clicked a superlink', 'groundhogg' ),
+			'imported'                => __( 'Was imported', 'groundhogg' ),
+		] );
+	}
+
+	/**
+	 * Keep a query to the flows, broadcasts and emails in $args: what's from any of the flows or broadcasts, and from
+	 * one of the emails
+	 *
+	 * @param \Groundhogg\DB\Query\Where $where
+	 * @param array                      $args
+	 * @param string                     $broadcast_column where a broadcast's ID is, step_id in the activity and events
+	 *
+	 * @return void
+	 */
+	protected static function where_sent_from( $where, array $args, string $broadcast_column = 'step_id' ) {
+
+		$funnels    = $args['funnel_ids'] ?? [];
+		$broadcasts = $args['broadcast_ids'] ?? [];
+
+		if ( $funnels || $broadcasts ) {
+			$where->subOr( function ( $or ) use ( $funnels, $broadcasts, $broadcast_column ) {
+
+				if ( $funnels ) {
+					$or->in( 'funnel_id', $funnels );
+				}
+
+				// a broadcast's activity has the broadcasts' own funnel ID, and the broadcast's ID as its step
+				if ( $broadcasts ) {
+					$or->subAnd( function ( $and ) use ( $broadcasts, $broadcast_column ) {
+						$and->equals( 'funnel_id', Broadcast::FUNNEL_ID )->in( $broadcast_column, $broadcasts );
+					} );
+				}
+			} );
+		}
+
+		if ( ! empty( $args['email_ids'] ) ) {
+			$where->in( 'email_id', $args['email_ids'] );
 		}
 	}
 
@@ -163,6 +313,10 @@ class Contact_Markdown {
 			case 'step':
 				$step  = new Step( $id );
 				$title = $step->exists() ? $step->get_title() : '';
+				break;
+			case 'broadcast':
+				$broadcast = new Broadcast( $id );
+				$title     = $broadcast->exists() ? $broadcast->get_title() : '';
 				break;
 			default:
 				$title = '';
@@ -259,10 +413,15 @@ class Contact_Markdown {
 	public static function fields( Contact $contact, array $args ): string {
 
 		$pairs = [];
+		$only  = $args['fields'] ?? [];
 
 		foreach ( Properties::instance()->get_fields() as $field ) {
 
 			if ( empty( $field['name'] ) || ( ! empty( $field['pii'] ) && ! $args['personal'] ) ) {
+				continue;
+			}
+
+			if ( $only && ! in_array( $field['name'], $only, true ) ) {
 				continue;
 			}
 
@@ -283,6 +442,7 @@ class Contact_Markdown {
 
 		$query = new Table_Query( 'notes' );
 		$query->where()->equals( 'object_type', 'contact' )->equals( 'object_id', $contact->get_id() );
+		Markdown::where_in_range( $query->where(), 'timestamp', $args );
 		$query->setOrderby( 'timestamp' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$items = [];
@@ -305,6 +465,7 @@ class Contact_Markdown {
 
 		$query = new Table_Query( 'tasks' );
 		$query->where()->equals( 'object_type', 'contact' )->equals( 'object_id', $contact->get_id() );
+		Markdown::where_in_range( $query->where(), 'due_date', $args, 'mysql' );
 		$query->setOrderby( 'due_date' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$items = [];
@@ -330,13 +491,23 @@ class Contact_Markdown {
 
 		$query = new Table_Query( 'messages' );
 		$query->where()->equals( 'object_type', 'contact' )->equals( 'object_id', $contact->get_id() );
+		Markdown::where_in_range( $query->where(), 'date_created', $args, 'mysql' );
+
+		if ( ! empty( $args['direction'] ) ) {
+			$query->where()->in( 'direction', $args['direction'] );
+		}
+
 		$query->setOrderby( 'date_created' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
+		// a few messages are sent whole, like their latest reply for a step to classify. Many are cut short.
+		$few   = $args['limit'] <= 3;
 		$items = [];
 
 		foreach ( $query->get_results() as $message ) {
 
-			$text = self::free_text( $message->summary ?: $message->content, $contact, $args, 400 );
+			$text = $few
+				? self::free_text( $message->content ?: $message->summary, $contact, $args, 3000 )
+				: self::free_text( $message->summary ?: $message->content, $contact, $args, 400 );
 
 			$items[] = sprintf(
 			/* translators: 1: date, 2: they wrote, or sent to them, 3: the subject, 4: what it says */
@@ -358,6 +529,14 @@ class Contact_Markdown {
 		      ->equals( 'contact_id', $contact->get_id() )
 		      // seeing a form isn't something they did
 		      ->notEquals( 'activity_type', 'form_impression' );
+
+		Markdown::where_in_range( $query->where(), 'timestamp', $args );
+		self::where_sent_from( $query->where(), $args );
+
+		if ( ! empty( $args['types'] ) ) {
+			$query->where()->in( 'activity_type', $args['types'] );
+		}
+
 		$query->setOrderby( 'timestamp' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$items = [];
@@ -451,6 +630,10 @@ class Contact_Markdown {
 		      ->equals( 'contact_id', $contact->get_id() )
 		      ->greaterThan( 'email_id', 0 )
 		      ->equals( 'status', Event::COMPLETE );
+
+		Markdown::where_in_range( $query->where(), 'time', $args );
+		self::where_sent_from( $query->where(), $args );
+
 		$query->setOrderby( 'time' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$events = $query->get_results();
@@ -505,13 +688,27 @@ class Contact_Markdown {
 		$events = get_db( 'events' )->table_name;
 		$queue  = get_db( 'event_queue' )->table_name;
 
+		// only the flows asked for, the IDs are integers by now
+		$only = empty( $args['funnel_ids'] ) ? '' : ' AND funnel_id IN (' . implode( ',', array_map( 'absint', $args['funnel_ids'] ) ) . ')';
+
+		// the steps they went through in the time range
+		$range = '';
+
+		if ( ! empty( $args['since'] ) ) {
+			$range .= $wpdb->prepare( ' AND time >= %d', $args['since'] );
+		}
+
+		if ( ! empty( $args['until'] ) ) {
+			$range .= $wpdb->prepare( ' AND time <= %d', $args['until'] );
+		}
+
 		// each flow, the newest first: how many steps they got through and the last one
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the tables are ours, the values are prepared
-		$flows = $wpdb->get_results( $wpdb->prepare( "SELECT funnel_id, COUNT(*) AS steps, MAX(time) AS last_time, SUBSTRING_INDEX(GROUP_CONCAT(step_id ORDER BY time DESC), ',', 1) AS last_step FROM {$events} WHERE contact_id = %d AND event_type = %d AND status = %s GROUP BY funnel_id ORDER BY last_time DESC LIMIT %d", $contact->get_id(), Event::FUNNEL, Event::COMPLETE, $args['limit'] ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the tables are ours, the values are prepared or integers
+		$flows = $wpdb->get_results( $wpdb->prepare( "SELECT funnel_id, COUNT(*) AS steps, MAX(time) AS last_time, SUBSTRING_INDEX(GROUP_CONCAT(step_id ORDER BY time DESC), ',', 1) AS last_step FROM {$events} WHERE contact_id = %d AND event_type = %d AND status = %s{$only}{$range} GROUP BY funnel_id ORDER BY last_time DESC LIMIT %d", $contact->get_id(), Event::FUNNEL, Event::COMPLETE, $args['limit'] ) );
 
 		// what's waiting for them
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the tables are ours, the values are prepared
-		$waiting = $wpdb->get_results( $wpdb->prepare( "SELECT funnel_id, step_id, time FROM {$queue} WHERE contact_id = %d AND event_type = %d AND status = %s ORDER BY time ASC", $contact->get_id(), Event::FUNNEL, Event::WAITING ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- the tables are ours, the values are prepared or integers
+		$waiting = $wpdb->get_results( $wpdb->prepare( "SELECT funnel_id, step_id, time FROM {$queue} WHERE contact_id = %d AND event_type = %d AND status = %s{$only} ORDER BY time ASC", $contact->get_id(), Event::FUNNEL, Event::WAITING ) );
 
 		$next = [];
 
@@ -559,6 +756,13 @@ class Contact_Markdown {
 
 		$query = new Table_Query( 'submissions' );
 		$query->where()->equals( 'contact_id', $contact->get_id() );
+		// stored in the site's time zone, unlike most dates
+		Markdown::where_in_range( $query->where(), 'date_created', $args, 'local' );
+
+		if ( ! empty( $args['form_ids'] ) ) {
+			$query->where()->in( 'step_id', $args['form_ids'] );
+		}
+
 		$query->setOrderby( 'date_created' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$items = [];
@@ -577,7 +781,7 @@ class Contact_Markdown {
 					$what = ucfirst( str_replace( [ '_', '-' ], ' ', sanitize_key( $submission->type ) ) );
 			}
 
-			$items[] = Markdown::date( $submission->date_created ) . ': ' . $what;
+			$items[] = Markdown::date( $submission->date_created, true ) . ': ' . $what;
 		}
 
 		return Markdown::items( $items );
@@ -587,6 +791,7 @@ class Contact_Markdown {
 
 		$query = new Table_Query( 'page_visits' );
 		$query->where()->equals( 'contact_id', $contact->get_id() );
+		Markdown::where_in_range( $query->where(), 'timestamp', $args );
 		$query->setOrderby( 'timestamp' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$items = [];
