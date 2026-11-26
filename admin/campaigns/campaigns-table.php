@@ -100,9 +100,21 @@ class Campaigns_Table extends Table {
 	 */
 	protected function column_name( $campaign ) {
 		return html()->e( 'a', [
-			'class' => 'row-title',
-			'href'  => $campaign->admin_link()
+			'class'   => 'row-title edit-campaign',
+			'href'    => self::editor_url( $campaign ),
+			'data-id' => $campaign->get_id(),
 		], esc_html( $campaign->get_name() ) );
+	}
+
+	/**
+	 * Opens the campaign in the editor beside the table, also in a new tab
+	 *
+	 * @param Campaign $campaign
+	 *
+	 * @return string
+	 */
+	public static function editor_url( $campaign ) {
+		return admin_page_url( 'gh_campaigns', [ 'editing' => $campaign->get_id() ] );
 	}
 
 	/**
@@ -129,14 +141,25 @@ class Campaigns_Table extends Table {
 	 * @return string
 	 */
 	protected function column_assets( $campaign ) {
+		return html()->div( [
+			'class' => 'display-flex column'
+		], self::get_asset_links( $campaign ) );
+	}
+
+	/**
+	 * Links to what's in a campaign, each to its list filtered by the campaign
+	 *
+	 * @param Campaign $campaign
+	 *
+	 * @return string[] the links, as HTML
+	 */
+	public static function get_asset_links( $campaign ) {
 
 		$funnels    = $campaign->count_parents( 'funnel' );
 		$broadcasts = $campaign->count_parents( 'broadcast' );
 		$emails     = $campaign->count_parents( 'email' );
 
-		return html()->div( [
-			'class' => 'display-flex column'
-		], [
+		$links = [
 			html()->e( 'a', [
 				'href' => admin_page_url( 'gh_funnels', [
 					'include_filters' => base64_json_encode( [ [ [ 'type' => 'campaigns', 'campaigns' => [ $campaign->ID ] ] ] ] )
@@ -159,8 +182,15 @@ class Campaigns_Table extends Table {
 					'include_filters' => base64_json_encode( [ [ [ 'type' => 'campaigns', 'campaigns' => [ $campaign->ID ] ] ] ] )
 				] )
 			], sprintf( '%s emails', number_format_i18n( $emails ) ) ),
-		] );
+		];
 
+		/**
+		 * Filter the links to what's in a campaign, so add-ons can list their own things
+		 *
+		 * @param string[] $links    the links, as HTML
+		 * @param Campaign $campaign the campaign
+		 */
+		return apply_filters( 'groundhogg/admin/campaigns/table/assets', $links, $campaign );
 	}
 
 	/**
@@ -202,9 +232,13 @@ class Campaigns_Table extends Table {
 				'url'     => false
 			],
 			[
-				'class'   => 'edit',
-				'display' => esc_html__( 'Edit' , 'groundhogg' ),
-				'url'     => $item->admin_link()
+				'class'     => 'edit',
+				'display'   => esc_html__( 'Edit' , 'groundhogg' ),
+				'url'       => self::editor_url( $item ),
+				'linkProps' => [
+					'class'   => 'edit-campaign',
+					'data-id' => $item->get_id(),
+				],
 			],
 			[
 				'class'   => 'view',

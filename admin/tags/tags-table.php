@@ -8,9 +8,11 @@ use Groundhogg\Tag;
 use WP_List_Table;
 use function Groundhogg\_nf;
 use function Groundhogg\action_url;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\get_db;
 use function Groundhogg\get_screen_option;
 use function Groundhogg\get_url_var;
+use function Groundhogg\html;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -84,10 +86,22 @@ class Tags_Table extends Table {
 	 * @return string
 	 */
 	protected function column_tag_name( $tag ) {
-		$editUrl = esc_url( admin_url( 'admin.php?page=gh_tags&action=edit&tag=' . $tag->get_id() ) );
-		$html    = "<a class='pill tag' href='$editUrl'>" . esc_html( $tag->get_name() ) . "</a>";
+		return html()->e( 'a', [
+			'class'   => 'pill tag edit-tag',
+			'href'    => self::editor_url( $tag ),
+			'data-id' => $tag->get_id(),
+		], esc_html( $tag->get_name() ) );
+	}
 
-		return $html;
+	/**
+	 * Opens the tag in the editor beside the table, also in a new tab
+	 *
+	 * @param Tag $tag
+	 *
+	 * @return string
+	 */
+	public static function editor_url( $tag ) {
+		return admin_page_url( 'gh_tags', [ 'editing' => $tag->get_id() ] );
 	}
 
 	/**
@@ -155,9 +169,13 @@ class Tags_Table extends Table {
 				'url'     => false
 			],
 			[
-				'class'   => 'edit',
-				'display' => esc_html__( 'Edit' , 'groundhogg' ),
-				'url'     => $item->admin_link()
+				'class'     => 'edit',
+				'display'   => esc_html__( 'Edit' , 'groundhogg' ),
+				'url'       => self::editor_url( $item ),
+				'linkProps' => [
+					'class'   => 'edit-tag',
+					'data-id' => $item->get_id(),
+				],
 			],
 			[
 				'class'   => 'trash',

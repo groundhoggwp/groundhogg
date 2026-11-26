@@ -253,6 +253,27 @@ class Scripts {
 			'wp-i18n'
 		], GROUNDHOGG_VERSION );
 
+		// the editor that slides in beside a list table
+		wp_register_script( 'groundhogg-admin-sidebar-editor', GROUNDHOGG_ASSETS_URL . 'js/admin/sidebar-editor' . $dot_min . '.js', [
+			'groundhogg-admin-element',
+			'groundhogg-make-el',
+			'wp-i18n',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_set_script_translations( 'groundhogg-admin-sidebar-editor', 'groundhogg', GROUNDHOGG_PATH . 'languages' );
+
+		wp_register_script( 'groundhogg-admin-tags', GROUNDHOGG_ASSETS_URL . 'js/admin/tags' . $dot_min . '.js', [
+			'groundhogg-admin-sidebar-editor',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_set_script_translations( 'groundhogg-admin-tags', 'groundhogg', GROUNDHOGG_PATH . 'languages' );
+
+		wp_register_script( 'groundhogg-admin-campaigns', GROUNDHOGG_ASSETS_URL . 'js/admin/campaigns' . $dot_min . '.js', [
+			'groundhogg-admin-sidebar-editor',
+		], GROUNDHOGG_VERSION, true );
+
+		wp_set_script_translations( 'groundhogg-admin-campaigns', 'groundhogg', GROUNDHOGG_PATH . 'languages' );
+
 		wp_register_script( 'groundhogg-admin-components', GROUNDHOGG_ASSETS_URL . 'js/admin/components' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-saved-replies',
@@ -810,6 +831,7 @@ class Scripts {
 		wp_register_style( 'groundhogg-admin-contact-inline', GROUNDHOGG_ASSETS_URL . 'css/admin/contacts.css', [ 'groundhogg-admin-element' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-contact-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/contact-editor.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-element', GROUNDHOGG_ASSETS_URL . 'css/admin/elements.css', [ 'groundhogg-admin' ], GROUNDHOGG_VERSION );
+		wp_register_style( 'groundhogg-admin-sidebar-editor', GROUNDHOGG_ASSETS_URL . 'css/admin/sidebar-editor.css', [ 'groundhogg-admin-element' ], GROUNDHOGG_VERSION );
 		wp_register_style( 'groundhogg-admin-filters', GROUNDHOGG_ASSETS_URL . 'css/admin/search-filters.css', [
 			'groundhogg-admin',
 			'groundhogg-admin-element'

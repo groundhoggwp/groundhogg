@@ -417,6 +417,20 @@ abstract class Table extends WP_List_Table {
 		return 'view';
 	}
 
+	/**
+	 * The HTML of an item's row, for replacing it in the table after the item changes
+	 *
+	 * @param object $item the item as the table's rows get it, after parse_item()
+	 *
+	 * @return string
+	 */
+	public function get_row_html( $item ) {
+		ob_start();
+		$this->single_row( $item );
+
+		return ob_get_clean();
+	}
+
 	public function single_row( $item ) {
 
 		$classes = [];
@@ -433,8 +447,11 @@ abstract class Table extends WP_List_Table {
 
 		$classes = implode( ' ', $classes );
 
+		// tags' primary key isn't ID
+		$id = method_exists( $item, 'get_id' ) ? $item->get_id() : $item->ID;
+
 		?>
-        <tr id="<?php echo esc_attr( $item->ID ); ?>" class="<?php esc_attr( $classes ); ?>"><?php
+        <tr id="<?php echo esc_attr( $id ); ?>" class="<?php esc_attr( $classes ); ?>"><?php
 		$this->single_row_columns( $item );
 		?></tr><?php
 	}

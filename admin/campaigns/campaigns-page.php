@@ -10,6 +10,8 @@ use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\managed_page_url;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -33,7 +35,9 @@ class Campaigns_Page extends Admin_Page {
 	}
 
 	public function scripts() {
-		// TODO: Implement scripts() method.
+		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-sidebar-editor' );
+		wp_enqueue_script( 'groundhogg-admin-campaigns' );
 	}
 
 	public function help() {
@@ -188,10 +192,29 @@ class Campaigns_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$id = absint( get_request_var( 'campaign' ) );
+		$updated = $this->update_campaign( new Campaign( absint( get_request_var( 'campaign' ) ) ) );
 
-		// The current campaign
-		$campaign = new Campaign( $id );
+		if ( is_wp_error( $updated ) ) {
+			return $updated;
+		}
+
+		$this->add_notice( 'updated', _x( 'Campaign updated.', 'notice', 'groundhogg' ) );
+
+		return true;
+	}
+
+	/**
+	 * Update a campaign from the posted fields, for the edit screen and the editor beside the table
+	 *
+	 * @param Campaign $campaign
+	 *
+	 * @return true|WP_Error
+	 */
+	protected function update_campaign( Campaign $campaign ) {
+
+		if ( ! $campaign->exists() ) {
+			return new WP_Error( 'not_found', esc_html__( 'That campaign no longer exists.', 'groundhogg' ) );
+		}
 
 		$name        = sanitize_text_field( get_post_var( 'name' ) );
 		$description = sanitize_textarea_field( get_post_var( 'description' ) );
@@ -227,12 +250,75 @@ class Campaigns_Page extends Admin_Page {
 			'visibility'  => get_post_var( 'public' ) ? 'public' : 'hidden'
 		] );
 
-		$this->add_notice( 'updated', _x( 'Campaign updated.', 'notice', 'groundhogg' ) );
-
-		do_action( 'groundhogg/admin/tags/edit', $id );
+		/**
+		 * After a campaign is saved from the admin
+		 *
+		 * @param int $campaign_id
+		 */
+		do_action( 'groundhogg/admin/campaigns/edit', $campaign->get_id() );
 
 		return true;
+	}
 
+	/**
+	 * What the editor beside the table shows for a campaign
+	 *
+	 * @param Campaign $campaign
+	 *
+	 * @return array
+	 */
+	protected function get_editor_item( Campaign $campaign ) {
+		return [
+			'ID'          => $campaign->get_id(),
+			'name'        => $campaign->get_name(),
+			'slug'        => $campaign->get_slug(),
+			'description' => $campaign->get_description(),
+			'visibility'  => $campaign->is_public() ? 'public' : 'hidden',
+			'archive_url' => managed_page_url( sprintf( '/campaigns/%s', $campaign->get_slug() ) ),
+			'assets'      => Campaigns_Table::get_asset_links( $campaign ),
+			'row'         => ( new Campaigns_Table() )->get_row_html( $campaign ),
+		];
+	}
+
+	/**
+	 * Load a campaign into the editor beside the table
+	 *
+	 * @return void
+	 */
+	public function ajax_campaign_editor() {
+
+		if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$campaign = new Campaign( absint( get_post_var( 'campaign' ) ) );
+
+		if ( ! $campaign->exists() ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'That campaign no longer exists.', 'groundhogg' ) ] );
+		}
+
+		wp_send_json_success( $this->get_editor_item( $campaign ) );
+	}
+
+	/**
+	 * Save a campaign from the editor beside the table
+	 *
+	 * @return void
+	 */
+	public function ajax_save_campaign() {
+
+		if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'manage_campaigns' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$campaign = new Campaign( absint( get_post_var( 'campaign' ) ) );
+		$updated  = $this->update_campaign( $campaign );
+
+		if ( is_wp_error( $updated ) ) {
+			wp_send_json_error( [ 'message' => $updated->get_error_message() ] );
+		}
+
+		wp_send_json_success( $this->get_editor_item( new Campaign( $campaign->get_id() ) ) );
 	}
 
 	/**
@@ -274,7 +360,8 @@ class Campaigns_Page extends Admin_Page {
 	}
 
 	protected function add_ajax_actions() {
-		// TODO: Implement add_ajax_actions() method.
+		add_action( 'wp_ajax_groundhogg_campaign_editor', [ $this, 'ajax_campaign_editor' ] );
+		add_action( 'wp_ajax_groundhogg_save_campaign', [ $this, 'ajax_save_campaign' ] );
 	}
 
 	protected function add_additional_actions() {

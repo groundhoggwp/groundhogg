@@ -7,11 +7,13 @@ use Groundhogg\Plugin;
 use Groundhogg\Tag;
 use WP_Error;
 use function Groundhogg\action_input;
+use function Groundhogg\admin_page_url;
 use function Groundhogg\db;
 use function Groundhogg\get_db;
 use function Groundhogg\get_post_var;
 use function Groundhogg\get_request_var;
 use function Groundhogg\html;
+use function Groundhogg\verify_admin_ajax_nonce;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,8 +31,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     Admin
  */
 class Tags_Page extends Admin_Page {
-	// UNUSED FUNCTIONS
+
 	protected function add_ajax_actions() {
+		add_action( 'wp_ajax_groundhogg_tag_editor', [ $this, 'ajax_tag_editor' ] );
+		add_action( 'wp_ajax_groundhogg_save_tag', [ $this, 'ajax_save_tag' ] );
 	}
 
 	public function help() {
@@ -38,6 +42,8 @@ class Tags_Page extends Admin_Page {
 
 	public function scripts() {
 		wp_enqueue_style( 'groundhogg-admin' );
+		wp_enqueue_style( 'groundhogg-admin-sidebar-editor' );
+		wp_enqueue_script( 'groundhogg-admin-tags' );
 	}
 
 	public function get_slug() {
@@ -254,28 +260,143 @@ class Tags_Page extends Admin_Page {
 			$this->wp_die_no_access();
 		}
 
-		$id = absint( get_request_var( 'tag' ) );
+		$updated = $this->update_tag( new Tag( absint( get_request_var( 'tag' ) ) ) );
 
-		$tag_name        = sanitize_text_field( get_post_var( 'name' ) );
+		if ( is_wp_error( $updated ) ) {
+			return $updated;
+		}
+
+		$this->add_notice( 'updated', _x( 'Tag updated.', 'notice', 'groundhogg' ) );
+
+		// Return false to return to main page.
+		return true;
+	}
+
+	/**
+	 * Update a tag from the posted name and description, for the edit screen and the editor beside the table
+	 *
+	 * Add-ons save their own fields from the edit form on groundhogg/admin/tags/edit
+	 *
+	 * @param Tag $tag
+	 *
+	 * @return true|WP_Error
+	 */
+	protected function update_tag( Tag $tag ) {
+
+		if ( ! $tag->exists() ) {
+			return new WP_Error( 'not_found', esc_html__( 'That tag no longer exists.', 'groundhogg' ) );
+		}
+
+		$tag_name        = trim( sanitize_text_field( get_post_var( 'name' ) ) );
 		$tag_description = sanitize_textarea_field( get_post_var( 'description' ) );
+
+		if ( empty( $tag_name ) ) {
+			return new WP_Error( 'invalid', esc_html__( 'Name can\'t be empty', 'groundhogg' ) );
+		}
+
 		if ( strlen( $tag_name ) > db()->tags->get_max_index_length() ) {
 			/* translators: %d: the maximum allowed length of a tag */
 			return new WP_Error( 'too_long', sprintf( esc_html__(  "Maximum length for tag name is %d characters.", 'groundhogg' ), db()->tags->get_max_index_length() ) );
 		}
-		$args = array(
+
+		$tag_slug = sanitize_title( $tag_name );
+
+		// the slug is unique, so the update would fail
+		if ( $tag_slug !== $tag->get_slug() && db()->tags->exists( $tag_slug, 'tag_slug' ) ) {
+			return new WP_Error( 'in_use', esc_html__( 'Another tag already has that name.', 'groundhogg' ) );
+		}
+
+		db()->tags->update( $tag->get_id(), [
 			'tag_name'        => $tag_name,
-			'tag_slug'        => sanitize_title( $tag_name ),
+			'tag_slug'        => $tag_slug,
 			'tag_description' => $tag_description,
-		);
+		] );
 
-		db()->tags->update( $id, $args );
+		do_action( 'groundhogg/admin/tags/edit', $tag->get_id() );
 
-		$this->add_notice( 'updated', _x( 'Tag updated.', 'notice', 'groundhogg' ) );
-
-		do_action( 'groundhogg/admin/tags/edit', $id );
-
-		// Return false to return to main page.
 		return true;
+	}
+
+	/**
+	 * What the editor beside the table shows for a tag
+	 *
+	 * @param Tag $tag
+	 *
+	 * @return array
+	 */
+	protected function get_editor_item( Tag $tag ) {
+
+		$count = $tag->get_contact_count();
+
+		ob_start();
+
+		/**
+		 * Fields for the tag's edit form, as rows of a form table. They're saved on groundhogg/admin/tags/edit
+		 *
+		 * @param int $tag_id
+		 */
+		do_action( 'groundhogg/admin/tags/edit/form', $tag->get_id() );
+
+		$fields = trim( ob_get_clean() );
+
+		return [
+			'fields'          => $fields ? sprintf( '<table class="form-table"><tbody>%s</tbody></table>', $fields ) : '',
+			'ID'              => $tag->get_id(),
+			'tag_name'        => $tag->get_name(),
+			'tag_description' => $tag->get_description(),
+			'contacts'        => $count,
+			'contacts_text'   => sprintf(
+			/* translators: %s: the number of contacts */
+				_n( '%s contact has this tag.', '%s contacts have this tag.', $count, 'groundhogg' ),
+				number_format_i18n( $count )
+			),
+			'contacts_url'    => admin_page_url( 'gh_contacts', [ 'tags_include' => $tag->get_id() ] ),
+			'row'             => ( new Tags_Table() )->get_row_html( $tag ),
+		];
+	}
+
+	/**
+	 * Load a tag into the editor beside the table, with the fields add-ons put in the edit screen
+	 *
+	 * @return void
+	 */
+	public function ajax_tag_editor() {
+
+		if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'edit_tags' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$tag = new Tag( absint( get_post_var( 'tag' ) ) );
+
+		if ( ! $tag->exists() ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'That tag no longer exists.', 'groundhogg' ) ] );
+		}
+
+		wp_send_json_success( $this->get_editor_item( $tag ) );
+	}
+
+	/**
+	 * Save a tag from the editor beside the table
+	 *
+	 * @return void
+	 */
+	public function ajax_save_tag() {
+
+		if ( ! verify_admin_ajax_nonce() || ! current_user_can( 'edit_tags' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$tag     = new Tag( absint( get_post_var( 'tag' ) ) );
+		$updated = $this->update_tag( $tag );
+
+		if ( is_wp_error( $updated ) ) {
+			wp_send_json_error( [ 'message' => $updated->get_error_message() ] );
+		}
+
+		// what add-ons changed too
+		$tag = new Tag( $tag->get_id() );
+
+		wp_send_json_success( $this->get_editor_item( $tag ) );
 	}
 
 	/**
