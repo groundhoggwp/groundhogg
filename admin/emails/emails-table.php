@@ -160,6 +160,21 @@ class Emails_Table extends Table {
 
 		$html .= "</strong>";
 
+		// Variations aren't listed on their own, they're opened from their email
+		$variations = $email->get_variations();
+
+		if ( ! empty( $variations ) ) {
+			$links = array_map( function ( Email $variation ) {
+				return html()->e( 'a', [ 'href' => $variation->admin_link() ], esc_html( $variation->get_title() ) );
+			}, $variations );
+
+			$html .= html()->e( 'div', [ 'class' => 'email-variations' ], sprintf(
+				/* translators: %s: links to the variations of the email */
+				esc_html__( 'Variations: %s', 'groundhogg' ),
+				implode( ', ', $links )
+			) );
+		}
+
 		return $html;
 	}
 

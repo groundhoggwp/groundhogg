@@ -6,6 +6,7 @@ use Groundhogg\Admin\Funnels\Simulator;
 use Groundhogg\Classes\Activity;
 use Groundhogg\Contact;
 use Groundhogg\Email;
+use Groundhogg\Email_Variations;
 use Groundhogg\Event;
 use Groundhogg\Step;
 use function Groundhogg\bold_it;
@@ -268,6 +269,9 @@ class Send_Email extends Action {
 
 		$sent = $email->send( $contact, $event );
 
+		// The contact may have been sent a variation of the email, like the one in their language
+		$email = $email->get_sent_email();
+
 		// Thread stuff only if email was sent successfully
 		if ( $sent === true ) {
 
@@ -397,6 +401,10 @@ class Send_Email extends Action {
 
 		$email->create( $data );
 		$email->update_meta( $meta );
+
+		if ( ! empty( $raw_email['variations'] ) && is_array( $raw_email['variations'] ) ) {
+			Email_Variations::import( $email, $raw_email['variations'] );
+		}
 
 		$step->update_meta( 'email_id', $email->get_id() );
 	}

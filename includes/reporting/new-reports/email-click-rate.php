@@ -67,7 +67,7 @@ class Email_Click_Rate extends Base_Quick_Stat_Percent {
 		}
 
 		if ( $this->get_email_id() ) {
-			$query['email_id'] = $this->get_email_id();
+			$query['email_id'] = $this->get_email_ids();
 		}
 
 		return $db->count( $query );

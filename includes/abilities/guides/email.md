@@ -121,6 +121,22 @@ An email from the HTML editor has no blocks. `get-email-template` returns its vi
 - `replace_html` replaces an exact piece of the HTML: a link, an image, a style, or a whole `<tr>…</tr>`. Copy it from `get-email-template` with `find`, which returns each place some text or HTML is with the HTML around it, exactly as saved. A piece that opens a tag has to close it.
 - Both must match exactly once, unless `all: true`.
 
+## Variations
+
+A variation is another version of an email, like the email in another language, sent instead of it to the contacts in the variation's audience. Flows, broadcasts and notifications keep sending the original email: each contact gets the first ready variation whose audience they're in, or the original. Its opens and clicks count towards the original email's reports too.
+
+To translate an email:
+
+1. `get-setup-status` lists the site's languages under `languages`, with how many contacts speak each one. A contact's language is their `locale`, like `fr_FR`.
+2. `create-email-variation` with the `email_id` and `audience: {"locales": ["fr_FR"]}`. It returns a draft copy of the email with the same block ids.
+3. Translate it with `edit-email`, passing the variation's `id` as `email_id`: `get-email-template` on the variation for its outline, then `set_content` or `replace_text` on each text block, and the button text, alt text and links that need it. Translate the subject and preview text with `update-email-template`. Keep merge tags and links as they are.
+4. Check it with `send-test-email` on the variation, then make it ready with `update-email-template` and `status: "ready"`. A draft variation is never sent.
+
+- The audience takes the same filters as a segment in `search-contacts`, for a variation that isn't about language, like `{"tags_include": ["VIP"]}`. Everything given must match. A contact in more than one audience gets the one with the lowest `priority`.
+- `get-email-template` on an email lists its `variations`; on a variation it gives `variation_of` and its `variation` settings. `update-email-variation` changes the audience, priority or language, and `delete-email-variation` removes one.
+- `resolve-email-variation` says which version a contact would get, and why each variation was or wasn't chosen.
+- A variation can't have variations of its own, and templates and global blocks can't have any.
+
 ## Merge tags
 
 Merge tags are resolved for each recipient when the email is sent, in the subject, preview text and content.

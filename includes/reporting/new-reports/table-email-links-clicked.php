@@ -70,7 +70,7 @@ class Table_Email_Links_Clicked extends Base_Table_Report {
 
 			$activityQuery->where( 'funnel_id', $this->get_funnel_id() );
 			$activityQuery->where( 'step_id', $this->get_step_id() );
-			$activityQuery->where( 'email_id', $this->get_email_id() );
+			$activityQuery->where()->in( 'email_id', $this->get_email_ids() );
 		}
 
 		$linkResults = $activityQuery->get_results();

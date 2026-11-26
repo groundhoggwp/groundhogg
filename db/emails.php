@@ -71,7 +71,17 @@ class Emails extends DB {
 	 * @return mixed
 	 */
 	public function get_db_version() {
-		return '2.1';
+		return '2.2';
+	}
+
+	/**
+	 * Whether the table has the parent_id column variations need. Until the update that adds it has run, emails have
+	 * no variations and nothing queries the column.
+	 *
+	 * @return bool
+	 */
+	public function supports_variations() {
+		return version_compare( (string) get_option( $this->table_name . '_db_version' ), '2.2', '>=' );
 	}
 
 	protected function maybe_register_filters() {
@@ -200,6 +210,12 @@ class Emails extends DB {
 			];
 		}
 
+		// Variations are part of their email, so lists and counts leave them out unless they're asked for by
+		// parent_id, or by ID with include
+		if ( $this->supports_variations() && ! array_key_exists( 'parent_id', $query_vars ) && empty( $query_vars['include'] ) ) {
+			$query_vars['parent_id'] = [ 'compare' => '=', 'val' => 0 ];
+		}
+
 		return parent::query( $query_vars, $ORDER_BY, $from_cache );
 	}
 
@@ -231,7 +247,7 @@ class Emails extends DB {
 	 * @since   2.1
 	 */
 	public function get_columns() {
-		return [
+		$columns = [
 			'ID'           => '%d',
 			'subject'      => '%s',
 			'title'        => '%s',
@@ -247,6 +263,13 @@ class Emails extends DB {
 			'last_updated' => '%s',
 			'date_created' => '%s',
 		];
+
+		// Writing a column that isn't there yet would break saving every email
+		if ( $this->supports_variations() ) {
+			$columns['parent_id'] = '%d';
+		}
+
+		return $columns;
 	}
 
 	/**
@@ -258,6 +281,7 @@ class Emails extends DB {
 	public function get_column_defaults() {
 		return [
 			'ID'           => 0,
+			'parent_id'    => 0,
 			'subject'      => '',
 			'title'        => '',
 			'pre_header'   => '',
@@ -309,7 +333,9 @@ class Emails extends DB {
         message_type VARCHAR(20) NOT NULL,
         last_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         date_created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        PRIMARY KEY  (ID)
+        parent_id bigint(20) unsigned NOT NULL DEFAULT 0,
+        PRIMARY KEY  (ID),
+        KEY parent_id (parent_id)
 		) {$this->get_charset_collate()};";
 
 		dbDelta( $sql );

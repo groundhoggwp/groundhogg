@@ -1,6 +1,6 @@
 # Email variations: multilingual sends and A/B tests
 
-Status: proposal (2026-11-26). Phase 1 (locale foundation) is built; phases 2–4 are not.
+Status: proposal (2026-11-26). Phases 1 (locale foundation) and 2 (variation core) are built; phases 3–4 are not.
 
 ## The problem
 
@@ -270,6 +270,35 @@ no plugin at all.
    family-aware email reports; `create-email-variation`, the
    `get-`/`update-email-template` extensions, `resolve-email-variation`; a
    section in `includes/abilities/guides/email.md`.
+
+   **Built (2026-11-26).** `Groundhogg\Email_Variations` (`includes/email-variations.php`)
+   holds the model, resolution, family IDs, create/update/copy/export/import and
+   the delete cascade. Audience variations only (`locales` plus Filters DSL);
+   test variations wait for phase 4. Details and where it differs from the plan above:
+   - `emails.parent_id` (table version 2.2) is added by the pending 4.13 update.
+     Until it runs, `Emails::supports_variations()` is false: `get_columns()`
+     leaves the column out and nothing queries it, so a site on the old schema
+     keeps working with no variations.
+   - `Emails::query()` adds `parent_id = 0` unless the caller passes `parent_id`
+     or `include`, which hides variations from the admin table, REST and v3
+     search, pickers and `list-email-templates` in one place.
+   - Only a ready parent resolves, and test sends never do. A variation's
+     `message_type` is always its parent's.
+   - Family-aware: the contact segment filters that take an `email_id` (email
+     received/opened/clicked, unsubscribed, custom activity), every email report,
+     and the funnel/broadcast performance tables (rows merged into the parent with
+     `merge_into_parents()`). Add-ons that match one `email_id` won't see a
+     variation's sends until they use `Email_Variations::get_family_ids()`.
+   - Abilities: `create-email-variation`, `update-email-variation`,
+     `delete-email-variation`, `resolve-email-variation`. Update and delete are
+     their own abilities rather than a `variation` field on
+     `update-email-template`, so the audience (a `Segment_Schema` object, with
+     `locales` kept apart for the no-query check) never mixes with email fields.
+     `Email_Schema` shows `variation_of`, `variation` and `variations`.
+   - Duplicating an email, a flow template export and the Send Email step's
+     import carry the variations. The emails table lists an email's variations
+     under its title; there's no editor UI for them yet (phase 3).
+   - Tests: `tests/phpunit/unit-tests/includes/class-email-variations-tests.php`.
 3. **Translation workflow:** `get-`/`set-email-strings`; staleness tracking;
    AI translate job; a language switcher (tabs) in the email editor for humans.
 4. **A/B tests:** test variations with sticky weights; variation report with

@@ -64,7 +64,7 @@ class Total_Emails_Sent extends Base_Quick_Stat {
 			$eventsQuery->where( 'event_type', Event::FUNNEL )
 			            ->equals( 'status', Event::COMPLETE )
 			            ->equals( 'funnel_id', $this->get_funnel_id() )
-			            ->equals( 'email_id', $this->get_email_id() )
+			            ->in( 'email_id', $this->get_email_ids() )
 			            ->equals( 'step_id', $this->get_step_id() )
 			            ->greaterThanEqualTo( 'time', $start )
 			            ->lessThanEqualTo( 'time', $end );

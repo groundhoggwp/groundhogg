@@ -6,6 +6,7 @@ use Groundhogg\Broadcast;
 use Groundhogg\Classes\Activity;
 use Groundhogg\DB\Query\Table_Query;
 use Groundhogg\Email;
+use Groundhogg\Email_Variations;
 use Groundhogg\Event;
 use function Groundhogg\_nf;
 use function Groundhogg\array_find;
@@ -63,8 +64,9 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 			              ->equals( 'secondary_object_type', 'campaign' );
 		}
 
-		$sentResults     = $sentQuery->get_results();
-		$activityResults = $activityQuery->get_results();
+		// One row for a broadcast's email, including its variations
+		$sentResults     = Email_Variations::merge_into_parents( $sentQuery->get_results(), [ 'sent' ] );
+		$activityResults = Email_Variations::merge_into_parents( $activityQuery->get_results(), [ 'total' ] );
 
 		$list = [];
 

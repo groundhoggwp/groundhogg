@@ -880,8 +880,9 @@ class Contact_Query extends Table_Query {
 				$eventQuery->where()->equals( 'step_id', $step_id );
 			}
 
+			// An email's variations were sent as it
 			if ( $email_id ) {
-				$eventQuery->where()->equals( 'email_id', $email_id );
+				$eventQuery->where()->in( 'email_id', Email_Variations::get_family_ids( $email_id ) );
 			}
 
 			$where->in( 'ID', $eventQuery );
@@ -907,7 +908,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		if ( $email_id ) {
-			$where->equals( "$table.email_id", $email_id );
+			$where->in( "$table.email_id", Email_Variations::get_family_ids( $email_id ) );
 		}
 
 		$where->query->setGroupby( 'ID' );
@@ -1018,7 +1019,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		if ( $email_id ) {
-			$eventQuery->where->equals( 'email_id', $email_id );
+			$eventQuery->where->in( 'email_id', Email_Variations::get_family_ids( $email_id ) );
 		} else {
 			$eventQuery->where->notEquals( 'email_id', 0 );
 		}
@@ -1073,7 +1074,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		if ( $email_id ) {
-			$activityQuery->where->equals( 'email_id', $email_id );
+			$activityQuery->where->in( 'email_id', Email_Variations::get_family_ids( $email_id ) );
 		}
 
 		if ( $step_id ) {
@@ -1142,7 +1143,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		if ( $email_id ) {
-			$activityQuery->where->equals( 'email_id', $email_id );
+			$activityQuery->where->in( 'email_id', Email_Variations::get_family_ids( $email_id ) );
 		}
 
 		if ( $step_id ) {
@@ -1380,7 +1381,7 @@ class Contact_Query extends Table_Query {
 		}
 
 		if ( ! empty( $email_ids ) ) {
-			$activityQuery->where->in( 'email_id', $email_ids );
+			$activityQuery->where->in( 'email_id', Email_Variations::get_family_ids( $email_ids ) );
 		}
 
 		if ( ! empty( $step_ids ) ) {

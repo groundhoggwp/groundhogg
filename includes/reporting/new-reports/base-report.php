@@ -5,6 +5,7 @@ namespace Groundhogg\Reporting\New_Reports;
 use Groundhogg\Campaign;
 use Groundhogg\Contact_Query;
 use Groundhogg\DB\Query\Table_Query;
+use Groundhogg\Email_Variations;
 use Groundhogg\Funnel;
 use Groundhogg\Plugin;
 use Groundhogg\Reports;
@@ -310,6 +311,15 @@ abstract class Base_Report {
 		self::$email_id = absint( Reports::get_param( 'email_id' ) );
 
 		return self::$email_id;
+	}
+
+	/**
+	 * The email and its variations, which were sent as it. Use this to find what was sent of the email.
+	 *
+	 * @return int[] [ 0 ] if there's no email, like get_email_id()
+	 */
+	protected function get_email_ids() {
+		return Email_Variations::get_family_ids( $this->get_email_id() ) ?: [ 0 ];
 	}
 
 	/**

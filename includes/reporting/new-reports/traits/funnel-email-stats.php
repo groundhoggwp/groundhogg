@@ -17,7 +17,7 @@ trait Funnel_Email_Stats {
 		           ->equals( 'event_type', Event::FUNNEL )
 		           ->equals( 'funnel_id', $this->get_funnel_id() )
 		           ->equals( 'step_id', $this->get_step_id() )
-		           ->equals( 'email_id', $this->get_email_id() )
+		           ->in( 'email_id', $this->get_email_ids() )
 		           ->lessThanEqualTo( 'time', $this->end )
 		           ->greaterThanEqualTo( 'time', $this->start );
 
@@ -30,7 +30,7 @@ trait Funnel_Email_Stats {
 		              ->in( 'activity_type', [ Activity::EMAIL_OPENED, Activity::EMAIL_CLICKED, Activity::UNSUBSCRIBED ] )
 		              ->equals( 'funnel_id', $this->get_funnel_id() )
 		              ->equals( 'step_id', $this->get_step_id() )
-		              ->equals( 'email_id', $this->get_email_id() )
+		              ->in( 'email_id', $this->get_email_ids() )
 		              ->lessThanEqualTo( 'timestamp', $this->end )
 		              ->greaterThanEqualTo( 'timestamp', $this->start );
 

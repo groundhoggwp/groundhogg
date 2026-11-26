@@ -3,6 +3,7 @@
 namespace Groundhogg\Abilities\Schemas;
 
 use Groundhogg\Email;
+use Groundhogg\Email_Variations;
 use function Groundhogg\get_edit_version;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -114,6 +115,60 @@ class Email_Schema extends Schema {
 					'type'        => 'string',
 					'description' => __( 'Changes whenever the email changes. Give it to groundhogg/edit-email or groundhogg/update-email-template as expected_version, so a change made since it was read isn\'t overwritten.', 'groundhogg' ),
 				],
+				'variation_of' => [
+					'type'        => 'integer',
+					'description' => __( 'When this email is a variation, the ID of the email it\'s a variation of; otherwise 0. A variation is never sent on its own: it\'s sent instead of that email to the contacts in its audience.', 'groundhogg' ),
+				],
+				'variation' => [
+					'type'        => 'object',
+					'description' => __( 'Only on a variation: who gets it.', 'groundhogg' ),
+					'properties'  => self::variation_properties(),
+				],
+				'variations' => [
+					'type'        => 'array',
+					'description' => __( 'Only on an email with variations: the other versions of it, like the email in other languages, checked in this order. A contact gets the first ready one whose audience they\'re in, or this email if none.', 'groundhogg' ),
+					'items'       => [
+						'type'       => 'object',
+						'properties' => array_merge( [
+							'id'     => [ 'type' => 'integer' ],
+							'title'  => [ 'type' => 'string' ],
+							'status' => [
+								'type'        => 'string',
+								'description' => __( 'Only a "ready" variation is sent.', 'groundhogg' ),
+							],
+						], self::variation_properties() ),
+					],
+				],
+			],
+		];
+	}
+
+	/**
+	 * What a variation's settings look like in the output
+	 *
+	 * @return array
+	 */
+	public static function variation_properties(): array {
+		return [
+			'audience' => [
+				'type'        => 'object',
+				'description' => __( 'Contacts get the variation when they speak one of `locales` (if any) and match `include_filters` and not `exclude_filters` (if any), in Groundhogg\'s segment filter format.', 'groundhogg' ),
+				'properties'  => [
+					'locales'         => [
+						'type'  => 'array',
+						'items' => [ 'type' => 'string' ],
+					],
+					'include_filters' => [ 'type' => 'array' ],
+					'exclude_filters' => [ 'type' => 'array' ],
+				],
+			],
+			'priority' => [
+				'type'        => 'integer',
+				'description' => __( 'For a contact in more than one variation\'s audience, the lowest goes first.', 'groundhogg' ),
+			],
+			'locale'   => [
+				'type'        => 'string',
+				'description' => __( 'The language the variation is written in. Groundhogg\'s own text in it, like the footer, is in that language.', 'groundhogg' ),
 			],
 		];
 	}
@@ -295,7 +350,14 @@ class Email_Schema extends Schema {
 			'date_created'      => (string) $object->get_date_created(),
 			'last_updated'      => (string) $object->get_last_updated(),
 			'preview_url'       => $object->get_preview_url(),
+			'variation_of'      => $object->get_parent_id(),
 		];
+
+		if ( $object->is_variation() ) {
+			$data['variation'] = array_diff_key( Email_Variations::describe( $object ), array_flip( [ 'id', 'title', 'status' ] ) );
+		} else if ( $object->has_variations() ) {
+			$data['variations'] = array_map( [ Email_Variations::class, 'describe' ], $object->get_variations() );
+		}
 
 		if ( in_array( 'content', $include, true ) ) {
 			$data['content'] = $object->get_content();

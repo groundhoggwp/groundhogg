@@ -57,6 +57,20 @@ class Email extends Base_Object_With_Meta {
 	 */
 	protected $from_userdata;
 
+	/**
+	 * The variation send() sent instead of this email, if it did
+	 *
+	 * @var Email|null
+	 */
+	protected $sent_variation = null;
+
+	/**
+	 * The email this is a variation of
+	 *
+	 * @var Email|null
+	 */
+	protected $parent = null;
+
 	protected $_use_legacy_tracking_links = false;
 
 	/**
@@ -370,7 +384,82 @@ class Email extends Base_Object_With_Meta {
 	 * @return bool|mixed
 	 */
 	public function get_message_type() {
+
+		// A variation is sent by the same rules as the email it's a variation of
+		if ( $this->is_variation() ) {
+			$parent = $this->get_parent();
+
+			if ( $parent && $parent->exists() ) {
+				return $parent->get_message_type();
+			}
+		}
+
 		return $this->message_type;
+	}
+
+	/**
+	 * The email this is a variation of, see Email_Variations
+	 *
+	 * @return int 0 when it isn't a variation
+	 */
+	public function get_parent_id() {
+		return absint( get_array_var( $this->data, 'parent_id', 0 ) );
+	}
+
+	/**
+	 * Whether this is a variation of another email
+	 *
+	 * @return bool
+	 */
+	public function is_variation() {
+		return $this->get_parent_id() > 0;
+	}
+
+	/**
+	 * The email this is a variation of
+	 *
+	 * @return Email|false
+	 */
+	public function get_parent() {
+
+		if ( ! $this->is_variation() ) {
+			return false;
+		}
+
+		if ( ! $this->parent || $this->parent->get_id() !== $this->get_parent_id() ) {
+			$this->parent = new Email( $this->get_parent_id() );
+		}
+
+		return $this->parent;
+	}
+
+	/**
+	 * The variations of this email
+	 *
+	 * @param bool $ready_only only the ones that can be sent
+	 *
+	 * @return Email[]
+	 */
+	public function get_variations( $ready_only = false ) {
+		return Email_Variations::get_variations( $this, $ready_only );
+	}
+
+	/**
+	 * Whether this email has variations
+	 *
+	 * @return bool
+	 */
+	public function has_variations() {
+		return ! $this->is_variation() && ! empty( Email_Variations::get_variation_ids( $this->get_id() ) );
+	}
+
+	/**
+	 * What send() sent last: a variation of this email, or this email
+	 *
+	 * @return Email
+	 */
+	public function get_sent_email() {
+		return $this->sent_variation ?: $this;
 	}
 
 	/**
@@ -1366,13 +1455,34 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function send( $contact_id_or_email, $event = null ) {
 
+		$this->sent_variation = null;
+
+		$contact = get_contactdata( $contact_id_or_email );
+
+		// Send the contact their variation of this email instead, like the one in their language. Tests send the email
+		// that's being tested, and an email that isn't ready doesn't send at all.
+		if ( ! $this->is_testing() && $this->is_ready() ) {
+
+			$variation = Email_Variations::resolve( $this, $contact );
+
+			if ( $variation ) {
+				$this->sent_variation = $variation;
+
+				// what was sent, and what's opened and clicked, is counted for the variation
+				Email_Variations::attribute_event( $event, $variation );
+
+				return $variation->send( $contact_id_or_email, $event );
+			}
+		}
+
 		is_sending( true );
 		the_email( $this );
 
-		// Build the email in the contact's language, so Groundhogg's own text in it (like the footer) is in it too.
+		// Build the email in its language or the contact's, so Groundhogg's own text in it (like the footer) is in it too.
 		// The event queue already switches for queued sends, this covers sending right away.
-		$contact  = get_contactdata( $contact_id_or_email );
-		$switched = is_a_contact( $contact ) && $contact->get_locale() !== get_locale() && switch_to_locale( $contact->get_locale() );
+		$locale   = $this->is_variation() ? Multilingual::sanitize_locale( $this->get_meta( Email_Variations::LOCALE_KEY ) ) : '';
+		$locale   = $locale ?: ( is_a_contact( $contact ) ? $contact->get_locale() : '' );
+		$switched = $locale && $locale !== get_locale() && switch_to_locale( $locale );
 
 		// Every way out of sending has to turn the flag back off. It gates things like minting auto-login
 		// keys, so it must not be left on by an early return (undeliverable, not ready...) or an exception.
@@ -1617,6 +1727,7 @@ class Email extends Base_Object_With_Meta {
 				case 'is_template':
 				case 'from_user':
 				case 'author':
+				case 'parent_id':
 					$value = absint( $value );
 					break;
 				case 'from_profile':
@@ -1722,10 +1833,11 @@ class Email extends Base_Object_With_Meta {
 	 *
 	 * @param $overrides
 	 * @param $meta_overrides
+	 * @param bool $with_variations also copy the email's variations to the copy
 	 *
 	 * @return Base_Object|Base_Object_With_Meta
 	 */
-	public function duplicate( $overrides = [], $meta_overrides = [] ) {
+	public function duplicate( $overrides = [], $meta_overrides = [], $with_variations = true ) {
 
 		$overrides = array_merge( [
 			/* translators: %s: the asset title being copied */
@@ -1734,7 +1846,13 @@ class Email extends Base_Object_With_Meta {
 			'last_updated' => current_time( 'mysql' ),
 		], $overrides );
 
-		return parent::duplicate( $overrides, $meta_overrides );
+		$copy = parent::duplicate( $overrides, $meta_overrides );
+
+		if ( $with_variations && ! $this->is_variation() && $copy->exists() && ! $copy->is_variation() ) {
+			Email_Variations::copy_variations( $this, $copy );
+		}
+
+		return $copy;
 	}
 
 	/**
@@ -1747,6 +1865,11 @@ class Email extends Base_Object_With_Meta {
 
 		unset( $data['context'] );
 		unset( $data['preview_url'] );
+
+		// A flow template or export keeps the email's variations
+		if ( $this->has_variations() ) {
+			$data['variations'] = Email_Variations::export( $this );
+		}
 
 		return $data;
 	}
