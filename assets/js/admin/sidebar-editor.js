@@ -123,9 +123,14 @@
    * @param config object
    * @param config.id string prefixes the editor's element IDs, like "tag"
    * @param config.label string the editor's accessible name, like "Edit tag"
-   * @param config.load function async, given the ID returns what the editor shows, with a row's HTML in `row` if it changed
+   * @param config.load function given the ID returns what the editor shows, or a promise of it, with a row's HTML in
+   *                    `row` if it changed
    * @param config.draft function given what was loaded, returns the values the editor changes
-   * @param config.name object { key, placeholder } the draft value the header's name field edits
+   * @param config.name object|null { key, placeholder } the draft value the header's name field edits
+   * @param config.title function|null given { item, draft }, what the header shows in place of a name field
+   * @param config.headerActions function given the item, returns more elements for the header, before the save button
+   * @param config.onRender function given { item, draft, changed }, called once the editor is on the page, for
+   *                        fields that are set up by their ID
    * @param config.toggle object|null { key, on, off, onLabel, offLabel, title } a switch in the header
    * @param config.status object|null { key, active, inactive, confirmDeactivate, messages: { activated, deactivated } }
    *                      Activate and Deactivate buttons around the save button, like the flow editor's header. They
@@ -135,15 +140,20 @@
    * @param config.save function async, given { item, draft } returns the saved item, with the row's HTML in `row`
    * @param config.moreActions function given the item, returns more menu items, each { key, text, onSelect }
    * @param config.editLinks string selector for links that open an item, with the ID in data-id
-   * @param config.messages object { saved, saveFailed, discard }
-   * @param config.urlParam string keeps the open item across reloads
+   * @param config.messages object { saved, saveFailed, discard }, an empty saved message shows nothing
+   * @param config.urlParam string|null keeps the open item across reloads, null for editors that aren't a page's own
+   * @param config.rows bool whether the items are rows of the page's list table, to highlight the open one
    */
   const SidebarEditor = ({
     id,
     label = '',
     load,
     draft: makeDraft,
-    name: nameField,
+    name: nameField = null,
+    title = null,
+    headerActions = () => [],
+    onRender = () => {},
+    rows = true,
     toggle = null,
     status = null,
     panels,
@@ -183,7 +193,7 @@
         el.id = paneId
         el.className = 'gh-sidebar-editor'
         el.setAttribute('aria-label', label)
-        document.getElementById('wpbody-content').append(el)
+        document.body.append(el)
       }
 
       return el
@@ -193,7 +203,7 @@
 
     const replaceRow = (itemId, html) => {
 
-      if (!html) {
+      if (!html || !rows) {
         return
       }
 
@@ -214,6 +224,9 @@
     let current = null
 
     const markActiveRow = () => {
+      if (!rows) {
+        return
+      }
       document.querySelectorAll('#the-list > tr.gh-sidebar-editing').forEach(row => row.classList.remove('gh-sidebar-editing'))
       if (current) {
         let row = rowOf(current.id)
@@ -224,6 +237,9 @@
     }
 
     const setUrlParam = itemId => {
+      if (!urlParam) {
+        return
+      }
       const url = new URL(window.location.href)
       if (itemId) {
         url.searchParams.set(urlParam, itemId)
@@ -243,6 +259,12 @@
     }
 
     const show = content => {
+
+      // last on the page, so it opens above a modal it was opened from, and modals opened from it go above it
+      if (!pane().classList.contains('open')) {
+        document.body.append(pane())
+      }
+
       pane().innerHTML = ''
       pane().append(content)
       pane().scrollTop = 0
@@ -435,9 +457,12 @@
           replaceRow(saved.ID, saved.row)
           markActiveRow()
 
-          dialog({
-            message,
-          })
+          // an empty message for editors whose pages say so themselves
+          if (message) {
+            dialog({
+              message,
+            })
+          }
         }
 
         // it was closed, or another item was opened, while it saved
@@ -497,7 +522,12 @@
         }, Div({
           className: 'inside display-flex gap-10 align-center',
         }, [
-          Input({
+          title ? Div({
+            className: 'gh-sidebar-editor-title display-flex gap-10 align-center',
+          }, title({
+            item,
+            draft,
+          })) : Input({
             // not `${ id }-name`, which the add forms beside tables use
             id         : `${ id }-editor-name`,
             className  : 'full-width',
@@ -530,6 +560,7 @@
               changed()
             },
           })) : null,
+          ...headerActions(item),
           Buttons(),
           more.length ? Button({
             id       : `${ id }-more`,
@@ -560,6 +591,12 @@
         }),
       ]))
 
+      onRender({
+        item,
+        draft,
+        changed,
+      })
+
       markActiveRow()
       setUrlParam(item.ID)
     }
@@ -568,18 +605,25 @@
      * Load an item, then open it
      *
      * @param itemId number
+     * @param reopen bool show it again if it's already open, like when its editor was set up differently
      */
-    const open = itemId => maybeDiscard().then(async () => {
+    const open = (itemId, reopen = false) => maybeDiscard().then(async () => {
 
-      if (current && current.id === itemId) {
+      if (current && current.id === itemId && !reopen) {
         return
       }
 
       current = null
-      show(EditorSkeleton())
 
       try {
-        let item = await load(itemId)
+        let item = load(itemId)
+
+        // only stand in for the editor when it has to wait
+        if (item instanceof Promise) {
+          show(EditorSkeleton())
+          item = await item
+        }
+
         replaceRow(item.ID, item.row)
         render(item)
       }
@@ -599,7 +643,7 @@
      */
     const removed = itemId => {
 
-      let row = rowOf(itemId)
+      let row = rows ? rowOf(itemId) : null
       if (row) {
         row.remove()
       }
@@ -661,7 +705,7 @@
       })
 
       // reopen the item that was open before a reload
-      const editing = parseInt(new URL(window.location.href).searchParams.get(urlParam))
+      const editing = urlParam ? parseInt(new URL(window.location.href).searchParams.get(urlParam)) : 0
 
       if (editing) {
         open(editing)

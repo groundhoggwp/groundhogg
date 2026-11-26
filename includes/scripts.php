@@ -20,6 +20,10 @@ class Scripts {
 
 		add_action( 'wp_after_admin_bar_render', [ $this, 'toolbar_scripts' ] );
 
+		// before the footer prints its late styles
+		add_action( 'admin_print_footer_scripts', [ $this, 'maybe_enqueue_sidebar_editor_style' ], 1 );
+		add_action( 'wp_print_footer_scripts', [ $this, 'maybe_enqueue_sidebar_editor_style' ], 1 );
+
 		add_filter( 'wp_refresh_nonces', [ $this, 'refresh_nonces' ], 10, 3 );
 
 		add_action( 'enqueue_block_editor_assets', [ $this, 'block_editor_assets' ], 5 );
@@ -63,6 +67,18 @@ class Scripts {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * The sidebar editor's styles, wherever its script is, including as a dependency of the components that add-ons
+	 * enqueue for the contact quick edit
+	 *
+	 * @return void
+	 */
+	public function maybe_enqueue_sidebar_editor_style() {
+		if ( wp_script_is( 'groundhogg-admin-sidebar-editor', 'enqueued' ) && wp_style_is( 'groundhogg-admin-sidebar-editor', 'registered' ) ) {
+			wp_enqueue_style( 'groundhogg-admin-sidebar-editor' );
+		}
 	}
 
 	public function toolbar_scripts() {
@@ -277,6 +293,7 @@ class Scripts {
 		wp_register_script( 'groundhogg-admin-components', GROUNDHOGG_ASSETS_URL . 'js/admin/components' . $dot_min . '.js', [
 			'groundhogg-admin-element',
 			'groundhogg-admin-saved-replies',
+			'groundhogg-admin-sidebar-editor', // the contact quick edit
 		], GROUNDHOGG_VERSION );
 
 		wp_register_script( 'groundhogg-admin-properties', GROUNDHOGG_ASSETS_URL . 'js/admin/components/properties' . $dot_min . '.js', [

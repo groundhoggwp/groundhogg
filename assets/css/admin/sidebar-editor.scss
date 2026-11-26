@@ -7,7 +7,8 @@
   top: var(--wp-admin--admin-bar--height, 32px);
   right: 0;
   bottom: 0;
-  z-index: 9990;
+  // like modals, the pane is moved to the end of the page when it opens, so it's above the ones open before it
+  z-index: 10000;
   box-sizing: border-box;
   width: clamp(480px, 45vw, 760px);
   max-width: 100vw;
@@ -37,6 +38,33 @@
     margin: 0 -20px;
     border-radius: 0;
     border-width: 0 0 1px;
+  }
+
+  // what the header shows in place of a name field, like a contact's picture and name
+  .gh-sidebar-editor-title {
+    flex: 1;
+    min-width: 0;
+
+    > * {
+      min-width: 0;
+    }
+
+    img {
+      flex-shrink: 0;
+      border-radius: var(--gh-border-radius);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    :is(h2, .description) {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   // the name field gives up the room, not the buttons

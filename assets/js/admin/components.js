@@ -280,46 +280,25 @@
     mount()
   }
 
-  const quickEditContactModal = ({
-    contact,
-    prefix = 'quick-edit',
-    onEdit = (contact) => {},
-    additionalFields = () => '',
-    additionalFieldsOnMount = () => {},
-  }) => {
+  // what a user who can't view contact PII is given in its place, it isn't a value to edit
+  const isRedacted = (value) => value === '[redacted]'
 
-    if (contact && contact.tags) {
-      TagsStore.itemsFetched(contact.tags)
-    }
+  const emptyQuickEditPayload = () => ( {
+    data       : {},
+    meta       : {},
+    add_tags   : [],
+    remove_tags: [],
+  } )
 
-    const getContact = () => {
-      return ContactsStore.get(contact.ID)
-    }
-
-    // what a user who can't view contact PII is given in its place, it isn't a value to edit
-    const isRedacted = (value) => value === '[redacted]'
-
-    const quickEdit = (contact) => {
-
-      const redactedName = isRedacted(contact.data.first_name) || isRedacted(contact.data.last_name)
-
-      // language=HTML
-      return `
-          <div class="contact-quick-edit" tabindex="0">
-              <div class="gh-header space-between">
-                  <div class="align-left-space-between">
-                      <img class="border-radius-5" height="40" width="40" src="${ contact.data.gravatar }" alt="avatar"/>
-                      <h3 class="contact-name">
-                          ${ specialChars(redactedName ? ( contact.i18n?.displayAs ?? '' ) : `${ contact.data.first_name } ${ contact.data.last_name }`) }</h3>
-                  </div>
-                  <div class="actions align-right-space-between">
-                      <a class="gh-button secondary"
-                         href="${ contact.admin }">${ __('Edit Full Profile', 'groundhogg') }</a>
-                      <button class="gh-button dashicon no-border icon text ${ prefix }-cancel"><span
-                              class="dashicons dashicons-no-alt"></span></button>
-                  </div>
-              </div>
-              <div class="contact-quick-edit-fields gh-rows-and-columns">
+  /**
+   * The quick edit's contact fields, as HTML
+   *
+   * @param prefix string
+   * @param contact object
+   */
+  const quickEditContactFields = (prefix, contact) => {
+    // language=HTML
+    return `
                   <div class="gh-row">
                       <div class="gh-col">
                           <label for="${ prefix }-first-name">${ __('First Name', 'groundhogg') }</label>
@@ -352,6 +331,18 @@
                           }) }
                       </div>
                       <div class="gh-col">
+                          <label for="${ prefix }-mobile-phone">${ __('Mobile Phone', 'groundhogg') }</label>
+                          ${ input({
+                              type : 'tel',
+                              id   : `${ prefix }-mobile-phone`,
+                              name : 'mobile_phone',
+                              value: contact.meta.mobile_phone,
+                              disabled: isRedacted(contact.meta.mobile_phone),
+                          }) }
+                      </div>
+                  </div>
+                  <div class="gh-row">
+                      <div class="gh-col">
                           <div class="gh-row phone">
                               <div class="gh-col">
                                   <label for="${ prefix }-primary-phone">${ __('Primary Phone', 'groundhogg') }</label>
@@ -377,30 +368,29 @@
                               </div>
                           </div>
                       </div>
-                  </div>
+                      <div class="gh-col"></div>
+                  </div>`
+  }
+
+  /**
+   * The quick edit's opt-in status and owner fields, as HTML
+   *
+   * @param prefix string
+   * @param contact object
+   */
+  const quickEditStatusFields = (prefix, contact) => {
+    // language=HTML
+    return `
                   <div class="gh-row">
                       <div class="gh-col">
-                          <label for="${ prefix }-email">${ __('Opt-in Status', 'groundhogg') }</label>
+                          <label for="${ prefix }-optin-status">${ __('Opt-in Status', 'groundhogg') }</label>
                           ${ select({
                               id  : `${ prefix }-optin-status`,
                               name: 'optin_status',
                           }, Groundhogg.filters.optin_status, contact.data.optin_status) }
                       </div>
                       <div class="gh-col">
-                          <label for="${ prefix }-mobile-phone">${ __('Mobile Phone', 'groundhogg') }</label>
-                          ${ input({
-                              type : 'tel',
-                              id   : `${ prefix }-mobile-phone`,
-                              name : 'mobile_phone',
-                              value: contact.meta.mobile_phone,
-                              disabled: isRedacted(contact.meta.mobile_phone),
-                          }) }
-                      </div>
-                  </div>
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          <label for="${ prefix }-owner">${ __('Owner', 'noun the contact owner',
-                                  'groundhogg') }</label>
+                          <label for="${ prefix }-owner">${ _x('Owner', 'noun the contact owner', 'groundhogg') }</label>
                           ${ select({
                               id  : `${ prefix }-owner`,
                               name: 'owner_id',
@@ -409,155 +399,235 @@
                               value: u.ID,
                           } )), contact.data.owner_id) }
                       </div>
-                      <div class="gh-col"></div>
-                  </div>
-                  <div class="gh-row">
-                      <div class="gh-col">
-                          <label for="${ prefix }-tags">${ __('Tags', 'groundhogg') }</label>
-                          <div id="${ prefix }-tags-here"></div>
-                      </div>
-                  </div>
-                  ${ additionalFields({
-                      prefix,
-                      contact,
-                  }) }
-              </div>
-              <div class="align-right-space-between" style="margin-top: 20px">
-                  <button class="gh-button text danger ${ prefix }-cancel">${ __('Cancel', 'groundhogg') }</button>
-                  <button class="gh-button primary" id="${ prefix }-save">${ __('Save Changes', 'groundhogg') }</button>
-              </div>
-          </div>`
-    }
+                  </div>`
+  }
 
-    const quickEditMounted = ({
-      close,
-      setContent,
-    }) => {
+  // the editor every quick edit shares, made the first time one opens
+  let quickEditor = null
 
-      let payload
+  // what the quick edit that's open was given, and what the one about to open was given
+  let quickEditOptions = {}
+  let nextQuickEditOptions = {}
 
-      const clearPayload = () => {
-        payload = {
-          data       : {},
-          meta       : {},
-          add_tags   : [],
-          remove_tags: [],
-        }
-      }
+  const QuickEditor = () => {
 
-      clearPayload()
-
-      const updateContact = (data) => {
-
-        payload = {
-          ...data,
-          data: {
-            ...payload.data,
-            ...data.data,
-          },
-          meta: {
-            ...payload.meta,
-            ...data.meta,
-          },
-        }
-      }
-
-      const $quickEdit = $('.contact-quick-edit')
-
-      $quickEdit.focus()
-
-      $(`#${ prefix }-save`).on('click', (e) => {
-
-        const $btn = $(e.target)
-
-        $btn.prop('disabled', true)
-        $btn.text(__('Saving', 'groundhogg'))
-        const { stop } = loadingDots(`#${ prefix }-save`)
-
-        ContactsStore.patch(contact.ID, payload).then(c => {
-          stop()
-          clearPayload()
-          onEdit(c)
-
-          setContent(quickEdit(getContact()))
-          quickEditMounted({
-            close,
-            setContent,
-          })
-        }).catch(e => {
-
-          stop()
-          clearPayload()
-          setContent(quickEdit(getContact()))
-          quickEditMounted({
-            close,
-            setContent,
-          })
-
-          console.log(e)
-
-          dialog({
-            type   : 'error',
-            message: e.message,
-          })
-        })
-
-      })
-
-      $(`.${ prefix }-cancel`).on('click', (e) => {
-        clearPayload()
-        close()
-      })
-
-      betterTagPicker(`#${ prefix }-tags-here`, {
-        selected: getContact().tags,
-        onChange: ({
-          addTags,
-          removeTags,
-        }) => {
-          updateContact({
-            add_tags   : addTags,
-            remove_tags: removeTags,
-          })
-        },
-      })
-
-      Groundhogg.Select2Picker( document.getElementById( `${ prefix }-owner` ) )
-
-      $(`#${ prefix }-first-name, #${ prefix }-last-name, #${ prefix }-email, #${ prefix }-optin-status, #${ prefix }-owner`).
-        on('change', (e) => {
-          updateContact({
-            data: {
-              [e.target.name]: e.target.value,
-            },
-          })
-        })
-
-      $(`#${ prefix }-primary-phone, #${ prefix }-primary-phone-extension, #${ prefix }-mobile-phone`).
-        on('change', (e) => {
-          updateContact({
-            meta: {
-              [e.target.name]: e.target.value,
-            },
-          })
-        })
-
-      additionalFieldsOnMount({
-        prefix,
-        contact,
-        setPayload: updateContact,
-        getPayload: () => payload,
-      })
+    if (quickEditor) {
+      return quickEditor
     }
 
     const {
-      close,
-      setContent,
-    } = modal({
-      // dialogClasses: 'overflow-visible',
-      content: quickEdit(getContact()),
-      onOpen : quickEditMounted,
+      Panel: EditorPanel,
+    } = Groundhogg.SidebarEditor
+
+    quickEditor = Groundhogg.SidebarEditor({
+      id      : 'contact-quick-edit',
+      label   : __('Edit contact', 'groundhogg'),
+      // opens on any page, over whatever it was opened from
+      rows    : false,
+      urlParam: null,
+      load    : id => {
+        // past any "discard changes?" for the one that was open, so its options are this one's now
+        quickEditOptions = nextQuickEditOptions
+        return ContactsStore.get(id) ?? ContactsStore.fetchItem(id)
+      },
+      draft   : () => ( {
+        // only what changed, like the contacts API takes it
+        payload: emptyQuickEditPayload(),
+      } ),
+      title   : ({ item: contact }) => {
+
+        const redactedName = isRedacted(contact.data.first_name) || isRedacted(contact.data.last_name)
+
+        return [
+          Img({
+            className: 'contact-quick-edit-avatar',
+            height   : 40,
+            width    : 40,
+            src      : contact.data.gravatar,
+            alt      : '',
+          }),
+          Div({ className: 'contact-quick-edit-name' }, [
+            H2({}, specialChars(redactedName ? ( contact.i18n?.displayAs ?? '' ) : `${ contact.data.first_name } ${ contact.data.last_name }`)),
+            isRedacted(contact.data.email) ? null : Span({ className: 'description' }, specialChars(contact.data.email)),
+          ]),
+        ]
+      },
+      headerActions: contact => [
+        An({
+          id       : 'contact-quick-edit-profile',
+          className: 'gh-button secondary text icon',
+          href     : contact.admin,
+          title    : __('Edit Full Profile', 'groundhogg'),
+        }, Dashicon('id-alt')),
+      ],
+      panels  : ({ item: contact }) => {
+
+        const {
+          prefix,
+          additionalFields,
+        } = quickEditOptions
+
+        const more = additionalFields({
+          prefix,
+          contact,
+        })
+
+        // fields are HTML, so the ones add-ons give look and work like ours
+        const Fields = html => Div({
+          className: 'gh-rows-and-columns',
+          onCreate : el => {
+            el.innerHTML = html
+          },
+        })
+
+        return [
+          EditorPanel({
+            id   : `${ prefix }-contact-info`,
+            title: __('Contact info', 'groundhogg'),
+          }, Fields(quickEditContactFields(prefix, contact))),
+          EditorPanel({
+            id   : `${ prefix }-status`,
+            title: __('Status', 'groundhogg'),
+          }, Fields(quickEditStatusFields(prefix, contact))),
+          EditorPanel({
+            id   : `${ prefix }-tags`,
+            title: __('Tags', 'groundhogg'),
+          }, Div({ id: `${ prefix }-tags-here` })),
+          more && more.trim() ? EditorPanel({
+            id   : `${ prefix }-more`,
+            title: __('More details', 'groundhogg'),
+          }, Fields(more)) : null,
+        ].filter(Boolean)
+      },
+      // the fields are on the page now
+      onRender: ({
+        item: contact,
+        draft,
+        changed,
+      }) => {
+
+        const {
+          prefix,
+          additionalFieldsOnMount,
+        } = quickEditOptions
+
+        const updateContact = (data) => {
+
+          draft.payload = {
+            ...draft.payload,
+            ...data,
+            data: {
+              ...draft.payload.data,
+              ...data.data,
+            },
+            meta: {
+              ...draft.payload.meta,
+              ...data.meta,
+            },
+          }
+
+          changed()
+        }
+
+        if (contact.tags) {
+          TagsStore.itemsFetched(contact.tags)
+        }
+
+        betterTagPicker(`#${ prefix }-tags-here`, {
+          selected: contact.tags ?? [],
+          onChange: ({
+            addTags,
+            removeTags,
+          }) => {
+            updateContact({
+              add_tags   : addTags,
+              remove_tags: removeTags,
+            })
+          },
+        })
+
+        Groundhogg.Select2Picker(document.getElementById(`${ prefix }-owner`))
+
+        // jQuery, because the owner picker triggers its change with jQuery
+        $(`#${ prefix }-first-name, #${ prefix }-last-name, #${ prefix }-email, #${ prefix }-optin-status, #${ prefix }-owner`).
+          on('change input', (e) => {
+            updateContact({
+              data: {
+                [e.target.name]: e.target.value,
+              },
+            })
+          })
+
+        $(`#${ prefix }-primary-phone, #${ prefix }-primary-phone-extension, #${ prefix }-mobile-phone`).
+          on('change input', (e) => {
+            updateContact({
+              meta: {
+                [e.target.name]: e.target.value,
+              },
+            })
+          })
+
+        additionalFieldsOnMount({
+          prefix,
+          contact,
+          setPayload: updateContact,
+          getPayload: () => draft.payload,
+        })
+      },
+      save    : ({
+        item: contact,
+        draft,
+      }) => ContactsStore.patch(contact.ID, draft.payload).then(saved => {
+        quickEditOptions.onEdit(saved)
+        return saved
+      }),
+      messages: {
+        // the pages that open it say so themselves, in onEdit
+        saved     : '',
+        saveFailed: __('The contact could not be saved.', 'groundhogg'),
+        discard   : __('You have unsaved changes to this contact. Discard them?', 'groundhogg'),
+      },
     })
+
+    return quickEditor
+  }
+
+  /**
+   * Edit a contact's details in a sidebar that slides in from the right, over whatever page or modal it's opened from
+   *
+   * @param contact object the contact, from the contacts store
+   * @param prefix string prefixes the fields' IDs
+   * @param onEdit function given the contact after it saves
+   * @param additionalFields function given { prefix, contact }, returns more fields as HTML, in .gh-row and .gh-col
+   * @param additionalFieldsOnMount function given { prefix, contact, setPayload, getPayload }, sets up those fields
+   *                                once they're on the page. setPayload merges changes, like { meta: { key: value } }
+   */
+  const quickEditContactModal = ({
+    contact,
+    prefix = 'quick-edit',
+    onEdit = (contact) => {},
+    additionalFields = () => '',
+    additionalFieldsOnMount = () => {},
+  }) => {
+
+    if (contact && contact.tags) {
+      TagsStore.itemsFetched(contact.tags)
+    }
+
+    // the editor shows the contact from the store
+    if (contact && !ContactsStore.has(contact.ID)) {
+      ContactsStore.itemsFetched([contact])
+    }
+
+    nextQuickEditOptions = {
+      prefix,
+      onEdit,
+      additionalFields,
+      additionalFieldsOnMount,
+    }
+
+    // again, even if it's open, since it may have been opened with other options
+    return QuickEditor().open(contact.ID, true)
   }
 
   const quickAddForm = (selector, {
