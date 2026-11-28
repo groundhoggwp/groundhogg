@@ -640,7 +640,7 @@ class Email_Block_Renderer {
 	 *
 	 * @return string|null null for a block that has none
 	 */
-	protected function block_plain_text( array $block ) {
+	public function block_plain_text( array $block ) {
 
 		$props = array_merge( $this->defaults( $block['type'] ), $block );
 		$type  = $this->types()[ $block['type'] ] ?? null;

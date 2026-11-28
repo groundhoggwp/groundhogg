@@ -55,6 +55,99 @@ class Block_Registry {
 			'html'  => [ $this, 'global' ],
 			'plain' => [ $this, 'global_plain' ],
 		] );
+
+		// not registered like the dynamic blocks: most of the time its saved HTML is used as it is, see footer()
+		add_filter( 'groundhogg/email/block_render', [ $this, 'footer' ], 10, 3 );
+	}
+
+	/**
+	 * The footer block's text, like "Unsubscribe" and "Privacy Policy", is saved with the email in the language of
+	 * whoever saved it. When the email is sent in another of the site's languages, like a variation in French or to a
+	 * contact who speaks it, the footer is made again from the site's settings in that language.
+	 *
+	 * Otherwise the saved footer is used as it is, so an email on a site in one language is sent exactly as before.
+	 *
+	 * @param string $content the block's content: its <td> for HTML, its text for plain text
+	 * @param array  $block   the block's props
+	 * @param string $context html or plain
+	 *
+	 * @return string
+	 */
+	public function footer( $content, $block, $context = 'html' ) {
+
+		if ( ! is_array( $block ) || ( $block['type'] ?? '' ) !== 'footer' || ! is_string( $content ) || ! self::footer_follows_locale() ) {
+			return $content;
+		}
+
+		$email    = the_email();
+		$renderer = new Abilities\Emails\Email_Block_Renderer( is_a( $email, Email::class ) ? Abilities\Emails\Email_Block_Renderer::context_of( $email ) : [] );
+
+		if ( $context !== 'html' ) {
+			$text = $renderer->block_plain_text( $block );
+
+			return is_string( $text ) ? $text : $content;
+		}
+
+		// only the footer itself, so what's around it, like the email's width in a full width template, stays
+		$saved = self::find_footer( $content );
+		// through kses like the saved content is, which also writes its styles the same way
+		$made  = self::find_footer( email_kses( $renderer->inner_html( $block ) ) );
+
+		if ( ! $saved || ! $made ) {
+			return $content;
+		}
+
+		return substr_replace( $content, $made[2], $saved[0], $saved[1] - $saved[0] );
+	}
+
+	/**
+	 * Whether the footer is made again in the language the email is being sent in: one of the site's languages, but
+	 * not its default, which the footer is usually saved in
+	 *
+	 * @return bool
+	 */
+	protected static function footer_follows_locale(): bool {
+
+		$locale  = determine_locale();
+		$follows = Multilingual::is_site_locale( $locale ) && $locale !== Multilingual::get_default_locale();
+
+		/**
+		 * Whether to make the email's footer again in the language it's sent in, rather than send the saved one
+		 *
+		 * @param bool   $follows
+		 * @param string $locale the language the email is being sent in
+		 */
+		return (bool) apply_filters( 'groundhogg/email/footer/follows_locale', $follows, $locale );
+	}
+
+	/**
+	 * Where the footer's <div id="footer"> is in some HTML
+	 *
+	 * @param string $html
+	 *
+	 * @return array|null [ start, end, the HTML of it ]
+	 */
+	protected static function find_footer( string $html ) {
+
+		if ( ! preg_match( '/<div\b[^>]*\bid\s*=\s*(["\'])footer\1[^>]*>/i', $html, $open, PREG_OFFSET_CAPTURE ) ) {
+			return null;
+		}
+
+		$start  = $open[0][1];
+		$offset = $start + strlen( $open[0][0] );
+		$depth  = 1;
+
+		while ( preg_match( '/<(\/?)div\b[^>]*>/i', $html, $tag, PREG_OFFSET_CAPTURE, $offset ) ) {
+
+			$depth  += $tag[1][0] === '/' ? - 1 : 1;
+			$offset = $tag[0][1] + strlen( $tag[0][0] );
+
+			if ( $depth === 0 ) {
+				return [ $start, $offset, substr( $html, $start, $offset - $start ) ];
+			}
+		}
+
+		return null;
 	}
 
 	/**
