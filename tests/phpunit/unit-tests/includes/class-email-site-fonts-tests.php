@@ -204,6 +204,71 @@ class Email_Site_Fonts_Tests extends GH_UnitTestCase {
 		$this->assertFalse( $this->find( 'system-ui' ) );
 	}
 
+	public function test_theme_paths_cant_leave_the_folder() {
+
+		$this->site_file( 'Lora-Regular.woff2' );
+
+		$this->theme_fonts( [
+			[
+				'name'       => 'Lora',
+				'slug'       => 'lora',
+				'fontFamily' => 'Lora',
+				'fontFace'   => [
+					// a file that exists, but outside the theme by ..
+					[ 'fontFamily' => 'Lora', 'fontWeight' => '400', 'src' => [ 'file:./../../uploads/test-site-fonts/Lora-Regular.woff2' ] ],
+					[ 'fontFamily' => 'Lora', 'fontWeight' => '700', 'src' => [ 'file:./../../../../../../../../../../etc/fonts/x.ttf' ] ],
+				],
+			],
+		] );
+
+		$this->assertFalse( $this->find( 'lora' ) );
+
+		$uploads = wp_get_upload_dir();
+
+		$this->assertFalse( Email_Fonts::contained_path( $uploads['basedir'] . '/test-site-fonts/../test-site-fonts/Lora-Regular.woff2' ) );
+		$this->assertSame( wp_normalize_path( $uploads['basedir'] . '/test-site-fonts/Lora-Regular.woff2' ), Email_Fonts::contained_path( $uploads['basedir'] . '/test-site-fonts/Lora-Regular.woff2' ) );
+		$this->assertFalse( Email_Fonts::contained_path( ABSPATH . 'wp-config.php' ), 'not a font' );
+	}
+
+	public function test_filtered_fonts_are_cleaned() {
+
+		$uploads = wp_get_upload_dir();
+		$file    = $this->site_file( 'Brand.woff2' );
+
+		add_filter( 'groundhogg/email_fonts/site_fonts', $filter = function ( $families ) use ( $uploads, $file ) {
+			$families['brand'] = [
+				'id'       => 'whatever',
+				'name'     => "Brand'};body{color:red",
+				'fallback' => 'Comic Sans; color: red',
+				'source'   => '<b>',
+				'files'    => [
+					[ 'path' => $uploads['basedir'] . '/test-site-fonts/Brand.woff2', 'url' => $file . "') ; x:url('", 'weight' => 'heavy', 'style' => 'slanted' ],
+					// outside the WordPress folder, or not a font
+					[ 'path' => '/etc/passwd', 'url' => $file, 'weight' => '400', 'style' => 'normal' ],
+				],
+			];
+			$families['empty'] = [ 'name' => 'Empty', 'files' => [] ];
+			$families['bad']   = 'not a font';
+
+			return $families;
+		} );
+
+		$fonts = Email_Fonts::site_fonts();
+
+		remove_filter( 'groundhogg/email_fonts/site_fonts', $filter );
+
+		$this->assertCount( 1, $fonts );
+		$this->assertSame( 'brandbodycolorred', $fonts[0]['id'] );
+		$this->assertSame( 'Brandbodycolorred', $fonts[0]['name'] );
+		$this->assertSame( 'Helvetica, Arial, sans-serif', $fonts[0]['fallback'] );
+		$this->assertSame( 'site', $fonts[0]['source'] );
+		$this->assertCount( 1, $fonts[0]['files'] );
+		$this->assertSame( '400', $fonts[0]['files'][0]['weight'] );
+		$this->assertSame( 'normal', $fonts[0]['files'][0]['style'] );
+		$this->assertStringNotContainsString( "'", $fonts[0]['files'][0]['url'] );
+		$this->assertStringNotContainsString( ')', $fonts[0]['files'][0]['url'] );
+	}
+
 	public function test_built_in_and_uploaded_fonts_are_not_offered() {
 
 		$this->theme_fonts( [
@@ -325,6 +390,13 @@ class Email_Site_Fonts_Tests extends GH_UnitTestCase {
 
 		$this->lora_theme_font();
 
+		// not to someone who can't add them
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'marketer' ] ) );
+
+		$this->assertStringNotContainsString( 'add-site-font', ( new \Groundhogg\Abilities\Emails\Email_Block_Renderer() )->design_summary() );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
 		$summary = ( new \Groundhogg\Abilities\Emails\Email_Block_Renderer() )->design_summary();
 
 		$this->assertStringContainsString( 'which emails can\'t use until `add-site-font` adds them: "Lora" (400, 400 italic).', $summary );
@@ -377,6 +449,110 @@ class Email_Site_Fonts_Tests extends GH_UnitTestCase {
 
 		// a fallback that isn't one of the editor's fonts is refused by the schema
 		$this->assertWPError( $ability->execute( [ 'font' => 'Lora', 'fallback' => 'Comic Neue' ] ) );
+	}
+
+	/**
+	 * Put a file in the fonts folder, like an upload would
+	 *
+	 * @param string $name
+	 *
+	 * @return string
+	 */
+	protected function font_file( string $name ): string {
+		Email_Fonts::make_folder();
+		file_put_contents( Email_Fonts::file_path( $name ), 'wOF2' );
+		$this->paths[] = Email_Fonts::file_path( $name );
+
+		return $name;
+	}
+
+	public function test_saving_keeps_fonts_added_elsewhere() {
+
+		update_option( Email_Fonts::OPTION, Email_Fonts::sanitize( [
+			[ 'name' => 'Alpha', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'Alpha.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		] ) );
+
+		// what an editor opened now has
+		$editor = [
+			[ 'name' => 'Alpha', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => 'Alpha.woff2', 'weight' => '400', 'style' => 'normal' ] ] ],
+		];
+
+		// meanwhile, a font and a file are added elsewhere
+		update_option( Email_Fonts::OPTION, Email_Fonts::sanitize( [
+			[ 'name' => 'Alpha', 'fallback' => 'Arial, sans-serif', 'files' => [
+				[ 'file' => 'Alpha.woff2', 'weight' => '400', 'style' => 'normal' ],
+				[ 'file' => $this->font_file( 'Alpha-Bold.woff2' ), 'weight' => '700', 'style' => 'normal' ],
+			] ],
+			[ 'name' => 'Beta', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'Beta.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		] ) );
+
+		// the editor changes Alpha's fallback and saves
+		$editor[0]['fallback'] = 'Georgia, serif';
+
+		$saved = Email_Fonts::save_from_editor( $editor );
+
+		$this->assertSame( [ 'alpha', 'beta' ], array_column( $saved, 'id' ) );
+		$this->assertSame( 'Georgia, serif', $saved[0]['fallback'] );
+		$this->assertSame( [ 'Alpha.woff2', 'Alpha-Bold.woff2' ], array_column( $saved[0]['files'], 'file' ) );
+		$this->assertFileExists( Email_Fonts::file_path( 'Beta.woff2' ) );
+		$this->assertFileExists( Email_Fonts::file_path( 'Alpha-Bold.woff2' ) );
+	}
+
+	public function test_saving_deletes_what_the_editor_deleted() {
+
+		update_option( Email_Fonts::OPTION, Email_Fonts::sanitize( [
+			[ 'name' => 'Alpha', 'fallback' => 'Arial, sans-serif', 'files' => [
+				[ 'file' => $this->font_file( 'Alpha.woff2' ), 'weight' => '400', 'style' => 'normal' ],
+				[ 'file' => $this->font_file( 'Alpha-Bold.woff2' ), 'weight' => '700', 'style' => 'normal' ],
+			] ],
+			[ 'name' => 'Beta', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'Beta.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		] ) );
+
+		// Alpha renamed to Gamma, its bold deleted and its regular replaced by an upload, and Beta deleted
+		$saved = Email_Fonts::save_from_editor( [
+			[ 'name' => 'Gamma', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'Gamma.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		], [ 'alpha', 'Beta' ], [ 'Alpha-Bold.woff2', 'Alpha.woff2', 'Beta.woff2' ] );
+
+		$this->assertSame( [ 'gamma' ], array_column( $saved, 'id' ) );
+		$this->assertSame( [ 'Gamma.woff2' ], array_column( $saved[0]['files'], 'file' ) );
+
+		foreach ( [ 'Alpha.woff2', 'Alpha-Bold.woff2', 'Beta.woff2' ] as $file ) {
+			$this->assertFileDoesNotExist( Email_Fonts::file_path( $file ) );
+		}
+
+		// a file of a weight the editor has now isn't brought back, even if it didn't say it deleted it
+		update_option( Email_Fonts::OPTION, Email_Fonts::sanitize( [
+			[ 'name' => 'Gamma', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => 'Gamma.woff2', 'weight' => '400', 'style' => 'normal' ] ] ],
+		] ) );
+
+		$saved = Email_Fonts::save_from_editor( [
+			[ 'name' => 'Gamma', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'Gamma-2.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		] );
+
+		$this->assertSame( [ 'Gamma-2.woff2' ], array_column( $saved[0]['files'], 'file' ) );
+	}
+
+	public function test_save_route() {
+
+		update_option( Email_Fonts::OPTION, Email_Fonts::sanitize( [
+			[ 'name' => 'Beta', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'Beta.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		] ) );
+
+		$request = new WP_REST_Request( 'PATCH', '/gh/v4/emails/fonts' );
+		$request->set_param( 'fonts', [
+			[ 'name' => 'Alpha', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'Alpha.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		] );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'marketer' ] ) );
+		$this->assertSame( 403, rest_do_request( $request )->get_status() );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( [ 'alpha', 'beta' ], array_column( $response->get_data()['items'], 'id' ) );
+		$this->assertSame( Email_Fonts::file_url( 'Alpha.woff2' ), $response->get_data()['items'][0]['files'][0]['url'] );
 	}
 
 	public function test_rest_route() {

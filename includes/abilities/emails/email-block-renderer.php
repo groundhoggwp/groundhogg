@@ -504,7 +504,7 @@ class Email_Block_Renderer {
 			}, $font['files'] );
 
 			return sprintf( '"%s" (%s)', $font['name'], implode( ', ', $files ) );
-		}, Email_Fonts::site_fonts() );
+		}, current_user_can( 'manage_options' ) && current_user_can( 'edit_emails' ) ? Email_Fonts::site_fonts() : [] ); // the ones add-site-font can add
 
 		if ( ! empty( $on_site ) ) {
 			$lines[] = '- Fonts the site\'s theme or Font Library has, which emails can\'t use until `add-site-font` adds them: ' . implode( ', ', $on_site ) . '. Add one when it suits the email, like the site\'s own heading font, then use it by name.';

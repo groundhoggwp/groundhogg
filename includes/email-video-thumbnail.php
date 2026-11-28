@@ -331,7 +331,8 @@ class Email_Video_Thumbnail {
 	 * Before 4.13 the images were saved in the uploads folder itself, in email-video-thumbnails, because Groundhogg's
 	 * isn't public. Copy them into output_dir() and point the emails that show them at the copies.
 	 *
-	 * The old files stay where they are, because emails that were sent already still show them.
+	 * The old files stay where they are, because emails that were sent already still show them. The emails are only
+	 * changed if every image was copied and the site can load them from the new folder.
 	 *
 	 * @return void
 	 */
@@ -353,13 +354,21 @@ class Email_Video_Thumbnail {
 			return;
 		}
 
+		$copied = true;
+
 		foreach ( glob( $old['path'] . '/*.jpg' ) ?: [] as $file ) {
 
 			$to = $new['path'] . '/' . basename( $file );
 
-			if ( ! file_exists( $to ) ) {
-				files()->copy( $file, $to );
+			if ( ! file_exists( $to ) && ! files()->copy( $file, $to ) ) {
+				$copied = false;
 			}
+		}
+
+		// The emails keep the old images, which still work, unless every one was copied and the new folder can be
+		// loaded from: the server might block Groundhogg's uploads folder, like nginx set up to deny all of it.
+		if ( ! $copied || ( $new['path'] === files()->get_uploads_dir( self::FOLDER ) && files()->can_load_public_dir( self::FOLDER ) !== true ) ) {
+			return;
 		}
 
 		self::replace_in_emails( $old['url'] . '/', $new['url'] . '/' );

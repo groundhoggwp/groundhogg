@@ -190,6 +190,28 @@ class Emails_Api extends Base_Object_Api {
 				'callback'            => [ $this, 'upload_font' ],
 				'permission_callback' => [ $this, 'upload_font_permissions_callback' ]
 			],
+			// Saving the editor's changes to the fonts, merged with what's saved so a font added elsewhere isn't lost
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => [ $this, 'save_fonts' ],
+				'permission_callback' => [ $this, 'upload_font_permissions_callback' ],
+				'args'                => [
+					'fonts'         => [
+						'required' => true,
+						'type'     => 'array',
+					],
+					'deleted_fonts' => [
+						'type'    => 'array',
+						'items'   => [ 'type' => 'string' ],
+						'default' => [],
+					],
+					'deleted_files' => [
+						'type'    => 'array',
+						'items'   => [ 'type' => 'string' ],
+						'default' => [],
+					],
+				],
+			],
 		] );
 
 		// Adding a font the site has already, like the theme's, to the uploaded fonts
@@ -206,6 +228,26 @@ class Emails_Api extends Base_Object_Api {
 					],
 				],
 			],
+		] );
+	}
+
+	/**
+	 * Save the editor's fonts
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function save_fonts( WP_REST_Request $request ) {
+
+		$fonts = Email_Fonts::save_from_editor(
+			(array) $request->get_param( 'fonts' ),
+			array_map( 'strval', (array) $request->get_param( 'deleted_fonts' ) ),
+			array_map( 'strval', (array) $request->get_param( 'deleted_files' ) )
+		);
+
+		return self::SUCCESS_RESPONSE( [
+			'items' => $fonts,
 		] );
 	}
 

@@ -389,7 +389,7 @@ class Main_Updater extends Old_Updater {
 			],
 			'4.13' => [
 				'automatic'   => true,
-				'description' => __( 'Copy the thumbnails of email video blocks into the plugin\'s uploads folder, and update the emails that show them. The old copies are kept for emails that were already sent. Add a column to the emails table for email variations, like a version of an email in another language.', 'groundhogg' ),
+				'description' => __( 'Copy the thumbnails of email video blocks into the plugin\'s uploads folder, and update the emails that show them if the server lets them be loaded from there. The old copies are kept for emails that were already sent. Add a column to the emails table for email variations, like a version of an email in another language.', 'groundhogg' ),
 				'callback'    => function () {
 					Email_Video_Thumbnail::copy_legacy_images();
 					get_db( 'emails' )->create_table(); // add parent_id

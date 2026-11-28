@@ -632,7 +632,8 @@ class Site_Health {
 
 	/**
 	 * The uploads folder has imports, exports and files uploaded for contacts. Its .htaccess keeps them private, but only
-	 * servers that read .htaccess files do what it says, nginx doesn't.
+	 * servers that read .htaccess files do what it says, nginx doesn't. Its email fonts and video thumbnails folders
+	 * have to be public, which a server that blocks the whole folder breaks.
 	 *
 	 * @return array
 	 */
@@ -640,10 +641,32 @@ class Site_Health {
 
 		$public = files()->is_private_dir_public();
 
+		$rules = '<pre style="overflow-x:auto;white-space:pre"><code>' . esc_html( files()->nginx_rules() ) . '</code></pre>';
+
 		if ( $public === false ) {
-			return $this->result( 'private_files', 'good', __( 'Private files can\'t be downloaded', 'groundhogg' ), $this->paragraphs(
-				__( 'Imports, exports and files uploaded for contacts can only be downloaded by people who are allowed to see them.', 'groundhogg' )
-			) );
+
+			// private files are safe, but the server might block the public ones with them
+			$blocked = array_keys( array_filter( files()->public_dirs(), function ( $types, $subdir ) {
+				return files()->can_load_public_dir( (string) $subdir ) === false;
+			}, ARRAY_FILTER_USE_BOTH ) );
+
+			if ( empty( $blocked ) ) {
+				return $this->result( 'private_files', 'good', __( 'Private files can\'t be downloaded', 'groundhogg' ), $this->paragraphs(
+					__( 'Imports, exports and files uploaded for contacts can only be downloaded by people who are allowed to see them, and mail apps can load email fonts and video thumbnails.', 'groundhogg' )
+				) );
+			}
+
+			$folders = array_map( function ( $subdir ) {
+				return files()->server_path() . '/' . $subdir . '/';
+			}, $blocked );
+
+			return $this->result( 'private_files', 'recommended', __( 'Mail apps can\'t load email fonts and video thumbnails', 'groundhogg' ),
+				$this->paragraphs(
+					/* translators: %s: folders, like /wp-content/uploads/groundhogg/email-fonts/ */
+					sprintf( __( 'The server blocks the files in %s, so emails show their fallback fonts instead of uploaded ones, and video blocks show broken images.', 'groundhogg' ), implode( ', ', $folders ) ),
+					__( 'Those folders are inside the uploads folder, which is private, and have .htaccess files that make their files public. On nginx, which doesn\'t read .htaccess files, use these rules in place of the one that denies the uploads folder, and reload nginx. On Apache, AllowOverride has to let the folders\' .htaccess files change access, AllowOverride All does. Your host can do this for you.', 'groundhogg' )
+				) . $rules
+			);
 		}
 
 		if ( $public === null ) {
@@ -658,7 +681,7 @@ class Site_Health {
 				sprintf( __( 'Anyone who knows or guesses the link to a file in %s can download it. That folder has imports, exports and files uploaded for contacts.', 'groundhogg' ), wp_parse_url( files()->get_base_uploads_url(), PHP_URL_PATH ) . '/' ),
 				__( 'The folder has an .htaccess file that denies access, but the server isn\'t using it. nginx never reads .htaccess files, and on Apache AllowOverride has to allow them.', 'groundhogg' ),
 				__( 'On nginx, add these rules to the site\'s server block and reload nginx. They keep the folder private and let mail apps load email fonts and video thumbnails. Your host can do this for you.', 'groundhogg' )
-			) . '<pre style="overflow-x:auto;white-space:pre"><code>' . esc_html( files()->nginx_rules() ) . '</code></pre>'
+			) . $rules
 		);
 	}
 

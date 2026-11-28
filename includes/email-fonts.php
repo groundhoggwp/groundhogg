@@ -277,11 +277,14 @@ class Email_Fonts {
 
 				$weight = (string) ( $file['weight'] ?? '400' );
 				$style  = (string) ( $file['style'] ?? 'normal' );
+				$weight = in_array( $weight, self::WEIGHTS, true ) || $weight === self::VARIABLE ? $weight : '400';
+				$style  = in_array( $style, self::STYLES, true ) ? $style : 'normal';
 
+				// one file per weight and style, keyed by what they are once cleaned up
 				$files[ $weight . $style ] = [
 					'file'   => $name_on_disk,
-					'weight' => in_array( $weight, self::WEIGHTS, true ) || $weight === self::VARIABLE ? $weight : '400',
-					'style'  => in_array( $style, self::STYLES, true ) ? $style : 'normal',
+					'weight' => $weight,
+					'style'  => $style,
 				];
 			}
 
@@ -306,6 +309,16 @@ class Email_Fonts {
 	public static function sanitize_name( string $name ): string {
 		$name = preg_replace( '/[^\p{L}\p{N} \-]/u', '', $name );
 		$name = trim( preg_replace( '/\s+/', ' ', (string) $name ) );
+
+		// The name is used without quotes in font-family, so each word has to be a CSS identifier: a word of only
+		// hyphens is dropped, one that starts with a digit is joined to the word before, "Exo 2" to "Exo-2", and a
+		// name that starts with one gets a word in front
+		$name = trim( preg_replace( '/ +/', ' ', preg_replace( '/(^| )-+(?= |$)/', ' ', $name ) ) );
+		$name = preg_replace( '/ (?=-*\p{N})/u', '-', $name );
+
+		if ( preg_match( '/^-*\p{N}/u', $name ) ) {
+			$name = 'Font-' . ltrim( $name, '-' );
+		}
 
 		return mb_substr( $name, 0, 60 );
 	}
@@ -489,13 +502,16 @@ class Email_Fonts {
 
 		$fonts = [];
 
-		foreach ( $families as $family ) {
+		foreach ( is_array( $families ) ? $families : [] as $family ) {
 
-			if ( empty( $family['files'] ) || in_array( $family['id'], $taken, true ) ) {
+			// the filter may have added families, so they're cleaned up like the rest
+			$family = self::clean_site_font( $family );
+
+			if ( ! $family || in_array( $family['id'], $taken, true ) ) {
 				continue;
 			}
 
-			$family['files'] = array_values( $family['files'] );
+			$taken[] = $family['id'];
 
 			// lightest first, variable before them all, and normal before italic
 			usort( $family['files'], function ( $a, $b ) {
@@ -510,6 +526,78 @@ class Email_Fonts {
 		}
 
 		return $fonts;
+	}
+
+	/**
+	 * A family from site_fonts() cleaned up: a name that's safe in CSS, a fallback that's one of the editor's fonts, and
+	 * files that are font files in the WordPress or content folder, with a URL that can't break out of url('')
+	 *
+	 * @param mixed $family
+	 *
+	 * @return array|false false if it has no name or no files left
+	 */
+	protected static function clean_site_font( $family ) {
+
+		if ( ! is_array( $family ) ) {
+			return false;
+		}
+
+		$name = self::sanitize_name( (string) ( $family['name'] ?? '' ) );
+
+		if ( ! $name ) {
+			return false;
+		}
+
+		$files = [];
+
+		foreach ( (array) ( $family['files'] ?? [] ) as $file ) {
+
+			$path = is_array( $file ) ? self::contained_path( (string) ( $file['path'] ?? '' ) ) : false;
+			$url  = is_array( $file ) ? self::css_url( (string) ( $file['url'] ?? '' ) ) : '';
+
+			if ( ! $path || ! $url ) {
+				continue;
+			}
+
+			$weight = (string) ( $file['weight'] ?? '400' );
+			$style  = (string) ( $file['style'] ?? 'normal' );
+
+			$files[] = [
+				'path'   => $path,
+				'url'    => $url,
+				'weight' => in_array( $weight, self::WEIGHTS, true ) || $weight === self::VARIABLE ? $weight : '400',
+				'style'  => in_array( $style, self::STYLES, true ) ? $style : 'normal',
+			];
+		}
+
+		if ( empty( $files ) ) {
+			return false;
+		}
+
+		$fallback = (string) ( $family['fallback'] ?? '' );
+
+		return [
+			'id'       => self::font_id( $name ),
+			'name'     => $name,
+			'fallback' => in_array( $fallback, Email_Block_Style::FONTS, true ) ? $fallback : 'Helvetica, Arial, sans-serif',
+			'source'   => in_array( $family['source'] ?? '', [ 'theme', 'library' ], true ) ? $family['source'] : 'site',
+			'files'    => $files,
+		];
+	}
+
+	/**
+	 * A URL for url('') in CSS: escaped for a URL, and without the characters that would end it, which are encoded
+	 *
+	 * @param string $url
+	 *
+	 * @return string
+	 */
+	public static function css_url( string $url ): string {
+		return str_replace(
+			[ "'", '"', '(', ')', '\\', ' ' ],
+			[ '%27', '%22', '%28', '%29', '%5C', '%20' ],
+			esc_url_raw( $url )
+		);
 	}
 
 	/**
@@ -586,6 +674,58 @@ class Email_Fonts {
 	}
 
 	/**
+	 * Save the fonts as the editor has them, merged with the ones saved
+	 *
+	 * The editor has the fonts as they were when it was opened, so fonts and files added since, in another tab, by
+	 * another user or by an assistant, would be dropped, and their files deleted. So they're kept, unless the editor
+	 * says it deleted them. A renamed font's old name is deleted.
+	 *
+	 * @param array    $fonts         the editor's fonts: name, fallback and files, which have file, weight and style
+	 * @param string[] $deleted_fonts the names or ids of fonts deleted in the editor
+	 * @param string[] $deleted_files the files deleted, or replaced by others, in the editor
+	 *
+	 * @return array[] the saved fonts, like get() has them
+	 */
+	public static function save_from_editor( array $fonts, array $deleted_fonts = [], array $deleted_files = [] ): array {
+
+		$fonts         = self::sanitize( $fonts );
+		$deleted_fonts = array_map( [ __CLASS__, 'font_id' ], $deleted_fonts );
+		$deleted_files = array_map( function ( $file ) {
+			return sanitize_file_name( wp_basename( $file ) );
+		}, $deleted_files );
+
+		foreach ( self::sanitize( get_option( self::OPTION, [] ) ) as $saved ) {
+
+			$index = array_search( $saved['id'], array_column( $fonts, 'id' ), true );
+
+			// added since the editor was opened
+			if ( $index === false ) {
+				if ( ! in_array( $saved['id'], $deleted_fonts, true ) ) {
+					$fonts[] = $saved;
+				}
+
+				continue;
+			}
+
+			// files added to it since, unless the editor has one for that weight and style now
+			$files = array_column( $fonts[ $index ]['files'], 'file' );
+			$kinds = array_map( function ( $file ) {
+				return $file['weight'] . $file['style'];
+			}, $fonts[ $index ]['files'] );
+
+			foreach ( $saved['files'] as $file ) {
+				if ( ! in_array( $file['file'], $files, true ) && ! in_array( $file['file'], $deleted_files, true ) && ! in_array( $file['weight'] . $file['style'], $kinds, true ) ) {
+					$fonts[ $index ]['files'][] = $file;
+				}
+			}
+		}
+
+		update_option( self::OPTION, self::sanitize( $fonts ) );
+
+		return self::get();
+	}
+
+	/**
 	 * The editor's fallback font for a font-family stack, by its generic family
 	 *
 	 * @param string $stack like "Inter", sans-serif
@@ -658,22 +798,20 @@ class Email_Fonts {
 
 			if ( str_starts_with( $src, 'file:./' ) ) {
 				$relative = substr( $src, 7 );
-				$path     = get_theme_file_path( $relative );
+				$path     = self::contained_path( get_theme_file_path( $relative ) );
 				$url      = get_theme_file_uri( $relative );
 			} else {
 				$url  = $src;
 				$path = self::url_to_path( $src );
 			}
 
-			$ext = strtolower( pathinfo( (string) $path, PATHINFO_EXTENSION ) );
-
-			if ( ! $path || ! isset( self::FORMATS[ $ext ] ) || ! is_file( $path ) ) {
+			if ( ! $path ) {
 				continue;
 			}
 
-			$found[ $ext ] = [
-				'path' => wp_normalize_path( $path ),
-				'url'  => $url,
+			$found[ strtolower( pathinfo( $path, PATHINFO_EXTENSION ) ) ] = [
+				'path' => $path,
+				'url'  => self::css_url( $url ),
 			];
 		}
 
@@ -723,16 +861,47 @@ class Email_Fonts {
 				continue;
 			}
 
-			$file      = realpath( trailingslashit( $root_path ) . substr( $path, strlen( $prefix ) ) );
-			$real_root = realpath( $root_path );
+			$file = self::contained_path( trailingslashit( $root_path ) . substr( $path, strlen( $prefix ) ) );
 
-			// realpath() resolves any ../ so this catches a path that leaves the folder
-			if ( $file && $real_root && str_starts_with( wp_normalize_path( $file ), trailingslashit( wp_normalize_path( $real_root ) ) ) ) {
-				return wp_normalize_path( $file );
+			if ( $file ) {
+				return $file;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * A path, if it's a font file in the WordPress folder or the content folder
+	 *
+	 * A path with a .. in it is refused rather than resolved, so it can't leave those folders, and folders that are
+	 * symlinks, like a theme's, still work.
+	 *
+	 * @param string $path
+	 *
+	 * @return string|false the normalized path
+	 */
+	public static function contained_path( string $path ) {
+
+		$path = wp_normalize_path( $path );
+
+		if ( ! $path || str_contains( $path, "\0" ) || in_array( '..', explode( '/', $path ), true ) ) {
+			return false;
+		}
+
+		$in_root = false;
+
+		foreach ( [ WP_CONTENT_DIR, ABSPATH ] as $root ) {
+			if ( str_starts_with( $path, trailingslashit( wp_normalize_path( $root ) ) ) ) {
+				$in_root = true;
+			}
+		}
+
+		if ( ! $in_root || ! isset( self::FORMATS[ strtolower( pathinfo( $path, PATHINFO_EXTENSION ) ) ] ) || ! is_file( $path ) ) {
+			return false;
+		}
+
+		return $path;
 	}
 
 	/**
@@ -900,6 +1069,9 @@ class Email_Fonts {
 
 		$fonts = self::get();
 
+		// quotes written as entities in a style attribute, font-family: &quot;Inter&quot;, would end the match at their ;
+		$html = str_ireplace( [ '&quot;', '&#34;', '&#039;', '&#39;' ], '', $html );
+
 		if ( empty( $fonts ) || ! preg_match_all( '/font-family\s*:\s*([^;}"]+)/i', $html, $matches ) ) {
 			return [];
 		}
@@ -936,7 +1108,8 @@ class Email_Fonts {
 				$rules[] = sprintf(
 					"@font-face { font-family: '%s'; src: url('%s') format('%s'); font-weight: %s; font-style: %s; font-display: swap; }",
 					$font['name'],
-					esc_url( $file['url'] ),
+					// HTML entities aren't decoded in <style>, so esc_url() would break a URL with a query string
+					self::css_url( $file['url'] ),
 					self::FORMATS[ $ext ] ?? 'woff2',
 					$file['weight'] === self::VARIABLE ? '100 900' : $file['weight'],
 					$file['style']
@@ -970,9 +1143,8 @@ class Email_Fonts {
 			return $content;
 		}
 
-		$style = '<style id="email-fonts">' . $css . '</style>';
-
-		return preg_replace( '/<\/head>/i', $style . '</head>', $content, 1 );
+		// not preg_replace(), which would read a $1 in the CSS as a backreference
+		return substr_replace( $content, '<style id="email-fonts">' . $css . '</style>', stripos( $content, '</head>' ), 0 );
 	}
 
 	/**

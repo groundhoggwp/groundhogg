@@ -183,6 +183,66 @@ class Email_Fonts_Tests extends GH_UnitTestCase {
 		], $fonts );
 	}
 
+	public function test_names_are_css_identifiers() {
+
+		// a word that starts with a digit isn't an identifier, so font-family: Exo 2, Arial would be dropped
+		$this->assertSame( 'Exo-2', Email_Fonts::sanitize_name( 'Exo 2' ) );
+		$this->assertSame( 'Source Sans-3', Email_Fonts::sanitize_name( 'Source Sans 3' ) );
+		$this->assertSame( 'M PLUS-1p', Email_Fonts::sanitize_name( 'M PLUS 1p' ) );
+		$this->assertSame( 'Arial-2', Email_Fonts::sanitize_name( 'Arial 2' ) );
+		$this->assertSame( 'Exo--2', Email_Fonts::sanitize_name( 'Exo -2' ) );
+		$this->assertSame( 'Font-8bit Wonder', Email_Fonts::sanitize_name( '8bit Wonder' ) );
+		$this->assertSame( 'Font-8bit', Email_Fonts::sanitize_name( '-8bit' ) );
+		$this->assertSame( 'Open Sans', Email_Fonts::sanitize_name( 'Open - Sans' ) );
+		$this->assertSame( '', Email_Fonts::sanitize_name( '- --' ) );
+
+		// so the stack is valid CSS, every family a run of identifiers
+		$this->assertMatchesRegularExpression( '/^(-?[\p{L}_-][\p{L}\p{N}_-]*)( -?[\p{L}_-][\p{L}\p{N}_-]*)*$/u', Email_Fonts::sanitize_name( 'Baloo 2 3D 7' ) );
+	}
+
+	public function test_one_file_per_cleaned_weight() {
+
+		$fonts = Email_Fonts::sanitize( [
+			[
+				'name'     => 'Inter',
+				'fallback' => 'Arial, sans-serif',
+				'files'    => [
+					// bold isn't a weight the editor has, so it's 400 like the second
+					[ 'file' => $this->font_file( 'Inter-A.woff2' ), 'weight' => 'bold', 'style' => 'normal' ],
+					[ 'file' => $this->font_file( 'Inter-B.woff2' ), 'weight' => '400', 'style' => 'normal' ],
+					[ 'file' => $this->font_file( 'Inter-C.woff2' ), 'weight' => '400', 'style' => 'oblique' ],
+				],
+			],
+		] );
+
+		$this->assertSame( [ [ 'file' => 'Inter-C.woff2', 'weight' => '400', 'style' => 'normal' ] ], $fonts[0]['files'] );
+	}
+
+	public function test_css_url() {
+		$this->assertSame( 'https://cdn.example.com/f.woff2?v=1&x=2', Email_Fonts::css_url( 'https://cdn.example.com/f.woff2?v=1&x=2' ) );
+		$this->assertSame( 'https://example.com/a%27%29%20b.woff2', Email_Fonts::css_url( "https://example.com/a') b.woff2" ) );
+		$this->assertSame( '', Email_Fonts::css_url( 'javascript:alert(1)' ) );
+	}
+
+	public function test_font_faces_with_a_cdn_url() {
+
+		add_filter( 'groundhogg/email_fonts/file_url', $filter = function ( $url, $file ) {
+			return 'https://cdn.example.com/$1/' . $file . '?v=2&x=1';
+		}, 10, 2 );
+
+		// a font of its own, get() keeps the URLs it worked out for the same fonts
+		update_option( Email_Fonts::OPTION, Email_Fonts::sanitize( [
+			[ 'name' => 'Cdn Font', 'fallback' => 'Arial, sans-serif', 'files' => [ [ 'file' => $this->font_file( 'CdnFont.woff2' ), 'weight' => '400', 'style' => 'normal' ] ] ],
+		] ) );
+
+		$html = ( new Email_Fonts() )->add_font_faces( '<html><head></head><body><p style="font-family:Cdn Font">Hi</p></body></html>' );
+
+		remove_filter( 'groundhogg/email_fonts/file_url', $filter );
+
+		// as it is, not HTML-escaped, and $1 isn't read as a backreference
+		$this->assertStringContainsString( "url('https://cdn.example.com/$1/CdnFont.woff2?v=2&x=1')", $html );
+	}
+
 	public function test_stacks_and_normalize_font() {
 
 		$this->save_inter();
@@ -208,6 +268,7 @@ class Email_Fonts_Tests extends GH_UnitTestCase {
 
 		$this->assertCount( 1, Email_Fonts::used_in( '<h1 style="font-family:Inter, Helvetica, Arial, sans-serif;">Hi</h1>' ) );
 		$this->assertCount( 1, Email_Fonts::used_in( "<style>p { font-family: 'Inter', sans-serif }</style>" ) );
+		$this->assertCount( 1, Email_Fonts::used_in( '<p style="font-family: &quot;Inter&quot;, sans-serif">Hi</p>' ) );
 
 		// The word alone isn't a use
 		$this->assertCount( 0, Email_Fonts::used_in( '<p style="font-family:Arial, sans-serif">Inter is a font</p>' ) );

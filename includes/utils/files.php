@@ -32,12 +32,38 @@ class Files {
 	}
 
 	/**
+	 * The .htaccess of the uploads folder, which denies everything, the way each Apache version reads it: Require for
+	 * 2.4, Order and Deny for 2.2. A plain "Deny from all" is an error on 2.4 without mod_access_compat, which makes
+	 * every request in the folder fail, the public files' too.
+	 */
+	const PRIVATE_HTACCESS = <<<'HTACCESS'
+# Imports, exports and files uploaded for contacts are private
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+	Order Deny,Allow
+	Deny from all
+</IfModule>
+
+HTACCESS;
+
+	/**
 	 * Create an .htaccess file for the uploads dir.
+	 *
+	 * It's written if it isn't there, or is still the "Deny from all" of earlier versions. One that was changed, maybe
+	 * by the site's admin for their server, is left alone.
 	 */
 	public function add_htaccess() {
-		$htaccess_content = "Deny from all";
-		$base_url         = $this->get_base_uploads_dir();
-		$this->put( $base_url . DIRECTORY_SEPARATOR . '.htaccess', $htaccess_content, '' );
+
+		$htaccess = $this->get_base_uploads_dir() . DIRECTORY_SEPARATOR . '.htaccess';
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- a local file
+		$current = is_file( $htaccess ) ? trim( (string) file_get_contents( $htaccess ) ) : '';
+
+		if ( $current === '' || $current === 'Deny from all' ) {
+			$this->put( $htaccess, self::PRIVATE_HTACCESS, '' );
+		}
 	}
 
 	/**
@@ -65,8 +91,8 @@ class Files {
 	 * Access-Control-Allow-Origin, which mail apps need to use fonts.
 	 *
 	 * Access is allowed the way each Apache version reads it: Require for 2.4, Order and Allow for 2.2 and for 2.4's
-	 * mod_access_compat, which is what reads the parent folder's "Deny from all". Order Deny,Allow lets "Allow from all"
-	 * win over that inherited Deny.
+	 * mod_access_compat, which is what reads a parent folder's "Deny from all", like the one earlier versions wrote.
+	 * Order Deny,Allow lets "Allow from all" win over that inherited Deny.
 	 *
 	 * @param string[] $types file extension => content type
 	 *
@@ -154,18 +180,19 @@ HTACCESS;
 	 */
 	public function nginx_rules(): string {
 
-		$base = untrailingslashit( (string) wp_parse_url( $this->get_base_uploads_url(), PHP_URL_PATH ) );
+		$base = $this->server_path();
 
-		$rules = "location ^~ $base/ {\n\tdeny all;\n";
+		// quoted, so a space in the path doesn't end the location
+		$rules = "location ^~ \"$base/\" {\n\tdeny all;\n";
 
 		foreach ( $this->public_dirs() as $subdir => $types ) {
 
 			$extensions = implode( '|', array_map( 'sanitize_key', array_keys( $types ) ) );
 
-			// a - outside [] needs no escaping, and wp\-content is harder to read
-			$path = str_replace( '\-', '-', preg_quote( "$base/$subdir/" ) );
+			// a - outside [] needs no escaping, and wp\-content is harder to read, a " would end the quotes
+			$path = str_replace( [ '\-', '"' ], [ '-', '\"' ], preg_quote( "$base/$subdir/" ) );
 
-			$rules .= "\n\tlocation ~ ^$path" . "[^/]+\.($extensions)$ {\n";
+			$rules .= "\n\tlocation ~ \"^$path" . "[^/]+\.($extensions)$\" {\n";
 			$rules .= "\t\tallow all;\n";
 			$rules .= "\t\tadd_header Access-Control-Allow-Origin \"*\";\n";
 			$rules .= "\t}\n";
@@ -175,24 +202,48 @@ HTACCESS;
 	}
 
 	/**
-	 * Whether anyone can download the files in the uploads folder, found by putting a file there and asking the site
-	 * for it. The folder's .htaccess is what stops it, which servers that don't read .htaccess files, like nginx, ignore.
+	 * The path of the uploads folder that nginx matches locations against, from where it is on the server
 	 *
-	 * @return bool|null null if it couldn't be checked
+	 * Not from its URL: on a multisite network in subdirectories a site's URLs start with its path, /shop/wp-content/...,
+	 * which WordPress' nginx config rewrites to /wp-content/... before matching locations.
+	 *
+	 * @return string without a trailing slash
 	 */
-	public function is_private_dir_public() {
+	public function server_path(): string {
 
-		$this->mk_dir();
+		$dir  = wp_normalize_path( $this->get_base_uploads_dir() );
+		$root = trailingslashit( wp_normalize_path( ABSPATH ) );
+
+		if ( str_starts_with( $dir, $root ) ) {
+			// where WordPress is, which is the network's main site on multisite
+			$wordpress = (string) wp_parse_url( is_multisite() ? network_site_url( '/' ) : site_url( '/' ), PHP_URL_PATH );
+
+			return untrailingslashit( '/' . trim( $wordpress, '/' ) ) . '/' . substr( $dir, strlen( $root ) );
+		}
+
+		// the content folder is somewhere else, so its URL is the best guess
+		return untrailingslashit( (string) wp_parse_url( $this->get_base_uploads_url(), PHP_URL_PATH ) );
+	}
+
+	/**
+	 * Put a test file in a folder of the uploads folder and ask the site for it, like a visitor would
+	 *
+	 * @param string $subdir    the folder in the uploads folder, '' for the uploads folder itself
+	 * @param string $extension the test file's
+	 *
+	 * @return array|null the response's code, and whether it was the test file, or null if it couldn't be asked for
+	 */
+	protected function request_test_file( string $subdir, string $extension ) {
 
 		$token = wp_generate_password( 32, false );
-		$file  = 'access-check-' . wp_generate_password( 12, false ) . '.txt';
-		$path  = $this->get_uploads_dir( '', $file );
+		$file  = 'access-check-' . wp_generate_password( 12, false ) . '.' . sanitize_key( $extension );
+		$path  = $this->get_uploads_dir( $subdir, $file );
 
 		if ( ! $path || ! $this->put( $path, $token ) ) {
 			return null;
 		}
 
-		$response = wp_remote_get( $this->get_uploads_url( '', $file ), [
+		$response = wp_remote_get( $this->get_uploads_url( $subdir, $file ), [
 			'timeout'     => 5,
 			'redirection' => 0,
 			// the same as WordPress' own loopback requests
@@ -205,13 +256,66 @@ HTACCESS;
 			return null;
 		}
 
-		$code = wp_remote_retrieve_response_code( $response );
+		$code = (int) wp_remote_retrieve_response_code( $response );
 
-		if ( $code === 200 ) {
-			return trim( wp_remote_retrieve_body( $response ) ) === $token;
+		return [
+			'code'    => $code,
+			'is_file' => $code === 200 && trim( wp_remote_retrieve_body( $response ) ) === $token,
+		];
+	}
+
+	/**
+	 * Whether anyone can download the files in the uploads folder, found by putting a file there and asking the site
+	 * for it. The folder's .htaccess is what stops it, which servers that don't read .htaccess files, like nginx, ignore.
+	 *
+	 * @return bool|null null if it couldn't be checked
+	 */
+	public function is_private_dir_public() {
+
+		$this->mk_dir();
+
+		$response = $this->request_test_file( '', 'txt' );
+
+		if ( ! $response ) {
+			return null;
 		}
 
-		return in_array( $code, [ 401, 403, 404 ], true ) ? false : null;
+		if ( $response['code'] === 200 ) {
+			return $response['is_file'];
+		}
+
+		return in_array( $response['code'], [ 401, 403, 404 ], true ) ? false : null;
+	}
+
+	/**
+	 * Whether mail apps can load the files in a public folder, by putting a file of its first type there and asking
+	 * the site for it. The server may block it, like nginx configured to deny the whole uploads folder, or Apache
+	 * that doesn't let the folder's .htaccess override its parent's.
+	 *
+	 * @param string $subdir one of public_dirs()
+	 *
+	 * @return bool|null null if it couldn't be checked
+	 */
+	public function can_load_public_dir( string $subdir ) {
+
+		$types = $this->public_dirs()[ $subdir ] ?? [];
+
+		if ( ! $types || ! $this->make_public_dir( $subdir ) ) {
+			return null;
+		}
+
+		$response = $this->request_test_file( $subdir, (string) array_key_first( $types ) );
+
+		if ( ! $response ) {
+			return null;
+		}
+
+		if ( $response['is_file'] ) {
+			return true;
+		}
+
+		// 500 too, an .htaccess the server can't read fails every request
+		return in_array( $response['code'], [ 401, 403, 404, 500 ], true ) ? false : null;
 	}
 
 	/**

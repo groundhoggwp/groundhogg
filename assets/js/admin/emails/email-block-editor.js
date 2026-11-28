@@ -176,8 +176,18 @@
       otf  : 'opentype',
     },
 
-    // Same as Email_Fonts::sanitize_name()
-    cleanName: name => name.replace(/[^\p{L}\p{N} \-]/gu, '').replace(/\s+/g, ' ').trim().substring(0, 60),
+    // Same as Email_Fonts::sanitize_name(): each word has to be a CSS identifier, so "Exo 2" becomes "Exo-2"
+    cleanName: name => {
+      name = name.replace(/[^\p{L}\p{N} \-]/gu, '').replace(/\s+/g, ' ').trim()
+      name = name.replace(/(^| )-+(?= |$)/g, ' ').replace(/ +/g, ' ').trim()
+      name = name.replace(/ (?=-*\p{N})/gu, '-')
+
+      if (/^-*\p{N}/u.test(name)) {
+        name = `Font-${ name.replace(/^-+/, '') }`
+      }
+
+      return name.substring(0, 60)
+    },
 
     stack: font => `${ font.name }, ${ font.fallback }`,
 
@@ -209,15 +219,49 @@
       return font
     },
 
+    // What was deleted here since the last save, so saving can keep fonts and files added elsewhere, see
+    // Email_Fonts::save_from_editor()
+    deletedFonts: new Set(),
+    deletedFiles: new Set(),
+
     rename (id, name) {
       let font = this.get(id)
       font.name = name
       font.id = fontId(name)
+
+      if (font.id !== id) {
+        this.deletedFonts.add(id)
+      }
+
       return font
     },
 
     delete (id) {
+      let font = this.get(id)
+
+      if (font) {
+        this.deletedFonts.add(id)
+        font.files.forEach(file => this.deletedFiles.add(file.file))
+      }
+
       this.fonts = this.fonts.filter(font => font.id !== id)
+    },
+
+    /**
+     * Remove a font's files that match, like ones replaced by an upload
+     *
+     * @param font
+     * @param remove {function} given a file, whether to remove it
+     */
+    removeFiles (font, remove) {
+      font.files = font.files.filter(file => {
+        if (remove(file)) {
+          this.deletedFiles.add(file.file)
+          return false
+        }
+
+        return true
+      })
     },
 
     /**
@@ -240,21 +284,26 @@
     },
 
     async save () {
-      let items = await Groundhogg.stores.options.patch({
-        gh_email_editor_custom_fonts: this.fonts.map(({ name, fallback, files }) => ( {
+      let response = await Groundhogg.api.patch(`${ EmailsStore.route }/fonts`, {
+        fonts        : this.fonts.map(({ name, fallback, files }) => ( {
           name,
           fallback,
           files: files.map(({ file, weight, style }) => ( { file, weight, style } )),
         } )),
+        deleted_fonts: [...this.deletedFonts],
+        deleted_files: [...this.deletedFiles],
       })
 
-      let saved = items?.gh_email_editor_custom_fonts
+      let saved = response?.items
 
       if (Array.isArray(saved)) {
 
+        this.deletedFonts.clear()
+        this.deletedFiles.clear()
+
         // Update the fonts and files in place rather than replacing them. Morphing keeps the controls' elements, so
         // their change handlers still hold the objects they were made with, and edits to replaced copies would be lost.
-        // The saved list doesn't have the urls, so those are kept too.
+        // The saved list may have fonts added elsewhere, which are new objects.
         let current = this.fonts
 
         this.fonts = saved.map(font => {
@@ -262,11 +311,14 @@
 
           let files = font.files.map(file => {
             let existingFile = existing.files?.find(f => f.file === file.file) ?? {}
-            return Object.assign(existingFile, file, { url: existingFile.url })
+            return Object.assign(existingFile, file)
           })
 
           return Object.assign(existing, font, { files })
         })
+
+        // one of the site's fonts may have been added elsewhere
+        this.siteFonts = this.siteFonts.filter(siteFont => !this.get(siteFont.id))
       }
 
       rebuildFonts()
@@ -5605,15 +5657,17 @@
 
           // A name like a built-in font's, Arial, is taken
           for (let i = 2; !CustomFonts.nameIsFree(name); i++) {
-            name = `${ CustomFonts.cleanName(uploaded.name) || __('Uploaded font', 'groundhogg') } ${ i }`
+            name = CustomFonts.cleanName(`${ CustomFonts.cleanName(uploaded.name) || __('Uploaded font', 'groundhogg') } ${ i }`)
           }
 
           font = CustomFonts.add(name)
         }
 
-        // One file per weight and style
+        // One file per weight and style, an upload replaces the file that was
+        CustomFonts.removeFiles(font, f => f.weight === uploaded.weight && f.style === uploaded.style)
+
         font.files = [
-          ...font.files.filter(f => f.weight !== uploaded.weight || f.style !== uploaded.style),
+          ...font.files,
           {
             file  : uploaded.file,
             url   : uploaded.url,
@@ -5724,7 +5778,7 @@
             id       : `font-file-${ file.file }-delete`,
             className: 'gh-button danger text icon small',
             onClick  : e => {
-              font.files = font.files.filter(f => f.file !== file.file)
+              CustomFonts.removeFiles(font, f => f.file === file.file)
               saveAndMorph()
             },
           },
