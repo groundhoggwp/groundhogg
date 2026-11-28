@@ -309,7 +309,8 @@ class Search_Docs extends Ability {
 			return '`' . str_replace( [ '<', '>' ], [ '&lt;', '&gt;' ], $decode( $match[1] ) ) . '`';
 		}, $html );
 
-		$markdown = html2markdown( $html );
+		// with its entities as they are: they're decoded below, once, after the tags it leaves are taken out
+		$markdown = html2markdown( $html, true, true, false );
 
 		// tags it doesn't convert, like figures, divs and iframes
 		$markdown = preg_replace( '#</?[a-z][a-z0-9-]*(\s[^<>]*)?/?>#i', '', $markdown );

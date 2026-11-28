@@ -9237,12 +9237,14 @@ function get_json_regex() {
  * @param      $string
  * @param bool $clean_up
  * @param bool $tidy_up
+ * @param bool $decode   whether the text comes back as UTF-8 characters, like é rather than &eacute;. &lt; and &gt;
+ *                       stay as they are either way, so text can't become a tag. False for the entities as they are.
  *
  * @return string
  *
  * @credit https://gist.github.com/gaffling/94eca5d545b1781a2ea34324b1cf7a6c
  */
-function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
+function html2markdown( $string, $clean_up = true, $tidy_up = true, $decode = true ) {
 
 	if ( empty( $string ) ) {
 		return '';
@@ -9255,7 +9257,11 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 		// CORRECT THE HTML - or use https://www.barattalo.it/html-fixer/
 		$dom = new \DOMDocument(); // FIX ENCODING https://stackoverflow.com/a/8218649
 
-		if ( function_exists( 'iconv' ) ) {
+		// DOMDocument reads HTML as ISO-8859-1, so every character outside ASCII goes in as a numeric entity, which it
+		// reads as that character whatever the script, emoji included. Only encoded, nothing is decoded before it's read.
+		if ( function_exists( 'mb_encode_numericentity' ) ) {
+			$markdown = mb_encode_numericentity( $markdown, [ 0x80, 0x10FFFF, 0, 0x1FFFFF ], 'UTF-8' );
+		} else if ( function_exists( 'iconv' ) ) {
 			$decoded = htmlspecialchars_decode( iconv( 'UTF-8', 'ISO-8859-1', htmlentities( $markdown, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES );
 			if ( ! empty( $decoded ) ) {
 				$markdown = $decoded;
@@ -9421,7 +9427,28 @@ function html2markdown( $string, $clean_up = true, $tidy_up = true ) {
 		}
 	}
 
+	if ( $decode ) {
+		$markdown = decode_entities_but_markup( $markdown );
+	}
+
 	return trim( $markdown );
+}
+
+/**
+ * Text with its HTML entities as UTF-8 characters, once, except &lt; and &gt;: those stay, so text like "<b>" doesn't
+ * become a tag when the plain text is stripped of tags later
+ *
+ * @param string $text
+ *
+ * @return string
+ */
+function decode_entities_but_markup( string $text ): string {
+
+	// every way of writing < and >, kept as &lt; and &gt;
+	$text = preg_replace( [ '/&(lt|#0*60|#x0*3c);/i', '/&(gt|#0*62|#x0*3e);/i' ], [ "\x01lt\x01", "\x01gt\x01" ], $text );
+	$text = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+	return str_replace( [ "\x01lt\x01", "\x01gt\x01" ], [ '&lt;', '&gt;' ], $text );
 }
 
 /**
