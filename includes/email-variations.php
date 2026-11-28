@@ -385,10 +385,11 @@ class Email_Variations {
 	 *
 	 * @param Email   $variation
 	 * @param Contact $contact
+	 * @param bool    $closest also when it's for another variety of the contact's language, like fr_FR for fr_CA
 	 *
 	 * @return bool
 	 */
-	public static function matches( Email $variation, Contact $contact ): bool {
+	public static function matches( Email $variation, Contact $contact, bool $closest = false ): bool {
 
 		$audience = self::get_audience( $variation );
 		$matches  = ! self::audience_is_empty( $audience );
@@ -396,6 +397,10 @@ class Email_Variations {
 		// The language is checked first, it needs no query
 		if ( $matches && ! empty( $audience['locales'] ) ) {
 			$matches = in_array( $contact->get_locale(), $audience['locales'], true );
+
+			if ( ! $matches && $closest ) {
+				$matches = in_array( self::language_of( $contact->get_locale() ), array_map( [ __CLASS__, 'language_of' ], $audience['locales'] ), true );
+			}
 		}
 
 		if ( $matches && ( ! empty( $audience['include_filters'] ) || ! empty( $audience['exclude_filters'] ) ) ) {
@@ -427,6 +432,45 @@ class Email_Variations {
 	}
 
 	/**
+	 * The language of a locale, without where it's spoken: fr for fr_CA
+	 *
+	 * @param string $locale
+	 *
+	 * @return string
+	 */
+	public static function language_of( $locale ): string {
+		return strtolower( (string) strtok( (string) $locale, '_' ) );
+	}
+
+	/**
+	 * Whether a contact with no variation for their language exactly gets one for another variety of it, like the
+	 * fr_FR one for fr_CA
+	 *
+	 * Not when the email itself is closer: it's written in the site's default language, so someone who speaks en_GB on
+	 * an en_US site gets the email, not the en_AU variation. And not for Chinese, where zh_CN and zh_TW are written in
+	 * different scripts.
+	 *
+	 * @param Email   $email
+	 * @param Contact $contact
+	 *
+	 * @return bool
+	 */
+	public static function uses_closest_language( Email $email, Contact $contact ): bool {
+
+		$language = self::language_of( $contact->get_locale() );
+		$closest  = $language && $language !== 'zh' && $language !== self::language_of( Multilingual::get_default_locale() );
+
+		/**
+		 * Filters whether a contact can get the variation for another variety of their language
+		 *
+		 * @param bool    $closest
+		 * @param Email   $email   the email, not one of its variations
+		 * @param Contact $contact
+		 */
+		return (bool) apply_filters( 'groundhogg/email/variation/closest_language', $closest, $email, $contact );
+	}
+
+	/**
 	 * Which variation of the email the contact gets, or false for the email itself
 	 *
 	 * @param Email         $email
@@ -440,13 +484,26 @@ class Email_Variations {
 			return false;
 		}
 
-		$chosen = false;
+		$chosen     = false;
+		$variations = array_filter( self::get_variations( $email, true ), function ( Email $variation ) {
+			return ! self::is_test( $variation );
+		} );
 
 		// a variation for their audience, like their language, first
-		foreach ( self::get_variations( $email, true ) as $variation ) {
-			if ( ! self::is_test( $variation ) && self::matches( $variation, $contact ) ) {
+		foreach ( $variations as $variation ) {
+			if ( self::matches( $variation, $contact ) ) {
 				$chosen = $variation;
 				break;
+			}
+		}
+
+		// then the closest to their language: someone who speaks fr_CA gets the one for fr_FR when none is for fr_CA
+		if ( ! $chosen && self::uses_closest_language( $email, $contact ) ) {
+			foreach ( $variations as $variation ) {
+				if ( self::matches( $variation, $contact, true ) ) {
+					$chosen = $variation;
+					break;
+				}
 			}
 		}
 

@@ -189,6 +189,50 @@ class Email_Variations_Tests extends GH_UnitTestCase {
 		$this->assertFalse( Email_Variations::resolve( $email, $this->contact() ) );
 	}
 
+	public function test_resolve_by_the_closest_language() {
+
+		$email = $this->email();
+		$fr    = $this->variation( $email, 'fr_FR', [ 'priority' => 1 ] );
+
+		// no variation for fr_CA, so the one for fr_FR
+		$this->assertSame( $fr->get_id(), Email_Variations::resolve( $email, $this->contact( 'fr_CA' ) )->get_id() );
+
+		// one for their language exactly wins, whatever the order
+		$ca = $this->variation( $email, 'fr_CA', [ 'priority' => 5 ] );
+		$this->assertSame( $ca->get_id(), Email_Variations::resolve( $email, $this->contact( 'fr_CA' ) )->get_id() );
+		$this->assertSame( $fr->get_id(), Email_Variations::resolve( $email, $this->contact( 'fr_BE' ) )->get_id() );
+
+		// the email is in the site's language, which is closer than another variety of it
+		$this->variation( $email, 'en_AU' );
+		$this->assertFalse( Email_Variations::resolve( $email, $this->contact( 'en_GB' ) ) );
+
+		// different scripts
+		$this->variation( $email, 'zh_CN' );
+		$this->assertFalse( Email_Variations::resolve( $email, $this->contact( 'zh_TW' ) ) );
+
+		// the filters still have to match
+		$tag = get_db( 'tags' )->add( [ 'tag_name' => 'vip', 'tag_slug' => 'vip' ] );
+		$vip = $this->variation( $email, 'de_DE', [
+			'audience' => [
+				'locales'         => [ 'de_DE' ],
+				'include_filters' => [ [ [ 'type' => 'tags', 'tags' => [ $tag ], 'compare' => 'includes', 'compare2' => 'any' ] ] ],
+			],
+		] );
+
+		$austrian_vip = $this->contact( 'de_AT' );
+		$austrian_vip->apply_tag( $tag );
+
+		$this->assertSame( $vip->get_id(), Email_Variations::resolve( $email, $austrian_vip )->get_id() );
+		$this->assertFalse( Email_Variations::resolve( $email, $this->contact( 'de_AT' ) ) );
+
+		// and it can be turned off
+		add_filter( 'groundhogg/email/variation/closest_language', '__return_false' );
+		$none = Email_Variations::resolve( $email, $this->contact( 'fr_CH' ) );
+		remove_filter( 'groundhogg/email/variation/closest_language', '__return_false' );
+
+		$this->assertFalse( $none );
+	}
+
 	public function test_drafts_are_not_sent() {
 
 		$email = $this->email();

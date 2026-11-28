@@ -139,6 +139,7 @@ Keeping translations up to date: after the original email changes, `get-email-st
 - `get-email-template` on an email lists its `variations`; on a variation it gives `variation_of` and its `variation` settings. `update-email-variation` changes the audience, priority or language, and `delete-email-variation` removes one.
 - `resolve-email-variation` says which version a contact would get, and why each variation was or wasn't chosen.
 - A variation can't have variations of its own, and templates and global blocks can't have any.
+- A language's regional varieties share a variation unless they have their own: a contact who speaks `fr_CA` gets the `fr_FR` variation when there's none for `fr_CA`, so one variation a language is enough. Add one for a region only when its wording should differ. The original email counts as the site's default language, so on an `en_US` site an `en_GB` contact gets the original.
 
 ### A/B tests
 

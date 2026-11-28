@@ -72,7 +72,7 @@ class Resolve_Email_Variation extends Ability {
 								'reason'  => [
 									'type'        => 'string',
 									'enum'        => [ 'chosen', 'not_ready', 'language', 'filters', 'not_checked', 'filtered', 'other_share', 'lost' ],
-									'description' => __( '"chosen": the contact gets it. "not_ready": it\'s a draft, so nobody gets it. "language": the contact doesn\'t speak one of its languages. "filters": the contact doesn\'t match its filters. "not_checked": a variation before it was chosen. "filtered": the contact is in its audience, but code on the site picked another version. "other_share": a test version, and the contact is in another version\'s share of the test. "lost": a test version that didn\'t win the test.', 'groundhogg' ),
+									'description' => __( '"chosen": the contact gets it, which can be the one for another region of their language, like fr_FR for fr_CA, when none is for theirs. "not_ready": it\'s a draft, so nobody gets it. "language": the contact doesn\'t speak one of its languages. "filters": the contact doesn\'t match its filters. "not_checked": a variation before it was chosen. "filtered": the contact is in its audience, but code on the site picked another version. "other_share": a test version, and the contact is in another version\'s share of the test. "lost": a test version that didn\'t win the test.', 'groundhogg' ),
 								],
 							],
 						],
