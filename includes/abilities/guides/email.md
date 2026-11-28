@@ -9,6 +9,7 @@ Emails on this site are edited in a drag-and-drop block editor. To make an email
 1. Look at one or two existing block emails so the new one looks like it belongs to this site. Find them with `list-email-templates` (without `expand`) and read one with `get-email-template` and `view: "specs"`. Reuse their structure, fonts and colors and swap in new copy.
 2. Call `list-replacement-codes` for the merge tags this site supports. Use them for greetings, sign-offs and compliance links instead of static text.
 3. Call `list-sender-profiles` if the email should come from someone other than the default sender.
+4. Call `get-setup-status` and look at `languages`. If `site` lists more than one, write the email in the `default` language, then ask whether it should be translated into the site's other languages. Don't translate it without being asked to. See Variations below.
 
 {{email_design}}
 
@@ -129,17 +130,20 @@ To translate an email:
 
 1. `get-setup-status` lists the site's languages under `languages`, with how many contacts speak each one. A contact's language is their `locale`, like `fr_FR`.
 2. `create-email-variation` with the `email_id` and `audience: {"locales": ["fr_FR"]}`. It returns a draft copy of the email with the same block ids.
-3. `get-email-strings` on the variation's `id` gives its text as strings by key: the subject, preview text, each paragraph, heading, list item, button and menu label, and image alt text. Inline tags are placeholders like `<1>bold</1>` and `<2/>`.
-4. Translate them all in one `set-email-strings` call: `{"email_id": 41, "strings": {"subject": "…", "text-cc143b": "Bonjour <1>{first}</1>,"}}`. Keep every placeholder exactly once, around the words it belongs to, and keep merge tags like `{first}` as they are. A string that's the same in both languages, like a name, is given its own text to mark it translated. Links and images are changed with `edit-email`, if they need to be.
-5. Check it with `send-test-email` on the variation, then make it ready with `update-email-template` and `status: "ready"`. A draft variation is never sent.
+3. `get-email-strings` on the variation's `id` gives its text as strings by key: the subject, preview text, each paragraph, heading, list item, button and menu label, the text in HTML blocks, and image and video alt text. Inline tags are placeholders like `<1>bold</1>` and `<2/>`. The footer isn't in the strings: it's made in the variation's language when the email is sent.
+4. Translate them all in one `set-email-strings` call: `{"email_id": 41, "strings": {"subject": "…", "text-cc143b": "Bonjour <1>{first}</1>,"}}`. Keep every placeholder exactly once, around the words it belongs to, and keep merge tags like `{first}` as they are. A string that's the same in both languages, like a name, is given its own text to mark it translated. The strings don't include where links go or which images are shown: when a link goes to a page that has a version in the variation's language, like `/fr/pricing/`, point it there with `edit-email`, and swap an image that has text in it. Ask for the translated page's address if you can't find it, don't guess it.
+5. For a language written right to left, like Arabic, Hebrew, Persian or Urdu, set the variation's direction with `update-email-template` and `template_settings: {"direction": "rtl"}`. A copy starts with the original's direction.
+6. Check it with `send-test-email` on the variation, then make it ready with `update-email-template` and `status: "ready"`. A draft variation is never sent.
+
+The strings don't cover global blocks or dynamic blocks like posts and shortcodes, so `get-email-strings` and `set-email-strings` list those under `not_translated`: when you say a translation is done, name each one and its `note` as left to check by hand, rather than calling the email fully translated.
 
 Keeping translations up to date: after the original email changes, `get-email-strings` with `needs_translation: true` on a variation lists only what to translate again (`status: "changed"`, with the new `source`), and `missing` lists text in blocks the email has that the variation doesn't; add those blocks to the variation with `edit-email`. `set-email-strings` says how many are `left_to_translate`.
 
+- A language's regional varieties share a variation unless they have their own: a contact who speaks `fr_CA` gets the `fr_FR` variation when there's none for `fr_CA`, so one variation a language is enough. Add one for a region only when its wording should differ. The original email counts as the site's default language, so on an `en_US` site an `en_GB` contact gets the original.
 - The audience takes the same filters as a segment in `search-contacts`, for a variation that isn't about language, like `{"tags_include": ["VIP"]}`. Everything given must match. A contact in more than one audience gets the one with the lowest `priority`.
 - `get-email-template` on an email lists its `variations`; on a variation it gives `variation_of` and its `variation` settings. `update-email-variation` changes the audience, priority or language, and `delete-email-variation` removes one.
 - `resolve-email-variation` says which version a contact would get, and why each variation was or wasn't chosen.
 - A variation can't have variations of its own, and templates and global blocks can't have any.
-- A language's regional varieties share a variation unless they have their own: a contact who speaks `fr_CA` gets the `fr_FR` variation when there's none for `fr_CA`, so one variation a language is enough. Add one for a region only when its wording should differ. The original email counts as the site's default language, so on an `en_US` site an `en_GB` contact gets the original.
 
 ### A/B tests
 
