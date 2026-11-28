@@ -90,6 +90,7 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 			'text-6b50c2'      => 'Seventy',
 			'menu-00f930'      => 'Home',
 			'menu-00f930.2'    => 'Blog',
+			'html-941cd0'      => 'Raw <1>HTML</1> & things<2/>line two',
 			'text-fbf290'      => 'Boxed text',
 		], $strings );
 	}
@@ -197,7 +198,7 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 		$variation = $this->variation( $this->block_email() );
 
 		$this->assertSame( [ 'untranslated' ], array_values( array_unique( $this->statuses( $variation ) ) ) );
-		$this->assertSame( 21, Email_Strings::count_to_translate( $variation ) );
+		$this->assertSame( 22, Email_Strings::count_to_translate( $variation ) );
 	}
 
 	public function test_translated_strings_and_changes_to_the_email() {
@@ -242,6 +243,263 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 		$this->assertSame( [ [ 'key' => 'b', 'source' => 'Two' ] ], $compared['missing'] );
 	}
 
+	public function test_the_text_in_an_html_block_is_translated() {
+
+		$email     = $this->block_email();
+		$variation = $this->variation( $email );
+
+		$this->assertNotWPError( Email_Strings::set( $variation, [ 'html-941cd0' => 'Du <1>HTML</1> brut & plus<2/>ligne deux' ] ) );
+
+		$variation = new Email( $variation->get_id() );
+
+		$this->assertStringContainsString( '<div style="text-align:center;color:#888">Du <b>HTML</b> brut &amp; plus<br>ligne deux</div>', $variation->get_content() );
+		$this->assertStringContainsString( 'Du **HTML** brut', $variation->get_alt_body(), 'and in the plain text' );
+		$this->assertSame( 'translated', $this->statuses( $variation )['html-941cd0'] );
+
+		// and tracked like the rest when the email changes
+		Email_Strings::set( $email, [ 'html-941cd0' => 'Plain <1>HTML</1> & more<2/>line two' ] );
+		$this->assertSame( 'changed', $this->statuses( $variation )['html-941cd0'] );
+	}
+
+	public function test_the_blocks_that_are_not_translated() {
+
+		$row = function ( $type, $id, $props = '{}', $inner = '' ) {
+			return '<tr><!--' . $type . ':' . $id . ' ' . $props . '--><td id="b-' . $id . '">' . $inner . '</td><!--/' . $type . ':' . $id . '--></tr>';
+		};
+
+		$email = $this->block_email( '<table cellpadding="0" cellspacing="0" width="100%" role="presentation">'
+		                             . $row( 'text', 'a', '{}', '<p>Hello</p>' )
+		                             . $row( 'global', 'g', '{"templateId":5}' )
+		                             . $row( 'posts', 'p' )
+		                             . $row( 'queryloop', 'q' )
+		                             . $row( 'shortcode', 's', '{"shortcode":"[gallery]"}' )
+		                             . $row( 'footer', 'f', '{}', '<div id="footer" class="footer"><p>Footer</p></div>' )
+		                             . $row( 'video', 'v', '{}', '<a href="https://example.com/v"><img src="https://example.com/v.jpg" alt="Our video"></a>' )
+		                             . '</table>' );
+
+		$this->assertSame( [ 'g' => 'global', 'p' => 'posts', 'q' => 'queryloop', 's' => 'shortcode' ], array_column( Email_Strings::not_translated( $email ), 'type', 'id' ), 'not the footer, which is made in the contact\'s language' );
+
+		foreach ( Email_Strings::not_translated( $email ) as $block ) {
+			$this->assertNotEmpty( $block['note'] );
+		}
+
+		$this->assertSame( [ 'subject', 'preview', 'a', 'v.alt' ], array_keys( Email_Strings::get( $email ) ), 'a video\'s alt text is a string, like an image\'s' );
+
+		// the editor shows them for a version in another language, but a test version isn't a translation
+		$variation = $this->variation( $email );
+		$test      = Email_Variations::create( $email, [ 'kind' => 'test', 'copy' => true ] );
+		$this->assertInstanceOf( Email::class, $test );
+
+		$data = array_column( Email_Variations::editor_data( $email )['variations'], 'not_translated', 'id' );
+		$this->assertCount( 4, $data[ $variation->get_id() ] );
+		$this->assertSame( [], $data[ $test->get_id() ] );
+
+		// an HTML email has no blocks
+		$html = new Email();
+		$html->create( [ 'title' => 'HTML', 'subject' => 'Hi', 'content' => '<p>Hello</p>', 'status' => 'ready' ] );
+		$html->update_meta( 'type', 'html' );
+		$this->assertSame( [], Email_Strings::not_translated( new Email( $html->get_id() ) ) );
+	}
+
+	/* the footer, in the language the email is sent in */
+
+	/**
+	 * @var WP_Locale_Switcher|null the real one, while switchable() has swapped it
+	 */
+	protected $switcher = null;
+
+	/**
+	 * Let the locale be switched to languages WordPress doesn't have installed in the tests
+	 *
+	 * @param string[] $installed
+	 */
+	protected function switchable( array $installed ) {
+		$this->switcher = $GLOBALS['wp_locale_switcher'];
+		$available      = fn() => $installed;
+
+		add_filter( 'get_available_languages', $available );
+		$GLOBALS['wp_locale_switcher'] = new WP_Locale_Switcher();
+		$GLOBALS['wp_locale_switcher']->init();
+		remove_filter( 'get_available_languages', $available );
+	}
+
+	protected function unswitchable() {
+
+		while ( is_locale_switched() ) {
+			restore_previous_locale();
+		}
+
+		if ( $this->switcher ) {
+			remove_filter( 'locale', [ $GLOBALS['wp_locale_switcher'], 'filter_locale' ] );
+			remove_filter( 'determine_locale', [ $GLOBALS['wp_locale_switcher'], 'filter_locale' ] );
+			$GLOBALS['wp_locale_switcher'] = $this->switcher;
+			$this->switcher                = null;
+		}
+	}
+
+	protected function site_in( array $locales ) {
+		add_filter( 'groundhogg/multilingual/plugin', fn() => 'test' );
+		add_filter( 'groundhogg/multilingual/site_languages', fn() => array_map( fn( $locale ) => [
+			'locale'  => $locale,
+			'name'    => $locale,
+			'default' => $locale === 'en_US',
+		], array_combine( $locales, $locales ) ) );
+		Multilingual::flush();
+	}
+
+	/**
+	 * The email's footer as it's sent, the HTML and the plain text, and the same without the footer being made again
+	 *
+	 * @param Email $email
+	 *
+	 * @return array [ html, plain, saved html, saved plain ]
+	 */
+	protected function footers( Email $email ): array {
+
+		$registry = \Groundhogg\Block_Registry::instance();
+		\Groundhogg\the_email( $email );
+
+		$sent = [ $registry->parse_blocks( $email->get_content(), 'html' ), $registry->parse_blocks( $email->get_alt_body(), 'plain' ) ];
+
+		remove_filter( 'groundhogg/email/block_render', [ $registry, 'footer' ] );
+		$saved = [ $registry->parse_blocks( $email->get_content(), 'html' ), $registry->parse_blocks( $email->get_alt_body(), 'plain' ) ];
+		add_filter( 'groundhogg/email/block_render', [ $registry, 'footer' ], 10, 3 );
+
+		return array_merge( $sent, $saved );
+	}
+
+	protected function with_plain_text( Email $email ): Email {
+		// like the editor saves it
+		$made = ( new \Groundhogg\Abilities\Emails\Email_Block_Renderer( \Groundhogg\Abilities\Emails\Email_Block_Renderer::context_of( $email ) ) )->css_and_plain_text( $email->get_content() );
+		$email->update( [ 'plain_text' => $made['plain_text'] ] );
+
+		return new Email( $email->get_id() );
+	}
+
+	public function test_the_footer_is_sent_as_it_was_saved_on_a_site_in_one_language() {
+
+		$marketing     = $this->with_plain_text( $this->block_email() );
+		$transactional = $this->with_plain_text( $this->block_email() );
+		$transactional->update( [ 'message_type' => 'transactional' ] );
+		$transactional = new Email( $transactional->get_id() );
+
+		$this->switchable( [ 'fr_FR' ] );
+
+		try {
+			foreach ( [ $marketing, $transactional ] as $email ) {
+
+				[ $html, $plain, $saved_html, $saved_plain ] = $this->footers( $email );
+				$this->assertSame( $saved_html, $html );
+				$this->assertSame( $saved_plain, $plain );
+				$this->assertStringContainsString( '#unsubscribe_link#', $html );
+
+				// even sent to a contact in another language, the site has only the one
+				switch_to_locale( 'fr_FR' );
+				[ $html, $plain, $saved_html, $saved_plain ] = $this->footers( $email );
+				restore_previous_locale();
+
+				$this->assertSame( $saved_html, $html );
+				$this->assertSame( $saved_plain, $plain );
+			}
+		} finally {
+			$this->unswitchable();
+		}
+	}
+
+	public function test_the_footer_is_made_in_the_language_the_email_is_sent_in() {
+
+		$this->site_in( [ 'en_US', 'fr_FR' ] );
+		$this->switchable( [ 'fr_FR' ] );
+
+		$email = $this->with_plain_text( $this->block_email() );
+
+		try {
+			// in the site's default language it's the saved one
+			[ $html, $plain, $saved_html ] = $this->footers( $email );
+			$this->assertSame( $saved_html, $html );
+
+			switch_to_locale( 'fr_FR' );
+			[ $html, $plain, $saved_html ] = $this->footers( $email );
+
+			$this->assertStringContainsString( 'Se désabonner', $html );
+			$this->assertStringContainsString( 'href="#unsubscribe_link#"', $html, 'the link is still replaced when it\'s sent' );
+			$this->assertStringNotContainsString( '>Unsubscribe<', $html );
+			$this->assertStringContainsString( '<td id="b-footer-28eb52"', $html, 'the block around it stays' );
+			$this->assertSame( 1, substr_count( $html, '<div id="footer"' ) );
+			$this->assertStringContainsString( 'Se désabonner', $plain );
+
+			// a transactional email has no unsubscribe line
+			$email->update( [ 'message_type' => 'transactional' ] );
+			[ $html ] = $this->footers( new Email( $email->get_id() ) );
+			$this->assertStringNotContainsString( 'Se désabonner', $html );
+			$this->assertStringNotContainsString( '#unsubscribe_link#', $html );
+			$this->assertStringContainsString( '<div id="footer"', $html );
+
+			restore_previous_locale();
+		} finally {
+			$this->unswitchable();
+		}
+	}
+
+	public function test_the_footer_made_again_is_the_one_the_editor_saves() {
+
+		// the settings of the site the fixture was saved on, which its footer was made from
+		foreach ( json_decode( file_get_contents( __DIR__ . '/abilities/fixtures/email-blocks/settings.json' ), true ) as $name => $value ) {
+			update_option( $name, $value );
+		}
+
+		// made again in the site's own language, so it should be what the editor saved
+		add_filter( 'groundhogg/email/footer/follows_locale', '__return_true' );
+
+		$footer = function ( string $html ): string {
+			$this->assertSame( 1, preg_match( '/<div id="footer".*?<\/div>/s', $html, $match ) );
+
+			return $match[0];
+		};
+
+		try {
+			$marketing = $this->with_plain_text( $this->block_email() );
+			$saved     = $footer( $marketing->get_content() );
+
+			[ $html, $plain, $saved_html, $saved_plain ] = $this->footers( $marketing );
+			$this->assertSame( $saved, $footer( $html ) );
+			$this->assertSame( $saved_html, $html );
+			$this->assertSame( $saved_plain, $plain );
+
+			// the editor leaves the unsubscribe line out of a transactional email's footer
+			$transactional = $this->with_plain_text( $this->block_email() );
+			$transactional->update( [ 'message_type' => 'transactional' ] );
+			$transactional = new Email( $transactional->get_id() );
+
+			[ $html, $plain, $saved_html, $saved_plain ] = $this->footers( $transactional );
+			$this->assertSame( preg_replace( '/<p [^>]*>Don\'t want these emails\?.*?<\/p>/s', '', $saved ), $footer( $html ) );
+			$this->assertSame( $saved_plain, $plain );
+		} finally {
+			remove_filter( 'groundhogg/email/footer/follows_locale', '__return_true' );
+		}
+	}
+
+	public function test_the_plugins_own_translations_are_loaded_when_the_locale_is_switched() {
+
+		global $wp_textdomain_registry;
+
+		$this->switchable( [ 'fr_FR' ] );
+
+		// an add-on that uses the same text domain registers its own folder, which WordPress loads it from after a switch
+		$wp_textdomain_registry->set_custom_path( 'groundhogg', get_temp_dir() . 'an-add-on/languages' );
+
+		try {
+			switch_to_locale( 'fr_FR' );
+			$this->assertSame( 'Se désabonner', __( 'Unsubscribe', 'groundhogg' ) );
+
+			restore_previous_locale();
+			$this->assertSame( 'Unsubscribe', __( 'Unsubscribe', 'groundhogg' ) );
+		} finally {
+			$wp_textdomain_registry->set_custom_path( 'groundhogg', GROUNDHOGG_PATH . 'languages' );
+			$this->unswitchable();
+		}
+	}
+
 	public function test_translations_made_in_the_editor_are_remembered() {
 
 		$email     = $this->block_email();
@@ -281,8 +539,10 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 
 		$read = $this->ability( 'groundhogg/get-email-strings', [ 'email_id' => $variation->get_id(), 'needs_translation' => true ] );
 		$this->assertSame( 'fr_FR', $read['locale'] );
-		$this->assertCount( 21, $read['strings'] );
+		$this->assertCount( 22, $read['strings'] );
 		$this->assertSame( 'untranslated', $read['strings'][0]['status'] );
+		// the fixture's footer is made in the contact's language when it's sent, nothing else is left out
+		$this->assertSame( [], $read['not_translated'] );
 
 		$set = $this->ability( 'groundhogg/set-email-strings', [
 			'email_id'         => $variation->get_id(),
@@ -292,7 +552,8 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 
 		$this->assertNotWPError( $set );
 		$this->assertEqualSets( [ 'subject', 'text-cc143b' ], $set['changed'] );
-		$this->assertSame( 19, $set['left_to_translate'] );
+		$this->assertSame( 20, $set['left_to_translate'] );
+		$this->assertSame( [], $set['not_translated'] );
 
 		$this->assertWPError( $this->ability( 'groundhogg/set-email-strings', [
 			'email_id'         => $variation->get_id(),
@@ -301,7 +562,7 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 		] ) );
 
 		$read = $this->ability( 'groundhogg/get-email-strings', [ 'email_id' => $variation->get_id(), 'needs_translation' => true ] );
-		$this->assertCount( 19, $read['strings'] );
+		$this->assertCount( 20, $read['strings'] );
 	}
 
 	/* the email editor */
@@ -327,7 +588,8 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 		$this->assertTrue( $data['supported'] );
 		$this->assertCount( 1, $data['variations'] );
 		$this->assertSame( [ 'Français' ], $data['variations'][0]['languages'] );
-		$this->assertSame( 21, $data['variations'][0]['to_translate'] );
+		$this->assertSame( 22, $data['variations'][0]['to_translate'] );
+		$this->assertSame( [], $data['variations'][0]['not_translated'] );
 		$this->assertSame( [ 'de_DE' ], array_column( $data['languages'], 'locale' ) );
 		$this->assertSame( 'Newsletter (Français)', ( new Email( $data['created'] ) )->get_title() );
 
@@ -390,7 +652,7 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 		$input = $job->validate( [ 'email_id' => $variation->get_id() ] );
 		$this->assertNotWPError( $input );
 		$this->assertSame( 'fr_FR', $input['locale'] );
-		$this->assertCount( 21, $input['strings'] );
+		$this->assertCount( 22, $input['strings'] );
 		$this->assertSame( 'Some <1>bold</1>, <2>italic</2> and a <3>link</3>.', $input['strings']['text-cc143b.2'] );
 
 		$response = $job->respond( self::result( wp_json_encode( [
@@ -407,7 +669,8 @@ class Email_Strings_Tests extends GH_UnitTestCase {
 		$this->assertNotWPError( $response );
 		$this->assertSame( 2, $response['translated'] );
 		$this->assertSame( [ 'heading-49807b' ], $response['skipped'] );
-		$this->assertSame( 19, $response['left_to_translate'] );
+		$this->assertSame( 20, $response['left_to_translate'] );
+		$this->assertSame( [], $response['not_translated'] );
 
 		$strings = Email_Strings::get( new Email( $variation->get_id() ) );
 		$this->assertSame( 'Bonjour & bienvenue', $strings['subject'] );

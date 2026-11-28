@@ -22,8 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Keys:
  * - subject, preview
  * - in an email built with blocks, the block's id for its first piece of text, then "{id}.2", "{id}.3"..., and
- *   "{id}.alt" for an image's alt text. Text, heading, button and menu blocks are read; the footer is made from the
- *   site's settings, and HTML, global and dynamic blocks aren't text to translate.
+ *   "{id}.alt" for an image's or video's alt text. Text, heading, button, menu and HTML blocks are read. The footer is
+ *   made again in the contact's language when the email is sent (see Block_Registry::footer()). Global and dynamic
+ *   blocks aren't the email's own text, see not_translated().
  * - in an HTML email, "text.1", "text.2"... in the order they're in the body
  *
  * A variation remembers what the email said for each string when it was translated (a hash of it), so it can tell
@@ -49,7 +50,12 @@ class Email_Strings {
 	/**
 	 * The blocks that have text
 	 */
-	const TEXT_BLOCKS = [ 'text', 'heading', 'button', 'menu' ];
+	const TEXT_BLOCKS = [ 'text', 'heading', 'button', 'menu', 'html' ];
+
+	/**
+	 * The blocks whose image has alt text
+	 */
+	const ALT_BLOCKS = [ 'image', 'video' ];
 
 	/**
 	 * Where a variation keeps the hashes of what the email said when each string was translated
@@ -89,6 +95,70 @@ class Email_Strings {
 		return array_map( function ( $string ) {
 			return $string['text'];
 		}, $found['strings'] );
+	}
+
+	/**
+	 * The blocks in an email whose text isn't read as strings, so translating the strings doesn't translate them: a
+	 * global block, which is the same in every email it's in, and dynamic blocks, whose content comes from the site
+	 * when the email is sent, like posts or a shortcode. So whoever translates it can say what's left to check by hand.
+	 *
+	 * @param Email $email
+	 *
+	 * @return array[] each with id, type, and note: what to do about it
+	 */
+	public static function not_translated( Email $email ): array {
+
+		if ( $email->get_editor_type() !== 'blocks' ) {
+			return [];
+		}
+
+		$doc = new Email_Block_Document( (string) $email->get_content() );
+
+		if ( ! $doc->is_valid() ) {
+			return [];
+		}
+
+		$list = [];
+
+		foreach ( $doc->ids() as $id ) {
+
+			$type = (string) $doc->get( $id )['type'];
+
+			switch ( $type ) {
+				case 'global':
+					$note = __( 'A global block is the same in every email it\'s in. Swap it for a global block written in this language.', 'groundhogg' );
+					break;
+				case 'posts':
+				case 'queryloop':
+					$note = __( 'Shows posts from the site when the email is sent, in the language they\'re written in.', 'groundhogg' );
+					break;
+				case 'footer':
+					// made again in the contact's language when it's sent, see Block_Registry::footer()
+					continue 2;
+				default:
+					// a dynamic block, like a shortcode or one from an add-on
+					if ( ! Block_Registry::instance()->is_registered( $type ) ) {
+						continue 2;
+					}
+
+					$note = __( 'Its content comes from the site when the email is sent, so it isn\'t translated with the text.', 'groundhogg' );
+					break;
+			}
+
+			$list[] = [
+				'id'   => $id,
+				'type' => $type,
+				'note' => $note,
+			];
+		}
+
+		/**
+		 * The blocks in an email whose text isn't translated with its strings
+		 *
+		 * @param array[] $list  each with id, type and note
+		 * @param Email   $email
+		 */
+		return apply_filters( 'groundhogg/email_strings/not_translated', $list, $email );
 	}
 
 	/**
@@ -145,7 +215,7 @@ class Email_Strings {
 			$block = $doc->get( $id );
 			$inner = $doc->inner_html( $id );
 
-			if ( $block['type'] === 'image' ) {
+			if ( in_array( $block['type'], self::ALT_BLOCKS, true ) ) {
 
 				$alt = self::alt_of( $inner );
 

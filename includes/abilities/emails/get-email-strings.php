@@ -30,7 +30,7 @@ class Get_Email_Strings extends Ability {
 
 		return [
 			'label'       => __( 'Get Email Strings', 'groundhogg' ),
-			'description' => __( 'Read an email\'s text as a list of strings to translate: the subject, preview text, each paragraph, heading, list item, button and menu label, and image alt text, by key. Inline tags are placeholders like <1>bold</1> or <2/>, so there are no styles or links to keep. For a variation (see groundhogg/create-email-variation), each string comes with the original email\'s `source` and a `status`, and `missing` lists text the email has that the variation doesn\'t. Translate them with groundhogg/set-email-strings. Only for emails built with the block editor or the HTML editor.', 'groundhogg' ),
+			'description' => __( 'Read an email\'s text as a list of strings to translate: the subject, preview text, each paragraph, heading, list item, button and menu label, the text in HTML blocks, and image and video alt text, by key. `not_translated` lists the blocks whose text isn\'t in the strings, like global blocks and posts. Inline tags are placeholders like <1>bold</1> or <2/>, so there are no styles or links to keep. For a variation (see groundhogg/create-email-variation), each string comes with the original email\'s `source` and a `status`, and `missing` lists text the email has that the variation doesn\'t. Translate them with groundhogg/set-email-strings. Only for emails built with the block editor or the HTML editor.', 'groundhogg' ),
 
 			'input_schema' => [
 				'type'                 => 'object',
@@ -92,6 +92,30 @@ class Get_Email_Strings extends Ability {
 							],
 						],
 					],
+					'not_translated' => self::not_translated_schema(),
+				],
+			],
+		];
+	}
+
+	/**
+	 * The schema of the blocks whose text isn't strings, see Email_Strings::not_translated()
+	 *
+	 * @return array
+	 */
+	public static function not_translated_schema(): array {
+		return [
+			'type'        => 'array',
+			'description' => __( 'Blocks whose text isn\'t in the strings, so translating the strings leaves them as they are: global blocks, and dynamic blocks like posts or a shortcode, whose content comes from the site when the email is sent. When you say a translation is done, say these are left to check by hand.', 'groundhogg' ),
+			'items'       => [
+				'type'       => 'object',
+				'properties' => [
+					'id'   => [ 'type' => 'string' ],
+					'type' => [ 'type' => 'string' ],
+					'note' => [
+						'type'        => 'string',
+						'description' => __( 'What to do about it.', 'groundhogg' ),
+					],
 				],
 			],
 		];
@@ -125,6 +149,8 @@ class Get_Email_Strings extends Ability {
 				$output['strings'][] = [ 'key' => (string) $key, 'text' => $text ];
 			}
 
+			$output['not_translated'] = Email_Strings::not_translated( $email );
+
 			return $output;
 		}
 
@@ -149,6 +175,8 @@ class Get_Email_Strings extends Ability {
 		$output['locale']  = (string) $email->get_meta( Email_Variations::LOCALE_KEY );
 		$output['strings'] = array_values( $strings );
 		$output['missing'] = $compared['missing'];
+
+		$output['not_translated'] = Email_Strings::not_translated( $email );
 
 		return $output;
 	}

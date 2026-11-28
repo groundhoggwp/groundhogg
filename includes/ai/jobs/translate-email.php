@@ -169,7 +169,7 @@ class Translate_Email extends Job {
 	 * @param \WordPress\AiClient\Results\DTO\GenerativeAiResult $result
 	 * @param array                                               $input
 	 *
-	 * @return array|WP_Error [ translated, skipped, left_to_translate ]
+	 * @return array|WP_Error [ translated, skipped, left_to_translate, not_translated ]
 	 */
 	public function respond( $result, array $input ) {
 
@@ -204,10 +204,14 @@ class Translate_Email extends Job {
 			do_action( 'groundhogg/api/email/updated', $variation );
 		}
 
+		$variation = new Email( $variation->get_id() );
+
 		return [
 			'translated'        => count( $translations ) - count( $saved['skipped'] ),
 			'skipped'           => array_keys( $saved['skipped'] ),
-			'left_to_translate' => (int) Email_Strings::count_to_translate( new Email( $variation->get_id() ) ),
+			'left_to_translate' => (int) Email_Strings::count_to_translate( $variation ),
+			// the blocks it couldn't translate, to check by hand
+			'not_translated'    => Email_Strings::not_translated( $variation ),
 		];
 	}
 }

@@ -68,6 +68,7 @@ class Set_Email_Strings extends Ability {
 						'type'        => 'integer',
 						'description' => __( 'For a variation: how many strings still need translating, including text the variation is missing.', 'groundhogg' ),
 					],
+					'not_translated'     => Get_Email_Strings::not_translated_schema(),
 				],
 			],
 		];
@@ -121,6 +122,8 @@ class Set_Email_Strings extends Ability {
 		if ( $email->is_variation() ) {
 			$output['left_to_translate'] = (int) Email_Strings::count_to_translate( $email );
 		}
+
+		$output['not_translated'] = Email_Strings::not_translated( $email );
 
 		return $output;
 	}

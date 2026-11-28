@@ -904,7 +904,9 @@ class Email_Variations {
 				'languages'    => array_map( [ Multilingual::class, 'get_locale_name' ], $describe['audience']['locales'] ),
 				'subject'      => $variation->get_subject_line(),
 				'edit_url'     => $variation->admin_link(),
-				'to_translate' => Email_Strings::supports( $variation ) ? Email_Strings::count_to_translate( $variation ) : null,
+				'to_translate'   => Email_Strings::supports( $variation ) ? Email_Strings::count_to_translate( $variation ) : null,
+				// only for a version in another language, a test version isn't a translation
+				'not_translated' => $describe['locale'] ? Email_Strings::not_translated( $variation ) : [],
 			] );
 		}, $can_have ? self::get_variations( $original ) : [] );
 

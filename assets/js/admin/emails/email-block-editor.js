@@ -5062,6 +5062,27 @@
     return names.join(', ')
   }
 
+  // The blocks of a variation in another language that its strings don't cover, like global blocks, to check by hand
+  const NotTranslatedLine = variation => {
+
+    const blocks = variation.not_translated || []
+
+    if (!blocks.length) {
+      return null
+    }
+
+    // the block types by their names in the editor, once each
+    const types = [...new Set(blocks.map(({ type }) => BlockRegistry.get(type)?.name || type))]
+
+    return Span({
+        className: 'gh-text small',
+        title    : blocks.map(({ note }) => note).filter((note, i, notes) => notes.indexOf(note) === i).join(' '),
+      },
+      // translators: 1: how many blocks, 2: their types, like "Global block, Posts"
+      sprintf(_n('%1$d block to check by hand: %2$s', '%1$d blocks to check by hand: %2$s', blocks.length, 'groundhogg'),
+        blocks.length, escHTML(types.join(', '))))
+  }
+
   /**
    * The Translate button of a variation, when the site's AI can translate. The open email is reloaded after, since
    * the translation is saved to it.
@@ -5295,6 +5316,7 @@
                 sprintf(_n('%d string to translate', '%d strings to translate', variation.to_translate, 'groundhogg'), variation.to_translate)),
               TranslateVariationButton(variation, morph),
             ]) : null,
+            NotTranslatedLine(variation),
           ])
 
           if (is_variation) {
