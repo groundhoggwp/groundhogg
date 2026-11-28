@@ -516,6 +516,9 @@ switch ( $action ):
 			if ( is_string( $locale ) && Multilingual::is_site_locale( $locale ) && Multilingual::sanitize_locale( $locale ) !== $contact->get_locale() ) {
 				$contact->set_locale( $locale );
 				add_notice( 'notice_profile_updated' );
+
+				// so the page that says it was saved is in the language they picked, not the one they left
+				Multilingual::switch_page_to( $contact->get_locale() );
 			}
 		}
 

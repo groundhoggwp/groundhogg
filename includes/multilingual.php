@@ -38,7 +38,17 @@ class Multilingual {
 	public function __construct() {
 		add_action( 'groundhogg/form/v2/submit', [ $this, 'update_locale_from_form' ], 10, 3 );
 		add_action( 'groundhogg/form/submission_handler/after', [ $this, 'update_locale_from_legacy_form' ], 10, 3 );
+
+		// Before Rewrites (9) and Tracking (10), so everything they show is in the contact's language
+		add_action( 'template_redirect', [ $this, 'switch_for_managed_page' ], 8 );
 	}
+
+	/**
+	 * The language the current page was switched to with switch_page_to(), if it was
+	 *
+	 * @var string
+	 */
+	protected static $page_locale = '';
 
 	/**
 	 * Clear the static caches, for tests
@@ -48,6 +58,149 @@ class Multilingual {
 	public static function flush() {
 		self::$site_languages = null;
 		self::$default_locale = null;
+
+		if ( self::$page_locale ) {
+			self::$page_locale = '';
+			restore_previous_locale();
+		}
+	}
+
+	/**
+	 * Show the managed page (preferences, unsubscribe, browser view, archive) in the contact's language
+	 *
+	 * The managed page is its own template, without the theme's header and footer, so everything on it is this
+	 * plugin's text and switching the locale translates all of it, with any multilingual plugin or none. The links in
+	 * emails stay as they are.
+	 *
+	 * @return void
+	 */
+	public function switch_for_managed_page() {
+
+		if ( ! is_managed_page() ) {
+			return;
+		}
+
+		self::switch_page_to( self::get_managed_page_locale() );
+	}
+
+	/**
+	 * The language to show the current managed page in: the one of the email being looked at when it's the version of
+	 * an email for a language, otherwise the contact's
+	 *
+	 * @return string a locale, or '' to leave the page as it is
+	 */
+	public static function get_managed_page_locale(): string {
+
+		$contact = get_contactdata();
+		$locale  = '';
+
+		if ( is_a_contact( $contact ) ) {
+
+			$email = null;
+
+			switch ( get_query_var( 'subpage' ) ) {
+				case 'browser_view':
+					$event = new Event( absint( get_query_var( 'event_id' ) ), 'events', get_query_var( 'use_queued' ) ? 'queued_id' : 'ID' );
+
+					// someone else's email is refused by the page, and says nothing about this contact's language
+					if ( $event->exists() && absint( $event->get_contact_id() ) === $contact->get_id() && $event->get_email_id() ) {
+						$email = new Email( $event->get_email_id() );
+					}
+					break;
+				case 'emails':
+					$email = new Email( absint( get_query_var( 'email_id' ) ) );
+					break;
+			}
+
+			// the email as it was sent, which may not be the language they have now
+			if ( $email && $email->exists() && $email->is_variation() ) {
+				$locale = self::sanitize_locale( $email->get_meta( Email_Variations::LOCALE_KEY ) );
+			}
+
+			if ( ! $locale ) {
+				$locale = self::sanitize_locale( $contact->get_locale() );
+			}
+		}
+
+		/**
+		 * Filters the language a managed page is shown in
+		 *
+		 * @param string        $locale  '' leaves the page in the language it would be in anyway
+		 * @param Contact|false $contact the contact the page is for, if it's known
+		 */
+		return self::sanitize_locale( apply_filters( 'groundhogg/multilingual/managed_page_locale', $locale, $contact ) );
+	}
+
+	/**
+	 * Switch the rest of the page to a language. Safe to call again, like after the contact picks another language on
+	 * the preferences page: the last call wins.
+	 *
+	 * Nothing changes, and the page shows as it would have, when the site isn't in that language, when it's the page's
+	 * language already, or when WordPress doesn't have the language installed.
+	 *
+	 * @param string $locale
+	 *
+	 * @return bool whether the page is in that language now
+	 */
+	public static function switch_page_to( $locale ): bool {
+
+		$locale = self::sanitize_locale( $locale );
+
+		if ( ! $locale || ! self::is_site_locale( $locale ) ) {
+			return false;
+		}
+
+		// what translations are loaded for, which is the switched locale, and the site's or the multilingual plugin's
+		// before any switch
+		if ( $locale === determine_locale() ) {
+			return true;
+		}
+
+		// only one switch of ours at a time, so the locales switched to don't pile up
+		if ( self::$page_locale ) {
+			self::$page_locale = '';
+			restore_previous_locale();
+		}
+
+		// back to the language the page started in
+		if ( $locale === determine_locale() ) {
+			return true;
+		}
+
+		// false when WordPress doesn't have the language
+		if ( ! switch_to_locale( $locale ) ) {
+			return false;
+		}
+
+		self::$page_locale = $locale;
+
+		// Polylang adds its locale filter after WordPress' locale switcher added its own, so get_locale() would still
+		// be the language of the URL. Added once, and it does nothing when the page isn't switched.
+		if ( ! has_filter( 'locale', [ __CLASS__, 'filter_page_locale' ] ) ) {
+			add_filter( 'locale', [ __CLASS__, 'filter_page_locale' ], PHP_INT_MAX );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Keeps get_locale() on the language the page was switched to, whatever was filtered in before
+	 *
+	 * @param string $locale
+	 *
+	 * @return string
+	 */
+	public static function filter_page_locale( $locale ) {
+
+		global $wp_locale_switcher;
+
+		if ( ! self::$page_locale || ! is_locale_switched() || ! $wp_locale_switcher instanceof \WP_Locale_Switcher ) {
+			return $locale;
+		}
+
+		// A later switch, like sending an email in another contact's language while the page loads, has its own locale.
+		// Asked of the switcher, not determine_locale(), which calls get_locale() and would end up back here.
+		return $wp_locale_switcher->get_switched_locale() === self::$page_locale ? self::$page_locale : $locale;
 	}
 
 	/**

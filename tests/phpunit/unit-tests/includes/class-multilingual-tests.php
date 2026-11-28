@@ -329,4 +329,189 @@ class Multilingual_Tests extends GH_UnitTestCase {
 		$this->assertSame( [ 'en_US' => 2, 'fr_FR' => 1 ], array_column( $languages['site'], 'contacts', 'locale' ) );
 		$this->assertSame( [ 'es_ES' => 2 ], array_column( $languages['other'], 'contacts', 'locale' ) );
 	}
+
+	/* managed pages in the contact's language */
+
+	/**
+	 * Pretend the request is for the managed page, with WordPress having these languages installed, for a contact
+	 *
+	 * @param string[] $installed locales WordPress can switch to
+	 * @param string   $locale    the tracked contact's, 'none' for no contact
+	 * @param array    $vars      query vars, like subpage
+	 *
+	 * @return Contact|null
+	 */
+	protected function on_managed_page( array $installed, string $locale = 'none', array $vars = [] ) {
+
+		// the locale switcher reads what's installed once, when it's made
+		$this->switcher = $GLOBALS['wp_locale_switcher'];
+		$available      = fn() => $installed;
+
+		add_filter( 'get_available_languages', $available );
+		$GLOBALS['wp_locale_switcher'] = new WP_Locale_Switcher();
+		$GLOBALS['wp_locale_switcher']->init();
+		remove_filter( 'get_available_languages', $available );
+
+		set_query_var( 'pagename', \Groundhogg\get_managed_page_name() );
+
+		foreach ( $vars as $var => $value ) {
+			set_query_var( $var, $value );
+		}
+
+		if ( $locale === 'none' ) {
+			return null;
+		}
+
+		$this->make_contacts( [ 'visitor' => $locale ] );
+		$contact = new Contact( $this->contacts['visitor'] );
+		\Groundhogg\tracking()->set_current_contact( $contact );
+
+		return $contact;
+	}
+
+	/**
+	 * @var WP_Locale_Switcher|null the real one, while on_managed_page() has swapped it
+	 */
+	protected $switcher = null;
+
+	protected function leave_managed_page() {
+
+		Multilingual::flush();
+
+		if ( $this->switcher ) {
+			$GLOBALS['wp_locale_switcher'] = $this->switcher;
+			$this->switcher                = null;
+		}
+
+		foreach ( [ 'pagename', 'subpage', 'email_id', 'event_id' ] as $var ) {
+			set_query_var( $var, '' );
+		}
+
+		remove_all_filters( 'groundhogg/multilingual/managed_page_locale' );
+	}
+
+	public function test_managed_page_is_shown_in_the_contacts_language() {
+
+		$this->fake_multilingual( [ 'en_US', 'fr_FR', 'de_DE' ] );
+		$this->on_managed_page( [ 'fr_FR', 'de_DE' ], 'fr_FR' );
+
+		( new Multilingual() )->switch_for_managed_page();
+
+		$this->assertSame( 'fr_FR', determine_locale() );
+		$this->assertSame( 'fr_FR', get_locale() );
+
+		$this->leave_managed_page();
+
+		$this->assertSame( 'en_US', determine_locale(), 'and it\'s put back for the tests after' );
+		$this->assertSame( 'en_US', get_locale() );
+	}
+
+	public function test_managed_page_keeps_its_language_when_a_plugin_filters_the_locale_later() {
+
+		$this->fake_multilingual( [ 'en_US', 'fr_FR' ] );
+		$this->on_managed_page( [ 'fr_FR' ], 'fr_FR' );
+
+		// Polylang adds its filter after the locale switcher's, at the same priority, so it wins
+		$polylang = fn() => 'en_US';
+		add_filter( 'locale', $polylang );
+
+		( new Multilingual() )->switch_for_managed_page();
+
+		$this->assertSame( 'fr_FR', determine_locale() );
+		$this->assertSame( 'fr_FR', get_locale(), 'get_locale() is the page\'s language too' );
+
+		// another switch on the way, like an email sent while the page loads, isn't held to the page's language
+		remove_filter( 'locale', $polylang );
+		switch_to_locale( 'en_US' );
+		$this->assertSame( 'en_US', get_locale() );
+		restore_previous_locale();
+		$this->assertSame( 'fr_FR', get_locale() );
+
+		$this->leave_managed_page();
+	}
+
+	public function test_managed_page_is_left_alone_when_it_cant_be_switched() {
+
+		$this->fake_multilingual( [ 'en_US', 'fr_FR' ] );
+
+		// no contact
+		$this->on_managed_page( [ 'fr_FR' ] );
+		( new Multilingual() )->switch_for_managed_page();
+		$this->assertSame( 'en_US', determine_locale() );
+		$this->leave_managed_page();
+
+		// a language the site isn't in
+		$this->on_managed_page( [ 'fr_FR', 'es_ES' ], 'es_ES' );
+		( new Multilingual() )->switch_for_managed_page();
+		$this->assertSame( 'en_US', determine_locale() );
+		$this->leave_managed_page();
+
+		// a language WordPress doesn't have installed
+		$this->on_managed_page( [], 'fr_FR' );
+		( new Multilingual() )->switch_for_managed_page();
+		$this->assertSame( 'en_US', determine_locale() );
+		$this->assertSame( 'en_US', get_locale() );
+		$this->leave_managed_page();
+
+		// not the managed page
+		$this->on_managed_page( [ 'fr_FR' ], 'fr_FR' );
+		set_query_var( 'pagename', 'about' );
+		( new Multilingual() )->switch_for_managed_page();
+		$this->assertSame( 'en_US', determine_locale() );
+		$this->leave_managed_page();
+
+		// a site that says no
+		$this->on_managed_page( [ 'fr_FR' ], 'fr_FR' );
+		add_filter( 'groundhogg/multilingual/managed_page_locale', '__return_empty_string' );
+		( new Multilingual() )->switch_for_managed_page();
+		$this->assertSame( 'en_US', determine_locale() );
+		$this->leave_managed_page();
+	}
+
+	public function test_managed_page_follows_a_language_picked_on_it() {
+
+		$this->fake_multilingual( [ 'en_US', 'fr_FR', 'de_DE' ] );
+		$contact = $this->on_managed_page( [ 'fr_FR', 'de_DE' ], 'fr_FR' );
+
+		( new Multilingual() )->switch_for_managed_page();
+		$this->assertSame( 'fr_FR', get_locale() );
+
+		// what the preferences page does when the contact picks another language
+		$contact->set_locale( 'de_DE' );
+		$this->assertTrue( Multilingual::switch_page_to( $contact->get_locale() ) );
+		$this->assertSame( 'de_DE', determine_locale() );
+		$this->assertSame( 'de_DE', get_locale() );
+
+		// and back to the site's own
+		$this->assertTrue( Multilingual::switch_page_to( 'en_US' ) );
+		$this->assertSame( 'en_US', determine_locale() );
+		$this->assertSame( 'en_US', get_locale() );
+		$this->assertFalse( is_locale_switched(), 'the switches don\'t pile up' );
+
+		$this->leave_managed_page();
+	}
+
+	public function test_an_email_in_the_archive_is_shown_in_its_own_language() {
+
+		$this->fake_multilingual( [ 'en_US', 'fr_FR', 'de_DE' ] );
+
+		$email = new \Groundhogg\Email();
+		$email->create( [ 'title' => 'Welcome', 'subject' => 'Welcome', 'content' => '<p>Hello</p>', 'status' => 'ready' ] );
+
+		$variation = \Groundhogg\Email_Variations::create( $email, [ 'audience' => [ 'locales' => [ 'de_DE' ] ], 'copy' => true ] );
+		$this->assertInstanceOf( \Groundhogg\Email::class, $variation );
+
+		$variation = new \Groundhogg\Email( $variation->get_id() );
+		$variation->update_meta( \Groundhogg\Email_Variations::LOCALE_KEY, 'de_DE' );
+
+		// the contact speaks French now, the email they're looking at was the German one
+		$this->on_managed_page( [ 'fr_FR', 'de_DE' ], 'fr_FR', [ 'subpage' => 'emails', 'email_id' => $variation->get_id() ] );
+
+		$this->assertSame( 'de_DE', Multilingual::get_managed_page_locale() );
+
+		set_query_var( 'email_id', $email->get_id() );
+		$this->assertSame( 'fr_FR', Multilingual::get_managed_page_locale(), 'the email itself has no language of its own' );
+
+		$this->leave_managed_page();
+	}
 }
