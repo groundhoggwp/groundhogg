@@ -20,8 +20,10 @@ class Table_Top_Performing_Broadcasts extends Base_Funnel_Email_Performance_Tabl
 
 	protected function get_table_data() {
 
+		// Contacts, not events, so an event that is in the history table twice isn't counted twice
 		$sentQuery = new Table_Query( 'events' );
-		$sentQuery->setSelect( 'email_id', 'step_id', [ 'COUNT(ID)', 'sent' ] )
+		$sentQuery->add_safe_column( 'COUNT(DISTINCT(contact_id))' );
+		$sentQuery->setSelect( 'email_id', 'step_id', [ 'COUNT(DISTINCT(contact_id))', 'sent' ] )
 		          ->setGroupby( 'email_id', 'step_id' )
 		          ->setOrderby( 'sent' )
 		          ->where( 'status', Event::COMPLETE )

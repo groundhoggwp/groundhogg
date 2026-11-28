@@ -6,6 +6,7 @@ use Exception;
 use Groundhogg\Admin\Tabbed_Admin_Page;
 use Groundhogg\background\Export_Contacts_Last_Id;
 use Groundhogg\background\Import_Contacts;
+use Groundhogg\Background\Remove_Duplicate_Events;
 use Groundhogg\background\Sync_Users_Last_Id;
 use Groundhogg\Background_Tasks;
 use Groundhogg\Bulk_Jobs\Create_Users;
@@ -1348,6 +1349,27 @@ class Tools_Page extends Tabbed_Admin_Page {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Remove events that were added to the event history more than once
+	 *
+	 * @return string|WP_Error
+	 */
+	public function process_remove_duplicate_events() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$this->wp_die_no_access();
+		}
+
+		$added = Background_Tasks::add( new Remove_Duplicate_Events() );
+
+		if ( is_wp_error( $added ) ) {
+			return $added;
+		}
+
+		notices()->add_user_notice( __( 'Duplicate events are being removed from the event history in the background. You will get a notice when it is done.', 'groundhogg' ) );
+
+		return admin_page_url( 'gh_tools', [ 'tab' => 'misc' ] );
 	}
 
 }

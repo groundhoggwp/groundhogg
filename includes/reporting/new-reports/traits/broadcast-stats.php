@@ -30,13 +30,17 @@ trait Broadcast_Stats {
 			];
 		}
 
+		// A broadcast sends to a contact once, so count contacts, not events. Like opens and clicks, and an event that
+		// ended up in the history table twice can't make the sent count too high.
 		$eventQuery = new Table_Query( 'events' );
-		$eventQuery->where()
+		$eventQuery->add_safe_column( 'COUNT(DISTINCT(contact_id))' );
+		$eventQuery->setSelect( 'COUNT(DISTINCT(contact_id))' )
+		           ->where()
 		           ->equals( 'event_type', Event::BROADCAST )
 		           ->equals( 'funnel_id', Broadcast::FUNNEL_ID )
 		           ->equals( 'step_id', $broadcast->get_id() );
 
-		$sent  = $eventQuery->count();
+		$sent  = absint( $eventQuery->get_var() );
 		$opens = 0;
 
 		$activityQuery = new Table_Query( 'activity' );

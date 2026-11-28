@@ -97,9 +97,63 @@ class Event_Queue extends DB {
 	}
 
 	/**
+	 * How long a move waits for another one to finish before going ahead anyway, in seconds.
+	 */
+	const MOVE_LOCK_TIMEOUT = 15;
+
+	/**
+	 * The columns an event keeps when it moves to the history table. A copy that matches the queued event on all of these
+	 * is the same event, not a later run of an event whose ID was used again.
+	 *
+	 * Queue IDs aren't unique in the history table forever, older MySQL versions start the AUTO_INCREMENT of an empty
+	 * table again from 1 after a restart, so the queued_id alone can't tell a copy from another event.
+	 */
+	const MOVE_MATCH_COLUMNS = [
+		'ID'         => 'queued_id',
+		'contact_id' => 'contact_id',
+		'funnel_id'  => 'funnel_id',
+		'step_id'    => 'step_id',
+		'event_type' => 'event_type',
+		'time'       => 'time',
+		'status'     => 'status',
+	];
+
+	/**
+	 * SQL that is true when the queued row {$queue_ref} already has its copy in the history table.
+	 *
+	 * @param string $queue_ref what the queue table is called in the outer query
+	 *
+	 * @return string
+	 */
+	protected function in_history_sql( string $queue_ref ) {
+
+		$events     = get_db( 'events' )->get_table_name();
+		$conditions = [];
+
+		foreach ( self::MOVE_MATCH_COLUMNS as $queue_col => $history_col ) {
+			$conditions[] = "h.$history_col = $queue_ref.$queue_col";
+		}
+
+		// the queued_id comes first so the lookup uses queued_idx
+		return "EXISTS ( SELECT 1 FROM $events h WHERE " . implode( ' AND ', $conditions ) . ' )';
+	}
+
+	/**
 	 * Move events from the queue to the history table
 	 *
-	 * @param array $where
+	 * Safe to run from several processes at once, and again over the same rows. Every queue run ends with a move of all
+	 * the finished events in the table, not only the ones it ran, and the queue runs from WP-Cron, gh-cron.php, the
+	 * heartbeat and when a contact's events are processed right away, so moves overlap. The copy and the delete are two
+	 * statements, and a second move that copied the rows before the first one deleted them added every event to the
+	 * history table twice. Now:
+	 *
+	 * - moves wait for each other with a named lock, so one copies and deletes before the next one looks
+	 * - an event that is in the history table already isn't copied again, for when the lock isn't there or a move
+	 *   stopped between the copy and the delete
+	 * - an event is only deleted from the queue once its copy is in the history table, so a failed copy loses nothing
+	 *
+	 * @param array  $where
+	 * @param string $relationship
 	 */
 	public function move_events_to_history( $where = [], $relationship = 'OR' ) {
 
@@ -131,17 +185,68 @@ class Event_Queue extends DB {
 
 		$where = $this->generate_where( $where, $relationship );
 
-		// added two different query because single query was not working on my localhost(says: ERROR in your SQL statement please review it.)
-		// Move the events to the event queue
+		$locked = $this->get_move_lock();
+
+		// phpcs:disable WordPress.DB.PreparedSQL -- table names, column names and a where clause built by generate_where()
+
+		// Copy the events to the history table, apart from any that are there already
 		$wpdb->query( "INSERT INTO $events ($history_columns)
 			SELECT $queue_columns
-			FROM $event_queue
-			WHERE ( $where ) AND status != 'waiting'" );
+			FROM $event_queue q
+			WHERE ( $where ) AND status != 'waiting' AND NOT " . $this->in_history_sql( 'q' ) );
 
-		$wpdb->query( "DELETE FROM $event_queue WHERE ( $where ) AND status != 'waiting' ORDER BY ID;" );
+		// Then delete from the queue only the events that made it to the history table
+		$wpdb->query( "DELETE FROM $event_queue WHERE ( $where ) AND status != 'waiting' AND " . $this->in_history_sql( $event_queue ) . ' ORDER BY ID;' );
+
+		// phpcs:enable WordPress.DB.PreparedSQL
+
+		if ( $locked ) {
+			$this->release_move_lock();
+		}
 
 		$this->cache_set_last_changed();
 		get_db( 'events' )->cache_set_last_changed();
+	}
+
+	/**
+	 * The name of the lock moves wait on. Lock names are shared by every database on the server, so it's per table.
+	 *
+	 * @return string
+	 */
+	protected function get_move_lock_name() {
+		return 'gh_move_events_' . md5( $this->get_table_name() );
+	}
+
+	/**
+	 * Wait for any other move to finish. The lock belongs to the database connection, so it goes away by itself if the
+	 * request dies.
+	 *
+	 * If it can't be had, because another move is taking longer than MOVE_LOCK_TIMEOUT or the database doesn't support
+	 * GET_LOCK(), the move goes ahead anyway and the checks in the queries keep it from adding copies.
+	 *
+	 * @return bool whether the lock was acquired
+	 */
+	protected function get_move_lock() {
+		global $wpdb;
+
+		$suppress = $wpdb->suppress_errors();
+		$locked   = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK( %s, %d )', $this->get_move_lock_name(), self::MOVE_LOCK_TIMEOUT ) );
+		$wpdb->suppress_errors( $suppress );
+
+		return absint( $locked ) === 1;
+	}
+
+	/**
+	 * Let the next move go ahead
+	 *
+	 * @return void
+	 */
+	protected function release_move_lock() {
+		global $wpdb;
+
+		$suppress = $wpdb->suppress_errors();
+		$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK( %s )', $this->get_move_lock_name() ) );
+		$wpdb->suppress_errors( $suppress );
 	}
 
 	/**

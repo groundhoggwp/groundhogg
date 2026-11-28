@@ -34,6 +34,20 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
         </div>
     </div>
+	<?php if ( current_user_can( 'manage_options' ) ): ?>
+        <div class="gh-panel">
+            <div class="gh-panel-header">
+                <h2><?php esc_html_e( 'Remove duplicate events', 'groundhogg' ); ?></h2>
+            </div>
+            <div class="inside">
+                <p><?php esc_html_e( 'If the sent count of a broadcast or email is about twice what it should be, some events may have been added to the event history twice. This removes the extra copies in the background and keeps the original of each event.', 'groundhogg' ); ?></p>
+                <p><?php html( 'a', [
+						'class' => 'gh-button secondary',
+						'href'  => action_url( 'remove_duplicate_events' ),
+					], esc_html__( 'Remove duplicates', 'groundhogg' ) ) ?></p>
+            </div>
+        </div>
+	<?php endif; ?>
 	<?php if ( Tag_Mapping::enabled() ): ?>
         <div class="gh-panel">
             <div class="gh-panel-header">

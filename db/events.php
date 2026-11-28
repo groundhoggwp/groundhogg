@@ -202,6 +202,73 @@ class Events extends DB {
 	}
 
 	/**
+	 * The columns two history rows must share to be copies of one queued event. Everything the move copies apart from
+	 * error details and args, so a different event that got a queue ID that was used before is never matched.
+	 */
+	const DUPLICATE_MATCH_COLUMNS = [
+		'queued_id',
+		'contact_id',
+		'funnel_id',
+		'step_id',
+		'email_id',
+		'event_type',
+		'time',
+		'micro_time',
+		'time_scheduled',
+		'status',
+	];
+
+	/**
+	 * SQL joining a copy (dup) to an earlier row of the same queued event (keep)
+	 *
+	 * @return string
+	 */
+	protected function duplicate_join_sql() {
+
+		$conditions = [ 'keep.ID < dup.ID' ];
+
+		foreach ( self::DUPLICATE_MATCH_COLUMNS as $column ) {
+			$conditions[] = "keep.$column = dup.$column";
+		}
+
+		return "INNER JOIN $this->table_name keep ON " . implode( ' AND ', $conditions );
+	}
+
+	/**
+	 * Delete the copies of queued events that a move to the history table added more than once, keeping the row with the
+	 * lowest ID. Only looks at rows with an ID in ( $after_id, $up_to_id ], so it can be run in batches over a large table.
+	 * Legacy rows without a queued_id are left alone.
+	 *
+	 * @param int $after_id
+	 * @param int $up_to_id
+	 *
+	 * @return array{deleted:int,broadcast_ids:int[]} how many were deleted, and the broadcasts whose events were among them
+	 */
+	public function delete_duplicate_events( int $after_id, int $up_to_id ) {
+		global $wpdb;
+
+		$join = $this->duplicate_join_sql();
+
+		// So that their cached reports can be cleared
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name and join built from constants
+		$broadcast_ids = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT dup.step_id FROM $this->table_name dup $join
+			WHERE dup.ID > %d AND dup.ID <= %d AND dup.queued_id > 0 AND dup.event_type = %d", $after_id, $up_to_id, Event::BROADCAST ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name and join built from constants
+		$deleted = $wpdb->query( $wpdb->prepare( "DELETE dup FROM $this->table_name dup $join
+			WHERE dup.ID > %d AND dup.ID <= %d AND dup.queued_id > 0", $after_id, $up_to_id ) );
+
+		if ( $deleted ) {
+			$this->cache_set_last_changed();
+		}
+
+		return [
+			'deleted'       => absint( $deleted ),
+			'broadcast_ids' => wp_parse_id_list( $broadcast_ids ),
+		];
+	}
+
+	/**
 	 * For some reason, queued_id is getting duplicated on large installs
 	 * So let's order the table by ID DESC so we get the most recent event...
 	 *
