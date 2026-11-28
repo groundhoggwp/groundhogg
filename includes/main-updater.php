@@ -389,16 +389,10 @@ class Main_Updater extends Old_Updater {
 			],
 			'4.13' => [
 				'automatic'   => true,
-				'description' => __( 'Copy the thumbnails of email video blocks into the plugin\'s uploads folder, and update the emails that show them if the server lets them be loaded from there. The old copies are kept for emails that were already sent. Add a column to the emails table for email variations, like a version of an email in another language.', 'groundhogg' ),
+				'description' => __( 'Copy the thumbnails of email video blocks into the plugin\'s uploads folder, and update the emails that show them if the server lets them be loaded from there. The old copies are kept for emails that were already sent. Add a column to the emails table for email variations, like a version of an email in another language. Add the AI usage table, and the <code>use_ai</code> capability for administrators and marketers.', 'groundhogg' ),
 				'callback'    => function () {
 					Email_Video_Thumbnail::copy_legacy_images();
 					get_db( 'emails' )->create_table(); // add parent_id
-				},
-			],
-			'4.14' => [
-				'automatic'   => true,
-				'description' => __( 'Add the AI usage table, and the <code>use_ai</code> capability for administrators and marketers.', 'groundhogg' ),
-				'callback'    => function () {
 					get_db( 'ai_usage' )->create_table();
 					Plugin::instance()->roles->add_caps();
 				},

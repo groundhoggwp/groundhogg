@@ -6,7 +6,7 @@ Donate link: https://groundhogg.io/pricing/
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 4.12
+Stable tag: 4.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.md
 
@@ -334,29 +334,43 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 4.12 (2026-11-24) =
-* ADDED Tracking cookies follow consent plugins that support the WP Consent API, such as Complianz, when GDPR features are enabled. Tracking starts once the visitor allows the `marketing` category, and works on cached pages.
-* ADDED A Video block for emails: paste a YouTube, Vimeo, Wistia or Rumble link to show the video's thumbnail with a play button or progress bar, linked to the video.
-* ADDED Your AI assistant can find what to improve in your marketing and help troubleshoot problems, from the AI agent tab, Analyze with AI on the Reports page, and Troubleshoot with AI in the troubleshooter.
-* IMPROVED The troubleshooter lists Site Health's problems, checks cron in a single step with the cron job's live status, and searches the docs the same way the AI does.
-* TWEAKED The contact importer has a step-by-step look, with a drop zone for your CSV and a clearer screen for matching columns to contact fields.
-* TWEAKED A broadcast none of its contacts can receive is refused with the reason, instead of being created empty.
-* TWEAKED Mobile app tasks: completing one offers to add an outcome and a note, the summary comes from the first line, and someone who can edit others' tasks can assign one to another user.
-* FIXED Broadcasts stopped scheduling when a whole batch of contacts was skipped, for example as unmarketable, failing with "Unable to schedule events" or never finishing.
-* FIXED Contacts made unmarketable by another plugin said "Will receive marketing." under a red status. They now say another plugin or custom code made them unmarketable.
-* FIXED Imports could repeat or skip rows when a cell had line breaks, missed the first column of Excel "CSV UTF-8" files, and didn't report skipped rows. Large CSVs now upload on hosts with a low upload limit.
-* FIXED The page load that ran the 4.11 update showed `[redacted]` and refused exports and imports to everyone, and the update missed users given `view_contacts` directly instead of through their role.
-* FIXED An administrator without `view_contact_pii` couldn't give it back to themselves. Users who can edit users and manage options can now change it on a profile, though managing options alone doesn't give access to contact details.
-* FIXED When a user couldn't be created for a contact, the contact was linked to the first administrator, and LMS enroll actions enrolled that administrator. The action now fails with a message instead.
-* FIXED Mobile app fixes.
- * A task made from the Create menu can be assigned to a contact, new tasks show straight away, and a task with no contact no longer shows `#0`.
- * Line breaks in notes and tasks are kept on the desktop, and the "ago" on a note can be translated.
- * "Show older" on a contact's activity no longer repeats entries that happened in the same second.
- * The install prompt is no longer withheld on sites without a Site Icon, and a white labeled site's icon is its domain's first letter.
-* SECURITY A link or form on another site could make admin pages run an action, like deleting contacts, emails or flows, for a logged-in user. Actions now only run with a valid security token. Credit: Wordfence PRISM, via Wordfence.
-* SECURITY A crafted link to a campaign archive or form page let a logged-out visitor rename, create or delete campaigns, broadcasts and flow steps. These pages now only accept a single value from the link, and admin links that open a contact, flow or report only accept an ID. Credit: Yukou Tashiro, via Patchstack.
-* SECURITY A mobile app contact link could hide a REST route in the contact ID and send a request of its choosing, like creating an administrator. The app now only opens numeric contact IDs and refuses paths that could reach another route. Credit: Santh, via Patchstack.
-* SECURITY Changing the letter case of a REST route, like `/gh/v4/Contacts`, got round the `view_contact_pii` capability.
-* SECURITY Contacts and WordPress users are no longer linked by a matching email address alone.
+= 4.13 (2026-11-27) =
+* ADDED Email variations: an email can have other versions of itself, and each contact gets the one meant for them.
+ * A variation is for contacts who speak certain languages, match certain filters, or both. Flows, broadcasts and notifications keep sending the same email.
+ * Contact languages come from WPML, Polylang or TranslatePress. Forms set a contact's language from the page they were filled in on, and contacts can choose theirs on the preferences page.
+ * The email editor's Variations panel shows what's left to translate in each version, and can translate one with AI, keeping bold, links and other formatting.
+ * Opens, clicks and the browser view are tracked for the version that was sent, and the email's reports and segments include its variations.
+ * Copying, exporting, importing and deleting an email takes its variations with it.
+* ADDED A/B testing for emails: add a test version from the Variations panel, see how each version did and how sure the result is, then pick the winner, which everyone gets from then on.
+* ADDED Broadcasts can A/B test on a sample of the audience first. Choose how much of the audience, how long to wait, and clicks or opens, and the version that did best goes to everyone else.
+* ADDED Custom fonts for emails: upload font files in the email editor's settings, or add the ones your theme or the Font Library has from "Fonts on this site".
+ * The files are served from your own site, so no recipient details are sent to a font service.
+ * Variable fonts are detected on upload, and classic Outlook shows the fallback font.
+* ADDED AI features that run on the site's own AI provider key, from Settings › Connectors in WordPress 7.0.
+ * Write alt text for an image in the email editor.
+ * Subject line and preview text ideas, from what the email says.
+ * Contact summaries: hot, warm or cold with why, a summary, interests and a next step, shown above a contact's tags.
+ * An off switch, a monthly request limit and a Usage tab, and a `use_ai` capability for administrators and marketers.
+* ADDED An AI page for everything AI: the AI assistant connection, moved from Tools, and the AI features, moved from Settings. Links to the old tabs redirect.
+* ADDED AI assistants can read a contact's history in one call, for a period or only some sections, and save a summary on the contact's record.
+* ADDED AI assistants can create and translate email variations, run A/B tests and declare the winner, read and set a contact's language, and add the site's fonts to emails.
+* ADDED Remove duplicates in Tools › Misc removes events that are in the event history more than once.
+* TWEAKED Tags and campaigns are edited in a sidebar beside their tables, and the contact quick edit opens in the same sidebar everywhere it's used.
+* TWEAKED The AI Agent action shows in the flow editor without Advanced Features, as a paid feature. Not on white labeled sites.
+* TWEAKED Site Health's private files check asks the site for a file to see that the uploads folder really is private, warns when the server blocks email fonts and video thumbnails, and shows the nginx rules to use.
+* TWEAKED Email video thumbnails are saved in the plugin's uploads folder. The update copies the existing ones, and keeps the old copies for emails that were already sent.
+* TWEAKED Read-only and disabled fields look that way in the admin themes.
+* FIXED Finished events could be added to the event history twice when queue runs overlapped, which doubled a broadcast's sent count. Broadcast sent counts now count contacts, not events.
+* FIXED The flow editor said a flow had changed when a step had only saved its own run data, like a counter.
+* FIXED The locale segment filter didn't match `en_US` and broke outside the admin. Contacts without a language now get the site's default language, and emails sent right away are built in the contact's language.
+* FIXED Images, videos and buttons an AI assistant gave rounded corners came out with square ones.
+* FIXED Tooltips that were clipped by their container, or wider than the screen.
+* FIXED Tag rows had `id="0"` in the tags table, and saving a campaign fired `groundhogg/admin/tags/edit` with the campaign's ID.
+* DEV The `emails` table has a `parent_id` column, added by the 4.13 update. Add-ons that count what was sent of one `email_id` should use `Email_Variations::get_family_ids()`.
+* DEV Step types can name the meta they write while contacts go through them with `Funnel_Step::get_runtime_meta_keys()` or the `groundhogg/steps/runtime_meta_keys` filter, so it doesn't change the flow's revision.
+* DEV New `Groundhogg.SidebarEditor` for editing a list table's items in a sidebar. `quickEditContactModal()` keeps its name and options.
+* DEV AI features run as named jobs through `Groundhogg\AI\AI`, with `POST gh/v4/ai/{job}`, `Groundhogg.ai.AiButton`, `MakeEl.AiThinking()` and the `groundhogg/ai/job_is_on` filter to turn single features off.
+* DEV New `Groundhogg\Markdown` builds a contact's record as markdown from pickable sections, and add-ons can add sections.
+* DEV Public folders inside the plugin's uploads folder with `files()->public_dirs()`, `make_public_dir()` and `nginx_rules()`. The uploads folder's `.htaccess` also denies access the way Apache 2.4 reads it.
 
 Older versions are in the full changelog on [groundhogg.io](https://groundhogg.io/changelog/).

@@ -4,6 +4,7 @@ namespace Groundhogg\Steps\Benchmarks;
 
 use Groundhogg\Contact;
 use Groundhogg\Email;
+use Groundhogg\Email_Variations;
 use Groundhogg\Step;
 use function Groundhogg\dashicon;
 use function Groundhogg\get_hostname;
@@ -203,16 +204,23 @@ class Link_Clicked extends Benchmark {
 		] );
 
 		foreach ( $send_email_steps as $send_email_step ) {
-			$email = new Email( $send_email_step->get_meta( 'email_id' ) );
+			// the email's variations have the link too, like the one in another language
+			foreach ( Email_Variations::get_family_ids( absint( $send_email_step->get_meta( 'email_id' ) ) ) as $email_id ) {
 
-			if ( ! $email->exists() ) {
-				continue;
+				$email = new Email( $email_id );
+
+				if ( ! $email->exists() ) {
+					continue;
+				}
+
+				$content = preg_replace( $old_url_regex, $new_url, $email->get_content() );
+
+				if ( $content !== null && $content !== $email->get_content() ) {
+					$email->update( [
+						'content' => $content
+					] );
+				}
 			}
-
-			$content = preg_replace( $old_url_regex, $new_url, $email->get_content() );
-			$email->update( [
-				'content' => $content
-			] );
 		}
 	}
 

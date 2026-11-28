@@ -182,6 +182,11 @@ class Markdown {
 			return 0;
 		}
 
+		// "30 days" is 30 days ago: PHP reads it as 30 days from now, and a period of history is never in the future
+		if ( preg_match( '/^\d+\s*(second|sec|minute|min|hour|day|week|fortnight|month|year)s?$/i', $value ) ) {
+			$value .= ' ago';
+		}
+
 		// 2026-11-25 until the end of the 25th, not its first second
 		if ( $end_of_day && preg_match( '/^\d{4}-?\d{2}-?\d{2}$/', $value ) ) {
 			$value .= ' 23:59:59';

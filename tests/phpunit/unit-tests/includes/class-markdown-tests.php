@@ -543,6 +543,12 @@ class Markdown_Tests extends GH_UnitTestCase {
 		$this->assertSame( 1790000000, Markdown::time( '1790000000' ) );
 
 		$this->assertSame( 0, Markdown::time( 'whenever' ) );
+
+		// a time on its own is that long ago, not from now
+		$this->assertLessThan( time(), Markdown::time( '30 days' ) );
+		$this->assertEqualsWithDelta( Markdown::time( '30 days ago' ), Markdown::time( '30 days' ), 2 );
+		$this->assertEqualsWithDelta( Markdown::time( '2 weeks ago' ), Markdown::time( '2 Weeks' ), 2 );
+		$this->assertGreaterThan( time(), Markdown::time( '+30 days' ), 'one that says it\'s ahead still is' );
 		$this->assertSame( [ 'since' ], Markdown::unreadable_times( Markdown::list_options(), [ 'since' => 'whenever', 'until' => '2026-11-01' ] ) );
 	}
 
