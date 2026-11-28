@@ -78,6 +78,7 @@ class AI {
 		// a key added or changed in Settings › Connectors changes what a provider can do
 		add_action( 'updated_option', [ __CLASS__, 'maybe_forget_providers' ] );
 		add_action( 'added_option', [ __CLASS__, 'maybe_forget_providers' ] );
+		add_action( 'deleted_option', [ __CLASS__, 'maybe_forget_providers' ] );
 
 		add_filter( 'script_loader_tag', [ __CLASS__, 'print_client_data' ], 10, 2 );
 	}
@@ -195,7 +196,8 @@ class AI {
 	}
 
 	/**
-	 * The requests that worked this month, which is what the limit counts
+	 * Every request sent to a provider this month, which is what the limit counts: the ones that worked, the ones that
+	 * failed, since a provider can bill those too, and the ones on their way
 	 *
 	 * @return int
 	 */
@@ -203,7 +205,7 @@ class AI {
 
 		$query = new Table_Query( 'ai_usage' );
 		$query->where()
-		      ->equals( 'status', 'complete' )
+		      ->in( 'status', [ 'pending', 'complete', 'failed' ] )
 		      ->greaterThanEqualTo( 'date_created', self::month_start() );
 
 		return absint( $query->count() );
@@ -378,11 +380,7 @@ class AI {
 		}
 
 		if ( self::limit_reached() ) {
-			return new WP_Error( 'ai_limit_reached', sprintf(
-				/* translators: %s: the number of requests allowed a month */
-				__( 'This month\'s %s AI requests are used up. They start again on the first of next month, or the limit can be raised in the settings.', 'groundhogg' ),
-				number_format_i18n( self::get_limit() )
-			), [ 'status' => 429 ] );
+			return self::limit_error();
 		}
 
 		if ( ! self::can_generate( $job->get_kind() ) ) {
@@ -401,14 +399,22 @@ class AI {
 			return $input;
 		}
 
+		// counted before it's sent, so requests at the same moment can't all take the last of the month's
+		$log_id = self::claim( $job );
+
+		if ( ! $log_id ) {
+			return self::limit_error();
+		}
+
 		try {
 			$result = $job->generate( $job->prompt( $input ) );
 		} catch ( \Throwable $e ) {
 			$result = new WP_Error( 'ai_failed', $e->getMessage() );
 		}
 
-		// nothing was sent, so nothing to log
+		// nothing was sent, so nothing to count
 		if ( is_wp_error( $result ) && $result->get_error_code() === 'ai_not_supported' ) {
+			get_db( 'ai_usage' )->delete( $log_id );
 			$result->add_data( [ 'status' => 503 ] );
 
 			return $result;
@@ -416,16 +422,17 @@ class AI {
 
 		if ( is_wp_error( $result ) ) {
 
-			self::log( $job, null, $result );
+			self::log( $job, null, $result, $log_id );
 
-			return new WP_Error( 'ai_failed', sprintf(
-				/* translators: %s: the error the AI provider gave */
+			// what the provider said is for someone who can fix it, like a key without credit
+			return new WP_Error( 'ai_failed', current_user_can( 'manage_options' ) ? sprintf(
+			/* translators: %s: the error the AI provider gave */
 				__( 'The AI provider couldn\'t do this: %s', 'groundhogg' ),
 				$result->get_error_message()
-			), [ 'status' => 502 ] );
+			) : __( 'The AI provider couldn\'t do this right now. Try again, or ask an administrator to look at the AI page.', 'groundhogg' ), [ 'status' => 502 ] );
 		}
 
-		$usage = self::log( $job, $result );
+		$usage = self::log( $job, $result, null, $log_id );
 
 		$response = $job->respond( $result, $input );
 
@@ -441,15 +448,61 @@ class AI {
 	}
 
 	/**
+	 * Why a job can't run
+	 *
+	 * @return WP_Error
+	 */
+	protected static function limit_error(): WP_Error {
+		return new WP_Error( 'ai_limit_reached', sprintf(
+		/* translators: %s: the number of requests allowed a month */
+			__( 'This month\'s %s AI requests are used up. They start again on the first of next month, or the limit can be raised in the settings.', 'groundhogg' ),
+			number_format_i18n( self::get_limit() )
+		), [ 'status' => 429 ] );
+	}
+
+	/**
+	 * Take one of the month's requests: a pending row in the usage log, added only while the limit isn't used up. With
+	 * a limit, under a database lock, so two requests at the same moment can't both take the last one.
+	 *
+	 * @param Job $job
+	 *
+	 * @return int the row's ID, 0 when the limit is used up
+	 */
+	protected static function claim( Job $job ): int {
+		global $wpdb;
+
+		$limit  = self::get_limit();
+		$lock   = $wpdb->prefix . 'gh_ai_requests';
+		$locked = $limit && $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 5)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+		try {
+			if ( $limit && self::requests_this_month() >= $limit ) {
+				return 0;
+			}
+
+			return absint( get_db( 'ai_usage' )->add( [
+				'job'     => $job->get_name(),
+				'user_id' => get_current_user_id(),
+				'status'  => 'pending',
+			] ) );
+		} finally {
+			if ( $locked ) {
+				$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			}
+		}
+	}
+
+	/**
 	 * Note a request in the usage log
 	 *
 	 * @param Job                                                      $job
 	 * @param \WordPress\AiClient\Results\DTO\GenerativeAiResult|null $result
 	 * @param WP_Error|null                                            $error
+	 * @param int                                                      $log_id the row taken for it, see claim()
 	 *
 	 * @return array the tokens used, and the provider and model
 	 */
-	public static function log( Job $job, $result = null, $error = null ): array {
+	public static function log( Job $job, $result = null, $error = null, int $log_id = 0 ): array {
 
 		$row = [
 			'job'     => $job->get_name(),
@@ -473,7 +526,11 @@ class AI {
 			];
 		}
 
-		get_db( 'ai_usage' )->add( $row );
+		if ( $log_id ) {
+			get_db( 'ai_usage' )->update( $log_id, $row );
+		} else {
+			get_db( 'ai_usage' )->add( $row );
+		}
 
 		return [
 			'provider' => $row['provider'] ?? '',

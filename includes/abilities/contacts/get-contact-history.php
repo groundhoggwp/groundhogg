@@ -104,7 +104,7 @@ class Get_Contact_History extends Ability {
 					],
 					'summary'  => [
 						'type'        => [ 'object', 'null' ],
-						'description' => __( 'The latest saved summary: temperature (hot, warm or cold), reason, summary, interests, next_step, date, age, who saved it, and source (site for the summarize button, assistant for an AI assistant). Null when there is none.', 'groundhogg' ),
+						'description' => __( 'The latest saved summary: temperature (hot, warm or cold), reason, summary, interests, next_step, date, age, who saved it, and source (site for the summarize button, assistant for an AI assistant). When it was made from information the person you are working for may not see, only hidden: true and when. Null when there is none.', 'groundhogg' ),
 					],
 				],
 			],
@@ -152,12 +152,33 @@ class Get_Contact_History extends Ability {
 		$personal = ( $input['personal'] ?? true ) && ! Pii::is_restricted();
 
 		// each section asked for, all of them when none are, with what it's narrowed to
-		$options = is_array( $input['options'] ?? null ) ? $input['options'] : [];
-		$keys    = array_map( 'strval', (array) ( $input['sections'] ?? [] ) ) ?: array_keys( Markdown::sections( 'contact' ) );
-		$wanted  = [];
+		$sections = Markdown::sections( 'contact' );
+		$options  = is_array( $input['options'] ?? null ) ? $input['options'] : [];
+		$keys     = array_map( 'strval', (array) ( $input['sections'] ?? [] ) ) ?: array_keys( $sections );
+		$wanted   = [];
+		$bad      = Markdown::unreadable_times( Markdown::list_options(), $input );
 
 		foreach ( $keys as $key ) {
+
 			$wanted[ $key ] = is_array( $options[ $key ] ?? null ) ? $options[ $key ] : [];
+
+			// no more in one list than in all of them
+			if ( isset( $wanted[ $key ]['limit'] ) ) {
+				$wanted[ $key ]['limit'] = min( self::MAX_LIMIT, max( 1, absint( $wanted[ $key ]['limit'] ) ) );
+			}
+
+			foreach ( Markdown::unreadable_times( $sections[ $key ]['options'] ?? [], $wanted[ $key ] ) as $name ) {
+				$bad[] = "options.{$key}.{$name}";
+			}
+		}
+
+		// a time that can't be read would quietly mean all time
+		if ( $bad ) {
+			return new WP_Error( 'groundhogg_bad_time', sprintf(
+			/* translators: %s: the options */
+				__( 'These times can\'t be read: %s. Use a date like 2026-11-01, a time ago like "30 days ago", or a Unix timestamp.', 'groundhogg' ),
+				implode( ', ', $bad )
+			) );
 		}
 
 		$markdown = Contact_Markdown::render( $contact, $wanted, [

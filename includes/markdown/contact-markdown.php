@@ -107,6 +107,20 @@ class Contact_Markdown {
 
 		$options = self::section_options();
 
+		// who may see what, the same as the notes and tasks tabs and the messages API
+		$can = [
+			'notes'    => function () {
+				return self::can_see_own_or_all( 'view_notes', 'view_others_notes', __( 'Only the notes added by the person this is for are shown. There may be others.', 'groundhogg' ) );
+			},
+			'tasks'    => function () {
+				return self::can_see_own_or_all( 'view_tasks', 'view_others_tasks', __( 'Only the tasks of the person this is for are shown. There may be others.', 'groundhogg' ) );
+			},
+			// what they wrote is full of who they are, the messages API keeps it from anyone who may not see that
+			'messages' => function () {
+				return ! get_current_user_id() || ! Pii::is_restricted();
+			},
+		];
+
 		foreach ( $sections as $key => $section ) {
 			Markdown::register( 'contact', $key, [
 				'label'       => $section[0],
@@ -114,8 +128,43 @@ class Contact_Markdown {
 				'personal'    => $section[2] ?? false,
 				'callback'    => [ __CLASS__, $key ],
 				'options'     => $options[ $key ] ?? [],
+				'can'         => $can[ $key ] ?? null,
 			] );
 		}
+	}
+
+	/**
+	 * Whether the current person sees all of a list, only their own, or none of it
+	 *
+	 * @param string $cap        to see any
+	 * @param string $others_cap to see other people's
+	 * @param string $only_own   what to say when they see only their own
+	 *
+	 * @return bool|string
+	 */
+	protected static function can_see_own_or_all( string $cap, string $others_cap, string $only_own ) {
+
+		// in a flow nobody is signed in, and everything is there
+		if ( ! get_current_user_id() ) {
+			return true;
+		}
+
+		if ( ! current_user_can( $cap ) ) {
+			return false;
+		}
+
+		return current_user_can( $others_cap ) ? true : $only_own;
+	}
+
+	/**
+	 * Whether the current person sees only their own of a list, like notes
+	 *
+	 * @param string $others_cap
+	 *
+	 * @return bool
+	 */
+	protected static function only_own( string $others_cap ): bool {
+		return get_current_user_id() && ! current_user_can( $others_cap );
 	}
 
 	/**
@@ -127,13 +176,21 @@ class Contact_Markdown {
 
 		$list = Markdown::list_options();
 
-		$ids = function ( string $label, string $description, string $type ) {
+		// named only for someone who may see them, anyone else gets the ID they gave
+		$view = [
+			'funnel'    => 'view_funnels',
+			'step'      => 'view_funnels',
+			'email'     => 'view_emails',
+			'broadcast' => 'view_broadcasts',
+		];
+
+		$ids = function ( string $label, string $description, string $type ) use ( $view ) {
 			return [
 				'type'        => 'ids',
 				'label'       => $label,
 				'description' => $description,
-				'name'        => function ( $id ) use ( $type ) {
-					return self::title( $type, absint( $id ) );
+				'name'        => function ( $id ) use ( $type, $view ) {
+					return ! get_current_user_id() || current_user_can( $view[ $type ] ) ? self::title( $type, absint( $id ) ) : '';
 				},
 			];
 		};
@@ -443,6 +500,10 @@ class Contact_Markdown {
 		$query = new Table_Query( 'notes' );
 		$query->where()->equals( 'object_type', 'contact' )->equals( 'object_id', $contact->get_id() );
 		Markdown::where_in_range( $query->where(), 'timestamp', $args );
+
+		if ( self::only_own( 'view_others_notes' ) ) {
+			$query->where()->equals( 'user_id', get_current_user_id() );
+		}
 		$query->setOrderby( 'timestamp' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$items = [];
@@ -465,7 +526,13 @@ class Contact_Markdown {
 
 		$query = new Table_Query( 'tasks' );
 		$query->where()->equals( 'object_type', 'contact' )->equals( 'object_id', $contact->get_id() );
-		Markdown::where_in_range( $query->where(), 'due_date', $args, 'mysql' );
+
+		// due dates are in the site's time zone, unlike most dates
+		Markdown::where_in_range( $query->where(), 'due_date', $args, 'local' );
+
+		if ( self::only_own( 'view_others_tasks' ) ) {
+			$query->where()->equals( 'user_id', get_current_user_id() );
+		}
 		$query->setOrderby( 'due_date' )->setOrder( 'DESC' )->setLimit( $args['limit'] );
 
 		$items = [];
@@ -474,13 +541,14 @@ class Contact_Markdown {
 
 			$text = trim( self::free_text( $task->summary, $contact, $args, 150 ) . ' ' . self::free_text( $task->content, $contact, $args, 300 ) );
 			$done = $task->date_completed && strpos( $task->date_completed, '0000' ) !== 0;
+			$due  = Markdown::time( $task->due_date ); // in the site's time zone
 
 			$items[] = sprintf(
 			/* translators: 1: the task, 2: when it's due, 3: done, or not done yet */
 				__( '%1$s (due %2$s, %3$s)', 'groundhogg' ),
 				$text ?: __( 'A task', 'groundhogg' ),
-				Markdown::date( $task->due_date ),
-				$done ? __( 'done', 'groundhogg' ) : ( strtotime( $task->due_date . ' UTC' ) < time() ? __( 'overdue', 'groundhogg' ) : __( 'not done yet', 'groundhogg' ) )
+				Markdown::date( $task->due_date, true ),
+				$done ? __( 'done', 'groundhogg' ) : ( $due && $due < time() ? __( 'overdue', 'groundhogg' ) : __( 'not done yet', 'groundhogg' ) )
 			);
 		}
 

@@ -94,6 +94,11 @@ class Save_Contact_Summary extends Ability {
 			return new WP_Error( 'groundhogg_cannot_edit_contact', __( 'You do not have permission to edit this contact.', 'groundhogg' ) );
 		}
 
+		// the one there was made from what they can't see, replacing it would lose it for the people who can
+		if ( ! Contact_Summary::can_replace( $contact ) ) {
+			return new WP_Error( 'groundhogg_summary_hidden', __( 'This contact already has a summary made from information you may not see, like deals or orders, so it can\'t be replaced by you. Give the person your summary in chat instead.', 'groundhogg' ) );
+		}
+
 		$summary = Contact_Summary::save( $contact, [
 			'temperature' => $input['temperature'] ?? '',
 			'reason'      => $input['reason'] ?? '',
@@ -120,6 +125,19 @@ class Save_Contact_Summary extends Ability {
 	 * @return array
 	 */
 	public static function public_fields( array $summary ): array {
+
+		// made from what the person this is for may not see
+		if ( ! empty( $summary['hidden'] ) ) {
+			return [
+				'hidden' => true,
+				'note'   => __( 'There is a saved summary, but it was made from information the person you are working for may not see, like deals or orders, so it is not shown. Work one out from the history instead, and don\'t save it over this one unless they ask.', 'groundhogg' ),
+				'date'   => gmdate( 'c', absint( $summary['date'] ) ),
+				'age'    => $summary['when'],
+				'by'     => $summary['by'],
+				'source' => $summary['source'] ?? 'site',
+			];
+		}
+
 		return [
 			'temperature' => $summary['temperature'],
 			'reason'      => $summary['reason'],

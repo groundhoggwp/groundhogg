@@ -45,6 +45,56 @@ class Markdown {
 	protected static $registered = [];
 
 	/**
+	 * @var string[] what each section of the last render had, by key: content, none or hidden
+	 */
+	protected static $last_render = [];
+
+	/**
+	 * What each section of the last render had, by key: content, none or hidden. Like for knowing which sections an AI
+	 * answer could have drawn on.
+	 *
+	 * @return string[]
+	 */
+	public static function last_render(): array {
+		return self::$last_render;
+	}
+
+	/**
+	 * Whether the current person may see all of a section of a record: true, false, or a sentence saying what of it
+	 * they can't see, see register()
+	 *
+	 * @param string $type
+	 * @param string $key
+	 * @param mixed  $object
+	 *
+	 * @return bool|string
+	 */
+	public static function can_see( string $type, string $key, $object ) {
+
+		$section = self::sections( $type )[ $key ] ?? null;
+
+		if ( ! $section ) {
+			return false;
+		}
+
+		if ( $section['personal'] && Pii::is_restricted() ) {
+			return false;
+		}
+
+		return is_callable( $section['can'] ) ? call_user_func( $section['can'], $object, [
+			'personal' => false,
+			'limit'    => 20,
+			'since'    => 0,
+			'until'    => 0,
+		] ) : true;
+	}
+
+	/**
+	 * The most IDs an option takes, like flows
+	 */
+	const MAX_IDS = 50;
+
+	/**
 	 * What registers the sections a type has built in, and those of the official add-ons that are running
 	 */
 	const CORE = [
@@ -114,13 +164,15 @@ class Markdown {
 	/**
 	 * A moment someone wrote, like 2026-11-01 or "30 days ago", in the site's time zone
 	 *
-	 * @param mixed $value a timestamp, a date or a relative time
+	 * @param mixed $value      a timestamp, a date or a relative time
+	 * @param bool  $end_of_day a date on its own means the end of that day, like for until
 	 *
 	 * @return int a timestamp, 0 when there isn't one
 	 */
-	public static function time( $value ): int {
+	public static function time( $value, bool $end_of_day = false ): int {
 
-		if ( is_numeric( $value ) ) {
+		// a timestamp, from 1973 on. A shorter number is more likely a date, like 20261101.
+		if ( is_int( $value ) || ( is_numeric( $value ) && (float) $value >= 100000000 ) ) {
 			return absint( $value );
 		}
 
@@ -128,6 +180,11 @@ class Markdown {
 
 		if ( $value === '' ) {
 			return 0;
+		}
+
+		// 2026-11-25 until the end of the 25th, not its first second
+		if ( $end_of_day && preg_match( '/^\d{4}-?\d{2}-?\d{2}$/', $value ) ) {
+			$value .= ' 23:59:59';
 		}
 
 		try {
@@ -162,8 +219,8 @@ class Markdown {
 			switch ( $option['type'] ?? '' ) {
 
 				case 'ids':
-					// what isn't a number is 0, which is no ID
-					$value = array_values( array_filter( wp_parse_id_list( $value ) ) );
+					// what isn't a number is 0, which is no ID. A list long enough to cost something is cut short.
+					$value = array_slice( array_values( array_filter( wp_parse_id_list( $value ) ) ), 0, self::MAX_IDS );
 					break;
 
 				case 'strings':
@@ -177,7 +234,7 @@ class Markdown {
 					break;
 
 				case 'time':
-					$value = self::time( $value );
+					$value = self::time( $value, $name === 'until' );
 					break;
 
 				case 'integer':
@@ -200,6 +257,32 @@ class Markdown {
 	}
 
 	/**
+	 * The time options that were given but can't be read, which would otherwise quietly mean all time
+	 *
+	 * @param array[] $offered a section's options
+	 * @param array   $given
+	 *
+	 * @return string[] their names
+	 */
+	public static function unreadable_times( array $offered, array $given ): array {
+
+		$bad = [];
+
+		foreach ( $offered as $name => $option ) {
+
+			if ( ( $option['type'] ?? '' ) !== 'time' || ! isset( $given[ $name ] ) || $given[ $name ] === '' || $given[ $name ] === null ) {
+				continue;
+			}
+
+			if ( ! is_scalar( $given[ $name ] ) || ! self::time( $given[ $name ] ) ) {
+				$bad[] = $name;
+			}
+		}
+
+		return $bad;
+	}
+
+	/**
 	 * The options as a JSON schema, for an ability's input
 	 *
 	 * @param array[] $options
@@ -216,7 +299,7 @@ class Markdown {
 
 			switch ( $option['type'] ?? '' ) {
 				case 'ids':
-					$schema = [ 'type' => 'array', 'items' => [ 'type' => 'integer', 'minimum' => 1 ] ];
+					$schema = [ 'type' => 'array', 'items' => [ 'type' => 'integer', 'minimum' => 1 ], 'maxItems' => self::MAX_IDS ];
 					break;
 				case 'strings':
 					$schema = [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ];
@@ -461,7 +544,7 @@ class Markdown {
 		$args['personal'] = $asked_personal && ! Pii::is_restricted();
 		$args['limit']    = min( 200, max( 1, absint( $args['limit'] ) ) );
 		$args['since']    = self::time( $args['since'] );
-		$args['until']    = self::time( $args['until'] );
+		$args['until']    = self::time( $args['until'], true );
 
 		$sections = self::sections( $type );
 		$wanted   = [];
@@ -478,7 +561,8 @@ class Markdown {
 			$wanted = array_fill_keys( array_keys( $sections ), [] );
 		}
 
-		$parts = [];
+		$parts             = [];
+		self::$last_render = [];
 
 		foreach ( $wanted as $key => $options ) {
 
@@ -494,7 +578,8 @@ class Markdown {
 			if ( $section['personal'] && ! $args['personal'] ) {
 
 				if ( $asked_personal ) {
-					$parts[] = $heading . self::hidden();
+					$parts[]                   = $heading . self::hidden();
+					self::$last_render[ $key ] = 'hidden';
 				}
 
 				continue;
@@ -513,7 +598,8 @@ class Markdown {
 			$can = is_callable( $section['can'] ) ? call_user_func( $section['can'], $object, $section_args ) : true;
 
 			if ( $can === false ) {
-				$parts[] = $heading . self::hidden();
+				$parts[]                   = $heading . self::hidden();
+				self::$last_render[ $key ] = 'hidden';
 				continue;
 			}
 
@@ -526,7 +612,8 @@ class Markdown {
 				self::scope( $section['options'], $section_args ),
 			] );
 
-			$parts[] = $heading . ( $notes ? implode( "\n\n", $notes ) . "\n\n" : '' ) . ( $body !== '' ? $body : self::none() );
+			$parts[]                   = $heading . ( $notes ? implode( "\n\n", $notes ) . "\n\n" : '' ) . ( $body !== '' ? $body : self::none() );
+			self::$last_render[ $key ] = $body !== '' ? 'content' : 'none';
 		}
 
 		/**

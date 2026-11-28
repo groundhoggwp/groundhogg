@@ -386,7 +386,7 @@ class Markdown_Tests extends GH_UnitTestCase {
 		$this->assertSame( [ 'a' ], $got['kinds'], 'only the choices offered' );
 		$this->assertSame( 200, $got['limit'] );
 		$this->assertSame( Markdown::time( '2026-11-01' ), $got['since'] );
-		$this->assertSame( Markdown::time( '2026-11-20' ), $got['until'], 'the time range of every list' );
+		$this->assertSame( Markdown::time( '2026-11-20', true ), $got['until'], 'the time range of every list, until the end of that day' );
 		$this->assertArrayNotHasKey( 'unknown', $got );
 
 		// an empty list that was narrowed says so, so it isn't read as never
@@ -478,6 +478,103 @@ class Markdown_Tests extends GH_UnitTestCase {
 
 		// many are cut short
 		$this->assertLessThan( 1200, strlen( Contact_Markdown::render( $contact, [ 'messages' ] ) ) );
+	}
+
+	/* ---- what the review found -------------------------------------------------------------------------------- */
+
+	public function test_someone_who_may_not_see_personal_details_doesnt_get_their_messages() {
+
+		$contact = $this->contact();
+
+		get_db( 'messages' )->add( [
+			'object_id'    => $contact->get_id(),
+			'object_type'  => 'contact',
+			'direction'    => 'inbound',
+			'subject'      => 'Call me',
+			'content'      => 'My other number is 555 0199, ask for Sam.',
+			'date_created' => gmdate( 'Y-m-d H:i:s' ),
+		] );
+
+		add_filter( 'groundhogg/pii/is_restricted', '__return_true' );
+		$restricted = Contact_Markdown::render( $contact, [ 'messages' => [ 'limit' => 1 ] ] );
+		remove_filter( 'groundhogg/pii/is_restricted', '__return_true' );
+
+		$this->assertStringNotContainsString( '555', $restricted );
+		$this->assertStringContainsString( "## Messages\n\n" . Markdown::hidden(), $restricted );
+		$this->assertStringContainsString( '555 0199', Contact_Markdown::render( $contact, [ 'messages' ] ) );
+	}
+
+	public function test_notes_follow_who_may_see_them() {
+
+		$contact = $this->contact();
+		$me      = get_current_user_id();
+		$other   = self::factory()->user->create( [ 'role' => 'administrator' ] );
+
+		$contact->add_note( 'Mine', 'user', $me );
+		$contact->add_note( 'Someone else\'s', 'user', $other );
+
+		$only_own = function ( $caps, $cap ) {
+			return $cap === 'view_others_notes' ? [ 'do_not_allow' ] : $caps;
+		};
+		add_filter( 'map_meta_cap', $only_own, 10, 2 );
+		$own = Contact_Markdown::render( $contact, [ 'notes' ] );
+		remove_filter( 'map_meta_cap', $only_own, 10 );
+
+		$this->assertStringContainsString( 'Mine', $own );
+		$this->assertStringNotContainsString( 'Someone else', $own );
+		$this->assertStringContainsString( 'There may be others.', $own );
+
+		$none = function ( $caps, $cap ) {
+			return $cap === 'view_notes' ? [ 'do_not_allow' ] : $caps;
+		};
+		add_filter( 'map_meta_cap', $none, 10, 2 );
+		$this->assertStringContainsString( "## Notes\n\n" . Markdown::hidden(), Contact_Markdown::render( $contact, [ 'notes' ] ) );
+		remove_filter( 'map_meta_cap', $none, 10 );
+	}
+
+	public function test_times_are_read_the_way_people_write_them() {
+
+		// a date on its own, until the end of that day
+		$this->assertSame( Markdown::time( '2026-11-25 23:59:59' ), Markdown::time( '2026-11-25', true ) );
+		$this->assertSame( Markdown::time( '2026-11-25 00:00:00' ), Markdown::time( '2026-11-25' ) );
+
+		// eight digits is a date, not a timestamp in 1970
+		$this->assertSame( Markdown::time( '2026-11-01' ), Markdown::time( '20261101' ) );
+		$this->assertSame( 1790000000, Markdown::time( '1790000000' ) );
+
+		$this->assertSame( 0, Markdown::time( 'whenever' ) );
+		$this->assertSame( [ 'since' ], Markdown::unreadable_times( Markdown::list_options(), [ 'since' => 'whenever', 'until' => '2026-11-01' ] ) );
+	}
+
+	public function test_an_assistant_is_told_when_a_time_cant_be_read() {
+
+		$out = $this->history( [ 'id' => $this->contact()->get_id(), 'options' => [ 'activity' => [ 'since' => 'the before times' ] ] ] );
+
+		$this->assertWPError( $out );
+		$this->assertSame( 'groundhogg_bad_time', $out->get_error_code() );
+		$this->assertStringContainsString( 'options.activity.since', $out->get_error_message() );
+	}
+
+	public function test_task_due_dates_are_in_the_sites_time_zone() {
+
+		update_option( 'timezone_string', 'America/Toronto' );
+
+		$contact = $this->contact();
+
+		get_db( 'tasks' )->add( [
+			'object_id'   => $contact->get_id(),
+			'object_type' => 'contact',
+			'user_id'     => get_current_user_id(),
+			'summary'     => 'Call back',
+			'due_date'    => '2030-01-15 17:00:00', // local, like the tasks table keeps it
+		] );
+
+		$tasks = Contact_Markdown::render( $contact, [ 'tasks' ] );
+
+		update_option( 'timezone_string', '' );
+
+		$this->assertStringContainsString( 'due 2030-01-15 17:00', $tasks );
+		$this->assertStringContainsString( 'not done yet', $tasks );
 	}
 
 	public function test_text_is_made_one_tidy_line() {

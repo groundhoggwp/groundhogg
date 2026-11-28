@@ -435,6 +435,33 @@
       $('#gh-ai-summarize').on('click', e => summarize(e.currentTarget))
       return
     }
+
+    // made from what this person may not see, like deals or orders, so they're told there is one, not what it says
+    if (summary && summary.hidden) {
+
+      // while they make one of their own, which isn't kept over this one
+      if (working) {
+        summary = null
+      }
+      else {
+        // language=HTML
+        $holder.html(`
+          <div class="gh-panel gh-ai-summary">
+              <div class="gh-panel-header">
+                  <h2>${ sparkle } ${ __('AI summary', 'groundhogg') }</h2>
+                  ${ canSummarize() ? `<button type="button" id="gh-ai-summary-again" class="gh-button secondary text small">${ __('Summarize for me', 'groundhogg') }</button>` : '' }
+              </div>
+              <div class="inside">
+                  <p>${ __('There\'s a summary of this contact, but it was made from information you don\'t have permission to see, like deals or orders.', 'groundhogg') }</p>
+                  <p class="gh-ai-summary-meta">${ escHTML(summarizedBy(summary)) }</p>
+              </div>
+          </div>`)
+
+        $('#gh-ai-summary-again').on('click', e => summarize(e.currentTarget))
+        return
+      }
+    }
+
     const [ color, label ] = summary ? temperatures[ summary.temperature ] || temperatures.cold : []
 
     // language=HTML

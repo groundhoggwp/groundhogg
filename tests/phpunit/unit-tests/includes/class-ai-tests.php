@@ -5,6 +5,7 @@ use Groundhogg\AI\AI;
 use Groundhogg\AI\Job;
 use Groundhogg\Mcp\Connection;
 use Groundhogg\AI\Jobs\Alt_Text;
+use Groundhogg\Contact;
 use Groundhogg\Plugin;
 use WordPress\AiClient\Messages\DTO\MessagePart;
 use WordPress\AiClient\Messages\DTO\ModelMessage;
@@ -53,8 +54,17 @@ class Fake_AI_Job extends Job {
 		return null;
 	}
 
+	/**
+	 * @var callable|null run while the provider would be answering
+	 */
+	public $during = null;
+
 	public function generate( $prompt ) {
 		$this->asked ++;
+
+		if ( is_callable( $this->during ) ) {
+			call_user_func( $this->during );
+		}
 
 		return $this->result;
 	}
@@ -139,7 +149,7 @@ class AI_Tests extends GH_UnitTestCase {
 		$this->assertSame( 'complete', $rows[0]->status );
 	}
 
-	public function test_a_failure_is_logged_but_not_counted() {
+	public function test_a_failure_is_logged_and_counted() {
 
 		$this->job->result = new WP_Error( 'rate_limited', 'Too many requests.' );
 
@@ -147,11 +157,39 @@ class AI_Tests extends GH_UnitTestCase {
 
 		$this->assertWPError( $result );
 		$this->assertSame( 'ai_failed', $result->get_error_code() );
-		$this->assertStringContainsString( 'Too many requests.', $result->get_error_message() );
+		$this->assertStringContainsString( 'Too many requests.', $result->get_error_message(), 'an administrator sees what the provider said' );
 		$this->assertSame( 502, $result->get_error_data()['status'] );
 
-		$this->assertSame( 0, AI::requests_this_month() );
+		// a provider can bill one that failed, so it counts toward the limit
+		$this->assertSame( 1, AI::requests_this_month() );
+		$this->assertSame( 0, AI::tokens_this_month() );
 		$this->assertSame( 'failed', get_db( 'ai_usage' )->query( [] )[0]->status );
+
+		// anyone else gets told to ask an administrator, without the provider's message
+		$marketer = self::factory()->user->create( [ 'role' => 'marketer' ] );
+		get_userdata( $marketer )->add_cap( AI::CAP );
+		wp_set_current_user( $marketer );
+
+		$result = AI::run( 'fake-job' );
+		$this->assertStringNotContainsString( 'Too many requests.', $result->get_error_message() );
+	}
+
+	public function test_a_request_is_counted_before_it_is_sent() {
+
+		update_option( AI::LIMIT_OPTION, 1 );
+
+		// while it's on its way, it already counts, so another at the same moment can't take the last one
+		$this->job->result = self::result( 'Hello there', 1, 1 );
+		$during            = null;
+
+		$this->job->during = function () use ( &$during ) {
+			$during = [ AI::requests_this_month(), get_db( 'ai_usage' )->query( [] )[0]->status ];
+		};
+
+		$this->assertNotWPError( AI::run( 'fake-job' ) );
+		$this->assertSame( [ 1, 'pending' ], $during );
+		$this->assertSame( 'complete', get_db( 'ai_usage' )->query( [] )[0]->status, 'the same row, finished' );
+		$this->assertSame( 1, get_db( 'ai_usage' )->count() );
 	}
 
 	/**
@@ -288,6 +326,23 @@ class AI_Tests extends GH_UnitTestCase {
 		// never a file outside the uploads folder
 		$outside = $job->validate( [ 'src' => wp_get_upload_dir()['baseurl'] . '/../../wp-config.php' ] );
 		$this->assertWPError( $outside );
+
+		// not even with the dots encoded, which survive esc_url_raw(): it's only ever sent as its address
+		$encoded = wp_get_upload_dir()['baseurl'] . '/%2e%2e/%2e%2e/secret.png';
+		$this->assertSame( esc_url_raw( $encoded ), $job->validate( [ 'src' => $encoded ] )['file'] );
+
+		// a file in uploads that isn't in the Media Library, like another plugin's private one, isn't read either
+		$private = wp_upload_bits( 'private-scan.png', null, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==' ) );
+		$this->assertSame( $private['url'], $job->validate( [ 'src' => $private['url'] ] )['file'] );
+		wp_delete_file( $private['file'] );
+
+		// nor an image they couldn't open in the Media Library
+		$deny = function ( $caps, $cap ) {
+			return $cap === 'read_post' ? [ 'do_not_allow' ] : $caps;
+		};
+		add_filter( 'map_meta_cap', $deny, 10, 2 );
+		$this->assertSame( 'ai_forbidden', $job->validate( [ 'attachment_id' => $id ] )->get_error_code() );
+		remove_filter( 'map_meta_cap', $deny, 10 );
 
 		wp_delete_attachment( $id, true );
 	}
@@ -627,6 +682,80 @@ class AI_Tests extends GH_UnitTestCase {
 
 		$this->assertSame( 'Send the pricing guide.', $saved['next_step'] );
 		$this->assertNotEmpty( $saved['when'] );
+	}
+
+	protected function summarize( Contact $contact, string $summary = 'A lead reading about pricing.' ) {
+		return $this->run_ideas( Groundhogg\AI\Jobs\Contact_Summary::class, wp_json_encode( [
+			'temperature' => 'warm',
+			'reason'      => 'Replied this week.',
+			'summary'     => $summary,
+			'interests'   => [ 'Pricing' ],
+			'next_step'   => 'Follow up.',
+		] ), [ 'contact_id' => $contact->get_id() ] );
+	}
+
+	public function test_a_summary_is_kept_without_who_they_are() {
+
+		$contact = get_contactdata( self::factory()->contacts->create( [ 'email' => 'summary-' . uniqid() . '@example.com', 'first_name' => 'Morgan', 'last_name' => 'Quill' ] ) );
+
+		// a model or an assistant can write it anyway
+		$this->summarize( $contact, "Morgan Quill ({$contact->get_email()}) asked about pricing." );
+
+		$saved = Groundhogg\AI\Jobs\Contact_Summary::get_saved( get_contactdata( $contact->get_id() ) );
+
+		$this->assertStringNotContainsString( 'Morgan', $saved['summary'] );
+		$this->assertStringNotContainsString( $contact->get_email(), $saved['summary'] );
+		$this->assertStringContainsString( 'asked about pricing', $saved['summary'] );
+	}
+
+	public function test_a_summary_made_from_what_someone_cant_see_is_hidden_from_them() {
+
+		$contact = get_contactdata( self::factory()->contacts->create( [ 'email' => 'summary-' . uniqid() . '@example.com' ] ) );
+
+		// their messages, which only someone who may see personal details sees
+		get_db( 'messages' )->add( [
+			'object_id'    => $contact->get_id(),
+			'object_type'  => 'contact',
+			'direction'    => 'inbound',
+			'subject'      => 'Renewal',
+			'content'      => 'We will renew if the price stays the same.',
+			'date_created' => gmdate( 'Y-m-d H:i:s' ),
+		] );
+
+		$this->summarize( $contact, 'Will renew at the same price.' );
+
+		$this->assertSame( 'Will renew at the same price.', Groundhogg\AI\Jobs\Contact_Summary::get_saved( get_contactdata( $contact->get_id() ) )['summary'] );
+
+		// someone who may not see their messages gets that there is one, not what it says
+		add_filter( 'groundhogg/pii/is_restricted', '__return_true' );
+
+		$hidden = Groundhogg\AI\Jobs\Contact_Summary::get_saved( get_contactdata( $contact->get_id() ) );
+		$this->assertTrue( $hidden['hidden'] );
+		$this->assertArrayNotHasKey( 'summary', $hidden );
+
+		// and their own doesn't replace it, it's only shown to them
+		$theirs = $this->summarize( get_contactdata( $contact->get_id() ), 'Not much to go on.' );
+		$this->assertSame( 'Not much to go on.', $theirs['summary']['summary'] );
+
+		remove_filter( 'groundhogg/pii/is_restricted', '__return_true' );
+
+		$this->assertSame( 'Will renew at the same price.', Groundhogg\AI\Jobs\Contact_Summary::get_saved( get_contactdata( $contact->get_id() ) )['summary'] );
+	}
+
+	public function test_a_summary_is_only_kept_by_someone_who_may_change_the_contact() {
+
+		$contact = get_contactdata( self::factory()->contacts->create( [ 'email' => 'summary-' . uniqid() . '@example.com' ] ) );
+
+		$deny = function ( $caps, $cap ) {
+			return $cap === 'edit_contact' ? [ 'do_not_allow' ] : $caps;
+		};
+		add_filter( 'map_meta_cap', $deny, 10, 2 );
+		$result = $this->summarize( $contact );
+		remove_filter( 'map_meta_cap', $deny, 10 );
+
+		$this->assertNotWPError( $result );
+		$this->assertSame( 'warm', $result['summary']['temperature'], 'they still see it' );
+		$this->assertNull( Groundhogg\AI\Jobs\Contact_Summary::get_saved( get_contactdata( $contact->get_id() ) ), 'but it isn\'t kept' );
 	}
 
 	/* ---- the usage tab ----------------------------------------------------------------------------------------- */

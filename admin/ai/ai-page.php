@@ -442,7 +442,7 @@ class AI_Page extends Tabbed_Admin_Page {
 					number_format_i18n( AI::requests_this_month() ),
 					number_format_i18n( $limit )
 				)
-				: __( 'Since the first of the month, for everyone together. Only requests that worked count toward the monthly limit.', 'groundhogg' ) );
+				: __( 'Since the first of the month, for everyone together. Every request sent to a provider counts toward the monthly limit, including ones that failed, since a provider can bill those too.', 'groundhogg' ) );
 
 			if ( empty( $usage ) ) {
 				Card_Sections::intro( esc_html__( 'Nothing yet this month.', 'groundhogg' ) );
@@ -534,6 +534,8 @@ class AI_Page extends Tabbed_Admin_Page {
                             <td class="num"><?php echo esc_html( number_format_i18n( absint( $row->total_tokens ) ) ); ?></td>
                             <td><?php if ( $row->status === 'complete' ): ?>
                                     <span class="pill green"><?php esc_html_e( 'Done', 'groundhogg' ); ?></span>
+								<?php elseif ( $row->status === 'pending' ): ?>
+                                    <span class="pill colorless" title="<?php esc_attr_e( 'Sent, without an answer yet. One that stays like this was cut off before the provider answered.', 'groundhogg' ); ?>"><?php esc_html_e( 'Waiting', 'groundhogg' ); ?></span>
 								<?php else: ?>
                                     <span class="pill red" title="<?php echo esc_attr( $row->error_code ); ?>"><?php esc_html_e( 'Failed', 'groundhogg' ); ?></span>
 								<?php endif; ?></td>

@@ -63,13 +63,17 @@ class Alt_Text extends Job {
 		$file = '';
 
 		if ( $attachment_id && wp_attachment_is_image( $attachment_id ) ) {
+
+			// only an image they could open in the Media Library
+			if ( ! current_user_can( 'read_post', $attachment_id ) ) {
+				return new WP_Error( 'ai_forbidden', __( 'You don\'t have permission to use that image.', 'groundhogg' ), [ 'status' => 403 ] );
+			}
+
 			$file = $this->local_file( $attachment_id, $src );
 		}
 
-		if ( ! $file && $src ) {
-			$file = $this->uploads_path( $src );
-		}
-
+		// anything else is sent as its address for the provider to fetch, the site never reads it: a file in the uploads
+		// folder that isn't in the Media Library could be another plugin's private one
 		if ( $file ) {
 			$mime = wp_check_filetype( $file )['type'];
 		} else if ( $src && wp_http_validate_url( $src ) ) {
@@ -126,27 +130,41 @@ class Alt_Text extends Job {
 
 		$file = (string) get_attached_file( $attachment_id );
 
-		if ( ! $file || ! is_readable( $file ) ) {
+		if ( ! $file ) {
 			return '';
 		}
 
-		// the size the email uses, when it's a smaller one
-		$size = $src ? $this->uploads_path( $src ) : '';
+		// the attachment's own files, by name: the original and its sizes, all in the same folder. Nothing else is read.
+		$folder = trailingslashit( dirname( $file ) );
+		$files  = [ wp_basename( $file ) => $file ];
+		$meta   = wp_get_attachment_metadata( $attachment_id );
 
-		if ( $size ) {
-			$file = $size;
+		foreach ( (array) ( $meta['sizes'] ?? [] ) as $size ) {
+			if ( ! empty( $size['file'] ) ) {
+				$files[ wp_basename( $size['file'] ) ] = $folder . wp_basename( $size['file'] );
+			}
 		}
 
-		if ( filesize( $file ) <= self::MAX_BYTES ) {
-			return $file;
+		$try = [];
+
+		// the size the email uses, when it's one of the attachment's
+		$wanted = $src ? rawurldecode( wp_basename( (string) strtok( $src, '?' ) ) ) : '';
+
+		if ( $wanted && isset( $files[ $wanted ] ) ) {
+			$try[] = $files[ $wanted ];
 		}
 
+		$try[] = $file;
+
+		// when the original is too big to send
 		$large = image_get_intermediate_size( $attachment_id, 'large' );
 
-		if ( $large && ! empty( $large['path'] ) ) {
-			$path = trailingslashit( wp_get_upload_dir()['basedir'] ) . $large['path'];
+		if ( $large && ! empty( $large['file'] ) && isset( $files[ wp_basename( $large['file'] ) ] ) ) {
+			$try[] = $files[ wp_basename( $large['file'] ) ];
+		}
 
-			if ( is_readable( $path ) && filesize( $path ) <= self::MAX_BYTES ) {
+		foreach ( $try as $path ) {
+			if ( $this->in_uploads( $path ) && is_readable( $path ) && filesize( $path ) <= self::MAX_BYTES ) {
 				return $path;
 			}
 		}
@@ -155,32 +173,18 @@ class Alt_Text extends Job {
 	}
 
 	/**
-	 * The file in the uploads folder a URL points to, if it's there and not too big
+	 * Whether a file really is in the uploads folder, once links and dots are resolved
 	 *
-	 * @param string $src
+	 * @param string $path
 	 *
-	 * @return string
+	 * @return bool
 	 */
-	protected function uploads_path( string $src ): string {
+	protected function in_uploads( string $path ): bool {
 
-		$uploads = wp_get_upload_dir();
-		$base    = set_url_scheme( $uploads['baseurl'] );
-		$src     = set_url_scheme( strtok( $src, '?' ) );
+		$real    = realpath( $path );
+		$uploads = realpath( wp_get_upload_dir()['basedir'] );
 
-		if ( strpos( $src, trailingslashit( $base ) ) !== 0 ) {
-			return '';
-		}
-
-		$relative = substr( $src, strlen( trailingslashit( $base ) ) );
-
-		// nothing outside the uploads folder
-		if ( strpos( $relative, '..' ) !== false ) {
-			return '';
-		}
-
-		$path = trailingslashit( $uploads['basedir'] ) . rawurldecode( $relative );
-
-		return is_readable( $path ) && filesize( $path ) <= self::MAX_BYTES ? $path : '';
+		return $real && $uploads && strpos( wp_normalize_path( $real ), trailingslashit( wp_normalize_path( $uploads ) ) ) === 0;
 	}
 
 	public function prompt( array $input ) {

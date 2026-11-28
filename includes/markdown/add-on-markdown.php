@@ -154,12 +154,13 @@ class Add_On_Markdown {
 
 			/** @var \GroundhoggCompanies\Classes\Company $company */
 			$parts = array_filter( [
-				Markdown::text( $company->get_domain(), 150 ),
+				// a sole trader's company is often named after them, and their website too
+				Contact_Markdown::free_text( $company->get_domain(), $contact, $args, 150 ),
 				Markdown::text( $company->get_meta( 'industry' ), 100 ),
 				Contact_Markdown::free_text( $company->get_description(), $contact, $args, 300 ),
 			] );
 
-			$items[] = '"' . Markdown::text( $company->get_name(), 150 ) . '"' . ( $parts ? ': ' . implode( ', ', $parts ) : '' );
+			$items[] = '"' . Contact_Markdown::free_text( $company->get_name(), $contact, $args, 150 ) . '"' . ( $parts ? ': ' . implode( ', ', $parts ) : '' );
 		}
 
 		return Markdown::items( $items );
@@ -258,7 +259,8 @@ class Add_On_Markdown {
 				$details[] = sprintf( __( 'products: %s', 'groundhogg' ), implode( ', ', $products ) );
 			}
 
-			$items[] = self::quote( $deal->get_title() ) . ' ' . implode( ', ', array_filter( $details ) );
+			// deals are often named after who they're with, like "Jane Doe - redesign"
+			$items[] = self::quote( Contact_Markdown::free_text( $deal->get_title(), $contact, $args, 150 ) ) . ' ' . implode( ', ', array_filter( $details ) );
 		}
 
 		return Markdown::items( $items );
