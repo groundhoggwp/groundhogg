@@ -39,6 +39,7 @@ define( 'GROUNDHOGG_ASSETS_URL', GROUNDHOGG_URL . 'assets/' );
 
 // Must run before Plugin::init() (plugins_loaded priority 0) so early gettext calls don't trigger just-in-time loading
 add_action( 'plugins_loaded', 'groundhogg_load_plugin_textdomain', -1 );
+add_action( 'change_locale', 'groundhogg_reload_plugin_textdomain' );
 
 define( 'GROUNDHOGG_TEXT_DOMAIN', 'groundhogg' );
 define( 'GROUNDHOGG_MINIMUM_PHP_VERSION', '7.4' );
@@ -72,6 +73,45 @@ do_action( 'groundhogg/loaded' );
  */
 function groundhogg_load_plugin_textdomain() {
 	load_plugin_textdomain( 'groundhogg', false, basename( __DIR__ ) . '/languages' );
+}
+
+/**
+ * Load Groundhogg's translations again when the locale is switched, like for an email sent in the contact's language
+ *
+ * After a switch WordPress loads a text domain's translations just in time, from the one folder registered for it.
+ * Add-ons that use the 'groundhogg' text domain register their own folder, and the last one wins, so without this the
+ * switch would leave Groundhogg's own text in the site's language.
+ *
+ * @param string $locale the locale switched to
+ *
+ * @return void
+ */
+function groundhogg_reload_plugin_textdomain( $locale ) {
+
+	global $wp_textdomain_registry;
+
+	$folders = [
+		// a language pack from WordPress.org comes first, like when it's loaded normally
+		WP_LANG_DIR . '/plugins/',
+		__DIR__ . '/languages/',
+	];
+
+	// the add-on's that WordPress would have loaded, so its text is translated too
+	$registered = $wp_textdomain_registry ? $wp_textdomain_registry->get( 'groundhogg', $locale ) : false;
+
+	if ( $registered ) {
+		$folders[] = trailingslashit( $registered );
+	}
+
+	foreach ( array_unique( array_map( 'wp_normalize_path', $folders ) ) as $folder ) {
+
+		$mofile = $folder . 'groundhogg-' . $locale . '.mo';
+
+		// load_textdomain() reads the .l10n.php version when there is one
+		if ( is_readable( $mofile ) || is_readable( substr( $mofile, 0, - 3 ) . '.l10n.php' ) ) {
+			load_textdomain( 'groundhogg', $mofile, $locale );
+		}
+	}
 }
 
 /**
