@@ -819,10 +819,12 @@ class Email_Block_Renderer {
 
 		$block['advancedStyle'] = $this->normalize_advanced_style( $this->resolve_tokens( (array) ( $spec['advancedStyle'] ?? [] ) ) );
 
-		// an image, video or button's own border, where a number like {"borderRadius": 8} means every side too
+		// an image, video or button's own border, where a number like {"borderRadius": 8} means every side too. Sides
+		// given as an object, like the site's block defaults, are kept as they are, like the editor does: their
+		// "linked" counts as set there, so it writes border-radius: 0px.
 		if ( isset( $block['borderStyle'] ) && is_array( $block['borderStyle'] ) ) {
 			foreach ( [ 'borderWidth', 'borderRadius' ] as $key ) {
-				if ( isset( $block['borderStyle'][ $key ] ) ) {
+				if ( isset( $block['borderStyle'][ $key ] ) && ! is_array( $block['borderStyle'][ $key ] ) ) {
 					$block['borderStyle'][ $key ] = self::four_sides( $block['borderStyle'][ $key ] );
 				}
 			}

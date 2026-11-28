@@ -213,6 +213,24 @@ class Email_Block_Renderer_Tests extends GH_UnitTestCase {
 		$this->assertSame( $out['content'], $again['content'] );
 	}
 
+	public function test_a_border_given_as_one_number_is_every_side() {
+
+		$this->use_fixture_settings();
+
+		$out = $this->render( [
+			[ 'type' => 'button', 'id' => 'b', 'text' => 'Go', 'link' => 'https://example.com', 'borderStyle' => [ 'borderStyle' => 'solid', 'borderColor' => '#000', 'borderWidth' => 2, 'borderRadius' => 8 ] ],
+			[ 'type' => 'image', 'id' => 'i', 'src' => 'https://example.com/i.png', 'alt' => 'I', 'borderStyle' => [ 'borderRadius' => 6 ] ],
+		] );
+
+		$this->assertStringContainsString( 'border-radius: 8px;border-style: solid;border-color: #000000;border-width: 2px', $out['content'] );
+		$this->assertStringContainsString( 'border-radius: 6px', $out['content'] );
+
+		// sides given one by one are kept as they are, like the editor, which writes border-radius: 0px when
+		// they're empty but linked, as in the site's defaults
+		$out = $this->render( [ [ 'type' => 'image', 'id' => 'i', 'src' => 'https://example.com/i.png', 'alt' => 'I' ] ] );
+		$this->assertStringContainsString( 'border-radius: 0px;border-width: 0px', $out['content'] );
+	}
+
 	public function test_text_is_styled_like_the_editor() {
 
 		$out = $this->render( [ [ 'type' => 'text', 'id' => 't', 'content' => '<p>One</p><p>Two <b>bold</b></p>' ] ] );
