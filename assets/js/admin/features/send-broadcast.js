@@ -263,7 +263,7 @@
       getState().ab_test ? Span({ className: 'gh-text small' }, sprintf(
         // translators: 1: the email's versions, like A, B
         __('The sample is split between %s by their weights.', 'groundhogg'),
-        andList([ getObject().data.title, ...versions.map(v => v.title) ].map(t => bold(t))),
+        andList([ getObject().data.title, ...versions.map(v => v.title) ].map(t => bold(Groundhogg.element.escHTML(t)))),
       )) : null,
       // batches and local time spread the sample out, and the wait starts after the last of it
       getState().ab_test && ( getState().batching || ( getState().send_in_local_time && getState().when === 'later' ) ) ? Span({ className: 'gh-text small' },

@@ -58,6 +58,17 @@ class Email_Variations {
 	const FINISH_BROADCAST_TEST_HOOK = 'groundhogg/email_variations/finish_broadcast_test';
 
 	/**
+	 * The email's meta about its own A/B test, which a copy or an export doesn't take with it
+	 */
+	const TEST_STATE_KEYS = [ self::WINNER_KEY, self::TEST_STARTED_KEY, self::BROADCAST_TEST_KEY ];
+
+	/**
+	 * How long past its first expected finish a broadcast test waits for the last of its sample, like a paused event,
+	 * before sending the winner anyway
+	 */
+	const BROADCAST_TEST_MAX_DELAY = WEEK_IN_SECONDS;
+
+	/**
 	 * What a test is judged on
 	 */
 	const METRICS = [ 'clicks', 'opens' ];
@@ -389,11 +400,13 @@ class Email_Variations {
 
 		if ( $matches && ( ! empty( $audience['include_filters'] ) || ! empty( $audience['exclude_filters'] ) ) ) {
 
+			// which version a contact gets doesn't depend on who's sending it, so not limited to the current user's
+			// contacts like a root query is for a sales rep
 			$query = new Contact_Query( [
 				'filters'         => $audience['include_filters'],
 				'exclude_filters' => $audience['exclude_filters'],
 				'include'         => $contact->get_id(),
-			] );
+			], Contact_Query::IS_SUB_QUERY );
 
 			try {
 				$matches = $query->count() > 0;
@@ -531,6 +544,17 @@ class Email_Variations {
 			'title'     => sanitize_text_field( $args['title'] ?? '' ) ?: $title,
 			'status'    => one_of( $args['status'] ?? 'draft', [ 'draft', 'ready' ] ),
 		];
+
+		// a given share has to fit beside the other test versions', like update() checks
+		if ( $is_test && isset( $args['weight'] ) ) {
+
+			$taken = array_sum( array_map( [ __CLASS__, 'get_weight' ], self::get_tests( $email ) ) );
+
+			if ( $taken + max( 1, min( 99, intval( $args['weight'] ) ) ) > 100 ) {
+				/* translators: %d: the most the weight can be */
+				return new \WP_Error( 'weight_too_high', sprintf( __( 'The test versions\' weights add up to more than 100. This one can be at most %d.', 'groundhogg' ), max( 0, 100 - $taken ) ) );
+			}
+		}
 
 		$meta = [
 			self::KIND_KEY     => $is_test ? 'test' : 'audience',
@@ -934,10 +958,31 @@ class Email_Variations {
 			$sample_query['marketable'] = true;
 		}
 
-		$contact_query = new Contact_Query();
+		// a broadcast goes to the whole audience whoever schedules it, so not limited to their own contacts
+		$contact_query = new Contact_Query( [], Contact_Query::IS_SUB_QUERY );
 		$contact_query->setSelect( 'ID' );
 
-		$ids = wp_parse_id_list( wp_list_pluck( (array) $contact_query->query( $sample_query ), 'ID' ) );
+		// like Broadcast::schedule(), refuse rather than send to the wrong contacts when part of the audience, like an
+		// exclusion from a deactivated add-on, can't be applied and would match nobody
+		$errors = [];
+		$track  = function ( $e ) use ( &$errors ) {
+			$errors[] = $e->getMessage();
+		};
+
+		add_action( 'groundhogg/query/filter_error', $track );
+		add_action( 'groundhogg/contact_query/error', $track );
+
+		try {
+			$ids = wp_parse_id_list( wp_list_pluck( (array) $contact_query->query( $sample_query ), 'ID' ) );
+		} finally {
+			remove_action( 'groundhogg/query/filter_error', $track );
+			remove_action( 'groundhogg/contact_query/error', $track );
+		}
+
+		if ( ! empty( $errors ) ) {
+			/* translators: %s: what went wrong with the filters */
+			return new \WP_Error( 'query_errors', sprintf( __( 'Some of the filters could not be applied, so nothing was sent: %s', 'groundhogg' ), implode( '; ', array_unique( $errors ) ) ) );
+		}
 
 		if ( count( $ids ) < 2 ) {
 			return new \WP_Error( 'too_few_contacts', __( 'A test needs an audience of at least two contacts.', 'groundhogg' ) );
@@ -948,15 +993,31 @@ class Email_Variations {
 		$size   = max( 1, min( count( $ids ) - 1, (int) round( count( $ids ) * $percent / 100 ) ) );
 		$sample = array_slice( $ids, 0, $size );
 
-		// a new test, counted from now
+		// a new test, counted from now. If the sample can't be scheduled, the test it replaced, and a winner flows are
+		// sending, are put back.
+		$before = self::fresh( $email );
+		$winner = $before->get_meta( self::WINNER_KEY );
+		$start  = $before->get_meta( self::TEST_STARTED_KEY );
+
 		self::restart_test( $email );
 
-		$broadcast = Broadcast::schedule( array_merge( $schedule, [
-			'object_id'    => $email->get_id(),
-			'object_type'  => 'email',
-			'segment_type' => 'fixed',
-			'query'        => [ 'include' => $sample ],
-		] ) );
+		try {
+			$broadcast = Broadcast::schedule( array_merge( $schedule, [
+				'object_id'    => $email->get_id(),
+				'object_type'  => 'email',
+				'segment_type' => 'fixed',
+				'query'        => [ 'include' => $sample ],
+			] ) );
+		} catch ( \Throwable $e ) {
+			$after = self::fresh( $email );
+			$after->update_meta( self::TEST_STARTED_KEY, $start );
+
+			if ( $winner ) {
+				$after->update_meta( self::WINNER_KEY, $winner );
+			}
+
+			throw $e;
+		}
 
 		// the wait starts once the last of the sample is sent, so a first guess at when that is: batches and local
 		// time spread it out. finish_broadcast_test() checks, and waits longer if it isn't.
@@ -978,6 +1039,8 @@ class Email_Variations {
 			'metric'       => $metric,
 			'wait_hours'   => $hours,
 			'finish_at'    => $finish,
+			// the first guess, to stop waiting at some point, see BROADCAST_TEST_MAX_DELAY
+			'expected_at'  => $finish,
 			'sample'       => $size,
 			'rest'         => count( $ids ) - $size,
 		] );
@@ -1014,10 +1077,12 @@ class Email_Variations {
 			return;
 		}
 
-		// every contact in the sample gets the whole wait, however the sample is batched or timed
-		$next = self::when_sample_is_done( $sample, absint( $record['wait_hours'] ?? 4 ) * HOUR_IN_SECONDS );
+		// every contact in the sample gets the whole wait, however the sample is batched or timed. But not forever: some
+		// of it may never go out, like a paused event, and the rest shouldn't wait on it for good.
+		$next     = self::when_sample_is_done( $sample, absint( $record['wait_hours'] ?? 4 ) * HOUR_IN_SECONDS );
+		$give_up  = absint( $record['expected_at'] ?? $record['finish_at'] ?? 0 ) + self::BROADCAST_TEST_MAX_DELAY;
 
-		if ( $next > time() ) {
+		if ( $next > time() && time() < $give_up ) {
 			$record['finish_at'] = $next;
 			$email->update_meta( self::BROADCAST_TEST_KEY, $record );
 			wp_schedule_single_event( $next, self::FINISH_BROADCAST_TEST_HOOK, [ $email->get_id() ] );

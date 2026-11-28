@@ -381,6 +381,36 @@ no plugin at all.
      nothing. The variation code writes through a fresh `Email` (`fresh()`).
    - Tests: `tests/phpunit/unit-tests/includes/class-email-ab-tests.php`.
 
+## Review (2026-11-26)
+
+An independent review of phases 1–4 found no high-severity issues (capabilities,
+SQL, XSS, PII and public input checked). Fixed from it:
+
+- Duplicating or exporting an email no longer copies its A/B test state
+  (`Email_Variations::TEST_STATE_KEYS`: winner, test start, broadcast test).
+- `ab_test: {}` on `send-email-broadcast` and `POST gh/v4/broadcasts` is a test
+  with the defaults, not a normal broadcast.
+- The broadcast test's sample refuses an audience with a filter that can't be
+  applied, like `Broadcast::schedule()` does, and is drawn without the
+  scheduling user's owner restriction (like every broadcast). Variation filters
+  match without it too.
+- A sample that fails to schedule puts back the winner and test start it reset.
+- A variation can't be broadcast (`Broadcast::schedule()`) or sent with
+  `send-email-template` on its own.
+- `parent_id` is only set at creation: `Email::update()` and the REST create drop
+  it, and a variation's message type reads its parent's column (no recursion).
+- A test version's weight is checked on create, like on update.
+- A broadcast test stops waiting for its sample a week past the first expected
+  finish (`BROADCAST_TEST_MAX_DELAY`) and sends the winner anyway.
+- `Email_Strings::set()` remembers sources only after the write succeeds.
+- `GET gh/v4/emails/{id}/variations` needs `edit_emails` (it has A/B results and
+  contact counts per language, which a template site's public read shouldn't give).
+
+Not changed: a `failed` broadcast test has no retry (the report shows the
+error); `_db_version` is written even if `dbDelta` couldn't add the column;
+variations aren't covered by the link-clicked benchmark's URL rewrite or "empty
+trash"; very large samples store their contact IDs in the broadcasts' queries.
+
 ## Open questions
 
 1. **Pricing.** Language variations look like core (they fix a long-standing

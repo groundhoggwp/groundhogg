@@ -252,12 +252,13 @@ class Email_Strings {
 			return new WP_Error( 'email_strings_invalid', __( 'Nothing was changed:', 'groundhogg' ) . "\n" . implode( "\n", $lines ), [ 'errors' => $errors ] );
 		}
 
-		// what a variation's strings are translated from, to tell when the email changes
-		if ( $email->is_variation() ) {
-			self::remember_sources( $email, array_merge( array_keys( $writes ), $confirmed ) );
-		}
-
 		if ( empty( $writes ) ) {
+
+			// strings confirmed as the same in both languages, like a name
+			if ( $email->is_variation() ) {
+				self::remember_sources( $email, $confirmed );
+			}
+
 			return [ 'changed' => [], 'skipped' => $errors ];
 		}
 
@@ -302,6 +303,12 @@ class Email_Strings {
 		$data['last_updated'] = current_time( 'mysql' );
 
 		$email->update( $data );
+
+		// what a variation's strings are translated from, to tell when the email changes. Only once they're written,
+		// so a failed write doesn't mark them translated.
+		if ( $email->is_variation() ) {
+			self::remember_sources( $email, array_merge( array_keys( $writes ), $confirmed ) );
+		}
 
 		return [
 			'changed' => array_keys( $writes ),

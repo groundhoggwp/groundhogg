@@ -1258,6 +1258,11 @@ class Broadcast extends Base_Object_With_Meta implements Event_Process {
 			if ( $email->is_draft() ) {
 				throw new DraftException( 'Cannot schedule a draft email' );
 			}
+
+			// a variation goes out through its email, to the contacts it's for, never to a whole list on its own
+			if ( $email->is_variation() ) {
+				throw new SchedulingException( esc_html( sprintf( 'This email is a variation of email #%d. Broadcast that email instead, and each contact gets the version for them.', absint( $email->get_parent_id() ) ) ) );
+			}
 		}
 
 		if ( $args['time'] !== null ){

@@ -89,7 +89,9 @@ class Emails_Api extends Base_Object_Api {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'read_variations' ],
-				'permission_callback' => [ $this, 'read_permissions_callback' ]
+				// for the editors: it has the A/B results and how many contacts speak each language, which a template
+				// site's public read access shouldn't give away
+				'permission_callback' => [ $this, 'update_permissions_callback' ]
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -273,6 +275,11 @@ class Emails_Api extends Base_Object_Api {
 	public function create_single( WP_REST_Request $request ) {
 		$data      = $request->get_param( 'data' );
 		$meta      = $request->get_param( 'meta' );
+
+		// variations are made with their own route, which checks what they can belong to
+		if ( is_array( $data ) ) {
+			unset( $data['parent_id'] );
+		}
 		$campaigns = wp_parse_id_list( $request->get_param( 'campaigns' ) );
 
 		$object = $this->create_new_object( $data, $meta, $request->has_param( 'force' ) );

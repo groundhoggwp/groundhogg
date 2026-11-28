@@ -417,6 +417,142 @@ class Email_AB_Tests extends GH_UnitTestCase {
 		$this->assertWPError( Email_Variations::start_broadcast_test( $email, [ 'include' => wp_list_pluck( $this->contacts( 5 ), 'ID' ) ], [ 'send_now' => true ], [] ) );
 	}
 
+	/* from the review */
+
+	public function test_a_copy_starts_without_the_originals_test() {
+
+		$email = $this->email();
+		$b     = $this->test_version( $email );
+		Email_Variations::declare_winner( $email, $b->get_id() );
+		self::fresh( $email )->update_meta( Email_Variations::BROADCAST_TEST_KEY, [ 'status' => 'testing' ] );
+
+		$copy = ( new Email( $email->get_id() ) )->duplicate();
+
+		$this->assertSame( 0, Email_Variations::get_winner_id( new Email( $copy->get_id() ) ) );
+		$this->assertEmpty( ( new Email( $copy->get_id() ) )->get_meta( Email_Variations::BROADCAST_TEST_KEY ) );
+
+		$export = ( new Email( $email->get_id() ) )->export();
+		$this->assertArrayNotHasKey( Email_Variations::WINNER_KEY, $export['meta'] );
+		$this->assertArrayNotHasKey( Email_Variations::BROADCAST_TEST_KEY, $export['meta'] );
+	}
+
+	protected static function fresh( Email $email ): Email {
+		return new Email( $email->get_id() );
+	}
+
+	public function test_a_failed_sample_keeps_the_winner() {
+
+		$email = $this->email();
+		$b     = $this->test_version( $email );
+		Email_Variations::declare_winner( $email, $b->get_id() );
+
+		$this->expectException( \Exception::class );
+
+		try {
+			// in the past, so it can't be scheduled
+			Email_Variations::start_broadcast_test( $email, [ 'include' => wp_list_pluck( $this->contacts( 10 ), 'ID' ) ], [
+				'date' => '2001-01-01',
+				'time' => '09:00:00',
+			], [] );
+		} finally {
+			$this->assertSame( $b->get_id(), Email_Variations::get_winner_id( self::fresh( $email ) ) );
+		}
+	}
+
+	public function test_a_sample_refuses_an_audience_it_cant_apply() {
+
+		$email = $this->email();
+		$this->test_version( $email );
+
+		// what a filter that can't be applied also says
+		$this->setExpectedIncorrectUsage( 'Groundhogg\DB\Query\Filters::handle_filter_error' );
+
+		$result = Email_Variations::start_broadcast_test( $email, [
+			'include'         => wp_list_pluck( $this->contacts( 10 ), 'ID' ),
+			'exclude_filters' => [ [ [ 'type' => 'not_a_real_filter' ] ] ],
+		], [ 'send_now' => true ], [] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'query_errors', $result->get_error_code() );
+	}
+
+	public function test_a_variation_cant_be_broadcast_on_its_own() {
+
+		$email = $this->email();
+		$b     = $this->test_version( $email );
+
+		$this->expectException( \Groundhogg\SchedulingException::class );
+
+		Broadcast::schedule( [
+			'object_id'   => $b->get_id(),
+			'object_type' => 'email',
+			'send_now'    => true,
+			'query'       => [ 'include' => wp_list_pluck( $this->contacts( 2 ), 'ID' ) ],
+		] );
+	}
+
+	public function test_which_email_a_variation_belongs_to_cant_be_changed() {
+
+		$email = $this->email();
+		$b     = $this->test_version( $email );
+		$other = $this->email();
+
+		$b->update( [ 'parent_id' => $other->get_id() ] );
+		$this->assertSame( $email->get_id(), self::fresh( $b )->get_parent_id() );
+
+		// an email that's its own parent, however it got there, doesn't loop
+		get_db( 'emails' )->update( $other->get_id(), [ 'parent_id' => $other->get_id() ] );
+		$this->assertSame( 'marketing', self::fresh( $other )->get_message_type() );
+	}
+
+	public function test_a_given_weight_has_to_fit() {
+
+		$email = $this->email();
+		$this->test_version( $email, [ 'weight' => 60 ] );
+
+		$this->assertWPError( Email_Variations::create( $email, [ 'kind' => 'test', 'weight' => 60 ] ) );
+		$this->assertInstanceOf( Email::class, Email_Variations::create( $email, [ 'kind' => 'test', 'weight' => 40 ] ) );
+	}
+
+	public function test_a_broadcast_test_stops_waiting_eventually() {
+
+		$email = $this->email();
+		$this->test_version( $email );
+
+		$sample = Email_Variations::start_broadcast_test( $email, [ 'include' => wp_list_pluck( $this->contacts( 10 ), 'ID' ) ], [ 'send_now' => true ], [] );
+
+		// the sample's events never went out, and it was due more than a week ago
+		$record                = $this->record( $email );
+		$record['expected_at'] = time() - 8 * DAY_IN_SECONDS;
+		self::fresh( $email )->update_meta( Email_Variations::BROADCAST_TEST_KEY, $record );
+
+		wp_unschedule_hook( Email_Variations::FINISH_BROADCAST_TEST_HOOK );
+		Email_Variations::finish_broadcast_test( $email->get_id() );
+
+		$this->assertSame( 'done', $this->record( $email )['status'] );
+	}
+
+	public function test_the_ability_runs_a_test_with_the_defaults() {
+
+		if ( ! function_exists( 'wp_get_ability' ) || ! wp_get_ability( 'groundhogg/send-email-broadcast' ) ) {
+			$this->markTestSkipped( 'The broadcast ability is not registered.' );
+		}
+
+		$email = $this->email();
+		$this->test_version( $email );
+
+		$out = $this->ability( 'groundhogg/send-email-broadcast', [
+			'email_id' => $email->get_id(),
+			'include'  => wp_list_pluck( $this->contacts( 10 ), 'ID' ),
+			'send_now' => true,
+			'ab_test'  => new stdClass(),
+		] );
+
+		$this->assertNotWPError( $out );
+		$this->assertSame( 2, $out['ab_test']['sample'] );
+		$this->assertSame( 2, $out['estimated_recipients'] );
+	}
+
 	/* abilities */
 
 	protected function ability( string $name, array $input ) {

@@ -385,16 +385,34 @@ class Email extends Base_Object_With_Meta {
 	 */
 	public function get_message_type() {
 
-		// A variation is sent by the same rules as the email it's a variation of
+		// A variation is sent by the same rules as the email it's a variation of. Its own column, not
+		// get_message_type(), so a parent_id that points back round can't loop.
 		if ( $this->is_variation() ) {
 			$parent = $this->get_parent();
 
-			if ( $parent && $parent->exists() ) {
-				return $parent->get_message_type();
+			if ( $parent && $parent->exists() && $parent->get_id() !== $this->get_id() ) {
+				return $parent->message_type;
 			}
 		}
 
 		return $this->message_type;
+	}
+
+	/**
+	 * Which email a variation belongs to is set when it's made, by Email_Variations::create() or a copy, and never
+	 * changed after: moving one would skip create()'s checks, and could point it at itself
+	 *
+	 * @param array $data
+	 *
+	 * @return bool
+	 */
+	public function update( $data = [] ) {
+
+		if ( is_array( $data ) ) {
+			unset( $data['parent_id'] );
+		}
+
+		return parent::update( $data );
 	}
 
 	/**
@@ -1846,6 +1864,9 @@ class Email extends Base_Object_With_Meta {
 			'last_updated' => current_time( 'mysql' ),
 		], $overrides );
 
+		// a copy starts without the original's A/B test: its winner and broadcast test are the original's versions
+		$meta_overrides = array_merge( array_fill_keys( Email_Variations::TEST_STATE_KEYS, '' ), $meta_overrides );
+
 		$copy = parent::duplicate( $overrides, $meta_overrides );
 
 		if ( $with_variations && ! $this->is_variation() && $copy->exists() && ! $copy->is_variation() ) {
@@ -1865,6 +1886,11 @@ class Email extends Base_Object_With_Meta {
 
 		unset( $data['context'] );
 		unset( $data['preview_url'] );
+
+		// the A/B test's state is about this site's versions, an import makes new ones
+		if ( isset( $data['meta'] ) && is_array( $data['meta'] ) ) {
+			$data['meta'] = array_diff_key( $data['meta'], array_flip( Email_Variations::TEST_STATE_KEYS ) );
+		}
 
 		// A flow template or export keeps the email's variations
 		if ( $this->has_variations() ) {

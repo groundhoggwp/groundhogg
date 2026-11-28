@@ -220,7 +220,8 @@ class Broadcasts_Api extends Base_Object_Api {
 
 		$ab_test = $request->get_param( 'ab_test' );
 
-		if ( is_array( $ab_test ) && ! empty( $ab_test ) ) {
+		// an empty one is a test with the defaults; the scheduler sends null for no test
+		if ( is_array( $ab_test ) ) {
 			return $this->create_ab_test( $request, $ab_test );
 		}
 

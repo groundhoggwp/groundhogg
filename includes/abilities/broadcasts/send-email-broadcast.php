@@ -280,11 +280,12 @@ class Send_Email_Broadcast extends Ability {
 			$args['batch_interval_length'] = max( 1, absint( $batching['interval_length'] ?? 10 ) );
 		}
 
-		$ab_test = is_array( $input['ab_test'] ?? null ) ? $input['ab_test'] : null;
+		// an empty ab_test is a test with the defaults, not no test
+		$ab_test = isset( $input['ab_test'] ) && ( is_array( $input['ab_test'] ) || is_object( $input['ab_test'] ) ) ? (array) $input['ab_test'] : null;
 
 		try {
 
-			if ( $ab_test ) {
+			if ( $ab_test !== null ) {
 
 				// the sample now, the winner to everyone else later
 				$schedule = array_diff_key( $args, array_flip( [ 'object_id', 'object_type', 'query', 'segment_type' ] ) );
@@ -337,7 +338,7 @@ class Send_Email_Broadcast extends Ability {
 			'scheduling_complete'  => $broadcast->is_scheduled(),
 		];
 
-		if ( $ab_test ) {
+		if ( $ab_test !== null ) {
 			$test = ( new Email( $email->get_id() ) )->get_meta( Email_Variations::BROADCAST_TEST_KEY );
 
 			$output['ab_test'] = [

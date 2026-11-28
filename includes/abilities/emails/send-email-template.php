@@ -143,6 +143,16 @@ class Send_Email_Template extends Ability {
 			return new WP_Error( 'groundhogg_not_sendable', __( 'That email is a global block and cannot be sent on its own.', 'groundhogg' ) );
 		}
 
+		// A variation goes out through its email, which picks the version for each contact. To check
+		// one, send a test with groundhogg/send-test-email.
+		if ( $email->is_variation() ) {
+			return new WP_Error( 'groundhogg_is_variation', sprintf(
+				/* translators: %d: the ID of the email the variation belongs to */
+				__( 'That email is a variation. Send the email it\'s a variation of instead, email_id %d, and each contact gets the version for them.', 'groundhogg' ),
+				$email->get_parent_id()
+			) );
+		}
+
 		$to = $input['to'] ?? [];
 
 		if ( empty( $to ) ) {
